@@ -66,7 +66,7 @@ For each send/receive interaction, we must add one virtual column $q_\sigma$ wit
 $$q_\sigma[r] = \frac {m_\sigma}{\alpha^{i_\sigma} + \sum_j \beta^j \cdot f_{\sigma,j}(\mathbf T[r])}$$
 The constraint is
 $$q_\sigma \cdot \left(\alpha^{i_\sigma} + \sum_j \beta^j \cdot f_{\sigma,j}(\mathbf T) \right) = m_\sigma$$
-has degree $1 + \mathrm{max}_j \deg(f_{\sigma,j})$ ($=2$ in the case $f_{\sigma,j}$ are linear).
+has degree $1 + max_j deg(f_{\sigma,j})$ ($=2$ in the case $f_{\sigma,j}$ are linear).
 
 Note: we could save columns by combining $q$ columns together, at the cost of increasing the constraint degree.
 
