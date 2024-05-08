@@ -3,15 +3,18 @@ use p3_challenger::{CanObserve, FieldChallenger};
 use p3_commit::{Pcs, PolynomialSpace};
 use p3_field::{AbstractExtensionField, AbstractField};
 use p3_uni_stark::{Domain, StarkGenericConfig, Val};
+use tracing::instrument;
 
 pub mod constraints;
 mod error;
 pub mod types;
 
 pub use error::*;
-use tracing::instrument;
 
-use crate::prover::{opener::AdjacentOpenedValues, types::Proof};
+use crate::{
+    prover::{opener::AdjacentOpenedValues, types::Proof},
+    setup::types::VerifyingKey,
+};
 
 use self::{constraints::verify_single_rap_constraints, types::VerifierRap};
 
@@ -33,6 +36,7 @@ impl<SC: StarkGenericConfig> PartitionVerifier<SC> {
     pub fn verify(
         &self,
         challenger: &mut SC::Challenger,
+        vk: VerifyingKey<SC>,
         raps: Vec<&dyn VerifierRap<SC>>,
         proof: Proof<SC>,
         public_values: &[Val<SC>],
@@ -41,6 +45,12 @@ impl<SC: StarkGenericConfig> PartitionVerifier<SC> {
         challenger.observe_slice(public_values);
 
         // TODO: valid shape check from verifying key
+        let preprocessed_commits: Vec<_> = vk
+            .preprocessed_data
+            .iter()
+            .filter_map(|md| md.as_ref().map(|data| data.commit.clone()))
+            .collect();
+        challenger.observe_slice(&preprocessed_commits);
 
         // Observe main trace commitments
         challenger.observe_slice(&proof.commitments.main_trace);
@@ -69,6 +79,13 @@ impl<SC: StarkGenericConfig> PartitionVerifier<SC> {
 
         let pcs = self.config.pcs();
         let opened_values = proof.opening.values;
+        // Map from opening index -> AIR index
+        let index_lookup_preprocessed: Vec<_> = vk
+            .preprocessed_data
+            .iter()
+            .enumerate()
+            .filter_map(|(i, md)| md.as_ref().map(|_| i))
+            .collect();
         // Partition to flat index lookup
         let mut index_lookup_main = opened_values
             .main
@@ -108,11 +125,23 @@ impl<SC: StarkGenericConfig> PartitionVerifier<SC> {
                     ],
                 )
             };
-        let mut rounds = opened_values
+        let mut rounds: Vec<_> = opened_values
+            .preprocessed
+            .iter()
+            .enumerate()
+            .map(|(i, values)| {
+                let index = index_lookup_preprocessed[i];
+                let data = vk.preprocessed_data[index].as_ref().unwrap();
+                let domain = pcs.natural_domain_for_degree(data.degree);
+                let domain_and_openings = trace_domain_and_openings(domain, zeta, values);
+                (data.commit.clone(), vec![domain_and_openings])
+            })
+            .collect();
+        opened_values
             .main
             .iter()
             .enumerate()
-            .map(|(i, values_per_mat)| {
+            .for_each(|(i, values_per_mat)| {
                 let domains_and_openings = values_per_mat
                     .iter()
                     .enumerate()
@@ -121,12 +150,11 @@ impl<SC: StarkGenericConfig> PartitionVerifier<SC> {
                         trace_domain_and_openings(domain, zeta, values)
                     })
                     .collect_vec();
-                (
+                rounds.push((
                     proof.commitments.main_trace[i].clone(),
                     domains_and_openings,
-                )
-            })
-            .collect_vec();
+                ));
+            });
         if let Some(values_per_mat) = &opened_values.perm {
             let domains_and_openings = values_per_mat
                 .iter()
@@ -158,7 +186,16 @@ impl<SC: StarkGenericConfig> PartitionVerifier<SC> {
             .map_err(|e| VerificationError::InvalidOpeningArgument(format!("{:?}", e)))?;
 
         // Verify each RAP's constraints
-        for (rap, data) in raps.into_iter().zip_eq(proof.rap_data) {
+        for (i, (rap, data)) in raps.into_iter().zip_eq(proof.rap_data).enumerate() {
+            let preprocessed_values = vk.preprocessed_data[i]
+                .as_ref()
+                .map(|_| {
+                    index_lookup_preprocessed
+                        .iter()
+                        .position(|&j| j == i)
+                        .map(|k| &opened_values.preprocessed[k])
+                })
+                .unwrap_or_default();
             let (main_commit_index, main_mat_index) = data.main_trace_ptr;
             let main_values = &opened_values.main[main_commit_index][main_mat_index];
             let main_domain = domains[data.index];
@@ -170,6 +207,7 @@ impl<SC: StarkGenericConfig> PartitionVerifier<SC> {
             let perm_exposed_values = proof.cumulative_sums[data.index].as_slice();
             verify_single_rap_constraints(
                 rap,
+                preprocessed_values,
                 main_values,
                 perm_values,
                 quotient_chunks,

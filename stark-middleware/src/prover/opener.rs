@@ -18,12 +18,16 @@ impl<'pcs, SC: StarkGenericConfig> OpeningProver<'pcs, SC> {
     }
 
     /// Opening proof for multiple RAP matrices, where
+    /// - permutation trace matrices have multiple commitments
     /// - main trace matrices can have multiple commitments
     /// - permutation trace matrices all committed together if they exist
     /// - quotient poly chunks all committed together
     pub fn open(
         &self,
         challenger: &mut SC::Challenger,
+        // For each preprocessed trace commitment, the prover data and
+        // the domain of the matrix, in order
+        preprocessed: Vec<(&PcsProverData<SC>, Domain<SC>)>,
         // For each main trace commitment, the prover data and
         // the domain of each matrix, in order
         main: Vec<(&PcsProverData<SC>, Vec<Domain<SC>>)>,
@@ -35,10 +39,15 @@ impl<'pcs, SC: StarkGenericConfig> OpeningProver<'pcs, SC> {
         // Quotient degree for each RAP, flattened
         quotient_degrees: &[usize],
     ) -> OpeningProof<SC> {
-        let zeta = self.zeta;
+        let preprocessed: Vec<_> = preprocessed
+            .into_iter()
+            .map(|(data, domain)| (data, vec![domain]))
+            .collect();
 
-        let mut rounds = main
+        let zeta = self.zeta;
+        let mut rounds = preprocessed
             .iter()
+            .chain(main.iter())
             .chain(perm.iter())
             .map(|(data, domains)| {
                 let points_per_mat = domains
@@ -65,17 +74,32 @@ impl<'pcs, SC: StarkGenericConfig> OpeningProver<'pcs, SC> {
                 .expect("Should have permutation trace opening");
             collect_trace_openings(ops)
         });
-        let main_openings = opening_values;
+
+        let main_openings = opening_values
+            .split_off(preprocessed.len())
+            .into_iter()
+            .map(collect_trace_openings)
+            .collect_vec();
         assert_eq!(
             main_openings.len(),
             main.len(),
             "Incorrect number of main trace openings"
         );
 
-        let main_openings = main_openings
+        let preprocessed_openings = opening_values
             .into_iter()
-            .map(collect_trace_openings)
+            .map(|values| {
+                let mut openings = collect_trace_openings(values);
+                openings
+                    .pop()
+                    .expect("Preprocessed trace should be opened at 1 point")
+            })
             .collect_vec();
+        assert_eq!(
+            preprocessed_openings.len(),
+            preprocessed.len(),
+            "Incorrect number of preprocessed trace openings"
+        );
 
         // Unflatten quotient openings
         let quotient_openings = quotient_degrees
@@ -94,6 +118,7 @@ impl<'pcs, SC: StarkGenericConfig> OpeningProver<'pcs, SC> {
         OpeningProof {
             proof: opening_proof,
             values: OpenedValues {
+                preprocessed: preprocessed_openings,
                 main: main_openings,
                 perm: perm_openings,
                 quotient: quotient_openings,
@@ -121,6 +146,8 @@ pub struct OpeningProof<SC: StarkGenericConfig> {
 
 #[derive(Serialize, Deserialize)]
 pub struct OpenedValues<Challenge> {
+    /// For each preprocessed trace commitment, the opened values
+    pub preprocessed: Vec<AdjacentOpenedValues<Challenge>>,
     /// For each main trace commitment, for each matrix in commitment, the
     /// opened values
     pub main: Vec<Vec<AdjacentOpenedValues<Challenge>>>,

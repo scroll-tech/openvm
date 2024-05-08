@@ -53,13 +53,19 @@ pub trait InteractiveAir<AB: AirBuilder>: Air<AB> + Chip<AB::F> {
     /// Returns the permutation trace as a matrix of extension field elements.
     fn generate_permutation_trace(
         &self,
+        preprocessed_trace: &Option<RowMajorMatrixView<AB::F>>,
         main_trace: &RowMajorMatrixView<AB::F>,
         permutation_randomness: [AB::EF; 2],
-    ) -> RowMajorMatrix<AB::EF>
+    ) -> Option<RowMajorMatrix<AB::EF>>
     where
         AB: PermutationAirBuilder,
     {
-        self::trace::generate_permutation_trace(self, main_trace, permutation_randomness)
+        self::trace::generate_permutation_trace(
+            self,
+            preprocessed_trace,
+            main_trace,
+            permutation_randomness,
+        )
     }
 }
 

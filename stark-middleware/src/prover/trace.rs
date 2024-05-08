@@ -54,6 +54,8 @@ pub struct ProvenSingleTraceView<'a, SC: StarkGenericConfig> {
 
 /// The domain of `main` and `permutation` must be the same.
 pub struct ProvenSingleRapTraceView<'a, SC: StarkGenericConfig> {
+    /// Preprocessed trace data
+    pub preprocessed: Option<ProvenSingleTraceView<'a, SC>>,
     /// Main trace data
     pub main: ProvenSingleTraceView<'a, SC>,
     /// Permutation trace data
@@ -75,6 +77,7 @@ impl<'a, SC: StarkGenericConfig> Clone for ProvenSingleTraceView<'a, SC> {
 impl<'a, SC: StarkGenericConfig> Clone for ProvenSingleRapTraceView<'a, SC> {
     fn clone(&self) -> Self {
         Self {
+            preprocessed: self.preprocessed.clone(),
             main: self.main.clone(),
             permutation: self.permutation.clone(),
             permutation_exposed_values: self.permutation_exposed_values.clone(),
