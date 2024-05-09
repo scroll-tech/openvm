@@ -1,0 +1,24 @@
+name: stark-middleware Tests
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main", "develop"]
+    paths:
+      - "stark-middleware/**"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run stark-middleware tests
+        working-directory: "stark-middleware"
+        run: |
+          cargo test
