@@ -3,28 +3,21 @@ use std::{iter, sync::Arc};
 
 use afs_chips::{range, range_gate, xor_bits, xor_limbs};
 use afs_stark_backend::verifier::VerificationError;
+use afs_test_utils::utils::create_seeded_rng;
 use afs_test_utils::{
-    config::poseidon2::StarkConfigPoseidon2,
-    interaction::dummy_interaction_air::DummyInteractionAir,
-    utils::{run_simple_test, ProverVerifierRap},
+    config::baby_bear_poseidon2::run_simple_test,
+    interaction::dummy_interaction_air::DummyInteractionAir, utils::ProverVerifierRap,
 };
 use p3_baby_bear::BabyBear;
 use p3_field::AbstractField;
 use p3_matrix::dense::{DenseMatrix, RowMajorMatrix};
 use p3_maybe_rayon::prelude::*;
-use rand::{rngs::StdRng, Rng, SeedableRng};
+use rand::Rng;
 
 mod list;
 mod xor_requester;
 
 type Val = BabyBear;
-
-fn create_seeded_rng() -> StdRng {
-    let seed = [42; 32];
-    let rng = StdRng::from_seed(seed);
-
-    rng
-}
 
 #[test]
 fn test_list_range_checker() {
@@ -67,7 +60,7 @@ fn test_list_range_checker() {
 
     let range_trace = range_checker.generate_trace();
 
-    let mut all_chips: Vec<&dyn ProverVerifierRap<StarkConfigPoseidon2>> = vec![];
+    let mut all_chips: Vec<&dyn ProverVerifierRap<_>> = vec![];
     for list in &lists {
         all_chips.push(list);
     }
@@ -118,7 +111,7 @@ fn test_xor_bits_chip() {
 
     let xor_chip_trace = xor_chip.generate_trace();
 
-    let mut all_chips: Vec<&dyn ProverVerifierRap<StarkConfigPoseidon2>> = vec![];
+    let mut all_chips: Vec<&dyn ProverVerifierRap<_>> = vec![];
     for requester in &requesters {
         all_chips.push(requester);
     }
@@ -241,7 +234,7 @@ fn test_xor_limbs_chip() {
     let xor_limbs_chip_trace = xor_chip.generate_trace();
     let xor_lookup_chip_trace = xor_chip.xor_lookup_chip.generate_trace();
 
-    let mut all_chips: Vec<&dyn ProverVerifierRap<StarkConfigPoseidon2>> = vec![];
+    let mut all_chips: Vec<&dyn ProverVerifierRap<_>> = vec![];
     for requester in &requesters {
         all_chips.push(requester);
     }
@@ -371,7 +364,7 @@ fn test_range_gate_chip() {
 
     let range_trace = range_checker.generate_trace();
 
-    let mut all_chips: Vec<&dyn ProverVerifierRap<StarkConfigPoseidon2>> = vec![];
+    let mut all_chips: Vec<&dyn ProverVerifierRap<_>> = vec![];
     for list in &lists {
         all_chips.push(list);
     }
