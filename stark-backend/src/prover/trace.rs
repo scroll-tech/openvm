@@ -32,6 +32,12 @@ impl<'a, SC: StarkGenericConfig> TraceCommitmentBuilder<'a, SC> {
         }
     }
 
+    pub fn clear(&mut self) {
+        self.traces_to_commit.clear();
+        self.committed_traces.clear();
+        self.data.clear();
+    }
+
     /// Add trace to list of to-be-committed
     pub fn load_trace(&mut self, trace: RowMajorMatrix<Val<SC>>) {
         self.traces_to_commit.push(trace);
@@ -119,6 +125,8 @@ impl<'pcs, SC: StarkGenericConfig> TraceCommitter<'pcs, SC> {
 
 /// Prover data for multi-matrix trace commitments.
 /// The data is for the traces committed into a single commitment.
+#[derive(Derivative)]
+#[derivative(Clone(bound = "PcsProverData<SC>: Clone"))]
 pub struct ProverTraceData<SC: StarkGenericConfig> {
     /// Commitment to the trace matrices.
     pub commit: Com<SC>,
