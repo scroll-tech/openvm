@@ -1,6 +1,6 @@
 use std::{iter, sync::Arc};
 
-use afs_chips::{range, range_gate, xor_bits, xor_limbs};
+use afs_chips::{range, range_gate, sorted_limbs, xor_bits, xor_limbs};
 use afs_stark_backend::prover::USE_DEBUG_BUILDER;
 use afs_stark_backend::rap::AnyRap;
 use afs_stark_backend::verifier::VerificationError;
@@ -71,6 +71,45 @@ fn test_list_range_checker() {
         .collect::<Vec<DenseMatrix<BabyBear>>>();
 
     run_simple_test_no_pis(all_chips, all_traces).expect("Verification failed");
+}
+
+#[test]
+fn test_sorted_limbs_chip() {
+    let mut rng = create_seeded_rng();
+
+    use sorted_limbs::SortedLimbsChip;
+
+    const BUS_INDEX: usize = 0;
+    const LIMB_BITS: usize = 20;
+    const DECOMP: usize = 8;
+    const KEY_VEC_LEN: usize = 4;
+
+    const LOG_REQUESTS: usize = 2;
+
+    const MAX: u32 = 1 << 8;
+    const MAX_LIMB: u32 = 1 << LIMB_BITS;
+    const REQUESTS: usize = 1 << LOG_REQUESTS;
+
+    let requests = (0..REQUESTS)
+        .map(|_| {
+            (0..KEY_VEC_LEN)
+                .map(|_| rng.gen::<u32>() % MAX_LIMB)
+                .collect::<Vec<u32>>()
+        })
+        .collect::<Vec<Vec<u32>>>();
+
+    let sorted_limbs_chip =
+        SortedLimbsChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
+
+    let sorted_limbs_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip.generate_trace();
+    let sorted_limbs_range_chip_trace: DenseMatrix<BabyBear> =
+        sorted_limbs_chip.range_checker_gate.generate_trace();
+
+    run_simple_test_no_pis(
+        vec![&sorted_limbs_chip, &sorted_limbs_chip.range_checker_gate],
+        vec![sorted_limbs_chip_trace, sorted_limbs_range_chip_trace],
+    )
+    .expect("Verification failed");
 }
 
 #[test]
