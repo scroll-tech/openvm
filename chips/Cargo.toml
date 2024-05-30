@@ -12,12 +12,14 @@ p3-field = { workspace = true }
 p3-matrix = { workspace = true }
 p3-maybe-rayon = { workspace = true }
 p3-util = { workspace = true }
+p3-uni-stark = { workspace = true }
 rand = "0.8"
 
 afs-stark-backend = { path = "../stark-backend" }
 afs-derive = { path = "../derive" }
 afs-test-utils = { path = "../test-utils" }
 parking_lot = "0.12.2"
+tracing = "0.1.40"
 
 [dev-dependencies]
 p3-uni-stark = { workspace = true }
