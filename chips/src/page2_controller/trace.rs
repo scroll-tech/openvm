@@ -35,7 +35,7 @@ where
                             * self.request_counts[i][j].load(std::sync::atomic::Ordering::Relaxed),
                     );
                     row.push(self.request_counts[i][j].load(std::sync::atomic::Ordering::Relaxed));
-                    println!("row is {:?}", row);
+                    // println!("row is {:?}", row);
                     row
                 })
                 .collect();

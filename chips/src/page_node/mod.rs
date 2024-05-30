@@ -1,11 +1,10 @@
-use std::{cmp::max, sync::Mutex};
+use std::cmp::max;
 
-use crate::{page2_controller::types::PageNode, range::RangeCheckerChip, MAX_COMMITMENT_LEN};
+use crate::MAX_COMMITMENT_LEN;
 
-use self::columns::PageNodeReadCols;
 use afs_stark_backend::interaction::Interaction;
 use columns::{PageNodeBranch, PageNodeTerminal};
-use p3_air::{BaseAir, VirtualPairCol};
+use p3_air::VirtualPairCol;
 use p3_field::PrimeField64;
 
 pub mod air;
@@ -62,11 +61,6 @@ impl PageNodeReadChip {
     }
 
     pub fn get_width(&self) -> usize {
-        // 3 + MAX_COMMITMENT_LEN
-        //     + max(
-        //         MAX_COMMITMENT_LEN + 2 * self.key_len,
-        //         self.key_len + self.val_len,
-        //     )
         6 + max(
             MAX_COMMITMENT_LEN + 2 * self.key_len,
             self.key_len + self.val_len,

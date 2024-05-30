@@ -2,7 +2,7 @@ use std::borrow::Borrow;
 
 use afs_stark_backend::air_builders::PartitionedAirBuilder;
 use p3_air::{Air, AirBuilder, AirBuilderWithPublicValues, BaseAir};
-use p3_field::{AbstractField, Field};
+use p3_field::Field;
 use p3_matrix::Matrix;
 
 use crate::MAX_COMMITMENT_LEN;

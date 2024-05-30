@@ -62,7 +62,7 @@ impl Page2ReadChip {
         }
         vec![Interaction {
             fields: virtual_cols,
-            count: VirtualPairCol::single_main(cols.mult),
+            count: VirtualPairCol::single_main(cols.mult_b),
             argument_index: self.path_bus_index(),
         }]
     }
@@ -75,7 +75,7 @@ impl Page2ReadChip {
         }
         vec![Interaction {
             fields: virtual_cols,
-            count: VirtualPairCol::single_main(cols.mult),
+            count: VirtualPairCol::single_main(cols.mult_b),
             argument_index: self.path_bus_index(),
         }]
     }

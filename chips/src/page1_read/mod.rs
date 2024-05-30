@@ -83,12 +83,12 @@ impl Page1ReadChip {
         vec![
             Interaction {
                 fields: val_virtual_cols,
-                count: VirtualPairCol::single_main(cols.mult),
+                count: VirtualPairCol::single_main(cols.mult_t),
                 argument_index: self.val_bus_index(),
             },
             Interaction {
                 fields: path_virtual_cols,
-                count: VirtualPairCol::single_main(cols.mult),
+                count: VirtualPairCol::single_main(cols.mult_t),
                 argument_index: self.path_bus_index(),
             },
         ]

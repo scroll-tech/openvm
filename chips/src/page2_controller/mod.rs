@@ -4,11 +4,9 @@ use crate::{
 };
 use afs_stark_backend::{
     config::Com,
-    interaction::Interaction,
     prover::trace::{ProverTraceData, TraceCommitter},
 };
 use afs_test_utils::utils::create_seeded_rng;
-use p3_air::VirtualPairCol;
 use p3_field::{AbstractField, PrimeField32};
 use p3_matrix::dense::DenseMatrix;
 use p3_uni_stark::{StarkGenericConfig, Val};
@@ -88,15 +86,6 @@ impl<SC: StarkGenericConfig> Page2Controller<SC> {
     }
 
     pub fn clear(&mut self) {
-        //     request_counts: Vec<Vec<Arc<AtomicU32>>>,
-        // is_p: Vec<Vec<u32>>,
-        // is_t: Vec<Vec<u32>>,
-        // page_commitments: Vec<Com<SC>>,
-        // adj: Vec<Vec<usize>>,
-        // parent: Vec<(usize, usize)>,
-        // find_node: BTreeMap<Vec<u32>, Vec<(usize, usize)>>,
-        // find_val: BTreeMap<Vec<u32>, Vec<Vec<u32>>>,
-        // root_commitment: Vec<u32>,
         self.request_counts.clear();
         self.is_p.clear();
         self.is_t.clear();
@@ -119,6 +108,7 @@ impl<SC: StarkGenericConfig> Page2Controller<SC> {
         Com<SC>: Into<[Val<SC>; MAX_COMMITMENT_LEN]>,
         Val<SC>: PrimeField32,
     {
+        println!("START");
         self.known_structure = known_structure;
         let mut nodes = Vec::new();
         let mut commitments = Vec::new();
@@ -146,6 +136,7 @@ impl<SC: StarkGenericConfig> Page2Controller<SC> {
                 }
             }
             let page_read_chip = if is_t && known_structure {
+                println!("TERMINAL");
                 PageNode::PageTerminal(Page1ReadChip::new(
                     self.val_bus_index,
                     self.path_bus_index,
@@ -155,6 +146,7 @@ impl<SC: StarkGenericConfig> Page2Controller<SC> {
                     page.clone(),
                 ))
             } else if is_b && known_structure {
+                println!("BRANCH");
                 PageNode::PageBranch(Page2ReadChip::new(
                     self.path_bus_index,
                     self.key_len,
@@ -162,6 +154,7 @@ impl<SC: StarkGenericConfig> Page2Controller<SC> {
                     page.clone(),
                 ))
             } else {
+                println!("MIXED");
                 PageNode::PageMixed(PageNodeReadChip::new(
                     self.val_bus_index,
                     self.path_bus_index,
@@ -271,9 +264,9 @@ impl<SC: StarkGenericConfig> Page2Controller<SC> {
         let val = &vals[idx];
         while cur.0 != usize::MAX {
             self.request_counts[cur.0][cur.1].fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-            println!("OLD CUR: {:?}", cur.0);
+            // println!("OLD CUR: {:?}", cur.0);
             cur = self.parent[cur.0];
-            println!("NEW CUR: {:?}", cur.0);
+            // println!("NEW CUR: {:?}", cur.0);
         }
         return val.clone();
         // let mut path_cols = Vec::new();

@@ -2,23 +2,19 @@ use std::iter;
 
 use crate::page2_requester::Page2Requester;
 use crate::{page2_controller, page2_requester, page_controller, MAX_COMMITMENT_LEN};
+use afs_stark_backend::prover::MultiTraceStarkProver;
 use afs_stark_backend::rap::AnyRap;
 use afs_stark_backend::verifier::VerificationError;
 use afs_stark_backend::{
     keygen::{types::MultiStarkPartialProvingKey, MultiStarkKeygenBuilder},
-    prover::{trace::TraceCommitmentBuilder, MultiTraceStarkProver},
+    prover::trace::TraceCommitmentBuilder,
 };
 use afs_test_utils::config::{
     self,
     baby_bear_poseidon2::{BabyBearPoseidon2Config, BabyBearPoseidon2Engine},
 };
-use afs_test_utils::{
-    engine::StarkEngine, interaction::dummy_interaction_air::DummyInteractionAir,
-    utils::create_seeded_rng,
-};
+use afs_test_utils::{engine::StarkEngine, utils::create_seeded_rng};
 use p3_baby_bear::BabyBear;
-use p3_field::AbstractField;
-use p3_matrix::dense::RowMajorMatrix;
 use rand::Rng;
 
 use super::types::PageNode;
@@ -35,14 +31,12 @@ fn load_pages_test(
     trace_builder: &mut TraceCommitmentBuilder<BabyBearPoseidon2Config>,
     partial_pk: &MultiStarkPartialProvingKey<BabyBearPoseidon2Config>,
 ) -> Result<(), VerificationError> {
-    let mut rng = create_seeded_rng();
     page_controller.clear();
     let (page_trace, prover_data) =
         page_controller.load_pages(&mut trace_builder.committer, known_structure, &pages);
     let requester_trace = page_requester.generate_trace(&page_controller);
     let page_metadata_trace = page_controller.generate_trace();
     trace_builder.clear();
-    // println!("TRACE IS {:?}", page_metadata_trace);
     for (trace, data) in page_trace.into_iter().zip(prover_data.into_iter()) {
         trace_builder.load_cached_trace(trace, data);
     }
@@ -55,15 +49,6 @@ fn load_pages_test(
 
     let partial_vk = partial_pk.partial_vk();
     let mut vec: Vec<&dyn AnyRap<BabyBearPoseidon2Config>> = Vec::new();
-    // let vec: Vec<&dyn AnyRap<BabyBearPoseidon2Config>> = page_controller
-    //     .page_read_chip
-    //     .into_iter()
-    //     .map(|chip| match chip.as_ref() {
-    //         PageNode::PageTerminal(p) => p,
-    //         PageNode::PageBranch(p) => p,
-    //         PageNode::PageMixed(p) => p,
-    //     })
-    //     .collect::<Vec<&dyn AnyRap<BabyBearPoseidon2Config>>>();
     for chip in &page_controller.page_read_chip {
         vec.push(match chip.as_ref() {
             PageNode::PageTerminal(p) => p,
@@ -154,8 +139,6 @@ fn page2_read_chip_test_known_structure() {
         blank_row.clone(),
         branch([0, 1, 1], [3, 1, 1], leaf_com),
         branch([0, 1, 1], [3, 1, 1], tier2_com),
-        // blank_row.clone(),
-        // blank_row.clone(),
         blank_row.clone(),
         blank_row.clone(),
         blank_row.clone(),
@@ -204,8 +187,6 @@ fn page2_read_chip_test_known_structure() {
     let blank_page = vec![blank_row.clone(); page_height];
     let pages = vec![tier2_node2.clone(), leaf_page2.clone(), blank_page.clone()];
     let good_keys: Vec<Vec<u32>> = vec![vec![0, 1, 1], vec![2, 1, 1], vec![0, 0, 0], vec![3, 1, 1]];
-    // let mut page_controller = Page2Controller::new(bus_index);
-    // let page_requester = DummyInteractionAir::new(1 + page_width, true, bus_index);
     let mut page_controller = Page2Controller::new(
         val_bus_index,
         path_bus_index,
@@ -284,6 +265,23 @@ fn page2_read_chip_test_known_structure() {
     )
     .expect("Verification failed");
 
+    test_pages = vec![branch_page.clone(), leaf_page.clone(), tier2_node.clone()];
+    test_good_keys = vec![vec![0, 1, 1], vec![3, 1, 1]];
+    test_good_requests = (0..num_requests)
+        .map(|_| test_good_keys[rng.gen::<usize>() % test_good_keys.len()].clone())
+        .collect::<Vec<Vec<u32>>>();
+    page_requester.reset_request(test_good_requests);
+    load_pages_test(
+        &engine,
+        &test_pages,
+        &mut page_controller,
+        true,
+        &page_requester,
+        &mut trace_builder,
+        &partial_pk,
+    )
+    .expect("Verification failed");
+
     test_pages = vec![tier2_node.clone(), blank_page.clone(), leaf_page.clone()];
     test_good_keys = vec![vec![0, 1, 1], vec![3, 1, 1]];
     test_good_requests = (0..num_requests)
@@ -339,28 +337,28 @@ fn page2_read_chip_test_known_structure() {
         Err(VerificationError::NonZeroCumulativeSum),
         "Verification failed"
     );
-    // load_page_test(
-    //     &engine,
-    //     &pages[1],
-    //     &pages[1],
-    //     &mut page_controller,
-    //     &page_requester,
-    //     &mut trace_builder,
-    //     &partial_pk,
-    //     num_requests,
-    // )
-    // .expect("Verification failed");
 
-    // let result = load_page_test(
-    //     &engine,
-    //     &pages[0],
-    //     &pages[1],
-    //     &mut page_controller,
-    //     &page_requester,
-    //     &mut trace_builder,
-    //     &partial_pk,
-    //     num_requests,
-    // );
+    test_pages = vec![tier2_node.clone(), blank_page.clone(), leaf_page2.clone()];
+    test_good_keys = vec![vec![0, 0, 0], vec![2, 1, 1]];
+    test_good_requests = (0..num_requests)
+        .map(|_| test_good_keys[rng.gen::<usize>() % test_good_keys.len()].clone())
+        .collect::<Vec<Vec<u32>>>();
+    page_requester.reset_request(test_good_requests);
+    let result = load_pages_test(
+        &engine,
+        &test_pages,
+        &mut page_controller,
+        true,
+        &page_requester,
+        &mut trace_builder,
+        &partial_pk,
+    );
+
+    assert_eq!(
+        result,
+        Err(VerificationError::NonZeroCumulativeSum),
+        "Verification failed"
+    );
 }
 
 #[test]
@@ -470,8 +468,7 @@ fn page2_read_chip_test_unknown_structure() {
     let blank_page = pad(vec![blank_row.clone(); page_height]);
     let pages = vec![tier2_node2.clone(), leaf_page2.clone(), blank_page.clone()];
     let good_keys: Vec<Vec<u32>> = vec![vec![0, 1, 1], vec![2, 1, 1], vec![0, 0, 0], vec![3, 1, 1]];
-    // let mut page_controller = Page2Controller::new(bus_index);
-    // let page_requester = DummyInteractionAir::new(1 + page_width, true, bus_index);
+
     let mut page_controller = Page2Controller::new(
         val_bus_index,
         path_bus_index,
@@ -605,26 +602,4 @@ fn page2_read_chip_test_unknown_structure() {
         Err(VerificationError::NonZeroCumulativeSum),
         "Verification failed"
     );
-    // load_page_test(
-    //     &engine,
-    //     &pages[1],
-    //     &pages[1],
-    //     &mut page_controller,
-    //     &page_requester,
-    //     &mut trace_builder,
-    //     &partial_pk,
-    //     num_requests,
-    // )
-    // .expect("Verification failed");
-
-    // let result = load_page_test(
-    //     &engine,
-    //     &pages[0],
-    //     &pages[1],
-    //     &mut page_controller,
-    //     &page_requester,
-    //     &mut trace_builder,
-    //     &partial_pk,
-    //     num_requests,
-    // );
 }
