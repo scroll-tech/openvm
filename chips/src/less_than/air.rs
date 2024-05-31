@@ -33,7 +33,7 @@ where
             self.key_vec_len(),
         );
 
-        SubAir::eval(self, builder, vec![local_cols]);
+        SubAir::eval(self, builder, (), vec![local_cols]);
     }
 }
 
@@ -43,11 +43,12 @@ impl<const MAX: u32> AirConfig for LessThanChip<MAX> {
 
 // sub-chip with constraints to check whether one key is less than the next (row-wise)
 impl<const MAX: u32, AB: AirBuilder> SubAir<AB> for LessThanChip<MAX> {
-    type ColsPassed = Vec<Self::Cols<AB::Var>>;
+    type IoView = ();
+    type AuxView = Vec<LessThanCols<AB::Var>>;
 
-    fn eval(&self, builder: &mut AB, cols: Self::ColsPassed) {
-        let local_cols = &cols[0];
-        let next_cols = &cols[1];
+    fn eval(&self, builder: &mut AB, _io: Self::IoView, aux: Self::AuxView) {
+        let local_cols = &aux[0];
+        let next_cols = &aux[1];
 
         // num_limbs is the number of sublimbs per limb, not including the shifted last sublimb
         let num_limbs = (self.limb_bits() + self.decomp() - 1) / self.decomp();

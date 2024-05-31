@@ -79,6 +79,11 @@ where
         );
 
         // constrain the current row is less than the next row
-        SubAir::eval(&self.less_than_chip, builder, vec![local_cols, next_cols]);
+        SubAir::eval(
+            &self.less_than_chip,
+            builder,
+            (),
+            vec![local_cols, next_cols],
+        );
     }
 }
