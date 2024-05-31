@@ -20,9 +20,6 @@ use p3_matrix::dense::DenseMatrix;
  *     partition on number of rows:
  *         number of rows < 4
  *         number of rows >= 4
- *     partition on size of each limb:
- *         each limb has at most limb_bits bits
- *         at least one limb has more than limb_bits bits
  *     partition on row order:
  *         rows are sorted lexicographically
  *         rows are not sorted lexicographically

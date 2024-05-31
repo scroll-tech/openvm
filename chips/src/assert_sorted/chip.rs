@@ -1,19 +1,19 @@
 use crate::sub_chip::SubAirWithInteractions;
 
-use super::columns::AssertedSortedCols;
+use super::columns::AssertSortedCols;
 use afs_stark_backend::interaction::{Chip, Interaction};
 use p3_air::VirtualPairCol;
 use p3_field::PrimeField64;
 
-use super::AssertedSortedChip;
+use super::AssertSortedChip;
 
-impl<F: PrimeField64, const MAX: u32> Chip<F> for AssertedSortedChip<MAX> {
+impl<F: PrimeField64, const MAX: u32> Chip<F> for AssertSortedChip<MAX> {
     fn sends(&self) -> Vec<Interaction<F>> {
         let num_cols =
-            AssertedSortedCols::<F>::get_width(self.limb_bits(), self.decomp(), self.key_vec_len());
+            AssertSortedCols::<F>::get_width(self.limb_bits(), self.decomp(), self.key_vec_len());
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
-        let cols_numbered = AssertedSortedCols::<F>::cols_numbered(
+        let cols_numbered = AssertSortedCols::<F>::cols_numbered(
             &all_cols,
             self.limb_bits(),
             self.decomp(),

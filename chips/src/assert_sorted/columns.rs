@@ -2,15 +2,15 @@ use afs_derive::AlignedBorrow;
 
 use crate::less_than::columns::{LessThanAuxCols, LessThanCols, LessThanIOCols};
 
-// Since AssertedSortedChip contains a LessThanChip subchip, a subset of the columns are those of the
+// Since AssertSortedChip contains a LessThanChip subchip, a subset of the columns are those of the
 // LessThanChip
 #[derive(AlignedBorrow)]
-pub struct AssertedSortedCols<T> {
+pub struct AssertSortedCols<T> {
     pub keys_decomp: Vec<Vec<T>>,
     pub less_than_cols: LessThanCols<T>,
 }
 
-impl<T: Clone> AssertedSortedCols<T> {
+impl<T: Clone> AssertSortedCols<T> {
     pub fn from_slice(slc: &[T], limb_bits: usize, decomp: usize, key_vec_len: usize) -> Self {
         // num_limbs is the number of sublimbs per limb, not including the shifted last sublimb
         let num_limbs = (limb_bits + decomp - 1) / decomp;
@@ -124,7 +124,7 @@ impl<T: Clone> AssertedSortedCols<T> {
         limb_bits: usize,
         decomp: usize,
         key_vec_len: usize,
-    ) -> AssertedSortedCols<usize> {
+    ) -> AssertSortedCols<usize> {
         // num_limbs is the number of sublimbs per limb, not including the shifted last sublimb
         let num_limbs = (limb_bits + decomp - 1) / decomp;
         let mut cur_start_idx = 0;
@@ -190,7 +190,7 @@ impl<T: Clone> AssertedSortedCols<T> {
 
         let less_than_cols = LessThanCols { io, aux };
 
-        AssertedSortedCols {
+        AssertSortedCols {
             keys_decomp,
             less_than_cols,
         }

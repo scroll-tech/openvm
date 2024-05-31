@@ -7,16 +7,16 @@ use p3_matrix::Matrix;
 use crate::less_than::columns::LessThanCols;
 use crate::sub_chip::SubAir;
 
-use super::columns::AssertedSortedCols;
-use super::AssertedSortedChip;
+use super::columns::AssertSortedCols;
+use super::AssertSortedChip;
 
-impl<F: Field, const MAX: u32> BaseAir<F> for AssertedSortedChip<MAX> {
+impl<F: Field, const MAX: u32> BaseAir<F> for AssertSortedChip<MAX> {
     fn width(&self) -> usize {
-        AssertedSortedCols::<F>::get_width(self.limb_bits(), self.decomp(), self.key_vec_len())
+        AssertSortedCols::<F>::get_width(self.limb_bits(), self.decomp(), self.key_vec_len())
     }
 }
 
-impl<AB: AirBuilder, const MAX: u32> Air<AB> for AssertedSortedChip<MAX>
+impl<AB: AirBuilder, const MAX: u32> Air<AB> for AssertSortedChip<MAX>
 where
     AB: AirBuilder,
     AB::Var: Clone,
@@ -27,7 +27,7 @@ where
         let (local, next) = (main.row_slice(0), main.row_slice(1));
         let local: &[AB::Var] = (*local).borrow();
 
-        let local_cols = AssertedSortedCols::<AB::Var>::from_slice(
+        let local_cols = AssertSortedCols::<AB::Var>::from_slice(
             local,
             self.limb_bits(),
             self.decomp(),
