@@ -1,8 +1,11 @@
 use std::borrow::Borrow;
 
-use p3_air::{Air, AirBuilder, AirBuilderWithPublicValues, BaseAir};
+use p3_air::{Air, AirBuilder, BaseAir};
 use p3_field::{AbstractField, Field};
 use p3_matrix::Matrix;
+
+use crate::less_than::columns::LessThanCols;
+use crate::sub_chip::SubAir;
 
 use super::columns::SortedLimbsCols;
 use super::SortedLimbsChip;
@@ -13,27 +16,19 @@ impl<F: Field, const MAX: u32> BaseAir<F> for SortedLimbsChip<MAX> {
     }
 }
 
-impl<AB: AirBuilderWithPublicValues, const MAX: u32> Air<AB> for SortedLimbsChip<MAX>
+impl<AB: AirBuilder, const MAX: u32> Air<AB> for SortedLimbsChip<MAX>
 where
     AB: AirBuilder,
     AB::Var: Clone,
 {
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
-        let _pis = builder.public_values();
 
         let (local, next) = (main.row_slice(0), main.row_slice(1));
         let local: &[AB::Var] = (*local).borrow();
-        let next: &[AB::Var] = (*next).borrow();
 
         let local_cols = SortedLimbsCols::<AB::Var>::from_slice(
             local,
-            self.limb_bits(),
-            self.decomp(),
-            self.key_vec_len(),
-        );
-        let next_cols = SortedLimbsCols::<AB::Var>::from_slice(
-            next,
             self.limb_bits(),
             self.decomp(),
             self.key_vec_len(),
@@ -59,9 +54,31 @@ where
                 * AB::Expr::from_canonical_u64(1 << last_limb_shift);
 
             builder.assert_eq(local_cols.keys_decomp[i][num_limbs], shifted_val);
-            builder.assert_eq(key_from_limbs, local_cols.key[i]);
+            builder.assert_eq(key_from_limbs, local_cols.less_than_cols.key[i]);
         }
 
-        self.is_less_than(builder, local_cols, next_cols);
+        // generate LessThanCols struct for current row and next row
+        let mut local_slice: Vec<AB::Var> = local[0..self.key_vec_len()].to_vec();
+        local_slice.extend_from_slice(&local[(self.key_vec_len() * (num_limbs + 2))..]);
+
+        let mut next_slice: Vec<AB::Var> = next[0..self.key_vec_len()].to_vec();
+        next_slice.extend_from_slice(&next[(self.key_vec_len() * (num_limbs + 2))..]);
+
+        let local_cols = LessThanCols::<AB::Var>::from_slice(
+            &local_slice,
+            self.limb_bits(),
+            self.decomp(),
+            self.key_vec_len(),
+        );
+
+        let next_cols = LessThanCols::<AB::Var>::from_slice(
+            &next_slice,
+            self.limb_bits(),
+            self.decomp(),
+            self.key_vec_len(),
+        );
+
+        // constrain the current row is less than the next row
+        SubAir::eval(&self.less_than_chip, builder, vec![local_cols, next_cols]);
     }
 }

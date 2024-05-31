@@ -1,16 +1,18 @@
 use afs_derive::AlignedBorrow;
 
-use crate::less_than::columns::LessThanCols;
-
-// Since SortedLimbsChip contains a LessThanChip subchip, a subset of the columns are those of the
-// LessThanChip
 #[derive(Default, AlignedBorrow)]
-pub struct SortedLimbsCols<T> {
-    pub keys_decomp: Vec<Vec<T>>,
-    pub less_than_cols: LessThanCols<T>,
+pub struct LessThanCols<T> {
+    pub key: Vec<T>,
+    pub intermed_sum: Vec<T>,
+    pub lower_bits: Vec<T>,
+    pub upper_bit: Vec<T>,
+    pub lower_bits_decomp: Vec<Vec<T>>,
+    pub diff: Vec<T>,
+    pub is_zero: Vec<T>,
+    pub inverses: Vec<T>,
 }
 
-impl<T: Clone> SortedLimbsCols<T> {
+impl<T: Clone> LessThanCols<T> {
     pub fn from_slice(slc: &[T], limb_bits: usize, decomp: usize, key_vec_len: usize) -> Self {
         // num_limbs is the number of sublimbs per limb, not including the shifted last sublimb
         let num_limbs = (limb_bits + decomp - 1) / decomp;
@@ -19,15 +21,6 @@ impl<T: Clone> SortedLimbsCols<T> {
 
         // the first key_vec_len elements are the key itself
         let key = slc[cur_start_idx..cur_end_idx].to_vec();
-        cur_start_idx = cur_end_idx;
-        cur_end_idx += key_vec_len * (num_limbs + 1);
-
-        // the next key_vec_len * (num_limbs + 1) elements are the decomposed keys (with each having
-        // an extra shifted last sublimb)
-        let keys_decomp = slc[cur_start_idx..cur_end_idx]
-            .chunks(num_limbs + 1)
-            .map(|chunk| chunk.to_vec())
-            .collect();
         cur_start_idx = cur_end_idx;
         cur_end_idx += key_vec_len;
 
@@ -72,7 +65,7 @@ impl<T: Clone> SortedLimbsCols<T> {
         // note that this sum will always be nonzero so the inverse will exist
         let inverses = slc[cur_start_idx..cur_end_idx].to_vec();
 
-        let less_than_cols = LessThanCols {
+        Self {
             key,
             intermed_sum,
             lower_bits,
@@ -81,12 +74,23 @@ impl<T: Clone> SortedLimbsCols<T> {
             diff,
             is_zero,
             inverses,
-        };
-
-        Self {
-            keys_decomp,
-            less_than_cols,
         }
+    }
+
+    pub fn flatten(&self) -> Vec<T> {
+        let mut flattened = vec![];
+        flattened.extend_from_slice(&self.key);
+        flattened.extend_from_slice(&self.intermed_sum);
+        flattened.extend_from_slice(&self.lower_bits);
+        flattened.extend_from_slice(&self.upper_bit);
+        for decomp_vec in &self.lower_bits_decomp {
+            flattened.extend_from_slice(decomp_vec);
+        }
+        flattened.extend_from_slice(&self.diff);
+        flattened.extend_from_slice(&self.is_zero);
+        flattened.extend_from_slice(&self.inverses);
+
+        flattened
     }
 
     pub fn get_width(limb_bits: usize, decomp: usize, key_vec_len: usize) -> usize {
@@ -96,9 +100,6 @@ impl<T: Clone> SortedLimbsCols<T> {
         let mut width = 0;
         // for the key itself
         width += key_vec_len;
-        // for the decomposed keys
-        let num_limbs = (limb_bits + decomp - 1) / decomp;
-        width += key_vec_len * (num_limbs + 1);
         // for the 2^limb_bits + b - a values
         width += key_vec_len;
         // for the lower_bits
@@ -106,6 +107,7 @@ impl<T: Clone> SortedLimbsCols<T> {
         // for the upper_bit
         width += key_vec_len;
         // for the decomposed lower_bits
+        let num_limbs = (limb_bits + decomp - 1) / decomp;
         width += key_vec_len * (num_limbs + 1);
         // for the difference between consecutive rows
         width += key_vec_len;
@@ -122,7 +124,7 @@ impl<T: Clone> SortedLimbsCols<T> {
         limb_bits: usize,
         decomp: usize,
         key_vec_len: usize,
-    ) -> SortedLimbsCols<usize> {
+    ) -> LessThanCols<usize> {
         // num_limbs is the number of sublimbs per limb, not including the shifted last sublimb
         let num_limbs = (limb_bits + decomp - 1) / decomp;
         let mut cur_start_idx = 0;
@@ -130,14 +132,6 @@ impl<T: Clone> SortedLimbsCols<T> {
 
         // the first key_vec_len elements are the key itself
         let key = cols[cur_start_idx..cur_end_idx].to_vec();
-        cur_start_idx = cur_end_idx;
-        cur_end_idx += key_vec_len * (num_limbs + 1);
-
-        // the next key_vec_len * (num_limbs + 1) elements are the decomposed keys
-        let keys_decomp = cols[cur_start_idx..cur_end_idx]
-            .chunks(num_limbs + 1)
-            .map(|chunk| chunk.to_vec())
-            .collect();
         cur_start_idx = cur_end_idx;
         cur_end_idx += key_vec_len;
 
@@ -175,7 +169,7 @@ impl<T: Clone> SortedLimbsCols<T> {
         // the next key_vec_len elements are the inverses
         let inverses = cols[cur_start_idx..cur_end_idx].to_vec();
 
-        let less_than_cols = LessThanCols {
+        LessThanCols {
             key,
             intermed_sum,
             lower_bits,
@@ -184,11 +178,6 @@ impl<T: Clone> SortedLimbsCols<T> {
             diff,
             is_zero,
             inverses,
-        };
-
-        SortedLimbsCols {
-            keys_decomp,
-            less_than_cols,
         }
     }
 }

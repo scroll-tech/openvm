@@ -47,11 +47,16 @@ fn test_sorted_limbs_chip_small_positive() {
         SortedLimbsChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
 
     let sorted_limbs_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip.generate_trace();
-    let sorted_limbs_range_chip_trace: DenseMatrix<BabyBear> =
-        sorted_limbs_chip.range_checker_gate.generate_trace();
+    let sorted_limbs_range_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip
+        .less_than_chip
+        .range_checker_gate
+        .generate_trace();
 
     run_simple_test_no_pis(
-        vec![&sorted_limbs_chip, &sorted_limbs_chip.range_checker_gate],
+        vec![
+            &sorted_limbs_chip,
+            &sorted_limbs_chip.less_than_chip.range_checker_gate,
+        ],
         vec![sorted_limbs_chip_trace, sorted_limbs_range_chip_trace],
     )
     .expect("Verification failed");
@@ -81,11 +86,16 @@ fn test_sorted_limbs_chip_large_positive() {
         SortedLimbsChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
 
     let sorted_limbs_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip.generate_trace();
-    let sorted_limbs_range_chip_trace: DenseMatrix<BabyBear> =
-        sorted_limbs_chip.range_checker_gate.generate_trace();
+    let sorted_limbs_range_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip
+        .less_than_chip
+        .range_checker_gate
+        .generate_trace();
 
     run_simple_test_no_pis(
-        vec![&sorted_limbs_chip, &sorted_limbs_chip.range_checker_gate],
+        vec![
+            &sorted_limbs_chip,
+            &sorted_limbs_chip.less_than_chip.range_checker_gate,
+        ],
         vec![sorted_limbs_chip_trace, sorted_limbs_range_chip_trace],
     )
     .expect("Verification failed");
@@ -116,11 +126,16 @@ fn test_sorted_limbs_chip_largelimb_negative() {
         SortedLimbsChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
 
     let sorted_limbs_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip.generate_trace();
-    let sorted_limbs_range_chip_trace: DenseMatrix<BabyBear> =
-        sorted_limbs_chip.range_checker_gate.generate_trace();
+    let sorted_limbs_range_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip
+        .less_than_chip
+        .range_checker_gate
+        .generate_trace();
 
     let result = run_simple_test_no_pis(
-        vec![&sorted_limbs_chip, &sorted_limbs_chip.range_checker_gate],
+        vec![
+            &sorted_limbs_chip,
+            &sorted_limbs_chip.less_than_chip.range_checker_gate,
+        ],
         vec![sorted_limbs_chip_trace, sorted_limbs_range_chip_trace],
     );
 
@@ -156,15 +171,20 @@ fn test_sorted_limbs_chip_unsorted_negative() {
         SortedLimbsChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
 
     let sorted_limbs_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip.generate_trace();
-    let sorted_limbs_range_chip_trace: DenseMatrix<BabyBear> =
-        sorted_limbs_chip.range_checker_gate.generate_trace();
+    let sorted_limbs_range_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip
+        .less_than_chip
+        .range_checker_gate
+        .generate_trace();
 
     USE_DEBUG_BUILDER.with(|debug| {
         *debug.lock().unwrap() = false;
     });
     assert_eq!(
         run_simple_test_no_pis(
-            vec![&sorted_limbs_chip, &sorted_limbs_chip.range_checker_gate],
+            vec![
+                &sorted_limbs_chip,
+                &sorted_limbs_chip.less_than_chip.range_checker_gate,
+            ],
             vec![sorted_limbs_chip_trace, sorted_limbs_range_chip_trace],
         ),
         Err(VerificationError::OodEvaluationMismatch),
