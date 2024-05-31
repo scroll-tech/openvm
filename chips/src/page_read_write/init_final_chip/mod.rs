@@ -1,32 +1,27 @@
-use std::sync::{atomic::AtomicU32, Arc};
-
-pub mod air;
 pub mod chip;
 pub mod columns;
-pub mod trace;
 
-#[derive(Default)]
 pub struct InitFinalChip {
-    /// The index for the Range Checker bus.
     bus_index: usize,
-    pub count: Vec<Arc<AtomicU32>>,
+    page_width: usize,
+
+    is_send: bool,
 }
 
-impl<const MAX: u32> InitFinalChip<MAX> {
-    pub fn new(bus_index: usize) -> Self {
-        let mut count = vec![];
-        for _ in 0..MAX {
-            count.push(Arc::new(AtomicU32::new(0)));
+impl InitFinalChip {
+    pub fn new(bus_index: usize, page_width: usize, is_send: bool) -> Self {
+        Self {
+            bus_index,
+            page_width,
+            is_send,
         }
-        Self { bus_index, count }
     }
 
     pub fn bus_index(&self) -> usize {
         self.bus_index
     }
 
-    pub fn add_count(&self, val: u32) {
-        let val_atomic = &self.count[val as usize];
-        val_atomic.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    pub fn air_width(&self) -> usize {
+        self.page_width
     }
 }

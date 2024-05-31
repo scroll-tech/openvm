@@ -10,13 +10,11 @@ pub struct PageReadChip {
 }
 
 impl PageReadChip {
-    pub fn new(bus_index: usize, page: Vec<Vec<u32>>) -> Self {
-        assert!(!page.is_empty());
-
+    pub fn new(bus_index: usize, page_width: usize, page_height: usize) -> Self {
         Self {
             bus_index,
-            page_width: page[0].len(),
-            page_height: page.len(),
+            page_width,
+            page_height,
         }
     }
 
