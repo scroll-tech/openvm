@@ -39,7 +39,7 @@ impl<F: PrimeField64, const MAX: u32> SubAirWithInteractions<F> for LessThanChip
             for j in 0..(num_limbs + 1) {
                 interactions.push(Interaction {
                     fields: vec![VirtualPairCol::single_main(
-                        col_indices.lower_bits_decomp[i][j],
+                        col_indices.aux.lower_bits_decomp[i][j],
                     )],
                     count: VirtualPairCol::constant(F::one()),
                     argument_index: self.bus_index(),

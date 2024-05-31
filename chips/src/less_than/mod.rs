@@ -1,5 +1,8 @@
 use crate::range_gate::RangeCheckerGateChip;
 
+#[cfg(test)]
+pub mod tests;
+
 pub mod air;
 pub mod chip;
 pub mod columns;
@@ -8,11 +11,7 @@ pub mod trace;
 /**
  * This Chip constrains that consecutive rows are sorted lexicographically.
  *
- * Each row consists of a key decomposed into limbs, and the chip constrains
- * each limb has at most limb_bits bits, where limb_bits is at most 31. It
- * does this by interacting with a RangeCheckerGateChip. Because the range checker
- * gate can take MAX up to 2^20, we further decompose each limb into sublimbs
- * of size decomp bits.
+ * Each row consists of a key decomposed into limbs with at most limb_bits bits
  */
 #[derive(Default)]
 pub struct LessThanChip<const MAX: u32> {

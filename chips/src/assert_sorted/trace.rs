@@ -3,12 +3,12 @@ use p3_matrix::dense::RowMajorMatrix;
 
 use crate::sub_chip::LocalTraceInstructions;
 
-use super::{columns::SortedLimbsCols, SortedLimbsChip};
+use super::{columns::AssertedSortedCols, AssertedSortedChip};
 
-impl<const MAX: u32> SortedLimbsChip<MAX> {
+impl<const MAX: u32> AssertedSortedChip<MAX> {
     pub fn generate_trace<F: PrimeField64>(&self) -> RowMajorMatrix<F> {
         let num_cols: usize =
-            SortedLimbsCols::<F>::get_width(self.limb_bits(), self.decomp(), self.key_vec_len());
+            AssertedSortedCols::<F>::get_width(self.limb_bits(), self.decomp(), self.key_vec_len());
 
         let num_limbs = (self.limb_bits() + self.decomp() - 1) / self.decomp();
 

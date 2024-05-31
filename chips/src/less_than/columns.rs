@@ -1,8 +1,11 @@
 use afs_derive::AlignedBorrow;
 
 #[derive(Default, AlignedBorrow)]
-pub struct LessThanCols<T> {
+pub struct LessThanIOCols<T> {
     pub key: Vec<T>,
+}
+
+pub struct LessThanAuxCols<T> {
     pub intermed_sum: Vec<T>,
     pub lower_bits: Vec<T>,
     pub upper_bit: Vec<T>,
@@ -10,6 +13,11 @@ pub struct LessThanCols<T> {
     pub diff: Vec<T>,
     pub is_zero: Vec<T>,
     pub inverses: Vec<T>,
+}
+
+pub struct LessThanCols<T> {
+    pub io: LessThanIOCols<T>,
+    pub aux: LessThanAuxCols<T>,
 }
 
 impl<T: Clone> LessThanCols<T> {
@@ -65,8 +73,8 @@ impl<T: Clone> LessThanCols<T> {
         // note that this sum will always be nonzero so the inverse will exist
         let inverses = slc[cur_start_idx..cur_end_idx].to_vec();
 
-        Self {
-            key,
+        let io = LessThanIOCols { key };
+        let aux = LessThanAuxCols {
             intermed_sum,
             lower_bits,
             upper_bit,
@@ -74,21 +82,23 @@ impl<T: Clone> LessThanCols<T> {
             diff,
             is_zero,
             inverses,
-        }
+        };
+
+        Self { io, aux }
     }
 
     pub fn flatten(&self) -> Vec<T> {
         let mut flattened = vec![];
-        flattened.extend_from_slice(&self.key);
-        flattened.extend_from_slice(&self.intermed_sum);
-        flattened.extend_from_slice(&self.lower_bits);
-        flattened.extend_from_slice(&self.upper_bit);
-        for decomp_vec in &self.lower_bits_decomp {
+        flattened.extend_from_slice(&self.io.key);
+        flattened.extend_from_slice(&self.aux.intermed_sum);
+        flattened.extend_from_slice(&self.aux.lower_bits);
+        flattened.extend_from_slice(&self.aux.upper_bit);
+        for decomp_vec in &self.aux.lower_bits_decomp {
             flattened.extend_from_slice(decomp_vec);
         }
-        flattened.extend_from_slice(&self.diff);
-        flattened.extend_from_slice(&self.is_zero);
-        flattened.extend_from_slice(&self.inverses);
+        flattened.extend_from_slice(&self.aux.diff);
+        flattened.extend_from_slice(&self.aux.is_zero);
+        flattened.extend_from_slice(&self.aux.inverses);
 
         flattened
     }
@@ -169,8 +179,8 @@ impl<T: Clone> LessThanCols<T> {
         // the next key_vec_len elements are the inverses
         let inverses = cols[cur_start_idx..cur_end_idx].to_vec();
 
-        LessThanCols {
-            key,
+        let io = LessThanIOCols { key };
+        let aux = LessThanAuxCols {
             intermed_sum,
             lower_bits,
             upper_bit,
@@ -178,6 +188,8 @@ impl<T: Clone> LessThanCols<T> {
             diff,
             is_zero,
             inverses,
-        }
+        };
+
+        LessThanCols { io, aux }
     }
 }

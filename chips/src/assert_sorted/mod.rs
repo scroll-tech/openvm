@@ -1,7 +1,7 @@
 use crate::less_than::LessThanChip;
 
 use afs_stark_backend::interaction::Interaction;
-use columns::SortedLimbsCols;
+use columns::AssertedSortedCols;
 use p3_air::VirtualPairCol;
 use p3_field::PrimeField64;
 
@@ -22,15 +22,15 @@ pub mod trace;
  * gate can take MAX up to 2^20, we further decompose each limb into sublimbs
  * of size decomp bits.
  *
- * The SortedLimbsChip contains a LessThanChip subchip, which is used to constrain
+ * The AssertedSortedChip contains a LessThanChip subchip, which is used to constrain
  * that the rows are sorted lexicographically.
  */
 #[derive(Default)]
-pub struct SortedLimbsChip<const MAX: u32> {
+pub struct AssertedSortedChip<const MAX: u32> {
     less_than_chip: LessThanChip<MAX>,
 }
 
-impl<const MAX: u32> SortedLimbsChip<MAX> {
+impl<const MAX: u32> AssertedSortedChip<MAX> {
     pub fn new(
         bus_index: usize,
         limb_bits: usize,
@@ -71,7 +71,7 @@ impl<const MAX: u32> SortedLimbsChip<MAX> {
 
     pub fn sends_custom<F: PrimeField64>(
         &self,
-        cols: &SortedLimbsCols<usize>,
+        cols: &AssertedSortedCols<usize>,
     ) -> Vec<Interaction<F>> {
         // num_limbs is the number of sublimbs per limb of key, not including the
         // shifted last sublimb

@@ -1,4 +1,4 @@
-use super::super::sorted_limbs;
+use super::super::assert_sorted;
 
 use afs_stark_backend::prover::USE_DEBUG_BUILDER;
 use afs_stark_backend::verifier::VerificationError;
@@ -7,7 +7,7 @@ use p3_baby_bear::BabyBear;
 use p3_matrix::dense::DenseMatrix;
 
 /**
- * Testing strategy for the sorted limbs chip:
+ * Testing strategy for the assert sorted chip:
  *     partition on limb_bits:
  *         limb_bits < 20
  *         limb_bits >= 20
@@ -32,7 +32,7 @@ use p3_matrix::dense::DenseMatrix;
 // most limb_bits bits, rows are sorted lexicographically
 #[test]
 fn test_sorted_limbs_chip_small_positive() {
-    use sorted_limbs::SortedLimbsChip;
+    use assert_sorted::AssertedSortedChip;
 
     const BUS_INDEX: usize = 0;
     const LIMB_BITS: usize = 16;
@@ -44,7 +44,7 @@ fn test_sorted_limbs_chip_small_positive() {
     let requests = vec![vec![7784, 35423], vec![17558, 44832]];
 
     let sorted_limbs_chip =
-        SortedLimbsChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
+        AssertedSortedChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
 
     let sorted_limbs_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip.generate_trace();
     let sorted_limbs_range_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip
@@ -66,7 +66,7 @@ fn test_sorted_limbs_chip_small_positive() {
 // most limb_bits bits, rows are sorted lexicographically
 #[test]
 fn test_sorted_limbs_chip_large_positive() {
-    use sorted_limbs::SortedLimbsChip;
+    use assert_sorted::AssertedSortedChip;
 
     const BUS_INDEX: usize = 0;
     const LIMB_BITS: usize = 30;
@@ -83,7 +83,7 @@ fn test_sorted_limbs_chip_large_positive() {
     ];
 
     let sorted_limbs_chip =
-        SortedLimbsChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
+        AssertedSortedChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
 
     let sorted_limbs_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip.generate_trace();
     let sorted_limbs_range_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip
@@ -105,7 +105,7 @@ fn test_sorted_limbs_chip_large_positive() {
 // has more than limb_bits bits, rows are sorted lexicographically
 #[test]
 fn test_sorted_limbs_chip_largelimb_negative() {
-    use sorted_limbs::SortedLimbsChip;
+    use assert_sorted::AssertedSortedChip;
 
     const BUS_INDEX: usize = 0;
     const LIMB_BITS: usize = 10;
@@ -123,7 +123,7 @@ fn test_sorted_limbs_chip_largelimb_negative() {
     ];
 
     let sorted_limbs_chip =
-        SortedLimbsChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
+        AssertedSortedChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
 
     let sorted_limbs_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip.generate_trace();
     let sorted_limbs_range_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip
@@ -150,7 +150,7 @@ fn test_sorted_limbs_chip_largelimb_negative() {
 // most limb_bits bits, rows are not sorted lexicographically
 #[test]
 fn test_sorted_limbs_chip_unsorted_negative() {
-    use sorted_limbs::SortedLimbsChip;
+    use assert_sorted::AssertedSortedChip;
 
     const BUS_INDEX: usize = 0;
     const LIMB_BITS: usize = 30;
@@ -168,7 +168,7 @@ fn test_sorted_limbs_chip_unsorted_negative() {
     ];
 
     let sorted_limbs_chip =
-        SortedLimbsChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
+        AssertedSortedChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
 
     let sorted_limbs_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip.generate_trace();
     let sorted_limbs_range_chip_trace: DenseMatrix<BabyBear> = sorted_limbs_chip

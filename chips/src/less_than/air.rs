@@ -6,7 +6,10 @@ use p3_matrix::Matrix;
 
 use crate::sub_chip::{AirConfig, SubAir};
 
-use super::{columns::LessThanCols, LessThanChip};
+use super::{
+    columns::{LessThanAuxCols, LessThanCols, LessThanIOCols},
+    LessThanChip,
+};
 
 impl<F: Field, const MAX: u32> BaseAir<F> for LessThanChip<MAX> {
     fn width(&self) -> usize {
@@ -23,8 +26,9 @@ where
         let main = builder.main();
         let _pis = builder.public_values();
 
-        let (local, _next) = (main.row_slice(0), main.row_slice(1));
+        let (local, next) = (main.row_slice(0), main.row_slice(1));
         let local: &[AB::Var] = (*local).borrow();
+        let next: &[AB::Var] = (*next).borrow();
 
         let local_cols = LessThanCols::<AB::Var>::from_slice(
             local,
@@ -33,7 +37,19 @@ where
             self.key_vec_len(),
         );
 
-        SubAir::eval(self, builder, (), vec![local_cols]);
+        let next_cols = LessThanCols::<AB::Var>::from_slice(
+            next,
+            self.limb_bits(),
+            self.decomp(),
+            self.key_vec_len(),
+        );
+
+        SubAir::eval(
+            self,
+            builder,
+            vec![local_cols.io, next_cols.io],
+            local_cols.aux,
+        );
     }
 }
 
@@ -43,20 +59,22 @@ impl<const MAX: u32> AirConfig for LessThanChip<MAX> {
 
 // sub-chip with constraints to check whether one key is less than the next (row-wise)
 impl<const MAX: u32, AB: AirBuilder> SubAir<AB> for LessThanChip<MAX> {
-    type IoView = ();
-    type AuxView = Vec<LessThanCols<AB::Var>>;
+    type IoView = Vec<LessThanIOCols<AB::Var>>;
+    type AuxView = LessThanAuxCols<AB::Var>;
 
-    fn eval(&self, builder: &mut AB, _io: Self::IoView, aux: Self::AuxView) {
-        let local_cols = &aux[0];
-        let next_cols = &aux[1];
+    fn eval(&self, builder: &mut AB, io: Self::IoView, aux: Self::AuxView) {
+        let local_key = io[0].key.clone();
+        let next_key = io[1].key.clone();
+
+        let local_aux = &aux;
 
         // num_limbs is the number of sublimbs per limb, not including the shifted last sublimb
         let num_limbs = (self.limb_bits() + self.decomp() - 1) / self.decomp();
 
-        let intermed_sum = local_cols.intermed_sum.clone();
-        let lower_bits = local_cols.lower_bits.clone();
-        let upper_bit = local_cols.upper_bit.clone();
-        let lower_bits_decomp = local_cols.lower_bits_decomp.clone();
+        let intermed_sum = local_aux.intermed_sum.clone();
+        let lower_bits = local_aux.lower_bits.clone();
+        let upper_bit = local_aux.upper_bit.clone();
+        let lower_bits_decomp = local_aux.lower_bits_decomp.clone();
 
         // we want to check these constraints for each row except the last one
         let mut when_transition = builder.when_transition();
@@ -65,9 +83,7 @@ impl<const MAX: u32, AB: AirBuilder> SubAir<AB> for LessThanChip<MAX> {
         // the correct range
         let last_limb_shift = (self.decomp() - (self.limb_bits() % self.decomp())) % self.decomp();
 
-        for (i, (key_local, key_next)) in
-            local_cols.key.iter().zip(next_cols.key.iter()).enumerate()
-        {
+        for (i, (key_local, key_next)) in local_key.iter().zip(next_key.iter()).enumerate() {
             // this is the desired intermediate value (i.e. 2^limb_bits + b - a - 1)
             let intermed_val = *key_next - *key_local
                 + AB::Expr::from_canonical_u64(1 << self.limb_bits())
@@ -83,8 +99,7 @@ impl<const MAX: u32, AB: AirBuilder> SubAir<AB> for LessThanChip<MAX> {
 
             // constrain that diff is the difference between the two elements of consecutive rows
             let diff = *key_next - *key_local;
-            //when_transition.assert_zero(local_cols.diff[i]);
-            when_transition.assert_eq(diff, local_cols.diff[i]);
+            when_transition.assert_eq(diff, local_aux.diff[i]);
         }
 
         for i in 0..self.key_vec_len() {
@@ -110,9 +125,9 @@ impl<const MAX: u32, AB: AirBuilder> SubAir<AB> for LessThanChip<MAX> {
         }
 
         for i in 0..self.key_vec_len() {
-            let diff = local_cols.diff[i];
-            let is_equal = local_cols.is_zero[i];
-            let inverse = local_cols.inverses[i];
+            let diff = local_aux.diff[i];
+            let is_equal = local_aux.is_zero[i];
+            let inverse = local_aux.inverses[i];
 
             // check that diff * is_equal = 0
             when_transition.assert_zero(diff * is_equal);
@@ -130,7 +145,7 @@ impl<const MAX: u32, AB: AirBuilder> SubAir<AB> for LessThanChip<MAX> {
 
         for (i, &upper_bit_value) in upper_bit.iter().enumerate() {
             let mut curr_expr: AB::Expr = upper_bit_value.into();
-            for &is_zero_value in &local_cols.is_zero[i + 1..] {
+            for &is_zero_value in &local_aux.is_zero[i + 1..] {
                 curr_expr *= is_zero_value.into();
             }
             check_less_than += curr_expr;

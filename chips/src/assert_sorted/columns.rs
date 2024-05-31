@@ -1,16 +1,16 @@
 use afs_derive::AlignedBorrow;
 
-use crate::less_than::columns::LessThanCols;
+use crate::less_than::columns::{LessThanAuxCols, LessThanCols, LessThanIOCols};
 
-// Since SortedLimbsChip contains a LessThanChip subchip, a subset of the columns are those of the
+// Since AssertedSortedChip contains a LessThanChip subchip, a subset of the columns are those of the
 // LessThanChip
-#[derive(Default, AlignedBorrow)]
-pub struct SortedLimbsCols<T> {
+#[derive(AlignedBorrow)]
+pub struct AssertedSortedCols<T> {
     pub keys_decomp: Vec<Vec<T>>,
     pub less_than_cols: LessThanCols<T>,
 }
 
-impl<T: Clone> SortedLimbsCols<T> {
+impl<T: Clone> AssertedSortedCols<T> {
     pub fn from_slice(slc: &[T], limb_bits: usize, decomp: usize, key_vec_len: usize) -> Self {
         // num_limbs is the number of sublimbs per limb, not including the shifted last sublimb
         let num_limbs = (limb_bits + decomp - 1) / decomp;
@@ -72,8 +72,8 @@ impl<T: Clone> SortedLimbsCols<T> {
         // note that this sum will always be nonzero so the inverse will exist
         let inverses = slc[cur_start_idx..cur_end_idx].to_vec();
 
-        let less_than_cols = LessThanCols {
-            key,
+        let io = LessThanIOCols { key };
+        let aux = LessThanAuxCols {
             intermed_sum,
             lower_bits,
             upper_bit,
@@ -82,6 +82,8 @@ impl<T: Clone> SortedLimbsCols<T> {
             is_zero,
             inverses,
         };
+
+        let less_than_cols = LessThanCols { io, aux };
 
         Self {
             keys_decomp,
@@ -122,7 +124,7 @@ impl<T: Clone> SortedLimbsCols<T> {
         limb_bits: usize,
         decomp: usize,
         key_vec_len: usize,
-    ) -> SortedLimbsCols<usize> {
+    ) -> AssertedSortedCols<usize> {
         // num_limbs is the number of sublimbs per limb, not including the shifted last sublimb
         let num_limbs = (limb_bits + decomp - 1) / decomp;
         let mut cur_start_idx = 0;
@@ -175,8 +177,8 @@ impl<T: Clone> SortedLimbsCols<T> {
         // the next key_vec_len elements are the inverses
         let inverses = cols[cur_start_idx..cur_end_idx].to_vec();
 
-        let less_than_cols = LessThanCols {
-            key,
+        let io = LessThanIOCols { key };
+        let aux = LessThanAuxCols {
             intermed_sum,
             lower_bits,
             upper_bit,
@@ -186,7 +188,9 @@ impl<T: Clone> SortedLimbsCols<T> {
             inverses,
         };
 
-        SortedLimbsCols {
+        let less_than_cols = LessThanCols { io, aux };
+
+        AssertedSortedCols {
             keys_decomp,
             less_than_cols,
         }

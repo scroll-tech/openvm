@@ -3,7 +3,10 @@ use p3_matrix::dense::RowMajorMatrix;
 
 use crate::sub_chip::LocalTraceInstructions;
 
-use super::{columns::LessThanCols, LessThanChip};
+use super::{
+    columns::{LessThanAuxCols, LessThanCols, LessThanIOCols},
+    LessThanChip,
+};
 
 impl<const MAX: u32> LessThanChip<MAX> {
     pub fn generate_trace<F: PrimeField64>(&self) -> RowMajorMatrix<F> {
@@ -102,8 +105,10 @@ impl<const MAX: u32, F: PrimeField64> LocalTraceInstructions<F> for LessThanChip
             }
         }
 
-        LessThanCols {
+        let io = LessThanIOCols {
             key: key.into_iter().map(F::from_canonical_u32).collect(),
+        };
+        let aux = LessThanAuxCols {
             intermed_sum,
             lower_bits,
             upper_bit,
@@ -111,6 +116,8 @@ impl<const MAX: u32, F: PrimeField64> LocalTraceInstructions<F> for LessThanChip
             diff,
             is_zero,
             inverses,
-        }
+        };
+
+        LessThanCols { io, aux }
     }
 }

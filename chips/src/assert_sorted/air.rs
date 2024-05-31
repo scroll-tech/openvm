@@ -7,16 +7,16 @@ use p3_matrix::Matrix;
 use crate::less_than::columns::LessThanCols;
 use crate::sub_chip::SubAir;
 
-use super::columns::SortedLimbsCols;
-use super::SortedLimbsChip;
+use super::columns::AssertedSortedCols;
+use super::AssertedSortedChip;
 
-impl<F: Field, const MAX: u32> BaseAir<F> for SortedLimbsChip<MAX> {
+impl<F: Field, const MAX: u32> BaseAir<F> for AssertedSortedChip<MAX> {
     fn width(&self) -> usize {
-        SortedLimbsCols::<F>::get_width(self.limb_bits(), self.decomp(), self.key_vec_len())
+        AssertedSortedCols::<F>::get_width(self.limb_bits(), self.decomp(), self.key_vec_len())
     }
 }
 
-impl<AB: AirBuilder, const MAX: u32> Air<AB> for SortedLimbsChip<MAX>
+impl<AB: AirBuilder, const MAX: u32> Air<AB> for AssertedSortedChip<MAX>
 where
     AB: AirBuilder,
     AB::Var: Clone,
@@ -27,7 +27,7 @@ where
         let (local, next) = (main.row_slice(0), main.row_slice(1));
         let local: &[AB::Var] = (*local).borrow();
 
-        let local_cols = SortedLimbsCols::<AB::Var>::from_slice(
+        let local_cols = AssertedSortedCols::<AB::Var>::from_slice(
             local,
             self.limb_bits(),
             self.decomp(),
@@ -54,7 +54,7 @@ where
                 * AB::Expr::from_canonical_u64(1 << last_limb_shift);
 
             builder.assert_eq(local_cols.keys_decomp[i][num_limbs], shifted_val);
-            builder.assert_eq(key_from_limbs, local_cols.less_than_cols.key[i]);
+            builder.assert_eq(key_from_limbs, local_cols.less_than_cols.io.key[i]);
         }
 
         // generate LessThanCols struct for current row and next row
@@ -82,8 +82,8 @@ where
         SubAir::eval(
             &self.less_than_chip,
             builder,
-            (),
-            vec![local_cols, next_cols],
+            vec![local_cols.io, next_cols.io],
+            local_cols.aux,
         );
     }
 }
