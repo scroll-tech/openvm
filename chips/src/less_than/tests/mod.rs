@@ -25,8 +25,7 @@ use p3_matrix::dense::DenseMatrix;
  *         rows are not sorted lexicographically
  */
 
-// covers limb_bits < 20, key_vec_len < 4, limb_bits % decomp == 0, number of rows < 4, each limb has at
-// most limb_bits bits, rows are sorted lexicographically
+// covers limb_bits < 20, key_vec_len < 4, limb_bits % decomp == 0, number of rows < 4, rows are sorted lexicographically
 #[test]
 fn test_less_than_chip_small_positive() {
     use less_than::LessThanChip;
@@ -54,8 +53,7 @@ fn test_less_than_chip_small_positive() {
     .expect("Verification failed");
 }
 
-// covers limb_bits >= 20, key_vec_len >= 4, limb_bits % decomp != 0, number of rows >= 4, each limb has at
-// most limb_bits bits, rows are sorted lexicographically
+// covers limb_bits >= 20, key_vec_len >= 4, limb_bits % decomp != 0, number of rows >= 4, rows are sorted lexicographically
 #[test]
 fn test_less_than_chip_large_positive() {
     use less_than::LessThanChip;
@@ -88,8 +86,7 @@ fn test_less_than_chip_large_positive() {
     .expect("Verification failed");
 }
 
-// covers limb_bits >= 20, key_vec_len >= 4, limb_bits % decomp != 0, number of rows >= 4, each limb has at
-// most limb_bits bits, rows are not sorted lexicographically
+// covers limb_bits >= 20, key_vec_len >= 4, limb_bits % decomp != 0, number of rows >= 4, rows are not sorted lexicographically
 #[test]
 fn test_less_than_chip_unsorted_negative() {
     use less_than::LessThanChip;
