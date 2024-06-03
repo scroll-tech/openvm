@@ -1,5 +1,7 @@
+pub mod air;
 pub mod chip;
 pub mod columns;
+pub mod trace;
 
 pub struct InitFinalChip {
     bus_index: usize,

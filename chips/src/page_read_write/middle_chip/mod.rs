@@ -1,6 +1,7 @@
-use super::checker_controller::Operation;
+use super::page_controller::Operation;
 
 mod air;
+mod chip;
 mod columns;
 mod trace;
 
@@ -9,8 +10,6 @@ pub struct MiddleChip {
 
     key_len: usize,
     val_len: usize,
-
-    ops: Vec<Operation>,
 }
 
 impl MiddleChip {
@@ -19,7 +18,6 @@ impl MiddleChip {
             bus_index,
             key_len,
             val_len,
-            ops: vec![],
         }
     }
 
@@ -27,7 +25,11 @@ impl MiddleChip {
         self.bus_index
     }
 
+    fn page_width(&self) -> usize {
+        1 + self.key_len + self.val_len
+    }
+
     pub fn air_width(&self) -> usize {
-        4 + self.key_len + self.val_len
+        7 + self.page_width()
     }
 }
