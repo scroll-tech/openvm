@@ -39,8 +39,14 @@ fn test_less_than_chip_small_positive() {
 
     let requests = vec![vec![7784, 35423], vec![17558, 44832]];
 
-    let less_than_chip =
-        LessThanChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
+    let less_than_chip = LessThanChip::new(
+        BUS_INDEX,
+        MAX,
+        LIMB_BITS,
+        DECOMP,
+        KEY_VEC_LEN,
+        requests.clone(),
+    );
 
     let less_than_chip_trace: DenseMatrix<BabyBear> = less_than_chip.generate_trace();
     let less_than_range_chip_trace: DenseMatrix<BabyBear> =
@@ -72,8 +78,14 @@ fn test_less_than_chip_large_positive() {
         vec![875005, 767547, 196209, 887921],
     ];
 
-    let less_than_chip =
-        LessThanChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
+    let less_than_chip = LessThanChip::new(
+        BUS_INDEX,
+        MAX,
+        LIMB_BITS,
+        DECOMP,
+        KEY_VEC_LEN,
+        requests.clone(),
+    );
 
     let less_than_chip_trace: DenseMatrix<BabyBear> = less_than_chip.generate_trace();
     let less_than_range_chip_trace: DenseMatrix<BabyBear> =
@@ -106,8 +118,14 @@ fn test_less_than_chip_unsorted_negative() {
         vec![875005, 767547, 196209, 887921],
     ];
 
-    let less_than_chip =
-        LessThanChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
+    let less_than_chip = LessThanChip::new(
+        BUS_INDEX,
+        MAX,
+        LIMB_BITS,
+        DECOMP,
+        KEY_VEC_LEN,
+        requests.clone(),
+    );
 
     let less_than_chip_trace: DenseMatrix<BabyBear> = less_than_chip.generate_trace();
     let less_than_range_chip_trace: DenseMatrix<BabyBear> =

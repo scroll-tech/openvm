@@ -5,7 +5,7 @@ use crate::sub_chip::LocalTraceInstructions;
 
 use super::{columns::AssertSortedCols, AssertSortedChip};
 
-impl<const MAX: u32> AssertSortedChip<MAX> {
+impl AssertSortedChip {
     pub fn generate_trace<F: PrimeField64>(&self) -> RowMajorMatrix<F> {
         let num_cols: usize = AssertSortedCols::<F>::get_width(
             *self.less_than_chip.air.limb_bits(),
@@ -51,7 +51,7 @@ impl<const MAX: u32> AssertSortedChip<MAX> {
                 // so we need to shift it to constrain this
                 let bits = (val >> ((num_limbs - 1) * self.less_than_chip.air.decomp()))
                     & ((1 << self.less_than_chip.air.decomp()) - 1);
-                if (bits << last_limb_shift) < MAX {
+                if (bits << last_limb_shift) < *self.range_max() {
                     self.less_than_chip
                         .range_checker_gate
                         .add_count(bits << last_limb_shift);

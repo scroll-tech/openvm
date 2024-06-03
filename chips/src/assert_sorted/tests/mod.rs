@@ -43,8 +43,14 @@ fn test_assert_sorted_chip_small_positive() {
 
     let requests = vec![vec![7784, 35423], vec![17558, 44832]];
 
-    let assert_sorted_chip =
-        AssertSortedChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
+    let assert_sorted_chip = AssertSortedChip::new(
+        BUS_INDEX,
+        MAX,
+        LIMB_BITS,
+        DECOMP,
+        KEY_VEC_LEN,
+        requests.clone(),
+    );
 
     let assert_sorted_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip.generate_trace();
     let assert_sorted_range_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip
@@ -82,8 +88,14 @@ fn test_assert_sorted_chip_large_positive() {
         vec![875005, 767547, 196209, 887921],
     ];
 
-    let assert_sorted_chip =
-        AssertSortedChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
+    let assert_sorted_chip = AssertSortedChip::new(
+        BUS_INDEX,
+        MAX,
+        LIMB_BITS,
+        DECOMP,
+        KEY_VEC_LEN,
+        requests.clone(),
+    );
 
     let assert_sorted_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip.generate_trace();
     let assert_sorted_range_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip
@@ -122,8 +134,14 @@ fn test_assert_sorted_chip_largelimb_negative() {
         vec![128, 767, 196, 953],
     ];
 
-    let assert_sorted_chip =
-        AssertSortedChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
+    let assert_sorted_chip = AssertSortedChip::new(
+        BUS_INDEX,
+        MAX,
+        LIMB_BITS,
+        DECOMP,
+        KEY_VEC_LEN,
+        requests.clone(),
+    );
 
     let assert_sorted_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip.generate_trace();
     let assert_sorted_range_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip
@@ -167,8 +185,14 @@ fn test_assert_sorted_chip_unsorted_negative() {
         vec![875005, 767547, 196209, 887921],
     ];
 
-    let assert_sorted_chip =
-        AssertSortedChip::<MAX>::new(BUS_INDEX, LIMB_BITS, DECOMP, KEY_VEC_LEN, requests.clone());
+    let assert_sorted_chip = AssertSortedChip::new(
+        BUS_INDEX,
+        MAX,
+        LIMB_BITS,
+        DECOMP,
+        KEY_VEC_LEN,
+        requests.clone(),
+    );
 
     let assert_sorted_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip.generate_trace();
     let assert_sorted_range_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip

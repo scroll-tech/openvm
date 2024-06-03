@@ -1,4 +1,5 @@
 use crate::less_than::LessThanChip;
+use getset::Getters;
 
 use afs_stark_backend::interaction::Interaction;
 use columns::AssertSortedCols;
@@ -25,22 +26,27 @@ pub mod trace;
  * The AssertSortedChip contains a LessThanChip subchip, which is used to constrain
  * that the rows are sorted lexicographically.
  */
-#[derive(Default)]
-pub struct AssertSortedChip<const MAX: u32> {
-    less_than_chip: LessThanChip<MAX>,
+#[derive(Default, Getters)]
+pub struct AssertSortedChip {
+    #[getset(get = "pub")]
+    range_max: u32,
+    less_than_chip: LessThanChip,
 }
 
-impl<const MAX: u32> AssertSortedChip<MAX> {
+impl AssertSortedChip {
     pub fn new(
         bus_index: usize,
+        range_max: u32,
         limb_bits: usize,
         decomp: usize,
         key_vec_len: usize,
         keys: Vec<Vec<u32>>,
     ) -> Self {
         Self {
-            less_than_chip: LessThanChip::<MAX>::new(
+            range_max,
+            less_than_chip: LessThanChip::new(
                 bus_index,
+                range_max,
                 limb_bits,
                 decomp,
                 key_vec_len,

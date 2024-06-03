@@ -7,7 +7,7 @@ use p3_field::PrimeField64;
 
 use super::AssertSortedChip;
 
-impl<F: PrimeField64, const MAX: u32> Chip<F> for AssertSortedChip<MAX> {
+impl<F: PrimeField64> Chip<F> for AssertSortedChip {
     fn sends(&self) -> Vec<Interaction<F>> {
         let num_cols = AssertSortedCols::<F>::get_width(
             *self.less_than_chip.air.limb_bits(),

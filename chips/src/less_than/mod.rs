@@ -10,7 +10,9 @@ pub mod columns;
 pub mod trace;
 
 #[derive(Default, Getters)]
-pub struct LessThanAir<const MAX: u32> {
+pub struct LessThanAir {
+    #[getset(get = "pub")]
+    range_max: u32,
     #[getset(get = "pub")]
     limb_bits: usize,
     #[getset(get = "pub")]
@@ -27,24 +29,26 @@ pub struct LessThanAir<const MAX: u32> {
  * Each row consists of a key decomposed into limbs with at most limb_bits bits
  */
 #[derive(Default, Getters)]
-pub struct LessThanChip<const MAX: u32> {
-    pub air: LessThanAir<MAX>,
+pub struct LessThanChip {
+    pub air: LessThanAir,
 
     #[getset(get = "pub")]
     bus_index: usize,
 
-    pub range_checker_gate: RangeCheckerGateChip<MAX>,
+    pub range_checker_gate: RangeCheckerGateChip,
 }
 
-impl<const MAX: u32> LessThanChip<MAX> {
+impl LessThanChip {
     pub fn new(
         bus_index: usize,
+        range_max: u32,
         limb_bits: usize,
         decomp: usize,
         key_vec_len: usize,
         keys: Vec<Vec<u32>>,
     ) -> Self {
         let air = LessThanAir {
+            range_max,
             limb_bits,
             decomp,
             key_vec_len,
@@ -54,7 +58,7 @@ impl<const MAX: u32> LessThanChip<MAX> {
         Self {
             air,
             bus_index,
-            range_checker_gate: RangeCheckerGateChip::<MAX>::new(bus_index),
+            range_checker_gate: RangeCheckerGateChip::new(bus_index, range_max),
         }
     }
 }

@@ -7,7 +7,7 @@ use p3_field::PrimeField64;
 
 use super::LessThanChip;
 
-impl<F: PrimeField64, const MAX: u32> Chip<F> for LessThanChip<MAX> {
+impl<F: PrimeField64> Chip<F> for LessThanChip {
     fn sends(&self) -> Vec<Interaction<F>> {
         let num_cols = LessThanCols::<F>::get_width(
             *self.air.limb_bits(),
@@ -27,7 +27,7 @@ impl<F: PrimeField64, const MAX: u32> Chip<F> for LessThanChip<MAX> {
     }
 }
 
-impl<F: PrimeField64, const MAX: u32> SubAirWithInteractions<F> for LessThanChip<MAX> {
+impl<F: PrimeField64> SubAirWithInteractions<F> for LessThanChip {
     fn sends(&self, col_indices: LessThanCols<usize>) -> Vec<Interaction<F>> {
         // num_limbs is the number of sublimbs per limb of key, not including the
         // shifted last sublimb

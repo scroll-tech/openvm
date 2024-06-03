@@ -10,7 +10,7 @@ use crate::sub_chip::SubAir;
 use super::columns::AssertSortedCols;
 use super::AssertSortedChip;
 
-impl<F: Field, const MAX: u32> BaseAir<F> for AssertSortedChip<MAX> {
+impl<F: Field> BaseAir<F> for AssertSortedChip {
     fn width(&self) -> usize {
         AssertSortedCols::<F>::get_width(
             *self.less_than_chip.air.limb_bits(),
@@ -20,7 +20,7 @@ impl<F: Field, const MAX: u32> BaseAir<F> for AssertSortedChip<MAX> {
     }
 }
 
-impl<AB: AirBuilder, const MAX: u32> Air<AB> for AssertSortedChip<MAX> {
+impl<AB: AirBuilder> Air<AB> for AssertSortedChip {
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
 

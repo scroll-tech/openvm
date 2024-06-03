@@ -8,7 +8,7 @@ use super::{
     LessThanChip,
 };
 
-impl<const MAX: u32> LessThanChip<MAX> {
+impl LessThanChip {
     pub fn generate_trace<F: PrimeField64>(&self) -> RowMajorMatrix<F> {
         let num_cols: usize = LessThanCols::<F>::get_width(
             *self.air.limb_bits(),
@@ -32,7 +32,7 @@ impl<const MAX: u32> LessThanChip<MAX> {
     }
 }
 
-impl<const MAX: u32, F: PrimeField64> LocalTraceInstructions<F> for LessThanChip<MAX> {
+impl<F: PrimeField64> LocalTraceInstructions<F> for LessThanChip {
     type LocalInput = (Vec<u32>, Vec<u32>);
 
     fn generate_trace_row(&self, consecutive_keys: (Vec<u32>, Vec<u32>)) -> Self::Cols<F> {
@@ -100,7 +100,7 @@ impl<const MAX: u32, F: PrimeField64> LocalTraceInstructions<F> for LessThanChip
                 }
                 let bits =
                     (val >> ((num_limbs - 1) * self.air.decomp())) & ((1 << self.air.decomp()) - 1);
-                if (bits << last_limb_shift) < MAX {
+                if (bits << last_limb_shift) < *self.air.range_max() {
                     self.range_checker_gate.add_count(bits << last_limb_shift);
                 }
                 curr_decomp.push(F::from_canonical_u32(bits << last_limb_shift));

@@ -11,11 +11,11 @@ use super::{
     LessThanAir, LessThanChip,
 };
 
-impl<const MAX: u32> AirConfig for LessThanChip<MAX> {
+impl AirConfig for LessThanChip {
     type Cols<T> = LessThanCols<T>;
 }
 
-impl<F: Field, const MAX: u32> BaseAir<F> for LessThanChip<MAX> {
+impl<F: Field> BaseAir<F> for LessThanChip {
     fn width(&self) -> usize {
         LessThanCols::<F>::get_width(
             *self.air.limb_bits(),
@@ -25,7 +25,7 @@ impl<F: Field, const MAX: u32> BaseAir<F> for LessThanChip<MAX> {
     }
 }
 
-impl<AB: AirBuilder, const MAX: u32> Air<AB> for LessThanChip<MAX> {
+impl<AB: AirBuilder> Air<AB> for LessThanChip {
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
 
@@ -52,7 +52,7 @@ impl<AB: AirBuilder, const MAX: u32> Air<AB> for LessThanChip<MAX> {
 }
 
 // sub-chip with constraints to check whether one key is less than the next (row-wise)
-impl<const MAX: u32, AB: AirBuilder> SubAir<AB> for LessThanAir<MAX> {
+impl<AB: AirBuilder> SubAir<AB> for LessThanAir {
     type IoView = [LessThanIOCols<AB::Var>; 2];
     type AuxView = LessThanAuxCols<AB::Var>;
 
