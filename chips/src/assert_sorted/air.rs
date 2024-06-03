@@ -20,11 +20,7 @@ impl<F: Field, const MAX: u32> BaseAir<F> for AssertSortedChip<MAX> {
     }
 }
 
-impl<AB: AirBuilder, const MAX: u32> Air<AB> for AssertSortedChip<MAX>
-where
-    AB: AirBuilder,
-    AB::Var: Clone,
-{
+impl<AB: AirBuilder, const MAX: u32> Air<AB> for AssertSortedChip<MAX> {
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
 

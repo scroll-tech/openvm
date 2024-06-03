@@ -49,26 +49,6 @@ impl<const MAX: u32> AssertSortedChip<MAX> {
         }
     }
 
-    // pub fn bus_index(&self) -> &usize {
-    //     self.less_than_chip.bus_index()
-    // }
-
-    // pub fn limb_bits(&self) -> &usize {
-    //     self.less_than_chip.air.limb_bits()
-    // }
-
-    // pub fn decomp(&self) -> &usize {
-    //     self.less_than_chip.air.decomp()
-    // }
-
-    // pub fn key_vec_len(&self) -> &usize {
-    //     self.less_than_chip.air.key_vec_len()
-    // }
-
-    // pub fn keys(&self) -> &Vec<Vec<u32>> {
-    //     self.less_than_chip.air.keys()
-    // }
-
     pub fn sends_custom<F: PrimeField64>(
         &self,
         cols: &AssertSortedCols<usize>,
