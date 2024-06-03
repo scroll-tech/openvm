@@ -30,14 +30,14 @@ impl MiddleChip {
 /// - Every key block ends with an is_final
 /// - For every key, every read uses the same value as the last
 ///   operation with that key
-impl<AB: AirBuilder> Air<AB> for MiddleChip
+impl<AB: PartitionedAirBuilder> Air<AB> for MiddleChip
 where
     AB::M: Clone,
 {
     fn eval(&self, builder: &mut AB) {
-        // let main: &<AB as AirBuilder>::M = &builder.partitioned_main()[2].clone();
+        let main = &builder.partitioned_main()[2].clone();
 
-        let main = builder.main();
+        // let main = builder.main();
 
         let (local, next) = (main.row_slice(0), main.row_slice(1));
         let local: &[AB::Var] = (*local).borrow();

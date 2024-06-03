@@ -196,16 +196,25 @@ fn page_read_write_test() {
     );
 
     // TODO: fix the degree
-    // keygen_builder.add_partitioned_air(
-    //     &page_controller.middle_chip,
-    //     num_ops * 8,
-    //     0,
-    //     vec![init_page_ptr, final_page_ptr, ops_ptr],
-    // );
+    keygen_builder.add_partitioned_air(
+        &page_controller.init_chip,
+        page_height,
+        0,
+        vec![init_page_ptr],
+    );
 
-    keygen_builder.add_air(&page_controller.init_chip, page_height, 0);
-    keygen_builder.add_air(&page_controller.final_chip, page_height, 0);
-    keygen_builder.add_air(&page_controller.middle_chip, num_ops * 8, 0);
+    keygen_builder.add_partitioned_air(
+        &page_controller.final_chip,
+        page_height,
+        0,
+        vec![final_page_ptr],
+    );
+
+    keygen_builder.add_partitioned_air(&page_controller.middle_chip, num_ops * 8, 0, vec![ops_ptr]);
+
+    // keygen_builder.add_air(&page_controller.init_chip, page_height, 0);
+    // keygen_builder.add_air(&page_controller.final_chip, page_height, 0);
+    // keygen_builder.add_air(&page_controller.middle_chip, num_ops * 8, 0);
 
     let partial_pk = keygen_builder.generate_partial_pk();
 
