@@ -10,16 +10,19 @@ use super::{
 
 impl<const MAX: u32> LessThanChip<MAX> {
     pub fn generate_trace<F: PrimeField64>(&self) -> RowMajorMatrix<F> {
-        let num_cols: usize =
-            LessThanCols::<F>::get_width(self.limb_bits(), self.decomp(), self.key_vec_len());
+        let num_cols: usize = LessThanCols::<F>::get_width(
+            *self.air.limb_bits(),
+            *self.air.decomp(),
+            *self.air.key_vec_len(),
+        );
 
         let mut rows: Vec<F> = vec![];
-        for i in 0..self.key_vec_len() {
-            let key = self.keys[i].clone();
-            let next_key: Vec<u32> = if i == self.key_vec_len() - 1 {
-                vec![0; self.key_vec_len()]
+        for i in 0..*self.air.key_vec_len() {
+            let key = self.air.keys[i].clone();
+            let next_key: Vec<u32> = if i == *self.air.key_vec_len() - 1 {
+                vec![0; *self.air.key_vec_len()]
             } else {
-                self.keys[i + 1].clone()
+                self.air.keys[i + 1].clone()
             };
             let row = self.generate_trace_row((key, next_key)).flatten();
             rows.extend_from_slice(&row);
@@ -34,11 +37,10 @@ impl<const MAX: u32, F: PrimeField64> LocalTraceInstructions<F> for LessThanChip
 
     fn generate_trace_row(&self, consecutive_keys: (Vec<u32>, Vec<u32>)) -> Self::Cols<F> {
         let (key, next_key) = consecutive_keys;
-        let num_limbs = (self.limb_bits() + self.decomp() - 1) / self.decomp();
-        let last_limb_shift = (self.decomp() - (self.limb_bits() % self.decomp())) % self.decomp();
+        let num_limbs = (self.air.limb_bits() + self.air.decomp() - 1) / self.air.decomp();
+        let last_limb_shift =
+            (self.air.decomp() - (self.air.limb_bits() % self.air.decomp())) % self.air.decomp();
 
-        // this will contain 2^limb_bits + b - a
-        let mut intermed_sum: Vec<F> = vec![];
         // the lower limb_bits bits of the corresponding check value
         let mut lower_bits: Vec<F> = vec![];
         let mut lower_bits_u32: Vec<u32> = vec![];
@@ -56,16 +58,18 @@ impl<const MAX: u32, F: PrimeField64> LocalTraceInstructions<F> for LessThanChip
         for (j, &val) in key.iter().enumerate() {
             let next_val = next_key[j];
             // compute 2^limb_bits + next_val - val - 1
-            let check_less_than = (1 << self.limb_bits()) + next_val - val - 1;
-            intermed_sum.push(F::from_canonical_u32(check_less_than));
+            let check_less_than = (1 << self.air.limb_bits()) + next_val - val - 1;
+
             // the lower limb_bits bits of the check value
             lower_bits.push(F::from_canonical_u32(
-                check_less_than & ((1 << self.limb_bits()) - 1),
+                check_less_than & ((1 << self.air.limb_bits()) - 1),
             ));
             // we also need the u32 value to compute the decomposition later
-            lower_bits_u32.push(check_less_than & ((1 << self.limb_bits()) - 1));
+            lower_bits_u32.push(check_less_than & ((1 << self.air.limb_bits()) - 1));
             // the (n + 1)st bit of the check value, will be 1 if a < b
-            upper_bit.push(F::from_canonical_u32(check_less_than >> self.limb_bits()));
+            upper_bit.push(F::from_canonical_u32(
+                check_less_than >> self.air.limb_bits(),
+            ));
 
             // the difference between the two limbs
             let curr_diff = F::from_canonical_u32(next_val) - F::from_canonical_u32(val);
@@ -90,11 +94,12 @@ impl<const MAX: u32, F: PrimeField64> LocalTraceInstructions<F> for LessThanChip
             if i != lower_bits_u32.len() {
                 let mut curr_decomp: Vec<F> = vec![];
                 for j in 0..num_limbs {
-                    let bits = (val >> (j * self.decomp())) & ((1 << self.decomp()) - 1);
+                    let bits = (val >> (j * self.air.decomp())) & ((1 << self.air.decomp()) - 1);
                     curr_decomp.push(F::from_canonical_u32(bits));
                     self.range_checker_gate.add_count(bits);
                 }
-                let bits = (val >> ((num_limbs - 1) * self.decomp())) & ((1 << self.decomp()) - 1);
+                let bits =
+                    (val >> ((num_limbs - 1) * self.air.decomp())) & ((1 << self.air.decomp()) - 1);
                 if (bits << last_limb_shift) < MAX {
                     self.range_checker_gate.add_count(bits << last_limb_shift);
                 }
@@ -109,7 +114,6 @@ impl<const MAX: u32, F: PrimeField64> LocalTraceInstructions<F> for LessThanChip
             key: key.into_iter().map(F::from_canonical_u32).collect(),
         };
         let aux = LessThanAuxCols {
-            intermed_sum,
             lower_bits,
             upper_bit,
             lower_bits_decomp,

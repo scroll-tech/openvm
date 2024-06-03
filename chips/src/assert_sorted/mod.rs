@@ -49,25 +49,25 @@ impl<const MAX: u32> AssertSortedChip<MAX> {
         }
     }
 
-    pub fn bus_index(&self) -> usize {
-        self.less_than_chip.bus_index()
-    }
+    // pub fn bus_index(&self) -> &usize {
+    //     self.less_than_chip.bus_index()
+    // }
 
-    pub fn limb_bits(&self) -> usize {
-        self.less_than_chip.limb_bits()
-    }
+    // pub fn limb_bits(&self) -> &usize {
+    //     self.less_than_chip.air.limb_bits()
+    // }
 
-    pub fn decomp(&self) -> usize {
-        self.less_than_chip.decomp()
-    }
+    // pub fn decomp(&self) -> &usize {
+    //     self.less_than_chip.air.decomp()
+    // }
 
-    pub fn key_vec_len(&self) -> usize {
-        self.less_than_chip.key_vec_len()
-    }
+    // pub fn key_vec_len(&self) -> &usize {
+    //     self.less_than_chip.air.key_vec_len()
+    // }
 
-    pub fn keys(&self) -> Vec<Vec<u32>> {
-        self.less_than_chip.keys().clone()
-    }
+    // pub fn keys(&self) -> &Vec<Vec<u32>> {
+    //     self.less_than_chip.air.keys()
+    // }
 
     pub fn sends_custom<F: PrimeField64>(
         &self,
@@ -75,8 +75,10 @@ impl<const MAX: u32> AssertSortedChip<MAX> {
     ) -> Vec<Interaction<F>> {
         // num_limbs is the number of sublimbs per limb of key, not including the
         // shifted last sublimb
-        let num_limbs = (self.limb_bits() + self.decomp() - 1) / self.decomp();
-        let num_keys = self.key_vec_len();
+        let num_limbs = (*self.less_than_chip.air.limb_bits() + *self.less_than_chip.air.decomp()
+            - 1)
+            / *self.less_than_chip.air.decomp();
+        let num_keys = *self.less_than_chip.air.key_vec_len();
 
         let mut interactions = vec![];
 
@@ -87,7 +89,7 @@ impl<const MAX: u32> AssertSortedChip<MAX> {
                 interactions.push(Interaction {
                     fields: vec![VirtualPairCol::single_main(cols.keys_decomp[i][j])],
                     count: VirtualPairCol::constant(F::one()),
-                    argument_index: self.bus_index(),
+                    argument_index: *self.less_than_chip.bus_index(),
                 });
             }
         }

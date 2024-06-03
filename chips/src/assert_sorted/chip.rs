@@ -9,21 +9,26 @@ use super::AssertSortedChip;
 
 impl<F: PrimeField64, const MAX: u32> Chip<F> for AssertSortedChip<MAX> {
     fn sends(&self) -> Vec<Interaction<F>> {
-        let num_cols =
-            AssertSortedCols::<F>::get_width(self.limb_bits(), self.decomp(), self.key_vec_len());
+        let num_cols = AssertSortedCols::<F>::get_width(
+            *self.less_than_chip.air.limb_bits(),
+            *self.less_than_chip.air.decomp(),
+            *self.less_than_chip.air.key_vec_len(),
+        );
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
-        let cols_numbered = AssertSortedCols::<F>::cols_numbered(
+        let cols_numbered = AssertSortedCols::<usize>::from_slice(
             &all_cols,
-            self.limb_bits(),
-            self.decomp(),
-            self.key_vec_len(),
+            *self.less_than_chip.air.limb_bits(),
+            *self.less_than_chip.air.decomp(),
+            *self.less_than_chip.air.key_vec_len(),
         );
 
         let mut interactions: Vec<Interaction<F>> = vec![];
 
-        let num_limbs = (self.limb_bits() + self.decomp() - 1) / self.decomp();
-        let num_keys = self.key_vec_len();
+        let num_limbs = (*self.less_than_chip.air.limb_bits() + *self.less_than_chip.air.decomp()
+            - 1)
+            / *self.less_than_chip.air.decomp();
+        let num_keys = *self.less_than_chip.air.key_vec_len();
 
         // we will range check the decomposed limbs of the key
         for i in 0..num_keys {
@@ -32,7 +37,7 @@ impl<F: PrimeField64, const MAX: u32> Chip<F> for AssertSortedChip<MAX> {
                 interactions.push(Interaction {
                     fields: vec![VirtualPairCol::single_main(cols_numbered.keys_decomp[i][j])],
                     count: VirtualPairCol::constant(F::one()),
-                    argument_index: self.bus_index(),
+                    argument_index: *self.less_than_chip.bus_index(),
                 });
             }
         }

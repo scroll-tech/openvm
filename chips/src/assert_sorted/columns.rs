@@ -31,12 +31,6 @@ impl<T: Clone> AssertSortedCols<T> {
         cur_start_idx = cur_end_idx;
         cur_end_idx += key_vec_len;
 
-        // the next key_vec_len elements are the values of 2^num_limbs + b - a - 1 where a and b are limbs
-        // on consecutive rows and b is the row after a
-        let intermed_sum = slc[cur_start_idx..cur_end_idx].to_vec();
-        cur_start_idx = cur_end_idx;
-        cur_end_idx += key_vec_len;
-
         // the next key_vec_len elements are the values of the lower num_limbs bits of the intermediate sum
         let lower_bits = slc[cur_start_idx..cur_end_idx].to_vec();
         cur_start_idx = cur_end_idx;
@@ -74,7 +68,6 @@ impl<T: Clone> AssertSortedCols<T> {
 
         let io = LessThanIOCols { key };
         let aux = LessThanAuxCols {
-            intermed_sum,
             lower_bits,
             upper_bit,
             lower_bits_decomp,
@@ -101,8 +94,6 @@ impl<T: Clone> AssertSortedCols<T> {
         // for the decomposed keys
         let num_limbs = (limb_bits + decomp - 1) / decomp;
         width += key_vec_len * (num_limbs + 1);
-        // for the 2^limb_bits + b - a values
-        width += key_vec_len;
         // for the lower_bits
         width += key_vec_len;
         // for the upper_bit
@@ -117,82 +108,5 @@ impl<T: Clone> AssertSortedCols<T> {
         width += key_vec_len;
 
         width
-    }
-
-    pub fn cols_numbered(
-        cols: &[usize],
-        limb_bits: usize,
-        decomp: usize,
-        key_vec_len: usize,
-    ) -> AssertSortedCols<usize> {
-        // num_limbs is the number of sublimbs per limb, not including the shifted last sublimb
-        let num_limbs = (limb_bits + decomp - 1) / decomp;
-        let mut cur_start_idx = 0;
-        let mut cur_end_idx = key_vec_len;
-
-        // the first key_vec_len elements are the key itself
-        let key = cols[cur_start_idx..cur_end_idx].to_vec();
-        cur_start_idx = cur_end_idx;
-        cur_end_idx += key_vec_len * (num_limbs + 1);
-
-        // the next key_vec_len * (num_limbs + 1) elements are the decomposed keys
-        let keys_decomp = cols[cur_start_idx..cur_end_idx]
-            .chunks(num_limbs + 1)
-            .map(|chunk| chunk.to_vec())
-            .collect();
-        cur_start_idx = cur_end_idx;
-        cur_end_idx += key_vec_len;
-
-        // the next key_vec_len elements are the intermediate sum
-        let intermed_sum = cols[cur_start_idx..cur_end_idx].to_vec();
-        cur_start_idx = cur_end_idx;
-        cur_end_idx += key_vec_len;
-
-        // the next key_vec_len elements are the lower_bits
-        let lower_bits = cols[cur_start_idx..cur_end_idx].to_vec();
-        cur_start_idx = cur_end_idx;
-        cur_end_idx += key_vec_len;
-
-        // the next key_vec_len elements are the upper_bit
-        let upper_bit = cols[cur_start_idx..cur_end_idx].to_vec();
-        cur_start_idx = cur_end_idx;
-        cur_end_idx += key_vec_len * (num_limbs + 1);
-
-        // the next key_vec_len * (num_limbs + 1) elements are the decomposed lower_bits
-        let lower_bits_decomp = cols[cur_start_idx..cur_end_idx]
-            .chunks(num_limbs + 1)
-            .map(|chunk| chunk.to_vec())
-            .collect();
-
-        // the next key_vec_len elements are the difference between consecutive rows
-        let diff = cols[cur_start_idx..cur_end_idx].to_vec();
-        cur_start_idx = cur_end_idx;
-        cur_end_idx += key_vec_len;
-
-        // the next key_vec_len elements are the indicator whether difference is zero
-        let is_zero = cols[cur_start_idx..cur_end_idx].to_vec();
-        cur_start_idx = cur_end_idx;
-        cur_end_idx += key_vec_len;
-
-        // the next key_vec_len elements are the inverses
-        let inverses = cols[cur_start_idx..cur_end_idx].to_vec();
-
-        let io = LessThanIOCols { key };
-        let aux = LessThanAuxCols {
-            intermed_sum,
-            lower_bits,
-            upper_bit,
-            lower_bits_decomp,
-            diff,
-            is_zero,
-            inverses,
-        };
-
-        let less_than_cols = LessThanCols { io, aux };
-
-        AssertSortedCols {
-            keys_decomp,
-            less_than_cols,
-        }
     }
 }

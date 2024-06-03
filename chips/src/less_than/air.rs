@@ -1,6 +1,6 @@
 use std::borrow::Borrow;
 
-use p3_air::{Air, AirBuilder, AirBuilderWithPublicValues, BaseAir};
+use p3_air::{Air, AirBuilder, BaseAir};
 use p3_field::{AbstractField, Field};
 use p3_matrix::Matrix;
 
@@ -8,60 +8,55 @@ use crate::sub_chip::{AirConfig, SubAir};
 
 use super::{
     columns::{LessThanAuxCols, LessThanCols, LessThanIOCols},
-    LessThanChip,
+    LessThanAir, LessThanChip,
 };
-
-impl<F: Field, const MAX: u32> BaseAir<F> for LessThanChip<MAX> {
-    fn width(&self) -> usize {
-        LessThanCols::<F>::get_width(self.limb_bits(), self.decomp(), self.key_vec_len())
-    }
-}
-
-impl<AB: AirBuilderWithPublicValues, const MAX: u32> Air<AB> for LessThanChip<MAX>
-where
-    AB: AirBuilder,
-    AB::Var: Clone,
-{
-    fn eval(&self, builder: &mut AB) {
-        let main = builder.main();
-        let _pis = builder.public_values();
-
-        let (local, next) = (main.row_slice(0), main.row_slice(1));
-        let local: &[AB::Var] = (*local).borrow();
-        let next: &[AB::Var] = (*next).borrow();
-
-        let local_cols = LessThanCols::<AB::Var>::from_slice(
-            local,
-            self.limb_bits(),
-            self.decomp(),
-            self.key_vec_len(),
-        );
-
-        let next_cols = LessThanCols::<AB::Var>::from_slice(
-            next,
-            self.limb_bits(),
-            self.decomp(),
-            self.key_vec_len(),
-        );
-
-        SubAir::eval(
-            self,
-            builder,
-            vec![local_cols.io, next_cols.io],
-            local_cols.aux,
-        );
-    }
-}
 
 impl<const MAX: u32> AirConfig for LessThanChip<MAX> {
     type Cols<T> = LessThanCols<T>;
 }
 
+impl<F: Field, const MAX: u32> BaseAir<F> for LessThanChip<MAX> {
+    fn width(&self) -> usize {
+        LessThanCols::<F>::get_width(
+            *self.air.limb_bits(),
+            *self.air.decomp(),
+            *self.air.key_vec_len(),
+        )
+    }
+}
+
+impl<AB: AirBuilder, const MAX: u32> Air<AB> for LessThanChip<MAX> {
+    fn eval(&self, builder: &mut AB) {
+        let main = builder.main();
+
+        let (local, next) = (main.row_slice(0), main.row_slice(1));
+        let local: &[AB::Var] = (*local).borrow();
+        let next: &[AB::Var] = (*next).borrow();
+
+        let [local_cols, next_cols] = [local, next].map(|view| {
+            LessThanCols::<AB::Var>::from_slice(
+                view,
+                *self.air.limb_bits(),
+                *self.air.decomp(),
+                *self.air.key_vec_len(),
+            )
+        });
+
+        SubAir::eval(
+            &self.air,
+            builder,
+            [local_cols.io, next_cols.io],
+            local_cols.aux,
+        );
+    }
+}
+
 // sub-chip with constraints to check whether one key is less than the next (row-wise)
-impl<const MAX: u32, AB: AirBuilder> SubAir<AB> for LessThanChip<MAX> {
-    type IoView = Vec<LessThanIOCols<AB::Var>>;
+impl<const MAX: u32, AB: AirBuilder> SubAir<AB> for LessThanAir<MAX> {
+    type IoView = [LessThanIOCols<AB::Var>; 2];
     type AuxView = LessThanAuxCols<AB::Var>;
 
+    // constrain that local_key < next_key lexicographically
     fn eval(&self, builder: &mut AB, io: Self::IoView, aux: Self::AuxView) {
         let local_key = io[0].key.clone();
         let next_key = io[1].key.clone();
@@ -71,10 +66,9 @@ impl<const MAX: u32, AB: AirBuilder> SubAir<AB> for LessThanChip<MAX> {
         // num_limbs is the number of sublimbs per limb, not including the shifted last sublimb
         let num_limbs = (self.limb_bits() + self.decomp() - 1) / self.decomp();
 
-        let intermed_sum = local_aux.intermed_sum.clone();
-        let lower_bits = local_aux.lower_bits.clone();
-        let upper_bit = local_aux.upper_bit.clone();
-        let lower_bits_decomp = local_aux.lower_bits_decomp.clone();
+        let lower_bits = &local_aux.lower_bits;
+        let upper_bit = &local_aux.upper_bit;
+        let lower_bits_decomp = &local_aux.lower_bits_decomp;
 
         // we want to check these constraints for each row except the last one
         let mut when_transition = builder.when_transition();
@@ -89,20 +83,17 @@ impl<const MAX: u32, AB: AirBuilder> SubAir<AB> for LessThanChip<MAX> {
                 + AB::Expr::from_canonical_u64(1 << self.limb_bits())
                 - AB::Expr::one();
 
-            // constrain that the intermed val (2^limb_bits + key_next - key_local) is correct
-            when_transition.assert_eq(intermed_sum[i], intermed_val);
-
             // constrain that lower_bits[i] + upper_bit[i] * 2^limb_bits is the correct intermediate sum
             let check_val =
                 lower_bits[i] + upper_bit[i] * AB::Expr::from_canonical_u64(1 << self.limb_bits());
-            when_transition.assert_eq(intermed_sum[i], check_val);
+            when_transition.assert_eq(intermed_val, check_val);
 
             // constrain that diff is the difference between the two elements of consecutive rows
             let diff = *key_next - *key_local;
             when_transition.assert_eq(diff, local_aux.diff[i]);
         }
 
-        for i in 0..self.key_vec_len() {
+        for i in 0..*self.key_vec_len() {
             let mut lower_bits_from_decomp: AB::Expr = AB::Expr::zero();
             // constrain that the decomposition of each lower_bits element is correct
             for j in 0..num_limbs {
@@ -118,13 +109,13 @@ impl<const MAX: u32, AB: AirBuilder> SubAir<AB> for LessThanChip<MAX> {
             when_transition.assert_eq(lower_bits_from_decomp, lower_bits[i]);
         }
 
-        for upper_bit_value in &upper_bit {
+        for upper_bit_value in upper_bit {
             // constrain that each element in upper_bit is a boolean
             let is_bool = *upper_bit_value * (AB::Expr::one() - *upper_bit_value);
             when_transition.assert_zero(is_bool);
         }
 
-        for i in 0..self.key_vec_len() {
+        for i in 0..*self.key_vec_len() {
             let diff = local_aux.diff[i];
             let is_equal = local_aux.is_zero[i];
             let inverse = local_aux.inverses[i];
