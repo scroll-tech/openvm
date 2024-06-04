@@ -33,11 +33,10 @@ impl<F: PrimeField64> LocalTraceInstructions<F> for IsLessThanChip {
         let last_limb_shift =
             (self.air.decomp() - (self.air.limb_bits() % self.air.decomp())) % self.air.decomp();
 
-        // obtain the lower_bits and upper_bit
+        // obtain the lower_bits
         let check_less_than = (1 << self.air.limb_bits()) + y - x - 1;
         let lower_bits = F::from_canonical_u32(check_less_than & ((1 << self.air.limb_bits()) - 1));
         let lower_bits_u32 = check_less_than & ((1 << self.air.limb_bits()) - 1);
-        let upper_bit = F::from_canonical_u32(check_less_than >> self.air.limb_bits());
 
         // decompose lower_bits into limbs and range check
         let mut lower_bits_decomp: Vec<F> = vec![];
@@ -62,7 +61,6 @@ impl<F: PrimeField64> LocalTraceInstructions<F> for IsLessThanChip {
         };
         let aux = IsLessThanAuxCols {
             lower_bits,
-            upper_bit,
             lower_bits_decomp,
         };
 

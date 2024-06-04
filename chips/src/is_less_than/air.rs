@@ -35,12 +35,12 @@ impl<AB: AirBuilder> Air<AB> for IsLessThanChip {
     }
 }
 
-// sub-chip with constraints to check whether one key is less than the next (row-wise)
+// sub-chip with constraints to check whether one number is less than another
 impl<AB: AirBuilder> SubAir<AB> for IsLessThanAir {
     type IoView = IsLessThanIOCols<AB::Var>;
     type AuxView = IsLessThanAuxCols<AB::Var>;
 
-    // constrain that local_key < next_key lexicographically
+    // constrain that the result of x < y is given by less_than
     fn eval(&self, builder: &mut AB, io: Self::IoView, aux: Self::AuxView) {
         let x = io.x;
         let y = io.y;
@@ -48,14 +48,13 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanAir {
 
         let local_aux = &aux;
 
-        // num_limbs is the number of sublimbs per limb, not including the shifted last sublimb
+        // num_limbs is the number of limbs, not including the last shifted limb
         let num_limbs = (self.limb_bits() + self.decomp() - 1) / self.decomp();
 
         let lower_bits = local_aux.lower_bits;
-        let upper_bit = local_aux.upper_bit;
         let lower_bits_decomp = local_aux.lower_bits_decomp.clone();
 
-        // to range check the last sublimb of the decomposed limb, we need to shift it to make sure it is in
+        // to range check the last limb of the decomposed lower_bits, we need to shift it to make sure it is in
         // the correct range
         let last_limb_shift = (self.decomp() - (self.limb_bits() % self.decomp())) % self.decomp();
 
@@ -63,9 +62,9 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanAir {
         let intermed_val =
             y - x + AB::Expr::from_canonical_u64(1 << self.limb_bits()) - AB::Expr::one();
 
-        // constrain that the lower bits + upper bit * 2^limb_bits is the correct intermediate sum
+        // constrain that the lower_bits + less_than * 2^limb_bits is the correct intermediate sum
         let check_val =
-            lower_bits + upper_bit * AB::Expr::from_canonical_u64(1 << self.limb_bits());
+            lower_bits + less_than * AB::Expr::from_canonical_u64(1 << self.limb_bits());
 
         builder.assert_eq(intermed_val, check_val);
 
@@ -86,10 +85,8 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanAir {
         // constrain that the shifted last limb is shifted correctly
         builder.assert_eq(lower_bits_decomp[num_limbs], shifted_val);
 
-        // constrain that upper_bit is a boolean
-        let is_bool = upper_bit * (AB::Expr::one() - upper_bit);
+        // constrain that less_than is a boolean
+        let is_bool = less_than * (AB::Expr::one() - less_than);
         builder.assert_zero(is_bool);
-
-        builder.assert_eq(less_than, upper_bit);
     }
 }
