@@ -80,8 +80,10 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         &self,
         page: &mut Vec<Vec<u32>>,
         ops: &Vec<Operation>,
+        trace_degree: usize,
     ) -> RowMajorMatrix<Val<SC>> {
-        self.middle_chip.generate_trace::<SC>(page, ops.clone())
+        self.middle_chip
+            .generate_trace::<SC>(page, ops.clone(), trace_degree)
     }
 
     pub fn load_page_and_ops(
@@ -90,8 +92,12 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         key_len: usize,
         val_len: usize,
         ops: Vec<Operation>,
+        trace_degree: usize,
         trace_committer: &mut TraceCommitter<SC>,
     ) -> (Vec<DenseMatrix<Val<SC>>>, Vec<ProverTraceData<SC>>) {
+        println!("in load_page_and_ops");
+        println!("page: {:?}", page);
+
         assert!(page.len() > 0);
         self.init_chip_trace = Some(self.get_page_trace(page.clone()));
 
@@ -104,7 +110,7 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         println!("initialized init_chip and its trace");
 
         self.middle_chip = MiddleChip::new(bus_index, key_len, val_len);
-        self.middle_chip_trace = Some(self.gen_ops_trace(&mut page, &ops));
+        self.middle_chip_trace = Some(self.gen_ops_trace(&mut page, &ops, trace_degree));
 
         println!("initialized middle_chip and its trace");
 

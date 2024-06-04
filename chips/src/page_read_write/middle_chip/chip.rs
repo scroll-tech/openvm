@@ -42,7 +42,12 @@ impl<F: PrimeField64> Chip<F> for MiddleChip {
         let num_cols = self.air_width();
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
-        let cols_to_receive = MiddleChipCols::<F>::cols_numbered(&all_cols);
+        let cols_to_receive = MiddleChipCols::<F>::cols_numbered(
+            &all_cols,
+            self.page_width(),
+            self.key_len,
+            self.val_len,
+        );
         SubAirWithInteractions::receives(self, cols_to_receive)
     }
 
@@ -50,7 +55,12 @@ impl<F: PrimeField64> Chip<F> for MiddleChip {
         let num_cols = self.air_width();
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
-        let cols_to_send = MiddleChipCols::<F>::cols_numbered(&all_cols);
+        let cols_to_send = MiddleChipCols::<F>::cols_numbered(
+            &all_cols,
+            self.page_width(),
+            self.key_len,
+            self.val_len,
+        );
         SubAirWithInteractions::sends(self, cols_to_send)
     }
 }

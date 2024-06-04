@@ -1,4 +1,4 @@
-use std::borrow::Borrow;
+use std::{borrow::Borrow, fmt::Debug};
 
 use afs_stark_backend::air_builders::PartitionedAirBuilder;
 use p3_air::{Air, AirBuilder, BaseAir};
@@ -18,12 +18,6 @@ impl<F: Field> BaseAir<F> for MiddleChip {
     }
 }
 
-impl MiddleChip {
-    fn implies<AB: AirBuilder>(&self, builder: &mut AB, a: AB::Expr, b: AB::Expr) {
-        builder.assert_one((AB::Expr::one() - a.clone()) + b.clone() - (AB::Expr::one() - a) * b);
-    }
-}
-
 /// Imposes the following constraints:
 /// - Rows are sorted by key then by timestamp (clk)
 /// - Every key block starts with a write
@@ -33,9 +27,10 @@ impl MiddleChip {
 impl<AB: PartitionedAirBuilder> Air<AB> for MiddleChip
 where
     AB::M: Clone,
+    AB::Var: Debug, // TODO: remove
 {
     fn eval(&self, builder: &mut AB) {
-        let main = &builder.partitioned_main()[2].clone();
+        let main = &builder.partitioned_main()[0].clone();
 
         // let main = builder.main();
 
@@ -48,13 +43,17 @@ where
             local.len()
         );
 
-        let local_cols = MiddleChipCols::from_slice(local);
-        let next_cols = MiddleChipCols::from_slice(next);
+        let local_cols =
+            MiddleChipCols::from_slice(local, self.page_width(), self.key_len, self.val_len);
+        let next_cols =
+            MiddleChipCols::from_slice(next, self.page_width(), self.key_len, self.val_len);
 
         // TODO: make sure all the relations between is_initial, is_final, op_type are followed
 
         // Making sure op_type is always bool (read or write)
         builder.assert_bool(local_cols.op_type);
+        builder.assert_bool(local_cols.is_extra);
+        // TODO: do I need to assert that other bits are bools?
 
         // Making sure first row starts with same_key, same_value being false
         builder.when_first_row().assert_zero(local_cols.same_key);
@@ -62,36 +61,58 @@ where
 
         // TODO: make sure same_key and same_val are correct for the rest of the rows
 
+        // TODO: make sure all rows are sorted
+
+        let and = |a: AB::Expr, b: AB::Expr| a * b;
+
+        let or = |a: AB::Expr, b: AB::Expr| a.clone() + b.clone() - a * b;
+
+        let implies = |a: AB::Expr, b: AB::Expr| or(AB::Expr::one() - a, b);
+
         // Making sure every key block starts with a write
-        builder.assert_one(
-            local_cols.same_key + local_cols.op_type - local_cols.same_key * local_cols.op_type,
-        );
+        builder.assert_one(or(
+            local_cols.is_extra.into(),
+            or(local_cols.same_key.into(), local_cols.op_type.into()),
+        ));
 
         // Making sure every key block ends with a is_final
-        builder.assert_one(
-            (AB::Expr::one() - next_cols.same_key) + local_cols.is_final
-                - (AB::Expr::one() - next_cols.same_key) * local_cols.is_final,
-        );
-        builder.when_last_row().assert_one(local_cols.is_final);
+        builder.when_transition().assert_one(or(
+            local_cols.is_extra.into(),
+            or(next_cols.same_key.into(), local_cols.is_final.into()),
+        ));
+        builder.when_transition().assert_one(implies(
+            and(
+                AB::Expr::one() - local_cols.is_extra.into(),
+                next_cols.is_extra.into(),
+            ),
+            local_cols.is_final.into(),
+        ));
+        builder.when_last_row().assert_one(implies(
+            AB::Expr::one() - local_cols.is_extra,
+            local_cols.is_final.into(),
+        ));
 
         // Making sure that is_initial rows only appear at the start of blocks
         // is_initial => not same_key
-        builder.assert_one(
-            (AB::Expr::one() - local_cols.is_initial) + (AB::Expr::one() - local_cols.same_key)
-                - (AB::Expr::one() - local_cols.is_initial)
-                    * (AB::Expr::one() - local_cols.same_key),
-        );
+        builder.assert_one(implies(
+            local_cols.is_initial.into(),
+            AB::Expr::one() - local_cols.same_key,
+        ));
 
         // Making sure that every read uses the same value as the last operation
         // read => same_val
-        builder.assert_one(
-            next_cols.op_type + next_cols.same_val - next_cols.op_type * next_cols.same_val,
-        );
+        builder.assert_one(or(
+            local_cols.is_extra.into(),
+            or(local_cols.op_type.into(), local_cols.same_val.into()),
+        ));
 
         // Making sure that is_final implies a read
-        builder.assert_one(
-            (AB::Expr::one() - local_cols.is_final) + (AB::Expr::one() - local_cols.op_type)
-                - (AB::Expr::one() - local_cols.is_final) * (AB::Expr::one() - local_cols.op_type),
-        );
+        builder.assert_one(or(
+            local_cols.is_extra.into(),
+            implies(
+                local_cols.is_final.into(),
+                AB::Expr::one() - local_cols.op_type.into(),
+            ),
+        ));
     }
 }

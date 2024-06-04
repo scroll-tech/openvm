@@ -1,3 +1,5 @@
+use std::iter;
+
 use afs_stark_backend::interaction::{Chip, Interaction};
 use p3_air::VirtualPairCol;
 use p3_field::PrimeField64;
@@ -12,10 +14,9 @@ impl InitFinalChip {
         &self,
         col_indices: InitFinalCols<usize>,
     ) -> Vec<Interaction<F>> {
-        let virtual_cols = col_indices
-            .page_row
-            .iter()
-            .map(|col| VirtualPairCol::single_main(*col))
+        let virtual_cols = iter::once(col_indices.is_alloc)
+            .chain(col_indices.page_row)
+            .map(VirtualPairCol::single_main)
             .collect::<Vec<_>>();
 
         vec![Interaction {

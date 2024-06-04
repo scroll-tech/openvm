@@ -39,6 +39,7 @@ fn load_page_test(
         key_len,
         val_len,
         ops.clone(),
+        ops.len() * 8,
         &mut trace_builder.committer,
     );
 
@@ -51,7 +52,12 @@ fn load_page_test(
 
     trace_builder.load_cached_trace(page_traces[0].clone(), prover_data.remove(0));
     trace_builder.load_cached_trace(page_traces[1].clone(), prover_data.remove(0));
-    trace_builder.load_trace(middle_chip_trace);
+    trace_builder.load_trace(middle_chip_trace.clone());
+
+    println!("ultimate debugging");
+    println!("page_traces[0]: {:?}", page_traces[0]);
+    println!("page_traces[1]: {:?}", page_traces[1]);
+    println!("middle_chip_trace: {:?}", middle_chip_trace);
 
     println!("loaded all the traces");
 
@@ -88,7 +94,11 @@ fn load_page_test(
     let result = verifier.verify(
         &mut challenger,
         partial_vk,
-        vec![&page_controller.middle_chip],
+        vec![
+            &page_controller.init_chip,
+            &page_controller.final_chip,
+            &page_controller.middle_chip,
+        ],
         proof,
         &pis,
     );
@@ -107,28 +117,51 @@ fn page_read_write_test() {
     // TODO: remove this
     let max_val = 10;
 
-    let log_page_height = 3;
-    let log_num_ops = 5;
+    // TODO: up those rookie numbers
+    let log_page_height = 2;
+    let log_num_ops = 2;
 
-    let page_width = 4;
+    let page_width = 3;
     let page_height = 1 << log_page_height;
     let num_ops: usize = 1 << log_num_ops;
 
-    let key_len = rng.gen::<usize>() % ((page_width - 1) - 1) + 1;
-    let val_len = (page_width - 1) - key_len;
+    // let key_len = rng.gen::<usize>() % ((page_width - 1) - 1) + 1;
+    // let val_len = (page_width - 1) - key_len;
+    let key_len = 1;
+    let val_len = 1;
 
     println!("page_width: {}, page_height: {}", page_width, page_height);
 
     println!("key_len: {}, val_len: {}", key_len, val_len);
 
-    let page = (0..page_height)
-        .map(|_| {
-            iter::once(1)
-                .chain(0..page_width - 1)
+    // let page = (0..page_height)
+    //     .map(|_| {
+    //         iter::once(1)
+    //             .chain((0..page_width - 1).map(|_| rng.gen::<u32>() % max_val))
+    //             .collect::<Vec<u32>>()
+    //     })
+    //     .collect::<Vec<Vec<u32>>>();
+
+    // println!("right after initializing page: {:?}", page);
+
+    // Generating a random page with distinct keys
+    let mut page: Vec<Vec<u32>> = vec![];
+    let mut all_keys = HashMap::new();
+    for i in 0..page_height {
+        let mut key;
+        loop {
+            key = (0..key_len)
                 .map(|_| rng.gen::<u32>() % max_val)
-                .collect::<Vec<u32>>()
-        })
-        .collect::<Vec<Vec<u32>>>();
+                .collect::<Vec<u32>>();
+            if !all_keys.contains_key(&key) {
+                break;
+            }
+        }
+
+        all_keys.insert(key.clone(), i);
+        let val: Vec<u32> = (0..val_len).map(|_| rng.gen::<u32>() % max_val).collect();
+        page.push(iter::once(1).chain(key).chain(val).collect());
+    }
 
     println!("page: {:?}", page);
 
