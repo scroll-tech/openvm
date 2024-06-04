@@ -39,9 +39,6 @@ pub struct PageController<SC: StarkGenericConfig>
 where
     Val<SC>: AbstractField,
 {
-    ops: Vec<Operation>,
-
-    // TODO: maybe make those optional
     pub init_chip: InitFinalChip,
     pub middle_chip: MiddleChip,
     pub final_chip: InitFinalChip,
@@ -57,10 +54,8 @@ where
 impl<SC: StarkGenericConfig> PageController<SC> {
     pub fn new(bus_index: usize) -> Self {
         Self {
-            ops: vec![],
-
             init_chip: InitFinalChip::new(bus_index, 1, true),
-            middle_chip: MiddleChip::new(bus_index, 0, 0),
+            middle_chip: MiddleChip::new(bus_index, 1, 1),
             final_chip: InitFinalChip::new(bus_index, 1, false),
 
             init_chip_trace: None,
@@ -70,6 +65,10 @@ impl<SC: StarkGenericConfig> PageController<SC> {
             init_page_commitment: None,
             final_page_commitment: None,
         }
+    }
+
+    pub fn middle_chip_trace(&self) -> DenseMatrix<Val<SC>> {
+        self.middle_chip_trace.clone().unwrap()
     }
 
     fn get_page_trace(&self, page: Vec<Vec<u32>>) -> DenseMatrix<Val<SC>> {

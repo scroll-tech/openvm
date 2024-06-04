@@ -17,8 +17,9 @@ use rand::Rng;
 
 use crate::page_read_write::page_controller;
 
+// TODO: add tests
+
 // TODO: make ops not a parameter and generate inside
-// TODO: don't forget to clear trace builder
 fn load_page_test(
     engine: &BabyBearPoseidon2Engine,
     page_init: &Vec<Vec<u32>>,
@@ -45,8 +46,7 @@ fn load_page_test(
 
     println!("Committed to the traces of initial and final pages");
 
-    // TODO: maybe define a getter for this
-    let middle_chip_trace = page_controller.middle_chip_trace.clone().unwrap();
+    let middle_chip_trace = page_controller.middle_chip_trace();
 
     trace_builder.clear();
 
@@ -106,7 +106,6 @@ fn load_page_test(
     result
 }
 
-// TODO: Make sure all the keys generated in the test are distinct
 #[test]
 fn page_read_write_test() {
     let mut rng = create_seeded_rng();
@@ -114,52 +113,37 @@ fn page_read_write_test() {
 
     use page_read_write::page_controller::PageController;
 
-    // TODO: remove this
-    let max_val = 10;
+    // The prime used by BabyBear
+    const MAX_VAL: u32 = 0x78000001;
+    // const MAX_VAL: u32 = 10;
 
     // TODO: up those rookie numbers
-    let log_page_height = 2;
-    let log_num_ops = 2;
+    let log_page_height = 3;
+    let log_num_ops = 3;
 
-    let page_width = 3;
+    let page_width = 6;
     let page_height = 1 << log_page_height;
     let num_ops: usize = 1 << log_num_ops;
 
-    // let key_len = rng.gen::<usize>() % ((page_width - 1) - 1) + 1;
-    // let val_len = (page_width - 1) - key_len;
-    let key_len = 1;
-    let val_len = 1;
-
-    println!("page_width: {}, page_height: {}", page_width, page_height);
-
-    println!("key_len: {}, val_len: {}", key_len, val_len);
-
-    // let page = (0..page_height)
-    //     .map(|_| {
-    //         iter::once(1)
-    //             .chain((0..page_width - 1).map(|_| rng.gen::<u32>() % max_val))
-    //             .collect::<Vec<u32>>()
-    //     })
-    //     .collect::<Vec<Vec<u32>>>();
-
-    // println!("right after initializing page: {:?}", page);
+    let key_len = rng.gen::<usize>() % ((page_width - 1) - 1) + 1;
+    let val_len = (page_width - 1) - key_len;
 
     // Generating a random page with distinct keys
     let mut page: Vec<Vec<u32>> = vec![];
-    let mut all_keys = HashMap::new();
+    let mut key_val_map = HashMap::new();
     for i in 0..page_height {
         let mut key;
         loop {
             key = (0..key_len)
-                .map(|_| rng.gen::<u32>() % max_val)
+                .map(|_| rng.gen::<u32>() % MAX_VAL)
                 .collect::<Vec<u32>>();
-            if !all_keys.contains_key(&key) {
+            if !key_val_map.contains_key(&key) {
                 break;
             }
         }
 
-        all_keys.insert(key.clone(), i);
-        let val: Vec<u32> = (0..val_len).map(|_| rng.gen::<u32>() % max_val).collect();
+        let val: Vec<u32> = (0..val_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+        key_val_map.insert(key.clone(), val.clone());
         page.push(iter::once(1).chain(key).chain(val).collect());
     }
 
@@ -167,24 +151,16 @@ fn page_read_write_test() {
 
     // Generating random sorted timestamps for operations
     let mut clks: Vec<usize> = (0..num_ops)
-        .map(|_| rng.gen::<usize>() % (max_val as usize))
+        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
         .collect();
     clks.sort();
-
-    let mut all_keys = HashMap::new();
-    for (i, row) in page.iter().enumerate() {
-        let key = row[1..key_len + 1].to_vec().clone();
-        all_keys.insert(key, i);
-    }
-
-    println!("Number of keys: {}", all_keys.len());
 
     let mut ops: Vec<Operation> = vec![];
     for i in 0..num_ops {
         let clk = clks[i];
-        let key = all_keys
+        let key = key_val_map
             .iter()
-            .nth(rng.gen::<usize>() % all_keys.len())
+            .nth(rng.gen::<usize>() % key_val_map.len())
             .unwrap()
             .0
             .to_vec();
@@ -199,11 +175,15 @@ fn page_read_write_test() {
 
         let val = {
             if op_type == OpType::Read {
-                page[all_keys[&key]][key_len + 1..].to_vec()
+                key_val_map[&key].to_vec()
             } else {
-                (0..val_len).map(|_| rng.gen::<u32>() % max_val).collect()
+                (0..val_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
             }
         };
+
+        if op_type == OpType::Write {
+            key_val_map.insert(key.clone(), val.clone());
+        }
 
         ops.push(Operation::new(clk, key, val, op_type));
     }
@@ -220,15 +200,14 @@ fn page_read_write_test() {
 
     let init_page_ptr = keygen_builder.add_cached_main_matrix(page_width);
     let final_page_ptr = keygen_builder.add_cached_main_matrix(page_width);
-    let ops_ptr = keygen_builder.add_main_matrix(7 + page_width);
+    let ops_ptr = keygen_builder.add_main_matrix(7 + page_width + 2 * (key_len + val_len));
 
     println!(
         "ops trace width should be {} because page_width is {}",
-        7 + page_width,
+        7 + page_width + 2 * (key_len + val_len),
         page_width
     );
 
-    // TODO: fix the degree
     keygen_builder.add_partitioned_air(
         &page_controller.init_chip,
         page_height,
@@ -245,16 +224,70 @@ fn page_read_write_test() {
 
     keygen_builder.add_partitioned_air(&page_controller.middle_chip, num_ops * 8, 0, vec![ops_ptr]);
 
-    // keygen_builder.add_air(&page_controller.init_chip, page_height, 0);
-    // keygen_builder.add_air(&page_controller.final_chip, page_height, 0);
-    // keygen_builder.add_air(&page_controller.middle_chip, num_ops * 8, 0);
-
     let partial_pk = keygen_builder.generate_partial_pk();
 
     let prover = MultiTraceStarkProver::new(&engine.config);
     let mut trace_builder = TraceCommitmentBuilder::new(prover.pcs());
 
     println!("Done everything just calling load_page_test next");
+
+    load_page_test(
+        &engine,
+        &page,
+        key_len,
+        val_len,
+        &ops,
+        &mut page_controller,
+        &mut trace_builder,
+        &partial_pk,
+    )
+    .expect("Verification failed");
+
+    // Making the page only partiially-allocated
+    let rows_allocated = rng.gen::<usize>() % (page_height + 1);
+    for i in rows_allocated..page_height {
+        page[i][0] = 0;
+
+        // Making sure the first operation using this key is a write
+        let key = page[i][1..key_len + 1].to_vec();
+        for op in ops.iter_mut() {
+            if op.key == key {
+                op.op_type = OpType::Write;
+                break;
+            }
+        }
+    }
+
+    load_page_test(
+        &engine,
+        &page,
+        key_len,
+        val_len,
+        &ops,
+        &mut page_controller,
+        &mut trace_builder,
+        &partial_pk,
+    )
+    .expect("Verification failed");
+
+    // Making the page fully-unallocated with random garbage
+    for i in 0..page_height {
+        // Making sure the first operation that uses every key is a write
+        let key = page[i][1..key_len + 1].to_vec();
+        for op in ops.iter_mut() {
+            if op.key == key {
+                op.op_type = OpType::Write;
+                break;
+            }
+        }
+
+        page[i] = (0..page_width)
+            .map(|_| rng.gen::<u32>() % MAX_VAL)
+            .collect();
+        page[i][0] = 0;
+    }
+
+    println!("Final list of ops: {:?}", ops);
 
     load_page_test(
         &engine,

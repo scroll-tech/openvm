@@ -6,7 +6,14 @@ use p3_field::{AbstractField, Field};
 use p3_matrix::Matrix;
 
 use super::{columns::MiddleChipCols, MiddleChip};
-use crate::sub_chip::AirConfig;
+use crate::{
+    is_equal::columns::IsEqualIOCols,
+    is_equal_vec::{
+        columns::{IsEqualVecCols, IsEqualVecIOCols},
+        IsEqualVecChip,
+    },
+    sub_chip::{AirConfig, SubAir},
+};
 
 impl AirConfig for MiddleChip {
     type Cols<T> = MiddleChipCols<T>;
@@ -17,6 +24,8 @@ impl<F: Field> BaseAir<F> for MiddleChip {
         self.air_width()
     }
 }
+
+// TODO: look at imports in all files and make sure they're nice
 
 /// Imposes the following constraints:
 /// - Rows are sorted by key then by timestamp (clk)
@@ -59,7 +68,24 @@ where
         builder.when_first_row().assert_zero(local_cols.same_key);
         builder.when_first_row().assert_zero(local_cols.same_val);
 
+        let is_equal_cols_vec = local_cols.page_row[1..self.key_len + 1]
+            .to_vec()
+            .into_iter()
+            .chain(next_cols.page_row[1..self.key_len + 1].to_vec())
+            .chain(next_cols.is_equal_key_aux.flatten())
+            .collect::<Vec<AB::Var>>();
+
+        let is_equal_cols = IsEqualVecCols::from_slice(&is_equal_cols_vec, self.key_len);
+
+        let is_equal_vec_chip = IsEqualVecChip::new(self.key_len);
+
         // TODO: make sure same_key and same_val are correct for the rest of the rows
+        SubAir::eval(
+            &is_equal_vec_chip,
+            &mut builder.when_transition(),
+            is_equal_cols.io,
+            is_equal_cols.aux,
+        );
 
         // TODO: make sure all rows are sorted
 
@@ -101,6 +127,7 @@ where
 
         // Making sure that every read uses the same value as the last operation
         // read => same_val
+        println!("local_cols: {:?}", local_cols);
         builder.assert_one(or(
             local_cols.is_extra.into(),
             or(local_cols.op_type.into(), local_cols.same_val.into()),

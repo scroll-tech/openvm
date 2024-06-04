@@ -1,5 +1,5 @@
 use afs_stark_backend::interaction::Interaction;
-use p3_air::AirBuilder;
+use p3_air::{AirBuilder, FilteredAirBuilder};
 use p3_field::Field;
 
 pub trait AirConfig {
@@ -17,7 +17,7 @@ pub trait SubAir<AB: AirBuilder> {
     /// Typically this is either a subset of 'local' columns or subset of 'local' and 'next' columns.
     type AuxView;
 
-    fn eval(&self, builder: &mut AB, io: Self::IoView, aux: Self::AuxView);
+    fn eval(&self, builder: &mut FilteredAirBuilder<AB>, io: Self::IoView, aux: Self::AuxView);
 }
 
 // This is a helper for simple trace row generation. Not every AIR will need this.

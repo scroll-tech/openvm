@@ -23,8 +23,12 @@ impl MiddleChip {
     where
         Val<SC>: AbstractField,
     {
+        println!("generating trace for middle chip");
+
         let is_equal_key = IsEqualVecChip::new(self.key_len);
         let is_equal_val = IsEqualVecChip::new(self.val_len);
+
+        println!("created the chips");
 
         let mut rows_allocated = 0;
         while rows_allocated < page.len() && page[rows_allocated][0] == 1 {
@@ -35,6 +39,8 @@ impl MiddleChip {
         for i in 0..rows_allocated {
             key_index_map.insert(page[i][1..self.key_len + 1].to_vec(), i);
         }
+
+        println!("key index map: {:?}", key_index_map);
 
         // Creating a timestamp bigger than all others
         let max_clk = ops.iter().map(|op| op.clk).max().unwrap_or(0) + 1;
@@ -53,14 +59,27 @@ impl MiddleChip {
                        is_final: u8,
                        clk: usize,
                        op_type: u8,
-                       last_key: Vec<u32>,
-                       last_val: Vec<u32>,
+                       last_key: &mut Vec<u32>,
+                       last_val: &mut Vec<u32>,
                        is_extra: u8| {
+            println!(
+                "generating row: {}, {}, {}, {}, {}, {:?}, {:?}, {}",
+                is_initial, is_final, clk, page[index][0], op_type, last_key, last_val, is_extra
+            );
             // Make sure the row in the page is allocated
             assert!(page[index][0] == 1);
 
             let cur_key = page[index][1..self.key_len + 1].to_vec();
             let cur_val = page[index][self.key_len + 1..].to_vec();
+
+            let my_last_key = last_key.clone();
+            let my_last_val = last_val.clone();
+
+            *last_key = cur_key.clone();
+            *last_val = cur_val.clone();
+
+            let last_key = my_last_key;
+            let last_val = my_last_val;
 
             let same_key = cur_key == last_key;
             let same_val = cur_val == last_val;
@@ -99,8 +118,10 @@ impl MiddleChip {
 
         let mut rows = vec![];
 
-        let mut last_key = vec![];
-        let mut last_val = vec![];
+        // TODO: do I need to make sure this is different than first actual row?
+        let mut last_key = vec![4234233; self.key_len];
+        let mut last_val = vec![3534543; self.val_len];
+
         let mut i = 0;
         while i < ops.len() {
             let cur_key = ops[i].key.clone();
@@ -115,7 +136,6 @@ impl MiddleChip {
                 // Adding the is_initial row to the trace
                 idx = *key_index_map.get(&cur_key).unwrap();
 
-                let cur_val = page[idx][self.key_len + 1..].to_vec();
                 rows.push(gen_row(
                     page,
                     idx,
@@ -123,11 +143,10 @@ impl MiddleChip {
                     0,
                     0,
                     1,
-                    last_key.clone(),
-                    last_val.clone(),
+                    &mut last_key,
+                    &mut last_val,
                     0,
                 ));
-                last_val = cur_val;
             } else {
                 assert!(rows_allocated < page.len());
                 idx = rows_allocated;
@@ -148,12 +167,10 @@ impl MiddleChip {
                     0,
                     ops[k].clk,
                     ops[k].op_type.clone() as u8,
-                    last_key.clone(),
-                    last_val.clone(),
+                    &mut last_key,
+                    &mut last_val,
                     0,
                 ));
-                last_key = ops[k].key.clone();
-                last_val = ops[k].val.clone();
             }
 
             // Adding the is_final row to the trace
@@ -164,8 +181,8 @@ impl MiddleChip {
                 1,
                 max_clk,
                 0,
-                last_key.clone(),
-                last_val.clone(),
+                &mut last_key,
+                &mut last_val,
                 0,
             ));
 
@@ -176,9 +193,27 @@ impl MiddleChip {
         assert!(trace_degree > 0 && trace_degree & (trace_degree - 1) == 0);
 
         // Adding rows to the trace to make the height trace_degree
-        let dummy_row = gen_row(page, 0, 0, 0, 0, 0, last_key.clone(), last_val.clone(), 1);
         while rows.len() < trace_degree {
-            rows.push(dummy_row.clone());
+            rows.push(gen_row(
+                page,
+                0,
+                0,
+                0,
+                0,
+                0,
+                &mut last_key,
+                &mut last_val,
+                1,
+            ));
+        }
+
+        println!("width of air is {}, {}", rows[0].len(), self.air_width());
+
+        println!("Middle Chip trace by row");
+        for (i, row) in rows.iter().enumerate() {
+            let cols =
+                MiddleChipCols::from_slice(row, self.page_width(), self.key_len, self.val_len);
+            println!("row {}: {:?}", i, cols);
         }
 
         RowMajorMatrix::new(rows.concat(), self.air_width())

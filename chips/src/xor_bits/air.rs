@@ -1,7 +1,7 @@
 use std::{borrow::Borrow, iter::zip};
 
 use itertools::Itertools;
-use p3_air::{Air, AirBuilder, BaseAir};
+use p3_air::{Air, AirBuilder, BaseAir, FilteredAirBuilder};
 use p3_field::{AbstractField, Field};
 use p3_matrix::Matrix;
 
@@ -31,7 +31,12 @@ impl<AB: AirBuilder, const N: usize> Air<AB> for XorBitsChip<N> {
 
         let xor_cols = XorCols::<N, AB::Var>::from_slice(local);
 
-        SubAir::eval(&self.air, builder, xor_cols.io, xor_cols.bits);
+        SubAir::eval(
+            &self.air,
+            &mut builder.when(AB::Expr::one()),
+            xor_cols.io,
+            xor_cols.bits,
+        );
     }
 }
 
@@ -44,7 +49,7 @@ impl<const N: usize, AB: AirBuilder> SubAir<AB> for XorBitsAir<N> {
     type IoView = XorIOCols<AB::Var>;
     type AuxView = XorBitCols<AB::Var>;
 
-    fn eval(&self, builder: &mut AB, io: Self::IoView, bits: Self::AuxView) {
+    fn eval(&self, builder: &mut FilteredAirBuilder<AB>, io: Self::IoView, bits: Self::AuxView) {
         for (x, bit_decomp) in zip([io.x, io.y, io.z], [&bits.x, &bits.y, &bits.z]) {
             let mut from_bits = AB::Expr::zero();
             for (i, &bit) in bit_decomp.iter().enumerate() {

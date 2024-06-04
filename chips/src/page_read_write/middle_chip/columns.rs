@@ -81,16 +81,16 @@ where
             is_final: slc[1].clone(),
             clk: slc[2].clone(),
             page_row: slc[3..3 + page_width].to_vec(),
-            op_type: slc[4 + page_width].clone(),
-            same_key: slc[5 + page_width].clone(),
-            same_val: slc[6 + page_width].clone(),
-            is_extra: slc[7 + page_width].clone(),
+            op_type: slc[3 + page_width].clone(),
+            same_key: slc[4 + page_width].clone(),
+            same_val: slc[5 + page_width].clone(),
+            is_extra: slc[6 + page_width].clone(),
             is_equal_key_aux: IsEqualVecAuxCols::from_slice(
-                &slc[8 + page_width..8 + page_width + 2 * key_len],
+                &slc[7 + page_width..7 + page_width + 2 * key_len],
                 key_len,
             ),
             is_equal_val_aux: IsEqualVecAuxCols::from_slice(
-                &slc[8 + page_width + 2 * key_len..8 + page_width + 2 * key_len + 2 * val_len],
+                &slc[7 + page_width + 2 * key_len..7 + page_width + 2 * key_len + 2 * val_len],
                 val_len,
             ),
         }
@@ -102,23 +102,26 @@ where
         key_len: usize,
         val_len: usize,
     ) -> MiddleChipCols<usize> {
+        println!("cols numbered: {} {} {}", page_width, key_len, val_len);
+        println!("cols_len: {}", cols.len());
+
         MiddleChipCols {
             is_initial: cols[0],
             is_final: cols[1],
             clk: cols[2],
             page_row: cols[3..3 + page_width].to_vec(),
-            op_type: cols[4 + page_width],
-            same_key: cols[5 + page_width],
-            same_val: cols[6 + page_width],
-            is_extra: cols[7 + page_width],
+            op_type: cols[3 + page_width],
+            same_key: cols[4 + page_width],
+            same_val: cols[5 + page_width],
+            is_extra: cols[6 + page_width],
             is_equal_key_aux: IsEqualVecAuxCols::new(
-                cols[8 + page_width..8 + page_width + key_len].to_vec(),
-                cols[8 + page_width + key_len..8 + page_width + 2 * key_len].to_vec(),
+                cols[7 + page_width..7 + page_width + key_len].to_vec(),
+                cols[7 + page_width + key_len..7 + page_width + 2 * key_len].to_vec(),
             ),
             is_equal_val_aux: IsEqualVecAuxCols::new(
-                cols[8 + page_width + 2 * key_len..8 + page_width + 2 * key_len + val_len].to_vec(),
-                cols[8 + page_width + 2 * key_len + val_len
-                    ..8 + page_width + 2 * key_len + 2 * val_len]
+                cols[7 + page_width + 2 * key_len..7 + page_width + 2 * key_len + val_len].to_vec(),
+                cols[7 + page_width + 2 * key_len + val_len
+                    ..7 + page_width + 2 * key_len + 2 * val_len]
                     .to_vec(),
             ),
         }
