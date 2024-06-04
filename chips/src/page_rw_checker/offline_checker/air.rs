@@ -5,17 +5,17 @@ use p3_air::{Air, AirBuilder, BaseAir};
 use p3_field::{AbstractField, Field};
 use p3_matrix::Matrix;
 
-use super::{columns::MiddleChipCols, MiddleChip};
+use super::{columns::OfflineCheckerCols, OfflineChecker};
 use crate::{
     is_equal_vec::{columns::IsEqualVecCols, IsEqualVecChip},
     sub_chip::{AirConfig, SubAir},
 };
 
-impl AirConfig for MiddleChip {
-    type Cols<T> = MiddleChipCols<T>;
+impl AirConfig for OfflineChecker {
+    type Cols<T> = OfflineCheckerCols<T>;
 }
 
-impl<F: Field> BaseAir<F> for MiddleChip {
+impl<F: Field> BaseAir<F> for OfflineChecker {
     fn width(&self) -> usize {
         self.air_width()
     }
@@ -29,7 +29,7 @@ impl<F: Field> BaseAir<F> for MiddleChip {
 /// - Every key block ends with an is_final
 /// - For every key, every read uses the same value as the last
 ///   operation with that key
-impl<AB: PartitionedAirBuilder> Air<AB> for MiddleChip
+impl<AB: PartitionedAirBuilder> Air<AB> for OfflineChecker
 where
     AB::M: Clone,
     AB::Var: Debug, // TODO: remove
@@ -41,15 +41,10 @@ where
         let local: &[AB::Var] = (*local).borrow();
         let next: &[AB::Var] = (*next).borrow();
 
-        println!(
-            "Here in the airbuilder eval file, local.len(): {:?}",
-            local.len()
-        );
-
         let local_cols =
-            MiddleChipCols::from_slice(local, self.page_width(), self.key_len, self.val_len);
+            OfflineCheckerCols::from_slice(local, self.page_width(), self.key_len, self.val_len);
         let next_cols =
-            MiddleChipCols::from_slice(next, self.page_width(), self.key_len, self.val_len);
+            OfflineCheckerCols::from_slice(next, self.page_width(), self.key_len, self.val_len);
 
         // TODO: make sure all the relations between is_initial, is_final, op_type are followed
 

@@ -5,8 +5,8 @@ use p3_matrix::dense::{DenseMatrix, RowMajorMatrix};
 use p3_matrix::Matrix;
 use p3_uni_stark::{StarkGenericConfig, Val};
 
-use super::init_final_chip::InitFinalChip;
-use super::middle_chip::MiddleChip;
+use super::offline_checker::OfflineChecker;
+use super::page_chip::PageChip;
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum OpType {
@@ -37,12 +37,12 @@ pub struct PageController<SC: StarkGenericConfig>
 where
     Val<SC>: AbstractField,
 {
-    pub init_chip: InitFinalChip,
-    pub middle_chip: MiddleChip,
-    pub final_chip: InitFinalChip,
+    pub init_chip: PageChip,
+    pub offline_checker: OfflineChecker,
+    pub final_chip: PageChip,
 
     init_chip_trace: Option<DenseMatrix<Val<SC>>>,
-    pub middle_chip_trace: Option<DenseMatrix<Val<SC>>>,
+    pub offline_checker_trace: Option<DenseMatrix<Val<SC>>>,
     final_chip_trace: Option<DenseMatrix<Val<SC>>>,
 
     init_page_commitment: Option<Com<SC>>,
@@ -52,12 +52,12 @@ where
 impl<SC: StarkGenericConfig> PageController<SC> {
     pub fn new(bus_index: usize, key_len: usize, val_len: usize) -> Self {
         Self {
-            init_chip: InitFinalChip::new(bus_index, 1 + key_len + val_len, true),
-            middle_chip: MiddleChip::new(bus_index, key_len, val_len),
-            final_chip: InitFinalChip::new(bus_index, 1 + key_len + val_len, false),
+            init_chip: PageChip::new(bus_index, 1 + key_len + val_len, true),
+            offline_checker: OfflineChecker::new(bus_index, key_len, val_len),
+            final_chip: PageChip::new(bus_index, 1 + key_len + val_len, false),
 
             init_chip_trace: None,
-            middle_chip_trace: None,
+            offline_checker_trace: None,
             final_chip_trace: None,
 
             init_page_commitment: None,
@@ -65,8 +65,8 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         }
     }
 
-    pub fn middle_chip_trace(&self) -> DenseMatrix<Val<SC>> {
-        self.middle_chip_trace.clone().unwrap()
+    pub fn offline_checker_trace(&self) -> DenseMatrix<Val<SC>> {
+        self.offline_checker_trace.clone().unwrap()
     }
 
     fn get_page_trace(&self, page: Vec<Vec<u32>>) -> DenseMatrix<Val<SC>> {
@@ -79,7 +79,7 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         ops: &Vec<Operation>,
         trace_degree: usize,
     ) -> RowMajorMatrix<Val<SC>> {
-        self.middle_chip
+        self.offline_checker
             .generate_trace::<SC>(page, ops.clone(), trace_degree)
     }
 
@@ -92,46 +92,33 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         trace_degree: usize,
         trace_committer: &mut TraceCommitter<SC>,
     ) -> (Vec<DenseMatrix<Val<SC>>>, Vec<ProverTraceData<SC>>) {
-        println!("in load_page_and_ops");
-        println!("page: {:?}", page);
-
         assert!(page.len() > 0);
         self.init_chip_trace = Some(self.get_page_trace(page.clone()));
 
-        let bus_index = self.middle_chip.bus_index();
+        let bus_index = self.offline_checker.bus_index();
         let page_width = 1 + key_len + val_len;
 
-        self.init_chip = InitFinalChip::new(bus_index, page_width, true);
+        self.init_chip = PageChip::new(bus_index, page_width, true);
         self.init_chip_trace = Some(self.get_page_trace(page.clone()));
 
-        println!("initialized init_chip and its trace");
+        self.offline_checker = OfflineChecker::new(bus_index, key_len, val_len);
+        self.offline_checker_trace = Some(self.gen_ops_trace(&mut page, &ops, trace_degree));
 
-        self.middle_chip = MiddleChip::new(bus_index, key_len, val_len);
-        self.middle_chip_trace = Some(self.gen_ops_trace(&mut page, &ops, trace_degree));
-
-        println!("initialized middle_chip and its trace");
-
-        self.final_chip = InitFinalChip::new(bus_index, page_width, false);
+        self.final_chip = PageChip::new(bus_index, page_width, false);
         self.final_chip_trace = Some(self.get_page_trace(page.clone()));
-
-        println!("initialized final_chip and its trace");
-
-        println!("initial page trace: {:?}", self.init_chip_trace);
 
         let prover_data = vec![
             trace_committer.commit(vec![self.init_chip_trace.clone().unwrap()]),
             trace_committer.commit(vec![self.final_chip_trace.clone().unwrap()]),
         ];
 
-        println!("committed to the traces using the committer");
-
         self.init_page_commitment = Some(prover_data[0].commit.clone());
         self.final_page_commitment = Some(prover_data[1].commit.clone());
 
-        println!(
+        tracing::debug!(
             "heights of all traces: {} {} {}",
             self.init_chip_trace.as_ref().unwrap().height(),
-            self.middle_chip_trace.as_ref().unwrap().height(),
+            self.offline_checker_trace.as_ref().unwrap().height(),
             self.final_chip_trace.as_ref().unwrap().height()
         );
 

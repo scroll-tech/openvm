@@ -19,7 +19,6 @@ impl<T: Clone> IsEqualVecIOCols<T> {
     }
 }
 
-// TODO: remove debug
 #[derive(Default, Debug)]
 pub struct IsEqualVecAuxCols<T> {
     pub prods: Vec<T>,

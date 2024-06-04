@@ -2,12 +2,12 @@ use afs_stark_backend::interaction::{Chip, Interaction};
 use p3_air::VirtualPairCol;
 use p3_field::PrimeField64;
 
-use super::columns::MiddleChipCols;
-use super::MiddleChip;
+use super::columns::OfflineCheckerCols;
+use super::OfflineChecker;
 use crate::sub_chip::SubAirWithInteractions;
 
-impl<F: PrimeField64> SubAirWithInteractions<F> for MiddleChip {
-    fn receives(&self, col_indices: MiddleChipCols<usize>) -> Vec<Interaction<F>> {
+impl<F: PrimeField64> SubAirWithInteractions<F> for OfflineChecker {
+    fn receives(&self, col_indices: OfflineCheckerCols<usize>) -> Vec<Interaction<F>> {
         let virtual_cols = col_indices
             .page_row
             .iter()
@@ -21,7 +21,7 @@ impl<F: PrimeField64> SubAirWithInteractions<F> for MiddleChip {
         }]
     }
 
-    fn sends(&self, col_indices: MiddleChipCols<usize>) -> Vec<Interaction<F>> {
+    fn sends(&self, col_indices: OfflineCheckerCols<usize>) -> Vec<Interaction<F>> {
         let virtual_cols = col_indices
             .page_row
             .iter()
@@ -36,12 +36,12 @@ impl<F: PrimeField64> SubAirWithInteractions<F> for MiddleChip {
     }
 }
 
-impl<F: PrimeField64> Chip<F> for MiddleChip {
+impl<F: PrimeField64> Chip<F> for OfflineChecker {
     fn receives(&self) -> Vec<Interaction<F>> {
         let num_cols = self.air_width();
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
-        let cols_to_receive = MiddleChipCols::<usize>::from_slice(
+        let cols_to_receive = OfflineCheckerCols::<usize>::from_slice(
             &all_cols,
             self.page_width(),
             self.key_len,
@@ -54,7 +54,7 @@ impl<F: PrimeField64> Chip<F> for MiddleChip {
         let num_cols = self.air_width();
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
-        let cols_to_send = MiddleChipCols::<usize>::from_slice(
+        let cols_to_send = OfflineCheckerCols::<usize>::from_slice(
             &all_cols,
             self.page_width(),
             self.key_len,

@@ -2,8 +2,8 @@ use std::collections::{HashMap, HashSet};
 use std::iter;
 use std::panic;
 
-use crate::page_read_write;
-use crate::page_read_write::page_controller::{OpType, Operation};
+use crate::page_rw_checker;
+use crate::page_rw_checker::page_controller::{OpType, Operation};
 use afs_stark_backend::prover::USE_DEBUG_BUILDER;
 use afs_stark_backend::verifier::VerificationError;
 use afs_stark_backend::{
@@ -17,7 +17,7 @@ use afs_test_utils::config::{
 use afs_test_utils::{engine::StarkEngine, utils::create_seeded_rng};
 use rand::Rng;
 
-use crate::page_read_write::page_controller;
+use crate::page_rw_checker::page_controller;
 
 // TODO: add tests
 
@@ -35,8 +35,6 @@ fn load_page_test(
     let page_height = page_init.len();
     assert!(page_height > 0);
 
-    println!("In load_page_test");
-
     let (page_traces, mut prover_data) = page_controller.load_page_and_ops(
         page_init.clone(),
         key_len,
@@ -46,26 +44,15 @@ fn load_page_test(
         &mut trace_builder.committer,
     );
 
-    println!("Committed to the traces of initial and final pages");
-
-    let middle_chip_trace = page_controller.middle_chip_trace();
+    let offline_checker_trace = page_controller.offline_checker_trace();
 
     trace_builder.clear();
 
     trace_builder.load_cached_trace(page_traces[0].clone(), prover_data.remove(0));
     trace_builder.load_cached_trace(page_traces[1].clone(), prover_data.remove(0));
-    trace_builder.load_trace(middle_chip_trace.clone());
-
-    println!("ultimate debugging");
-    println!("page_traces[0]: {:?}", page_traces[0]);
-    println!("page_traces[1]: {:?}", page_traces[1]);
-    println!("middle_chip_trace: {:?}", middle_chip_trace);
-
-    println!("loaded all the traces");
+    trace_builder.load_trace(offline_checker_trace.clone());
 
     trace_builder.commit_current();
-
-    println!("committed to all loaded traces");
 
     let partial_vk = partial_pk.partial_vk();
 
@@ -74,23 +61,17 @@ fn load_page_test(
         vec![
             &page_controller.init_chip,
             &page_controller.final_chip,
-            &page_controller.middle_chip,
+            &page_controller.offline_checker,
         ],
     );
-
-    println!("viewed trace successfully");
 
     let pis = vec![vec![]; partial_vk.per_air.len()];
 
     let prover = engine.prover();
     let verifier = engine.verifier();
 
-    println!("defined prover and verifier");
-
     let mut challenger = engine.new_challenger();
     let proof = prover.prove(&mut challenger, &partial_pk, main_trace_data, &pis);
-
-    println!("defined challenger and proof");
 
     let mut challenger = engine.new_challenger();
     let result = verifier.verify(
@@ -99,7 +80,7 @@ fn load_page_test(
         vec![
             &page_controller.init_chip,
             &page_controller.final_chip,
-            &page_controller.middle_chip,
+            &page_controller.offline_checker,
         ],
         proof,
         &pis,
@@ -113,12 +94,11 @@ fn page_read_write_test() {
     let mut rng = create_seeded_rng();
     let bus_index = 0;
 
-    use page_read_write::page_controller::PageController;
+    use page_rw_checker::page_controller::PageController;
 
     const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
 
-    // TODO: up those rookie numbers
-    let log_page_height = 3;
+    let log_page_height = 4;
     let log_num_ops = 3;
 
     let page_width = 6;
@@ -148,8 +128,6 @@ fn page_read_write_test() {
         key_val_map.insert(key.clone(), val.clone());
         page.push(iter::once(1).chain(key).chain(val).collect());
     }
-
-    println!("page: {:?}", page);
 
     // Generating random sorted timestamps for operations
     let mut clks: Vec<usize> = (0..num_ops)
@@ -190,25 +168,15 @@ fn page_read_write_test() {
         ops.push(Operation::new(clk, key, val, op_type));
     }
 
-    println!("ops: {:?}", ops);
-
     let mut page_controller: PageController<BabyBearPoseidon2Config> =
         PageController::new(bus_index, key_len, val_len);
     let engine = config::baby_bear_poseidon2::default_engine(log_page_height.max(3 + log_num_ops));
-
-    println!("Initialized page_controller");
 
     let mut keygen_builder = MultiStarkKeygenBuilder::new(&engine.config);
 
     let init_page_ptr = keygen_builder.add_cached_main_matrix(page_width);
     let final_page_ptr = keygen_builder.add_cached_main_matrix(page_width);
     let ops_ptr = keygen_builder.add_main_matrix(7 + page_width + 2 * (key_len + val_len));
-
-    println!(
-        "ops trace width should be {} because page_width is {}",
-        7 + page_width + 2 * (key_len + val_len),
-        page_width
-    );
 
     keygen_builder.add_partitioned_air(
         &page_controller.init_chip,
@@ -225,7 +193,7 @@ fn page_read_write_test() {
     );
 
     keygen_builder.add_partitioned_air(
-        &page_controller.middle_chip,
+        &page_controller.offline_checker,
         trace_degree,
         0,
         vec![ops_ptr],
@@ -235,8 +203,6 @@ fn page_read_write_test() {
 
     let prover = MultiTraceStarkProver::new(&engine.config);
     let mut trace_builder = TraceCommitmentBuilder::new(prover.pcs());
-
-    println!("Done everything just calling load_page_test next");
 
     // Testing a fully allocated page
     load_page_test(
@@ -296,8 +262,6 @@ fn page_read_write_test() {
             .collect();
         page[i][0] = 0;
     }
-
-    println!("Final list of ops: {:?}", ops);
 
     load_page_test(
         &engine,

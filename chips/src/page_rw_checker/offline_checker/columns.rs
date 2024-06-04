@@ -1,7 +1,7 @@
 use crate::is_equal_vec::columns::IsEqualVecAuxCols;
 
 #[derive(Debug)]
-pub struct MiddleChipCols<T> {
+pub struct OfflineCheckerCols<T> {
     pub is_initial: T, // this bit indicates if this row comes from the initial page
     pub is_final: T, // this bit indicates if this row should go to the final page (last row for the key)
 
@@ -18,7 +18,7 @@ pub struct MiddleChipCols<T> {
     pub is_equal_val_aux: IsEqualVecAuxCols<T>, // auxiliary columns used for same_val
 }
 
-impl<T> MiddleChipCols<T>
+impl<T> OfflineCheckerCols<T>
 where
     T: Clone,
 {
@@ -49,7 +49,7 @@ where
     }
 }
 
-impl<T> MiddleChipCols<T>
+impl<T> OfflineCheckerCols<T>
 where
     T: Clone,
 {

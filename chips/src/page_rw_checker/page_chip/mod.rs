@@ -3,14 +3,14 @@ pub mod chip;
 pub mod columns;
 pub mod trace;
 
-pub struct InitFinalChip {
+pub struct PageChip {
     bus_index: usize,
     page_width: usize,
 
     is_send: bool,
 }
 
-impl InitFinalChip {
+impl PageChip {
     pub fn new(bus_index: usize, page_width: usize, is_send: bool) -> Self {
         Self {
             bus_index,

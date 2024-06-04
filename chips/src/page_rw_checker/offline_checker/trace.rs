@@ -4,13 +4,13 @@ use p3_field::AbstractField;
 use p3_matrix::dense::RowMajorMatrix;
 use p3_uni_stark::{StarkGenericConfig, Val};
 
-use super::columns::MiddleChipCols;
-use super::MiddleChip;
+use super::columns::OfflineCheckerCols;
+use super::OfflineChecker;
 use crate::is_equal_vec::IsEqualVecChip;
-use crate::page_read_write::page_controller::Operation;
+use crate::page_rw_checker::page_controller::Operation;
 use crate::sub_chip::LocalTraceInstructions;
 
-impl MiddleChip {
+impl OfflineChecker {
     // TODO: update this
     // Each row in the trace follow the same order as the Cols struct:
     // [is_initial, is_final, clk, page_row, op_type, same_key, same_val, is_extra, is_equal_key_aux, is_equal_val_aux]
@@ -30,12 +30,8 @@ impl MiddleChip {
     where
         Val<SC>: AbstractField,
     {
-        println!("generating trace for middle chip");
-
         let is_equal_key = IsEqualVecChip::new(self.key_len);
         let is_equal_val = IsEqualVecChip::new(self.val_len);
-
-        println!("created the chips");
 
         let mut rows_allocated = 0;
         while rows_allocated < page.len() && page[rows_allocated][0] == 1 {
@@ -46,8 +42,6 @@ impl MiddleChip {
         for i in 0..rows_allocated {
             key_index_map.insert(page[i][1..self.key_len + 1].to_vec(), i);
         }
-
-        println!("key index map: {:?}", key_index_map);
 
         // Creating a timestamp bigger than all others
         let max_clk = ops.iter().map(|op| op.clk).max().unwrap_or(0) + 1;
@@ -70,10 +64,6 @@ impl MiddleChip {
                        last_key: &mut Vec<u32>,
                        last_val: &mut Vec<u32>,
                        is_extra: u8| {
-            println!(
-                "generating row: {}, {}, {}, {}, {}, {:?}, {:?}, {}",
-                is_initial, is_final, clk, page[index][0], op_type, last_key, last_val, is_extra
-            );
             // Make sure the row in the page is allocated
             assert!(page[index][0] == 1);
 
@@ -115,7 +105,7 @@ impl MiddleChip {
             let val_equal_cols =
                 LocalTraceInstructions::generate_trace_row(&is_equal_val, (last_val, cur_val));
 
-            let cols = MiddleChipCols::new(
+            let cols = OfflineCheckerCols::new(
                 Val::<SC>::from_canonical_u8(is_initial),
                 Val::<SC>::from_canonical_u8(is_final),
                 Val::<SC>::from_canonical_usize(clk),
@@ -230,13 +220,11 @@ impl MiddleChip {
             ));
         }
 
-        println!("width of air is {}, {}", rows[0].len(), self.air_width());
-
-        println!("Middle Chip trace by row");
+        tracing::debug!("Middle Chip trace by row");
         for (i, row) in rows.iter().enumerate() {
             let cols =
-                MiddleChipCols::from_slice(row, self.page_width(), self.key_len, self.val_len);
-            println!("row {}: {:?}", i, cols);
+                OfflineCheckerCols::from_slice(row, self.page_width(), self.key_len, self.val_len);
+            tracing::debug!("row {}: {:?}", i, cols);
         }
 
         RowMajorMatrix::new(rows.concat(), self.air_width())

@@ -3,14 +3,14 @@ mod chip;
 mod columns;
 mod trace;
 
-pub struct MiddleChip {
+pub struct OfflineChecker {
     bus_index: usize,
 
     key_len: usize,
     val_len: usize,
 }
 
-impl MiddleChip {
+impl OfflineChecker {
     pub fn new(bus_index: usize, key_len: usize, val_len: usize) -> Self {
         Self {
             bus_index,

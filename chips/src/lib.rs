@@ -2,7 +2,7 @@ pub mod keccak_permute;
 pub mod merkle_proof;
 pub mod page_controller;
 pub mod page_read;
-pub mod page_read_write;
+pub mod page_rw_checker;
 /// Chip to range check a value has less than a fixed number of bits
 pub mod range;
 pub mod range_gate;
