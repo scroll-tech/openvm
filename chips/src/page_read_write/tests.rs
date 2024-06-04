@@ -115,9 +115,7 @@ fn page_read_write_test() {
 
     use page_read_write::page_controller::PageController;
 
-    // The prime used by BabyBear
-    const MAX_VAL: u32 = 0x78000001;
-    // const MAX_VAL: u32 = 10;
+    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
 
     // TODO: up those rookie numbers
     let log_page_height = 3;

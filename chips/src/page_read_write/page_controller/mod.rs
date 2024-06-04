@@ -33,7 +33,6 @@ impl Operation {
     }
 }
 
-// TODO: store ops only in 1 place: either here or in the MiddleChip
 pub struct PageController<SC: StarkGenericConfig>
 where
     Val<SC>: AbstractField,
