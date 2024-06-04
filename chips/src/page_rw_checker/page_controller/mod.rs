@@ -76,11 +76,11 @@ impl<SC: StarkGenericConfig> PageController<SC> {
     fn gen_ops_trace(
         &self,
         page: &mut Vec<Vec<u32>>,
-        ops: &Vec<Operation>,
+        ops: &[Operation],
         trace_degree: usize,
     ) -> RowMajorMatrix<Val<SC>> {
         self.offline_checker
-            .generate_trace::<SC>(page, ops.clone(), trace_degree)
+            .generate_trace::<SC>(page, ops.to_owned(), trace_degree)
     }
 
     pub fn load_page_and_ops(
@@ -92,7 +92,7 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         trace_degree: usize,
         trace_committer: &mut TraceCommitter<SC>,
     ) -> (Vec<DenseMatrix<Val<SC>>>, Vec<ProverTraceData<SC>>) {
-        assert!(page.len() > 0);
+        assert!(!page.is_empty());
         self.init_chip_trace = Some(self.get_page_trace(page.clone()));
 
         let bus_index = self.offline_checker.bus_index();

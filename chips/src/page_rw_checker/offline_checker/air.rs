@@ -1,4 +1,4 @@
-use std::{borrow::Borrow, fmt::Debug};
+use std::borrow::Borrow;
 
 use afs_stark_backend::air_builders::PartitionedAirBuilder;
 use p3_air::{Air, AirBuilder, BaseAir};
@@ -43,8 +43,6 @@ where
         let next_cols =
             OfflineCheckerCols::from_slice(next, self.page_width(), self.key_len, self.val_len);
 
-        // TODO: make sure all the relations between is_initial, is_final, op_type are followed
-
         // Making sure bits are bools
         builder.assert_bool(local_cols.is_initial);
         builder.assert_bool(local_cols.is_final);
@@ -59,8 +57,8 @@ where
 
         // Making sure same_key is correct across rows
         let is_equal_keys_vec = local_cols.page_row[1..self.key_len + 1]
-            .to_vec()
-            .into_iter()
+            .iter()
+            .copied()
             .chain(next_cols.page_row[1..self.key_len + 1].to_vec())
             .chain(next_cols.is_equal_key_aux.flatten())
             .collect::<Vec<AB::Var>>();
@@ -76,8 +74,8 @@ where
 
         // Making sure same_val is correct across rows
         let is_equal_vals_vec = local_cols.page_row[self.key_len + 1..]
-            .to_vec()
-            .into_iter()
+            .iter()
+            .copied()
             .chain(next_cols.page_row[self.key_len + 1..].to_vec())
             .chain(next_cols.is_equal_val_aux.flatten())
             .collect::<Vec<AB::Var>>();

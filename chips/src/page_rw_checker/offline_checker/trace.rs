@@ -38,8 +38,8 @@ impl OfflineChecker {
         }
 
         let mut key_index_map = HashMap::new();
-        for i in 0..rows_allocated {
-            key_index_map.insert(page[i][1..self.key_len + 1].to_vec(), i);
+        for (i, row) in page.iter().enumerate().take(rows_allocated) {
+            key_index_map.insert(row[1..self.key_len + 1].to_vec(), i);
         }
 
         // Creating a timestamp bigger than all others
@@ -71,8 +71,8 @@ impl OfflineChecker {
 
             if *is_first_row {
                 // Making sure the last_key and last_val are different from current when its the first row
-                *last_key = cur_key.clone();
-                *last_val = cur_val.clone();
+                last_key.clone_from(&cur_key);
+                last_val.clone_from(&cur_val);
 
                 last_key[0] += 1;
                 last_val[0] += 1;
@@ -83,8 +83,8 @@ impl OfflineChecker {
             let my_last_key = last_key.clone();
             let my_last_val = last_val.clone();
 
-            *last_key = cur_key.clone();
-            *last_val = cur_val.clone();
+            last_key.clone_from(&cur_key);
+            last_val.clone_from(&cur_val);
 
             let last_key = my_last_key;
             let last_val = my_last_val;
@@ -109,8 +109,8 @@ impl OfflineChecker {
                 Val::<SC>::from_canonical_u8(is_final),
                 Val::<SC>::from_canonical_usize(clk),
                 page[index]
-                    .to_vec()
-                    .into_iter()
+                    .iter()
+                    .copied()
                     .map(Val::<SC>::from_canonical_u32)
                     .collect(),
                 Val::<SC>::from_canonical_u8(op_type),
@@ -163,10 +163,10 @@ impl OfflineChecker {
                 rows_allocated += 1;
             }
 
-            for k in i..j {
+            for op in ops.iter().take(j).skip(i) {
                 page[idx] = iter::once(1)
-                    .chain(ops[k].key.clone())
-                    .chain(ops[k].val.clone())
+                    .chain(op.key.clone())
+                    .chain(op.val.clone())
                     .collect();
 
                 rows.push(gen_row(
@@ -175,8 +175,8 @@ impl OfflineChecker {
                     idx,
                     0,
                     0,
-                    ops[k].clk,
-                    ops[k].op_type.clone() as u8,
+                    op.clk,
+                    op.op_type.clone() as u8,
                     &mut last_key,
                     &mut last_val,
                     0,
