@@ -19,8 +19,6 @@ use rand::Rng;
 
 use crate::page_rw_checker::page_controller;
 
-// TODO: add tests
-
 fn load_page_test(
     engine: &BabyBearPoseidon2Engine,
     page_init: Vec<Vec<u32>>,

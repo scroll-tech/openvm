@@ -21,8 +21,6 @@ impl<F: Field> BaseAir<F> for OfflineChecker {
     }
 }
 
-// TODO: look at imports in all files and make sure they're nice
-
 /// Imposes the following constraints:
 /// - Rows are sorted by key then by timestamp (clk)
 /// - Every key block starts with a write
@@ -32,7 +30,6 @@ impl<F: Field> BaseAir<F> for OfflineChecker {
 impl<AB: PartitionedAirBuilder> Air<AB> for OfflineChecker
 where
     AB::M: Clone,
-    AB::Var: Debug, // TODO: remove
 {
     fn eval(&self, builder: &mut AB) {
         let main = &builder.partitioned_main()[0].clone();

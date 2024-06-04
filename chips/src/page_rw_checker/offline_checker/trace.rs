@@ -11,7 +11,6 @@ use crate::page_rw_checker::page_controller::Operation;
 use crate::sub_chip::LocalTraceInstructions;
 
 impl OfflineChecker {
-    // TODO: update this
     // Each row in the trace follow the same order as the Cols struct:
     // [is_initial, is_final, clk, page_row, op_type, same_key, same_val, is_extra, is_equal_key_aux, is_equal_val_aux]
     //
