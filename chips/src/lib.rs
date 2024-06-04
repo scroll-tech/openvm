@@ -7,6 +7,7 @@ pub mod page_read_write;
 pub mod range;
 pub mod range_gate;
 pub mod sub_chip;
+pub mod sum;
 mod utils;
 pub mod xor_bits;
 pub mod xor_limbs;
