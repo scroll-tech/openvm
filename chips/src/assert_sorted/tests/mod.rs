@@ -1,6 +1,7 @@
 use super::super::assert_sorted;
 
 use afs_stark_backend::prover::USE_DEBUG_BUILDER;
+use afs_stark_backend::rap::AnyRap;
 use afs_stark_backend::verifier::VerificationError;
 use afs_test_utils::config::baby_bear_poseidon2::run_simple_test_no_pis;
 use assert_sorted::AssertSortedChip;
@@ -33,50 +34,64 @@ use p3_matrix::dense::DenseMatrix;
 // most limb_bits bits, rows are sorted lexicographically
 #[test]
 fn test_assert_sorted_chip_small_positive() {
-    const BUS_INDEX: usize = 0;
-    const LIMB_BITS: usize = 16;
-    const DECOMP: usize = 8;
-    const KEY_VEC_LEN: usize = 2;
+    let bus_index: usize = 0;
+    let limb_bits: Vec<usize> = vec![16, 16];
+    let decomp: usize = 8;
+    let key_vec_len: usize = 2;
 
-    const MAX: u32 = 1 << DECOMP;
+    let range_max: u32 = 1 << decomp;
 
     let requests = vec![vec![7784, 35423], vec![17558, 44832]];
 
     let assert_sorted_chip = AssertSortedChip::new(
-        BUS_INDEX,
-        MAX,
-        LIMB_BITS,
-        DECOMP,
-        KEY_VEC_LEN,
+        bus_index,
+        range_max,
+        limb_bits,
+        decomp,
+        key_vec_len,
         requests.clone(),
     );
 
     let assert_sorted_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip.generate_trace();
-    let assert_sorted_range_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip
-        .less_than_chip
-        .range_checker_gate
-        .generate_trace();
+    let assert_sorted_range_chip_trace: DenseMatrix<BabyBear> =
+        assert_sorted_chip.range_checker_gate.generate_trace();
 
-    run_simple_test_no_pis(
-        vec![
-            &assert_sorted_chip,
-            &assert_sorted_chip.less_than_chip.range_checker_gate,
-        ],
-        vec![assert_sorted_chip_trace, assert_sorted_range_chip_trace],
-    )
-    .expect("Verification failed");
+    let mut chips: Vec<&dyn AnyRap<_>> =
+        vec![&assert_sorted_chip, &assert_sorted_chip.range_checker_gate];
+
+    for is_less_than_chip in assert_sorted_chip
+        .is_less_than_tuple_chip
+        .is_less_than_chips
+        .iter()
+    {
+        chips.push(&is_less_than_chip.range_checker_gate);
+    }
+
+    let mut traces = vec![assert_sorted_chip_trace, assert_sorted_range_chip_trace];
+
+    for is_less_than_chip in assert_sorted_chip
+        .is_less_than_tuple_chip
+        .is_less_than_chips
+        .iter()
+    {
+        let range_trace: DenseMatrix<BabyBear> =
+            is_less_than_chip.range_checker_gate.generate_trace();
+        traces.push(range_trace);
+    }
+
+    run_simple_test_no_pis(chips, traces).expect("Verification failed");
 }
 
 // covers limb_bits >= 20, key_vec_len >= 4, limb_bits % decomp != 0, number of rows >= 4, each limb has at
 // most limb_bits bits, rows are sorted lexicographically
 #[test]
 fn test_assert_sorted_chip_large_positive() {
-    const BUS_INDEX: usize = 0;
-    const LIMB_BITS: usize = 30;
-    const DECOMP: usize = 8;
-    const KEY_VEC_LEN: usize = 4;
+    let bus_index: usize = 0;
+    let limb_bits: Vec<usize> = vec![30, 30, 30, 30];
+    let decomp: usize = 8;
+    let key_vec_len: usize = 4;
 
-    const MAX: u32 = 1 << DECOMP;
+    let range_max: u32 = 1 << decomp;
 
     let requests = vec![
         vec![35867, 318434, 12786, 44832],
@@ -86,40 +101,54 @@ fn test_assert_sorted_chip_large_positive() {
     ];
 
     let assert_sorted_chip = AssertSortedChip::new(
-        BUS_INDEX,
-        MAX,
-        LIMB_BITS,
-        DECOMP,
-        KEY_VEC_LEN,
+        bus_index,
+        range_max,
+        limb_bits,
+        decomp,
+        key_vec_len,
         requests.clone(),
     );
 
     let assert_sorted_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip.generate_trace();
-    let assert_sorted_range_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip
-        .less_than_chip
-        .range_checker_gate
-        .generate_trace();
+    let assert_sorted_range_chip_trace: DenseMatrix<BabyBear> =
+        assert_sorted_chip.range_checker_gate.generate_trace();
 
-    run_simple_test_no_pis(
-        vec![
-            &assert_sorted_chip,
-            &assert_sorted_chip.less_than_chip.range_checker_gate,
-        ],
-        vec![assert_sorted_chip_trace, assert_sorted_range_chip_trace],
-    )
-    .expect("Verification failed");
+    let mut chips: Vec<&dyn AnyRap<_>> =
+        vec![&assert_sorted_chip, &assert_sorted_chip.range_checker_gate];
+
+    for is_less_than_chip in assert_sorted_chip
+        .is_less_than_tuple_chip
+        .is_less_than_chips
+        .iter()
+    {
+        chips.push(&is_less_than_chip.range_checker_gate);
+    }
+
+    let mut traces = vec![assert_sorted_chip_trace, assert_sorted_range_chip_trace];
+
+    for is_less_than_chip in assert_sorted_chip
+        .is_less_than_tuple_chip
+        .is_less_than_chips
+        .iter()
+    {
+        let range_trace: DenseMatrix<BabyBear> =
+            is_less_than_chip.range_checker_gate.generate_trace();
+        traces.push(range_trace);
+    }
+
+    run_simple_test_no_pis(chips, traces).expect("Verification failed");
 }
 
 // covers limb_bits >= 20, key_vec_len >= 4, limb_bits % decomp != 0, number of rows >= 4, at least one limb
 // has more than limb_bits bits, rows are sorted lexicographically
 #[test]
 fn test_assert_sorted_chip_largelimb_negative() {
-    const BUS_INDEX: usize = 0;
-    const LIMB_BITS: usize = 10;
-    const DECOMP: usize = 8;
-    const KEY_VEC_LEN: usize = 4;
+    let bus_index: usize = 0;
+    let limb_bits: Vec<usize> = vec![10, 10, 10, 10];
+    let decomp: usize = 8;
+    let key_vec_len: usize = 4;
 
-    const MAX: u32 = 1 << DECOMP;
+    let range_max: u32 = 1 << decomp;
 
     // the first and second rows are not in sorted order
     let requests = vec![
@@ -130,27 +159,42 @@ fn test_assert_sorted_chip_largelimb_negative() {
     ];
 
     let assert_sorted_chip = AssertSortedChip::new(
-        BUS_INDEX,
-        MAX,
-        LIMB_BITS,
-        DECOMP,
-        KEY_VEC_LEN,
+        bus_index,
+        range_max,
+        limb_bits,
+        decomp,
+        key_vec_len,
         requests.clone(),
     );
 
     let assert_sorted_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip.generate_trace();
-    let assert_sorted_range_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip
-        .less_than_chip
-        .range_checker_gate
-        .generate_trace();
+    let assert_sorted_range_chip_trace: DenseMatrix<BabyBear> =
+        assert_sorted_chip.range_checker_gate.generate_trace();
 
-    let result = run_simple_test_no_pis(
-        vec![
-            &assert_sorted_chip,
-            &assert_sorted_chip.less_than_chip.range_checker_gate,
-        ],
-        vec![assert_sorted_chip_trace, assert_sorted_range_chip_trace],
-    );
+    let mut chips: Vec<&dyn AnyRap<_>> =
+        vec![&assert_sorted_chip, &assert_sorted_chip.range_checker_gate];
+
+    for is_less_than_chip in assert_sorted_chip
+        .is_less_than_tuple_chip
+        .is_less_than_chips
+        .iter()
+    {
+        chips.push(&is_less_than_chip.range_checker_gate);
+    }
+
+    let mut traces = vec![assert_sorted_chip_trace, assert_sorted_range_chip_trace];
+
+    for is_less_than_chip in assert_sorted_chip
+        .is_less_than_tuple_chip
+        .is_less_than_chips
+        .iter()
+    {
+        let range_trace: DenseMatrix<BabyBear> =
+            is_less_than_chip.range_checker_gate.generate_trace();
+        traces.push(range_trace);
+    }
+
+    let result = run_simple_test_no_pis(chips, traces);
 
     assert_eq!(
         result,
@@ -163,12 +207,12 @@ fn test_assert_sorted_chip_largelimb_negative() {
 // most limb_bits bits, rows are not sorted lexicographically
 #[test]
 fn test_assert_sorted_chip_unsorted_negative() {
-    const BUS_INDEX: usize = 0;
-    const LIMB_BITS: usize = 30;
-    const DECOMP: usize = 8;
-    const KEY_VEC_LEN: usize = 4;
+    let bus_index: usize = 0;
+    let limb_bits: Vec<usize> = vec![30, 30, 30, 30];
+    let decomp: usize = 8;
+    let key_vec_len: usize = 4;
 
-    const MAX: u32 = 1 << DECOMP;
+    let range_max: u32 = 1 << decomp;
 
     // the first and second rows are not in sorted order
     let requests = vec![
@@ -179,31 +223,46 @@ fn test_assert_sorted_chip_unsorted_negative() {
     ];
 
     let assert_sorted_chip = AssertSortedChip::new(
-        BUS_INDEX,
-        MAX,
-        LIMB_BITS,
-        DECOMP,
-        KEY_VEC_LEN,
+        bus_index,
+        range_max,
+        limb_bits,
+        decomp,
+        key_vec_len,
         requests.clone(),
     );
 
     let assert_sorted_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip.generate_trace();
-    let assert_sorted_range_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip
-        .less_than_chip
-        .range_checker_gate
-        .generate_trace();
+    let assert_sorted_range_chip_trace: DenseMatrix<BabyBear> =
+        assert_sorted_chip.range_checker_gate.generate_trace();
+
+    let mut chips: Vec<&dyn AnyRap<_>> =
+        vec![&assert_sorted_chip, &assert_sorted_chip.range_checker_gate];
+
+    for is_less_than_chip in assert_sorted_chip
+        .is_less_than_tuple_chip
+        .is_less_than_chips
+        .iter()
+    {
+        chips.push(&is_less_than_chip.range_checker_gate);
+    }
+
+    let mut traces = vec![assert_sorted_chip_trace, assert_sorted_range_chip_trace];
+
+    for is_less_than_chip in assert_sorted_chip
+        .is_less_than_tuple_chip
+        .is_less_than_chips
+        .iter()
+    {
+        let range_trace: DenseMatrix<BabyBear> =
+            is_less_than_chip.range_checker_gate.generate_trace();
+        traces.push(range_trace);
+    }
 
     USE_DEBUG_BUILDER.with(|debug| {
         *debug.lock().unwrap() = false;
     });
     assert_eq!(
-        run_simple_test_no_pis(
-            vec![
-                &assert_sorted_chip,
-                &assert_sorted_chip.less_than_chip.range_checker_gate,
-            ],
-            vec![assert_sorted_chip_trace, assert_sorted_range_chip_trace],
-        ),
+        run_simple_test_no_pis(chips, traces),
         Err(VerificationError::OodEvaluationMismatch),
         "Expected verification to fail, but it passed"
     );
