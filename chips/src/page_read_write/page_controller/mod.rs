@@ -4,7 +4,6 @@ use p3_field::AbstractField;
 use p3_matrix::dense::{DenseMatrix, RowMajorMatrix};
 use p3_matrix::Matrix;
 use p3_uni_stark::{StarkGenericConfig, Val};
-use std::collections::HashMap;
 
 use super::init_final_chip::InitFinalChip;
 use super::middle_chip::MiddleChip;
@@ -52,11 +51,11 @@ where
 }
 
 impl<SC: StarkGenericConfig> PageController<SC> {
-    pub fn new(bus_index: usize) -> Self {
+    pub fn new(bus_index: usize, key_len: usize, val_len: usize) -> Self {
         Self {
-            init_chip: InitFinalChip::new(bus_index, 1, true),
-            middle_chip: MiddleChip::new(bus_index, 1, 1),
-            final_chip: InitFinalChip::new(bus_index, 1, false),
+            init_chip: InitFinalChip::new(bus_index, 1 + key_len + val_len, true),
+            middle_chip: MiddleChip::new(bus_index, key_len, val_len),
+            final_chip: InitFinalChip::new(bus_index, 1 + key_len + val_len, false),
 
             init_chip_trace: None,
             middle_chip_trace: None,

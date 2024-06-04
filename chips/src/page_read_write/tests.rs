@@ -1,8 +1,10 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::iter;
+use std::panic;
 
 use crate::page_read_write;
 use crate::page_read_write::page_controller::{OpType, Operation};
+use afs_stark_backend::prover::USE_DEBUG_BUILDER;
 use afs_stark_backend::verifier::VerificationError;
 use afs_stark_backend::{
     keygen::{types::MultiStarkPartialProvingKey, MultiStarkKeygenBuilder},
@@ -19,16 +21,16 @@ use crate::page_read_write::page_controller;
 
 // TODO: add tests
 
-// TODO: make ops not a parameter and generate inside
 fn load_page_test(
     engine: &BabyBearPoseidon2Engine,
-    page_init: &Vec<Vec<u32>>,
+    page_init: Vec<Vec<u32>>,
     key_len: usize,
     val_len: usize,
     ops: &Vec<Operation>,
     page_controller: &mut page_controller::PageController<BabyBearPoseidon2Config>,
     trace_builder: &mut TraceCommitmentBuilder<BabyBearPoseidon2Config>,
     partial_pk: &MultiStarkPartialProvingKey<BabyBearPoseidon2Config>,
+    trace_degree: usize,
 ) -> Result<(), VerificationError> {
     let page_height = page_init.len();
     assert!(page_height > 0);
@@ -40,7 +42,7 @@ fn load_page_test(
         key_len,
         val_len,
         ops.clone(),
-        ops.len() * 8,
+        trace_degree,
         &mut trace_builder.committer,
     );
 
@@ -125,13 +127,15 @@ fn page_read_write_test() {
     let page_height = 1 << log_page_height;
     let num_ops: usize = 1 << log_num_ops;
 
+    let trace_degree = num_ops * 8;
+
     let key_len = rng.gen::<usize>() % ((page_width - 1) - 1) + 1;
     let val_len = (page_width - 1) - key_len;
 
     // Generating a random page with distinct keys
     let mut page: Vec<Vec<u32>> = vec![];
     let mut key_val_map = HashMap::new();
-    for i in 0..page_height {
+    for _ in 0..page_height {
         let mut key;
         loop {
             key = (0..key_len)
@@ -191,7 +195,7 @@ fn page_read_write_test() {
     println!("ops: {:?}", ops);
 
     let mut page_controller: PageController<BabyBearPoseidon2Config> =
-        PageController::new(bus_index);
+        PageController::new(bus_index, key_len, val_len);
     let engine = config::baby_bear_poseidon2::default_engine(log_page_height.max(3 + log_num_ops));
 
     println!("Initialized page_controller");
@@ -222,7 +226,12 @@ fn page_read_write_test() {
         vec![final_page_ptr],
     );
 
-    keygen_builder.add_partitioned_air(&page_controller.middle_chip, num_ops * 8, 0, vec![ops_ptr]);
+    keygen_builder.add_partitioned_air(
+        &page_controller.middle_chip,
+        trace_degree,
+        0,
+        vec![ops_ptr],
+    );
 
     let partial_pk = keygen_builder.generate_partial_pk();
 
@@ -231,19 +240,21 @@ fn page_read_write_test() {
 
     println!("Done everything just calling load_page_test next");
 
+    // Testing a fully allocated page
     load_page_test(
         &engine,
-        &page,
+        page.clone(),
         key_len,
         val_len,
         &ops,
         &mut page_controller,
         &mut trace_builder,
         &partial_pk,
+        trace_degree,
     )
     .expect("Verification failed");
 
-    // Making the page only partiially-allocated
+    // Testing a partially-allocated page
     let rows_allocated = rng.gen::<usize>() % (page_height + 1);
     for i in rows_allocated..page_height {
         page[i][0] = 0;
@@ -260,17 +271,18 @@ fn page_read_write_test() {
 
     load_page_test(
         &engine,
-        &page,
+        page.clone(),
         key_len,
         val_len,
         &ops,
         &mut page_controller,
         &mut trace_builder,
         &partial_pk,
+        trace_degree,
     )
     .expect("Verification failed");
 
-    // Making the page fully-unallocated with random garbage
+    // Testing a fully unallocated page
     for i in 0..page_height {
         // Making sure the first operation that uses every key is a write
         let key = page[i][1..key_len + 1].to_vec();
@@ -291,13 +303,135 @@ fn page_read_write_test() {
 
     load_page_test(
         &engine,
-        &page,
+        page.clone(),
         key_len,
         val_len,
         &ops,
         &mut page_controller,
         &mut trace_builder,
         &partial_pk,
+        trace_degree,
     )
     .expect("Verification failed");
+
+    // Testing writing only 1 key into an unallocated page
+    ops = vec![Operation::new(
+        10,
+        (0..key_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
+        (0..val_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
+        OpType::Write,
+    )];
+
+    load_page_test(
+        &engine,
+        page.clone(),
+        key_len,
+        val_len,
+        &ops,
+        &mut page_controller,
+        &mut trace_builder,
+        &partial_pk,
+        trace_degree,
+    )
+    .expect("Verification failed");
+
+    // Negative tests
+
+    // Testing reading from a non-existing key (in a fully-unallocated page)
+    ops = vec![Operation::new(
+        1,
+        (0..key_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
+        (0..val_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
+        OpType::Read,
+    )];
+
+    USE_DEBUG_BUILDER.with(|debug| {
+        *debug.lock().unwrap() = false;
+    });
+    assert_eq!(
+        load_page_test(
+            &engine,
+            page.clone(),
+            key_len,
+            val_len,
+            &ops,
+            &mut page_controller,
+            &mut trace_builder,
+            &partial_pk,
+            trace_degree,
+        ),
+        Err(VerificationError::OodEvaluationMismatch),
+        "Expected constraints to fail"
+    );
+
+    // Testing reading a wrong value from an existing key
+    let key: Vec<u32> = (0..key_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+    let val_1: Vec<u32> = (0..val_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+    let mut val_2 = val_1.clone();
+    val_2[0] += 1; // making sure val_2 is different
+
+    ops = vec![
+        Operation::new(1, key.clone(), val_1, OpType::Write),
+        Operation::new(2, key, val_2, OpType::Read),
+    ];
+
+    assert_eq!(
+        load_page_test(
+            &engine,
+            page.clone(),
+            key_len,
+            val_len,
+            &ops,
+            &mut page_controller,
+            &mut trace_builder,
+            &partial_pk,
+            trace_degree,
+        ),
+        Err(VerificationError::OodEvaluationMismatch),
+        "Expected constraints to fail"
+    );
+
+    // Testing writing too many keys to a fully unallocated page
+    let mut key_map = HashSet::new();
+    for _ in 0..page_height + 1 {
+        let mut key: Vec<u32>;
+        loop {
+            key = (0..key_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+            if !key_map.contains(&key) {
+                break;
+            }
+        }
+
+        key_map.insert(key);
+    }
+
+    ops.clear();
+    for (i, key) in key_map.iter().enumerate() {
+        ops.push(Operation::new(
+            i + 1,
+            key.clone(),
+            (0..val_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
+            OpType::Write,
+        ));
+    }
+
+    let engine_ref = &engine;
+    let result = panic::catch_unwind(move || {
+        let _ = load_page_test(
+            engine_ref,
+            page.clone(),
+            key_len,
+            val_len,
+            &ops,
+            &mut page_controller,
+            &mut trace_builder,
+            &partial_pk,
+            trace_degree,
+        );
+    });
+
+    assert!(
+        result.is_err(),
+        "Expected to fail when allocating too many keys"
+    );
 }

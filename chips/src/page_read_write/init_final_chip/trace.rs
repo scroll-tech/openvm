@@ -1,5 +1,3 @@
-use std::iter;
-
 use p3_field::AbstractField;
 use p3_matrix::dense::RowMajorMatrix;
 use p3_uni_stark::{StarkGenericConfig, Val};

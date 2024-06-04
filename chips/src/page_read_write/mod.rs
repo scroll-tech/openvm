@@ -1,6 +1,6 @@
-mod init_final_chip;
-mod middle_chip;
-mod page_controller;
+pub mod init_final_chip;
+pub mod middle_chip;
+pub mod page_controller;
 
 #[cfg(test)]
 pub mod tests;

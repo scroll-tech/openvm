@@ -1,7 +1,7 @@
 use std::borrow::Borrow;
 
 use afs_stark_backend::interaction::Chip;
-use p3_air::{Air, AirBuilder, BaseAir, FilteredAirBuilder};
+use p3_air::{Air, AirBuilder, BaseAir};
 use p3_field::AbstractField;
 use p3_field::Field;
 use p3_matrix::Matrix;
@@ -46,12 +46,7 @@ impl<AB: AirBuilder> Air<AB> for IsEqualVecChip {
 
         let is_equal_vec_cols = IsEqualVecCols::from_slice(local, self.vec_len);
 
-        SubAir::<AB>::eval(
-            self,
-            &mut builder.when(AB::Expr::one()),
-            is_equal_vec_cols.io,
-            is_equal_vec_cols.aux,
-        );
+        SubAir::<AB>::eval(self, builder, is_equal_vec_cols.io, is_equal_vec_cols.aux);
     }
 }
 
@@ -59,7 +54,7 @@ impl<AB: AirBuilder> SubAir<AB> for IsEqualVecChip {
     type IoView = IsEqualVecIOCols<AB::Var>;
     type AuxView = IsEqualVecAuxCols<AB::Var>;
 
-    fn eval(&self, builder: &mut FilteredAirBuilder<AB>, io: Self::IoView, aux: Self::AuxView) {
+    fn eval(&self, builder: &mut AB, io: Self::IoView, aux: Self::AuxView) {
         let IsEqualVecIOCols { x, y, prod: _ } = io;
         let IsEqualVecAuxCols { prods, invs } = aux;
         let vec_len = self.vec_len;

@@ -53,7 +53,8 @@ impl MiddleChip {
                 .collect::<Vec<Val<SC>>>()
         };
 
-        let gen_row = |page: &mut Vec<Vec<u32>>,
+        let gen_row = |is_first_row: &mut bool,
+                       page: &mut Vec<Vec<u32>>,
                        index: usize,
                        is_initial: u8,
                        is_final: u8,
@@ -71,6 +72,17 @@ impl MiddleChip {
 
             let cur_key = page[index][1..self.key_len + 1].to_vec();
             let cur_val = page[index][self.key_len + 1..].to_vec();
+
+            if *is_first_row {
+                // Making sure the last_key and last_val are different from current when its the first row
+                *last_key = cur_key.clone();
+                *last_val = cur_val.clone();
+
+                last_key[0] += 1;
+                last_val[0] += 1;
+
+                *is_first_row = false;
+            }
 
             let my_last_key = last_key.clone();
             let my_last_val = last_val.clone();
@@ -118,9 +130,9 @@ impl MiddleChip {
 
         let mut rows = vec![];
 
-        // TODO: do I need to make sure this is different than first actual row?
-        let mut last_key = vec![4234233; self.key_len];
-        let mut last_val = vec![3534543; self.val_len];
+        let mut last_key = vec![0; self.key_len];
+        let mut last_val = vec![0; self.val_len];
+        let mut is_first_row = true;
 
         let mut i = 0;
         while i < ops.len() {
@@ -137,6 +149,7 @@ impl MiddleChip {
                 idx = *key_index_map.get(&cur_key).unwrap();
 
                 rows.push(gen_row(
+                    &mut is_first_row,
                     page,
                     idx,
                     1,
@@ -161,6 +174,7 @@ impl MiddleChip {
                     .collect();
 
                 rows.push(gen_row(
+                    &mut is_first_row,
                     page,
                     idx,
                     0,
@@ -175,6 +189,7 @@ impl MiddleChip {
 
             // Adding the is_final row to the trace
             rows.push(gen_row(
+                &mut is_first_row,
                 page,
                 idx,
                 0,
@@ -195,6 +210,7 @@ impl MiddleChip {
         // Adding rows to the trace to make the height trace_degree
         while rows.len() < trace_degree {
             rows.push(gen_row(
+                &mut is_first_row,
                 page,
                 0,
                 0,

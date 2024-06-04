@@ -1,22 +1,22 @@
 use crate::is_equal_vec::columns::IsEqualVecAuxCols;
 
 // TODO: maybe separate into two structs, io and aux
-// TODO: add comments on what those bits do
 #[derive(Debug)]
 pub struct MiddleChipCols<T> {
-    pub is_initial: T,
-    pub is_final: T,
-    pub clk: T,
-    pub page_row: Vec<T>,
-    pub op_type: T, // 0 for read, 1 for write
+    pub is_initial: T, // this bit indicates if this row comes from the initial page
+    pub is_final: T, // this bit indicates if this row should go to the final page (last row for the key)
 
-    pub same_key: T,
-    pub same_val: T,
+    pub clk: T,           // timestamp for the operation
+    pub page_row: Vec<T>, // the row of the page: starts with is_alloc bit, then key, then val
+    pub op_type: T,       // 0 for read, 1 for write
+
+    pub same_key: T, // this bit indicates if the key matches the one in the previous row (should be 0 in first row)
+    pub same_val: T, // this bit indicates if the val matches the one in the previous row (should be 0 in first row)
 
     pub is_extra: T, // a bit to indicate if this is an extra row that should be ignored
 
-    pub is_equal_key_aux: IsEqualVecAuxCols<T>,
-    pub is_equal_val_aux: IsEqualVecAuxCols<T>,
+    pub is_equal_key_aux: IsEqualVecAuxCols<T>, // auxiliary columns used for same_key
+    pub is_equal_val_aux: IsEqualVecAuxCols<T>, // auxiliary columns used for same_val
 }
 
 impl<T> MiddleChipCols<T>
@@ -74,7 +74,6 @@ where
         flattened
     }
 
-    // TODO: is there a way to merge from_slice and cols_numbered?
     pub fn from_slice(slc: &[T], page_width: usize, key_len: usize, val_len: usize) -> Self {
         Self {
             is_initial: slc[0].clone(),
@@ -92,37 +91,6 @@ where
             is_equal_val_aux: IsEqualVecAuxCols::from_slice(
                 &slc[7 + page_width + 2 * key_len..7 + page_width + 2 * key_len + 2 * val_len],
                 val_len,
-            ),
-        }
-    }
-
-    pub fn cols_numbered(
-        cols: &[usize],
-        page_width: usize,
-        key_len: usize,
-        val_len: usize,
-    ) -> MiddleChipCols<usize> {
-        println!("cols numbered: {} {} {}", page_width, key_len, val_len);
-        println!("cols_len: {}", cols.len());
-
-        MiddleChipCols {
-            is_initial: cols[0],
-            is_final: cols[1],
-            clk: cols[2],
-            page_row: cols[3..3 + page_width].to_vec(),
-            op_type: cols[3 + page_width],
-            same_key: cols[4 + page_width],
-            same_val: cols[5 + page_width],
-            is_extra: cols[6 + page_width],
-            is_equal_key_aux: IsEqualVecAuxCols::new(
-                cols[7 + page_width..7 + page_width + key_len].to_vec(),
-                cols[7 + page_width + key_len..7 + page_width + 2 * key_len].to_vec(),
-            ),
-            is_equal_val_aux: IsEqualVecAuxCols::new(
-                cols[7 + page_width + 2 * key_len..7 + page_width + 2 * key_len + val_len].to_vec(),
-                cols[7 + page_width + 2 * key_len + val_len
-                    ..7 + page_width + 2 * key_len + 2 * val_len]
-                    .to_vec(),
             ),
         }
     }

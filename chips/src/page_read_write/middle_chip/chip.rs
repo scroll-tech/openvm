@@ -42,7 +42,7 @@ impl<F: PrimeField64> Chip<F> for MiddleChip {
         let num_cols = self.air_width();
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
-        let cols_to_receive = MiddleChipCols::<F>::cols_numbered(
+        let cols_to_receive = MiddleChipCols::<usize>::from_slice(
             &all_cols,
             self.page_width(),
             self.key_len,
@@ -55,7 +55,7 @@ impl<F: PrimeField64> Chip<F> for MiddleChip {
         let num_cols = self.air_width();
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
-        let cols_to_send = MiddleChipCols::<F>::cols_numbered(
+        let cols_to_send = MiddleChipCols::<usize>::from_slice(
             &all_cols,
             self.page_width(),
             self.key_len,

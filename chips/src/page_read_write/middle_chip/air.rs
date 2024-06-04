@@ -7,11 +7,7 @@ use p3_matrix::Matrix;
 
 use super::{columns::MiddleChipCols, MiddleChip};
 use crate::{
-    is_equal::columns::IsEqualIOCols,
-    is_equal_vec::{
-        columns::{IsEqualVecCols, IsEqualVecIOCols},
-        IsEqualVecChip,
-    },
+    is_equal_vec::{columns::IsEqualVecCols, IsEqualVecChip},
     sub_chip::{AirConfig, SubAir},
 };
 
@@ -41,8 +37,6 @@ where
     fn eval(&self, builder: &mut AB) {
         let main = &builder.partitioned_main()[0].clone();
 
-        // let main = builder.main();
-
         let (local, next) = (main.row_slice(0), main.row_slice(1));
         let local: &[AB::Var] = (*local).borrow();
         let next: &[AB::Var] = (*next).borrow();
@@ -68,23 +62,38 @@ where
         builder.when_first_row().assert_zero(local_cols.same_key);
         builder.when_first_row().assert_zero(local_cols.same_val);
 
-        let is_equal_cols_vec = local_cols.page_row[1..self.key_len + 1]
+        // Making sure same_key is correct across rows
+        let is_equal_keys_vec = local_cols.page_row[1..self.key_len + 1]
             .to_vec()
             .into_iter()
             .chain(next_cols.page_row[1..self.key_len + 1].to_vec())
             .chain(next_cols.is_equal_key_aux.flatten())
             .collect::<Vec<AB::Var>>();
+        let is_equal_keys = IsEqualVecCols::from_slice(&is_equal_keys_vec, self.key_len);
+        let is_equal_keys_chip = IsEqualVecChip::new(self.key_len);
 
-        let is_equal_cols = IsEqualVecCols::from_slice(&is_equal_cols_vec, self.key_len);
-
-        let is_equal_vec_chip = IsEqualVecChip::new(self.key_len);
-
-        // TODO: make sure same_key and same_val are correct for the rest of the rows
         SubAir::eval(
-            &is_equal_vec_chip,
+            &is_equal_keys_chip,
             &mut builder.when_transition(),
-            is_equal_cols.io,
-            is_equal_cols.aux,
+            is_equal_keys.io,
+            is_equal_keys.aux,
+        );
+
+        // Making sure same_val is correct across rows
+        let is_equal_vals_vec = local_cols.page_row[self.key_len + 1..]
+            .to_vec()
+            .into_iter()
+            .chain(next_cols.page_row[self.key_len + 1..].to_vec())
+            .chain(next_cols.is_equal_val_aux.flatten())
+            .collect::<Vec<AB::Var>>();
+        let is_equal_vals = IsEqualVecCols::from_slice(&is_equal_vals_vec, self.val_len);
+        let is_equal_vals_chip = IsEqualVecChip::new(self.val_len);
+
+        SubAir::eval(
+            &is_equal_vals_chip,
+            &mut builder.when_transition(),
+            is_equal_vals.io,
+            is_equal_vals.aux,
         );
 
         // TODO: make sure all rows are sorted
@@ -127,7 +136,6 @@ where
 
         // Making sure that every read uses the same value as the last operation
         // read => same_val
-        println!("local_cols: {:?}", local_cols);
         builder.assert_one(or(
             local_cols.is_extra.into(),
             or(local_cols.op_type.into(), local_cols.same_val.into()),
