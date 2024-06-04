@@ -3,6 +3,7 @@ use super::super::assert_sorted;
 use afs_stark_backend::prover::USE_DEBUG_BUILDER;
 use afs_stark_backend::verifier::VerificationError;
 use afs_test_utils::config::baby_bear_poseidon2::run_simple_test_no_pis;
+use assert_sorted::AssertSortedChip;
 use p3_baby_bear::BabyBear;
 use p3_matrix::dense::DenseMatrix;
 
@@ -32,8 +33,6 @@ use p3_matrix::dense::DenseMatrix;
 // most limb_bits bits, rows are sorted lexicographically
 #[test]
 fn test_assert_sorted_chip_small_positive() {
-    use assert_sorted::AssertSortedChip;
-
     const BUS_INDEX: usize = 0;
     const LIMB_BITS: usize = 16;
     const DECOMP: usize = 8;
@@ -72,8 +71,6 @@ fn test_assert_sorted_chip_small_positive() {
 // most limb_bits bits, rows are sorted lexicographically
 #[test]
 fn test_assert_sorted_chip_large_positive() {
-    use assert_sorted::AssertSortedChip;
-
     const BUS_INDEX: usize = 0;
     const LIMB_BITS: usize = 30;
     const DECOMP: usize = 8;
@@ -117,8 +114,6 @@ fn test_assert_sorted_chip_large_positive() {
 // has more than limb_bits bits, rows are sorted lexicographically
 #[test]
 fn test_assert_sorted_chip_largelimb_negative() {
-    use assert_sorted::AssertSortedChip;
-
     const BUS_INDEX: usize = 0;
     const LIMB_BITS: usize = 10;
     const DECOMP: usize = 8;
@@ -168,8 +163,6 @@ fn test_assert_sorted_chip_largelimb_negative() {
 // most limb_bits bits, rows are not sorted lexicographically
 #[test]
 fn test_assert_sorted_chip_unsorted_negative() {
-    use assert_sorted::AssertSortedChip;
-
     const BUS_INDEX: usize = 0;
     const LIMB_BITS: usize = 30;
     const DECOMP: usize = 8;

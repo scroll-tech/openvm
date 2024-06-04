@@ -1,4 +1,4 @@
-use super::super::less_than;
+use super::super::less_than::LessThanChip;
 
 use afs_stark_backend::prover::USE_DEBUG_BUILDER;
 use afs_stark_backend::verifier::VerificationError;
@@ -28,8 +28,6 @@ use p3_matrix::dense::DenseMatrix;
 // covers limb_bits < 20, key_vec_len < 4, limb_bits % decomp == 0, number of rows < 4, rows are sorted lexicographically
 #[test]
 fn test_less_than_chip_small_positive() {
-    use less_than::LessThanChip;
-
     const BUS_INDEX: usize = 0;
     const LIMB_BITS: usize = 16;
     const DECOMP: usize = 8;
@@ -62,8 +60,6 @@ fn test_less_than_chip_small_positive() {
 // covers limb_bits >= 20, key_vec_len >= 4, limb_bits % decomp != 0, number of rows >= 4, rows are sorted lexicographically
 #[test]
 fn test_less_than_chip_large_positive() {
-    use less_than::LessThanChip;
-
     const BUS_INDEX: usize = 0;
     const LIMB_BITS: usize = 30;
     const DECOMP: usize = 8;
@@ -101,8 +97,6 @@ fn test_less_than_chip_large_positive() {
 // covers limb_bits >= 20, key_vec_len >= 4, limb_bits % decomp != 0, number of rows >= 4, rows are not sorted lexicographically
 #[test]
 fn test_less_than_chip_unsorted_negative() {
-    use less_than::LessThanChip;
-
     const BUS_INDEX: usize = 0;
     const LIMB_BITS: usize = 30;
     const DECOMP: usize = 8;

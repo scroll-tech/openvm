@@ -1,4 +1,5 @@
 pub mod assert_sorted;
+pub mod is_less_than;
 pub mod keccak_permute;
 pub mod less_than;
 pub mod merkle_proof;
