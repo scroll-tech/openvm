@@ -4,10 +4,9 @@ use afs_stark_backend::interaction::{Chip, Interaction};
 use p3_air::VirtualPairCol;
 use p3_field::PrimeField64;
 
-use crate::sub_chip::SubAirWithInteractions;
-
 use super::columns::InitFinalCols;
 use super::InitFinalChip;
+use crate::sub_chip::SubAirWithInteractions;
 
 impl InitFinalChip {
     fn custom_sends_or_receives<F: PrimeField64>(

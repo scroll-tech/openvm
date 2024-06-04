@@ -1,6 +1,5 @@
 use crate::is_equal_vec::columns::IsEqualVecAuxCols;
 
-// TODO: maybe separate into two structs, io and aux
 #[derive(Debug)]
 pub struct MiddleChipCols<T> {
     pub is_initial: T, // this bit indicates if this row comes from the initial page

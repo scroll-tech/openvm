@@ -2,10 +2,9 @@ use afs_stark_backend::interaction::{Chip, Interaction};
 use p3_air::VirtualPairCol;
 use p3_field::PrimeField64;
 
-use crate::sub_chip::SubAirWithInteractions;
-
 use super::columns::MiddleChipCols;
 use super::MiddleChip;
+use crate::sub_chip::SubAirWithInteractions;
 
 impl<F: PrimeField64> SubAirWithInteractions<F> for MiddleChip {
     fn receives(&self, col_indices: MiddleChipCols<usize>) -> Vec<Interaction<F>> {

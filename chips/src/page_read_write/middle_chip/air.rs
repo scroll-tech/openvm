@@ -53,10 +53,13 @@ where
 
         // TODO: make sure all the relations between is_initial, is_final, op_type are followed
 
-        // Making sure op_type is always bool (read or write)
+        // Making sure bits are bools
+        builder.assert_bool(local_cols.is_initial);
+        builder.assert_bool(local_cols.is_final);
         builder.assert_bool(local_cols.op_type);
+        builder.assert_bool(local_cols.same_key);
+        builder.assert_bool(local_cols.same_val);
         builder.assert_bool(local_cols.is_extra);
-        // TODO: do I need to assert that other bits are bools?
 
         // Making sure first row starts with same_key, same_value being false
         builder.when_first_row().assert_zero(local_cols.same_key);
@@ -98,13 +101,13 @@ where
 
         // TODO: make sure all rows are sorted
 
+        // Some helpers
         let and = |a: AB::Expr, b: AB::Expr| a * b;
-
         let or = |a: AB::Expr, b: AB::Expr| a.clone() + b.clone() - a * b;
-
         let implies = |a: AB::Expr, b: AB::Expr| or(AB::Expr::one() - a, b);
 
         // Making sure every key block starts with a write
+        // not same_key => write
         builder.assert_one(or(
             local_cols.is_extra.into(),
             or(local_cols.same_key.into(), local_cols.op_type.into()),
@@ -141,7 +144,7 @@ where
             or(local_cols.op_type.into(), local_cols.same_val.into()),
         ));
 
-        // Making sure that is_final implies a read
+        // is_final => read
         builder.assert_one(or(
             local_cols.is_extra.into(),
             implies(
@@ -149,5 +152,18 @@ where
                 AB::Expr::one() - local_cols.op_type.into(),
             ),
         ));
+
+        // Making sure is_extra rows are at the bottom
+        builder.when_transition().assert_one(implies(
+            AB::Expr::one() - next_cols.is_extra,
+            AB::Expr::one() - local_cols.is_extra,
+        ));
+
+        // Note that the following is implied:
+        // - for every row: (is_initial => write) because is_initial => not same_key => write
+        // - for every row: (is_initial => not is_final) because is_final => read => same_val and is_initial => not same_key
+        // - there is at most 1 is_initial per key block because every row is sent at most once from the inital page chip
+        // - there is exactly 1 is_final per key block because every row is received at most once from the final page chip
+        //   and we make sure that is_final is the last row in the block
     }
 }

@@ -1,6 +1,6 @@
 pub struct InitFinalCols<T> {
-    pub is_alloc: T,
-    pub page_row: Vec<T>,
+    pub is_alloc: T,      // indicates if row is allocated
+    pub page_row: Vec<T>, // key followed by value in the row
 }
 
 impl<T> InitFinalCols<T> {

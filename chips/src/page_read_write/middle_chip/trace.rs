@@ -1,5 +1,4 @@
-use std::collections::HashMap;
-use std::iter;
+use std::{collections::HashMap, iter};
 
 use p3_field::AbstractField;
 use p3_matrix::dense::RowMajorMatrix;
@@ -12,8 +11,16 @@ use crate::page_read_write::page_controller::Operation;
 use crate::sub_chip::LocalTraceInstructions;
 
 impl MiddleChip {
-    // Each row in the trace follows the same order as the Cols struct:
-    // [is_initial, is_final, clk, page_row, op_type]
+    // TODO: update this
+    // Each row in the trace follow the same order as the Cols struct:
+    // [is_initial, is_final, clk, page_row, op_type, same_key, same_val, is_extra, is_equal_key_aux, is_equal_val_aux]
+    //
+    // The trace consists of a row for every read/write operation plus some extra rows
+    // The trace is sorted by key (in page_row) and then by clk, so every key has a block of consective rows in the trace with the following structure
+    // If the key exists in the initial page, the block starts with a row of the initial data with is_initial=1
+    // Then, a row is added to the trace for every read/write operation with the corresponding data
+    // Then, a row is added with the final value for that key with is_final=1
+    // The trace is padded at the end to be of height trace_degree
     pub fn generate_trace<SC: StarkGenericConfig>(
         &self,
         page: &mut Vec<Vec<u32>>,
