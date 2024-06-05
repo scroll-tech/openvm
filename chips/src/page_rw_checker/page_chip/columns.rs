@@ -1,13 +1,15 @@
 pub struct PageCols<T> {
-    pub is_alloc: T,      // indicates if row is allocated
-    pub page_row: Vec<T>, // key followed by value in the row
+    pub is_alloc: T, // indicates if row is allocated
+    pub idx: Vec<T>,
+    pub data: Vec<T>,
 }
 
 impl<T> PageCols<T> {
-    pub fn cols_numbered(cols: &[usize]) -> PageCols<usize> {
+    pub fn cols_numbered(cols: &[usize], idx_len: usize, data_len: usize) -> PageCols<usize> {
         PageCols {
             is_alloc: cols[0],
-            page_row: cols[1..].to_vec(),
+            idx: cols[1..idx_len + 1].to_vec(),
+            data: cols[idx_len + 1..idx_len + data_len + 1].to_vec(),
         }
     }
 }

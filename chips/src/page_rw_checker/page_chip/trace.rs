@@ -21,7 +21,7 @@ impl PageChip {
                         .collect::<Vec<Val<SC>>>()
                 })
                 .collect(),
-            self.page_width,
+            self.air_width(),
         )
     }
 }

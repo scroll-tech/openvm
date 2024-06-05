@@ -15,5 +15,10 @@ impl AirConfig for PageChip {
 }
 
 impl<AB: AirBuilder> Air<AB> for PageChip {
-    fn eval(&self, _builder: &mut AB) {}
+    fn eval(&self, _builder: &mut AB) {
+        if self.is_send {
+            // We assume the initial page is properly formatted
+            return;
+        }
+    }
 }

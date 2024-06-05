@@ -17,17 +17,17 @@ pub enum OpType {
 #[derive(Clone, Debug)]
 pub struct Operation {
     pub clk: usize,
-    pub key: Vec<u32>,
-    pub val: Vec<u32>,
+    pub idx: Vec<u32>,
+    pub data: Vec<u32>,
     pub op_type: OpType,
 }
 
 impl Operation {
-    pub fn new(clk: usize, key: Vec<u32>, val: Vec<u32>, op_type: OpType) -> Self {
+    pub fn new(clk: usize, idx: Vec<u32>, data: Vec<u32>, op_type: OpType) -> Self {
         Self {
             clk,
-            key,
-            val,
+            idx,
+            data,
             op_type,
         }
     }
@@ -50,11 +50,11 @@ where
 }
 
 impl<SC: StarkGenericConfig> PageController<SC> {
-    pub fn new(bus_index: usize, key_len: usize, val_len: usize) -> Self {
+    pub fn new(bus_index: usize, idx_len: usize, data_len: usize) -> Self {
         Self {
-            init_chip: PageChip::new(bus_index, 1 + key_len + val_len, true),
-            offline_checker: OfflineChecker::new(bus_index, key_len, val_len),
-            final_chip: PageChip::new(bus_index, 1 + key_len + val_len, false),
+            init_chip: PageChip::new(bus_index, idx_len, data_len, true),
+            offline_checker: OfflineChecker::new(bus_index, idx_len, data_len),
+            final_chip: PageChip::new(bus_index, idx_len, data_len, false),
 
             init_chip_trace: None,
             offline_checker_trace: None,
@@ -86,8 +86,8 @@ impl<SC: StarkGenericConfig> PageController<SC> {
     pub fn load_page_and_ops(
         &mut self,
         mut page: Vec<Vec<u32>>,
-        key_len: usize,
-        val_len: usize,
+        idx_len: usize,
+        data_len: usize,
         ops: Vec<Operation>,
         trace_degree: usize,
         trace_committer: &mut TraceCommitter<SC>,
@@ -96,15 +96,14 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         self.init_chip_trace = Some(self.get_page_trace(page.clone()));
 
         let bus_index = self.offline_checker.bus_index();
-        let page_width = 1 + key_len + val_len;
 
-        self.init_chip = PageChip::new(bus_index, page_width, true);
+        self.init_chip = PageChip::new(bus_index, idx_len, data_len, true);
         self.init_chip_trace = Some(self.get_page_trace(page.clone()));
 
-        self.offline_checker = OfflineChecker::new(bus_index, key_len, val_len);
+        self.offline_checker = OfflineChecker::new(bus_index, idx_len, data_len);
         self.offline_checker_trace = Some(self.gen_ops_trace(&mut page, &ops, trace_degree));
 
-        self.final_chip = PageChip::new(bus_index, page_width, false);
+        self.final_chip = PageChip::new(bus_index, idx_len, data_len, false);
         self.final_chip_trace = Some(self.get_page_trace(page.clone()));
 
         let prover_data = vec![

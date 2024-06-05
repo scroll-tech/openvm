@@ -14,7 +14,8 @@ impl PageChip {
         col_indices: PageCols<usize>,
     ) -> Vec<Interaction<F>> {
         let virtual_cols = iter::once(col_indices.is_alloc)
-            .chain(col_indices.page_row)
+            .chain(col_indices.idx)
+            .chain(col_indices.data)
             .map(VirtualPairCol::single_main)
             .collect::<Vec<_>>();
 
@@ -28,36 +29,36 @@ impl PageChip {
 
 impl<F: PrimeField64> SubAirWithInteractions<F> for PageChip {
     fn receives(&self, col_indices: PageCols<usize>) -> Vec<Interaction<F>> {
+        if self.is_send {
+            return vec![];
+        }
+
         self.custom_sends_or_receives(col_indices)
     }
 
     fn sends(&self, col_indices: PageCols<usize>) -> Vec<Interaction<F>> {
+        if !self.is_send {
+            return vec![];
+        }
+
         self.custom_sends_or_receives(col_indices)
     }
 }
 
 impl<F: PrimeField64> Chip<F> for PageChip {
     fn receives(&self) -> Vec<Interaction<F>> {
-        if self.is_send {
-            return vec![];
-        }
-
         let num_cols = self.air_width();
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
-        let cols_to_receive = PageCols::<F>::cols_numbered(&all_cols);
+        let cols_to_receive = PageCols::<F>::cols_numbered(&all_cols, self.idx_len, self.data_len);
         SubAirWithInteractions::receives(self, cols_to_receive)
     }
 
     fn sends(&self) -> Vec<Interaction<F>> {
-        if !self.is_send {
-            return vec![];
-        }
-
         let num_cols = self.air_width();
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
-        let cols_to_send = PageCols::<F>::cols_numbered(&all_cols);
+        let cols_to_send = PageCols::<F>::cols_numbered(&all_cols, self.idx_len, self.data_len);
         SubAirWithInteractions::sends(self, cols_to_send)
     }
 }

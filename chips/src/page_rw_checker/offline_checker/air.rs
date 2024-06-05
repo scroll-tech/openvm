@@ -21,12 +21,7 @@ impl<F: Field> BaseAir<F> for OfflineChecker {
     }
 }
 
-/// Imposes the following constraints:
-/// - Rows are sorted by key then by timestamp (clk)
-/// - Every key block starts with a write
-/// - Every key block ends with an is_final
-/// - For every key, every read uses the same value as the last
-///   operation with that key
+/// This imposes constraints to make sure rows follow the format that we want (outlined in trace.rs)
 impl<AB: PartitionedAirBuilder> Air<AB> for OfflineChecker
 where
     AB::M: Clone,
@@ -39,54 +34,54 @@ where
         let next: &[AB::Var] = (*next).borrow();
 
         let local_cols =
-            OfflineCheckerCols::from_slice(local, self.page_width(), self.key_len, self.val_len);
+            OfflineCheckerCols::from_slice(local, self.page_width(), self.idx_len, self.data_len);
         let next_cols =
-            OfflineCheckerCols::from_slice(next, self.page_width(), self.key_len, self.val_len);
+            OfflineCheckerCols::from_slice(next, self.page_width(), self.idx_len, self.data_len);
 
         // Making sure bits are bools
         builder.assert_bool(local_cols.is_initial);
         builder.assert_bool(local_cols.is_final);
         builder.assert_bool(local_cols.op_type);
-        builder.assert_bool(local_cols.same_key);
-        builder.assert_bool(local_cols.same_val);
+        builder.assert_bool(local_cols.same_idx);
+        builder.assert_bool(local_cols.same_data);
         builder.assert_bool(local_cols.is_extra);
 
-        // Making sure first row starts with same_key, same_value being false
-        builder.when_first_row().assert_zero(local_cols.same_key);
-        builder.when_first_row().assert_zero(local_cols.same_val);
+        // Making sure first row starts with same_idx, same_data being false
+        builder.when_first_row().assert_zero(local_cols.same_idx);
+        builder.when_first_row().assert_zero(local_cols.same_data);
 
-        // Making sure same_key is correct across rows
-        let is_equal_keys_vec = local_cols.page_row[1..self.key_len + 1]
+        // Making sure same_idx is correct across rows
+        let is_equal_idx_vec = local_cols.page_row[1..self.idx_len + 1]
             .iter()
             .copied()
-            .chain(next_cols.page_row[1..self.key_len + 1].to_vec())
-            .chain(next_cols.is_equal_key_aux.flatten())
+            .chain(next_cols.page_row[1..self.idx_len + 1].to_vec())
+            .chain(next_cols.is_equal_idx_aux.flatten())
             .collect::<Vec<AB::Var>>();
-        let is_equal_keys = IsEqualVecCols::from_slice(&is_equal_keys_vec, self.key_len);
-        let is_equal_keys_chip = IsEqualVecChip::new(self.key_len);
+        let is_equal_idx = IsEqualVecCols::from_slice(&is_equal_idx_vec, self.idx_len);
+        let is_equal_idx_chip = IsEqualVecChip::new(self.idx_len);
 
         SubAir::eval(
-            &is_equal_keys_chip,
+            &is_equal_idx_chip,
             &mut builder.when_transition(),
-            is_equal_keys.io,
-            is_equal_keys.aux,
+            is_equal_idx.io,
+            is_equal_idx.aux,
         );
 
-        // Making sure same_val is correct across rows
-        let is_equal_vals_vec = local_cols.page_row[self.key_len + 1..]
+        // Making sure same_data is correct across rows
+        let is_equal_data_vec = local_cols.page_row[self.idx_len + 1..]
             .iter()
             .copied()
-            .chain(next_cols.page_row[self.key_len + 1..].to_vec())
-            .chain(next_cols.is_equal_val_aux.flatten())
+            .chain(next_cols.page_row[self.idx_len + 1..].to_vec())
+            .chain(next_cols.is_equal_data_aux.flatten())
             .collect::<Vec<AB::Var>>();
-        let is_equal_vals = IsEqualVecCols::from_slice(&is_equal_vals_vec, self.val_len);
-        let is_equal_vals_chip = IsEqualVecChip::new(self.val_len);
+        let is_equal_data = IsEqualVecCols::from_slice(&is_equal_data_vec, self.data_len);
+        let is_equal_data_chip = IsEqualVecChip::new(self.data_len);
 
         SubAir::eval(
-            &is_equal_vals_chip,
+            &is_equal_data_chip,
             &mut builder.when_transition(),
-            is_equal_vals.io,
-            is_equal_vals.aux,
+            is_equal_data.io,
+            is_equal_data.aux,
         );
 
         // TODO: make sure all rows are sorted
@@ -96,17 +91,17 @@ where
         let or = |a: AB::Expr, b: AB::Expr| a.clone() + b.clone() - a * b;
         let implies = |a: AB::Expr, b: AB::Expr| or(AB::Expr::one() - a, b);
 
-        // Making sure every key block starts with a write
-        // not same_key => write
+        // Making sure every idx block starts with a write
+        // not same_idx => write
         builder.assert_one(or(
             local_cols.is_extra.into(),
-            or(local_cols.same_key.into(), local_cols.op_type.into()),
+            or(local_cols.same_idx.into(), local_cols.op_type.into()),
         ));
 
-        // Making sure every key block ends with a is_final
+        // Making sure every idx block ends with a is_final
         builder.when_transition().assert_one(or(
             local_cols.is_extra.into(),
-            or(next_cols.same_key.into(), local_cols.is_final.into()),
+            or(next_cols.same_idx.into(), local_cols.is_final.into()),
         ));
         builder.when_transition().assert_one(implies(
             and(
@@ -121,17 +116,17 @@ where
         ));
 
         // Making sure that is_initial rows only appear at the start of blocks
-        // is_initial => not same_key
+        // is_initial => not same_idx
         builder.assert_one(implies(
             local_cols.is_initial.into(),
-            AB::Expr::one() - local_cols.same_key,
+            AB::Expr::one() - local_cols.same_idx,
         ));
 
-        // Making sure that every read uses the same value as the last operation
-        // read => same_val
+        // Making sure that every read uses the same data as the last operation
+        // read => same_data
         builder.assert_one(or(
             local_cols.is_extra.into(),
-            or(local_cols.op_type.into(), local_cols.same_val.into()),
+            or(local_cols.op_type.into(), local_cols.same_data.into()),
         ));
 
         // is_final => read
@@ -150,10 +145,10 @@ where
         ));
 
         // Note that the following is implied:
-        // - for every row: (is_initial => write) because is_initial => not same_key => write
-        // - for every row: (is_initial => not is_final) because is_final => read => same_val and is_initial => not same_key
-        // - there is at most 1 is_initial per key block because every row is sent at most once from the inital page chip
-        // - there is exactly 1 is_final per key block because every row is received at most once from the final page chip
+        // - for every row: (is_initial => write) because is_initial => not same_idx => write
+        // - for every row: (is_initial => not is_final) because is_final => read and is_initial => not same_idx => write
+        // - there is at most 1 is_initial per index block because every row is sent at most once from the inital page chip
+        // - there is exactly 1 is_final per index block because every row is received at most once from the final page chip
         //   and we make sure that is_final is the last row in the block
     }
 }

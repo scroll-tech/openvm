@@ -5,16 +5,18 @@ pub mod trace;
 
 pub struct PageChip {
     bus_index: usize,
-    page_width: usize,
+    idx_len: usize,
+    data_len: usize,
 
     is_send: bool,
 }
 
 impl PageChip {
-    pub fn new(bus_index: usize, page_width: usize, is_send: bool) -> Self {
+    pub fn new(bus_index: usize, idx_len: usize, data_len: usize, is_send: bool) -> Self {
         Self {
             bus_index,
-            page_width,
+            idx_len,
+            data_len,
             is_send,
         }
     }
@@ -24,6 +26,6 @@ impl PageChip {
     }
 
     pub fn air_width(&self) -> usize {
-        self.page_width
+        1 + self.idx_len + self.data_len
     }
 }

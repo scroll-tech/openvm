@@ -2,8 +2,6 @@ use std::collections::{HashMap, HashSet};
 use std::iter;
 use std::panic;
 
-use crate::page_rw_checker;
-use crate::page_rw_checker::page_controller::{OpType, Operation};
 use afs_stark_backend::prover::USE_DEBUG_BUILDER;
 use afs_stark_backend::verifier::VerificationError;
 use afs_stark_backend::{
@@ -17,13 +15,16 @@ use afs_test_utils::config::{
 use afs_test_utils::{engine::StarkEngine, utils::create_seeded_rng};
 use rand::Rng;
 
-use crate::page_rw_checker::page_controller;
+use crate::page_rw_checker::{
+    self,
+    page_controller::{self, OpType, Operation},
+};
 
 fn load_page_test(
     engine: &BabyBearPoseidon2Engine,
     page_init: Vec<Vec<u32>>,
-    key_len: usize,
-    val_len: usize,
+    idx_len: usize,
+    data_len: usize,
     ops: &Vec<Operation>,
     page_controller: &mut page_controller::PageController<BabyBearPoseidon2Config>,
     trace_builder: &mut TraceCommitmentBuilder<BabyBearPoseidon2Config>,
@@ -35,8 +36,8 @@ fn load_page_test(
 
     let (page_traces, mut prover_data) = page_controller.load_page_and_ops(
         page_init.clone(),
-        key_len,
-        val_len,
+        idx_len,
+        data_len,
         ops.clone(),
         trace_degree,
         &mut trace_builder.committer,
@@ -105,26 +106,26 @@ fn page_read_write_test() {
 
     let trace_degree = num_ops * 8;
 
-    let key_len = rng.gen::<usize>() % ((page_width - 1) - 1) + 1;
-    let val_len = (page_width - 1) - key_len;
+    let idx_len = rng.gen::<usize>() % ((page_width - 1) - 1) + 1;
+    let data_len = (page_width - 1) - idx_len;
 
-    // Generating a random page with distinct keys
+    // Generating a random page with distinct indices
     let mut page: Vec<Vec<u32>> = vec![];
-    let mut key_val_map = HashMap::new();
+    let mut idx_data_map = HashMap::new();
     for _ in 0..page_height {
-        let mut key;
+        let mut idx;
         loop {
-            key = (0..key_len)
+            idx = (0..idx_len)
                 .map(|_| rng.gen::<u32>() % MAX_VAL)
                 .collect::<Vec<u32>>();
-            if !key_val_map.contains_key(&key) {
+            if !idx_data_map.contains_key(&idx) {
                 break;
             }
         }
 
-        let val: Vec<u32> = (0..val_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
-        key_val_map.insert(key.clone(), val.clone());
-        page.push(iter::once(1).chain(key).chain(val).collect());
+        let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+        idx_data_map.insert(idx.clone(), data.clone());
+        page.push(iter::once(1).chain(idx).chain(data).collect());
     }
 
     // Generating random sorted timestamps for operations
@@ -136,9 +137,9 @@ fn page_read_write_test() {
     let mut ops: Vec<Operation> = vec![];
     for i in 0..num_ops {
         let clk = clks[i];
-        let key = key_val_map
+        let idx = idx_data_map
             .iter()
-            .nth(rng.gen::<usize>() % key_val_map.len())
+            .nth(rng.gen::<usize>() % idx_data_map.len())
             .unwrap()
             .0
             .to_vec();
@@ -151,30 +152,30 @@ fn page_read_write_test() {
             }
         };
 
-        let val = {
+        let data = {
             if op_type == OpType::Read {
-                key_val_map[&key].to_vec()
+                idx_data_map[&idx].to_vec()
             } else {
-                (0..val_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
+                (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
             }
         };
 
         if op_type == OpType::Write {
-            key_val_map.insert(key.clone(), val.clone());
+            idx_data_map.insert(idx.clone(), data.clone());
         }
 
-        ops.push(Operation::new(clk, key, val, op_type));
+        ops.push(Operation::new(clk, idx, data, op_type));
     }
 
     let mut page_controller: PageController<BabyBearPoseidon2Config> =
-        PageController::new(bus_index, key_len, val_len);
+        PageController::new(bus_index, idx_len, data_len);
     let engine = config::baby_bear_poseidon2::default_engine(log_page_height.max(3 + log_num_ops));
 
     let mut keygen_builder = MultiStarkKeygenBuilder::new(&engine.config);
 
     let init_page_ptr = keygen_builder.add_cached_main_matrix(page_width);
     let final_page_ptr = keygen_builder.add_cached_main_matrix(page_width);
-    let ops_ptr = keygen_builder.add_main_matrix(7 + page_width + 2 * (key_len + val_len));
+    let ops_ptr = keygen_builder.add_main_matrix(7 + page_width + 2 * (idx_len + data_len));
 
     keygen_builder.add_partitioned_air(
         &page_controller.init_chip,
@@ -206,8 +207,8 @@ fn page_read_write_test() {
     load_page_test(
         &engine,
         page.clone(),
-        key_len,
-        val_len,
+        idx_len,
+        data_len,
         &ops,
         &mut page_controller,
         &mut trace_builder,
@@ -221,10 +222,10 @@ fn page_read_write_test() {
     for i in rows_allocated..page_height {
         page[i][0] = 0;
 
-        // Making sure the first operation using this key is a write
-        let key = page[i][1..key_len + 1].to_vec();
+        // Making sure the first operation using this index is a write
+        let idx = page[i][1..idx_len + 1].to_vec();
         for op in ops.iter_mut() {
-            if op.key == key {
+            if op.idx == idx {
                 op.op_type = OpType::Write;
                 break;
             }
@@ -234,8 +235,8 @@ fn page_read_write_test() {
     load_page_test(
         &engine,
         page.clone(),
-        key_len,
-        val_len,
+        idx_len,
+        data_len,
         &ops,
         &mut page_controller,
         &mut trace_builder,
@@ -246,10 +247,10 @@ fn page_read_write_test() {
 
     // Testing a fully unallocated page
     for i in 0..page_height {
-        // Making sure the first operation that uses every key is a write
-        let key = page[i][1..key_len + 1].to_vec();
+        // Making sure the first operation that uses every index is a write
+        let idx = page[i][1..idx_len + 1].to_vec();
         for op in ops.iter_mut() {
-            if op.key == key {
+            if op.idx == idx {
                 op.op_type = OpType::Write;
                 break;
             }
@@ -264,8 +265,8 @@ fn page_read_write_test() {
     load_page_test(
         &engine,
         page.clone(),
-        key_len,
-        val_len,
+        idx_len,
+        data_len,
         &ops,
         &mut page_controller,
         &mut trace_builder,
@@ -274,19 +275,19 @@ fn page_read_write_test() {
     )
     .expect("Verification failed");
 
-    // Testing writing only 1 key into an unallocated page
+    // Testing writing only 1 index into an unallocated page
     ops = vec![Operation::new(
         10,
-        (0..key_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
-        (0..val_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
+        (0..idx_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
+        (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
         OpType::Write,
     )];
 
     load_page_test(
         &engine,
         page.clone(),
-        key_len,
-        val_len,
+        idx_len,
+        data_len,
         &ops,
         &mut page_controller,
         &mut trace_builder,
@@ -297,11 +298,11 @@ fn page_read_write_test() {
 
     // Negative tests
 
-    // Testing reading from a non-existing key (in a fully-unallocated page)
+    // Testing reading from a non-existing index (in a fully-unallocated page)
     ops = vec![Operation::new(
         1,
-        (0..key_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
-        (0..val_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
+        (0..idx_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
+        (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
         OpType::Read,
     )];
 
@@ -312,8 +313,8 @@ fn page_read_write_test() {
         load_page_test(
             &engine,
             page.clone(),
-            key_len,
-            val_len,
+            idx_len,
+            data_len,
             &ops,
             &mut page_controller,
             &mut trace_builder,
@@ -324,23 +325,23 @@ fn page_read_write_test() {
         "Expected constraints to fail"
     );
 
-    // Testing reading a wrong value from an existing key
-    let key: Vec<u32> = (0..key_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
-    let val_1: Vec<u32> = (0..val_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
-    let mut val_2 = val_1.clone();
-    val_2[0] += 1; // making sure val_2 is different
+    // Testing reading wrong data from an existing index
+    let idx: Vec<u32> = (0..idx_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+    let data_1: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+    let mut data_2 = data_1.clone();
+    data_2[0] += 1; // making sure data_2 is different
 
     ops = vec![
-        Operation::new(1, key.clone(), val_1, OpType::Write),
-        Operation::new(2, key, val_2, OpType::Read),
+        Operation::new(1, idx.clone(), data_1, OpType::Write),
+        Operation::new(2, idx, data_2, OpType::Read),
     ];
 
     assert_eq!(
         load_page_test(
             &engine,
             page.clone(),
-            key_len,
-            val_len,
+            idx_len,
+            data_len,
             &ops,
             &mut page_controller,
             &mut trace_builder,
@@ -351,26 +352,26 @@ fn page_read_write_test() {
         "Expected constraints to fail"
     );
 
-    // Testing writing too many keys to a fully unallocated page
-    let mut key_map = HashSet::new();
+    // Testing writing too many indices to a fully unallocated page
+    let mut idx_map = HashSet::new();
     for _ in 0..page_height + 1 {
-        let mut key: Vec<u32>;
+        let mut idx: Vec<u32>;
         loop {
-            key = (0..key_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
-            if !key_map.contains(&key) {
+            idx = (0..idx_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+            if !idx_map.contains(&idx) {
                 break;
             }
         }
 
-        key_map.insert(key);
+        idx_map.insert(idx);
     }
 
     ops.clear();
-    for (i, key) in key_map.iter().enumerate() {
+    for (i, idx) in idx_map.iter().enumerate() {
         ops.push(Operation::new(
             i + 1,
-            key.clone(),
-            (0..val_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
+            idx.clone(),
+            (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
             OpType::Write,
         ));
     }
@@ -380,8 +381,8 @@ fn page_read_write_test() {
         let _ = load_page_test(
             engine_ref,
             page.clone(),
-            key_len,
-            val_len,
+            idx_len,
+            data_len,
             &ops,
             &mut page_controller,
             &mut trace_builder,
@@ -392,6 +393,6 @@ fn page_read_write_test() {
 
     assert!(
         result.is_err(),
-        "Expected to fail when allocating too many keys"
+        "Expected to fail when allocating too many indices"
     );
 }

@@ -44,8 +44,8 @@ impl<F: PrimeField64> Chip<F> for OfflineChecker {
         let cols_to_receive = OfflineCheckerCols::<usize>::from_slice(
             &all_cols,
             self.page_width(),
-            self.key_len,
-            self.val_len,
+            self.idx_len,
+            self.data_len,
         );
         SubAirWithInteractions::receives(self, cols_to_receive)
     }
@@ -57,8 +57,8 @@ impl<F: PrimeField64> Chip<F> for OfflineChecker {
         let cols_to_send = OfflineCheckerCols::<usize>::from_slice(
             &all_cols,
             self.page_width(),
-            self.key_len,
-            self.val_len,
+            self.idx_len,
+            self.data_len,
         );
         SubAirWithInteractions::sends(self, cols_to_send)
     }
