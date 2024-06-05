@@ -1,6 +1,8 @@
+use std::sync::Arc;
+
 use getset::Getters;
 
-use crate::is_less_than::IsLessThanChip;
+use crate::{is_less_than::IsLessThanAir, range_gate::RangeCheckerGateChip};
 
 #[cfg(test)]
 pub mod tests;
@@ -17,11 +19,19 @@ pub struct IsLessThanTupleAir {
     #[getset(get = "pub")]
     range_max: u32,
     #[getset(get = "pub")]
-    limb_bits: Vec<usize>,
-    #[getset(get = "pub")]
     decomp: usize,
     #[getset(get = "pub")]
-    tuple_len: usize,
+    is_lt_airs: Vec<IsLessThanAir>,
+}
+
+impl IsLessThanTupleAir {
+    pub fn tuple_len(&self) -> usize {
+        self.is_lt_airs.len()
+    }
+
+    pub fn limb_bits(&self) -> Vec<usize> {
+        self.is_lt_airs.iter().map(|air| *air.limb_bits()).collect()
+    }
 }
 
 /**
@@ -33,7 +43,7 @@ pub struct IsLessThanTupleAir {
 pub struct IsLessThanTupleChip {
     pub air: IsLessThanTupleAir,
 
-    pub is_less_than_chips: Vec<IsLessThanChip>,
+    pub range_checker: Arc<RangeCheckerGateChip>,
 }
 
 impl IsLessThanTupleChip {
@@ -42,25 +52,20 @@ impl IsLessThanTupleChip {
         range_max: u32,
         limb_bits: Vec<usize>,
         decomp: usize,
-        tuple_len: usize,
+        range_checker: Arc<RangeCheckerGateChip>,
     ) -> Self {
+        let is_lt_airs = limb_bits
+            .iter()
+            .map(|&limb_bit| IsLessThanAir::new(bus_index, range_max, limb_bit, decomp))
+            .collect::<Vec<_>>();
+
         let air = IsLessThanTupleAir {
             bus_index,
             range_max,
-            limb_bits: limb_bits.clone(),
             decomp,
-            tuple_len,
+            is_lt_airs,
         };
 
-        // create less_than_chips which will be used to compare individual tuple elements
-        let is_less_than_chips = limb_bits
-            .iter()
-            .map(|&limb_bit| IsLessThanChip::new(bus_index, range_max, limb_bit, decomp))
-            .collect::<Vec<_>>();
-
-        Self {
-            air,
-            is_less_than_chips,
-        }
+        Self { air, range_checker }
     }
 }

@@ -40,14 +40,14 @@ impl AssertSortedChip {
                 for i in 0..num_limbs {
                     let bits = (val >> (i * self.air.decomp())) & ((1 << self.air.decomp()) - 1);
                     key_decomp_trace.push(F::from_canonical_u32(bits));
-                    self.range_checker_gate.add_count(bits);
+                    self.range_checker.add_count(bits);
                 }
                 // the last sublimb should be of size self.limb_bits() % self.decomp() bits,
                 // so we need to shift it to constrain this
                 let bits =
                     (val >> ((num_limbs - 1) * self.air.decomp())) & ((1 << self.air.decomp()) - 1);
                 if (bits << last_limb_shift) < *self.air.range_max() {
-                    self.range_checker_gate.add_count(bits << last_limb_shift);
+                    self.range_checker.add_count(bits << last_limb_shift);
                 }
                 key_decomp_trace.push(F::from_canonical_u32(bits << last_limb_shift));
             }

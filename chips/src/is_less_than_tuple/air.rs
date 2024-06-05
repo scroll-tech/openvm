@@ -1,4 +1,4 @@
-use std::borrow::Borrow;
+use std::{borrow::Borrow, sync::Arc};
 
 use p3_air::{Air, AirBuilder, BaseAir};
 use p3_field::{AbstractField, Field};
@@ -6,6 +6,7 @@ use p3_matrix::Matrix;
 
 use crate::{
     is_less_than::{columns::IsLessThanCols, IsLessThanChip},
+    range_gate::RangeCheckerGateChip,
     sub_chip::{AirConfig, SubAir},
 };
 
@@ -23,7 +24,7 @@ impl<F: Field> BaseAir<F> for IsLessThanTupleChip {
         IsLessThanTupleCols::<F>::get_width(
             self.air.limb_bits().clone(),
             *self.air.decomp(),
-            *self.air.tuple_len(),
+            self.air.tuple_len(),
         )
     }
 }
@@ -39,7 +40,7 @@ impl<AB: AirBuilder> Air<AB> for IsLessThanTupleChip {
             local,
             self.air.limb_bits().clone(),
             *self.air.decomp(),
-            *self.air.tuple_len(),
+            self.air.tuple_len(),
         );
 
         SubAir::eval(&self.air, builder, local_cols.io, local_cols.aux);
@@ -60,11 +61,17 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanTupleAir {
             let x_val = x[i];
             let y_val = y[i];
 
+            let range_checker_dummy = Arc::new(RangeCheckerGateChip::new(
+                *self.bus_index(),
+                *self.range_max(),
+            ));
+
             let is_less_than_chip_dummy = IsLessThanChip::new(
                 *self.bus_index(),
                 *self.range_max(),
                 self.limb_bits()[i],
                 *self.decomp(),
+                range_checker_dummy,
             );
 
             // here we constrain that less_than[i] indicates whether x[i] < y[i] using the IsLessThan subchip
@@ -94,7 +101,7 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanTupleAir {
         }
 
         // together, these constrain that is_equal is the indicator for whether diff == 0, i.e. x[i] = y[i]
-        for i in 0..*self.tuple_len() {
+        for i in 0..self.tuple_len() {
             let diff = aux.diff[i];
             let is_equal = aux.is_zero[i];
             let inverse = aux.inverses[i];

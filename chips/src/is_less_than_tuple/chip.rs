@@ -9,7 +9,7 @@ impl<F: PrimeField64> Chip<F> for IsLessThanTupleChip {
         let num_cols = IsLessThanTupleCols::<F>::get_width(
             self.air.limb_bits().clone(),
             *self.air.decomp(),
-            *self.air.tuple_len(),
+            self.air.tuple_len(),
         );
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
@@ -17,7 +17,7 @@ impl<F: PrimeField64> Chip<F> for IsLessThanTupleChip {
             &all_cols,
             self.air.limb_bits().clone(),
             *self.air.decomp(),
-            *self.air.tuple_len(),
+            self.air.tuple_len(),
         );
 
         SubAirWithInteractions::sends(self, cols_numbered)
@@ -29,7 +29,7 @@ impl<F: PrimeField64> SubAirWithInteractions<F> for IsLessThanTupleChip {
         // num_limbs is the number of limbs, not including the last shifted limb
         let mut interactions = vec![];
 
-        for i in 0..*self.air.tuple_len() {
+        for i in 0..self.air.tuple_len() {
             let mut is_less_than_cols = vec![
                 col_indices.io.x[i],
                 col_indices.io.y[i],
@@ -46,7 +46,7 @@ impl<F: PrimeField64> SubAirWithInteractions<F> for IsLessThanTupleChip {
             );
 
             let curr_interactions =
-                SubAirWithInteractions::<F>::sends(&self.is_less_than_chips[i], is_less_than_cols);
+                SubAirWithInteractions::<F>::sends(&self.air.is_lt_airs[i], is_less_than_cols);
             interactions.extend(curr_interactions);
         }
 

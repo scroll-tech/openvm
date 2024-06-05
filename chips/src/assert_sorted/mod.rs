@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::{is_less_than_tuple::IsLessThanTupleChip, range_gate::RangeCheckerGateChip};
 use getset::Getters;
 
@@ -46,7 +48,7 @@ pub struct AssertedSortedAir {
 pub struct AssertSortedChip {
     air: AssertedSortedAir,
     is_less_than_tuple_chip: IsLessThanTupleChip,
-    range_checker_gate: RangeCheckerGateChip,
+    range_checker: Arc<RangeCheckerGateChip>,
 }
 
 impl AssertSortedChip {
@@ -57,6 +59,7 @@ impl AssertSortedChip {
         decomp: usize,
         key_vec_len: usize,
         keys: Vec<Vec<u32>>,
+        range_checker: Arc<RangeCheckerGateChip>,
     ) -> Self {
         Self {
             air: AssertedSortedAir {
@@ -72,9 +75,9 @@ impl AssertSortedChip {
                 range_max,
                 limb_bits,
                 decomp,
-                key_vec_len,
+                range_checker.clone(),
             ),
-            range_checker_gate: RangeCheckerGateChip::new(bus_index, range_max),
+            range_checker,
         }
     }
 

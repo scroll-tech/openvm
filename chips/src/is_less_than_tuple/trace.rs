@@ -1,7 +1,7 @@
 use p3_field::PrimeField64;
 use p3_matrix::dense::RowMajorMatrix;
 
-use crate::sub_chip::LocalTraceInstructions;
+use crate::{is_less_than::IsLessThanChip, sub_chip::LocalTraceInstructions};
 
 use super::{
     columns::{IsLessThanTupleAuxCols, IsLessThanTupleCols, IsLessThanTupleIOCols},
@@ -13,7 +13,7 @@ impl IsLessThanTupleChip {
         let num_cols: usize = IsLessThanTupleCols::<F>::get_width(
             self.air.limb_bits().clone(),
             *self.air.decomp(),
-            *self.air.tuple_len(),
+            self.air.tuple_len(),
         );
 
         let row: Vec<F> = self.generate_trace_row((x, y)).flatten();
@@ -37,10 +37,16 @@ impl<F: PrimeField64> LocalTraceInstructions<F> for IsLessThanTupleChip {
 
         // use subchip to generate relevant columns
         for i in 0..x.len() {
-            let is_less_than_chip = &self.is_less_than_chips[i];
+            let is_less_than_chip = IsLessThanChip::new(
+                *self.air.bus_index(),
+                *self.air.range_max(),
+                self.air.limb_bits()[i],
+                *self.air.decomp(),
+                self.range_checker.clone(),
+            );
 
             let curr_less_than_row =
-                LocalTraceInstructions::generate_trace_row(is_less_than_chip, (x[i], y[i]))
+                LocalTraceInstructions::generate_trace_row(&is_less_than_chip, (x[i], y[i]))
                     .flatten();
             less_than.push(curr_less_than_row[2]);
             lower_bits.push(curr_less_than_row[3]);

@@ -8,8 +8,10 @@ pub struct IsLessThanIOCols<T> {
 }
 
 pub struct IsLessThanAuxCols<T> {
-    pub lower_bits: T,
-    pub lower_bits_decomp: Vec<T>,
+    pub lower: T,
+    // lower_decomp consists of lower decomposed into limbs of size decomp where we also shift
+    // the final limb and store it as the last element of lower decomp so we can range check
+    pub lower_decomp: Vec<T>,
 }
 
 pub struct IsLessThanCols<T> {
@@ -29,16 +31,16 @@ impl<T: Clone> IsLessThanCols<T> {
         let less_than = slc[2].clone();
 
         // the next element is the value of the lower num_limbs bits of the intermediate sum
-        let lower_bits = slc[3].clone();
+        let lower = slc[3].clone();
 
         // the next num_limbs + 1 elements are the decomposed limbs of the lower bits of the
         // intermediate sum
-        let lower_bits_decomp = slc[4..4 + num_limbs + 1].to_vec();
+        let lower_decomp = slc[4..4 + num_limbs + 1].to_vec();
 
         let io = IsLessThanIOCols { x, y, less_than };
         let aux = IsLessThanAuxCols {
-            lower_bits,
-            lower_bits_decomp,
+            lower,
+            lower_decomp,
         };
 
         Self { io, aux }
@@ -49,9 +51,9 @@ impl<T: Clone> IsLessThanCols<T> {
             self.io.x.clone(),
             self.io.y.clone(),
             self.io.less_than.clone(),
-            self.aux.lower_bits.clone(),
+            self.aux.lower.clone(),
         ];
-        flattened.extend(self.aux.lower_bits_decomp.iter().cloned());
+        flattened.extend(self.aux.lower_decomp.iter().cloned());
         flattened
     }
 
@@ -61,9 +63,9 @@ impl<T: Clone> IsLessThanCols<T> {
         width += 2;
         // for the less_than indicator
         width += 1;
-        // for the lower_bits
+        // for the lower
         width += 1;
-        // for the decomposed lower_bits
+        // for the decomposed lower
         let num_limbs = (limb_bits + decomp - 1) / decomp;
         width += num_limbs + 1;
 

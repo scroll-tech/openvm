@@ -33,7 +33,7 @@ impl<F: PrimeField64> Chip<F> for AssertSortedChip {
                 interactions.push(Interaction {
                     fields: vec![VirtualPairCol::single_main(cols_numbered.keys_decomp[i][j])],
                     count: VirtualPairCol::constant(F::one()),
-                    argument_index: self.range_checker_gate.bus_index(),
+                    argument_index: self.range_checker.bus_index(),
                 });
             }
         }
