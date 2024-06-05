@@ -1,6 +1,5 @@
 use std::iter;
 
-use crate::page_controller;
 use afs_stark_backend::verifier::VerificationError;
 use afs_stark_backend::{
     keygen::{types::MultiStarkPartialProvingKey, MultiStarkKeygenBuilder},
@@ -25,7 +24,7 @@ fn load_page_test(
     engine: &BabyBearPoseidon2Engine,
     page_to_receive: &Vec<Vec<u32>>,
     page_to_send: &Vec<Vec<u32>>,
-    page_controller: &mut page_controller::PageController<BabyBearPoseidon2Config>,
+    page_controller: &mut super::PageController<BabyBearPoseidon2Config>,
     page_requester: &DummyInteractionAir,
     trace_builder: &mut TraceCommitmentBuilder<BabyBearPoseidon2Config>,
     partial_pk: &MultiStarkPartialProvingKey<BabyBearPoseidon2Config>,
@@ -100,7 +99,7 @@ fn page_read_chip_test() {
     let mut rng = create_seeded_rng();
     let bus_index = 0;
 
-    use page_controller::PageController;
+    use super::PageController;
 
     let log_page_height = 3;
     let log_num_requests = 5;

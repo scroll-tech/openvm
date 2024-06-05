@@ -1,6 +1,7 @@
 pub mod air;
 pub mod chip;
 pub mod columns;
+pub mod page_controller;
 
 pub struct PageReadChip {
     bus_index: usize,
