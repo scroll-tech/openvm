@@ -82,20 +82,33 @@ impl<T: Clone> AssertSortedCols<T> {
         // note that this sum will always be nonzero so the inverse will exist
         let inverses = slc[curr_start_idx..curr_end_idx].to_vec();
 
-        let mut less_than_cols: Vec<IsLessThanAuxCols<T>> = vec![];
+        curr_start_idx = curr_end_idx;
+        curr_end_idx += key_vec_len;
+
+        let mut less_than_aux: Vec<IsLessThanAuxCols<T>> = vec![];
         for i in 0..key_vec_len {
             let less_than_col = IsLessThanAuxCols {
                 lower: lower_vec[i].clone(),
                 lower_decomp: lower_decomp_vec[i].clone(),
             };
-            less_than_cols.push(less_than_col);
+            less_than_aux.push(less_than_col);
         }
 
-        let mut is_equal_cols: Vec<IsEqualAuxCols<T>> = vec![];
+        let mut is_equal_aux: Vec<IsEqualAuxCols<T>> = vec![];
         for inv in inverses.iter() {
             let is_equal_col = IsEqualAuxCols { inv: inv.clone() };
-            is_equal_cols.push(is_equal_col);
+            is_equal_aux.push(is_equal_col);
         }
+
+        let mut is_equal_cumulative: Vec<T> = vec![];
+        let mut less_than_cumulative: Vec<T> = vec![];
+
+        is_equal_cumulative.extend_from_slice(&slc[curr_start_idx..curr_end_idx]);
+
+        curr_start_idx = curr_end_idx;
+        curr_end_idx += key_vec_len;
+
+        less_than_cumulative.extend_from_slice(&slc[curr_start_idx..curr_end_idx]);
 
         let io = IsLessThanTupleIOCols {
             x,
@@ -104,9 +117,11 @@ impl<T: Clone> AssertSortedCols<T> {
         };
         let aux = IsLessThanTupleAuxCols {
             less_than,
-            less_than_cols,
+            less_than_aux,
             is_equal,
-            is_equal_cols,
+            is_equal_aux,
+            is_equal_cumulative,
+            less_than_cumulative,
         };
 
         let is_less_than_tuple_cols = IsLessThanTupleCols { io, aux };
@@ -150,6 +165,9 @@ impl<T: Clone> AssertSortedCols<T> {
         width += key_vec_len;
         // for the y such that y * (i + x) = 1
         width += key_vec_len;
+
+        // for the cumulative is_equal and less_than
+        width += 2 * key_vec_len;
 
         width
     }

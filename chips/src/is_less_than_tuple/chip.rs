@@ -5,25 +5,25 @@ use crate::{
 use afs_stark_backend::interaction::{Chip, Interaction};
 use p3_field::PrimeField64;
 
-use super::{columns::IsLessThanTupleCols, IsLessThanTupleAir, IsLessThanTupleChip};
+use super::{columns::IsLessThanTupleCols, IsLessThanTupleAir};
 
-impl<F: PrimeField64> Chip<F> for IsLessThanTupleChip {
+impl<F: PrimeField64> Chip<F> for IsLessThanTupleAir {
     fn sends(&self) -> Vec<Interaction<F>> {
         let num_cols = IsLessThanTupleCols::<F>::get_width(
-            self.air.limb_bits().clone(),
-            *self.air.decomp(),
-            self.air.tuple_len(),
+            self.limb_bits().clone(),
+            *self.decomp(),
+            self.tuple_len(),
         );
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
         let cols_numbered = IsLessThanTupleCols::<usize>::from_slice(
             &all_cols,
-            self.air.limb_bits().clone(),
-            *self.air.decomp(),
-            self.air.tuple_len(),
+            self.limb_bits().clone(),
+            *self.decomp(),
+            self.tuple_len(),
         );
 
-        SubAirWithInteractions::sends(&self.air, cols_numbered)
+        SubAirWithInteractions::sends(self, cols_numbered)
     }
 }
 
@@ -40,8 +40,8 @@ impl<F: PrimeField64> SubAirWithInteractions<F> for IsLessThanTupleAir {
                     less_than: col_indices.aux.less_than[i],
                 },
                 aux: IsLessThanAuxCols {
-                    lower: col_indices.aux.less_than_cols[i].lower,
-                    lower_decomp: col_indices.aux.less_than_cols[i].lower_decomp.clone(),
+                    lower: col_indices.aux.less_than_aux[i].lower,
+                    lower_decomp: col_indices.aux.less_than_aux[i].lower_decomp.clone(),
                 },
             };
 

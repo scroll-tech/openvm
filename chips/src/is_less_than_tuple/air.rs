@@ -1,7 +1,7 @@
 use std::{borrow::Borrow, sync::Arc};
 
 use p3_air::{Air, AirBuilder, BaseAir};
-use p3_field::{AbstractField, Field};
+use p3_field::Field;
 use p3_matrix::Matrix;
 
 use crate::{
@@ -19,24 +19,24 @@ use crate::{
 
 use super::{
     columns::{IsLessThanTupleAuxCols, IsLessThanTupleCols, IsLessThanTupleIOCols},
-    IsLessThanTupleAir, IsLessThanTupleChip,
+    IsLessThanTupleAir,
 };
 
 impl AirConfig for IsLessThanTupleAir {
     type Cols<T> = IsLessThanTupleCols<T>;
 }
 
-impl<F: Field> BaseAir<F> for IsLessThanTupleChip {
+impl<F: Field> BaseAir<F> for IsLessThanTupleAir {
     fn width(&self) -> usize {
         IsLessThanTupleCols::<F>::get_width(
-            self.air.limb_bits().clone(),
-            *self.air.decomp(),
-            self.air.tuple_len(),
+            self.limb_bits().clone(),
+            *self.decomp(),
+            self.tuple_len(),
         )
     }
 }
 
-impl<AB: AirBuilder> Air<AB> for IsLessThanTupleChip {
+impl<AB: AirBuilder> Air<AB> for IsLessThanTupleAir {
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
 
@@ -45,12 +45,12 @@ impl<AB: AirBuilder> Air<AB> for IsLessThanTupleChip {
 
         let local_cols = IsLessThanTupleCols::<AB::Var>::from_slice(
             local,
-            self.air.limb_bits().clone(),
-            *self.air.decomp(),
-            self.air.tuple_len(),
+            self.limb_bits().clone(),
+            *self.decomp(),
+            self.tuple_len(),
         );
 
-        SubAir::eval(&self.air, builder, local_cols.io, local_cols.aux);
+        SubAir::eval(self, builder, local_cols.io, local_cols.aux);
     }
 }
 
@@ -86,8 +86,8 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanTupleAir {
                     less_than: aux.less_than[i],
                 },
                 aux: IsLessThanAuxCols {
-                    lower: aux.less_than_cols[i].lower,
-                    lower_decomp: aux.less_than_cols[i].lower_decomp.clone(),
+                    lower: aux.less_than_aux[i].lower,
+                    lower_decomp: aux.less_than_aux[i].lower_decomp.clone(),
                 },
             };
 
@@ -102,7 +102,7 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanTupleAir {
         // together, these constrain that is_equal is the indicator for whether diff == 0, i.e. x[i] = y[i]
         for i in 0..x.len() {
             let is_equal = aux.is_equal[i];
-            let inv = aux.is_equal_cols[i].inv;
+            let inv = aux.is_equal_aux[i].inv;
 
             let is_equal_chip = IsEqualChip {};
             let is_equal_cols = IsEqualCols {
@@ -117,19 +117,26 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanTupleAir {
             SubAir::eval(&is_equal_chip, builder, is_equal_cols.io, is_equal_cols.aux);
         }
 
-        // to check whether one row is less than another, we can use the indicators to generate a boolean
-        // expression; the idea is that, starting at the most significant limb, a row is less than the next
-        // if all the limbs more significant are equal and the current limb is less than the corresponding
-        // limb in the next row
-        let mut check_less_than: AB::Expr = AB::Expr::zero();
-        let less_than = aux.less_than.clone();
+        let is_equal_cumulative = aux.is_equal_cumulative.clone();
+        let less_than_cumulative = aux.less_than_cumulative.clone();
 
-        for (i, &less_than_value) in less_than.iter().enumerate() {
-            let mut curr_expr: AB::Expr = less_than_value.into();
-            for &is_equal_value in &aux.is_equal[i + 1..] {
-                curr_expr *= is_equal_value.into();
-            }
-            check_less_than += curr_expr;
+        builder.assert_eq(is_equal_cumulative[0], aux.is_equal[0]);
+        builder.assert_eq(less_than_cumulative[0], aux.less_than[0]);
+        for i in 1..x.len() {
+            builder.assert_eq(
+                is_equal_cumulative[i],
+                is_equal_cumulative[i - 1] * aux.is_equal[i],
+            );
+            builder.assert_eq(
+                less_than_cumulative[i],
+                less_than_cumulative[i - 1] + aux.less_than[i] * is_equal_cumulative[i - 1],
+            );
+        }
+
+        let mut check_less_than: AB::Expr = less_than_cumulative[0].into();
+
+        for i in 1..x.len() {
+            check_less_than += less_than_cumulative[i] * is_equal_cumulative[i - 1];
         }
 
         builder.assert_eq(io.tuple_less_than, check_less_than);

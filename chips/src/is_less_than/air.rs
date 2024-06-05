@@ -8,20 +8,20 @@ use crate::sub_chip::{AirConfig, SubAir};
 
 use super::{
     columns::{IsLessThanAuxCols, IsLessThanCols, IsLessThanIOCols},
-    IsLessThanAir, IsLessThanChip,
+    IsLessThanAir,
 };
 
 impl AirConfig for IsLessThanAir {
     type Cols<T> = IsLessThanCols<T>;
 }
 
-impl<F: Field> BaseAir<F> for IsLessThanChip {
+impl<F: Field> BaseAir<F> for IsLessThanAir {
     fn width(&self) -> usize {
-        IsLessThanCols::<F>::get_width(*self.air.limb_bits(), *self.air.decomp())
+        IsLessThanCols::<F>::get_width(*self.limb_bits(), *self.decomp())
     }
 }
 
-impl<AB: AirBuilder> Air<AB> for IsLessThanChip {
+impl<AB: AirBuilder> Air<AB> for IsLessThanAir {
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
 
@@ -29,9 +29,9 @@ impl<AB: AirBuilder> Air<AB> for IsLessThanChip {
         let local: &[AB::Var] = (*local).borrow();
 
         let local_cols =
-            IsLessThanCols::<AB::Var>::from_slice(local, *self.air.limb_bits(), *self.air.decomp());
+            IsLessThanCols::<AB::Var>::from_slice(local, *self.limb_bits(), *self.decomp());
 
-        SubAir::eval(&self.air, builder, local_cols.io, local_cols.aux);
+        SubAir::eval(self, builder, local_cols.io, local_cols.aux);
     }
 }
 

@@ -65,13 +65,37 @@ impl<F: PrimeField64> LocalTraceInstructions<F> for IsLessThanTupleAir {
             lower_decomp_vec.push(curr_less_than_row[4..].to_vec());
         }
 
+        let mut less_than_cumulative: Vec<F> = vec![];
+
+        let mut transition_index = 0;
+        while transition_index < x.len() && x[transition_index] == y[transition_index] {
+            transition_index += 1;
+        }
+
+        let is_equal_cumulative = std::iter::repeat(F::one())
+            .take(transition_index)
+            .chain(std::iter::repeat(F::zero()).take(x.len() - transition_index))
+            .collect::<Vec<F>>();
+
         // compute whether the x < y
-        for i in (0..x.len()).rev() {
+        for i in 0..x.len() {
+            let mut less_than_curr = if i > 0 {
+                less_than_cumulative[i - 1]
+            } else {
+                F::zero()
+            };
+
+            if x[i] < y[i] && (i == 0 || is_equal_cumulative[i - 1] == F::one()) {
+                less_than_curr = F::one();
+            }
+
             if x[i] < y[i] && valid {
                 tuple_less_than = F::one();
             } else if x[i] > y[i] && valid {
                 valid = false;
             }
+
+            less_than_cumulative.push(less_than_curr);
         }
 
         // contains indicator whether difference is zero
@@ -96,19 +120,19 @@ impl<F: PrimeField64> LocalTraceInstructions<F> for IsLessThanTupleAir {
             }
         }
 
-        let mut less_than_cols: Vec<IsLessThanAuxCols<F>> = vec![];
+        let mut less_than_aux: Vec<IsLessThanAuxCols<F>> = vec![];
         for i in 0..x.len() {
             let less_than_col = IsLessThanAuxCols {
                 lower: lower_vec[i],
                 lower_decomp: lower_decomp_vec[i].clone(),
             };
-            less_than_cols.push(less_than_col);
+            less_than_aux.push(less_than_col);
         }
 
-        let mut is_equal_cols: Vec<IsEqualAuxCols<F>> = vec![];
+        let mut is_equal_aux: Vec<IsEqualAuxCols<F>> = vec![];
         for inverse in &inverses {
             let is_equal_col = IsEqualAuxCols { inv: *inverse };
-            is_equal_cols.push(is_equal_col);
+            is_equal_aux.push(is_equal_col);
         }
 
         let io = IsLessThanTupleIOCols {
@@ -118,9 +142,11 @@ impl<F: PrimeField64> LocalTraceInstructions<F> for IsLessThanTupleAir {
         };
         let aux = IsLessThanTupleAuxCols {
             less_than,
-            less_than_cols,
+            less_than_aux,
             is_equal,
-            is_equal_cols,
+            is_equal_aux,
+            is_equal_cumulative,
+            less_than_cumulative,
         };
 
         IsLessThanTupleCols { io, aux }

@@ -11,9 +11,12 @@ pub struct IsLessThanTupleIOCols<T> {
 
 pub struct IsLessThanTupleAuxCols<T> {
     pub less_than: Vec<T>,
-    pub less_than_cols: Vec<IsLessThanAuxCols<T>>,
+    pub less_than_aux: Vec<IsLessThanAuxCols<T>>,
     pub is_equal: Vec<T>,
-    pub is_equal_cols: Vec<IsEqualAuxCols<T>>,
+    pub is_equal_aux: Vec<IsEqualAuxCols<T>>,
+
+    pub is_equal_cumulative: Vec<T>,
+    pub less_than_cumulative: Vec<T>,
 }
 
 pub struct IsLessThanTupleCols<T> {
@@ -28,12 +31,15 @@ impl<T: Clone> IsLessThanTupleCols<T> {
 
         let mut lower_vec: Vec<T> = vec![];
         let mut lower_decomp_vec: Vec<Vec<T>> = vec![];
-        let mut less_than_cols: Vec<IsLessThanAuxCols<T>> = vec![];
+        let mut less_than_aux: Vec<IsLessThanAuxCols<T>> = vec![];
 
         let mut less_than: Vec<T> = vec![];
         let mut is_equal: Vec<T> = vec![];
         let mut inverses: Vec<T> = vec![];
-        let mut is_equal_cols: Vec<IsEqualAuxCols<T>> = vec![];
+        let mut is_equal_aux: Vec<IsEqualAuxCols<T>> = vec![];
+
+        let mut is_equal_cumulative: Vec<T> = vec![];
+        let mut less_than_cumulative: Vec<T> = vec![];
 
         let mut curr_start_idx = 0;
         let mut curr_end_idx = tuple_len;
@@ -79,6 +85,15 @@ impl<T: Clone> IsLessThanTupleCols<T> {
             lower_decomp_vec.push(lower_bits_curr);
         }
 
+        for i in 0..tuple_len {
+            let less_than_col = IsLessThanAuxCols {
+                lower: lower_vec[i].clone(),
+                lower_decomp: lower_decomp_vec[i].clone(),
+            };
+
+            less_than_aux.push(less_than_col);
+        }
+
         curr_start_idx = curr_end_idx;
         curr_end_idx += tuple_len;
 
@@ -91,19 +106,20 @@ impl<T: Clone> IsLessThanTupleCols<T> {
         // get the inverses k such that k * (diff[i] + is_zero[i]) = 1
         inverses.extend_from_slice(&slc[curr_start_idx..curr_end_idx]);
 
-        for i in 0..tuple_len {
-            let less_than_col = IsLessThanAuxCols {
-                lower: lower_vec[i].clone(),
-                lower_decomp: lower_decomp_vec[i].clone(),
-            };
-
-            less_than_cols.push(less_than_col);
-        }
+        curr_start_idx = curr_end_idx;
+        curr_end_idx += tuple_len;
 
         for inv in inverses.iter() {
             let is_equal_col = IsEqualAuxCols { inv: inv.clone() };
-            is_equal_cols.push(is_equal_col);
+            is_equal_aux.push(is_equal_col);
         }
+
+        is_equal_cumulative.extend_from_slice(&slc[curr_start_idx..curr_end_idx]);
+
+        curr_start_idx = curr_end_idx;
+        curr_end_idx += tuple_len;
+
+        less_than_cumulative.extend_from_slice(&slc[curr_start_idx..curr_end_idx]);
 
         IsLessThanTupleCols {
             io: IsLessThanTupleIOCols {
@@ -113,9 +129,11 @@ impl<T: Clone> IsLessThanTupleCols<T> {
             },
             aux: IsLessThanTupleAuxCols {
                 less_than,
-                less_than_cols,
+                less_than_aux,
                 is_equal,
-                is_equal_cols,
+                is_equal_aux,
+                is_equal_cumulative,
+                less_than_cumulative,
             },
         }
     }
@@ -127,19 +145,22 @@ impl<T: Clone> IsLessThanTupleCols<T> {
         flattened.push(self.io.tuple_less_than.clone());
         flattened.extend_from_slice(&self.aux.less_than);
 
-        for i in 0..self.aux.less_than_cols.len() {
-            flattened.push(self.aux.less_than_cols[i].lower.clone());
+        for i in 0..self.aux.less_than_aux.len() {
+            flattened.push(self.aux.less_than_aux[i].lower.clone());
         }
 
-        for i in 0..self.aux.less_than_cols.len() {
-            flattened.extend_from_slice(&self.aux.less_than_cols[i].lower_decomp);
+        for i in 0..self.aux.less_than_aux.len() {
+            flattened.extend_from_slice(&self.aux.less_than_aux[i].lower_decomp);
         }
 
         flattened.extend_from_slice(&self.aux.is_equal);
 
-        for i in 0..self.aux.is_equal_cols.len() {
-            flattened.push(self.aux.is_equal_cols[i].inv.clone());
+        for i in 0..self.aux.is_equal_aux.len() {
+            flattened.push(self.aux.is_equal_aux[i].inv.clone());
         }
+
+        flattened.extend_from_slice(&self.aux.is_equal_cumulative);
+        flattened.extend_from_slice(&self.aux.less_than_cumulative);
 
         flattened
     }
@@ -165,6 +186,9 @@ impl<T: Clone> IsLessThanTupleCols<T> {
         width += tuple_len;
         // for the inverses k such that k * (diff[i] + is_zero[i]) = 1
         width += tuple_len;
+
+        // for the cumulative is_equal and less_than
+        width += 2 * tuple_len;
 
         width
     }

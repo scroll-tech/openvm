@@ -5,20 +5,15 @@ use afs_stark_backend::interaction::{Chip, Interaction};
 use p3_air::VirtualPairCol;
 use p3_field::PrimeField64;
 
-use super::IsLessThanChip;
-
-impl<F: PrimeField64> Chip<F> for IsLessThanChip {
+impl<F: PrimeField64> Chip<F> for IsLessThanAir {
     fn sends(&self) -> Vec<Interaction<F>> {
-        let num_cols = IsLessThanCols::<F>::get_width(*self.air.limb_bits(), *self.air.decomp());
+        let num_cols = IsLessThanCols::<F>::get_width(*self.limb_bits(), *self.decomp());
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
-        let cols_numbered = IsLessThanCols::<usize>::from_slice(
-            &all_cols,
-            *self.air.limb_bits(),
-            *self.air.decomp(),
-        );
+        let cols_numbered =
+            IsLessThanCols::<usize>::from_slice(&all_cols, *self.limb_bits(), *self.decomp());
 
-        SubAirWithInteractions::sends(&self.air, cols_numbered)
+        SubAirWithInteractions::sends(self, cols_numbered)
     }
 }
 
