@@ -11,10 +11,6 @@ use super::{
     IsLessThanAir, IsLessThanChip,
 };
 
-impl AirConfig for IsLessThanChip {
-    type Cols<T> = IsLessThanCols<T>;
-}
-
 impl AirConfig for IsLessThanAir {
     type Cols<T> = IsLessThanCols<T>;
 }

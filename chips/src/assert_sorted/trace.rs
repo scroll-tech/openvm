@@ -23,8 +23,8 @@ impl AssertSortedChip {
             };
 
             let is_less_than_tuple_trace = LocalTraceInstructions::generate_trace_row(
-                &self.is_less_than_tuple_chip,
-                (key.clone(), next_key.clone()),
+                &self.is_less_than_tuple_chip.air,
+                (key.clone(), next_key.clone(), self.range_checker.clone()),
             )
             .flatten();
 

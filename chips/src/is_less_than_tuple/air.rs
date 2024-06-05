@@ -5,7 +5,14 @@ use p3_field::{AbstractField, Field};
 use p3_matrix::Matrix;
 
 use crate::{
-    is_less_than::{columns::IsLessThanCols, IsLessThanChip},
+    is_equal::{
+        columns::{IsEqualAuxCols, IsEqualCols, IsEqualIOCols},
+        IsEqualChip,
+    },
+    is_less_than::{
+        columns::{IsLessThanAuxCols, IsLessThanCols, IsLessThanIOCols},
+        IsLessThanChip,
+    },
     range_gate::RangeCheckerGateChip,
     sub_chip::{AirConfig, SubAir},
 };
@@ -15,7 +22,7 @@ use super::{
     IsLessThanTupleAir, IsLessThanTupleChip,
 };
 
-impl AirConfig for IsLessThanTupleChip {
+impl AirConfig for IsLessThanTupleAir {
     type Cols<T> = IsLessThanTupleCols<T>;
 }
 
@@ -75,16 +82,17 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanTupleAir {
             );
 
             // here we constrain that less_than[i] indicates whether x[i] < y[i] using the IsLessThan subchip
-            let mut is_less_than_slice = vec![x_val, y_val];
-            is_less_than_slice.push(aux.less_than[i]);
-            is_less_than_slice.push(aux.lower_bits[i]);
-            is_less_than_slice.extend_from_slice(&aux.lower_bits_decomp[i]);
-
-            let is_less_than_cols = IsLessThanCols::<AB::Var>::from_slice(
-                &is_less_than_slice,
-                self.limb_bits()[i],
-                *self.decomp(),
-            );
+            let is_less_than_cols = IsLessThanCols {
+                io: IsLessThanIOCols {
+                    x: x_val,
+                    y: y_val,
+                    less_than: aux.less_than[i],
+                },
+                aux: IsLessThanAuxCols {
+                    lower: aux.less_than_cols[i].lower,
+                    lower_decomp: aux.less_than_cols[i].lower_decomp.clone(),
+                },
+            };
 
             SubAir::eval(
                 &is_less_than_chip_dummy.air,
@@ -94,24 +102,22 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanTupleAir {
             );
         }
 
-        for i in 0..x.len() {
-            // constrain that diff is the difference between the two elements of consecutive rows
-            let diff = y[i] - x[i];
-            builder.assert_eq(diff, aux.diff[i]);
-        }
-
         // together, these constrain that is_equal is the indicator for whether diff == 0, i.e. x[i] = y[i]
-        for i in 0..self.tuple_len() {
-            let diff = aux.diff[i];
-            let is_equal = aux.is_zero[i];
-            let inverse = aux.inverses[i];
+        for i in 0..x.len() {
+            let is_equal = aux.is_equal[i];
+            let inv = aux.is_equal_cols[i].inv;
 
-            // check that diff * is_equal = 0
-            builder.assert_zero(diff * is_equal);
-            // check that is_equal is boolean
-            builder.assert_zero(is_equal * (AB::Expr::one() - is_equal));
-            // check that inverse * (diff + is_equal) = 1
-            builder.assert_one(inverse * (diff + is_equal));
+            let is_equal_chip = IsEqualChip {};
+            let is_equal_cols = IsEqualCols {
+                io: IsEqualIOCols {
+                    x: x[i],
+                    y: y[i],
+                    is_equal,
+                },
+                aux: IsEqualAuxCols { inv },
+            };
+
+            SubAir::eval(&is_equal_chip, builder, is_equal_cols.io, is_equal_cols.aux);
         }
 
         // to check whether one row is less than another, we can use the indicators to generate a boolean
@@ -123,8 +129,8 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanTupleAir {
 
         for (i, &less_than_value) in less_than.iter().enumerate() {
             let mut curr_expr: AB::Expr = less_than_value.into();
-            for &is_zero_value in &aux.is_zero[i + 1..] {
-                curr_expr *= is_zero_value.into();
+            for &is_equal_value in &aux.is_equal[i + 1..] {
+                curr_expr *= is_equal_value.into();
             }
             check_less_than += curr_expr;
         }

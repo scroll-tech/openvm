@@ -1,5 +1,7 @@
 use afs_derive::AlignedBorrow;
 
+use crate::{is_equal::columns::IsEqualAuxCols, is_less_than::columns::IsLessThanAuxCols};
+
 #[derive(Default, AlignedBorrow)]
 pub struct IsLessThanTupleIOCols<T> {
     pub x: Vec<T>,
@@ -9,11 +11,9 @@ pub struct IsLessThanTupleIOCols<T> {
 
 pub struct IsLessThanTupleAuxCols<T> {
     pub less_than: Vec<T>,
-    pub lower_bits: Vec<T>,
-    pub lower_bits_decomp: Vec<Vec<T>>,
-    pub diff: Vec<T>,
-    pub is_zero: Vec<T>,
-    pub inverses: Vec<T>,
+    pub less_than_cols: Vec<IsLessThanAuxCols<T>>,
+    pub is_equal: Vec<T>,
+    pub is_equal_cols: Vec<IsEqualAuxCols<T>>,
 }
 
 pub struct IsLessThanTupleCols<T> {
@@ -26,12 +26,14 @@ impl<T: Clone> IsLessThanTupleCols<T> {
         let mut x: Vec<T> = vec![];
         let mut y: Vec<T> = vec![];
 
+        let mut lower_vec: Vec<T> = vec![];
+        let mut lower_decomp_vec: Vec<Vec<T>> = vec![];
+        let mut less_than_cols: Vec<IsLessThanAuxCols<T>> = vec![];
+
         let mut less_than: Vec<T> = vec![];
-        let mut lower_bits: Vec<T> = vec![];
-        let mut lower_bits_decomp: Vec<Vec<T>> = vec![];
-        let mut diff: Vec<T> = vec![];
-        let mut is_zero: Vec<T> = vec![];
+        let mut is_equal: Vec<T> = vec![];
         let mut inverses: Vec<T> = vec![];
+        let mut is_equal_cols: Vec<IsEqualAuxCols<T>> = vec![];
 
         let mut curr_start_idx = 0;
         let mut curr_end_idx = tuple_len;
@@ -60,7 +62,7 @@ impl<T: Clone> IsLessThanTupleCols<T> {
         curr_end_idx += tuple_len;
 
         // get the lower bits for each 2^limb_bits[i] + y[i] - x[i] - 1
-        lower_bits.extend_from_slice(&slc[curr_start_idx..curr_end_idx]);
+        lower_vec.extend_from_slice(&slc[curr_start_idx..curr_end_idx]);
 
         // get the lower bits decompositions
         for &limb_bit in limb_bits.iter() {
@@ -74,26 +76,34 @@ impl<T: Clone> IsLessThanTupleCols<T> {
                 lower_bits_curr.push(slc[curr_start_idx + j].clone());
             }
 
-            lower_bits_decomp.push(lower_bits_curr);
+            lower_decomp_vec.push(lower_bits_curr);
         }
 
         curr_start_idx = curr_end_idx;
         curr_end_idx += tuple_len;
 
-        // get the differences y[i] - x[i]
-        diff.extend_from_slice(&slc[curr_start_idx..curr_end_idx]);
-
-        curr_start_idx = curr_end_idx;
-        curr_end_idx += tuple_len;
-
         // get whether y[i] - x[i] == 0
-        is_zero.extend_from_slice(&slc[curr_start_idx..curr_end_idx]);
+        is_equal.extend_from_slice(&slc[curr_start_idx..curr_end_idx]);
 
         curr_start_idx = curr_end_idx;
         curr_end_idx += tuple_len;
 
         // get the inverses k such that k * (diff[i] + is_zero[i]) = 1
         inverses.extend_from_slice(&slc[curr_start_idx..curr_end_idx]);
+
+        for i in 0..tuple_len {
+            let less_than_col = IsLessThanAuxCols {
+                lower: lower_vec[i].clone(),
+                lower_decomp: lower_decomp_vec[i].clone(),
+            };
+
+            less_than_cols.push(less_than_col);
+        }
+
+        for inv in inverses.iter() {
+            let is_equal_col = IsEqualAuxCols { inv: inv.clone() };
+            is_equal_cols.push(is_equal_col);
+        }
 
         IsLessThanTupleCols {
             io: IsLessThanTupleIOCols {
@@ -103,11 +113,9 @@ impl<T: Clone> IsLessThanTupleCols<T> {
             },
             aux: IsLessThanTupleAuxCols {
                 less_than,
-                lower_bits,
-                lower_bits_decomp,
-                diff,
-                is_zero,
-                inverses,
+                less_than_cols,
+                is_equal,
+                is_equal_cols,
             },
         }
     }
@@ -118,13 +126,20 @@ impl<T: Clone> IsLessThanTupleCols<T> {
         flattened.extend_from_slice(&self.io.y);
         flattened.push(self.io.tuple_less_than.clone());
         flattened.extend_from_slice(&self.aux.less_than);
-        flattened.extend_from_slice(&self.aux.lower_bits);
-        for i in 0..self.aux.lower_bits_decomp.len() {
-            flattened.extend_from_slice(&self.aux.lower_bits_decomp[i]);
+
+        for i in 0..self.aux.less_than_cols.len() {
+            flattened.push(self.aux.less_than_cols[i].lower.clone());
         }
-        flattened.extend_from_slice(&self.aux.diff);
-        flattened.extend_from_slice(&self.aux.is_zero);
-        flattened.extend_from_slice(&self.aux.inverses);
+
+        for i in 0..self.aux.less_than_cols.len() {
+            flattened.extend_from_slice(&self.aux.less_than_cols[i].lower_decomp);
+        }
+
+        flattened.extend_from_slice(&self.aux.is_equal);
+
+        for i in 0..self.aux.is_equal_cols.len() {
+            flattened.push(self.aux.is_equal_cols[i].inv.clone());
+        }
 
         flattened
     }
@@ -137,17 +152,15 @@ impl<T: Clone> IsLessThanTupleCols<T> {
         width += 1;
         // for the less than indicator
         width += tuple_len;
-        // for the lower bits
+        // for the lowers
         width += tuple_len;
 
-        // for the lower bits decomposition
+        // for the decomposed lowers
         for &limb_bit in limb_bits.iter() {
             let num_limbs = (limb_bit + decomp - 1) / decomp;
             width += num_limbs + 1;
         }
 
-        // for the difference between consecutive rows
-        width += tuple_len;
         // for the indicator whether difference is zero
         width += tuple_len;
         // for the inverses k such that k * (diff[i] + is_zero[i]) = 1

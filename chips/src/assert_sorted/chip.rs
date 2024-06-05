@@ -39,7 +39,7 @@ impl<F: PrimeField64> Chip<F> for AssertSortedChip {
         }
 
         let subchip_interactions = SubAirWithInteractions::<F>::sends(
-            &self.is_less_than_tuple_chip,
+            &self.is_less_than_tuple_chip.air,
             cols_numbered.is_less_than_tuple_cols,
         );
 

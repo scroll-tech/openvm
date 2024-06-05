@@ -2,7 +2,7 @@ use crate::{is_less_than::columns::IsLessThanCols, sub_chip::SubAirWithInteracti
 use afs_stark_backend::interaction::{Chip, Interaction};
 use p3_field::PrimeField64;
 
-use super::{columns::IsLessThanTupleCols, IsLessThanTupleChip};
+use super::{columns::IsLessThanTupleCols, IsLessThanTupleAir, IsLessThanTupleChip};
 
 impl<F: PrimeField64> Chip<F> for IsLessThanTupleChip {
     fn sends(&self) -> Vec<Interaction<F>> {
@@ -20,33 +20,33 @@ impl<F: PrimeField64> Chip<F> for IsLessThanTupleChip {
             self.air.tuple_len(),
         );
 
-        SubAirWithInteractions::sends(self, cols_numbered)
+        SubAirWithInteractions::sends(&self.air, cols_numbered)
     }
 }
 
-impl<F: PrimeField64> SubAirWithInteractions<F> for IsLessThanTupleChip {
+impl<F: PrimeField64> SubAirWithInteractions<F> for IsLessThanTupleAir {
     fn sends(&self, col_indices: IsLessThanTupleCols<usize>) -> Vec<Interaction<F>> {
         // num_limbs is the number of limbs, not including the last shifted limb
         let mut interactions = vec![];
 
-        for i in 0..self.air.tuple_len() {
+        for i in 0..self.tuple_len() {
             let mut is_less_than_cols = vec![
                 col_indices.io.x[i],
                 col_indices.io.y[i],
                 col_indices.aux.less_than[i],
-                col_indices.aux.lower_bits[i],
+                col_indices.aux.less_than_cols[i].lower,
             ];
 
-            is_less_than_cols.extend_from_slice(&col_indices.aux.lower_bits_decomp[i]);
+            is_less_than_cols.extend_from_slice(&col_indices.aux.less_than_cols[i].lower_decomp);
 
             let is_less_than_cols = IsLessThanCols::<usize>::from_slice(
                 &is_less_than_cols,
-                self.air.limb_bits().clone()[i],
-                *self.air.decomp(),
+                self.limb_bits().clone()[i],
+                *self.decomp(),
             );
 
             let curr_interactions =
-                SubAirWithInteractions::<F>::sends(&self.air.is_lt_airs[i], is_less_than_cols);
+                SubAirWithInteractions::<F>::sends(&self.is_lt_airs[i], is_less_than_cols);
             interactions.extend(curr_interactions);
         }
 

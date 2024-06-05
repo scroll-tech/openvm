@@ -70,12 +70,4 @@ impl IsLessThanChip {
 
         Self { air, range_checker }
     }
-
-    fn calc_less_than(&self, x: u32, y: u32) -> u32 {
-        if x < y {
-            1
-        } else {
-            0
-        }
-    }
 }

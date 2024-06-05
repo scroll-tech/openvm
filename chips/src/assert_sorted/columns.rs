@@ -1,7 +1,11 @@
 use afs_derive::AlignedBorrow;
 
-use crate::is_less_than_tuple::columns::{
-    IsLessThanTupleAuxCols, IsLessThanTupleCols, IsLessThanTupleIOCols,
+use crate::{
+    is_equal::columns::IsEqualAuxCols,
+    is_less_than::columns::IsLessThanAuxCols,
+    is_less_than_tuple::columns::{
+        IsLessThanTupleAuxCols, IsLessThanTupleCols, IsLessThanTupleIOCols,
+    },
 };
 
 // Since AssertSortedChip contains a LessThanChip subchip, a subset of the columns are those of the
@@ -53,35 +57,45 @@ impl<T: Clone> AssertSortedCols<T> {
 
         // the next key_vec_len elements are the values of the lower bits of each intermediate sum
         // (i.e. 2^limb_bits[i] + y[i] - x[i] - 1)
-        let lower_bits = slc[curr_start_idx..curr_end_idx].to_vec();
+        let lower_vec = slc[curr_start_idx..curr_end_idx].to_vec();
 
         // the next elements are the decomposed lower bits
-        let mut lower_bits_decomp: Vec<Vec<T>> = vec![];
+        let mut lower_decomp_vec: Vec<Vec<T>> = vec![];
         for curr_limb_bits in limb_bits.iter() {
             let num_limbs = (curr_limb_bits + decomp - 1) / decomp;
 
             curr_start_idx = curr_end_idx;
             curr_end_idx += num_limbs + 1;
 
-            lower_bits_decomp.push(slc[curr_start_idx..curr_end_idx].to_vec());
+            lower_decomp_vec.push(slc[curr_start_idx..curr_end_idx].to_vec());
         }
-        curr_start_idx = curr_end_idx;
-        curr_end_idx += key_vec_len;
-
-        // the next key_vec_len elements are the difference between consecutive limbs of rows
-        let diff = slc[curr_start_idx..curr_end_idx].to_vec();
         curr_start_idx = curr_end_idx;
         curr_end_idx += key_vec_len;
 
         // the next key_vec_len elements are the indicator whether the difference is zero; if difference is
         // zero then the two limbs must be equal
-        let is_zero = slc[curr_start_idx..curr_end_idx].to_vec();
+        let is_equal = slc[curr_start_idx..curr_end_idx].to_vec();
         curr_start_idx = curr_end_idx;
         curr_end_idx += key_vec_len;
 
         // the next key_vec_len elements contain the inverses of the corresponding sum of diff and is_zero;
         // note that this sum will always be nonzero so the inverse will exist
         let inverses = slc[curr_start_idx..curr_end_idx].to_vec();
+
+        let mut less_than_cols: Vec<IsLessThanAuxCols<T>> = vec![];
+        for i in 0..key_vec_len {
+            let less_than_col = IsLessThanAuxCols {
+                lower: lower_vec[i].clone(),
+                lower_decomp: lower_decomp_vec[i].clone(),
+            };
+            less_than_cols.push(less_than_col);
+        }
+
+        let mut is_equal_cols: Vec<IsEqualAuxCols<T>> = vec![];
+        for inv in inverses.iter() {
+            let is_equal_col = IsEqualAuxCols { inv: inv.clone() };
+            is_equal_cols.push(is_equal_col);
+        }
 
         let io = IsLessThanTupleIOCols {
             x,
@@ -90,11 +104,9 @@ impl<T: Clone> AssertSortedCols<T> {
         };
         let aux = IsLessThanTupleAuxCols {
             less_than,
-            lower_bits,
-            lower_bits_decomp,
-            diff,
-            is_zero,
-            inverses,
+            less_than_cols,
+            is_equal,
+            is_equal_cols,
         };
 
         let is_less_than_tuple_cols = IsLessThanTupleCols { io, aux };
@@ -125,17 +137,15 @@ impl<T: Clone> AssertSortedCols<T> {
         // for the less_than indicators
         width += key_vec_len;
 
-        // for the lower_bits
+        // for the lowers
         width += key_vec_len;
 
-        // for the decomposed lower_bits
+        // for the decomposed lowers
         for &limb_bit in limb_bits.iter() {
             let num_limbs = (limb_bit + decomp - 1) / decomp;
             width += num_limbs + 1;
         }
 
-        // for the difference between consecutive rows
-        width += key_vec_len;
         // for the indicator whether difference is zero
         width += key_vec_len;
         // for the y such that y * (i + x) = 1
