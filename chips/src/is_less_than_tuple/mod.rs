@@ -14,12 +14,16 @@ pub mod trace;
 
 #[derive(Default, Getters)]
 pub struct IsLessThanTupleAir {
+    // The bus index for sends to range chip
     #[getset(get = "pub")]
     bus_index: usize,
+    // The maximum range for the range checker
     #[getset(get = "pub")]
     range_max: u32,
+    // The number of bits to decompose each number into, for less than checking
     #[getset(get = "pub")]
     decomp: usize,
+    // IsLessThanAirs for each tuple element
     #[getset(get = "pub")]
     is_lt_airs: Vec<IsLessThanAir>,
 }

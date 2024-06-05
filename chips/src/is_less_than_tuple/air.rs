@@ -73,13 +73,10 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanTupleAir {
                 *self.range_max(),
             ));
 
-            let is_less_than_chip_dummy = IsLessThanChip::new(
-                *self.bus_index(),
-                *self.range_max(),
-                self.limb_bits()[i],
-                *self.decomp(),
-                range_checker_dummy,
-            );
+            let is_less_than_chip_dummy = IsLessThanChip {
+                air: self.is_lt_airs[i].clone(),
+                range_checker: range_checker_dummy,
+            };
 
             // here we constrain that less_than[i] indicates whether x[i] < y[i] using the IsLessThan subchip
             let is_less_than_cols = IsLessThanCols {

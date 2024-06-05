@@ -18,16 +18,22 @@ pub mod trace;
 
 #[derive(Default, Getters)]
 pub struct AssertedSortedAir {
+    // The bus index for sends to range chip
     #[getset(get = "pub")]
     bus_index: usize,
+    // The maximum range for the range checker
     #[getset(get = "pub")]
     range_max: u32,
+    // The limb_bits for each element of the keys
     #[getset(get = "pub")]
     limb_bits: Vec<usize>,
+    // The number of bits to decompose each number into, for less than checking
     #[getset(get = "pub")]
     decomp: usize,
+    // The number of elements in a key
     #[getset(get = "pub")]
     key_vec_len: usize,
+    // The keys to check for sortedness
     #[getset(get = "pub")]
     keys: Vec<Vec<u32>>,
 }

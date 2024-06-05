@@ -11,9 +11,9 @@ pub mod chip;
 pub mod columns;
 pub mod trace;
 
-#[derive(Default, Getters)]
+#[derive(Default, Clone, Getters)]
 pub struct IsLessThanAir {
-    // The bus index
+    // The bus index for sends to range chip
     #[getset(get = "pub")]
     bus_index: usize,
     // The maximum range for the range checker
