@@ -21,47 +21,7 @@ fn test_is_less_than_chip_lt() {
     let range_checker = Arc::new(RangeCheckerGateChip::new(bus_index, range_max));
 
     let chip = IsLessThanChip::new(bus_index, range_max, limb_bits, decomp, range_checker);
-    let trace = chip.generate_trace(14321, 26883);
-    let range_trace: DenseMatrix<BabyBear> = chip.range_checker.generate_trace();
-
-    run_simple_test_no_pis(
-        vec![&chip.air, chip.range_checker.as_ref()],
-        vec![trace, range_trace],
-    )
-    .expect("Verification failed");
-}
-
-#[test]
-fn test_is_less_than_chip_gt() {
-    let bus_index: usize = 0;
-    let limb_bits: usize = 16;
-    let decomp: usize = 8;
-    let range_max: u32 = 1 << decomp;
-
-    let range_checker = Arc::new(RangeCheckerGateChip::new(bus_index, range_max));
-
-    let chip = IsLessThanChip::new(bus_index, range_max, limb_bits, decomp, range_checker);
-    let trace = chip.generate_trace(1, 0);
-    let range_trace: DenseMatrix<BabyBear> = chip.range_checker.generate_trace();
-
-    run_simple_test_no_pis(
-        vec![&chip.air, chip.range_checker.as_ref()],
-        vec![trace, range_trace],
-    )
-    .expect("Verification failed");
-}
-
-#[test]
-fn test_is_less_than_chip_eq() {
-    let bus_index: usize = 0;
-    let limb_bits: usize = 16;
-    let decomp: usize = 8;
-    let range_max: u32 = 1 << decomp;
-
-    let range_checker = Arc::new(RangeCheckerGateChip::new(bus_index, range_max));
-
-    let chip = IsLessThanChip::new(bus_index, range_max, limb_bits, decomp, range_checker);
-    let trace = chip.generate_trace(773, 773);
+    let trace = chip.generate_trace(vec![14321, 1, 773, 337], vec![26883, 0, 773, 456]);
     let range_trace: DenseMatrix<BabyBear> = chip.range_checker.generate_trace();
 
     run_simple_test_no_pis(
@@ -81,7 +41,7 @@ fn test_is_less_than_negative() {
     let range_checker = Arc::new(RangeCheckerGateChip::new(bus_index, range_max));
 
     let chip = IsLessThanChip::new(bus_index, range_max, limb_bits, decomp, range_checker);
-    let mut trace = chip.generate_trace(446, 553);
+    let mut trace = chip.generate_trace(vec![446], vec![553]);
     let range_trace = chip.range_checker.generate_trace();
 
     trace.values[2] = AbstractField::from_canonical_u64(0);

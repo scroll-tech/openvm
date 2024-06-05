@@ -133,12 +133,6 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanTupleAir {
             );
         }
 
-        let mut check_less_than: AB::Expr = less_than_cumulative[0].into();
-
-        for i in 1..x.len() {
-            check_less_than += less_than_cumulative[i] * is_equal_cumulative[i - 1];
-        }
-
-        builder.assert_eq(io.tuple_less_than, check_less_than);
+        builder.assert_eq(io.tuple_less_than, less_than_cumulative[x.len() - 1]);
     }
 }

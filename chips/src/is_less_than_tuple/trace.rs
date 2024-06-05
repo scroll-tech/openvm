@@ -16,19 +16,28 @@ use super::{
 };
 
 impl IsLessThanTupleChip {
-    pub fn generate_trace<F: PrimeField64>(&self, x: Vec<u32>, y: Vec<u32>) -> RowMajorMatrix<F> {
+    pub fn generate_trace<F: PrimeField64>(
+        &self,
+        x: Vec<Vec<u32>>,
+        y: Vec<Vec<u32>>,
+    ) -> RowMajorMatrix<F> {
         let num_cols: usize = IsLessThanTupleCols::<F>::get_width(
             self.air.limb_bits().clone(),
             *self.air.decomp(),
             self.air.tuple_len(),
         );
 
-        let row: Vec<F> = self
-            .air
-            .generate_trace_row((x, y, self.range_checker.clone()))
-            .flatten();
+        let mut rows: Vec<F> = vec![];
 
-        RowMajorMatrix::new(row, num_cols)
+        for i in 0..x.len() {
+            let row: Vec<F> = self
+                .air
+                .generate_trace_row((x[i].clone(), y[i].clone(), self.range_checker.clone()))
+                .flatten();
+            rows.extend(row);
+        }
+
+        RowMajorMatrix::new(rows, num_cols)
     }
 }
 

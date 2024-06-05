@@ -20,10 +20,8 @@ fn test_is_less_than_tuple_chip_lt() {
 
     let chip = IsLessThanTupleChip::new(bus_index, range_max, limb_bits, decomp, range_checker);
     let range_checker = chip.range_checker.as_ref();
-    let trace = chip.generate_trace(vec![14321, 123], vec![26678, 233]);
+    let trace = chip.generate_trace(vec![vec![14321, 123]], vec![vec![26678, 233]]);
     let range_checker_trace = range_checker.generate_trace();
-
-    println!("trace: {:?}", trace);
 
     run_simple_test_no_pis(
         vec![&chip.air, range_checker],
@@ -43,10 +41,8 @@ fn test_is_less_than_tuple_chip_gt() {
 
     let chip = IsLessThanTupleChip::new(bus_index, range_max, limb_bits, decomp, range_checker);
     let range_checker = chip.range_checker.as_ref();
-    let trace = chip.generate_trace(vec![244, 14321], vec![233, 26678]);
+    let trace = chip.generate_trace(vec![vec![244, 14321]], vec![vec![233, 26678]]);
     let range_checker_trace = range_checker.generate_trace();
-
-    println!("trace: {:?}", trace);
 
     run_simple_test_no_pis(
         vec![&chip.air, range_checker],
@@ -66,10 +62,8 @@ fn test_is_less_than_tuple_chip_eq() {
 
     let chip = IsLessThanTupleChip::new(bus_index, range_max, limb_bits, decomp, range_checker);
     let range_checker = chip.range_checker.as_ref();
-    let trace = chip.generate_trace(vec![14321, 244], vec![14321, 244]);
+    let trace = chip.generate_trace(vec![vec![14321, 244]], vec![vec![14321, 244]]);
     let range_checker_trace = range_checker.generate_trace();
-
-    println!("trace: {:?}", trace);
 
     run_simple_test_no_pis(
         vec![&chip.air, range_checker],
@@ -89,7 +83,7 @@ fn test_is_less_than_tuple_chip_negative() {
 
     let chip = IsLessThanTupleChip::new(bus_index, range_max, limb_bits, decomp, range_checker);
     let range_checker = chip.range_checker.as_ref();
-    let mut trace = chip.generate_trace(vec![14321, 123], vec![26678, 233]);
+    let mut trace = chip.generate_trace(vec![vec![14321, 123]], vec![vec![26678, 233]]);
     let range_checker_trace = range_checker.generate_trace();
 
     trace.values[2] = AbstractField::from_canonical_u64(0);

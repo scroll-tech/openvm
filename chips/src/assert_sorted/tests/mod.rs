@@ -81,10 +81,10 @@ fn test_assert_sorted_chip_large_positive() {
     let range_max: u32 = 1 << decomp;
 
     let requests = vec![
-        vec![35867, 318434, 12786, 44832],
-        vec![704210, 369315, 42421, 487111],
-        vec![370183, 37202, 729789, 783571],
-        vec![875005, 767547, 196209, 887921],
+        vec![44832, 12786, 318434, 35867],
+        vec![487111, 42421, 369315, 704210],
+        vec![783571, 729789, 37202, 370183],
+        vec![887921, 196209, 767547, 875005],
     ];
 
     let range_checker = Arc::new(RangeCheckerGateChip::new(bus_index, range_max));
@@ -123,10 +123,10 @@ fn test_assert_sorted_chip_largelimb_negative() {
 
     // the first and second rows are not in sorted order
     let requests = vec![
-        vec![223, 448, 15, 587],
-        vec![883, 168, 772, 673],
-        vec![57, 386, 1025, 694],
-        vec![128, 767, 196, 953],
+        vec![587, 15, 448, 223],
+        vec![673, 772, 168, 883],
+        vec![694, 1025, 386, 57],
+        vec![953, 196, 767, 128],
     ];
 
     let range_checker = Arc::new(RangeCheckerGateChip::new(bus_index, range_max));
@@ -170,10 +170,10 @@ fn test_assert_sorted_chip_unsorted_negative() {
 
     // the first and second rows are not in sorted order
     let requests = vec![
-        vec![704210, 369315, 42421, 44832],
-        vec![35867, 318434, 12786, 44832],
-        vec![370183, 37202, 729789, 783571],
-        vec![875005, 767547, 196209, 887921],
+        vec![44832, 42421, 369315, 704210],
+        vec![44832, 12786, 318434, 35867],
+        vec![783571, 729789, 37202, 370183],
+        vec![887921, 196209, 767547, 875005],
     ];
 
     let range_checker = Arc::new(RangeCheckerGateChip::new(bus_index, range_max));
