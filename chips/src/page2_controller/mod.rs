@@ -17,10 +17,12 @@ use std::{
 };
 use types::PageNode;
 
+#[cfg(test)]
 pub mod tests;
 pub mod trace;
 pub mod types;
 
+/// Assumes that all parts of the key are limb_bits number of bits, and that the pages are formatted correctly (No inconsistencies, deleted rows are actually deleted).
 pub struct Page2Controller<SC: StarkGenericConfig> {
     val_bus_index: usize,
     path_bus_index: usize,

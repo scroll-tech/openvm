@@ -1,7 +1,5 @@
-use std::iter;
-
 use crate::page2_requester::Page2Requester;
-use crate::{page2_controller, page2_requester, page_controller, MAX_COMMITMENT_LEN};
+use crate::MAX_COMMITMENT_LEN;
 use afs_stark_backend::prover::MultiTraceStarkProver;
 use afs_stark_backend::rap::AnyRap;
 use afs_stark_backend::verifier::VerificationError;
@@ -19,8 +17,6 @@ use rand::Rng;
 
 use super::types::PageNode;
 use super::Page2Controller;
-
-type Val = BabyBear;
 
 fn load_pages_test(
     engine: &BabyBearPoseidon2Engine,
