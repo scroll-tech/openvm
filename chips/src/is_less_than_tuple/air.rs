@@ -1,4 +1,4 @@
-use std::{borrow::Borrow, sync::Arc};
+use std::borrow::Borrow;
 
 use p3_air::{Air, AirBuilder, BaseAir};
 use p3_field::Field;
@@ -9,11 +9,7 @@ use crate::{
         columns::{IsEqualAuxCols, IsEqualCols, IsEqualIOCols},
         IsEqualChip,
     },
-    is_less_than::{
-        columns::{IsLessThanAuxCols, IsLessThanCols, IsLessThanIOCols},
-        IsLessThanChip,
-    },
-    range_gate::RangeCheckerGateChip,
+    is_less_than::columns::{IsLessThanAuxCols, IsLessThanCols, IsLessThanIOCols},
     sub_chip::{AirConfig, SubAir},
 };
 
@@ -68,16 +64,6 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanTupleAir {
             let x_val = x[i];
             let y_val = y[i];
 
-            let range_checker_dummy = Arc::new(RangeCheckerGateChip::new(
-                *self.bus_index(),
-                *self.range_max(),
-            ));
-
-            let is_less_than_chip_dummy = IsLessThanChip {
-                air: self.is_lt_airs[i].clone(),
-                range_checker: range_checker_dummy,
-            };
-
             // here we constrain that less_than[i] indicates whether x[i] < y[i] using the IsLessThan subchip
             let is_less_than_cols = IsLessThanCols {
                 io: IsLessThanIOCols {
@@ -92,7 +78,7 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanTupleAir {
             };
 
             SubAir::eval(
-                &is_less_than_chip_dummy.air,
+                &self.is_lt_airs[i].clone(),
                 builder,
                 is_less_than_cols.io,
                 is_less_than_cols.aux,

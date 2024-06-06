@@ -1,52 +1,32 @@
 use afs_derive::AlignedBorrow;
 
 use crate::{
-    is_equal::columns::IsEqualAuxCols,
-    is_less_than::columns::IsLessThanAuxCols,
-    is_less_than_tuple::columns::{
-        IsLessThanTupleAuxCols, IsLessThanTupleCols, IsLessThanTupleIOCols,
-    },
+    is_equal::columns::IsEqualAuxCols, is_less_than::columns::IsLessThanAuxCols,
+    is_less_than_tuple::columns::IsLessThanTupleAuxCols,
 };
 
 // Since AssertSortedChip contains a LessThanChip subchip, a subset of the columns are those of the
 // LessThanChip
 #[derive(AlignedBorrow)]
 pub struct AssertSortedCols<T> {
-    pub keys_decomp: Vec<Vec<T>>,
-    pub is_less_than_tuple_cols: IsLessThanTupleCols<T>,
+    pub key: Vec<T>,
+    pub less_than_next_key: T,
+    pub is_less_than_tuple_aux: IsLessThanTupleAuxCols<T>,
 }
 
 impl<T: Clone> AssertSortedCols<T> {
     pub fn from_slice(slc: &[T], limb_bits: Vec<usize>, decomp: usize, key_vec_len: usize) -> Self {
-        // num_limbs is the number of sublimbs per limb, not including the shifted last sublimb
         let mut curr_start_idx = 0;
         let mut curr_end_idx = key_vec_len;
 
         // the first key_vec_len elements are the key itself
-        let x = slc[curr_start_idx..curr_end_idx].to_vec();
-        curr_start_idx = curr_end_idx;
-        curr_end_idx += key_vec_len;
-
-        // the next key_vec_len elements are the next key (the following row)
-        let y = slc[curr_start_idx..curr_end_idx].to_vec();
-
-        // the next elements are the decomposed key (with each having an extra shifted last sublimb)
-        let mut keys_decomp: Vec<Vec<T>> = vec![];
-
-        for curr_limb_bits in limb_bits.iter() {
-            let num_limbs = (curr_limb_bits + decomp - 1) / decomp;
-
-            curr_start_idx = curr_end_idx;
-            curr_end_idx += num_limbs + 1;
-
-            keys_decomp.push(slc[curr_start_idx..curr_end_idx].to_vec());
-        }
+        let key = slc[curr_start_idx..curr_end_idx].to_vec();
 
         curr_start_idx = curr_end_idx;
         curr_end_idx += 1;
 
         // the next element is the indicator for whether the key is less than the next key
-        let tuple_less_than = slc[curr_start_idx].clone();
+        let less_than_next_key = slc[curr_start_idx].clone();
         curr_start_idx = curr_end_idx;
         curr_end_idx += key_vec_len;
 
@@ -110,12 +90,7 @@ impl<T: Clone> AssertSortedCols<T> {
 
         less_than_cumulative.extend_from_slice(&slc[curr_start_idx..curr_end_idx]);
 
-        let io = IsLessThanTupleIOCols {
-            x,
-            y,
-            tuple_less_than,
-        };
-        let aux = IsLessThanTupleAuxCols {
+        let is_less_than_tuple_aux = IsLessThanTupleAuxCols {
             less_than,
             less_than_aux,
             is_equal,
@@ -124,11 +99,10 @@ impl<T: Clone> AssertSortedCols<T> {
             less_than_cumulative,
         };
 
-        let is_less_than_tuple_cols = IsLessThanTupleCols { io, aux };
-
         Self {
-            keys_decomp,
-            is_less_than_tuple_cols,
+            key,
+            less_than_next_key,
+            is_less_than_tuple_aux,
         }
     }
 
@@ -137,16 +111,11 @@ impl<T: Clone> AssertSortedCols<T> {
         // account for the sublimb itself, and another 1 to account for the shifted
         // last sublimb
         let mut width = 0;
-        // for the x and y keys
-        width += 2 * key_vec_len;
+        
+        // for the key itself
+        width += key_vec_len;
 
-        // for the decomposed key
-        for &limb_bit in limb_bits.iter() {
-            let num_limbs = (limb_bit + decomp - 1) / decomp;
-            width += num_limbs + 1;
-        }
-
-        // for the tuple less than indicator
+        // for the less than next key indicator
         width += 1;
 
         // for the less_than indicators
@@ -161,9 +130,10 @@ impl<T: Clone> AssertSortedCols<T> {
             width += num_limbs + 1;
         }
 
-        // for the indicator whether difference is zero
+        // for the is_equal indicators
         width += key_vec_len;
-        // for the y such that y * (i + x) = 1
+
+        // for the inverses
         width += key_vec_len;
 
         // for the cumulative is_equal and less_than

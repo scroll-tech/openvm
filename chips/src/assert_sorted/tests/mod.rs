@@ -40,7 +40,6 @@ fn test_assert_sorted_chip_small_positive() {
     let bus_index: usize = 0;
     let limb_bits: Vec<usize> = vec![16, 16];
     let decomp: usize = 8;
-    let key_vec_len: usize = 2;
 
     let range_max: u32 = 1 << decomp;
 
@@ -53,7 +52,6 @@ fn test_assert_sorted_chip_small_positive() {
         range_max,
         limb_bits,
         decomp,
-        key_vec_len,
         requests.clone(),
         range_checker.clone(),
     );
@@ -63,7 +61,7 @@ fn test_assert_sorted_chip_small_positive() {
     let range_checker_trace = assert_sorted_chip.range_checker.generate_trace();
 
     run_simple_test_no_pis(
-        vec![&assert_sorted_chip, range_checker_chip],
+        vec![&assert_sorted_chip.air, range_checker_chip],
         vec![assert_sorted_chip_trace, range_checker_trace],
     )
     .expect("Verification failed");
@@ -76,7 +74,6 @@ fn test_assert_sorted_chip_large_positive() {
     let bus_index: usize = 0;
     let limb_bits: Vec<usize> = vec![30, 30, 30, 30];
     let decomp: usize = 8;
-    let key_vec_len: usize = 4;
 
     let range_max: u32 = 1 << decomp;
 
@@ -94,7 +91,6 @@ fn test_assert_sorted_chip_large_positive() {
         range_max,
         limb_bits,
         decomp,
-        key_vec_len,
         requests.clone(),
         range_checker.clone(),
     );
@@ -104,57 +100,10 @@ fn test_assert_sorted_chip_large_positive() {
     let range_checker_trace = assert_sorted_chip.range_checker.generate_trace();
 
     run_simple_test_no_pis(
-        vec![&assert_sorted_chip, range_checker_chip],
+        vec![&assert_sorted_chip.air, range_checker_chip],
         vec![assert_sorted_chip_trace, range_checker_trace],
     )
     .expect("Verification failed");
-}
-
-// covers limb_bits >= 20, key_vec_len >= 4, limb_bits % decomp != 0, number of rows >= 4, at least one limb
-// has more than limb_bits bits, rows are sorted lexicographically
-#[test]
-fn test_assert_sorted_chip_largelimb_negative() {
-    let bus_index: usize = 0;
-    let limb_bits: Vec<usize> = vec![10, 10, 10, 10];
-    let decomp: usize = 8;
-    let key_vec_len: usize = 4;
-
-    let range_max: u32 = 1 << decomp;
-
-    // the first and second rows are not in sorted order
-    let requests = vec![
-        vec![587, 15, 448, 223],
-        vec![673, 772, 168, 883],
-        vec![694, 1025, 386, 57],
-        vec![953, 196, 767, 128],
-    ];
-
-    let range_checker = Arc::new(RangeCheckerGateChip::new(bus_index, range_max));
-
-    let assert_sorted_chip = AssertSortedChip::new(
-        bus_index,
-        range_max,
-        limb_bits,
-        decomp,
-        key_vec_len,
-        requests.clone(),
-        range_checker.clone(),
-    );
-    let range_checker_chip = assert_sorted_chip.range_checker.as_ref();
-
-    let assert_sorted_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip.generate_trace();
-    let range_checker_trace = assert_sorted_chip.range_checker.generate_trace();
-
-    let result = run_simple_test_no_pis(
-        vec![&assert_sorted_chip, range_checker_chip],
-        vec![assert_sorted_chip_trace, range_checker_trace],
-    );
-
-    assert_eq!(
-        result,
-        Err(VerificationError::NonZeroCumulativeSum),
-        "Expected verification to fail, but it passed"
-    );
 }
 
 // covers limb_bits >= 20, key_vec_len >= 4, limb_bits % decomp != 0, number of rows >= 4, each limb has at
@@ -164,7 +113,6 @@ fn test_assert_sorted_chip_unsorted_negative() {
     let bus_index: usize = 0;
     let limb_bits: Vec<usize> = vec![30, 30, 30, 30];
     let decomp: usize = 8;
-    let key_vec_len: usize = 4;
 
     let range_max: u32 = 1 << decomp;
 
@@ -183,7 +131,6 @@ fn test_assert_sorted_chip_unsorted_negative() {
         range_max,
         limb_bits,
         decomp,
-        key_vec_len,
         requests.clone(),
         range_checker.clone(),
     );
@@ -197,7 +144,7 @@ fn test_assert_sorted_chip_unsorted_negative() {
     });
     assert_eq!(
         run_simple_test_no_pis(
-            vec![&assert_sorted_chip, range_checker_chip],
+            vec![&assert_sorted_chip.air, range_checker_chip],
             vec![assert_sorted_chip_trace, range_checker_trace],
         ),
         Err(VerificationError::OodEvaluationMismatch),

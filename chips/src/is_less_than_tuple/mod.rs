@@ -29,6 +29,20 @@ pub struct IsLessThanTupleAir {
 }
 
 impl IsLessThanTupleAir {
+    pub fn new(bus_index: usize, range_max: u32, limb_bits: Vec<usize>, decomp: usize) -> Self {
+        let is_lt_airs = limb_bits
+            .iter()
+            .map(|&limb_bit| IsLessThanAir::new(bus_index, range_max, limb_bit, decomp))
+            .collect::<Vec<_>>();
+
+        Self {
+            bus_index,
+            range_max,
+            decomp,
+            is_lt_airs,
+        }
+    }
+
     pub fn tuple_len(&self) -> usize {
         self.is_lt_airs.len()
     }

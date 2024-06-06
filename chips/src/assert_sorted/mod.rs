@@ -1,12 +1,7 @@
 use std::sync::Arc;
 
-use crate::{is_less_than_tuple::IsLessThanTupleChip, range_gate::RangeCheckerGateChip};
+use crate::{is_less_than_tuple::IsLessThanTupleAir, range_gate::RangeCheckerGateChip};
 use getset::Getters;
-
-use afs_stark_backend::interaction::Interaction;
-use columns::AssertSortedCols;
-use p3_air::VirtualPairCol;
-use p3_field::PrimeField64;
 
 #[cfg(test)]
 pub mod tests;
@@ -17,22 +12,9 @@ pub mod columns;
 pub mod trace;
 
 #[derive(Default, Getters)]
-pub struct AssertedSortedAir {
-    // The bus index for sends to range chip
+pub struct AssertSortedAir {
     #[getset(get = "pub")]
-    bus_index: usize,
-    // The maximum range for the range checker
-    #[getset(get = "pub")]
-    range_max: u32,
-    // The limb_bits for each element of the keys
-    #[getset(get = "pub")]
-    limb_bits: Vec<usize>,
-    // The number of bits to decompose each number into, for less than checking
-    #[getset(get = "pub")]
-    decomp: usize,
-    // The number of elements in a key
-    #[getset(get = "pub")]
-    key_vec_len: usize,
+    is_less_than_tuple_air: IsLessThanTupleAir,
     // The keys to check for sortedness
     #[getset(get = "pub")]
     keys: Vec<Vec<u32>>,
@@ -52,8 +34,7 @@ pub struct AssertedSortedAir {
  */
 #[derive(Default)]
 pub struct AssertSortedChip {
-    air: AssertedSortedAir,
-    is_less_than_tuple_chip: IsLessThanTupleChip,
+    air: AssertSortedAir,
     range_checker: Arc<RangeCheckerGateChip>,
 }
 
@@ -63,53 +44,17 @@ impl AssertSortedChip {
         range_max: u32,
         limb_bits: Vec<usize>,
         decomp: usize,
-        key_vec_len: usize,
         keys: Vec<Vec<u32>>,
         range_checker: Arc<RangeCheckerGateChip>,
     ) -> Self {
         Self {
-            air: AssertedSortedAir {
-                bus_index,
-                range_max,
-                limb_bits: limb_bits.clone(),
-                decomp,
-                key_vec_len,
+            air: AssertSortedAir {
+                is_less_than_tuple_air: IsLessThanTupleAir::new(
+                    bus_index, range_max, limb_bits, decomp,
+                ),
                 keys,
             },
-            is_less_than_tuple_chip: IsLessThanTupleChip::new(
-                bus_index,
-                range_max,
-                limb_bits,
-                decomp,
-                range_checker.clone(),
-            ),
             range_checker,
         }
-    }
-
-    pub fn sends_custom<F: PrimeField64>(
-        &self,
-        cols: &AssertSortedCols<usize>,
-    ) -> Vec<Interaction<F>> {
-        // num_limbs is the number of sublimbs per limb of key, not including the
-        // shifted last sublimb
-        let num_keys = *self.air.key_vec_len();
-
-        let mut interactions = vec![];
-
-        // we will range check the decomposed limbs of the key
-        for i in 0..num_keys {
-            let num_limbs = (self.air.limb_bits()[i] + *self.air.decomp() - 1) / *self.air.decomp();
-            // add 1 to account for the shifted last sublimb
-            for j in 0..(num_limbs + 1) {
-                interactions.push(Interaction {
-                    fields: vec![VirtualPairCol::single_main(cols.keys_decomp[i][j])],
-                    count: VirtualPairCol::constant(F::one()),
-                    argument_index: *self.air.bus_index(),
-                });
-            }
-        }
-
-        interactions
     }
 }
