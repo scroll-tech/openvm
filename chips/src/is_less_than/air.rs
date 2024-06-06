@@ -61,6 +61,8 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanAir {
             y - x + AB::Expr::from_canonical_u64(1 << self.limb_bits()) - AB::Expr::one();
 
         // constrain that the lower_bits + less_than * 2^limb_bits is the correct intermediate sum
+        // note that the intermediate value will be >= 2^limb_bits if and only if x < y, and check_val will therefore be
+        // the correct value if and only if less_than is the indicator for whether x < y
         let check_val = lower + less_than * AB::Expr::from_canonical_u64(1 << self.limb_bits());
 
         builder.assert_eq(intermed_val, check_val);

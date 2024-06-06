@@ -11,16 +11,17 @@ use super::{
 };
 
 impl IsLessThanChip {
-    pub fn generate_trace<F: PrimeField64>(&self, x: Vec<u32>, y: Vec<u32>) -> RowMajorMatrix<F> {
+    pub fn generate_trace<F: PrimeField64>(&self, pairs: Vec<(u32, u32)>) -> RowMajorMatrix<F> {
         let num_cols: usize =
             IsLessThanCols::<F>::get_width(*self.air.limb_bits(), *self.air.decomp());
 
         let mut rows = vec![];
 
-        for i in 0..x.len() {
+        // generate a row for each pair of numbers to compare
+        for (x, y) in pairs {
             let row: Vec<F> = self
                 .air
-                .generate_trace_row((x[i], y[i], self.range_checker.clone()))
+                .generate_trace_row((x, y, self.range_checker.clone()))
                 .flatten();
             rows.extend(row);
         }

@@ -25,12 +25,12 @@ pub struct IsLessThanTupleAir {
     decomp: usize,
     // IsLessThanAirs for each tuple element
     #[getset(get = "pub")]
-    is_lt_airs: Vec<IsLessThanAir>,
+    is_less_than_airs: Vec<IsLessThanAir>,
 }
 
 impl IsLessThanTupleAir {
     pub fn new(bus_index: usize, range_max: u32, limb_bits: Vec<usize>, decomp: usize) -> Self {
-        let is_lt_airs = limb_bits
+        let is_less_than_airs = limb_bits
             .iter()
             .map(|&limb_bit| IsLessThanAir::new(bus_index, range_max, limb_bit, decomp))
             .collect::<Vec<_>>();
@@ -39,23 +39,29 @@ impl IsLessThanTupleAir {
             bus_index,
             range_max,
             decomp,
-            is_lt_airs,
+            is_less_than_airs,
         }
     }
 
     pub fn tuple_len(&self) -> usize {
-        self.is_lt_airs.len()
+        self.is_less_than_airs.len()
     }
 
     pub fn limb_bits(&self) -> Vec<usize> {
-        self.is_lt_airs.iter().map(|air| *air.limb_bits()).collect()
+        self.is_less_than_airs
+            .iter()
+            .map(|air| *air.limb_bits())
+            .collect()
     }
 }
 
 /**
- * This Chip constrains that consecutive rows are sorted lexicographically.
+ * This chip computes whether one tuple is lexicographically less than another. Each element of the
+ * tuple has its own max number of bits, given by the limb_bits array. The chip assumes that each limb
+ * is within its given max limb_bits.
  *
- * Each row consists of a key decomposed into limbs with at most limb_bits bits
+ * The IsLessThanTupleChip uses the IsLessThanChip as a subchip to check whether individual tuple elements
+ * are less than each other.
  */
 #[derive(Default, Getters)]
 pub struct IsLessThanTupleChip {
@@ -72,7 +78,7 @@ impl IsLessThanTupleChip {
         decomp: usize,
         range_checker: Arc<RangeCheckerGateChip>,
     ) -> Self {
-        let is_lt_airs = limb_bits
+        let is_less_than_airs = limb_bits
             .iter()
             .map(|&limb_bit| IsLessThanAir::new(bus_index, range_max, limb_bit, decomp))
             .collect::<Vec<_>>();
@@ -81,7 +87,7 @@ impl IsLessThanTupleChip {
             bus_index,
             range_max,
             decomp,
-            is_lt_airs,
+            is_less_than_airs,
         };
 
         Self { air, range_checker }

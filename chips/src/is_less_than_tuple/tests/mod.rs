@@ -20,49 +20,13 @@ fn test_is_less_than_tuple_chip_lt() {
 
     let chip = IsLessThanTupleChip::new(bus_index, range_max, limb_bits, decomp, range_checker);
     let range_checker = chip.range_checker.as_ref();
-    let trace = chip.generate_trace(vec![vec![14321, 123]], vec![vec![26678, 233]]);
-    let range_checker_trace = range_checker.generate_trace();
 
-    run_simple_test_no_pis(
-        vec![&chip.air, range_checker],
-        vec![trace, range_checker_trace],
-    )
-    .expect("Verification failed");
-}
-
-#[test]
-fn test_is_less_than_tuple_chip_gt() {
-    let bus_index: usize = 0;
-    let limb_bits: Vec<usize> = vec![8, 16];
-    let decomp: usize = 8;
-    let range_max: u32 = 1 << decomp;
-
-    let range_checker = Arc::new(RangeCheckerGateChip::new(bus_index, range_max));
-
-    let chip = IsLessThanTupleChip::new(bus_index, range_max, limb_bits, decomp, range_checker);
-    let range_checker = chip.range_checker.as_ref();
-    let trace = chip.generate_trace(vec![vec![244, 14321]], vec![vec![233, 26678]]);
-    let range_checker_trace = range_checker.generate_trace();
-
-    run_simple_test_no_pis(
-        vec![&chip.air, range_checker],
-        vec![trace, range_checker_trace],
-    )
-    .expect("Verification failed");
-}
-
-#[test]
-fn test_is_less_than_tuple_chip_eq() {
-    let bus_index: usize = 0;
-    let limb_bits: Vec<usize> = vec![16, 8];
-    let decomp: usize = 8;
-    let range_max: u32 = 1 << decomp;
-
-    let range_checker = Arc::new(RangeCheckerGateChip::new(bus_index, range_max));
-
-    let chip = IsLessThanTupleChip::new(bus_index, range_max, limb_bits, decomp, range_checker);
-    let range_checker = chip.range_checker.as_ref();
-    let trace = chip.generate_trace(vec![vec![14321, 244]], vec![vec![14321, 244]]);
+    let trace = chip.generate_trace(vec![
+        (vec![14321, 123], vec![26678, 233]),
+        (vec![26678, 244], vec![14321, 233]),
+        (vec![14321, 244], vec![14321, 244]),
+        (vec![26678, 233], vec![14321, 244]),
+    ]);
     let range_checker_trace = range_checker.generate_trace();
 
     run_simple_test_no_pis(
@@ -83,7 +47,7 @@ fn test_is_less_than_tuple_chip_negative() {
 
     let chip = IsLessThanTupleChip::new(bus_index, range_max, limb_bits, decomp, range_checker);
     let range_checker = chip.range_checker.as_ref();
-    let mut trace = chip.generate_trace(vec![vec![14321, 123]], vec![vec![26678, 233]]);
+    let mut trace = chip.generate_trace(vec![(vec![14321, 123], vec![26678, 233])]);
     let range_checker_trace = range_checker.generate_trace();
 
     trace.values[2] = AbstractField::from_canonical_u64(0);

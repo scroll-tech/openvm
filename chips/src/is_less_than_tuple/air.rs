@@ -60,11 +60,11 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanTupleAir {
         let x = io.x.clone();
         let y = io.y.clone();
 
+        // here we constrain that less_than[i] indicates whether x[i] < y[i] using the IsLessThan subchip for each i
         for i in 0..x.len() {
             let x_val = x[i];
             let y_val = y[i];
 
-            // here we constrain that less_than[i] indicates whether x[i] < y[i] using the IsLessThan subchip
             let is_less_than_cols = IsLessThanCols {
                 io: IsLessThanIOCols {
                     x: x_val,
@@ -78,14 +78,14 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanTupleAir {
             };
 
             SubAir::eval(
-                &self.is_lt_airs[i].clone(),
+                &self.is_less_than_airs[i].clone(),
                 builder,
                 is_less_than_cols.io,
                 is_less_than_cols.aux,
             );
         }
 
-        // together, these constrain that is_equal is the indicator for whether diff == 0, i.e. x[i] = y[i]
+        // here, we constrain that is_equal is the indicator for whether diff == 0, i.e. x[i] = y[i]
         for i in 0..x.len() {
             let is_equal = aux.is_equal[i];
             let inv = aux.is_equal_aux[i].inv;
@@ -103,22 +103,29 @@ impl<AB: AirBuilder> SubAir<AB> for IsLessThanTupleAir {
             SubAir::eval(&is_equal_chip, builder, is_equal_cols.io, is_equal_cols.aux);
         }
 
+        // here, we constrain that is_equal_cumulative and less_than_cumulative are the correct values
         let is_equal_cumulative = aux.is_equal_cumulative.clone();
         let less_than_cumulative = aux.less_than_cumulative.clone();
 
         builder.assert_eq(is_equal_cumulative[0], aux.is_equal[0]);
         builder.assert_eq(less_than_cumulative[0], aux.less_than[0]);
+
         for i in 1..x.len() {
+            // this constrains that is_equal_cumulative[i] indicates whether the first i elements of x and y are equal
             builder.assert_eq(
                 is_equal_cumulative[i],
                 is_equal_cumulative[i - 1] * aux.is_equal[i],
             );
+            // this constrains that less_than_cumulative[i] indicates whether the first i elements of x are less than
+            // the first i elements of y, lexicographically
+            // note that less_than_cumulative[i - 1] and is_equal_cumulative[i - 1] are never both 1
             builder.assert_eq(
                 less_than_cumulative[i],
                 less_than_cumulative[i - 1] + aux.less_than[i] * is_equal_cumulative[i - 1],
             );
         }
 
+        // constrain that the tuple_less_than does indicate whether x < y, lexicographically
         builder.assert_eq(io.tuple_less_than, less_than_cumulative[x.len() - 1]);
     }
 }

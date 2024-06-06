@@ -29,9 +29,9 @@ impl<F: PrimeField64> Chip<F> for IsLessThanTupleAir {
 
 impl<F: PrimeField64> SubAirWithInteractions<F> for IsLessThanTupleAir {
     fn sends(&self, col_indices: IsLessThanTupleCols<usize>) -> Vec<Interaction<F>> {
-        // num_limbs is the number of limbs, not including the last shifted limb
         let mut interactions = vec![];
 
+        // we need to get the interactions from the IsLessThan subchip
         for i in 0..self.tuple_len() {
             let is_less_than_cols = IsLessThanCols {
                 io: IsLessThanIOCols {
@@ -46,7 +46,7 @@ impl<F: PrimeField64> SubAirWithInteractions<F> for IsLessThanTupleAir {
             };
 
             let curr_interactions =
-                SubAirWithInteractions::<F>::sends(&self.is_lt_airs[i], is_less_than_cols);
+                SubAirWithInteractions::<F>::sends(&self.is_less_than_airs[i], is_less_than_cols);
             interactions.extend(curr_interactions);
         }
 

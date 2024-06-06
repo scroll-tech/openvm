@@ -18,8 +18,7 @@ use super::{
 impl IsLessThanTupleChip {
     pub fn generate_trace<F: PrimeField64>(
         &self,
-        x: Vec<Vec<u32>>,
-        y: Vec<Vec<u32>>,
+        tuple_pairs: Vec<(Vec<u32>, Vec<u32>)>,
     ) -> RowMajorMatrix<F> {
         let num_cols: usize = IsLessThanTupleCols::<F>::get_width(
             self.air.limb_bits().clone(),
@@ -29,10 +28,11 @@ impl IsLessThanTupleChip {
 
         let mut rows: Vec<F> = vec![];
 
-        for i in 0..x.len() {
+        // for each tuple pair, generate the trace row
+        for (x, y) in tuple_pairs {
             let row: Vec<F> = self
                 .air
-                .generate_trace_row((x[i].clone(), y[i].clone(), self.range_checker.clone()))
+                .generate_trace_row((x.clone(), y.clone(), self.range_checker.clone()))
                 .flatten();
             rows.extend(row);
         }
@@ -74,8 +74,7 @@ impl<F: PrimeField64> LocalTraceInstructions<F> for IsLessThanTupleAir {
             lower_decomp_vec.push(curr_less_than_row[4..].to_vec());
         }
 
-        let mut less_than_cumulative: Vec<F> = vec![];
-
+        // compute is_equal_cumulative
         let mut transition_index = 0;
         while transition_index < x.len() && x[transition_index] == y[transition_index] {
             transition_index += 1;
@@ -86,7 +85,9 @@ impl<F: PrimeField64> LocalTraceInstructions<F> for IsLessThanTupleAir {
             .chain(std::iter::repeat(F::zero()).take(x.len() - transition_index))
             .collect::<Vec<F>>();
 
-        // compute whether the x < y
+        let mut less_than_cumulative: Vec<F> = vec![];
+
+        // compute less_than_cumulative
         for i in 0..x.len() {
             let mut less_than_curr = if i > 0 {
                 less_than_cumulative[i - 1]
@@ -129,6 +130,7 @@ impl<F: PrimeField64> LocalTraceInstructions<F> for IsLessThanTupleAir {
             }
         }
 
+        // compute less_than_aux and is_equal_aux
         let mut less_than_aux: Vec<IsLessThanAuxCols<F>> = vec![];
         for i in 0..x.len() {
             let less_than_col = IsLessThanAuxCols {

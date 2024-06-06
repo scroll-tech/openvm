@@ -43,7 +43,10 @@ impl IsLessThanAir {
 }
 
 /**
- * This chip computes whether one number is less than another.
+ * This chip checks whether one number is less than another. The two numbers have a max number of bits,
+ * given by limb_bits. The chip assumes that the two numbers are within limb_bits bits. The chip compares
+ * the numbers by decomposing them into limbs of size decomp bits, and interacts with a RangeCheckerGateChip
+ * to range check the decompositions.
  */
 #[derive(Default, Getters)]
 pub struct IsLessThanChip {
