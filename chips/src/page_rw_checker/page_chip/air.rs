@@ -2,7 +2,7 @@ use p3_air::{Air, AirBuilder, BaseAir};
 use p3_field::Field;
 
 use super::{columns::PageCols, PageChip};
-use crate::sub_chip::AirConfig;
+use crate::sub_chip::{AirConfig, SubAir};
 
 impl<F: Field> BaseAir<F> for PageChip {
     fn width(&self) -> usize {
@@ -16,6 +16,17 @@ impl AirConfig for PageChip {
 
 impl<AB: AirBuilder> Air<AB> for PageChip {
     fn eval(&self, _builder: &mut AB) {
+        if self.is_send {
+            // We assume the initial page is properly formatted
+            return;
+        }
+    }
+}
+
+impl<AB: AirBuilder> SubAir<AB> for PageChip {
+    type AuxView = ();
+    type IoView = PageCols<AB::Var>;
+    fn eval(&self, _builder: &mut AB, _io: Self::IoView, _aux: Self::AuxView) {
         if self.is_send {
             // We assume the initial page is properly formatted
             return;

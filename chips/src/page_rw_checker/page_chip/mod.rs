@@ -3,6 +3,7 @@ pub mod chip;
 pub mod columns;
 pub mod trace;
 
+#[derive(Clone)]
 pub struct PageChip {
     bus_index: usize,
     idx_len: usize,
