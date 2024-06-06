@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use crate::is_less_than_tuple::columns::IsLessThanTupleCols;
 use crate::range_gate::RangeCheckerGateChip;
 
 use super::super::is_less_than_tuple::IsLessThanTupleChip;
@@ -10,10 +11,28 @@ use afs_test_utils::config::baby_bear_poseidon2::run_simple_test_no_pis;
 use p3_field::AbstractField;
 
 #[test]
-fn test_is_less_than_tuple_chip_lt() {
+fn test_flatten_fromslice_roundtrip() {
+    let limb_bits = vec![16, 8, 20, 20];
+    let decomp = 8;
+    let tuple_len = 4;
+
+    let num_cols = IsLessThanTupleCols::<usize>::get_width(limb_bits.clone(), decomp, tuple_len);
+    let all_cols = (0..num_cols).collect::<Vec<usize>>();
+
+    let cols_numbered =
+        IsLessThanTupleCols::<usize>::from_slice(&all_cols, limb_bits.clone(), decomp, tuple_len);
+    let flattened = cols_numbered.flatten();
+
+    for (i, col) in flattened.iter().enumerate() {
+        assert_eq!(*col, all_cols[i]);
+    }
+}
+
+#[test]
+fn test_is_less_than_tuple_chip() {
     let bus_index: usize = 0;
     let limb_bits: Vec<usize> = vec![16, 8];
-    let decomp: usize = 8;
+    let decomp: usize = 6;
     let range_max: u32 = 1 << decomp;
 
     let range_checker = Arc::new(RangeCheckerGateChip::new(bus_index, range_max));
