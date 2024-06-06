@@ -14,9 +14,9 @@ impl AssertSortedChip {
         );
 
         let mut rows: Vec<F> = vec![];
-        for i in 0..self.air.is_less_than_tuple_air().tuple_len() {
+        for i in 0..self.air.keys().len() {
             let key = self.air.keys()[i].clone();
-            let next_key: Vec<u32> = if i == self.air.is_less_than_tuple_air().tuple_len() - 1 {
+            let next_key: Vec<u32> = if i == self.air.keys().len() - 1 {
                 vec![0; self.air.is_less_than_tuple_air().tuple_len()]
             } else {
                 self.air.keys()[i + 1].clone()
@@ -28,8 +28,10 @@ impl AssertSortedChip {
             )
             .flatten();
 
+            // the current key
             let mut row: Vec<F> =
                 is_less_than_tuple_trace[0..self.air.is_less_than_tuple_air().tuple_len()].to_vec();
+            // the less than indicator and the auxiliary columns
             row.extend_from_slice(
                 &is_less_than_tuple_trace[2 * self.air.is_less_than_tuple_air().tuple_len()..],
             );

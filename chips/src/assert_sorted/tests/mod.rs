@@ -25,16 +25,12 @@ use p3_matrix::dense::DenseMatrix;
  *     partition on number of rows:
  *         number of rows < 4
  *         number of rows >= 4
- *     partition on size of each limb:
- *         each limb has at most limb_bits bits
- *         at least one limb has more than limb_bits bits
  *     partition on row order:
  *         rows are sorted lexicographically
  *         rows are not sorted lexicographically
  */
 
-// covers limb_bits < 20, key_vec_len < 4, limb_bits % decomp == 0, number of rows < 4, each limb has at
-// most limb_bits bits, rows are sorted lexicographically
+// covers limb_bits < 20, key_vec_len < 4, limb_bits % decomp == 0, number of rows < 4, rows are sorted lexicographically
 #[test]
 fn test_assert_sorted_chip_small_positive() {
     let bus_index: usize = 0;
@@ -43,7 +39,12 @@ fn test_assert_sorted_chip_small_positive() {
 
     let range_max: u32 = 1 << decomp;
 
-    let requests = vec![vec![7784, 35423], vec![17558, 44832]];
+    let requests = vec![
+        vec![7784, 35423],
+        vec![17558, 44832],
+        vec![22843, 12786],
+        vec![32886, 24834],
+    ];
 
     let range_checker = Arc::new(RangeCheckerGateChip::new(bus_index, range_max));
 
@@ -67,8 +68,7 @@ fn test_assert_sorted_chip_small_positive() {
     .expect("Verification failed");
 }
 
-// covers limb_bits >= 20, key_vec_len >= 4, limb_bits % decomp != 0, number of rows >= 4, each limb has at
-// most limb_bits bits, rows are sorted lexicographically
+// covers limb_bits >= 20, key_vec_len >= 4, limb_bits % decomp != 0, number of rows >= 4, rows are sorted lexicographically
 #[test]
 fn test_assert_sorted_chip_large_positive() {
     let bus_index: usize = 0;
@@ -106,8 +106,7 @@ fn test_assert_sorted_chip_large_positive() {
     .expect("Verification failed");
 }
 
-// covers limb_bits >= 20, key_vec_len >= 4, limb_bits % decomp != 0, number of rows >= 4, each limb has at
-// most limb_bits bits, rows are not sorted lexicographically
+// covers limb_bits >= 20, key_vec_len >= 4, limb_bits % decomp != 0, number of rows >= 4, rows are not sorted lexicographically
 #[test]
 fn test_assert_sorted_chip_unsorted_negative() {
     let bus_index: usize = 0;

@@ -65,6 +65,19 @@ impl<T: Clone> AssertSortedCols<T> {
         curr_start_idx = curr_end_idx;
         curr_end_idx += key_vec_len;
 
+        // the next key_vec_len elements contain the cumulative is_equal indicators; is_equal_cumulative[i]
+        // indicates whether the first i elements of the key are equal to those of the next key
+        let is_equal_cumulative = slc[curr_start_idx..curr_end_idx].to_vec();
+
+        curr_start_idx = curr_end_idx;
+        curr_end_idx += key_vec_len;
+
+        // the next key_vec_len elements contain the cumulative less than indicators; less_than_cumulative[i]
+        // indicates whether the first i elements of the key are lexicographically less than those of the next
+        // key
+        let less_than_cumulative = slc[curr_start_idx..curr_end_idx].to_vec();
+
+        // now, we construct the IsLessThanTupleAuxCols
         let mut less_than_aux: Vec<IsLessThanAuxCols<T>> = vec![];
         for i in 0..key_vec_len {
             let less_than_col = IsLessThanAuxCols {
@@ -79,16 +92,6 @@ impl<T: Clone> AssertSortedCols<T> {
             let is_equal_col = IsEqualAuxCols { inv: inv.clone() };
             is_equal_aux.push(is_equal_col);
         }
-
-        let mut is_equal_cumulative: Vec<T> = vec![];
-        let mut less_than_cumulative: Vec<T> = vec![];
-
-        is_equal_cumulative.extend_from_slice(&slc[curr_start_idx..curr_end_idx]);
-
-        curr_start_idx = curr_end_idx;
-        curr_end_idx += key_vec_len;
-
-        less_than_cumulative.extend_from_slice(&slc[curr_start_idx..curr_end_idx]);
 
         let is_less_than_tuple_aux = IsLessThanTupleAuxCols {
             less_than,
@@ -107,11 +110,7 @@ impl<T: Clone> AssertSortedCols<T> {
     }
 
     pub fn get_width(limb_bits: Vec<usize>, decomp: usize, key_vec_len: usize) -> usize {
-        // there are (limb_bits + decomp - 1) / decomp sublimbs per limb, we add 1 to
-        // account for the sublimb itself, and another 1 to account for the shifted
-        // last sublimb
         let mut width = 0;
-        
         // for the key itself
         width += key_vec_len;
 

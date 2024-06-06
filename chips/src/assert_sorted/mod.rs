@@ -21,16 +21,14 @@ pub struct AssertSortedAir {
 }
 
 /**
- * This Chip constrains that consecutive rows are sorted lexicographically.
+ * This chip constrains that consecutive rows are sorted lexicographically.
  *
- * Each row consists of a key decomposed into limbs, and the chip constrains
- * each limb has at most limb_bits bits, where limb_bits is at most 31. It
- * does this by interacting with a RangeCheckerGateChip. Because the range checker
- * gate can take MAX up to 2^20, we further decompose each limb into sublimbs
- * of size decomp bits.
+ * Each row consists of a key decomposed into limbs. Each limb has its own max number of
+ * bits, given by the limb_bits array. The chip assumes that each limb is within its
+ * given max limb_bits.
  *
- * The AssertSortedChip contains a LessThanChip subchip, which is used to constrain
- * that the rows are sorted lexicographically.
+ * The AssertSortedChip uses the IsLessThanTupleChip as a subchip to check that the rows
+ * are sorted lexicographically.
  */
 #[derive(Default)]
 pub struct AssertSortedChip {

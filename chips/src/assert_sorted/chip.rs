@@ -25,8 +25,7 @@ impl<F: PrimeField64> Chip<F> for AssertSortedAir {
             self.is_less_than_tuple_air().tuple_len(),
         );
 
-        let mut interactions: Vec<Interaction<F>> = vec![];
-
+        // here, y doesn't matter since we are only range checking the decompositions of x
         let is_less_than_tuple_cols = IsLessThanTupleCols {
             io: IsLessThanTupleIOCols {
                 x: cols_numbered.key.clone(),
@@ -41,8 +40,6 @@ impl<F: PrimeField64> Chip<F> for AssertSortedAir {
             is_less_than_tuple_cols,
         );
 
-        interactions.extend(subchip_interactions);
-
-        interactions
+        subchip_interactions
     }
 }
