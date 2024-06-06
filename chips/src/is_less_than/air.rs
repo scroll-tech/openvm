@@ -28,8 +28,7 @@ impl<AB: AirBuilder> Air<AB> for IsLessThanAir {
         let local = main.row_slice(0);
         let local: &[AB::Var] = (*local).borrow();
 
-        let local_cols =
-            IsLessThanCols::<AB::Var>::from_slice(local, *self.limb_bits(), *self.decomp());
+        let local_cols = IsLessThanCols::<AB::Var>::from_slice(local);
 
         SubAir::eval(self, builder, local_cols.io, local_cols.aux);
     }

@@ -10,8 +10,7 @@ impl<F: PrimeField64> Chip<F> for IsLessThanAir {
         let num_cols = IsLessThanCols::<F>::get_width(*self.limb_bits(), *self.decomp());
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
-        let cols_numbered =
-            IsLessThanCols::<usize>::from_slice(&all_cols, *self.limb_bits(), *self.decomp());
+        let cols_numbered = IsLessThanCols::<usize>::from_slice(&all_cols);
 
         SubAirWithInteractions::sends(self, cols_numbered)
     }

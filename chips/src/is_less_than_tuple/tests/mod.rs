@@ -26,6 +26,8 @@ fn test_flatten_fromslice_roundtrip() {
     for (i, col) in flattened.iter().enumerate() {
         assert_eq!(*col, all_cols[i]);
     }
+
+    assert_eq!(num_cols, flattened.len());
 }
 
 #[test]

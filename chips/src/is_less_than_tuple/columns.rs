@@ -9,6 +9,24 @@ pub struct IsLessThanTupleIOCols<T> {
     pub tuple_less_than: T,
 }
 
+impl<T: Clone> IsLessThanTupleIOCols<T> {
+    pub fn from_slice(slc: &[T], tuple_len: usize) -> Self {
+        Self {
+            x: slc[0..tuple_len].to_vec(),
+            y: slc[tuple_len..2 * tuple_len].to_vec(),
+            tuple_less_than: slc[2 * tuple_len].clone(),
+        }
+    }
+
+    pub fn flatten(&self) -> Vec<T> {
+        let mut flattened = vec![];
+        flattened.extend_from_slice(&self.x);
+        flattened.extend_from_slice(&self.y);
+        flattened.push(self.tuple_less_than.clone());
+        flattened
+    }
+}
+
 pub struct IsLessThanTupleAuxCols<T> {
     pub less_than: Vec<T>,
     pub less_than_aux: Vec<IsLessThanAuxCols<T>>,
@@ -19,34 +37,11 @@ pub struct IsLessThanTupleAuxCols<T> {
     pub less_than_cumulative: Vec<T>,
 }
 
-pub struct IsLessThanTupleCols<T> {
-    pub io: IsLessThanTupleIOCols<T>,
-    pub aux: IsLessThanTupleAuxCols<T>,
-}
-
-impl<T: Clone> IsLessThanTupleCols<T> {
+impl<T: Clone> IsLessThanTupleAuxCols<T> {
     pub fn from_slice(slc: &[T], limb_bits: Vec<usize>, decomp: usize, tuple_len: usize) -> Self {
         let mut curr_start_idx = 0;
         let mut curr_end_idx = tuple_len;
 
-        // get the actual tuples, which are x and y
-        let x = slc[curr_start_idx..curr_end_idx].to_vec();
-
-        curr_start_idx = curr_end_idx;
-        curr_end_idx += tuple_len;
-
-        let y = slc[curr_start_idx..curr_end_idx].to_vec();
-
-        curr_start_idx = curr_end_idx;
-        curr_end_idx += 1;
-
-        // get the indicator for whether x < y, lexicographically
-        let tuple_less_than = slc[curr_start_idx].clone();
-
-        curr_start_idx = curr_end_idx;
-        curr_end_idx += tuple_len;
-
-        // get the indicators for whether x[i] < y[i] for all indices
         let less_than = slc[curr_start_idx..curr_end_idx].to_vec();
 
         curr_start_idx = curr_end_idx;
@@ -111,47 +106,63 @@ impl<T: Clone> IsLessThanTupleCols<T> {
             is_equal_aux.push(is_equal_col);
         }
 
-        IsLessThanTupleCols {
-            io: IsLessThanTupleIOCols {
-                x,
-                y,
-                tuple_less_than,
-            },
-            aux: IsLessThanTupleAuxCols {
-                less_than,
-                less_than_aux,
-                is_equal,
-                is_equal_aux,
-                is_equal_cumulative,
-                less_than_cumulative,
-            },
+        Self {
+            less_than,
+            less_than_aux,
+            is_equal,
+            is_equal_aux,
+            is_equal_cumulative,
+            less_than_cumulative,
         }
     }
 
     pub fn flatten(&self) -> Vec<T> {
         let mut flattened = vec![];
-        flattened.extend_from_slice(&self.io.x);
-        flattened.extend_from_slice(&self.io.y);
-        flattened.push(self.io.tuple_less_than.clone());
-        flattened.extend_from_slice(&self.aux.less_than);
 
-        for i in 0..self.aux.less_than_aux.len() {
-            flattened.push(self.aux.less_than_aux[i].lower.clone());
+        flattened.extend_from_slice(&self.less_than);
+
+        for i in 0..self.less_than_aux.len() {
+            flattened.push(self.less_than_aux[i].lower.clone());
         }
 
-        for i in 0..self.aux.less_than_aux.len() {
-            flattened.extend_from_slice(&self.aux.less_than_aux[i].lower_decomp);
+        for i in 0..self.less_than_aux.len() {
+            flattened.extend_from_slice(&self.less_than_aux[i].lower_decomp);
         }
 
-        flattened.extend_from_slice(&self.aux.is_equal);
+        flattened.extend_from_slice(&self.is_equal);
 
-        for i in 0..self.aux.is_equal_aux.len() {
-            flattened.push(self.aux.is_equal_aux[i].inv.clone());
+        for i in 0..self.is_equal_aux.len() {
+            flattened.push(self.is_equal_aux[i].inv.clone());
         }
 
-        flattened.extend_from_slice(&self.aux.is_equal_cumulative);
-        flattened.extend_from_slice(&self.aux.less_than_cumulative);
+        flattened.extend_from_slice(&self.is_equal_cumulative);
+        flattened.extend_from_slice(&self.less_than_cumulative);
 
+        flattened
+    }
+}
+
+pub struct IsLessThanTupleCols<T> {
+    pub io: IsLessThanTupleIOCols<T>,
+    pub aux: IsLessThanTupleAuxCols<T>,
+}
+
+impl<T: Clone> IsLessThanTupleCols<T> {
+    pub fn from_slice(slc: &[T], limb_bits: Vec<usize>, decomp: usize, tuple_len: usize) -> Self {
+        let io = IsLessThanTupleIOCols::from_slice(&slc[..2 * tuple_len + 1], tuple_len);
+        let aux = IsLessThanTupleAuxCols::from_slice(
+            &slc[2 * tuple_len + 1..],
+            limb_bits,
+            decomp,
+            tuple_len,
+        );
+
+        Self { io, aux }
+    }
+
+    pub fn flatten(&self) -> Vec<T> {
+        let mut flattened = self.io.flatten();
+        flattened.extend(self.aux.flatten());
         flattened
     }
 

@@ -1,9 +1,6 @@
 use afs_derive::AlignedBorrow;
 
-use crate::{
-    is_equal::columns::IsEqualAuxCols, is_less_than::columns::IsLessThanAuxCols,
-    is_less_than_tuple::columns::IsLessThanTupleAuxCols,
-};
+use crate::is_less_than_tuple::columns::IsLessThanTupleAuxCols;
 
 // Since AssertSortedChip contains a LessThanChip subchip, a subset of the columns are those of the
 // LessThanChip
@@ -28,79 +25,13 @@ impl<T: Clone> AssertSortedCols<T> {
         // the next element is the indicator for whether the key is less than the next key
         let less_than_next_key = slc[curr_start_idx].clone();
         curr_start_idx = curr_end_idx;
-        curr_end_idx += key_vec_len;
 
-        // the next key_vec_len elements are the indicators for the individual tuple element less thans
-        let less_than = slc[curr_start_idx..curr_end_idx].to_vec();
-        curr_start_idx = curr_end_idx;
-        curr_end_idx += key_vec_len;
-
-        // the next key_vec_len elements are the values of the lower bits of each intermediate sum
-        // (i.e. 2^limb_bits[i] + y[i] - x[i] - 1)
-        let lower_vec = slc[curr_start_idx..curr_end_idx].to_vec();
-
-        // the next elements are the decomposed lower bits
-        let mut lower_decomp_vec: Vec<Vec<T>> = vec![];
-        for curr_limb_bits in limb_bits.iter() {
-            let num_limbs = (curr_limb_bits + decomp - 1) / decomp;
-
-            curr_start_idx = curr_end_idx;
-            curr_end_idx += num_limbs + 1;
-
-            lower_decomp_vec.push(slc[curr_start_idx..curr_end_idx].to_vec());
-        }
-        curr_start_idx = curr_end_idx;
-        curr_end_idx += key_vec_len;
-
-        // the next key_vec_len elements are the indicator whether the difference is zero; if difference is
-        // zero then the two limbs must be equal
-        let is_equal = slc[curr_start_idx..curr_end_idx].to_vec();
-        curr_start_idx = curr_end_idx;
-        curr_end_idx += key_vec_len;
-
-        // the next key_vec_len elements contain the inverses of the corresponding sum of diff and is_zero;
-        // note that this sum will always be nonzero so the inverse will exist
-        let inverses = slc[curr_start_idx..curr_end_idx].to_vec();
-
-        curr_start_idx = curr_end_idx;
-        curr_end_idx += key_vec_len;
-
-        // the next key_vec_len elements contain the cumulative is_equal indicators; is_equal_cumulative[i]
-        // indicates whether the first i elements of the key are equal to those of the next key
-        let is_equal_cumulative = slc[curr_start_idx..curr_end_idx].to_vec();
-
-        curr_start_idx = curr_end_idx;
-        curr_end_idx += key_vec_len;
-
-        // the next key_vec_len elements contain the cumulative less than indicators; less_than_cumulative[i]
-        // indicates whether the first i elements of the key are lexicographically less than those of the next
-        // key
-        let less_than_cumulative = slc[curr_start_idx..curr_end_idx].to_vec();
-
-        // now, we construct the IsLessThanTupleAuxCols
-        let mut less_than_aux: Vec<IsLessThanAuxCols<T>> = vec![];
-        for i in 0..key_vec_len {
-            let less_than_col = IsLessThanAuxCols {
-                lower: lower_vec[i].clone(),
-                lower_decomp: lower_decomp_vec[i].clone(),
-            };
-            less_than_aux.push(less_than_col);
-        }
-
-        let mut is_equal_aux: Vec<IsEqualAuxCols<T>> = vec![];
-        for inv in inverses.iter() {
-            let is_equal_col = IsEqualAuxCols { inv: inv.clone() };
-            is_equal_aux.push(is_equal_col);
-        }
-
-        let is_less_than_tuple_aux = IsLessThanTupleAuxCols {
-            less_than,
-            less_than_aux,
-            is_equal,
-            is_equal_aux,
-            is_equal_cumulative,
-            less_than_cumulative,
-        };
+        let is_less_than_tuple_aux = IsLessThanTupleAuxCols::from_slice(
+            &slc[curr_start_idx..],
+            limb_bits,
+            decomp,
+            key_vec_len,
+        );
 
         Self {
             key,

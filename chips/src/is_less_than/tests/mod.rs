@@ -20,12 +20,14 @@ fn test_flatten_fromslice_roundtrip() {
     let num_cols = IsLessThanCols::<usize>::get_width(limb_bits, decomp);
     let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
-    let cols_numbered = IsLessThanCols::<usize>::from_slice(&all_cols, limb_bits, decomp);
+    let cols_numbered = IsLessThanCols::<usize>::from_slice(&all_cols);
     let flattened = cols_numbered.flatten();
 
     for (i, col) in flattened.iter().enumerate() {
         assert_eq!(*col, all_cols[i]);
     }
+
+    assert_eq!(num_cols, flattened.len());
 }
 
 #[test]
