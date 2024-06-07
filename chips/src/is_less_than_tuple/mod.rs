@@ -12,7 +12,7 @@ pub mod chip;
 pub mod columns;
 pub mod trace;
 
-#[derive(Default, Getters)]
+#[derive(Default, Clone, Getters)]
 pub struct IsLessThanTupleAir {
     // The bus index for sends to range chip
     #[getset(get = "pub")]
