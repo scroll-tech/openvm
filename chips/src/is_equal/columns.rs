@@ -16,7 +16,10 @@ pub struct IsEqualIOCols<T> {
     pub is_equal: T,
 }
 
+<<<<<<< HEAD
 #[derive(Clone)]
+=======
+>>>>>>> bd362118ce67d69c20c52cdf88fc66e47000305a
 pub struct IsEqualAuxCols<T> {
     pub inv: T,
 }

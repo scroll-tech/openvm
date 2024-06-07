@@ -25,7 +25,11 @@ impl<F: PrimeField64> Chip<F> for AssertSortedAir {
             self.is_less_than_tuple_air().tuple_len(),
         );
 
+<<<<<<< HEAD
         // here, y doesn't matter since we are only range checking the decompositions of x
+=======
+        // range check the decompositions of x within aux columns; here the io doesn't matter
+>>>>>>> bd362118ce67d69c20c52cdf88fc66e47000305a
         let is_less_than_tuple_cols = IsLessThanTupleCols {
             io: IsLessThanTupleIOCols {
                 x: cols_numbered.key.clone(),
