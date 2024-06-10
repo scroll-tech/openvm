@@ -1,7 +1,7 @@
 use getset::Getters;
 
 use crate::{
-    is_less_than_tuple::{columns::IsLessThanTupleCols, IsLessThanTupleAir},
+    is_less_than_tuple::{columns::{IsLessThanTupleAuxCols, IsLessThanTupleCols}, IsLessThanTupleAir},
     page_rw_checker::page_chip::PageChip,
 };
 
@@ -97,17 +97,15 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
     // in particular, we need to constrain that is_alloc * ((1 - (idx < start)) * (1 - (end < idx)) - 1) = 0
     pub fn air_width(&self) -> usize {
         self.page_chip().air_width()
-            + COMMITMENT_LEN
+            + COMMITMENT_LEN                // own_commitment
             + (1 - self.is_init as usize)
-                * 2
-                * (self.idx_len
-                    + 1
-                    + 2 * IsLessThanTupleCols::<usize>::get_width(
+                                         
+                * (2 * self.idx_len
+                    + 2
+                    + 2 * IsLessThanTupleAuxCols::<usize>::get_width(
                         self.is_less_than_tuple_param.limb_bits.clone(),
                         self.is_less_than_tuple_param.decomp,
                         self.idx_len,
-                    )
-                    - 4 * self.idx_len
-                    - 2)
+                    ))
     }
 }

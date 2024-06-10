@@ -69,8 +69,8 @@ where
             builder.when_transition().assert_zero(
                 next_data.is_alloc
                     * (prove_sort_cols.end_less_than_next
-                        - prove_sort_cols.end_less_than_next * prove_sort_cols.end_less_than_start)
-                    - AB::Expr::one(),
+                        - prove_sort_cols.end_less_than_next * prove_sort_cols.end_less_than_start
+                        - AB::Expr::one()),
             );
             let range_inclusion_cols = metadata.range_inclusion_cols.unwrap();
             let less_than_start = range_inclusion_cols.less_than_start;

@@ -95,18 +95,16 @@ impl<const COMMITMENT_LEN: usize> InternalPageChip<COMMITMENT_LEN> {
     // we then need extra columns that contain results of is_less_than comparisons
     // in particular, we need to constrain that is_alloc * ((1 - (idx < start)) * (1 - (end < idx)) - 1) = 0
     pub fn air_width(&self) -> usize {
-        4 + 2 * self.idx_len
-            + 2 * COMMITMENT_LEN
+        5 + 2 * self.idx_len                    // mult stuff and data
+            + 2 * COMMITMENT_LEN                // child commitment and own commitment
             + (1 - self.is_init as usize)
-                * (3 * self.idx_len
+                * (3 * self.idx_len             // prove sort + range inclusion columns
                     + 6
-                    + 6 * IsLessThanTupleCols::<usize>::get_width(
+                    + 6 * IsLessThanTupleAuxCols::<usize>::get_width(                  // aux columns?
                         self.is_less_than_tuple_param.limb_bits.clone(),
                         self.is_less_than_tuple_param.decomp,
                         self.idx_len,
                     )
-                    - 12 * self.idx_len
-                    - 6
-                    + 1)
+                    + 1) // is_zero
     }
 }

@@ -6,15 +6,11 @@ pub mod columns;
 pub mod trace;
 
 #[derive(Default)]
-pub struct IsEqualVecChip {
+pub struct IsEqualVecAir {
     vec_len: usize,
 }
 
-impl IsEqualVecChip {
-    pub fn new(vec_len: usize) -> Self {
-        Self { vec_len }
-    }
-
+impl IsEqualVecAir {
     pub fn request<F: Clone + PartialEq>(&self, x: &[F], y: &[F]) -> bool {
         x == y
     }

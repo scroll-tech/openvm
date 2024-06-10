@@ -1,5 +1,7 @@
 use std::sync::Arc;
 
+use afs_stark_backend::interaction::trace;
+use itertools::Itertools;
 use p3_field::{AbstractField, PrimeField64};
 use p3_matrix::dense::RowMajorMatrix;
 use p3_uni_stark::{StarkGenericConfig, Val};
@@ -18,7 +20,7 @@ impl<const COMMITMENT_LEN: usize> InternalPageChip<COMMITMENT_LEN> {
             page.into_iter()
                 .flat_map(|row| row.into_iter().map(F::from_wrapped_u32).collect::<Vec<F>>())
                 .collect(),
-            self.air_width(),
+            1 + 2 * self.idx_len + COMMITMENT_LEN,
         )
     }
 
@@ -40,8 +42,9 @@ impl<const COMMITMENT_LEN: usize> InternalPageChip<COMMITMENT_LEN> {
                     trace_row.extend(commit.clone());
                     trace_row.push(mult);
                     trace_row.push(mult * row[0]);
-                    trace_row.push(mult * row[0] - 1);
+                    // dummy value
                     trace_row.push((mult * row[0] == 1) as u32);
+                    trace_row.push(0);
                     let next = if i < page.len() - 1 {
                         page[i + 1][1..1 + self.idx_len].to_vec()
                     } else {
@@ -58,122 +61,71 @@ impl<const COMMITMENT_LEN: usize> InternalPageChip<COMMITMENT_LEN> {
                             .into_iter()
                             .map(|i| F::from_wrapped_u32(i))
                             .collect();
-                        {
-                            let aux: IsLessThanTupleAuxCols<F> = self
+                        let mut gen_aux = |idx1: Vec<u32>, idx2: Vec<u32>, lt_res_idx: usize| {
+                            let lt_cols = self
                                 .is_less_than_tuple_air
                                 .clone()
                                 .unwrap()
                                 .key1_start
-                                .generate_trace_row((
-                                    row[1..1 + self.idx_len].to_vec(),
-                                    range.0.clone(),
-                                    range_checker.clone(),
-                                ))
-                                .aux;
-                            trace_row.extend(aux.flatten());
-                        }
-                        {
-                            let aux: IsLessThanTupleAuxCols<F> = self
-                                .is_less_than_tuple_air
-                                .clone()
-                                .unwrap()
-                                .end_key1
-                                .generate_trace_row((
-                                    range.1.clone(),
-                                    row[1..1 + self.idx_len].to_vec(),
-                                    range_checker.clone(),
-                                ))
-                                .aux;
-                            trace_row.extend(aux.flatten());
-                        }
-                        {
-                            let aux: IsLessThanTupleAuxCols<F> = self
-                                .is_less_than_tuple_air
-                                .clone()
-                                .unwrap()
-                                .key2_start
-                                .generate_trace_row((
-                                    row[1 + self.idx_len..1 + 2 * self.idx_len].to_vec(),
-                                    range.0.clone(),
-                                    range_checker.clone(),
-                                ))
-                                .aux;
-                            trace_row.extend(aux.flatten());
-                        }
-                        {
-                            let aux: IsLessThanTupleAuxCols<F> = self
-                                .is_less_than_tuple_air
-                                .clone()
-                                .unwrap()
-                                .key2_start
-                                .generate_trace_row((
-                                    row[1 + self.idx_len..1 + 2 * self.idx_len].to_vec(),
-                                    range.0.clone(),
-                                    range_checker.clone(),
-                                ))
-                                .aux;
-                            trace_row.extend(aux.flatten());
-                        }
-                        {
-                            let aux: IsLessThanTupleAuxCols<F> = self
-                                .is_less_than_tuple_air
-                                .clone()
-                                .unwrap()
-                                .end_key2
-                                .generate_trace_row((
-                                    range.1.clone(),
-                                    row[1 + self.idx_len..1 + 2 * self.idx_len].to_vec(),
-                                    range_checker.clone(),
-                                ))
-                                .aux;
-                            trace_row.extend(aux.flatten());
-                        }
-                        {
-                            let aux: IsLessThanTupleAuxCols<F> = self
-                                .is_less_than_tuple_air
-                                .clone()
-                                .unwrap()
-                                .end_start
-                                .generate_trace_row((
-                                    row[1 + self.idx_len..1 + 2 * self.idx_len].to_vec(),
-                                    next.clone(),
-                                    range_checker.clone(),
-                                ))
-                                .aux;
-                            trace_row.extend(aux.flatten());
-                        }
-                        {
-                            let aux: IsLessThanTupleAuxCols<F> = self
-                                .is_less_than_tuple_air
-                                .clone()
-                                .unwrap()
-                                .end_next
-                                .generate_trace_row((
-                                    row[1 + self.idx_len..1 + 2 * self.idx_len].to_vec(),
-                                    row[1..1 + self.idx_len].to_vec(),
-                                    range_checker.clone(),
-                                ))
-                                .aux;
-                            trace_row.extend(aux.flatten());
-                        }
+                                .generate_trace_row((idx1, idx2, range_checker.clone()));
+                            trace_row.extend(lt_cols.aux.flatten());
+                            trace_row[COMMITMENT_LEN + 4 + self.idx_len + lt_res_idx] =
+                                lt_cols.io.tuple_less_than;
+                        };
+                        gen_aux(
+                            row[1..1 + self.idx_len].to_vec(),
+                            range.0.clone(),
+                            2 + 2 * self.idx_len,
+                        );
+                        gen_aux(
+                            range.1.clone(),
+                            row[1..1 + self.idx_len].to_vec(),
+                            2 + 2 * self.idx_len + 1,
+                        );
+                        gen_aux(
+                            row[1 + self.idx_len..1 + 2 * self.idx_len].to_vec(),
+                            range.0.clone(),
+                            2 + 2 * self.idx_len + 2,
+                        );
+                        gen_aux(
+                            range.1.clone(),
+                            row[1 + self.idx_len..1 + 2 * self.idx_len].to_vec(),
+                            2 + 2 * self.idx_len + 3,
+                        );
+                        gen_aux(
+                            row[1 + self.idx_len..1 + 2 * self.idx_len].to_vec(),
+                            next.clone(),
+                            0,
+                        );
+                        gen_aux(
+                            row[1 + self.idx_len..1 + 2 * self.idx_len].to_vec(),
+                            row[1..1 + self.idx_len].to_vec(),
+                            1,
+                        );
                         trace_row.push(
                             self.is_less_than_tuple_air
                                 .clone()
                                 .unwrap()
                                 .mult_is_1
-                                .generate_trace_row(F::from_wrapped_u32(mult * row[0] - 1))
+                                .generate_trace_row(F::from_wrapped_u32(mult * row[0]) - F::one())
                                 .inv,
                         );
+                        // println!("{:?}", *trace_row.last().unwrap());
+                        trace_row[COMMITMENT_LEN + 3] = trace_row[COMMITMENT_LEN + 1] - F::one();
+                        // println!("{:?}", trace_row[COMMITMENT_LEN + 1] - F::one());
+                        // println!("TRACE_LEN {:?}", trace_row.len());
                         trace_row
                     } else {
-                        trace_row
+                        let mut trace_row = trace_row
                             .into_iter()
                             .map(|i| F::from_wrapped_u32(i))
-                            .collect()
+                            .collect_vec();
+                        trace_row[COMMITMENT_LEN + 3] = trace_row[COMMITMENT_LEN + 1] - F::one();
+                        trace_row
                     }
                 })
                 .collect(),
-            self.air_width(),
+            self.air_width() - (1 + 2 * self.idx_len + COMMITMENT_LEN),
         )
     }
 }

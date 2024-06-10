@@ -182,18 +182,18 @@ where
                 }
             }
         } else {
-            for row in &leaf_pages[root.1] {
+            for row in &internal_pages[root.1] {
                 if row[0] == 1 {
                     let idx1 = row[1..1 + idx_len].to_vec();
                     let idx2 = row[1 + idx_len..1 + 2 * idx_len].to_vec();
-                    if leaf_ranges[root.1].0.len() == 0 {
-                        leaf_ranges[root.1] = (idx1, idx2);
+                    if internal_ranges[root.1].0.len() == 0 {
+                        internal_ranges[root.1] = (idx1, idx2);
                     } else {
-                        if cmp(&leaf_ranges[root.1].0, &idx1) > 0 {
-                            leaf_ranges[root.1].0 = idx1;
+                        if cmp(&internal_ranges[root.1].0, &idx1) > 0 {
+                            internal_ranges[root.1].0 = idx1;
                         }
-                        if cmp(&leaf_ranges[root.1].1, &idx2) < 0 {
-                            leaf_ranges[root.1].1 = idx2;
+                        if cmp(&internal_ranges[root.1].1, &idx2) < 0 {
+                            internal_ranges[root.1].1 = idx2;
                         }
                     }
                 }
@@ -360,7 +360,7 @@ where
                     idx_len,
                     true
                 );
-                init_param.leaf_cap
+                init_param.internal_cap
             ],
             offline_checker: OfflineChecker::new(data_bus_index, idx_len, data_len),
             final_leaf_chips: vec![
@@ -384,7 +384,7 @@ where
                     idx_len,
                     false
                 );
-                init_param.leaf_cap
+                init_param.internal_cap
             ],
             init_root_signal: RootSignalChip::new(init_param.path_bus_index, true, idx_len),
             final_root_signal: RootSignalChip::new(final_param.path_bus_index, false, idx_len),

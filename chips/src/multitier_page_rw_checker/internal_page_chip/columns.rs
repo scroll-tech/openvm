@@ -137,22 +137,22 @@ impl<T> InternalPageMetadataCols<T> {
                 end_less_than_next: cols[new_start + idx_len].clone(),
                 end_less_than_start: cols[new_start + idx_len + 1].clone(),
             };
-            new_start += commitment_len + idx_len + 2;
+            new_start += idx_len + 2;
             let range_inclusion_cols = TwoRangeInclusionCols {
                 start: cols[new_start..new_start + idx_len].to_vec(),
                 end: cols[new_start + idx_len..new_start + 2 * idx_len].to_vec(),
                 less_than_start: (
                     cols[new_start + 2 * idx_len].clone(),
-                    cols[new_start + 2 * idx_len + 1].clone(),
+                    cols[new_start + 2 * idx_len + 2].clone(),
                 ),
                 greater_than_end: (
-                    cols[new_start + 2 * idx_len + 2].clone(),
+                    cols[new_start + 2 * idx_len + 1].clone(),
                     cols[new_start + 2 * idx_len + 3].clone(),
                 ),
             };
             new_start += 2 * idx_len + 4;
             let mut aux_allocs = vec![];
-            let aux_size = IsLessThanTupleCols::<T>::get_width(
+            let aux_size = IsLessThanTupleAuxCols::<T>::get_width(
                 is_less_than_tuple_params.limb_bits.clone(),
                 is_less_than_tuple_params.decomp,
                 idx_len,

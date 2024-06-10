@@ -56,7 +56,7 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirWithInteractions<F>
         ));
         interactions.extend(self.custom_receives_path(col_indices.clone()));
 
-        if self.is_init {
+        if !self.is_init {
             let subairs = self.is_less_than_tuple_air.clone().unwrap();
             let range_inclusion = col_indices.metadata.range_inclusion_cols.clone().unwrap();
             let subair_aux = col_indices.metadata.subchip_aux_cols.clone().unwrap();
@@ -93,7 +93,7 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirWithInteractions<F>
             col_indices.cache_cols.clone(),
         ));
 
-        if self.is_init {
+        if !self.is_init {
             let subairs = self.is_less_than_tuple_air.clone().unwrap();
             let range_inclusion = col_indices.metadata.range_inclusion_cols.clone().unwrap();
             let subair_aux = col_indices.metadata.subchip_aux_cols.clone().unwrap();

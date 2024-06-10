@@ -18,7 +18,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
             page.into_iter()
                 .flat_map(|row| row.into_iter().map(F::from_wrapped_u32).collect::<Vec<F>>())
                 .collect(),
-            self.air_width(),
+            1 + self.idx_len + self.data_len,
         )
     }
 
@@ -55,6 +55,18 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
                                     range_checker.clone(),
                                 ))
                                 .aux;
+                            let io = self
+                                .is_less_than_tuple_air
+                                .clone()
+                                .unwrap()
+                                .key_start
+                                .generate_trace_row((
+                                    row[1..1 + self.idx_len].to_vec(),
+                                    range.0.clone(),
+                                    range_checker.clone(),
+                                ))
+                                .io;
+                            trace_row[COMMITMENT_LEN + 2 * range.0.len()] = io.tuple_less_than;
                             trace_row.extend(aux.flatten());
                         }
                         {
@@ -69,6 +81,18 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
                                     range_checker.clone(),
                                 ))
                                 .aux;
+                            let io = self
+                                .is_less_than_tuple_air
+                                .clone()
+                                .unwrap()
+                                .end_key
+                                .generate_trace_row((
+                                    range.1.clone(),
+                                    row[1..1 + self.idx_len].to_vec(),
+                                    range_checker.clone(),
+                                ))
+                                .io;
+                            trace_row[COMMITMENT_LEN + 2 * range.0.len() + 1] = io.tuple_less_than;
                             trace_row.extend(aux.flatten());
                         }
                         trace_row
@@ -80,7 +104,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
                     }
                 })
                 .collect(),
-            self.air_width(),
+            self.air_width() - (1 + self.idx_len + self.data_len),
         )
     }
 }
