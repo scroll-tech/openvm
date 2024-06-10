@@ -31,16 +31,7 @@ impl<AB: AirBuilder, const N: usize> Air<AB> for XorBitsAir<N> {
 
         let xor_cols = XorCols::<N, AB::Var>::from_slice(local);
 
-<<<<<<< HEAD
-        SubAir::eval(
-            &self.air,
-            &mut builder.when(AB::Expr::one()),
-            xor_cols.io,
-            xor_cols.bits,
-        );
-=======
         SubAir::eval(self, builder, xor_cols.io, xor_cols.bits);
->>>>>>> 45249cffed36a935a75b4d2235a408c2b4d7c714
     }
 }
 

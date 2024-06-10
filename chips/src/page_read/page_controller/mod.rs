@@ -24,7 +24,7 @@ where
 {
     pub fn new(bus_index: usize) -> Self {
         PageController {
-            page_read_chip: PageReadChip::new(bus_index, 0, 0),
+            page_read_chip: PageReadChip::new(bus_index, vec![vec![]]),
             request_count: vec![],
             page_trace: None,
             page_commitment: None,
