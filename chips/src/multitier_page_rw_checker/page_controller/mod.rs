@@ -5,7 +5,7 @@ use afs_stark_backend::config::Com;
 use afs_stark_backend::prover::trace::{ProverTraceData, TraceCommitter};
 use p3_field::{AbstractField, PrimeField64};
 use p3_matrix::dense::{DenseMatrix, RowMajorMatrix};
-use p3_matrix::Matrix;
+
 use p3_uni_stark::{StarkGenericConfig, Val};
 
 use crate::page_rw_checker::offline_checker::OfflineChecker;
@@ -60,7 +60,7 @@ where
     pub root_range: (Vec<u32>, Vec<u32>),
     pub root_mult: u32,
     pub commitment_to_node: BTreeMap<Vec<Val<SC>>, Node>,
-    pub map: BTreeMap<Vec<u32>, Vec<u32>>,
+    pub mega_page: Vec<Vec<u32>>,
 }
 
 impl<SC: StarkGenericConfig, const COMMITMENT_LEN: usize> PageTreeGraph<SC, COMMITMENT_LEN>
@@ -74,7 +74,7 @@ where
         leaf_ranges: &mut Vec<(Vec<u32>, Vec<u32>)>,
         internal_ranges: &mut Vec<(Vec<u32>, Vec<u32>)>,
         commitment_to_node: &BTreeMap<Vec<Val<SC>>, Node>,
-        map: &mut BTreeMap<Vec<u32>, Vec<u32>>,
+        mega_page: &mut Vec<Vec<u32>>,
         mults: &mut Vec<Vec<u32>>,
         idx_len: usize,
         cur_node: Node,
@@ -83,7 +83,7 @@ where
             let mut ans = 0;
             let mut mult = vec![];
             for row in &internal_pages[cur_node.1] {
-                if row[0] == 0 {
+                if row[1] == 0 {
                     mult.push(0);
                 } else {
                     let f_row: Vec<Val<SC>> = row
@@ -91,16 +91,16 @@ where
                         .map(|r| Val::<SC>::from_canonical_u32(*r))
                         .collect();
                     let next_node = commitment_to_node
-                        .get(&f_row[1 + 2 * idx_len..1 + 2 * idx_len + COMMITMENT_LEN].to_vec());
+                        .get(&f_row[2 + 2 * idx_len..2 + 2 * idx_len + COMMITMENT_LEN].to_vec());
                     match next_node {
                         None => mult.push(1),
                         Some(n) => {
                             if n.0 {
-                                leaf_ranges[n.1].0 = row[1..1 + idx_len].to_vec();
-                                leaf_ranges[n.1].1 = row[1 + idx_len..1 + 2 * idx_len].to_vec();
+                                leaf_ranges[n.1].0 = row[2..2 + idx_len].to_vec();
+                                leaf_ranges[n.1].1 = row[2 + idx_len..2 + 2 * idx_len].to_vec();
                             } else {
-                                internal_ranges[n.1].0 = row[1..1 + idx_len].to_vec();
-                                internal_ranges[n.1].1 = row[1 + idx_len..1 + 2 * idx_len].to_vec();
+                                internal_ranges[n.1].0 = row[2..2 + idx_len].to_vec();
+                                internal_ranges[n.1].1 = row[2 + idx_len..2 + 2 * idx_len].to_vec();
                             }
                             let m = PageTreeGraph::<SC, COMMITMENT_LEN>::dfs(
                                 leaf_pages,
@@ -108,7 +108,7 @@ where
                                 leaf_ranges,
                                 internal_ranges,
                                 commitment_to_node,
-                                map,
+                                mega_page,
                                 mults,
                                 idx_len,
                                 n.clone(),
@@ -124,8 +124,8 @@ where
         } else {
             let mut ans = 0;
             for row in &leaf_pages[cur_node.1] {
-                if row[0] == 1 {
-                    map.insert(row[1..1 + idx_len].to_vec(), row[1 + idx_len..].to_vec());
+                if row[1] == 1 {
+                    mega_page.push(row[1..].to_vec());
                     ans += 1;
                 }
             }
@@ -166,12 +166,12 @@ where
         let mut internal_ranges = vec![(vec![], vec![]); internal_pages.len()];
         if root.0 {
             for row in &leaf_pages[root.1] {
-                if row[0] == 1 {
+                if row[1] == 1 {
                     if leaf_ranges[root.1].0.len() == 0 {
                         leaf_ranges[root.1] =
-                            (row[1..1 + idx_len].to_vec(), row[1..1 + idx_len].to_vec());
+                            (row[2..2 + idx_len].to_vec(), row[2..2 + idx_len].to_vec());
                     } else {
-                        let idx = row[1..1 + idx_len].to_vec();
+                        let idx = row[2..2 + idx_len].to_vec();
                         if cmp(&leaf_ranges[root.1].0, &idx) > 0 {
                             leaf_ranges[root.1].0 = idx.clone();
                         }
@@ -183,9 +183,9 @@ where
             }
         } else {
             for row in &internal_pages[root.1] {
-                if row[0] == 1 {
-                    let idx1 = row[1..1 + idx_len].to_vec();
-                    let idx2 = row[1 + idx_len..1 + 2 * idx_len].to_vec();
+                if row[1] == 1 {
+                    let idx1 = row[2..2 + idx_len].to_vec();
+                    let idx2 = row[2 + idx_len..2 + 2 * idx_len].to_vec();
                     if internal_ranges[root.1].0.len() == 0 {
                         internal_ranges[root.1] = (idx1, idx2);
                     } else {
@@ -207,14 +207,14 @@ where
         }
         let mut mults = vec![vec![0; internal_pages[0].len()]; internal_pages.len()];
         commitment_to_node.insert(root_commitment.clone().to_vec(), root.clone());
-        let mut map = BTreeMap::<Vec<u32>, Vec<u32>>::new();
+        let mut mega_page = vec![];
         let root_mult = PageTreeGraph::<SC, COMMITMENT_LEN>::dfs(
             leaf_pages,
             internal_pages,
             &mut leaf_ranges,
             &mut internal_ranges,
             &commitment_to_node,
-            &mut map,
+            &mut mega_page,
             &mut mults,
             idx_len,
             root.clone(),
@@ -242,7 +242,7 @@ where
             commitment_to_node,
             leaf_ranges,
             internal_ranges,
-            map,
+            mega_page,
         }
     }
 }
@@ -319,7 +319,7 @@ where
     pub data_trace: Option<PageControllerDataTrace<SC, COMMITMENT_LEN>>,
     pub main_trace: Option<PageControllerMainTrace<SC, COMMITMENT_LEN>>,
     pub commit: Option<PageControllerCommit<SC>>,
-    range_checker: Arc<RangeCheckerGateChip>,
+    pub range_checker: Arc<RangeCheckerGateChip>,
 }
 
 impl<SC: StarkGenericConfig, const COMMITMENT_LEN: usize> PageController<SC, COMMITMENT_LEN>
@@ -373,7 +373,7 @@ where
                     data_len,
                     false
                 );
-                init_param.leaf_cap
+                final_param.leaf_cap
             ],
             final_internal_chips: vec![
                 InternalPageChip::new(
@@ -384,7 +384,7 @@ where
                     idx_len,
                     false
                 );
-                init_param.internal_cap
+                final_param.internal_cap
             ],
             init_root_signal: RootSignalChip::new(init_param.path_bus_index, true, idx_len),
             final_root_signal: RootSignalChip::new(final_param.path_bus_index, false, idx_len),
@@ -416,15 +416,12 @@ where
 
     fn gen_ops_trace(
         &self,
-        map: &BTreeMap<Vec<u32>, Vec<u32>>,
+        mega_page: &mut Vec<Vec<u32>>,
         ops: &[Operation],
         trace_degree: usize,
     ) -> RowMajorMatrix<Val<SC>> {
-        self.offline_checker.generate_trace_from_map::<SC>(
-            &mut map.clone(),
-            ops.to_owned(),
-            trace_degree,
-        )
+        self.offline_checker
+            .generate_trace::<SC>(mega_page, ops.to_owned(), trace_degree)
     }
 
     pub fn load_page_and_ops(
@@ -450,18 +447,22 @@ where
         let init_internal_height = self.params.init_tree_params.internal_page_height;
         let final_leaf_height = self.params.final_tree_params.leaf_page_height;
         let final_internal_height = self.params.final_tree_params.internal_page_height;
-        let blank_init_leaf =
-            vec![vec![0; 1 + self.params.idx_len + self.params.data_len]; init_leaf_height];
+
+        let mut blank_init_leaf_row = vec![1];
+        blank_init_leaf_row.resize(2 + self.params.idx_len + self.params.data_len, 0);
+        let blank_init_leaf = vec![blank_init_leaf_row.clone(); init_leaf_height];
+
         let blank_init_internal =
             vec![
-                vec![0; 1 + 2 * self.params.idx_len + self.params.commitment_len];
+                vec![0; 2 + 2 * self.params.idx_len + self.params.commitment_len];
                 init_internal_height
             ];
-        let blank_final_leaf =
-            vec![vec![0; 1 + self.params.idx_len + self.params.data_len]; final_leaf_height];
+        let mut blank_final_leaf_row = vec![1];
+        blank_final_leaf_row.resize(2 + self.params.idx_len + self.params.data_len, 0);
+        let blank_final_leaf = vec![blank_final_leaf_row.clone(); final_leaf_height];
         let blank_final_internal =
             vec![
-                vec![0; 1 + 2 * self.params.idx_len + self.params.commitment_len];
+                vec![0; 2 + 2 * self.params.idx_len + self.params.commitment_len];
                 final_internal_height
             ];
 
@@ -703,7 +704,14 @@ where
             final_tree.root_range.clone(),
         );
 
-        let offline_checker_trace = self.gen_ops_trace(&init_tree.map, &ops, trace_degree);
+        let mut mega_page = init_tree.mega_page.clone();
+
+        mega_page.resize(
+            mega_page.len() + 3 * ops.len(),
+            vec![0; 1 + self.params.idx_len + self.params.data_len],
+        );
+
+        let offline_checker_trace = self.gen_ops_trace(&mut mega_page, &ops, trace_degree);
 
         let commitments = PageControllerCommit {
             init_leaf_page_commitments: init_leaf_commitment,

@@ -1,11 +1,6 @@
-use p3_field::Field;
 use p3_matrix::dense::RowMajorMatrix; // Import the constant from columns.rs
 
-use crate::sub_chip::LocalTraceInstructions;
-use std::sync::Arc;
-
-use p3_field::{AbstractField, PrimeField64};
-use p3_uni_stark::{StarkGenericConfig, Val};
+use p3_field::PrimeField64;
 
 use super::RootSignalChip;
 
@@ -40,30 +35,3 @@ impl<const COMMITMENT_LEN: usize> RootSignalChip<COMMITMENT_LEN> {
         )
     }
 }
-
-// #[derive(Clone)]
-// pub struct LeafPageCols<T> {
-//     pub cache_cols: PageCols<T>,
-//     pub metadata: LeafPageMetadataCols<T>,
-// }
-
-// #[derive(Clone)]
-// pub struct LeafPageSubAirCols<T> {
-//     pub key_start: IsLessThanTupleAuxCols<T>,
-//     pub end_key: IsLessThanTupleAuxCols<T>,
-// }
-
-// #[derive(Clone)]
-// pub struct RangeInclusionCols<T> {
-//     pub start: Vec<T>,
-//     pub end: Vec<T>,
-//     pub less_than_start: T,
-//     pub greater_than_end: T,
-// }
-
-// #[derive(Clone)]
-// pub struct LeafPageMetadataCols<T> {
-//     pub own_commitment: Vec<T>,
-//     pub range_inclusion_cols: Option<RangeInclusionCols<T>>,
-//     pub subchip_aux_cols: Option<LeafPageSubAirCols<T>>,
-// }

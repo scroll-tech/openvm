@@ -1,18 +1,14 @@
 use getset::Getters;
 
 use crate::{
-    is_equal::IsEqualChip,
-    is_less_than_tuple::{
-        columns::{IsLessThanTupleAuxCols, IsLessThanTupleCols},
-        IsLessThanTupleAir,
-    },
-    is_zero::IsZeroChip,
+    is_less_than_tuple::{columns::IsLessThanTupleAuxCols, IsLessThanTupleAir},
+    is_zero::IsZeroAir,
 };
 
 use super::page_controller::LessThanTupleParams;
 
 pub mod air;
-pub mod chip;
+pub mod bridge;
 pub mod columns;
 pub mod trace;
 
@@ -24,7 +20,7 @@ pub struct InternalPageSubAirs {
     pub end_key2: IsLessThanTupleAir,
     pub end_start: IsLessThanTupleAir,
     pub end_next: IsLessThanTupleAir,
-    pub mult_is_1: IsZeroChip,
+    pub mult_is_1: IsZeroAir,
 }
 
 #[derive(Clone)]
@@ -77,7 +73,7 @@ impl<const COMMITMENT_LEN: usize> InternalPageChip<COMMITMENT_LEN> {
                 end_key2: air.clone(),
                 end_start: air.clone(),
                 end_next: air,
-                mult_is_1: IsZeroChip {},
+                mult_is_1: IsZeroAir {},
             })
         };
         Self {
@@ -95,7 +91,7 @@ impl<const COMMITMENT_LEN: usize> InternalPageChip<COMMITMENT_LEN> {
     // we then need extra columns that contain results of is_less_than comparisons
     // in particular, we need to constrain that is_alloc * ((1 - (idx < start)) * (1 - (end < idx)) - 1) = 0
     pub fn air_width(&self) -> usize {
-        5 + 2 * self.idx_len                    // mult stuff and data
+        7 + 2 * self.idx_len                    // mult stuff and data
             + 2 * COMMITMENT_LEN                // child commitment and own commitment
             + (1 - self.is_init as usize)
                 * (3 * self.idx_len             // prove sort + range inclusion columns

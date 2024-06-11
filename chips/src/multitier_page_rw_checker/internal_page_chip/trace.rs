@@ -1,13 +1,11 @@
 use std::sync::Arc;
 
-use afs_stark_backend::interaction::trace;
 use itertools::Itertools;
-use p3_field::{AbstractField, PrimeField64};
+use p3_field::PrimeField64;
 use p3_matrix::dense::RowMajorMatrix;
-use p3_uni_stark::{StarkGenericConfig, Val};
 
 use crate::{
-    is_less_than_tuple::columns::IsLessThanTupleAuxCols, range_gate::RangeCheckerGateChip,
+    is_less_than_tuple::IsLessThanTupleAir, range_gate::RangeCheckerGateChip,
     sub_chip::LocalTraceInstructions,
 };
 
@@ -20,7 +18,7 @@ impl<const COMMITMENT_LEN: usize> InternalPageChip<COMMITMENT_LEN> {
             page.into_iter()
                 .flat_map(|row| row.into_iter().map(F::from_wrapped_u32).collect::<Vec<F>>())
                 .collect(),
-            1 + 2 * self.idx_len + COMMITMENT_LEN,
+            2 + 2 * self.idx_len + COMMITMENT_LEN,
         )
     }
 
@@ -41,12 +39,13 @@ impl<const COMMITMENT_LEN: usize> InternalPageChip<COMMITMENT_LEN> {
                     let mut trace_row = vec![];
                     trace_row.extend(commit.clone());
                     trace_row.push(mult);
-                    trace_row.push(mult * row[0]);
+                    trace_row.push(mult * row[1]);
+                    trace_row.push((mult * row[1] == 1) as u32);
                     // dummy value
-                    trace_row.push((mult * row[0] == 1) as u32);
                     trace_row.push(0);
+                    trace_row.push(row[1] * mult - row[1]);
                     let next = if i < page.len() - 1 {
-                        page[i + 1][1..1 + self.idx_len].to_vec()
+                        page[i + 1][2..2 + self.idx_len].to_vec()
                     } else {
                         vec![0; self.idx_len]
                     };
@@ -61,53 +60,59 @@ impl<const COMMITMENT_LEN: usize> InternalPageChip<COMMITMENT_LEN> {
                             .into_iter()
                             .map(|i| F::from_wrapped_u32(i))
                             .collect();
-                        let mut gen_aux = |idx1: Vec<u32>, idx2: Vec<u32>, lt_res_idx: usize| {
-                            let lt_cols = self
-                                .is_less_than_tuple_air
-                                .clone()
-                                .unwrap()
-                                .key1_start
-                                .generate_trace_row((idx1, idx2, range_checker.clone()));
-                            trace_row.extend(lt_cols.aux.flatten());
-                            trace_row[COMMITMENT_LEN + 4 + self.idx_len + lt_res_idx] =
-                                lt_cols.io.tuple_less_than;
-                        };
+                        let mut gen_aux =
+                            |idx1: Vec<u32>,
+                             idx2: Vec<u32>,
+                             lt_res_idx: usize,
+                             air: IsLessThanTupleAir| {
+                                let lt_cols =
+                                    air.generate_trace_row((idx1, idx2, range_checker.clone()));
+                                trace_row.extend(lt_cols.aux.flatten());
+                                trace_row[COMMITMENT_LEN + 5 + self.idx_len + lt_res_idx] =
+                                    lt_cols.io.tuple_less_than;
+                            };
                         gen_aux(
-                            row[1..1 + self.idx_len].to_vec(),
+                            row[2..2 + self.idx_len].to_vec(),
                             range.0.clone(),
                             2 + 2 * self.idx_len,
+                            self.is_less_than_tuple_air.clone().unwrap().key1_start,
                         );
                         gen_aux(
                             range.1.clone(),
-                            row[1..1 + self.idx_len].to_vec(),
+                            row[2..2 + self.idx_len].to_vec(),
                             2 + 2 * self.idx_len + 1,
+                            self.is_less_than_tuple_air.clone().unwrap().end_key1,
                         );
                         gen_aux(
-                            row[1 + self.idx_len..1 + 2 * self.idx_len].to_vec(),
+                            row[2 + self.idx_len..2 + 2 * self.idx_len].to_vec(),
                             range.0.clone(),
                             2 + 2 * self.idx_len + 2,
+                            self.is_less_than_tuple_air.clone().unwrap().key2_start,
                         );
                         gen_aux(
                             range.1.clone(),
-                            row[1 + self.idx_len..1 + 2 * self.idx_len].to_vec(),
+                            row[2 + self.idx_len..2 + 2 * self.idx_len].to_vec(),
                             2 + 2 * self.idx_len + 3,
+                            self.is_less_than_tuple_air.clone().unwrap().end_key2,
                         );
                         gen_aux(
-                            row[1 + self.idx_len..1 + 2 * self.idx_len].to_vec(),
+                            row[2 + self.idx_len..2 + 2 * self.idx_len].to_vec(),
                             next.clone(),
                             0,
+                            self.is_less_than_tuple_air.clone().unwrap().end_next,
                         );
                         gen_aux(
-                            row[1 + self.idx_len..1 + 2 * self.idx_len].to_vec(),
-                            row[1..1 + self.idx_len].to_vec(),
+                            row[2 + self.idx_len..2 + 2 * self.idx_len].to_vec(),
+                            row[2..2 + self.idx_len].to_vec(),
                             1,
+                            self.is_less_than_tuple_air.clone().unwrap().end_start,
                         );
                         trace_row.push(
                             self.is_less_than_tuple_air
                                 .clone()
                                 .unwrap()
                                 .mult_is_1
-                                .generate_trace_row(F::from_wrapped_u32(mult * row[0]) - F::one())
+                                .generate_trace_row(F::from_wrapped_u32(mult * row[1]) - F::one())
                                 .inv,
                         );
                         // println!("{:?}", *trace_row.last().unwrap());
@@ -125,7 +130,7 @@ impl<const COMMITMENT_LEN: usize> InternalPageChip<COMMITMENT_LEN> {
                     }
                 })
                 .collect(),
-            self.air_width() - (1 + 2 * self.idx_len + COMMITMENT_LEN),
+            self.air_width() - (2 + 2 * self.idx_len + COMMITMENT_LEN),
         )
     }
 }

@@ -1,12 +1,13 @@
 use std::iter;
 
-use afs_stark_backend::interaction::{Chip, Interaction};
+use afs_stark_backend::interaction::{AirBridge, Interaction};
 use p3_air::VirtualPairCol;
 use p3_field::PrimeField64;
 
+use crate::sub_chip::SubAirBridge;
+
 use super::columns::PageCols;
 use super::PageChip;
-use crate::sub_chip::SubAirWithInteractions;
 
 impl PageChip {
     fn custom_sends_or_receives<F: PrimeField64>(
@@ -27,7 +28,7 @@ impl PageChip {
     }
 }
 
-impl<F: PrimeField64> SubAirWithInteractions<F> for PageChip {
+impl<F: PrimeField64> SubAirBridge<F> for PageChip {
     fn receives(&self, col_indices: PageCols<usize>) -> Vec<Interaction<F>> {
         if self.is_send {
             return vec![];
@@ -45,13 +46,13 @@ impl<F: PrimeField64> SubAirWithInteractions<F> for PageChip {
     }
 }
 
-impl<F: PrimeField64> Chip<F> for PageChip {
+impl<F: PrimeField64> AirBridge<F> for PageChip {
     fn receives(&self) -> Vec<Interaction<F>> {
         let num_cols = self.air_width();
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
         let cols_to_receive = PageCols::<F>::cols_numbered(&all_cols, self.idx_len, self.data_len);
-        SubAirWithInteractions::receives(self, cols_to_receive)
+        SubAirBridge::receives(self, cols_to_receive)
     }
 
     fn sends(&self) -> Vec<Interaction<F>> {
@@ -59,6 +60,6 @@ impl<F: PrimeField64> Chip<F> for PageChip {
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
 
         let cols_to_send = PageCols::<F>::cols_numbered(&all_cols, self.idx_len, self.data_len);
-        SubAirWithInteractions::sends(self, cols_to_send)
+        SubAirBridge::sends(self, cols_to_send)
     }
 }

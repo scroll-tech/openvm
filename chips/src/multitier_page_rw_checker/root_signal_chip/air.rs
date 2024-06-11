@@ -3,11 +3,7 @@ use p3_air::{Air, AirBuilder, AirBuilderWithPublicValues, BaseAir};
 use p3_field::Field;
 use p3_matrix::Matrix;
 
-use crate::{
-    is_less_than_tuple::columns::IsLessThanTupleIOCols,
-    page_rw_checker::page_chip::columns::PageCols,
-    sub_chip::{AirConfig, SubAir},
-};
+use crate::sub_chip::AirConfig;
 
 use super::{columns::RootSignalCols, RootSignalChip};
 

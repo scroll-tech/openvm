@@ -1,13 +1,19 @@
 use crate::{
-    is_less_than_tuple::columns::{IsLessThanTupleAuxCols, IsLessThanTupleCols},
+    is_less_than_tuple::columns::IsLessThanTupleAuxCols,
     multitier_page_rw_checker::page_controller::LessThanTupleParams,
     page_rw_checker::page_chip::columns::PageCols,
 };
 
 #[derive(Clone)]
 pub struct LeafPageCols<T> {
-    pub cache_cols: PageCols<T>,
+    pub cache_cols: LeafDataCols<T>,
     pub metadata: LeafPageMetadataCols<T>,
+}
+
+#[derive(Clone)]
+pub struct LeafDataCols<T> {
+    pub is_leaf: T,
+    pub page_cols: PageCols<T>,
 }
 
 #[derive(Clone)]
@@ -49,9 +55,13 @@ impl<T> LeafPageCols<T> {
         T: Clone,
     {
         LeafPageCols {
-            cache_cols: PageCols::from_slice(&cols[0..1 + idx_len + data_len], idx_len, data_len),
+            cache_cols: LeafDataCols::from_slice(
+                &cols[0..2 + idx_len + data_len],
+                idx_len,
+                data_len,
+            ),
             metadata: LeafPageMetadataCols::from_slice(
-                &cols[1 + idx_len + data_len..],
+                &cols[2 + idx_len + data_len..],
                 idx_len,
                 commitment_len,
                 is_init,
@@ -114,15 +124,14 @@ impl<T> LeafPageMetadataCols<T> {
     }
 }
 
-// impl<T> LeafPageCacheCols<T> {
-//     pub fn from_slice(cols: &[T], idx_len: usize, data_len: usize) -> Self
-//     where
-//         T: Clone,
-//     {
-//         LeafPageCacheCols {
-//             is_alloc: cols[0].clone(),
-//             idx: cols[1..idx_len + 1].to_vec(),
-//             data: cols[idx_len + 1..idx_len + data_len + 1].to_vec(),
-//         }
-//     }
-// }
+impl<T> LeafDataCols<T> {
+    pub fn from_slice(cols: &[T], idx_len: usize, data_len: usize) -> Self
+    where
+        T: Clone,
+    {
+        LeafDataCols {
+            is_leaf: cols[0].clone(),
+            page_cols: PageCols::from_slice(&cols[1..2 + idx_len + data_len], idx_len, data_len),
+        }
+    }
+}

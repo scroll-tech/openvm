@@ -1,10 +1,9 @@
 pub mod air;
-pub mod chip;
+pub mod bridge;
 pub mod columns;
 pub mod trace;
 
 use getset::Getters;
-use p3_field::Field;
 
 #[derive(Clone, Default, Getters)]
 // a single row chip meant to start the flow from the root

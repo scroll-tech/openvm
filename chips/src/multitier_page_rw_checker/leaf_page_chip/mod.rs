@@ -1,14 +1,14 @@
 use getset::Getters;
 
 use crate::{
-    is_less_than_tuple::{columns::{IsLessThanTupleAuxCols, IsLessThanTupleCols}, IsLessThanTupleAir},
+    is_less_than_tuple::{columns::{IsLessThanTupleAuxCols}, IsLessThanTupleAir},
     page_rw_checker::page_chip::PageChip,
 };
 
 use super::page_controller::LessThanTupleParams;
 
 pub mod air;
-pub mod chip;
+pub mod bridge;
 pub mod columns;
 pub mod trace;
 
@@ -96,7 +96,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
     // we then need extra columns that contain results of is_less_than comparisons
     // in particular, we need to constrain that is_alloc * ((1 - (idx < start)) * (1 - (end < idx)) - 1) = 0
     pub fn air_width(&self) -> usize {
-        self.page_chip().air_width()
+        1 + self.page_chip().air_width()
             + COMMITMENT_LEN                // own_commitment
             + (1 - self.is_init as usize)
                                          

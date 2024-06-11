@@ -1,9 +1,8 @@
-use std::collections::{HashMap, HashSet};
-use std::iter;
-use std::panic;
+use std::collections::HashMap;
+
 use std::sync::Arc;
 
-use afs_stark_backend::prover::USE_DEBUG_BUILDER;
+use afs_stark_backend::prover::trace::TraceCommitter;
 use afs_stark_backend::rap::AnyRap;
 use afs_stark_backend::verifier::VerificationError;
 use afs_stark_backend::{
@@ -16,7 +15,6 @@ use afs_test_utils::config::{
 };
 use afs_test_utils::{engine::StarkEngine, utils::create_seeded_rng};
 
-use p3_air::BaseAir;
 use p3_baby_bear::BabyBear;
 use rand::Rng;
 
@@ -24,12 +22,13 @@ use crate::multitier_page_rw_checker::page_controller::{
     LessThanTupleParams, PageController, PageTreeParams,
 };
 use crate::page_rw_checker::page_controller::{OpType, Operation};
-use crate::pagebtree::PageBTree;
+use crate::pagebtree::{PageBTree, PageBTreePages};
 use crate::range_gate::RangeCheckerGateChip;
 
 use super::page_controller;
 
 pub const BABYBEAR_COMMITMENT_LEN: usize = 8;
+pub const DECOMP_BITS: usize = 6;
 
 fn load_page_test(
     engine: &BabyBearPoseidon2Engine,
@@ -41,8 +40,6 @@ fn load_page_test(
     final_internal_pages: Vec<Vec<Vec<u32>>>,
     final_root_is_leaf: bool,
     final_root_idx: usize,
-    idx_len: usize,
-    data_len: usize,
     ops: &Vec<Operation>,
     page_controller: &mut page_controller::PageController<
         BabyBearPoseidon2Config,
@@ -52,6 +49,7 @@ fn load_page_test(
     partial_pk: &MultiStarkPartialProvingKey<BabyBearPoseidon2Config>,
     trace_degree: usize,
 ) -> Result<(), VerificationError> {
+    page_controller.range_checker.clear();
     let (data_trace, main_trace, commits, mut prover_data) = page_controller.load_page_and_ops(
         init_leaf_pages,
         init_internal_pages,
@@ -65,10 +63,10 @@ fn load_page_test(
         trace_degree,
         &mut trace_builder.committer,
     );
-
     let offline_checker_trace = main_trace.offline_checker_trace.clone();
     let init_root = main_trace.init_root_signal_trace.clone();
     let final_root = main_trace.final_root_signal_trace.clone();
+    let range_trace = page_controller.range_checker.generate_trace();
     trace_builder.clear();
 
     for trace in data_trace.init_leaf_chip_traces.iter() {
@@ -84,7 +82,6 @@ fn load_page_test(
     }
 
     for trace in data_trace.final_internal_chip_traces.iter() {
-        println!("data: {:?}", trace);
         trace_builder.load_cached_trace(trace.clone(), prover_data.final_internal_page.remove(0));
     }
 
@@ -101,13 +98,13 @@ fn load_page_test(
     }
 
     for trace in main_trace.final_internal_chip_main_traces.iter() {
-        println!("main: {:?}", trace);
         trace_builder.load_trace(trace.clone());
     }
 
     trace_builder.load_trace(offline_checker_trace.clone());
     trace_builder.load_trace(init_root);
     trace_builder.load_trace(final_root);
+    trace_builder.load_trace(range_trace);
     trace_builder.commit_current();
 
     let mut airs: Vec<&dyn AnyRap<BabyBearPoseidon2Config>> = vec![];
@@ -126,7 +123,7 @@ fn load_page_test(
     airs.push(&page_controller.offline_checker);
     airs.push(&page_controller.init_root_signal);
     airs.push(&page_controller.final_root_signal);
-    println!("{:?}", airs.len());
+    airs.push(&page_controller.range_checker.air);
     let partial_vk = partial_pk.partial_vk();
     let main_trace_data = trace_builder.view(&partial_vk, airs.clone());
 
@@ -156,7 +153,7 @@ fn load_page_test(
         let c: [BabyBear; BABYBEAR_COMMITMENT_LEN] = commits.final_root_commitment.into();
         pis.push(c.to_vec());
     }
-
+    pis.push(vec![]);
     let prover = engine.prover();
     let verifier = engine.verifier();
 
@@ -169,26 +166,17 @@ fn load_page_test(
     result
 }
 
-#[test]
-fn page_read_write_test() {
-    let mut rng = create_seeded_rng();
-    let data_bus_index = 0;
-    let internal_data_bus_index = 1;
-    let lt_bus_index = 2;
-    let limb_bits = 20;
-
+fn generate_no_new_key(
+    idx_len: usize,
+    data_len: usize,
+    page_height: usize,
+    limb_bits: usize,
+    num_ops: usize,
+    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
+) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
     const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
     const MAX_LIMB_VAL: u32 = 1 << 20;
-    let log_page_height = 4;
-    let log_num_ops = 3;
-
-    let page_height = 1 << log_page_height;
-    let num_ops: usize = 1 << log_num_ops;
-
-    let trace_degree = num_ops * 8;
-
-    let idx_len = 2;
-    let data_len = 3;
+    let mut rng = create_seeded_rng();
     let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
         limb_bits,
         idx_len,
@@ -196,7 +184,6 @@ fn page_read_write_test() {
         page_height,
     );
     // Generating a random page with distinct indices
-    let mut page: Vec<Vec<u32>> = vec![];
     let mut idx_data_map = HashMap::new();
     for _ in 0..4 * page_height {
         let mut idx;
@@ -211,21 +198,13 @@ fn page_read_write_test() {
 
         let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
         idx_data_map.insert(idx.clone(), data.clone());
-        page.push(
-            iter::once(1)
-                .chain(idx.clone())
-                .chain(data.clone())
-                .collect(),
-        );
         btree.update(&idx, &data);
     }
-
-    let engine = config::baby_bear_poseidon2::default_engine(log_page_height.max(3 + log_num_ops));
-    let prover = MultiTraceStarkProver::new(&engine.config);
-    let mut trace_builder = TraceCommitmentBuilder::new(prover.pcs());
-    let init_pages = btree.gen_all_trace(&mut trace_builder.committer);
-
-    // Generating random sorted timestamps for operations
+    let init_pages = btree.gen_all_trace(committer);
+    // check for correctness
+    for (idx, _) in idx_data_map.iter() {
+        btree.search(idx).unwrap();
+    }
     let mut clks: Vec<usize> = (0..num_ops)
         .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
         .collect();
@@ -264,6 +243,388 @@ fn page_read_write_test() {
 
         ops.push(Operation::new(clk, idx, data, op_type));
     }
+    let final_pages = btree.gen_all_trace(committer);
+    (init_pages, false, final_pages, false, ops)
+}
+
+fn generate_new_keys(
+    idx_len: usize,
+    data_len: usize,
+    page_height: usize,
+    limb_bits: usize,
+    num_ops: usize,
+    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
+) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
+    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
+    const MAX_LIMB_VAL: u32 = 1 << 20;
+    let mut rng = create_seeded_rng();
+    let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
+        limb_bits,
+        idx_len,
+        data_len,
+        page_height,
+    );
+    // Generating a random page with distinct indices
+    let mut idx_data_map = HashMap::new();
+    for _ in 0..4 * page_height {
+        let mut idx;
+        loop {
+            idx = (0..idx_len)
+                .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
+                .collect::<Vec<u32>>();
+            if !idx_data_map.contains_key(&idx) {
+                break;
+            }
+        }
+
+        let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+        idx_data_map.insert(idx.clone(), data.clone());
+        btree.update(&idx, &data);
+    }
+    let init_pages = btree.gen_all_trace(committer);
+    // check for correctness
+    for (idx, _) in idx_data_map.iter() {
+        btree.search(idx).unwrap();
+    }
+    let mut clks: Vec<usize> = (0..num_ops)
+        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
+        .collect();
+    clks.sort();
+    let mut ops: Vec<Operation> = vec![];
+    for i in 0..num_ops {
+        let clk = clks[i];
+        let mut idx;
+        loop {
+            idx = (0..idx_len)
+                .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
+                .collect::<Vec<u32>>();
+            if !idx_data_map.contains_key(&idx) {
+                break;
+            }
+        }
+
+        let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+        idx_data_map.insert(idx.clone(), data.clone());
+        btree.update(&idx, &data);
+        ops.push(Operation::new(clk, idx, data, OpType::Write));
+    }
+    let final_pages = btree.gen_all_trace(committer);
+    (init_pages, false, final_pages, false, ops)
+}
+
+fn generate_mixed_ops(
+    idx_len: usize,
+    data_len: usize,
+    page_height: usize,
+    limb_bits: usize,
+    num_ops: usize,
+    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
+) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
+    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
+    const MAX_LIMB_VAL: u32 = 1 << 20;
+    let mut rng = create_seeded_rng();
+    let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
+        limb_bits,
+        idx_len,
+        data_len,
+        page_height,
+    );
+    // Generating a random page with distinct indices
+    let mut idx_data_map = HashMap::new();
+    for _ in 0..4 * page_height {
+        let mut idx;
+        loop {
+            idx = (0..idx_len)
+                .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
+                .collect::<Vec<u32>>();
+            if !idx_data_map.contains_key(&idx) {
+                break;
+            }
+        }
+
+        let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+        idx_data_map.insert(idx.clone(), data.clone());
+        btree.update(&idx, &data);
+    }
+    let init_pages = btree.gen_all_trace(committer);
+    // check for correctness
+    for (idx, _) in idx_data_map.iter() {
+        btree.search(idx).unwrap();
+    }
+    let mut clks: Vec<usize> = (0..num_ops)
+        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
+        .collect();
+    clks.sort();
+    let mut ops: Vec<Operation> = vec![];
+    for i in 0..num_ops {
+        let clk = clks[i];
+        if rng.gen::<bool>() {
+            let mut idx;
+            loop {
+                idx = (0..idx_len)
+                    .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
+                    .collect::<Vec<u32>>();
+                if !idx_data_map.contains_key(&idx) {
+                    break;
+                }
+            }
+
+            let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+            idx_data_map.insert(idx.clone(), data.clone());
+            btree.update(&idx, &data);
+            ops.push(Operation::new(clk, idx, data, OpType::Write));
+        } else {
+            let idx = idx_data_map
+                .iter()
+                .nth(rng.gen::<usize>() % idx_data_map.len())
+                .unwrap()
+                .0
+                .to_vec();
+
+            let op_type = {
+                if rng.gen::<bool>() {
+                    OpType::Read
+                } else {
+                    OpType::Write
+                }
+            };
+
+            let data = {
+                if op_type == OpType::Read {
+                    idx_data_map[&idx].to_vec()
+                } else {
+                    (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
+                }
+            };
+
+            if op_type == OpType::Write {
+                idx_data_map.insert(idx.clone(), data.clone());
+                btree.update(&idx, &data);
+            }
+
+            ops.push(Operation::new(clk, idx, data, op_type));
+        }
+    }
+    let final_pages = btree.gen_all_trace(committer);
+    (init_pages, false, final_pages, false, ops)
+}
+
+fn generate_mixed_ops_remove_first_leaf(
+    idx_len: usize,
+    data_len: usize,
+    page_height: usize,
+    limb_bits: usize,
+    num_ops: usize,
+    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
+) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
+    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
+    const MAX_LIMB_VAL: u32 = 1 << 20;
+    let mut rng = create_seeded_rng();
+    let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
+        limb_bits,
+        idx_len,
+        data_len,
+        page_height,
+    );
+    // Generating a random page with distinct indices
+    let mut idx_data_map = HashMap::new();
+    for _ in 0..4 * page_height {
+        let mut idx;
+        loop {
+            idx = (0..idx_len)
+                .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
+                .collect::<Vec<u32>>();
+            if !idx_data_map.contains_key(&idx) {
+                break;
+            }
+        }
+
+        let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+        idx_data_map.insert(idx.clone(), data.clone());
+        btree.update(&idx, &data);
+    }
+    let mut init_pages = btree.gen_all_trace(committer);
+    // check for correctness
+    for (idx, _) in idx_data_map.iter() {
+        btree.search(idx).unwrap();
+    }
+    let mut clks: Vec<usize> = (0..num_ops)
+        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
+        .collect();
+    clks.sort();
+    let mut ops: Vec<Operation> = vec![];
+    for i in 0..num_ops {
+        let clk = clks[i];
+        if rng.gen::<bool>() {
+            let mut idx;
+            loop {
+                idx = (0..idx_len)
+                    .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
+                    .collect::<Vec<u32>>();
+                if !idx_data_map.contains_key(&idx) && idx[0] > MAX_LIMB_VAL / 2 {
+                    break;
+                }
+            }
+
+            let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+            idx_data_map.insert(idx.clone(), data.clone());
+            btree.update(&idx, &data);
+            ops.push(Operation::new(clk, idx, data, OpType::Write));
+        } else {
+            let mut idx;
+            loop {
+                idx = idx_data_map
+                    .iter()
+                    .nth(rng.gen::<usize>() % idx_data_map.len())
+                    .unwrap()
+                    .0
+                    .to_vec();
+                if idx[0] > MAX_LIMB_VAL / 2 {
+                    break;
+                }
+            }
+
+            let op_type = {
+                if rng.gen::<bool>() {
+                    OpType::Read
+                } else {
+                    OpType::Write
+                }
+            };
+
+            let data = {
+                if op_type == OpType::Read {
+                    idx_data_map[&idx].to_vec()
+                } else {
+                    (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
+                }
+            };
+
+            if op_type == OpType::Write {
+                idx_data_map.insert(idx.clone(), data.clone());
+                btree.update(&idx, &data);
+            }
+
+            ops.push(Operation::new(clk, idx, data, op_type));
+        }
+    }
+    let mut final_pages = btree.gen_all_trace(committer);
+    println!("INIT_PAGES: {:?}", init_pages.leaf_pages);
+    println!("FINAL_PAGES: {:?}", final_pages.leaf_pages);
+    final_pages.leaf_pages.pop();
+    init_pages.leaf_pages.pop();
+    (init_pages, false, final_pages, false, ops)
+}
+
+fn generate_mixed_ops_empty_start(
+    idx_len: usize,
+    data_len: usize,
+    page_height: usize,
+    limb_bits: usize,
+    num_ops: usize,
+    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
+) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
+    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
+    const MAX_LIMB_VAL: u32 = 1 << 20;
+    let mut rng = create_seeded_rng();
+    let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
+        limb_bits,
+        idx_len,
+        data_len,
+        page_height,
+    );
+    // Generating a random page with distinct indices
+    let mut idx_data_map = HashMap::new();
+    let init_pages = btree.gen_all_trace(committer);
+
+    let mut clks: Vec<usize> = (0..num_ops)
+        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
+        .collect();
+    clks.sort();
+    let mut ops: Vec<Operation> = vec![];
+    for i in 0..num_ops {
+        let clk = clks[i];
+        if rng.gen::<bool>() || i == 0 {
+            let mut idx;
+            loop {
+                idx = (0..idx_len)
+                    .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
+                    .collect::<Vec<u32>>();
+                if !idx_data_map.contains_key(&idx) {
+                    break;
+                }
+            }
+
+            let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+            idx_data_map.insert(idx.clone(), data.clone());
+            btree.update(&idx, &data);
+            ops.push(Operation::new(clk, idx, data, OpType::Write));
+        } else {
+            let idx = idx_data_map
+                .iter()
+                .nth(rng.gen::<usize>() % idx_data_map.len())
+                .unwrap()
+                .0
+                .to_vec();
+
+            let op_type = {
+                if rng.gen::<bool>() {
+                    OpType::Read
+                } else {
+                    OpType::Write
+                }
+            };
+
+            let data = {
+                if op_type == OpType::Read {
+                    idx_data_map[&idx].to_vec()
+                } else {
+                    (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
+                }
+            };
+
+            if op_type == OpType::Write {
+                idx_data_map.insert(idx.clone(), data.clone());
+                btree.update(&idx, &data);
+            }
+
+            ops.push(Operation::new(clk, idx, data, op_type));
+        }
+    }
+    let final_pages = btree.gen_all_trace(committer);
+    (init_pages, true, final_pages, true, ops)
+}
+
+fn multitier_page_rw_test<F>(generate_inputs: F, should_fail: bool)
+where
+    F: Fn(
+        usize,
+        usize,
+        usize,
+        usize,
+        usize,
+        &mut TraceCommitter<BabyBearPoseidon2Config>,
+    ) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>),
+{
+    let data_bus_index = 0;
+    let internal_data_bus_index = 1;
+    let lt_bus_index = 2;
+    let limb_bits = 20;
+
+    let log_page_height = 4;
+    let log_num_ops = 3;
+
+    let page_height = 1 << log_page_height;
+    let num_ops: usize = 1 << log_num_ops;
+
+    let trace_degree = num_ops * 8;
+
+    let idx_len = 2;
+    let data_len = 3;
+
+    let engine = config::baby_bear_poseidon2::default_engine(log_page_height.max(3 + log_num_ops));
+    let prover = MultiTraceStarkProver::new(&engine.config);
+    let mut trace_builder = TraceCommitmentBuilder::new(prover.pcs());
 
     let init_path_bus = 3;
     let final_path_bus = 4;
@@ -285,12 +646,12 @@ fn page_read_write_test() {
     };
 
     let less_than_tuple_param = LessThanTupleParams {
-        range_max: 1 << 20,
+        range_max: 1 << DECOMP_BITS,
         limb_bits: vec![20; idx_len],
-        decomp: 8,
+        decomp: DECOMP_BITS,
     };
 
-    let range_checker = Arc::new(RangeCheckerGateChip::new(lt_bus_index, 1 << 20));
+    let range_checker = Arc::new(RangeCheckerGateChip::new(lt_bus_index, 1 << DECOMP_BITS));
 
     let mut page_controller: PageController<BabyBearPoseidon2Config, BABYBEAR_COMMITMENT_LEN> =
         PageController::new(
@@ -304,8 +665,6 @@ fn page_read_write_test() {
             less_than_tuple_param,
             range_checker,
         );
-
-    let final_pages = btree.gen_all_trace(&mut trace_builder.committer);
 
     let mut keygen_builder = MultiStarkKeygenBuilder::new(&engine.config);
 
@@ -322,33 +681,33 @@ fn page_read_write_test() {
     let mut final_internal_main_ptrs = vec![];
 
     for _ in 0..init_param.leaf_cap {
-        init_leaf_data_ptrs.push(keygen_builder.add_cached_main_matrix(1 + idx_len + data_len));
+        init_leaf_data_ptrs.push(keygen_builder.add_cached_main_matrix(2 + idx_len + data_len));
     }
 
     for _ in 0..init_param.internal_cap {
         init_internal_data_ptrs
-            .push(keygen_builder.add_cached_main_matrix(1 + 2 * idx_len + BABYBEAR_COMMITMENT_LEN));
+            .push(keygen_builder.add_cached_main_matrix(2 + 2 * idx_len + BABYBEAR_COMMITMENT_LEN));
     }
 
     for _ in 0..final_param.leaf_cap {
-        final_leaf_data_ptrs.push(keygen_builder.add_cached_main_matrix(1 + idx_len + data_len));
+        final_leaf_data_ptrs.push(keygen_builder.add_cached_main_matrix(2 + idx_len + data_len));
     }
 
     for _ in 0..final_param.internal_cap {
         final_internal_data_ptrs
-            .push(keygen_builder.add_cached_main_matrix(1 + 2 * idx_len + BABYBEAR_COMMITMENT_LEN));
+            .push(keygen_builder.add_cached_main_matrix(2 + 2 * idx_len + BABYBEAR_COMMITMENT_LEN));
     }
 
     for _ in 0..init_param.leaf_cap {
         init_leaf_main_ptrs.push(keygen_builder.add_main_matrix(
-            page_controller.init_leaf_chips[0].air_width() - 1 - idx_len - data_len,
+            page_controller.init_leaf_chips[0].air_width() - 2 - idx_len - data_len,
         ));
     }
 
     for _ in 0..init_param.internal_cap {
         init_internal_main_ptrs.push(keygen_builder.add_main_matrix(
             page_controller.init_internal_chips[0].air_width()
-                - 1
+                - 2
                 - 2 * idx_len
                 - BABYBEAR_COMMITMENT_LEN,
         ));
@@ -356,14 +715,14 @@ fn page_read_write_test() {
 
     for _ in 0..final_param.leaf_cap {
         final_leaf_main_ptrs.push(keygen_builder.add_main_matrix(
-            page_controller.final_leaf_chips[0].air_width() - 1 - idx_len - data_len,
+            page_controller.final_leaf_chips[0].air_width() - 2 - idx_len - data_len,
         ));
     }
 
     for _ in 0..final_param.internal_cap {
         final_internal_main_ptrs.push(keygen_builder.add_main_matrix(
             page_controller.final_internal_chips[0].air_width()
-                - 1
+                - 2
                 - 2 * idx_len
                 - BABYBEAR_COMMITMENT_LEN,
         ));
@@ -433,204 +792,57 @@ fn page_read_write_test() {
         vec![final_root_ptr],
     );
 
+    keygen_builder.add_air(&page_controller.range_checker.air, 1 << DECOMP_BITS, 0);
+
     let partial_pk = keygen_builder.generate_partial_pk();
-    // Testing a fully allocated page
-    load_page_test(
-        &engine,
-        init_pages.leaf_pages,
-        init_pages.internal_pages,
-        false,
-        0,
-        final_pages.leaf_pages,
-        final_pages.internal_pages,
-        false,
-        0,
+    let (init_pages, init_root_is_leaf, final_pages, final_root_is_leaf, ops) = generate_inputs(
         idx_len,
         data_len,
+        page_height,
+        limb_bits,
+        num_ops,
+        &mut trace_builder.committer,
+    );
+    let res = load_page_test(
+        &engine,
+        init_pages.leaf_pages.clone(),
+        init_pages.internal_pages.clone(),
+        init_root_is_leaf,
+        0,
+        final_pages.leaf_pages.clone(),
+        final_pages.internal_pages.clone(),
+        final_root_is_leaf,
+        0,
         &ops,
         &mut page_controller,
         &mut trace_builder,
         &partial_pk,
         trace_degree,
-    )
-    .expect("Verification failed");
+    );
+    assert!(should_fail == res.is_err());
+}
 
-    // // Testing a partially-allocated page
-    // let rows_allocated = rng.gen::<usize>() % (page_height + 1);
-    // for i in rows_allocated..page_height {
-    //     page[i][0] = 0;
+#[test]
+fn multitier_page_rw_no_new_key() {
+    multitier_page_rw_test(generate_no_new_key, false);
+}
 
-    //     // Making sure the first operation using this index is a write
-    //     let idx = page[i][1..idx_len + 1].to_vec();
-    //     for op in ops.iter_mut() {
-    //         if op.idx == idx {
-    //             op.op_type = OpType::Write;
-    //             break;
-    //         }
-    //     }
-    // }
+#[test]
+fn multitier_page_rw_new_keys() {
+    multitier_page_rw_test(generate_new_keys, false);
+}
 
-    // load_page_test(
-    //     &engine,
-    //     page.clone(),
-    //     idx_len,
-    //     data_len,
-    //     &ops,
-    //     &mut page_controller,
-    //     &mut trace_builder,
-    //     &partial_pk,
-    //     trace_degree,
-    // )
-    // .expect("Verification failed");
+#[test]
+fn multitier_page_rw_mixed_ops() {
+    multitier_page_rw_test(generate_mixed_ops, false);
+}
 
-    // // Testing a fully unallocated page
-    // for i in 0..page_height {
-    //     // Making sure the first operation that uses every index is a write
-    //     let idx = page[i][1..idx_len + 1].to_vec();
-    //     for op in ops.iter_mut() {
-    //         if op.idx == idx {
-    //             op.op_type = OpType::Write;
-    //             break;
-    //         }
-    //     }
+#[test]
+fn multitier_page_rw_mixed_ops_empty_start() {
+    multitier_page_rw_test(generate_mixed_ops_empty_start, false);
+}
 
-    //     page[i] = (0..page_width)
-    //         .map(|_| rng.gen::<u32>() % MAX_VAL)
-    //         .collect();
-    //     page[i][0] = 0;
-    // }
-
-    // load_page_test(
-    //     &engine,
-    //     page.clone(),
-    //     idx_len,
-    //     data_len,
-    //     &ops,
-    //     &mut page_controller,
-    //     &mut trace_builder,
-    //     &partial_pk,
-    //     trace_degree,
-    // )
-    // .expect("Verification failed");
-
-    // // Testing writing only 1 index into an unallocated page
-    // ops = vec![Operation::new(
-    //     10,
-    //     (0..idx_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
-    //     (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
-    //     OpType::Write,
-    // )];
-
-    // load_page_test(
-    //     &engine,
-    //     page.clone(),
-    //     idx_len,
-    //     data_len,
-    //     &ops,
-    //     &mut page_controller,
-    //     &mut trace_builder,
-    //     &partial_pk,
-    //     trace_degree,
-    // )
-    // .expect("Verification failed");
-
-    // // Negative tests
-
-    // // Testing reading from a non-existing index (in a fully-unallocated page)
-    // ops = vec![Operation::new(
-    //     1,
-    //     (0..idx_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
-    //     (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
-    //     OpType::Read,
-    // )];
-
-    // USE_DEBUG_BUILDER.with(|debug| {
-    //     *debug.lock().unwrap() = false;
-    // });
-    // assert_eq!(
-    //     load_page_test(
-    //         &engine,
-    //         page.clone(),
-    //         idx_len,
-    //         data_len,
-    //         &ops,
-    //         &mut page_controller,
-    //         &mut trace_builder,
-    //         &partial_pk,
-    //         trace_degree,
-    //     ),
-    //     Err(VerificationError::OodEvaluationMismatch),
-    //     "Expected constraints to fail"
-    // );
-
-    // // Testing reading wrong data from an existing index
-    // let idx: Vec<u32> = (0..idx_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
-    // let data_1: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
-    // let mut data_2 = data_1.clone();
-    // data_2[0] += 1; // making sure data_2 is different
-
-    // ops = vec![
-    //     Operation::new(1, idx.clone(), data_1, OpType::Write),
-    //     Operation::new(2, idx, data_2, OpType::Read),
-    // ];
-
-    // assert_eq!(
-    //     load_page_test(
-    //         &engine,
-    //         page.clone(),
-    //         idx_len,
-    //         data_len,
-    //         &ops,
-    //         &mut page_controller,
-    //         &mut trace_builder,
-    //         &partial_pk,
-    //         trace_degree,
-    //     ),
-    //     Err(VerificationError::OodEvaluationMismatch),
-    //     "Expected constraints to fail"
-    // );
-
-    // // Testing writing too many indices to a fully unallocated page
-    // let mut idx_map = HashSet::new();
-    // for _ in 0..page_height + 1 {
-    //     let mut idx: Vec<u32>;
-    //     loop {
-    //         idx = (0..idx_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
-    //         if !idx_map.contains(&idx) {
-    //             break;
-    //         }
-    //     }
-
-    //     idx_map.insert(idx);
-    // }
-
-    // ops.clear();
-    // for (i, idx) in idx_map.iter().enumerate() {
-    //     ops.push(Operation::new(
-    //         i + 1,
-    //         idx.clone(),
-    //         (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect(),
-    //         OpType::Write,
-    //     ));
-    // }
-
-    // let engine_ref = &engine;
-    // let result = panic::catch_unwind(move || {
-    //     let _ = load_page_test(
-    //         engine_ref,
-    //         page.clone(),
-    //         idx_len,
-    //         data_len,
-    //         &ops,
-    //         &mut page_controller,
-    //         &mut trace_builder,
-    //         &partial_pk,
-    //         trace_degree,
-    //     );
-    // });
-
-    // assert!(
-    //     result.is_err(),
-    //     "Expected to fail when allocating too many indices"
-    // );
+#[test]
+fn multitier_page_rw_mixed_ops_remove_first_leaf() {
+    multitier_page_rw_test(generate_mixed_ops_remove_first_leaf, false);
 }

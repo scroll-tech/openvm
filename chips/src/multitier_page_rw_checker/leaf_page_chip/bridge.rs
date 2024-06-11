@@ -1,13 +1,11 @@
-use afs_stark_backend::interaction::{Chip, Interaction};
+use afs_stark_backend::interaction::{AirBridge, Interaction};
 use p3_air::VirtualPairCol;
 use p3_field::PrimeField64;
 
 use super::columns::LeafPageCols;
 use super::LeafPageChip;
-use crate::is_less_than_tuple::columns::{
-    IsLessThanTupleAuxCols, IsLessThanTupleCols, IsLessThanTupleIOCols,
-};
-use crate::sub_chip::SubAirWithInteractions;
+use crate::is_less_than_tuple::columns::{IsLessThanTupleCols, IsLessThanTupleIOCols};
+use crate::sub_chip::SubAirBridge;
 
 impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
     fn custom_receives_path<F: PrimeField64>(
@@ -23,7 +21,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
 
             vec![Interaction {
                 fields: virtual_cols,
-                count: VirtualPairCol::single_main(col_indices.cache_cols.is_alloc),
+                count: VirtualPairCol::single_main(col_indices.cache_cols.page_cols.is_alloc),
                 argument_index: *self.path_bus_index(),
             }]
         } else {
@@ -38,82 +36,54 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
 
             vec![Interaction {
                 fields: virtual_cols,
-                count: VirtualPairCol::single_main(col_indices.cache_cols.is_alloc),
+                count: VirtualPairCol::single_main(col_indices.cache_cols.page_cols.is_alloc),
                 argument_index: *self.path_bus_index(),
             }]
         }
     }
 }
 
-impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirWithInteractions<F>
+impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirBridge<F>
     for LeafPageChip<COMMITMENT_LEN>
 {
     fn receives(&self, col_indices: LeafPageCols<usize>) -> Vec<Interaction<F>> {
         let mut interactions = vec![];
-        interactions.extend(SubAirWithInteractions::receives(
+        interactions.extend(SubAirBridge::receives(
             self.page_chip(),
-            col_indices.cache_cols.clone(),
+            col_indices.cache_cols.page_cols.clone(),
         ));
         interactions.extend(self.custom_receives_path(col_indices.clone()));
-
-        if !self.is_init {
-            let subairs = self.is_less_than_tuple_air.clone().unwrap();
-            let range_inclusion = col_indices.metadata.range_inclusion_cols.clone().unwrap();
-            let subair_aux = col_indices.metadata.subchip_aux_cols.clone().unwrap();
-            interactions.extend(SubAirWithInteractions::receives(
-                &subairs.key_start,
-                IsLessThanTupleCols {
-                    io: IsLessThanTupleIOCols {
-                        x: col_indices.cache_cols.idx.clone(),
-                        y: range_inclusion.start.clone(),
-                        tuple_less_than: range_inclusion.less_than_start.clone(),
-                    },
-                    aux: subair_aux.key_start.clone(),
-                },
-            ));
-            interactions.extend(SubAirWithInteractions::receives(
-                &subairs.end_key,
-                IsLessThanTupleCols {
-                    io: IsLessThanTupleIOCols {
-                        x: range_inclusion.end.clone(),
-                        y: col_indices.cache_cols.idx.clone(),
-                        tuple_less_than: range_inclusion.greater_than_end.clone(),
-                    },
-                    aux: subair_aux.end_key.clone(),
-                },
-            ));
-        }
         interactions
     }
 
     fn sends(&self, col_indices: LeafPageCols<usize>) -> Vec<Interaction<F>> {
         let mut interactions = vec![];
-        interactions.extend(SubAirWithInteractions::sends(
+        interactions.extend(SubAirBridge::sends(
             self.page_chip(),
-            col_indices.cache_cols.clone(),
+            col_indices.cache_cols.page_cols.clone(),
         ));
 
         if !self.is_init {
             let subairs = self.is_less_than_tuple_air.clone().unwrap();
             let range_inclusion = col_indices.metadata.range_inclusion_cols.clone().unwrap();
             let subair_aux = col_indices.metadata.subchip_aux_cols.clone().unwrap();
-            interactions.extend(SubAirWithInteractions::sends(
+            interactions.extend(SubAirBridge::sends(
                 &subairs.key_start,
                 IsLessThanTupleCols {
                     io: IsLessThanTupleIOCols {
-                        x: col_indices.cache_cols.idx.clone(),
+                        x: col_indices.cache_cols.page_cols.idx.clone(),
                         y: range_inclusion.start.clone(),
                         tuple_less_than: range_inclusion.less_than_start.clone(),
                     },
                     aux: subair_aux.key_start.clone(),
                 },
             ));
-            interactions.extend(SubAirWithInteractions::sends(
+            interactions.extend(SubAirBridge::sends(
                 &subairs.end_key,
                 IsLessThanTupleCols {
                     io: IsLessThanTupleIOCols {
                         x: range_inclusion.end.clone(),
-                        y: col_indices.cache_cols.idx.clone(),
+                        y: col_indices.cache_cols.page_cols.idx.clone(),
                         tuple_less_than: range_inclusion.greater_than_end.clone(),
                     },
                     aux: subair_aux.end_key.clone(),
@@ -124,7 +94,7 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirWithInteractions<F>
     }
 }
 
-impl<F: PrimeField64, const COMMITMENT_LEN: usize> Chip<F> for LeafPageChip<COMMITMENT_LEN> {
+impl<F: PrimeField64, const COMMITMENT_LEN: usize> AirBridge<F> for LeafPageChip<COMMITMENT_LEN> {
     fn receives(&self) -> Vec<Interaction<F>> {
         let num_cols = self.air_width();
         let all_cols = (0..num_cols).collect::<Vec<usize>>();
@@ -137,7 +107,7 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> Chip<F> for LeafPageChip<COMM
             self.is_init,
             self.is_less_than_tuple_param.clone(),
         );
-        SubAirWithInteractions::receives(self, cols_to_receive)
+        SubAirBridge::receives(self, cols_to_receive)
     }
 
     fn sends(&self) -> Vec<Interaction<F>> {
@@ -152,6 +122,6 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> Chip<F> for LeafPageChip<COMM
             self.is_init,
             self.is_less_than_tuple_param.clone(),
         );
-        SubAirWithInteractions::sends(self, cols_to_receive)
+        SubAirBridge::sends(self, cols_to_receive)
     }
 }

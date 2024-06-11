@@ -8,8 +8,7 @@ use super::{
     InternalPageChip,
 };
 use crate::{
-    is_equal::columns::IsEqualIOCols,
-    is_less_than_tuple::{columns::IsLessThanTupleIOCols, IsLessThanTupleAir},
+    is_less_than_tuple::columns::IsLessThanTupleIOCols,
     is_zero::columns::IsZeroIOCols,
     sub_chip::{AirConfig, SubAir},
 };
@@ -50,7 +49,16 @@ where
         for i in 0..COMMITMENT_LEN {
             builder.assert_eq(pi[i], metadata.own_commitment[i]);
         }
+        builder.assert_zero(cached_data.is_leaf);
         builder.assert_eq(metadata.mult_alloc, cached_data.is_alloc * metadata.mult);
+        builder.assert_eq(
+            metadata.mult_alloc_minus_one,
+            metadata.mult_alloc - AB::Expr::one(),
+        );
+        builder.assert_eq(
+            metadata.mult_minus_one_alloc,
+            cached_data.is_alloc * metadata.mult_alloc_minus_one,
+        );
 
         if self.is_init {
             return;
@@ -119,20 +127,20 @@ where
             {
                 let io = IsLessThanTupleIOCols {
                     x: cached_data.end.clone(),
-                    y: cached_data.start.clone(),
-                    tuple_less_than: prove_sort_cols.end_less_than_start.clone(),
-                };
-                let aux = subair_aux_cols.end_start.clone();
-                SubAir::eval(&subairs.end_start, builder, io, aux);
-            }
-            {
-                let io = IsLessThanTupleIOCols {
-                    x: cached_data.end.clone(),
                     y: prove_sort_cols.next_key.clone(),
                     tuple_less_than: prove_sort_cols.end_less_than_next.clone(),
                 };
                 let aux = subair_aux_cols.end_next.clone();
                 SubAir::eval(&subairs.end_next, builder, io, aux);
+            }
+            {
+                let io = IsLessThanTupleIOCols {
+                    x: cached_data.end.clone(),
+                    y: cached_data.start.clone(),
+                    tuple_less_than: prove_sort_cols.end_less_than_start.clone(),
+                };
+                let aux = subair_aux_cols.end_start.clone();
+                SubAir::eval(&subairs.end_start, builder, io, aux);
             }
             {
                 let io = IsZeroIOCols {

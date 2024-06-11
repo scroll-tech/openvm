@@ -1,12 +1,10 @@
-use afs_stark_backend::interaction::{Chip, Interaction};
+use afs_stark_backend::interaction::{AirBridge, Interaction};
 use p3_air::VirtualPairCol;
 use p3_field::PrimeField64;
 
-use crate::sub_chip::SubAirWithInteractions;
-
 use super::{columns::RootSignalCols, RootSignalChip};
 
-impl<F: PrimeField64, const COMMITMENT_LEN: usize> Chip<F> for RootSignalChip<COMMITMENT_LEN> {
+impl<F: PrimeField64, const COMMITMENT_LEN: usize> AirBridge<F> for RootSignalChip<COMMITMENT_LEN> {
     fn receives(&self) -> Vec<Interaction<F>> {
         vec![]
     }
@@ -33,10 +31,10 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> Chip<F> for RootSignalChip<CO
                 argument_index: *self.bus_index(),
             }]
         } else {
-            let virtual_cols = (cols.root_commitment)
+            let virtual_cols = (cols.range.clone().unwrap().0)
                 .into_iter()
-                .chain(cols.range.clone().unwrap().0)
                 .chain(cols.range.clone().unwrap().1)
+                .chain(cols.root_commitment)
                 .map(VirtualPairCol::single_main)
                 .collect::<Vec<_>>();
 

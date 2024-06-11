@@ -1,11 +1,10 @@
 use std::sync::Arc;
 
-use p3_field::{AbstractField, PrimeField64};
+use p3_field::PrimeField64;
 use p3_matrix::dense::RowMajorMatrix;
-use p3_uni_stark::{StarkGenericConfig, Val};
 
 use crate::{
-    is_less_than_tuple::columns::IsLessThanTupleAuxCols, range_gate::RangeCheckerGateChip,
+    is_less_than_tuple::columns::IsLessThanTupleCols, range_gate::RangeCheckerGateChip,
     sub_chip::LocalTraceInstructions,
 };
 
@@ -18,7 +17,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
             page.into_iter()
                 .flat_map(|row| row.into_iter().map(F::from_wrapped_u32).collect::<Vec<F>>())
                 .collect(),
-            1 + self.idx_len + self.data_len,
+            2 + self.idx_len + self.data_len,
         )
     }
 
@@ -44,54 +43,34 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
                             .map(|i| F::from_wrapped_u32(i))
                             .collect();
                         {
-                            let aux: IsLessThanTupleAuxCols<F> = self
+                            let tuple: IsLessThanTupleCols<F> = self
                                 .is_less_than_tuple_air
                                 .clone()
                                 .unwrap()
                                 .key_start
                                 .generate_trace_row((
-                                    row[1..1 + self.idx_len].to_vec(),
+                                    row[2..2 + self.idx_len].to_vec(),
                                     range.0.clone(),
                                     range_checker.clone(),
-                                ))
-                                .aux;
-                            let io = self
-                                .is_less_than_tuple_air
-                                .clone()
-                                .unwrap()
-                                .key_start
-                                .generate_trace_row((
-                                    row[1..1 + self.idx_len].to_vec(),
-                                    range.0.clone(),
-                                    range_checker.clone(),
-                                ))
-                                .io;
+                                ));
+                            let aux = tuple.aux;
+                            let io = tuple.io;
                             trace_row[COMMITMENT_LEN + 2 * range.0.len()] = io.tuple_less_than;
                             trace_row.extend(aux.flatten());
                         }
                         {
-                            let aux: IsLessThanTupleAuxCols<F> = self
+                            let tuple: IsLessThanTupleCols<F> = self
                                 .is_less_than_tuple_air
                                 .clone()
                                 .unwrap()
                                 .end_key
                                 .generate_trace_row((
                                     range.1.clone(),
-                                    row[1..1 + self.idx_len].to_vec(),
+                                    row[2..2 + self.idx_len].to_vec(),
                                     range_checker.clone(),
-                                ))
-                                .aux;
-                            let io = self
-                                .is_less_than_tuple_air
-                                .clone()
-                                .unwrap()
-                                .end_key
-                                .generate_trace_row((
-                                    range.1.clone(),
-                                    row[1..1 + self.idx_len].to_vec(),
-                                    range_checker.clone(),
-                                ))
-                                .io;
+                                ));
+                            let aux = tuple.aux;
+                            let io = tuple.io;
                             trace_row[COMMITMENT_LEN + 2 * range.0.len() + 1] = io.tuple_less_than;
                             trace_row.extend(aux.flatten());
                         }
@@ -104,7 +83,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
                     }
                 })
                 .collect(),
-            self.air_width() - (1 + self.idx_len + self.data_len),
+            self.air_width() - (2 + self.idx_len + self.data_len),
         )
     }
 }
