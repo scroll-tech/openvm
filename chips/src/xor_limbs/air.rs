@@ -1,28 +1,23 @@
 use std::borrow::Borrow;
 
-use p3_air::{Air, AirBuilder, AirBuilderWithPublicValues, BaseAir};
+use p3_air::{Air, AirBuilder, BaseAir};
 use p3_field::{AbstractField, Field};
 use p3_matrix::Matrix;
 
 use super::columns::XorLimbsCols;
-use super::XorLimbsChip;
+use super::XorLimbsAir;
 
-impl<F: Field, const N: usize, const M: usize> BaseAir<F> for XorLimbsChip<N, M> {
+impl<F: Field, const N: usize, const M: usize> BaseAir<F> for XorLimbsAir<N, M> {
     fn width(&self) -> usize {
         XorLimbsCols::<N, M, F>::get_width()
     }
 }
 
-impl<AB: AirBuilderWithPublicValues, const N: usize, const M: usize> Air<AB> for XorLimbsChip<N, M>
-where
-    AB: AirBuilder,
-    AB::Var: Clone,
-{
+impl<AB: AirBuilder, const N: usize, const M: usize> Air<AB> for XorLimbsAir<N, M> {
     fn eval(&self, builder: &mut AB) {
         let num_limbs = (N + M - 1) / M;
 
         let main = builder.main();
-        let _pis = builder.public_values();
 
         let (local, _next) = (main.row_slice(0), main.row_slice(1));
         let local: &[AB::Var] = (*local).borrow();

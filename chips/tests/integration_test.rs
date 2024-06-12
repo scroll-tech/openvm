@@ -35,7 +35,7 @@ fn test_list_range_checker() {
     const LIST_LEN: usize = 1 << LOG_TRACE_DEGREE_LIST;
 
     // Creating a RangeCheckerChip
-    let range_checker = Arc::new(RangeCheckerChip::<MAX>::new(bus_index));
+    let range_checker = Arc::new(RangeCheckerChip::new(bus_index, MAX));
 
     // Generating random lists
     let num_lists = 10;
@@ -50,8 +50,8 @@ fn test_list_range_checker() {
     // define a bunch of ListChips
     let lists = lists_vals
         .iter()
-        .map(|vals| ListChip::new(bus_index, vals.to_vec(), Arc::clone(&range_checker)))
-        .collect::<Vec<ListChip<MAX>>>();
+        .map(|vals| ListChip::new(bus_index, MAX, vals.to_vec(), Arc::clone(&range_checker)))
+        .collect::<Vec<ListChip>>();
 
     let lists_traces = lists
         .par_iter()
@@ -64,7 +64,7 @@ fn test_list_range_checker() {
     for list in &lists {
         all_chips.push(list);
     }
-    all_chips.push(&*range_checker);
+    all_chips.push(&range_checker.air);
 
     let all_traces = lists_traces
         .into_iter()
@@ -115,7 +115,7 @@ fn test_xor_bits_chip() {
     for requester in &requesters {
         all_chips.push(requester);
     }
-    all_chips.push(&*xor_chip);
+    all_chips.push(&xor_chip.air);
 
     let all_traces = requesters_traces
         .into_iter()
@@ -165,7 +165,7 @@ fn negative_test_xor_bits_chip() {
     );
 
     let result = run_simple_test_no_pis(
-        vec![&dummy_requester, &*xor_chip],
+        vec![&dummy_requester, &xor_chip.air],
         vec![dummy_trace, xor_chip_trace],
     );
 
@@ -238,8 +238,8 @@ fn test_xor_limbs_chip() {
     for requester in &requesters {
         all_chips.push(requester);
     }
-    all_chips.push(&xor_chip);
-    all_chips.push(&xor_chip.xor_lookup_chip);
+    all_chips.push(&xor_chip.air);
+    all_chips.push(&xor_chip.xor_lookup_chip.air);
 
     let all_traces = requesters_traces
         .into_iter()
@@ -304,7 +304,7 @@ fn negative_test_xor_limbs_chip() {
     let xor_lookup_chip_trace = xor_chip.xor_lookup_chip.generate_trace();
 
     let result = run_simple_test_no_pis(
-        vec![&requester, &xor_chip, &xor_chip.xor_lookup_chip],
+        vec![&requester, &xor_chip.air, &xor_chip.xor_lookup_chip.air],
         vec![requester_trace, xor_limbs_chip_trace, xor_lookup_chip_trace],
     );
 
@@ -329,7 +329,7 @@ fn test_range_gate_chip() {
     const LOG_LIST_LEN: usize = 6;
     const LIST_LEN: usize = 1 << LOG_LIST_LEN;
 
-    let range_checker = RangeCheckerGateChip::<MAX>::new(bus_index);
+    let range_checker = RangeCheckerGateChip::new(bus_index, MAX);
 
     // Generating random lists
     let num_lists = 10;
@@ -368,7 +368,7 @@ fn test_range_gate_chip() {
         .iter()
         .map(|list| list as &dyn AnyRap<_>)
         .collect::<Vec<_>>();
-    all_chips.push(&range_checker);
+    all_chips.push(&range_checker.air);
 
     let all_traces = lists_traces
         .into_iter()
@@ -387,7 +387,7 @@ fn negative_test_range_gate_chip() {
     const N: usize = 3;
     const MAX: u32 = 1 << N;
 
-    let range_checker = RangeCheckerGateChip::<MAX>::new(bus_index);
+    let range_checker = RangeCheckerGateChip::new(bus_index, MAX);
 
     // generating a trace with a counter starting from 1
     // instead of 0 to test the AIR constraints in range_checker
@@ -407,7 +407,7 @@ fn negative_test_range_gate_chip() {
         *debug.lock().unwrap() = false;
     });
     assert_eq!(
-        run_simple_test_no_pis(vec![&range_checker], vec![range_trace]),
+        run_simple_test_no_pis(vec![&range_checker.air], vec![range_trace]),
         Err(VerificationError::OodEvaluationMismatch),
         "Expected constraint to fail"
     );
