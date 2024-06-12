@@ -9,7 +9,11 @@ pub mod merkle_proof;
 pub mod multitier_readonly;
 pub mod page_controller;
 // pub mod page_node;
+pub mod multitier_page_rw_checker;
 pub mod page_read;
+pub mod page_rw_checker;
+pub mod pagebtree;
+/// Chip to range check a value has less than a fixed number of bits
 pub mod range;
 pub mod range_gate;
 pub mod sub_chip;
