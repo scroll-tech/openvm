@@ -65,7 +65,8 @@ pub struct PageBTree<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COM
     limb_bits: usize,
     key_len: usize,
     val_len: usize,
-    page_height: usize,
+    leaf_page_height: usize,
+    internal_page_height: usize,
     root: Vec<PageBTreeNode<MAX_INTERNAL, MAX_LEAF, COMMITMENT_LEN>>,
     loaded_pages: PageBTreePages,
     depth: usize,
@@ -85,7 +86,8 @@ pub struct PageBTreeRootInfo {
     limb_bits: usize,
     key_len: usize,
     val_len: usize,
-    page_height: usize,
+    leaf_page_height: usize,
+    internal_page_height: usize,
     root_commitment: Vec<u32>,
     depth: usize,
     max_key: Vec<u32>,
@@ -423,7 +425,8 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
     fn gen_trace<SC: StarkGenericConfig>(
         &mut self,
         committer: &mut TraceCommitter<SC>,
-        page_height: usize,
+        leaf_page_height: usize,
+        internal_page_height: usize,
         key_len: usize,
         val_len: usize,
     ) -> Vec<Vec<u32>>
@@ -432,8 +435,10 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
     {
         match self {
-            PageBTreeNode::Leaf(l) => l.gen_trace(page_height, key_len, val_len),
-            PageBTreeNode::Internal(i) => i.gen_trace(committer, page_height, key_len, val_len),
+            PageBTreeNode::Leaf(l) => l.gen_trace(leaf_page_height, key_len, val_len),
+            PageBTreeNode::Internal(i) => {
+                i.gen_trace(committer, internal_page_height, key_len, val_len)
+            }
             PageBTreeNode::Unloaded(_) => panic!(),
         }
     }
@@ -489,7 +494,8 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
     fn gen_all_trace<SC: StarkGenericConfig>(
         &mut self,
         committer: &mut TraceCommitter<SC>,
-        page_height: usize,
+        leaf_page_height: usize,
+        internal_page_height: usize,
         key_len: usize,
         val_len: usize,
         pages: &mut PageBTreePages,
@@ -498,10 +504,15 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
     {
         match self {
-            PageBTreeNode::Leaf(l) => l.gen_all_trace(page_height, key_len, val_len, pages),
-            PageBTreeNode::Internal(i) => {
-                i.gen_all_trace(committer, page_height, key_len, val_len, pages)
-            }
+            PageBTreeNode::Leaf(l) => l.gen_all_trace(leaf_page_height, key_len, val_len, pages),
+            PageBTreeNode::Internal(i) => i.gen_all_trace(
+                committer,
+                leaf_page_height,
+                internal_page_height,
+                key_len,
+                val_len,
+                pages,
+            ),
             PageBTreeNode::Unloaded(_) => (),
         }
     }
@@ -509,7 +520,8 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
     fn commit_all<SC: StarkGenericConfig>(
         &mut self,
         committer: &mut TraceCommitter<SC>,
-        page_height: usize,
+        leaf_page_height: usize,
+        internal_page_height: usize,
         key_len: usize,
         val_len: usize,
     ) where
@@ -517,8 +529,14 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
     {
         match self {
-            PageBTreeNode::Leaf(l) => l.commit(committer, page_height, key_len, val_len),
-            PageBTreeNode::Internal(i) => i.commit_all(committer, page_height, key_len, val_len),
+            PageBTreeNode::Leaf(l) => l.commit(committer, leaf_page_height, key_len, val_len),
+            PageBTreeNode::Internal(i) => i.commit_all(
+                committer,
+                leaf_page_height,
+                internal_page_height,
+                key_len,
+                val_len,
+            ),
             PageBTreeNode::Unloaded(_) => (),
         }
     }
@@ -695,7 +713,8 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
     fn gen_all_trace<SC: StarkGenericConfig>(
         &mut self,
         committer: &mut TraceCommitter<SC>,
-        page_height: usize,
+        leaf_page_height: usize,
+        internal_page_height: usize,
         key_len: usize,
         val_len: usize,
         pages: &mut PageBTreePages,
@@ -704,11 +723,21 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
     {
         for i in 0..self.children.len() {
-            self.children[i].gen_all_trace(committer, page_height, key_len, val_len, pages);
+            self.children[i].gen_all_trace(
+                committer,
+                leaf_page_height,
+                internal_page_height,
+                key_len,
+                val_len,
+                pages,
+            );
         }
-        pages
-            .internal_pages
-            .push(self.gen_trace(committer, page_height, key_len, val_len));
+        pages.internal_pages.push(self.gen_trace(
+            committer,
+            internal_page_height,
+            key_len,
+            val_len,
+        ));
     }
 
     fn commit<SC: StarkGenericConfig>(
@@ -759,16 +788,23 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
     fn commit_all<SC: StarkGenericConfig>(
         &mut self,
         committer: &mut TraceCommitter<SC>,
-        page_height: usize,
+        leaf_page_height: usize,
+        internal_page_height: usize,
         key_len: usize,
         val_len: usize,
     ) where
         Val<SC>: PrimeField32 + AbstractField,
         Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
     {
-        self.commit(committer, page_height, key_len, val_len);
+        self.commit(committer, internal_page_height, key_len, val_len);
         for child in &mut self.children {
-            child.commit_all(committer, page_height, key_len, val_len);
+            child.commit_all(
+                committer,
+                leaf_page_height,
+                internal_page_height,
+                key_len,
+                val_len,
+            );
         }
     }
 }
@@ -776,7 +812,13 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
 impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usize>
     PageBTree<MAX_INTERNAL, MAX_LEAF, COMMITMENT_LEN>
 {
-    pub fn new(limb_bits: usize, key_len: usize, val_len: usize, page_height: usize) -> Self {
+    pub fn new(
+        limb_bits: usize,
+        key_len: usize,
+        val_len: usize,
+        leaf_page_height: usize,
+        internal_page_height: usize,
+    ) -> Self {
         let leaf = PageBTreeLeafNode {
             kv_pairs: Vec::new(),
             min_key: vec![0; key_len],
@@ -790,11 +832,12 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
             val_len,
             root: vec![leaf],
             loaded_pages: PageBTreePages::new(),
-            page_height,
+            leaf_page_height,
+            internal_page_height,
             depth: 1,
         };
-        assert!(page_height >= MAX_INTERNAL);
-        assert!(page_height >= MAX_LEAF);
+        assert!(internal_page_height >= MAX_INTERNAL);
+        assert!(leaf_page_height >= MAX_LEAF);
         tree
     }
     pub fn load(root_commit: Vec<u32>) -> Option<Self> {
@@ -819,7 +862,8 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
             limb_bits: info.limb_bits,
             key_len: info.key_len,
             val_len: info.val_len,
-            page_height: info.page_height,
+            leaf_page_height: info.leaf_page_height,
+            internal_page_height: info.leaf_page_height,
             root: vec![root],
             loaded_pages: PageBTreePages::new(),
             depth: info.depth,
@@ -886,7 +930,13 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         Val<SC>: PrimeField32 + AbstractField,
         Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
     {
-        self.root[0].gen_trace(committer, self.page_height, self.key_len, self.val_len)
+        self.root[0].gen_trace(
+            committer,
+            self.leaf_page_height,
+            self.internal_page_height,
+            self.key_len,
+            self.val_len,
+        )
     }
 
     pub fn gen_all_trace<SC: StarkGenericConfig>(
@@ -900,7 +950,8 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         let mut pages = PageBTreePages::new();
         self.root[0].gen_all_trace(
             committer,
-            self.page_height,
+            self.leaf_page_height,
+            self.internal_page_height,
             self.key_len,
             self.val_len,
             &mut pages,
@@ -919,8 +970,13 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         Val<SC>: PrimeField32 + AbstractField,
         Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
     {
-        let root_trace =
-            self.root[0].gen_trace(committer, self.page_height, self.key_len, self.val_len);
+        let root_trace = self.root[0].gen_trace(
+            committer,
+            self.leaf_page_height,
+            self.internal_page_height,
+            self.key_len,
+            self.val_len,
+        );
         let width = root_trace[0].len();
         let commitment: [Val<SC>; COMMITMENT_LEN] = committer
             .commit(vec![RowMajorMatrix::new(
@@ -950,7 +1006,8 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
             limb_bits: self.limb_bits,
             key_len: self.key_len,
             val_len: self.val_len,
-            page_height: self.page_height,
+            leaf_page_height: self.leaf_page_height,
+            internal_page_height: self.internal_page_height,
             root_commitment: commit,
             depth: self.depth,
             max_key: self.max_key(),
@@ -959,7 +1016,13 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         let mut writer = BufWriter::new(file);
         let _ = serde_json::to_writer(&mut writer, &root_info);
         let _ = writer.flush();
-        self.root[0].commit_all(committer, self.page_height, self.key_len, self.val_len);
+        self.root[0].commit_all(
+            committer,
+            self.leaf_page_height,
+            self.internal_page_height,
+            self.key_len,
+            self.val_len,
+        );
     }
 }
 

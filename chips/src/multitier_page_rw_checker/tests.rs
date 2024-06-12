@@ -30,694 +30,41 @@ use super::page_controller;
 pub const BABYBEAR_COMMITMENT_LEN: usize = 8;
 pub const DECOMP_BITS: usize = 6;
 
-fn load_page_test(
-    engine: &BabyBearPoseidon2Engine,
-    init_leaf_pages: Vec<Vec<Vec<u32>>>,
-    init_internal_pages: Vec<Vec<Vec<u32>>>,
-    init_root_is_leaf: bool,
-    init_root_idx: usize,
-    final_leaf_pages: Vec<Vec<Vec<u32>>>,
-    final_internal_pages: Vec<Vec<Vec<u32>>>,
-    final_root_is_leaf: bool,
-    final_root_idx: usize,
-    ops: &Vec<Operation>,
-    page_controller: &mut page_controller::PageController<
-        BabyBearPoseidon2Config,
-        BABYBEAR_COMMITMENT_LEN,
-    >,
-    trace_builder: &mut TraceCommitmentBuilder<BabyBearPoseidon2Config>,
-    partial_pk: &MultiStarkPartialProvingKey<BabyBearPoseidon2Config>,
-    trace_degree: usize,
-) -> Result<(), VerificationError> {
-    page_controller.range_checker.clear();
-    let (data_trace, main_trace, commits, mut prover_data) = page_controller.load_page_and_ops(
-        init_leaf_pages,
-        init_internal_pages,
-        init_root_is_leaf,
-        init_root_idx,
-        final_leaf_pages,
-        final_internal_pages,
-        final_root_is_leaf,
-        final_root_idx,
-        ops.clone(),
-        trace_degree,
-        &mut trace_builder.committer,
-    );
-    let offline_checker_trace = main_trace.offline_checker_trace.clone();
-    let init_root = main_trace.init_root_signal_trace.clone();
-    let final_root = main_trace.final_root_signal_trace.clone();
-    let range_trace = page_controller.range_checker.generate_trace();
-    trace_builder.clear();
-
-    for trace in data_trace.init_leaf_chip_traces.iter() {
-        trace_builder.load_cached_trace(trace.clone(), prover_data.init_leaf_page.remove(0));
-    }
-
-    for trace in data_trace.init_internal_chip_traces.iter() {
-        trace_builder.load_cached_trace(trace.clone(), prover_data.init_internal_page.remove(0));
-    }
-
-    for trace in data_trace.final_leaf_chip_traces.iter() {
-        trace_builder.load_cached_trace(trace.clone(), prover_data.final_leaf_page.remove(0));
-    }
-
-    for trace in data_trace.final_internal_chip_traces.iter() {
-        trace_builder.load_cached_trace(trace.clone(), prover_data.final_internal_page.remove(0));
-    }
-
-    for trace in main_trace.init_leaf_chip_main_traces.iter() {
-        trace_builder.load_trace(trace.clone());
-    }
-
-    for trace in main_trace.init_internal_chip_main_traces.iter() {
-        trace_builder.load_trace(trace.clone());
-    }
-
-    for trace in main_trace.final_leaf_chip_main_traces.iter() {
-        trace_builder.load_trace(trace.clone());
-    }
-
-    for trace in main_trace.final_internal_chip_main_traces.iter() {
-        trace_builder.load_trace(trace.clone());
-    }
-
-    trace_builder.load_trace(offline_checker_trace.clone());
-    trace_builder.load_trace(init_root);
-    trace_builder.load_trace(final_root);
-    trace_builder.load_trace(range_trace);
-    trace_builder.commit_current();
-
-    let mut airs: Vec<&dyn AnyRap<BabyBearPoseidon2Config>> = vec![];
-    for chip in &page_controller.init_leaf_chips {
-        airs.push(chip);
-    }
-    for chip in &page_controller.init_internal_chips {
-        airs.push(chip);
-    }
-    for chip in &page_controller.final_leaf_chips {
-        airs.push(chip);
-    }
-    for chip in &page_controller.final_internal_chips {
-        airs.push(chip);
-    }
-    airs.push(&page_controller.offline_checker);
-    airs.push(&page_controller.init_root_signal);
-    airs.push(&page_controller.final_root_signal);
-    airs.push(&page_controller.range_checker.air);
-    let partial_vk = partial_pk.partial_vk();
-    let main_trace_data = trace_builder.view(&partial_vk, airs.clone());
-
-    let mut pis = vec![];
-    for c in commits.init_leaf_page_commitments {
-        let c: [BabyBear; BABYBEAR_COMMITMENT_LEN] = c.into();
-        pis.push(c.to_vec());
-    }
-    for c in commits.init_internal_page_commitments {
-        let c: [BabyBear; BABYBEAR_COMMITMENT_LEN] = c.into();
-        pis.push(c.to_vec());
-    }
-    for c in commits.final_leaf_page_commitments {
-        let c: [BabyBear; BABYBEAR_COMMITMENT_LEN] = c.into();
-        pis.push(c.to_vec());
-    }
-    for c in commits.final_internal_page_commitments {
-        let c: [BabyBear; BABYBEAR_COMMITMENT_LEN] = c.into();
-        pis.push(c.to_vec());
-    }
-    pis.push(vec![]);
-    {
-        let c: [BabyBear; BABYBEAR_COMMITMENT_LEN] = commits.init_root_commitment.into();
-        pis.push(c.to_vec());
-    }
-    {
-        let c: [BabyBear; BABYBEAR_COMMITMENT_LEN] = commits.final_root_commitment.into();
-        pis.push(c.to_vec());
-    }
-    pis.push(vec![]);
-    let prover = engine.prover();
-    let verifier = engine.verifier();
-
-    let mut challenger = engine.new_challenger();
-    let proof = prover.prove(&mut challenger, &partial_pk, main_trace_data, &pis);
-
-    let mut challenger = engine.new_challenger();
-    let result = verifier.verify(&mut challenger, partial_vk, airs, proof, &pis);
-
-    result
+#[test]
+fn multitier_page_rw_no_new_keys() {
+    multitier_page_rw_test(generate_no_new_keys, false, 4);
 }
 
-fn generate_no_new_keys(
-    idx_len: usize,
-    data_len: usize,
-    page_height: usize,
-    limb_bits: usize,
-    num_ops: usize,
-    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
-) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
-    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
-    const MAX_LIMB_VAL: u32 = 1 << 20;
-    let mut rng = create_seeded_rng();
-    let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
-        limb_bits,
-        idx_len,
-        data_len,
-        page_height,
-    );
-    // Generating a random page with distinct indices
-    let mut idx_data_map = HashMap::new();
-    for _ in 0..4 * page_height {
-        let mut idx;
-        loop {
-            idx = (0..idx_len)
-                .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
-                .collect::<Vec<u32>>();
-            if !idx_data_map.contains_key(&idx) {
-                break;
-            }
-        }
-
-        let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
-        idx_data_map.insert(idx.clone(), data.clone());
-        btree.update(&idx, &data);
-    }
-    let init_pages = btree.gen_all_trace(committer);
-    // check for correctness
-    for (idx, _) in idx_data_map.iter() {
-        btree.search(idx).unwrap();
-    }
-    let mut clks: Vec<usize> = (0..num_ops)
-        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
-        .collect();
-    clks.sort();
-
-    let mut ops: Vec<Operation> = vec![];
-    for i in 0..num_ops {
-        let clk = clks[i];
-        let idx = idx_data_map
-            .iter()
-            .nth(rng.gen::<usize>() % idx_data_map.len())
-            .unwrap()
-            .0
-            .to_vec();
-
-        let op_type = {
-            if rng.gen::<bool>() {
-                OpType::Read
-            } else {
-                OpType::Write
-            }
-        };
-
-        let data = {
-            if op_type == OpType::Read {
-                idx_data_map[&idx].to_vec()
-            } else {
-                (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
-            }
-        };
-
-        if op_type == OpType::Write {
-            idx_data_map.insert(idx.clone(), data.clone());
-            btree.update(&idx, &data);
-        }
-
-        ops.push(Operation::new(clk, idx, data, op_type));
-    }
-    let final_pages = btree.gen_all_trace(committer);
-    (init_pages, false, final_pages, false, ops)
+#[test]
+fn multitier_page_rw_new_keys() {
+    multitier_page_rw_test(generate_new_keys, false, 4);
 }
 
-fn generate_new_keys(
-    idx_len: usize,
-    data_len: usize,
-    page_height: usize,
-    limb_bits: usize,
-    num_ops: usize,
-    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
-) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
-    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
-    const MAX_LIMB_VAL: u32 = 1 << 20;
-    let mut rng = create_seeded_rng();
-    let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
-        limb_bits,
-        idx_len,
-        data_len,
-        page_height,
-    );
-    // Generating a random page with distinct indices
-    let mut idx_data_map = HashMap::new();
-    for _ in 0..4 * page_height {
-        let mut idx;
-        loop {
-            idx = (0..idx_len)
-                .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
-                .collect::<Vec<u32>>();
-            if !idx_data_map.contains_key(&idx) {
-                break;
-            }
-        }
-
-        let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
-        idx_data_map.insert(idx.clone(), data.clone());
-        btree.update(&idx, &data);
-    }
-    let init_pages = btree.gen_all_trace(committer);
-    // check for correctness
-    for (idx, _) in idx_data_map.iter() {
-        btree.search(idx).unwrap();
-    }
-    let mut clks: Vec<usize> = (0..num_ops)
-        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
-        .collect();
-    clks.sort();
-    let mut ops: Vec<Operation> = vec![];
-    for i in 0..num_ops {
-        let clk = clks[i];
-        let mut idx;
-        loop {
-            idx = (0..idx_len)
-                .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
-                .collect::<Vec<u32>>();
-            if !idx_data_map.contains_key(&idx) {
-                break;
-            }
-        }
-
-        let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
-        idx_data_map.insert(idx.clone(), data.clone());
-        btree.update(&idx, &data);
-        ops.push(Operation::new(clk, idx, data, OpType::Write));
-    }
-    let final_pages = btree.gen_all_trace(committer);
-    (init_pages, false, final_pages, false, ops)
+#[test]
+fn multitier_page_rw_mixed_ops() {
+    multitier_page_rw_test(generate_mixed_ops, false, 4);
 }
 
-fn generate_mixed_ops(
-    idx_len: usize,
-    data_len: usize,
-    page_height: usize,
-    limb_bits: usize,
-    num_ops: usize,
-    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
-) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
-    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
-    const MAX_LIMB_VAL: u32 = 1 << 20;
-    let mut rng = create_seeded_rng();
-    let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
-        limb_bits,
-        idx_len,
-        data_len,
-        page_height,
-    );
-    // Generating a random page with distinct indices
-    let mut idx_data_map = HashMap::new();
-    for _ in 0..4 * page_height {
-        let mut idx;
-        loop {
-            idx = (0..idx_len)
-                .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
-                .collect::<Vec<u32>>();
-            if !idx_data_map.contains_key(&idx) {
-                break;
-            }
-        }
-
-        let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
-        idx_data_map.insert(idx.clone(), data.clone());
-        btree.update(&idx, &data);
-    }
-    let init_pages = btree.gen_all_trace(committer);
-    // check for correctness
-    for (idx, _) in idx_data_map.iter() {
-        btree.search(idx).unwrap();
-    }
-    let mut clks: Vec<usize> = (0..num_ops)
-        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
-        .collect();
-    clks.sort();
-    let mut ops: Vec<Operation> = vec![];
-    for i in 0..num_ops {
-        let clk = clks[i];
-        if rng.gen::<bool>() {
-            let mut idx;
-            loop {
-                idx = (0..idx_len)
-                    .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
-                    .collect::<Vec<u32>>();
-                if !idx_data_map.contains_key(&idx) {
-                    break;
-                }
-            }
-
-            let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
-            idx_data_map.insert(idx.clone(), data.clone());
-            btree.update(&idx, &data);
-            ops.push(Operation::new(clk, idx, data, OpType::Write));
-        } else {
-            let idx = idx_data_map
-                .iter()
-                .nth(rng.gen::<usize>() % idx_data_map.len())
-                .unwrap()
-                .0
-                .to_vec();
-
-            let op_type = {
-                if rng.gen::<bool>() {
-                    OpType::Read
-                } else {
-                    OpType::Write
-                }
-            };
-
-            let data = {
-                if op_type == OpType::Read {
-                    idx_data_map[&idx].to_vec()
-                } else {
-                    (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
-                }
-            };
-
-            if op_type == OpType::Write {
-                idx_data_map.insert(idx.clone(), data.clone());
-                btree.update(&idx, &data);
-            }
-
-            ops.push(Operation::new(clk, idx, data, op_type));
-        }
-    }
-    let final_pages = btree.gen_all_trace(committer);
-    (init_pages, false, final_pages, false, ops)
+#[test]
+fn multitier_page_rw_mixed_ops_empty_start() {
+    multitier_page_rw_test(generate_mixed_ops_empty_start, false, 4);
 }
 
-fn generate_mixed_ops_remove_first_leaf(
-    idx_len: usize,
-    data_len: usize,
-    page_height: usize,
-    limb_bits: usize,
-    num_ops: usize,
-    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
-) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
-    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
-    const MAX_LIMB_VAL: u32 = 1 << 20;
-    let mut rng = create_seeded_rng();
-    let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
-        limb_bits,
-        idx_len,
-        data_len,
-        page_height,
-    );
-    // Generating a random page with distinct indices
-    let mut idx_data_map = HashMap::new();
-    for _ in 0..4 * page_height {
-        let mut idx;
-        loop {
-            idx = (0..idx_len)
-                .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
-                .collect::<Vec<u32>>();
-            if !idx_data_map.contains_key(&idx) {
-                break;
-            }
-        }
-
-        let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
-        idx_data_map.insert(idx.clone(), data.clone());
-        btree.update(&idx, &data);
-    }
-    let mut init_pages = btree.gen_all_trace(committer);
-    // check for correctness
-    for (idx, _) in idx_data_map.iter() {
-        btree.search(idx).unwrap();
-    }
-    let mut clks: Vec<usize> = (0..num_ops)
-        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
-        .collect();
-    clks.sort();
-    let mut ops: Vec<Operation> = vec![];
-    for i in 0..num_ops {
-        let clk = clks[i];
-        if rng.gen::<bool>() {
-            let mut idx;
-            loop {
-                idx = (0..idx_len)
-                    .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
-                    .collect::<Vec<u32>>();
-                if !idx_data_map.contains_key(&idx) && idx[0] > MAX_LIMB_VAL / 2 {
-                    break;
-                }
-            }
-
-            let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
-            idx_data_map.insert(idx.clone(), data.clone());
-            btree.update(&idx, &data);
-            ops.push(Operation::new(clk, idx, data, OpType::Write));
-        } else {
-            let mut idx;
-            loop {
-                idx = idx_data_map
-                    .iter()
-                    .nth(rng.gen::<usize>() % idx_data_map.len())
-                    .unwrap()
-                    .0
-                    .to_vec();
-                if idx[0] > MAX_LIMB_VAL / 2 {
-                    break;
-                }
-            }
-
-            let op_type = {
-                if rng.gen::<bool>() {
-                    OpType::Read
-                } else {
-                    OpType::Write
-                }
-            };
-
-            let data = {
-                if op_type == OpType::Read {
-                    idx_data_map[&idx].to_vec()
-                } else {
-                    (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
-                }
-            };
-
-            if op_type == OpType::Write {
-                idx_data_map.insert(idx.clone(), data.clone());
-                btree.update(&idx, &data);
-            }
-
-            ops.push(Operation::new(clk, idx, data, op_type));
-        }
-    }
-    let mut final_pages = btree.gen_all_trace(committer);
-    println!("INIT_PAGES: {:?}", init_pages.leaf_pages);
-    println!("FINAL_PAGES: {:?}", final_pages.leaf_pages);
-    final_pages.leaf_pages.pop();
-    init_pages.leaf_pages.pop();
-    (init_pages.clone(), false, final_pages.clone(), false, ops)
+#[test]
+fn multitier_page_rw_mixed_ops_remove_first_leaf() {
+    multitier_page_rw_test(generate_mixed_ops_remove_first_leaf, false, 4);
 }
 
-fn generate_mixed_ops_empty_start(
-    idx_len: usize,
-    data_len: usize,
-    page_height: usize,
-    limb_bits: usize,
-    num_ops: usize,
-    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
-) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
-    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
-    const MAX_LIMB_VAL: u32 = 1 << 20;
-    let mut rng = create_seeded_rng();
-    let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
-        limb_bits,
-        idx_len,
-        data_len,
-        page_height,
-    );
-    // Generating a random page with distinct indices
-    let mut idx_data_map = HashMap::new();
-    let init_pages = btree.gen_all_trace(committer);
-
-    let mut clks: Vec<usize> = (0..num_ops)
-        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
-        .collect();
-    clks.sort();
-    let mut ops: Vec<Operation> = vec![];
-    for i in 0..num_ops {
-        let clk = clks[i];
-        if rng.gen::<bool>() || i == 0 {
-            let mut idx;
-            loop {
-                idx = (0..idx_len)
-                    .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
-                    .collect::<Vec<u32>>();
-                if !idx_data_map.contains_key(&idx) {
-                    break;
-                }
-            }
-
-            let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
-            idx_data_map.insert(idx.clone(), data.clone());
-            btree.update(&idx, &data);
-            ops.push(Operation::new(clk, idx, data, OpType::Write));
-        } else {
-            let idx = idx_data_map
-                .iter()
-                .nth(rng.gen::<usize>() % idx_data_map.len())
-                .unwrap()
-                .0
-                .to_vec();
-
-            let op_type = {
-                if rng.gen::<bool>() {
-                    OpType::Read
-                } else {
-                    OpType::Write
-                }
-            };
-
-            let data = {
-                if op_type == OpType::Read {
-                    idx_data_map[&idx].to_vec()
-                } else {
-                    (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
-                }
-            };
-
-            if op_type == OpType::Write {
-                idx_data_map.insert(idx.clone(), data.clone());
-                btree.update(&idx, &data);
-            }
-
-            ops.push(Operation::new(clk, idx, data, op_type));
-        }
-    }
-    let final_pages = btree.gen_all_trace(committer);
-    (init_pages, true, final_pages, true, ops)
+// These next tests require the large tree to be on disk
+// Run pagebtree::tests::make_a_large_tree to do this
+#[test]
+fn multitier_page_rw_large_tree_no_new_keys() {
+    multitier_page_rw_test(generate_large_tree_no_new_keys, false, 5);
 }
 
-fn generate_large_tree_no_new_keys(
-    _idx_len: usize,
-    data_len: usize,
-    _page_height: usize,
-    _limb_bits: usize,
-    num_ops: usize,
-    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
-) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
-    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
-    let mut rng = create_seeded_rng();
-    let mut btree = PageBTree::<32, 32, BABYBEAR_COMMITMENT_LEN>::load(vec![
-        639955356, 1577306122, 107201956, 1528176068, 704402408, 1775238984, 169542638, 1916258191,
-    ])
-    .unwrap();
-    // Generating a random page with distinct indices
-    let existing_keys = vec![vec![534524, 887809], vec![380587, 701877]];
-    for k in &existing_keys {
-        btree.search(k).unwrap();
-    }
-    let init_pages = btree.gen_all_trace(committer);
-    btree.consistency_check();
-    // println!("{:?}", init_pages.leaf_pages);
-    // panic!();
-    // panic!();
-    let mut clks: Vec<usize> = (0..num_ops)
-        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
-        .collect();
-    clks.sort();
-    let mut ops: Vec<Operation> = vec![];
-    for i in 0..num_ops {
-        let clk = clks[i];
-
-        let idx = existing_keys[rng.gen::<usize>() % existing_keys.len()].clone();
-
-        let op_type = {
-            if rng.gen::<bool>() {
-                OpType::Read
-            } else {
-                OpType::Write
-            }
-        };
-
-        let data = {
-            if op_type == OpType::Read {
-                btree.search(&idx).unwrap()
-            } else {
-                (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
-            }
-        };
-
-        if op_type == OpType::Write {
-            btree.update(&idx, &data);
-        }
-
-        ops.push(Operation::new(clk, idx, data, op_type));
-    }
-    let final_pages = btree.gen_all_trace(committer);
-    (init_pages.clone(), false, final_pages.clone(), false, ops)
-}
-
-fn generate_large_tree_new_keys(
-    idx_len: usize,
-    data_len: usize,
-    _page_height: usize,
-    _limb_bits: usize,
-    num_ops: usize,
-    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
-) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
-    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
-    let mut rng = create_seeded_rng();
-    let mut btree = PageBTree::<32, 32, BABYBEAR_COMMITMENT_LEN>::load(vec![
-        639955356, 1577306122, 107201956, 1528176068, 704402408, 1775238984, 169542638, 1916258191,
-    ])
-    .unwrap();
-    // Generating a random page with distinct indices
-    let existing_keys = vec![vec![534524, 887809], vec![380587, 701877]];
-    // println!("{:?}", init_pages.leaf_pages);
-    // panic!();
-    // panic!();
-    let mut clks: Vec<usize> = (0..num_ops)
-        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
-        .collect();
-    clks.sort();
-    let mut ops: Vec<Operation> = vec![];
-    for i in 0..num_ops {
-        let clk = clks[i];
-        if rng.gen::<bool>() || i == 0 {
-            let idx = (0..idx_len)
-                .map(|_| rng.gen::<u32>() % 1000 + 1000000)
-                .collect::<Vec<u32>>();
-
-            let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
-            btree.update(&idx, &data);
-            ops.push(Operation::new(clk, idx, data, OpType::Write));
-        } else {
-            let idx = existing_keys[rng.gen::<usize>() % existing_keys.len()].clone();
-
-            let op_type = {
-                if rng.gen::<bool>() {
-                    OpType::Read
-                } else {
-                    OpType::Write
-                }
-            };
-
-            let data = {
-                if op_type == OpType::Read {
-                    btree.search(&idx).unwrap()
-                } else {
-                    (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
-                }
-            };
-
-            if op_type == OpType::Write {
-                btree.update(&idx, &data);
-            }
-
-            ops.push(Operation::new(clk, idx, data, op_type));
-        }
-    }
-    let final_pages = btree.gen_all_trace(committer);
-    let init_pages = btree.gen_loaded_trace();
-    (init_pages.clone(), false, final_pages.clone(), false, ops)
+#[test]
+fn multitier_page_rw_large_tree_new_keys() {
+    multitier_page_rw_test(generate_large_tree_new_keys, false, 5);
 }
 
 fn multitier_page_rw_test<F>(generate_inputs: F, should_fail: bool, log_page_height: usize)
@@ -943,43 +290,691 @@ where
         &partial_pk,
         trace_degree,
     );
+    assert!(should_fail == res.is_err());
     if !should_fail {
         res.unwrap();
     }
-    // assert!(should_fail == res.is_err());
 }
 
-#[test]
-fn multitier_page_rw_no_new_keys() {
-    multitier_page_rw_test(generate_no_new_keys, false, 4);
+fn load_page_test(
+    engine: &BabyBearPoseidon2Engine,
+    init_leaf_pages: Vec<Vec<Vec<u32>>>,
+    init_internal_pages: Vec<Vec<Vec<u32>>>,
+    init_root_is_leaf: bool,
+    init_root_idx: usize,
+    final_leaf_pages: Vec<Vec<Vec<u32>>>,
+    final_internal_pages: Vec<Vec<Vec<u32>>>,
+    final_root_is_leaf: bool,
+    final_root_idx: usize,
+    ops: &Vec<Operation>,
+    page_controller: &mut page_controller::PageController<
+        BabyBearPoseidon2Config,
+        BABYBEAR_COMMITMENT_LEN,
+    >,
+    trace_builder: &mut TraceCommitmentBuilder<BabyBearPoseidon2Config>,
+    partial_pk: &MultiStarkPartialProvingKey<BabyBearPoseidon2Config>,
+    trace_degree: usize,
+) -> Result<(), VerificationError> {
+    page_controller.range_checker.clear();
+    let (data_trace, main_trace, commits, mut prover_data) = page_controller.load_page_and_ops(
+        init_leaf_pages,
+        init_internal_pages,
+        init_root_is_leaf,
+        init_root_idx,
+        final_leaf_pages,
+        final_internal_pages,
+        final_root_is_leaf,
+        final_root_idx,
+        ops.clone(),
+        trace_degree,
+        &mut trace_builder.committer,
+    );
+    let offline_checker_trace = main_trace.offline_checker_trace.clone();
+    let init_root = main_trace.init_root_signal_trace.clone();
+    let final_root = main_trace.final_root_signal_trace.clone();
+    let range_trace = page_controller.range_checker.generate_trace();
+    trace_builder.clear();
+
+    for trace in data_trace.init_leaf_chip_traces.iter() {
+        trace_builder.load_cached_trace(trace.clone(), prover_data.init_leaf_page.remove(0));
+    }
+
+    for trace in data_trace.init_internal_chip_traces.iter() {
+        trace_builder.load_cached_trace(trace.clone(), prover_data.init_internal_page.remove(0));
+    }
+
+    for trace in data_trace.final_leaf_chip_traces.iter() {
+        trace_builder.load_cached_trace(trace.clone(), prover_data.final_leaf_page.remove(0));
+    }
+
+    for trace in data_trace.final_internal_chip_traces.iter() {
+        trace_builder.load_cached_trace(trace.clone(), prover_data.final_internal_page.remove(0));
+    }
+
+    for trace in main_trace.init_leaf_chip_main_traces.iter() {
+        trace_builder.load_trace(trace.clone());
+    }
+
+    for trace in main_trace.init_internal_chip_main_traces.iter() {
+        trace_builder.load_trace(trace.clone());
+    }
+
+    for trace in main_trace.final_leaf_chip_main_traces.iter() {
+        trace_builder.load_trace(trace.clone());
+    }
+
+    for trace in main_trace.final_internal_chip_main_traces.iter() {
+        trace_builder.load_trace(trace.clone());
+    }
+
+    trace_builder.load_trace(offline_checker_trace.clone());
+    trace_builder.load_trace(init_root);
+    trace_builder.load_trace(final_root);
+    trace_builder.load_trace(range_trace);
+    trace_builder.commit_current();
+
+    let mut airs: Vec<&dyn AnyRap<BabyBearPoseidon2Config>> = vec![];
+    for chip in &page_controller.init_leaf_chips {
+        airs.push(chip);
+    }
+    for chip in &page_controller.init_internal_chips {
+        airs.push(chip);
+    }
+    for chip in &page_controller.final_leaf_chips {
+        airs.push(chip);
+    }
+    for chip in &page_controller.final_internal_chips {
+        airs.push(chip);
+    }
+    airs.push(&page_controller.offline_checker);
+    airs.push(&page_controller.init_root_signal);
+    airs.push(&page_controller.final_root_signal);
+    airs.push(&page_controller.range_checker.air);
+    let partial_vk = partial_pk.partial_vk();
+    let main_trace_data = trace_builder.view(&partial_vk, airs.clone());
+
+    let mut pis = vec![];
+    for c in commits.init_leaf_page_commitments {
+        let c: [BabyBear; BABYBEAR_COMMITMENT_LEN] = c.into();
+        pis.push(c.to_vec());
+    }
+    for c in commits.init_internal_page_commitments {
+        let c: [BabyBear; BABYBEAR_COMMITMENT_LEN] = c.into();
+        pis.push(c.to_vec());
+    }
+    for c in commits.final_leaf_page_commitments {
+        let c: [BabyBear; BABYBEAR_COMMITMENT_LEN] = c.into();
+        pis.push(c.to_vec());
+    }
+    for c in commits.final_internal_page_commitments {
+        let c: [BabyBear; BABYBEAR_COMMITMENT_LEN] = c.into();
+        pis.push(c.to_vec());
+    }
+    pis.push(vec![]);
+    {
+        let c: [BabyBear; BABYBEAR_COMMITMENT_LEN] = commits.init_root_commitment.into();
+        pis.push(c.to_vec());
+    }
+    {
+        let c: [BabyBear; BABYBEAR_COMMITMENT_LEN] = commits.final_root_commitment.into();
+        pis.push(c.to_vec());
+    }
+    pis.push(vec![]);
+    let prover = engine.prover();
+    let verifier = engine.verifier();
+
+    let mut challenger = engine.new_challenger();
+    let proof = prover.prove(&mut challenger, &partial_pk, main_trace_data, &pis);
+
+    let mut challenger = engine.new_challenger();
+    let result = verifier.verify(&mut challenger, partial_vk, airs, proof, &pis);
+
+    result
 }
 
-#[test]
-fn multitier_page_rw_new_keys() {
-    multitier_page_rw_test(generate_new_keys, false, 4);
+fn generate_no_new_keys(
+    idx_len: usize,
+    data_len: usize,
+    page_height: usize,
+    limb_bits: usize,
+    num_ops: usize,
+    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
+) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
+    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
+    const MAX_LIMB_VAL: u32 = 1 << 20;
+    let mut rng = create_seeded_rng();
+    let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
+        limb_bits,
+        idx_len,
+        data_len,
+        page_height,
+        page_height,
+    );
+    // Generating a random page with distinct indices
+    let mut idx_data_map = HashMap::new();
+    for _ in 0..4 * page_height {
+        let mut idx;
+        loop {
+            idx = (0..idx_len)
+                .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
+                .collect::<Vec<u32>>();
+            if !idx_data_map.contains_key(&idx) {
+                break;
+            }
+        }
+
+        let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+        idx_data_map.insert(idx.clone(), data.clone());
+        btree.update(&idx, &data);
+    }
+    let init_pages = btree.gen_all_trace(committer);
+    // check for correctness
+    for (idx, _) in idx_data_map.iter() {
+        btree.search(idx).unwrap();
+    }
+    let mut clks: Vec<usize> = (0..num_ops)
+        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
+        .collect();
+    clks.sort();
+
+    let mut ops: Vec<Operation> = vec![];
+    for i in 0..num_ops {
+        let clk = clks[i];
+        let idx = idx_data_map
+            .iter()
+            .nth(rng.gen::<usize>() % idx_data_map.len())
+            .unwrap()
+            .0
+            .to_vec();
+
+        let op_type = {
+            if rng.gen::<bool>() {
+                OpType::Read
+            } else {
+                OpType::Write
+            }
+        };
+
+        let data = {
+            if op_type == OpType::Read {
+                idx_data_map[&idx].to_vec()
+            } else {
+                (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
+            }
+        };
+
+        if op_type == OpType::Write {
+            idx_data_map.insert(idx.clone(), data.clone());
+            btree.update(&idx, &data);
+        }
+
+        ops.push(Operation::new(clk, idx, data, op_type));
+    }
+    let final_pages = btree.gen_all_trace(committer);
+    (init_pages, false, final_pages, false, ops)
 }
 
-#[test]
-fn multitier_page_rw_mixed_ops() {
-    multitier_page_rw_test(generate_mixed_ops, false, 4);
+fn generate_new_keys(
+    idx_len: usize,
+    data_len: usize,
+    page_height: usize,
+    limb_bits: usize,
+    num_ops: usize,
+    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
+) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
+    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
+    const MAX_LIMB_VAL: u32 = 1 << 20;
+    let mut rng = create_seeded_rng();
+    let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
+        limb_bits,
+        idx_len,
+        data_len,
+        page_height,
+        page_height,
+    );
+    // Generating a random page with distinct indices
+    let mut idx_data_map = HashMap::new();
+    for _ in 0..4 * page_height {
+        let mut idx;
+        loop {
+            idx = (0..idx_len)
+                .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
+                .collect::<Vec<u32>>();
+            if !idx_data_map.contains_key(&idx) {
+                break;
+            }
+        }
+
+        let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+        idx_data_map.insert(idx.clone(), data.clone());
+        btree.update(&idx, &data);
+    }
+    let init_pages = btree.gen_all_trace(committer);
+    // check for correctness
+    for (idx, _) in idx_data_map.iter() {
+        btree.search(idx).unwrap();
+    }
+    let mut clks: Vec<usize> = (0..num_ops)
+        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
+        .collect();
+    clks.sort();
+    let mut ops: Vec<Operation> = vec![];
+    for i in 0..num_ops {
+        let clk = clks[i];
+        let mut idx;
+        loop {
+            idx = (0..idx_len)
+                .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
+                .collect::<Vec<u32>>();
+            if !idx_data_map.contains_key(&idx) {
+                break;
+            }
+        }
+
+        let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+        idx_data_map.insert(idx.clone(), data.clone());
+        btree.update(&idx, &data);
+        ops.push(Operation::new(clk, idx, data, OpType::Write));
+    }
+    let final_pages = btree.gen_all_trace(committer);
+    (init_pages, false, final_pages, false, ops)
 }
 
-#[test]
-fn multitier_page_rw_mixed_ops_empty_start() {
-    multitier_page_rw_test(generate_mixed_ops_empty_start, false, 4);
+fn generate_mixed_ops(
+    idx_len: usize,
+    data_len: usize,
+    page_height: usize,
+    limb_bits: usize,
+    num_ops: usize,
+    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
+) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
+    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
+    const MAX_LIMB_VAL: u32 = 1 << 20;
+    let mut rng = create_seeded_rng();
+    let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
+        limb_bits,
+        idx_len,
+        data_len,
+        page_height,
+        page_height,
+    );
+    // Generating a random page with distinct indices
+    let mut idx_data_map = HashMap::new();
+    for _ in 0..4 * page_height {
+        let mut idx;
+        loop {
+            idx = (0..idx_len)
+                .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
+                .collect::<Vec<u32>>();
+            if !idx_data_map.contains_key(&idx) {
+                break;
+            }
+        }
+
+        let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+        idx_data_map.insert(idx.clone(), data.clone());
+        btree.update(&idx, &data);
+    }
+    let init_pages = btree.gen_all_trace(committer);
+    // check for correctness
+    for (idx, _) in idx_data_map.iter() {
+        btree.search(idx).unwrap();
+    }
+    let mut clks: Vec<usize> = (0..num_ops)
+        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
+        .collect();
+    clks.sort();
+    let mut ops: Vec<Operation> = vec![];
+    for i in 0..num_ops {
+        let clk = clks[i];
+        if rng.gen::<bool>() {
+            let mut idx;
+            loop {
+                idx = (0..idx_len)
+                    .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
+                    .collect::<Vec<u32>>();
+                if !idx_data_map.contains_key(&idx) {
+                    break;
+                }
+            }
+
+            let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+            idx_data_map.insert(idx.clone(), data.clone());
+            btree.update(&idx, &data);
+            ops.push(Operation::new(clk, idx, data, OpType::Write));
+        } else {
+            let idx = idx_data_map
+                .iter()
+                .nth(rng.gen::<usize>() % idx_data_map.len())
+                .unwrap()
+                .0
+                .to_vec();
+
+            let op_type = {
+                if rng.gen::<bool>() {
+                    OpType::Read
+                } else {
+                    OpType::Write
+                }
+            };
+
+            let data = {
+                if op_type == OpType::Read {
+                    idx_data_map[&idx].to_vec()
+                } else {
+                    (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
+                }
+            };
+
+            if op_type == OpType::Write {
+                idx_data_map.insert(idx.clone(), data.clone());
+                btree.update(&idx, &data);
+            }
+
+            ops.push(Operation::new(clk, idx, data, op_type));
+        }
+    }
+    let final_pages = btree.gen_all_trace(committer);
+    (init_pages, false, final_pages, false, ops)
 }
 
-#[test]
-fn multitier_page_rw_mixed_ops_remove_first_leaf() {
-    multitier_page_rw_test(generate_mixed_ops_remove_first_leaf, false, 4);
+fn generate_mixed_ops_remove_first_leaf(
+    idx_len: usize,
+    data_len: usize,
+    page_height: usize,
+    limb_bits: usize,
+    num_ops: usize,
+    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
+) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
+    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
+    const MAX_LIMB_VAL: u32 = 1 << 20;
+    let mut rng = create_seeded_rng();
+    let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
+        limb_bits,
+        idx_len,
+        data_len,
+        page_height,
+        page_height,
+    );
+    let mut idx_data_map = HashMap::new();
+    for _ in 0..4 * page_height {
+        let mut idx;
+        loop {
+            idx = (0..idx_len)
+                .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
+                .collect::<Vec<u32>>();
+            if !idx_data_map.contains_key(&idx) {
+                break;
+            }
+        }
+
+        let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+        idx_data_map.insert(idx.clone(), data.clone());
+        btree.update(&idx, &data);
+    }
+    let mut init_pages = btree.gen_all_trace(committer);
+    // check for correctness
+    for (idx, _) in idx_data_map.iter() {
+        btree.search(idx).unwrap();
+    }
+    let mut clks: Vec<usize> = (0..num_ops)
+        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
+        .collect();
+    clks.sort();
+    let mut ops: Vec<Operation> = vec![];
+    for i in 0..num_ops {
+        let clk = clks[i];
+        if rng.gen::<bool>() {
+            let mut idx;
+            loop {
+                idx = (0..idx_len)
+                    .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
+                    .collect::<Vec<u32>>();
+                if !idx_data_map.contains_key(&idx) && idx[0] > MAX_LIMB_VAL / 2 {
+                    break;
+                }
+            }
+
+            let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+            idx_data_map.insert(idx.clone(), data.clone());
+            btree.update(&idx, &data);
+            ops.push(Operation::new(clk, idx, data, OpType::Write));
+        } else {
+            let mut idx;
+            loop {
+                idx = idx_data_map
+                    .iter()
+                    .nth(rng.gen::<usize>() % idx_data_map.len())
+                    .unwrap()
+                    .0
+                    .to_vec();
+                if idx[0] > MAX_LIMB_VAL / 2 {
+                    break;
+                }
+            }
+
+            let op_type = {
+                if rng.gen::<bool>() {
+                    OpType::Read
+                } else {
+                    OpType::Write
+                }
+            };
+
+            let data = {
+                if op_type == OpType::Read {
+                    idx_data_map[&idx].to_vec()
+                } else {
+                    (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
+                }
+            };
+
+            if op_type == OpType::Write {
+                idx_data_map.insert(idx.clone(), data.clone());
+                btree.update(&idx, &data);
+            }
+
+            ops.push(Operation::new(clk, idx, data, op_type));
+        }
+    }
+    let mut final_pages = btree.gen_all_trace(committer);
+    final_pages.leaf_pages.pop();
+    init_pages.leaf_pages.pop();
+    (init_pages.clone(), false, final_pages.clone(), false, ops)
 }
 
-#[test]
-fn multitier_page_rw_large_tree_no_new_keys() {
-    multitier_page_rw_test(generate_large_tree_no_new_keys, false, 5);
+fn generate_mixed_ops_empty_start(
+    idx_len: usize,
+    data_len: usize,
+    page_height: usize,
+    limb_bits: usize,
+    num_ops: usize,
+    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
+) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
+    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
+    const MAX_LIMB_VAL: u32 = 1 << 20;
+    let mut rng = create_seeded_rng();
+    let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
+        limb_bits,
+        idx_len,
+        data_len,
+        page_height,
+        page_height,
+    );
+    let mut idx_data_map = HashMap::new();
+    let init_pages = btree.gen_all_trace(committer);
+
+    let mut clks: Vec<usize> = (0..num_ops)
+        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
+        .collect();
+    clks.sort();
+    let mut ops: Vec<Operation> = vec![];
+    for i in 0..num_ops {
+        let clk = clks[i];
+        if rng.gen::<bool>() || i == 0 {
+            let mut idx;
+            loop {
+                idx = (0..idx_len)
+                    .map(|_| rng.gen::<u32>() % MAX_LIMB_VAL)
+                    .collect::<Vec<u32>>();
+                if !idx_data_map.contains_key(&idx) {
+                    break;
+                }
+            }
+
+            let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+            idx_data_map.insert(idx.clone(), data.clone());
+            btree.update(&idx, &data);
+            ops.push(Operation::new(clk, idx, data, OpType::Write));
+        } else {
+            let idx = idx_data_map
+                .iter()
+                .nth(rng.gen::<usize>() % idx_data_map.len())
+                .unwrap()
+                .0
+                .to_vec();
+
+            let op_type = {
+                if rng.gen::<bool>() {
+                    OpType::Read
+                } else {
+                    OpType::Write
+                }
+            };
+
+            let data = {
+                if op_type == OpType::Read {
+                    idx_data_map[&idx].to_vec()
+                } else {
+                    (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
+                }
+            };
+
+            if op_type == OpType::Write {
+                idx_data_map.insert(idx.clone(), data.clone());
+                btree.update(&idx, &data);
+            }
+
+            ops.push(Operation::new(clk, idx, data, op_type));
+        }
+    }
+    let final_pages = btree.gen_all_trace(committer);
+    (init_pages, true, final_pages, true, ops)
 }
 
-#[test]
-fn multitier_page_rw_large_tree_new_keys() {
-    multitier_page_rw_test(generate_large_tree_new_keys, false, 5);
+fn generate_large_tree_no_new_keys(
+    _idx_len: usize,
+    data_len: usize,
+    _page_height: usize,
+    _limb_bits: usize,
+    num_ops: usize,
+    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
+) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
+    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
+    let mut rng = create_seeded_rng();
+    let mut btree = PageBTree::<32, 32, BABYBEAR_COMMITMENT_LEN>::load(vec![
+        639955356, 1577306122, 107201956, 1528176068, 704402408, 1775238984, 169542638, 1916258191,
+    ])
+    .unwrap();
+    let existing_keys = vec![vec![534524, 887809], vec![380587, 701877]];
+    for k in &existing_keys {
+        btree.search(k).unwrap();
+    }
+    let init_pages = btree.gen_all_trace(committer);
+    btree.consistency_check();
+    let mut clks: Vec<usize> = (0..num_ops)
+        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
+        .collect();
+    clks.sort();
+    let mut ops: Vec<Operation> = vec![];
+    for i in 0..num_ops {
+        let clk = clks[i];
+
+        let idx = existing_keys[rng.gen::<usize>() % existing_keys.len()].clone();
+
+        let op_type = {
+            if rng.gen::<bool>() {
+                OpType::Read
+            } else {
+                OpType::Write
+            }
+        };
+
+        let data = {
+            if op_type == OpType::Read {
+                btree.search(&idx).unwrap()
+            } else {
+                (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
+            }
+        };
+
+        if op_type == OpType::Write {
+            btree.update(&idx, &data);
+        }
+
+        ops.push(Operation::new(clk, idx, data, op_type));
+    }
+    let final_pages = btree.gen_all_trace(committer);
+    (init_pages.clone(), false, final_pages.clone(), false, ops)
+}
+
+fn generate_large_tree_new_keys(
+    idx_len: usize,
+    data_len: usize,
+    _page_height: usize,
+    _limb_bits: usize,
+    num_ops: usize,
+    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
+) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
+    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
+    let mut rng = create_seeded_rng();
+    let mut btree = PageBTree::<32, 32, BABYBEAR_COMMITMENT_LEN>::load(vec![
+        639955356, 1577306122, 107201956, 1528176068, 704402408, 1775238984, 169542638, 1916258191,
+    ])
+    .unwrap();
+    let existing_keys = vec![vec![534524, 887809], vec![380587, 701877]];
+    let mut clks: Vec<usize> = (0..num_ops)
+        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
+        .collect();
+    clks.sort();
+    let mut ops: Vec<Operation> = vec![];
+    for i in 0..num_ops {
+        let clk = clks[i];
+        if rng.gen::<bool>() || i == 0 {
+            let idx = (0..idx_len)
+                .map(|_| rng.gen::<u32>() % 1000 + 1000000)
+                .collect::<Vec<u32>>();
+
+            let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+            btree.update(&idx, &data);
+            ops.push(Operation::new(clk, idx, data, OpType::Write));
+        } else {
+            let idx = existing_keys[rng.gen::<usize>() % existing_keys.len()].clone();
+
+            let op_type = {
+                if rng.gen::<bool>() {
+                    OpType::Read
+                } else {
+                    OpType::Write
+                }
+            };
+
+            let data = {
+                if op_type == OpType::Read {
+                    btree.search(&idx).unwrap()
+                } else {
+                    (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
+                }
+            };
+
+            if op_type == OpType::Write {
+                btree.update(&idx, &data);
+            }
+
+            ops.push(Operation::new(clk, idx, data, op_type));
+        }
+    }
+    let final_pages = btree.gen_all_trace(committer);
+    let init_pages = btree.gen_loaded_trace();
+    (init_pages.clone(), false, final_pages.clone(), false, ops)
 }
