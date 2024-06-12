@@ -12,7 +12,7 @@ use crate::{
 use super::InternalPageChip;
 
 impl<const COMMITMENT_LEN: usize> InternalPageChip<COMMITMENT_LEN> {
-    // The trace is the whole page (including the is_alloc column)
+    // The cached trace is the whole page (including the is_leaf and is_alloc column)
     pub fn generate_cached_trace<F: PrimeField64>(&self, page: Vec<Vec<u32>>) -> RowMajorMatrix<F> {
         RowMajorMatrix::new(
             page.into_iter()
@@ -115,10 +115,7 @@ impl<const COMMITMENT_LEN: usize> InternalPageChip<COMMITMENT_LEN> {
                                 .generate_trace_row(F::from_wrapped_u32(mult * row[1]) - F::one())
                                 .inv,
                         );
-                        // println!("{:?}", *trace_row.last().unwrap());
                         trace_row[COMMITMENT_LEN + 3] = trace_row[COMMITMENT_LEN + 1] - F::one();
-                        // println!("{:?}", trace_row[COMMITMENT_LEN + 1] - F::one());
-                        // println!("TRACE_LEN {:?}", trace_row.len());
                         trace_row
                     } else {
                         let mut trace_row = trace_row
@@ -134,55 +131,3 @@ impl<const COMMITMENT_LEN: usize> InternalPageChip<COMMITMENT_LEN> {
         )
     }
 }
-
-// #[derive(Clone)]
-// pub struct PtrPageCols<T> {
-//     pub is_alloc: T,
-//     pub start: Vec<T>,
-//     pub end: Vec<T>,
-//     pub commitment: Vec<T>,
-// }
-
-// #[derive(Clone)]
-// pub struct InternalPageSubAirCols<T> {
-//     pub key1_start: IsLessThanTupleAuxCols<T>,
-//     pub end_key1: IsLessThanTupleAuxCols<T>,
-//     pub key2_start: IsLessThanTupleAuxCols<T>,
-//     pub end_key2: IsLessThanTupleAuxCols<T>,
-//     pub end_start: IsLessThanTupleAuxCols<T>,
-//     pub end_next: IsLessThanTupleAuxCols<T>,
-// }
-
-// // pub struct LeafPageCacheCols<T> {
-// //     pub is_alloc: T, // indicates if row is allocated
-// //     pub idx: Vec<T>,
-// //     pub data: Vec<T>,
-// // }
-// #[derive(Clone)]
-// pub struct TwoRangeInclusionCols<T> {
-//     pub start: Vec<T>,
-//     pub end: Vec<T>,
-//     pub less_than_start: (T, T),
-//     pub greater_than_end: (T, T),
-// }
-
-// #[derive(Clone)]
-// pub struct ProveSortCols<T> {
-//     pub next_key: Vec<T>,
-//     // we want this to be true
-//     pub end_less_than_next: T,
-//     // we want this to be false
-//     pub end_less_than_start: T,
-// }
-
-// #[derive(Clone)]
-// pub struct InternalPageMetadataCols<T> {
-//     pub own_commitment: Vec<T>,
-//     pub mult: T,
-//     pub mult_alloc: T,
-//     pub mult_alloc_minus_one: T,
-//     pub mult_alloc_is_1: T,
-//     pub prove_sort_cols: Option<ProveSortCols<T>>,
-//     pub range_inclusion_cols: Option<TwoRangeInclusionCols<T>>,
-//     pub subchip_aux_cols: Option<InternalPageSubAirCols<T>>,
-// }

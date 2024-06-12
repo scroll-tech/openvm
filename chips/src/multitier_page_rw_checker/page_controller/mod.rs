@@ -52,14 +52,13 @@ struct PageTreeGraph<SC: StarkGenericConfig, const COMMITMENT_LEN: usize>
 where
     Val<SC>: AbstractField + PrimeField64,
 {
-    pub root: Node,
-    // pub adj: BTreeMap<Node, Vec<Node>>,
+    pub _root: Node,
     pub mults: Vec<Vec<u32>>,
     pub leaf_ranges: Vec<(Vec<u32>, Vec<u32>)>,
     pub internal_ranges: Vec<(Vec<u32>, Vec<u32>)>,
     pub root_range: (Vec<u32>, Vec<u32>),
     pub root_mult: u32,
-    pub commitment_to_node: BTreeMap<Vec<Val<SC>>, Node>,
+    pub _commitment_to_node: BTreeMap<Vec<Val<SC>>, Node>,
     pub mega_page: Vec<Vec<u32>>,
 }
 
@@ -93,7 +92,10 @@ where
                     let next_node = commitment_to_node
                         .get(&f_row[2 + 2 * idx_len..2 + 2 * idx_len + COMMITMENT_LEN].to_vec());
                     match next_node {
-                        None => mult.push(1),
+                        None => {
+                            mult.push(1);
+                            ans += 1;
+                        }
                         Some(n) => {
                             if n.0 {
                                 leaf_ranges[n.1].0 = row[2..2 + idx_len].to_vec();
@@ -235,11 +237,11 @@ where
             internal_ranges[root.1].clone()
         };
         PageTreeGraph {
-            root,
+            _root: root,
             root_range,
             mults,
             root_mult,
-            commitment_to_node,
+            _commitment_to_node: commitment_to_node,
             leaf_ranges,
             internal_ranges,
             mega_page,
@@ -400,18 +402,6 @@ where
             main_trace: None,
             range_checker,
         }
-    }
-
-    // pub fn offline_checker_trace(&self) -> DenseMatrix<Val<SC>> {
-    //     self.main_trace.clone().unwrap().offline_checker_trace
-    // }
-
-    fn get_leaf_page_cache_trace(&self, page: Vec<Vec<u32>>) -> DenseMatrix<Val<SC>> {
-        self.init_leaf_chips[0].generate_cached_trace::<Val<SC>>(page)
-    }
-
-    fn get_internal_page_cache_trace(&self, page: Vec<Vec<u32>>) -> DenseMatrix<Val<SC>> {
-        self.init_internal_chips[0].generate_cached_trace::<Val<SC>>(page)
     }
 
     fn gen_ops_trace(

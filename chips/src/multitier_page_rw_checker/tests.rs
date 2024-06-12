@@ -166,7 +166,7 @@ fn load_page_test(
     result
 }
 
-fn generate_no_new_key(
+fn generate_no_new_keys(
     idx_len: usize,
     data_len: usize,
     page_height: usize,
@@ -513,7 +513,7 @@ fn generate_mixed_ops_remove_first_leaf(
     println!("FINAL_PAGES: {:?}", final_pages.leaf_pages);
     final_pages.leaf_pages.pop();
     init_pages.leaf_pages.pop();
-    (init_pages, false, final_pages, false, ops)
+    (init_pages.clone(), false, final_pages.clone(), false, ops)
 }
 
 fn generate_mixed_ops_empty_start(
@@ -595,7 +595,132 @@ fn generate_mixed_ops_empty_start(
     (init_pages, true, final_pages, true, ops)
 }
 
-fn multitier_page_rw_test<F>(generate_inputs: F, should_fail: bool)
+fn generate_large_tree_no_new_keys(
+    _idx_len: usize,
+    data_len: usize,
+    _page_height: usize,
+    _limb_bits: usize,
+    num_ops: usize,
+    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
+) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
+    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
+    let mut rng = create_seeded_rng();
+    let mut btree = PageBTree::<32, 32, BABYBEAR_COMMITMENT_LEN>::load(vec![
+        639955356, 1577306122, 107201956, 1528176068, 704402408, 1775238984, 169542638, 1916258191,
+    ])
+    .unwrap();
+    // Generating a random page with distinct indices
+    let existing_keys = vec![vec![534524, 887809], vec![380587, 701877]];
+    for k in &existing_keys {
+        btree.search(k).unwrap();
+    }
+    let init_pages = btree.gen_all_trace(committer);
+    btree.consistency_check();
+    // println!("{:?}", init_pages.leaf_pages);
+    // panic!();
+    // panic!();
+    let mut clks: Vec<usize> = (0..num_ops)
+        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
+        .collect();
+    clks.sort();
+    let mut ops: Vec<Operation> = vec![];
+    for i in 0..num_ops {
+        let clk = clks[i];
+
+        let idx = existing_keys[rng.gen::<usize>() % existing_keys.len()].clone();
+
+        let op_type = {
+            if rng.gen::<bool>() {
+                OpType::Read
+            } else {
+                OpType::Write
+            }
+        };
+
+        let data = {
+            if op_type == OpType::Read {
+                btree.search(&idx).unwrap()
+            } else {
+                (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
+            }
+        };
+
+        if op_type == OpType::Write {
+            btree.update(&idx, &data);
+        }
+
+        ops.push(Operation::new(clk, idx, data, op_type));
+    }
+    let final_pages = btree.gen_all_trace(committer);
+    (init_pages.clone(), false, final_pages.clone(), false, ops)
+}
+
+fn generate_large_tree_new_keys(
+    idx_len: usize,
+    data_len: usize,
+    _page_height: usize,
+    _limb_bits: usize,
+    num_ops: usize,
+    committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
+) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
+    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
+    let mut rng = create_seeded_rng();
+    let mut btree = PageBTree::<32, 32, BABYBEAR_COMMITMENT_LEN>::load(vec![
+        639955356, 1577306122, 107201956, 1528176068, 704402408, 1775238984, 169542638, 1916258191,
+    ])
+    .unwrap();
+    // Generating a random page with distinct indices
+    let existing_keys = vec![vec![534524, 887809], vec![380587, 701877]];
+    // println!("{:?}", init_pages.leaf_pages);
+    // panic!();
+    // panic!();
+    let mut clks: Vec<usize> = (0..num_ops)
+        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
+        .collect();
+    clks.sort();
+    let mut ops: Vec<Operation> = vec![];
+    for i in 0..num_ops {
+        let clk = clks[i];
+        if rng.gen::<bool>() || i == 0 {
+            let idx = (0..idx_len)
+                .map(|_| rng.gen::<u32>() % 1000 + 1000000)
+                .collect::<Vec<u32>>();
+
+            let data: Vec<u32> = (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect();
+            btree.update(&idx, &data);
+            ops.push(Operation::new(clk, idx, data, OpType::Write));
+        } else {
+            let idx = existing_keys[rng.gen::<usize>() % existing_keys.len()].clone();
+
+            let op_type = {
+                if rng.gen::<bool>() {
+                    OpType::Read
+                } else {
+                    OpType::Write
+                }
+            };
+
+            let data = {
+                if op_type == OpType::Read {
+                    btree.search(&idx).unwrap()
+                } else {
+                    (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
+                }
+            };
+
+            if op_type == OpType::Write {
+                btree.update(&idx, &data);
+            }
+
+            ops.push(Operation::new(clk, idx, data, op_type));
+        }
+    }
+    let final_pages = btree.gen_all_trace(committer);
+    let init_pages = btree.gen_loaded_trace();
+    (init_pages.clone(), false, final_pages.clone(), false, ops)
+}
+
+fn multitier_page_rw_test<F>(generate_inputs: F, should_fail: bool, log_page_height: usize)
 where
     F: Fn(
         usize,
@@ -611,7 +736,6 @@ where
     let lt_bus_index = 2;
     let limb_bits = 20;
 
-    let log_page_height = 4;
     let log_num_ops = 3;
 
     let page_height = 1 << log_page_height;
@@ -631,16 +755,16 @@ where
 
     let init_param = PageTreeParams {
         path_bus_index: init_path_bus,
-        leaf_cap: 10,
-        internal_cap: 2,
+        leaf_cap: 8,
+        internal_cap: 24,
         leaf_page_height: page_height,
         internal_page_height: page_height,
     };
 
     let final_param = PageTreeParams {
         path_bus_index: final_path_bus,
-        leaf_cap: 10,
-        internal_cap: 2,
+        leaf_cap: 8,
+        internal_cap: 24,
         leaf_page_height: page_height,
         internal_page_height: page_height,
     };
@@ -819,30 +943,43 @@ where
         &partial_pk,
         trace_degree,
     );
-    assert!(should_fail == res.is_err());
+    if !should_fail {
+        res.unwrap();
+    }
+    // assert!(should_fail == res.is_err());
 }
 
 #[test]
-fn multitier_page_rw_no_new_key() {
-    multitier_page_rw_test(generate_no_new_key, false);
+fn multitier_page_rw_no_new_keys() {
+    multitier_page_rw_test(generate_no_new_keys, false, 4);
 }
 
 #[test]
 fn multitier_page_rw_new_keys() {
-    multitier_page_rw_test(generate_new_keys, false);
+    multitier_page_rw_test(generate_new_keys, false, 4);
 }
 
 #[test]
 fn multitier_page_rw_mixed_ops() {
-    multitier_page_rw_test(generate_mixed_ops, false);
+    multitier_page_rw_test(generate_mixed_ops, false, 4);
 }
 
 #[test]
 fn multitier_page_rw_mixed_ops_empty_start() {
-    multitier_page_rw_test(generate_mixed_ops_empty_start, false);
+    multitier_page_rw_test(generate_mixed_ops_empty_start, false, 4);
 }
 
 #[test]
 fn multitier_page_rw_mixed_ops_remove_first_leaf() {
-    multitier_page_rw_test(generate_mixed_ops_remove_first_leaf, false);
+    multitier_page_rw_test(generate_mixed_ops_remove_first_leaf, false, 4);
+}
+
+#[test]
+fn multitier_page_rw_large_tree_no_new_keys() {
+    multitier_page_rw_test(generate_large_tree_no_new_keys, false, 5);
+}
+
+#[test]
+fn multitier_page_rw_large_tree_new_keys() {
+    multitier_page_rw_test(generate_large_tree_new_keys, false, 5);
 }

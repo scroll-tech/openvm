@@ -224,7 +224,6 @@ impl OfflineChecker {
             let cols =
                 OfflineCheckerCols::from_slice(row, self.page_width(), self.idx_len, self.data_len);
             tracing::debug!("row {}: {:?}", i, cols);
-            println!("row {}: {:?}", i, cols);
         }
 
         RowMajorMatrix::new(rows.concat(), self.air_width())

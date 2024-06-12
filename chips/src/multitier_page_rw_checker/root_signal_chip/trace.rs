@@ -1,4 +1,4 @@
-use p3_matrix::dense::RowMajorMatrix; // Import the constant from columns.rs
+use p3_matrix::dense::RowMajorMatrix;
 
 use p3_field::PrimeField64;
 

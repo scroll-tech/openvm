@@ -103,6 +103,9 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirBridge<F>
     fn receives(&self, col_indices: InternalPageCols<usize>) -> Vec<Interaction<F>> {
         let mut interactions = vec![];
         interactions.extend(self.custom_receives_path(col_indices.clone()));
+        if !self.is_init {
+            interactions.extend(self.custom_sends_or_receives(col_indices.clone()));
+        }
         interactions
     }
 
