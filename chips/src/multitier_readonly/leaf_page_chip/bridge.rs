@@ -37,28 +37,28 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> AirBridge<F> for LeafPageChip
 impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirBridge<F>
     for LeafPageChip<COMMITMENT_LEN>
 {
-    fn sends(&self, col_indices: Self::Cols<usize>) -> Vec<Interaction<F>> {
-        let virtual_cols = (col_indices.cache_cols.idx)
-            .into_iter()
-            .chain(col_indices.cache_cols.data)
-            .map(VirtualPairCol::single_main)
-            .collect::<Vec<_>>();
-        vec![Interaction {
-            fields: virtual_cols,
-            count: VirtualPairCol::single_main(col_indices.metadata.mult_alloc),
-            argument_index: *self.data_bus_index(),
-        }]
-    }
-
     fn receives(&self, col_indices: Self::Cols<usize>) -> Vec<Interaction<F>> {
         let virtual_cols = (col_indices.metadata.commitment)
             .into_iter()
             .map(VirtualPairCol::single_main)
             .collect::<Vec<_>>();
-        vec![Interaction {
-            fields: virtual_cols,
-            count: VirtualPairCol::single_main(col_indices.metadata.mult_alloc),
-            argument_index: *self.path_bus_index(),
-        }]
+        let data_cols = (col_indices.cache_cols.idx)
+            .into_iter()
+            .chain(col_indices.cache_cols.data)
+            .map(VirtualPairCol::single_main)
+            .collect::<Vec<_>>();
+
+        vec![
+            Interaction {
+                fields: virtual_cols,
+                count: VirtualPairCol::single_main(col_indices.metadata.mult_alloc),
+                argument_index: *self.path_bus_index(),
+            },
+            Interaction {
+                fields: data_cols,
+                count: VirtualPairCol::single_main(col_indices.metadata.mult_alloc),
+                argument_index: *self.data_bus_index(),
+            },
+        ]
     }
 }

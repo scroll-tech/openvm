@@ -7,7 +7,7 @@ use crate::multitier_readonly::page_requester::columns::make_col_map;
 use super::PageRequester;
 
 impl<F: PrimeField64> AirBridge<F> for PageRequester {
-    fn receives(&self) -> Vec<Interaction<F>> {
+    fn sends(&self) -> Vec<Interaction<F>> {
         let mut data_cols = Vec::new();
         let cols = make_col_map(self.idx_len, self.data_len);
         for k in cols.idx {

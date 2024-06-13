@@ -283,7 +283,7 @@ fn generate_no_new_keys(
     }
 
     let mut requests: Vec<Vec<u32>> = vec![];
-    for i in 0..num_ops {
+    for _ in 0..num_ops {
         let idx = idx_data_map
             .iter()
             .nth(rng.gen::<usize>() % idx_data_map.len())
