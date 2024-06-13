@@ -292,7 +292,6 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
             }
             leaf_mults.push(mult);
         }
-        println!("{:?}", leaf_mults);
         let leaf_trace = leaf_pages
             .iter()
             .zip(&self.leaf_chips)
