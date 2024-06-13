@@ -232,7 +232,22 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
         self.map.clear();
     }
 
-    pub fn load_pages<SC: StarkGenericConfig>(
+    pub fn load_pages(&mut self, leaf_pages: &Vec<Vec<Vec<u32>>>) {
+        for leaf_page in leaf_pages {
+            for row in leaf_page {
+                if row[1] == 1 {
+                    self.map.insert(
+                        row[2..2 + self.params.idx_len].to_vec(),
+                        row[2 + self.params.idx_len
+                            ..2 + self.params.idx_len + self.params.data_len]
+                            .to_vec(),
+                    );
+                }
+            }
+        }
+    }
+
+    pub fn generate_trace_data<SC: StarkGenericConfig>(
         &mut self,
         trace_committer: &mut TraceCommitter<SC>,
         leaf_pages: Vec<Vec<Vec<u32>>>,
@@ -244,7 +259,20 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
         Val<SC>: AbstractField + PrimeField64,
         Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
     {
-        self.clear();
+        let mut leaf_pages = leaf_pages.clone();
+        let mut internal_pages = internal_pages.clone();
+        let mut blank_leaf_row = vec![1];
+        blank_leaf_row.resize(2 + self.params.idx_len + self.params.data_len, 0);
+        let blank_internal_row = vec![0; 2 + 2 * self.params.idx_len + COMMITMENT_LEN];
+        let blank_leaf_page =
+            vec![blank_leaf_row.clone(); self.params.tree_params.leaf_page_height];
+        let blank_internal_page =
+            vec![blank_internal_row.clone(); self.params.tree_params.internal_page_height];
+        leaf_pages.resize(self.params.tree_params.leaf_cap, blank_leaf_page.clone());
+        internal_pages.resize(
+            self.params.tree_params.internal_cap,
+            blank_internal_page.clone(),
+        );
         let mut leaf_mults = vec![];
         for leaf in &leaf_pages {
             let mut mult = vec![];
@@ -264,6 +292,7 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
             }
             leaf_mults.push(mult);
         }
+        println!("{:?}", leaf_mults);
         let leaf_trace = leaf_pages
             .iter()
             .zip(&self.leaf_chips)
@@ -359,18 +388,6 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
                 mults[i].clone(),
             );
             internal_main_trace.push(main_trace);
-        }
-        for leaf_page in &leaf_pages {
-            for row in leaf_page {
-                if row[1] == 1 {
-                    self.map.insert(
-                        row[2..2 + self.params.idx_len].to_vec(),
-                        row[2 + self.params.idx_len
-                            ..2 + self.params.idx_len + self.params.data_len]
-                            .to_vec(),
-                    );
-                }
-            }
         }
         let leaf_prods: NodeProducts<SC, COMMITMENT_LEN> = NodeProducts {
             data_traces: leaf_trace,

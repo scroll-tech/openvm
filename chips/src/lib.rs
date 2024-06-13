@@ -7,7 +7,6 @@ pub mod is_zero;
 pub mod keccak_permute;
 pub mod merkle_proof;
 pub mod multitier_readonly;
-pub mod page_controller;
 // pub mod page_node;
 pub mod multitier_page_rw_checker;
 pub mod page_read;

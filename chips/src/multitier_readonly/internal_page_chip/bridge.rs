@@ -11,9 +11,8 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirBridge<F>
     for InternalPageChip<COMMITMENT_LEN>
 {
     fn sends(&self, col_indices: Self::Cols<usize>) -> Vec<Interaction<F>> {
-        let virtual_cols = (col_indices.cache_cols.start)
+        let virtual_cols = (col_indices.cache_cols.child_commit)
             .into_iter()
-            .chain(col_indices.cache_cols.end)
             .map(VirtualPairCol::single_main)
             .collect::<Vec<_>>();
         vec![Interaction {

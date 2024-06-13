@@ -41,7 +41,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
                     trace_row.into_iter().map(Val::<SC>::from_wrapped_u32)
                 })
                 .collect(),
-            2 + self.idx_len + self.data_len,
+            COMMITMENT_LEN + 2,
         )
     }
 }

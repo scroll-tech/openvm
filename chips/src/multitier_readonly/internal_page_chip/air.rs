@@ -43,7 +43,7 @@ where
         for i in 0..COMMITMENT_LEN {
             builder.assert_eq(metadata.commitment[i], pis[i]);
         }
-        builder.assert_one(page_data.is_leaf);
+        builder.assert_zero(page_data.is_leaf);
         builder.assert_eq(metadata.mult_alloc, metadata.mult * page_data.is_alloc);
     }
 }

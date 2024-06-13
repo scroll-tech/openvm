@@ -21,8 +21,7 @@ use rand::Rng;
 use crate::multitier_readonly::page_controller::{PageController, PageTreeParams};
 
 use crate::multitier_readonly::page_requester::PageRequester;
-// use crate::pagebtree::{PageBTree, PageBTreePages};
-use crate::range_gate::RangeCheckerGateChip;
+use crate::pagebtree::{PageBTree, PageBTreePages};
 
 use super::page_controller;
 
@@ -32,11 +31,6 @@ pub const DECOMP_BITS: usize = 6;
 #[test]
 fn multitier_page_readonly_no_new_keys() {
     multitier_page_readonly_test(generate_no_new_keys, false, 4);
-}
-
-pub struct PageBTreePages {
-    pub leaf_pages: Vec<Vec<Vec<u32>>>,
-    pub internal_pages: Vec<Vec<Vec<u32>>>,
 }
 
 fn multitier_page_readonly_test<F>(generate_inputs: F, should_fail: bool, log_page_height: usize)
@@ -173,11 +167,13 @@ fn load_page_test(
     trace_builder: &mut TraceCommitmentBuilder<BabyBearPoseidon2Config>,
     partial_pk: &MultiStarkPartialProvingKey<BabyBearPoseidon2Config>,
 ) -> Result<(), VerificationError> {
+    page_controller.clear();
+    page_controller.load_pages(&leaf_pages);
     let requester_trace = requester.generate_trace::<BabyBear, BABYBEAR_COMMITMENT_LEN>(
         requests.clone(),
         Arc::new(page_controller),
     );
-    let mut tree_prods = page_controller.load_pages(
+    let mut tree_prods = page_controller.generate_trace_data(
         &mut trace_builder.committer,
         leaf_pages,
         internal_pages,
@@ -285,14 +281,9 @@ fn generate_no_new_keys(
     for (idx, _) in idx_data_map.iter() {
         btree.search(idx).unwrap();
     }
-    let mut clks: Vec<usize> = (0..num_ops)
-        .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
-        .collect();
-    clks.sort();
 
-    let mut ops: Vec<Operation> = vec![];
+    let mut requests: Vec<Vec<u32>> = vec![];
     for i in 0..num_ops {
-        let clk = clks[i];
         let idx = idx_data_map
             .iter()
             .nth(rng.gen::<usize>() % idx_data_map.len())
@@ -300,29 +291,7 @@ fn generate_no_new_keys(
             .0
             .to_vec();
 
-        let op_type = {
-            if rng.gen::<bool>() {
-                OpType::Read
-            } else {
-                OpType::Write
-            }
-        };
-
-        let data = {
-            if op_type == OpType::Read {
-                idx_data_map[&idx].to_vec()
-            } else {
-                (0..data_len).map(|_| rng.gen::<u32>() % MAX_VAL).collect()
-            }
-        };
-
-        if op_type == OpType::Write {
-            idx_data_map.insert(idx.clone(), data.clone());
-            btree.update(&idx, &data);
-        }
-
-        ops.push(Operation::new(clk, idx, data, op_type));
+        requests.push(idx);
     }
-    let final_pages = btree.gen_all_trace(committer);
-    (init_pages, false, final_pages, false, ops)
+    (init_pages, false, requests)
 }

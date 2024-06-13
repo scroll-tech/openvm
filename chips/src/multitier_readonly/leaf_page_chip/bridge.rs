@@ -46,7 +46,7 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirBridge<F>
         vec![Interaction {
             fields: virtual_cols,
             count: VirtualPairCol::single_main(col_indices.metadata.mult_alloc),
-            argument_index: *self.path_bus_index(),
+            argument_index: *self.data_bus_index(),
         }]
     }
 
