@@ -73,7 +73,7 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirBridge<F>
                     io: IsLessThanTupleIOCols {
                         x: col_indices.cache_cols.page_cols.idx.clone(),
                         y: range_inclusion.start.clone(),
-                        tuple_less_than: range_inclusion.less_than_start.clone(),
+                        tuple_less_than: range_inclusion.less_than_start,
                     },
                     aux: subair_aux.key_start.clone(),
                 },
@@ -84,7 +84,7 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirBridge<F>
                     io: IsLessThanTupleIOCols {
                         x: range_inclusion.end.clone(),
                         y: col_indices.cache_cols.page_cols.idx.clone(),
-                        tuple_less_than: range_inclusion.greater_than_end.clone(),
+                        tuple_less_than: range_inclusion.greater_than_end,
                     },
                     aux: subair_aux.end_key.clone(),
                 },

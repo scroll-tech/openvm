@@ -35,16 +35,16 @@ pub struct LessThanTupleParams {
 #[derive(Clone)]
 struct Node(bool, usize);
 
-fn cmp(key1: &Vec<u32>, key2: &Vec<u32>) -> i32 {
+fn cmp(key1: &[u32], key2: &[u32]) -> i32 {
     assert!(key1.len() == key2.len());
     let mut i = 0;
     while i < key1.len() && key1[i] == key2[i] {
         i += 1;
     }
     if i == key1.len() {
-        return 0;
+        0
     } else {
-        return 2 * ((key1[i] > key2[i]) as i32) - 1;
+        2 * ((key1[i] > key2[i]) as i32) - 1
     }
 }
 
@@ -68,8 +68,8 @@ where
     Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
 {
     pub fn dfs(
-        leaf_pages: &Vec<Vec<Vec<u32>>>,
-        internal_pages: &Vec<Vec<Vec<u32>>>,
+        leaf_pages: &[Vec<Vec<u32>>],
+        internal_pages: &[Vec<Vec<u32>>],
         leaf_ranges: &mut Vec<(Vec<u32>, Vec<u32>)>,
         internal_ranges: &mut Vec<(Vec<u32>, Vec<u32>)>,
         commitment_to_node: &BTreeMap<Vec<Val<SC>>, Node>,
@@ -122,7 +122,7 @@ where
                 }
             }
             mults[cur_node.1] = mult;
-            return ans + 1;
+            ans + 1
         } else {
             let mut ans = 0;
             for row in &leaf_pages[cur_node.1] {
@@ -131,28 +131,28 @@ where
                     ans += 1;
                 }
             }
-            return ans + 1;
+            ans + 1
         }
     }
 
     pub fn new(
-        leaf_pages: &Vec<Vec<Vec<u32>>>,
-        internal_pages: &Vec<Vec<Vec<u32>>>,
-        leaf_commits: &Vec<Com<SC>>,
-        internal_commits: &Vec<Com<SC>>,
+        leaf_pages: &[Vec<Vec<u32>>],
+        internal_pages: &[Vec<Vec<u32>>],
+        leaf_commits: &[Com<SC>],
+        internal_commits: &[Com<SC>],
         root: (bool, usize),
         idx_len: usize,
     ) -> Self {
         let root = Node(root.0, root.1);
         let leaf_commits: Vec<[Val<SC>; COMMITMENT_LEN]> = leaf_commits
-            .into_iter()
+            .iter()
             .map(|c| {
                 let c: [Val<SC>; COMMITMENT_LEN] = c.clone().into();
                 c
             })
             .collect();
         let internal_commits: Vec<[Val<SC>; COMMITMENT_LEN]> = internal_commits
-            .into_iter()
+            .iter()
             .map(|c| {
                 let c: [Val<SC>; COMMITMENT_LEN] = c.clone().into();
                 c
@@ -169,13 +169,13 @@ where
         if root.0 {
             for row in &leaf_pages[root.1] {
                 if row[1] == 1 {
-                    if leaf_ranges[root.1].0.len() == 0 {
+                    if leaf_ranges[root.1].0.is_empty() {
                         leaf_ranges[root.1] =
                             (row[2..2 + idx_len].to_vec(), row[2..2 + idx_len].to_vec());
                     } else {
                         let idx = row[2..2 + idx_len].to_vec();
                         if cmp(&leaf_ranges[root.1].0, &idx) > 0 {
-                            leaf_ranges[root.1].0 = idx.clone();
+                            leaf_ranges[root.1].0.clone_from(&idx);
                         }
                         if cmp(&leaf_ranges[root.1].1, &idx) < 0 {
                             leaf_ranges[root.1].1 = idx;
@@ -188,7 +188,7 @@ where
                 if row[1] == 1 {
                     let idx1 = row[2..2 + idx_len].to_vec();
                     let idx2 = row[2 + idx_len..2 + 2 * idx_len].to_vec();
-                    if internal_ranges[root.1].0.len() == 0 {
+                    if internal_ranges[root.1].0.is_empty() {
                         internal_ranges[root.1] = (idx1, idx2);
                     } else {
                         if cmp(&internal_ranges[root.1].0, &idx1) > 0 {
@@ -221,14 +221,14 @@ where
             idx_len,
             root.clone(),
         );
-        for i in 0..leaf_ranges.len() {
-            if leaf_ranges[i].0.len() == 0 {
-                leaf_ranges[i] = (vec![0; idx_len], vec![0; idx_len]);
+        for range in &mut leaf_ranges {
+            if range.0.is_empty() {
+                *range = (vec![0; idx_len], vec![0; idx_len]);
             }
         }
-        for i in 0..internal_ranges.len() {
-            if internal_ranges[i].0.len() == 0 {
-                internal_ranges[i] = (vec![0; idx_len], vec![0; idx_len]);
+        for range in &mut internal_ranges {
+            if range.0.is_empty() {
+                *range = (vec![0; idx_len], vec![0; idx_len]);
             }
         }
         let root_range = if root.0 {
@@ -534,7 +534,7 @@ where
             init_root_signal_trace: init_tree_products.root.main_traces,
             init_leaf_chip_main_traces: init_tree_products.leaf.main_traces,
             init_internal_chip_main_traces: init_tree_products.internal.main_traces,
-            offline_checker_trace: offline_checker_trace,
+            offline_checker_trace,
             final_root_signal_trace: final_tree_products.root.main_traces,
             final_leaf_chip_main_traces: final_tree_products.leaf.main_traces,
             final_internal_chip_main_traces: final_tree_products.internal.main_traces,
@@ -553,18 +553,18 @@ where
             final_leaf_page: final_tree_products.leaf.prover_data,
             final_internal_page: final_tree_products.internal.prover_data,
         };
-        return (data_trace, main_trace, commitments, prover_data);
+        (data_trace, main_trace, commitments, prover_data)
     }
 }
 
 fn make_tree_products<SC: StarkGenericConfig, const COMMITMENT_LEN: usize>(
     committer: &mut TraceCommitter<SC>,
-    leaf_pages: &Vec<Vec<Vec<u32>>>,
-    leaf_chips: &Vec<LeafPageChip<COMMITMENT_LEN>>,
-    blank_leaf_page: &Vec<Vec<u32>>,
-    internal_pages: &Vec<Vec<Vec<u32>>>,
-    internal_chips: &Vec<InternalPageChip<COMMITMENT_LEN>>,
-    blank_internal_page: &Vec<Vec<u32>>,
+    leaf_pages: &[Vec<Vec<u32>>],
+    leaf_chips: &[LeafPageChip<COMMITMENT_LEN>],
+    blank_leaf_page: &[Vec<u32>],
+    internal_pages: &[Vec<Vec<u32>>],
+    internal_chips: &[InternalPageChip<COMMITMENT_LEN>],
+    blank_internal_page: &[Vec<u32>],
     root_signal: &RootSignalChip<COMMITMENT_LEN>,
     params: &PageTreeParams,
     root_is_leaf: bool,
@@ -577,10 +577,10 @@ where
     Val<SC>: AbstractField + PrimeField64,
     Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
 {
-    let mut leaf_pages = leaf_pages.clone();
-    let mut internal_pages = internal_pages.clone();
-    leaf_pages.resize(params.leaf_cap, blank_leaf_page.clone());
-    internal_pages.resize(params.internal_cap, blank_internal_page.clone());
+    let mut leaf_pages = leaf_pages.to_vec();
+    let mut internal_pages = internal_pages.to_vec();
+    leaf_pages.resize(params.leaf_cap, blank_leaf_page.to_vec());
+    internal_pages.resize(params.internal_cap, blank_internal_page.to_vec());
     let leaf_trace = leaf_pages
         .iter()
         .zip(leaf_chips.iter())
@@ -697,7 +697,7 @@ where
 
 fn data_from_trace<SC: StarkGenericConfig>(
     committer: &mut TraceCommitter<SC>,
-    traces: &Vec<RowMajorMatrix<Val<SC>>>,
+    traces: &[RowMajorMatrix<Val<SC>>],
 ) -> Vec<ProverTraceData<SC>> {
     traces
         .iter()
@@ -705,14 +705,14 @@ fn data_from_trace<SC: StarkGenericConfig>(
         .collect::<Vec<_>>()
 }
 
-fn commitment_from_data<SC: StarkGenericConfig>(data: &Vec<ProverTraceData<SC>>) -> Vec<Com<SC>> {
+fn commitment_from_data<SC: StarkGenericConfig>(data: &[ProverTraceData<SC>]) -> Vec<Com<SC>> {
     data.iter()
         .map(|data| data.commit.clone())
         .collect::<Vec<_>>()
 }
 
 fn arr_from_commitment<SC: StarkGenericConfig, const COMMITMENT_LEN: usize>(
-    commitment: &Vec<Com<SC>>,
+    commitment: &[Com<SC>],
 ) -> Vec<[Val<SC>; COMMITMENT_LEN]>
 where
     Val<SC>: AbstractField + PrimeField64,

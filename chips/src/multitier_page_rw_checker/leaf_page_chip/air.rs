@@ -64,7 +64,7 @@ where
                 let io = IsLessThanTupleIOCols {
                     x: cached_data.page_cols.idx.clone(),
                     y: range_inclusion_cols.start.clone(),
-                    tuple_less_than: range_inclusion_cols.less_than_start.clone(),
+                    tuple_less_than: range_inclusion_cols.less_than_start,
                 };
                 let aux = subair_aux_cols.key_start.clone();
                 SubAir::eval(&subairs.key_start, builder, io, aux);
@@ -73,7 +73,7 @@ where
                 let io = IsLessThanTupleIOCols {
                     x: range_inclusion_cols.end.clone(),
                     y: cached_data.page_cols.idx.clone(),
-                    tuple_less_than: range_inclusion_cols.greater_than_end.clone(),
+                    tuple_less_than: range_inclusion_cols.greater_than_end,
                 };
                 let aux = subair_aux_cols.end_key.clone();
                 SubAir::eval(&subairs.end_key, builder, io, aux);

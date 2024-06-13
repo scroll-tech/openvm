@@ -72,7 +72,7 @@ pub struct PageBTree<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COM
     depth: usize,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct PageBTreePages {
     pub leaf_pages: Vec<Vec<Vec<u32>>>,
     pub internal_pages: Vec<Vec<Vec<u32>>>,
@@ -189,7 +189,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
                 .push(internal.trace.clone().unwrap());
             return Some(PageBTreeNode::Internal(internal));
         };
-        return None;
+        None
     }
 }
 
@@ -207,7 +207,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
 {
     /// assume that kv_pairs is sorted
     fn new(kv_pairs: Vec<(Vec<u32>, Vec<u32>)>) -> Self {
-        if kv_pairs.len() == 0 {
+        if kv_pairs.is_empty() {
             Self {
                 kv_pairs: Vec::new(),
                 min_key: vec![],
@@ -234,7 +234,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         }
     }
 
-    fn search(&self, key: &Vec<u32>) -> Option<Vec<u32>> {
+    fn search(&self, key: &[u32]) -> Option<Vec<u32>> {
         for (k, v) in &self.kv_pairs {
             let c = cmp(k, key);
             if c > 0 {
@@ -243,7 +243,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
                 return Some(v.clone());
             }
         }
-        return None;
+        None
     }
 
     fn update(
@@ -262,31 +262,31 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
             let l2 = Self::new(self.kv_pairs[mididx..MAX_LEAF + 1].to_vec());
             self.kv_pairs = self.kv_pairs[0..mididx].to_vec();
             self.max_key = self.kv_pairs[mididx - 1].clone().0;
-            return Some((mid.0, PageBTreeNode::Leaf(l2)));
+            Some((mid.0, PageBTreeNode::Leaf(l2)))
         } else {
-            return None;
+            None
         }
     }
     // assumes we have space
     fn add_kv(&mut self, key: &Vec<u32>, val: &Vec<u32>) {
-        if self.kv_pairs.len() == 0 {
-            self.min_key = key.clone();
+        if self.kv_pairs.is_empty() {
+            self.min_key.clone_from(key);
         }
         for (i, (k, _)) in self.kv_pairs.iter().enumerate() {
             let c = cmp(k, key);
             if c > 0 {
-                self.kv_pairs.insert(i, (key.clone(), val.clone()));
+                self.kv_pairs.insert(i, (key.clone(), val.to_vec()));
                 if i == 0 {
-                    self.min_key = key.clone();
+                    self.min_key.clone_from(key);
                 }
                 return;
             } else if c == 0 {
-                self.kv_pairs[i].1 = val.clone();
+                self.kv_pairs[i].1.clone_from(val);
                 return;
             }
         }
         self.kv_pairs.push((key.to_vec(), val.to_vec()));
-        self.max_key = key.clone();
+        self.max_key.clone_from(key);
     }
 
     fn consistency_check(&self) {
@@ -316,8 +316,8 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
             trace.push(row);
         }
         trace.resize(page_height, vec![1]);
-        for i in 0..page_height {
-            trace[i].resize(2 + key_len + val_len, 0);
+        for t in &mut trace {
+            t.resize(2 + key_len + val_len, 0);
         }
         // println!("THIS IS THE TRACE OF A LEAF NODE: {:?}", trace.clone());
         self.trace = Some(trace.clone());
@@ -346,7 +346,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         Val<SC>: PrimeField32 + AbstractField,
         Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
     {
-        if self.trace == None {
+        if self.trace.is_none() {
             self.gen_trace(page_height, key_len, val_len);
         }
         let commitment = committer.commit(vec![RowMajorMatrix::new(
@@ -354,10 +354,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
                 .clone()
                 .unwrap()
                 .into_iter()
-                .flat_map(|row| {
-                    row.into_iter()
-                        .map(|i| Val::<SC>::from_wrapped_u32(i as u32))
-                })
+                .flat_map(|row| row.into_iter().map(Val::<SC>::from_wrapped_u32))
                 .collect(),
             2 + key_len + val_len,
         )]);
@@ -366,8 +363,6 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
             acc.to_owned() + &format!("{:08x}", x.as_canonical_u32())
         });
         if Path::new(&("src/pagebtree/leaf/".to_owned() + &s + ".json")).is_file() {
-            return;
-        } else {
             let file = File::create("src/pagebtree/leaf/".to_owned() + &s + ".json").unwrap();
             let mut writer = BufWriter::new(file);
             let _ = serde_json::to_writer(&mut writer, &self.trace.clone().unwrap());
@@ -461,10 +456,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
                 let commitment = committer.commit(vec![RowMajorMatrix::new(
                     trace
                         .into_iter()
-                        .flat_map(|row| {
-                            row.into_iter()
-                                .map(|i| Val::<SC>::from_wrapped_u32(i as u32))
-                        })
+                        .flat_map(|row| row.into_iter().map(Val::<SC>::from_wrapped_u32))
                         .collect(),
                     width,
                 )]);
@@ -477,10 +469,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
                 let commitment = committer.commit(vec![RowMajorMatrix::new(
                     trace
                         .into_iter()
-                        .flat_map(|row| {
-                            row.into_iter()
-                                .map(|i| Val::<SC>::from_wrapped_u32(i as u32))
-                        })
+                        .flat_map(|row| row.into_iter().map(Val::<SC>::from_wrapped_u32))
                         .collect(),
                     width,
                 )]);
@@ -549,7 +538,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         keys: Vec<Vec<u32>>,
         children: Vec<PageBTreeNode<MAX_INTERNAL, MAX_LEAF, COMMITMENT_LEN>>,
     ) -> Self {
-        assert!(keys.len() > 0);
+        assert!(!keys.is_empty());
         assert!(children.len() == keys.len() + 1);
         let min_key = children[0].min_key();
         let max_key = children[children.len() - 1].max_key();
@@ -576,7 +565,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         if let PageBTreeNode::Unloaded(u) = &self.children[last_idx] {
             self.children[last_idx] = u.load(key.len(), loaded_pages).unwrap();
         }
-        return self.children[self.keys.len()].search(key, loaded_pages);
+        self.children[self.keys.len()].search(key, loaded_pages)
     }
 
     fn update(
@@ -614,12 +603,12 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         };
         self.min_key = self.children[0].min_key();
         self.max_key = self.children[self.children.len() - 1].max_key();
-        return ret;
+        ret
     }
 
     fn add_key(
         &mut self,
-        key: &Vec<u32>,
+        key: &[u32],
         node: PageBTreeNode<MAX_INTERNAL, MAX_LEAF, COMMITMENT_LEN>,
         idx: usize,
     ) -> Option<(
@@ -628,7 +617,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
     )> {
         if self.children.len() == MAX_INTERNAL {
             let mut new_children = vec![];
-            self.keys.insert(idx - 1, key.clone());
+            self.keys.insert(idx - 1, key.to_vec());
             self.children.insert(idx, node);
             let mididx = MAX_INTERNAL / 2;
             for _ in mididx + 1..MAX_INTERNAL + 1 {
@@ -640,17 +629,17 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
             let mid = self.keys[mididx].clone();
             self.keys = self.keys[0..mididx].to_vec();
             self.max_key = self.children[self.children.len() - 1].max_key();
-            return Some((mid, PageBTreeNode::Internal(l2)));
+            Some((mid, PageBTreeNode::Internal(l2)))
         } else {
             if idx < self.children.len() {
-                self.keys.insert(idx - 1, key.clone());
+                self.keys.insert(idx - 1, key.to_vec());
                 self.children.insert(idx, node);
                 return None;
             }
             self.keys.push(key.to_vec());
             self.children.push(node);
             self.max_key = self.children[self.children.len() - 1].max_key();
-            return None;
+            None
         }
     }
 
@@ -702,8 +691,8 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
             trace.push(row);
         }
         trace.resize(page_height, vec![]);
-        for i in 0..page_height {
-            trace[i].resize(2 + 2 * key_len + COMMITMENT_LEN, 0);
+        for t in &mut trace {
+            t.resize(2 + 2 * key_len + COMMITMENT_LEN, 0);
         }
         // println!("THIS IS THE TRACE OF AN INTERNAL NODE: {:?}", trace);
         self.trace = Some(trace.clone());
@@ -750,7 +739,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         Val<SC>: PrimeField32 + AbstractField,
         Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
     {
-        if self.trace == None {
+        if self.trace.is_none() {
             self.gen_trace(committer, page_height, key_len, val_len);
         }
         let commitment = committer.commit(vec![RowMajorMatrix::new(
@@ -758,10 +747,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
                 .clone()
                 .unwrap()
                 .into_iter()
-                .flat_map(|row| {
-                    row.into_iter()
-                        .map(|i| Val::<SC>::from_wrapped_u32(i as u32))
-                })
+                .flat_map(|row| row.into_iter().map(Val::<SC>::from_wrapped_u32))
                 .collect(),
             2 + 2 * key_len + COMMITMENT_LEN,
         )]);
@@ -769,9 +755,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         let s = commit.iter().fold("".to_owned(), |acc, x| {
             acc.to_owned() + &format!("{:08x}", x.as_canonical_u32())
         });
-        if Path::new(&("src/pagebtree/internal/".to_owned() + &s + ".json")).is_file() {
-            return;
-        } else {
+        if !Path::new(&("src/pagebtree/internal/".to_owned() + &s + ".json")).is_file() {
             let s: String = "src/pagebtree/internal/".to_owned() + &s + ".json";
             let path = PathBuf::from(&s);
             let file = OpenOptions::new()
@@ -822,7 +806,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         let leaf = PageBTreeLeafNode {
             kv_pairs: Vec::new(),
             min_key: vec![0; key_len],
-            max_key: vec![1 << limb_bits - 1; key_len],
+            max_key: vec![(1 << limb_bits) - 1; key_len],
             trace: None,
         };
         let leaf = PageBTreeNode::Leaf(leaf);
@@ -911,7 +895,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         }
     }
     pub fn depth(&self) -> usize {
-        return self.depth;
+        self.depth
     }
 
     pub fn consistency_check(&self) {
@@ -919,7 +903,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
     }
 
     pub fn page_min_width(&self) -> usize {
-        return self.key_len + self.val_len + 1;
+        self.key_len + self.val_len + 1
     }
 
     pub fn gen_trace<SC: StarkGenericConfig>(
@@ -962,7 +946,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
     }
 
     pub fn gen_loaded_trace(&self) -> PageBTreePages {
-        return self.loaded_pages.clone();
+        self.loaded_pages.clone()
     }
 
     pub fn commit<SC: StarkGenericConfig>(&mut self, committer: &mut TraceCommitter<SC>)
@@ -982,10 +966,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
             .commit(vec![RowMajorMatrix::new(
                 root_trace
                     .into_iter()
-                    .flat_map(|row| {
-                        row.into_iter()
-                            .map(|i| Val::<SC>::from_wrapped_u32(i as u32))
-                    })
+                    .flat_map(|row| row.into_iter().map(Val::<SC>::from_wrapped_u32))
                     .collect(),
                 width,
             )])
@@ -1026,15 +1007,15 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
     }
 }
 
-fn cmp(key1: &Vec<u32>, key2: &Vec<u32>) -> i32 {
+fn cmp(key1: &[u32], key2: &[u32]) -> i32 {
     assert!(key1.len() == key2.len());
     let mut i = 0;
     while i < key1.len() && key1[i] == key2[i] {
         i += 1;
     }
     if i == key1.len() {
-        return 0;
+        0
     } else {
-        return 2 * ((key1[i] > key2[i]) as i32) - 1;
+        2 * ((key1[i] > key2[i]) as i32) - 1
     }
 }
