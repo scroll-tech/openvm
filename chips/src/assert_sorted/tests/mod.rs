@@ -48,17 +48,11 @@ fn test_assert_sorted_chip_small_positive() {
 
     let range_checker = Arc::new(RangeCheckerGateChip::new(bus_index, range_max));
 
-    let assert_sorted_chip = AssertSortedChip::new(
-        bus_index,
-        range_max,
-        limb_bits,
-        decomp,
-        requests.clone(),
-        range_checker.clone(),
-    );
+    let assert_sorted_chip = AssertSortedChip::new(bus_index, limb_bits, decomp, range_checker);
     let range_checker_chip = assert_sorted_chip.range_checker.as_ref();
 
-    let assert_sorted_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip.generate_trace();
+    let assert_sorted_chip_trace: DenseMatrix<BabyBear> =
+        assert_sorted_chip.generate_trace(requests.clone());
     let range_checker_trace = assert_sorted_chip.range_checker.generate_trace();
 
     run_simple_test_no_pis(
@@ -86,17 +80,12 @@ fn test_assert_sorted_chip_large_positive() {
 
     let range_checker = Arc::new(RangeCheckerGateChip::new(bus_index, range_max));
 
-    let assert_sorted_chip = AssertSortedChip::new(
-        bus_index,
-        range_max,
-        limb_bits,
-        decomp,
-        requests.clone(),
-        range_checker.clone(),
-    );
+    let assert_sorted_chip =
+        AssertSortedChip::new(bus_index, limb_bits, decomp, range_checker.clone());
     let range_checker_chip = assert_sorted_chip.range_checker.as_ref();
 
-    let assert_sorted_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip.generate_trace();
+    let assert_sorted_chip_trace: DenseMatrix<BabyBear> =
+        assert_sorted_chip.generate_trace(requests.clone());
     let range_checker_trace = assert_sorted_chip.range_checker.generate_trace();
 
     run_simple_test_no_pis(
@@ -125,17 +114,12 @@ fn test_assert_sorted_chip_unsorted_negative() {
 
     let range_checker = Arc::new(RangeCheckerGateChip::new(bus_index, range_max));
 
-    let assert_sorted_chip = AssertSortedChip::new(
-        bus_index,
-        range_max,
-        limb_bits,
-        decomp,
-        requests.clone(),
-        range_checker.clone(),
-    );
+    let assert_sorted_chip =
+        AssertSortedChip::new(bus_index, limb_bits, decomp, range_checker.clone());
     let range_checker_chip = assert_sorted_chip.range_checker.as_ref();
 
-    let assert_sorted_chip_trace: DenseMatrix<BabyBear> = assert_sorted_chip.generate_trace();
+    let assert_sorted_chip_trace: DenseMatrix<BabyBear> =
+        assert_sorted_chip.generate_trace(requests.clone());
     let range_checker_trace = assert_sorted_chip.range_checker.generate_trace();
 
     USE_DEBUG_BUILDER.with(|debug| {

@@ -75,25 +75,25 @@ impl<const COMMITMENT_LEN: usize> InternalPageChip<COMMITMENT_LEN> {
                             row[2..2 + self.idx_len].to_vec(),
                             range.0.clone(),
                             2 + 2 * self.idx_len,
-                            self.is_less_than_tuple_air.clone().unwrap().key1_start,
+                            self.is_less_than_tuple_air.clone().unwrap().idx1_start,
                         );
                         gen_aux(
                             range.1.clone(),
                             row[2..2 + self.idx_len].to_vec(),
                             2 + 2 * self.idx_len + 1,
-                            self.is_less_than_tuple_air.clone().unwrap().end_key1,
+                            self.is_less_than_tuple_air.clone().unwrap().end_idx1,
                         );
                         gen_aux(
                             row[2 + self.idx_len..2 + 2 * self.idx_len].to_vec(),
                             range.0.clone(),
                             2 + 2 * self.idx_len + 2,
-                            self.is_less_than_tuple_air.clone().unwrap().key2_start,
+                            self.is_less_than_tuple_air.clone().unwrap().idx2_start,
                         );
                         gen_aux(
                             range.1.clone(),
                             row[2 + self.idx_len..2 + 2 * self.idx_len].to_vec(),
                             2 + 2 * self.idx_len + 3,
-                            self.is_less_than_tuple_air.clone().unwrap().end_key2,
+                            self.is_less_than_tuple_air.clone().unwrap().end_idx2,
                         );
                         gen_aux(
                             row[2 + self.idx_len..2 + 2 * self.idx_len].to_vec(),

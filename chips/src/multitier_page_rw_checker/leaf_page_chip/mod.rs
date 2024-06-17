@@ -1,16 +1,31 @@
 use getset::Getters;
 
 use crate::{
-    is_less_than_tuple::{columns::{IsLessThanTupleAuxCols}, IsLessThanTupleAir},
-    page_rw_checker::page_chip::PageChip,
+    is_less_than_tuple::{columns::IsLessThanTupleAuxCols, IsLessThanTupleAir}, page_rw_checker::{my_final_page::MyFinalPageAir, my_initial_page::MyInitialPageAir},
 };
 
-use super::page_controller::LessThanTupleParams;
+use super::page_controller::MyLessThanTupleParams;
+
 
 pub mod air;
 pub mod bridge;
 pub mod columns;
 pub mod trace;
+
+#[derive(Clone, Debug)]
+pub enum MyPageAir {
+    Initial(MyInitialPageAir),
+    Final(MyFinalPageAir),
+}
+
+impl MyPageAir {
+    pub fn air_width(&self) -> usize {
+        match self {
+            MyPageAir::Initial(i) => i.air_width(),
+            MyPageAir::Final(f) => f.air_width(),
+        }
+    }
+}
 
 #[derive(Clone, Getters)]
 pub struct LeafPageChip<const COMMITMENT_LEN: usize> {
@@ -22,10 +37,10 @@ pub struct LeafPageChip<const COMMITMENT_LEN: usize> {
     data_bus_index: usize,
 
     #[getset(get = "pub")]
-    page_chip: PageChip,
+    page_chip: MyPageAir,
     // parameter telling if this is a leaf chip on the init side or the final side.
     is_less_than_tuple_air: Option<LeafPageSubAirs>,
-    is_less_than_tuple_param: LessThanTupleParams,
+    is_less_than_tuple_param: MyLessThanTupleParams,
     is_init: bool,
     idx_len: usize,
     data_len: usize,
@@ -33,21 +48,15 @@ pub struct LeafPageChip<const COMMITMENT_LEN: usize> {
 
 #[derive(Clone)]
 pub struct LeafPageSubAirs {
-    pub key_start: IsLessThanTupleAir,
-    pub end_key: IsLessThanTupleAir,
-}
-
-#[derive(Clone)]
-pub struct LeafPageSubAirBuses {
-    pub key_start: usize,
-    pub end_key: usize,
+    pub idx_start: IsLessThanTupleAir,
+    pub end_idx: IsLessThanTupleAir,
 }
 
 impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
     pub fn new(
         path_bus_index: usize,
         data_bus_index: usize,
-        is_less_than_tuple_param: LessThanTupleParams,
+        is_less_than_tuple_param: MyLessThanTupleParams,
         lt_bus_index: usize,
         idx_len: usize,
         data_len: usize,
@@ -57,7 +66,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
             Self {
                 path_bus_index,
                 data_bus_index,
-                page_chip: PageChip::new(data_bus_index, idx_len, data_len, is_init),
+                page_chip: MyPageAir::Initial(MyInitialPageAir::new(data_bus_index, idx_len, data_len)),
                 idx_len,
                 data_len,
                 is_init,
@@ -68,21 +77,19 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
             Self {
                 path_bus_index,
                 data_bus_index,
-                page_chip: PageChip::new(data_bus_index, idx_len, data_len, is_init),
+                page_chip: MyPageAir::Final(MyFinalPageAir::new(data_bus_index, lt_bus_index, idx_len, data_len, is_less_than_tuple_param.limb_bits, is_less_than_tuple_param.decomp)),
                 idx_len,
                 data_len,
                 is_init,
                 is_less_than_tuple_air: Some(LeafPageSubAirs {
-                    key_start: IsLessThanTupleAir::new(
+                    idx_start: IsLessThanTupleAir::new(
                         lt_bus_index,
-                        is_less_than_tuple_param.range_max, // unsure about this
-                        is_less_than_tuple_param.limb_bits.clone(),
+                        vec![is_less_than_tuple_param.limb_bits; idx_len],
                         is_less_than_tuple_param.decomp,
                     ),
-                    end_key: IsLessThanTupleAir::new(
+                    end_idx: IsLessThanTupleAir::new(
                         lt_bus_index,
-                        is_less_than_tuple_param.range_max, // unsure about this
-                        is_less_than_tuple_param.limb_bits.clone(),
+                        vec![is_less_than_tuple_param.limb_bits; idx_len],
                         is_less_than_tuple_param.decomp,
                     ),
                 }),
@@ -103,7 +110,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
                 * (2 * self.idx_len
                     + 2
                     + 2 * IsLessThanTupleAuxCols::<usize>::get_width(
-                        self.is_less_than_tuple_param.limb_bits.clone(),
+                        vec![self.is_less_than_tuple_param.limb_bits; self.idx_len],
                         self.is_less_than_tuple_param.decomp,
                         self.idx_len,
                     ))

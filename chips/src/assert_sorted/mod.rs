@@ -15,9 +15,6 @@ pub mod trace;
 pub struct AssertSortedAir {
     #[getset(get = "pub")]
     is_less_than_tuple_air: IsLessThanTupleAir,
-    /// The keys to check for sortedness
-    #[getset(get = "pub")]
-    keys: Vec<Vec<u32>>,
 }
 
 /// This chip constrains that consecutive rows are sorted lexicographically.
@@ -37,18 +34,13 @@ pub struct AssertSortedChip {
 impl AssertSortedChip {
     pub fn new(
         bus_index: usize,
-        range_max: u32,
         limb_bits: Vec<usize>,
         decomp: usize,
-        keys: Vec<Vec<u32>>,
         range_checker: Arc<RangeCheckerGateChip>,
     ) -> Self {
         Self {
             air: AssertSortedAir {
-                is_less_than_tuple_air: IsLessThanTupleAir::new(
-                    bus_index, range_max, limb_bits, decomp,
-                ),
-                keys,
+                is_less_than_tuple_air: IsLessThanTupleAir::new(bus_index, limb_bits, decomp),
             },
             range_checker,
         }

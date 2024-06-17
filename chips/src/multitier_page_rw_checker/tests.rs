@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use std::iter;
 use std::sync::Arc;
 
 use afs_stark_backend::prover::trace::TraceCommitter;
@@ -13,13 +14,16 @@ use afs_test_utils::config::{
     self,
     baby_bear_poseidon2::{BabyBearPoseidon2Config, BabyBearPoseidon2Engine},
 };
+use afs_test_utils::interaction::dummy_interaction_air::DummyInteractionAir;
 use afs_test_utils::{engine::StarkEngine, utils::create_seeded_rng};
 
 use p3_baby_bear::BabyBear;
+use p3_field::AbstractField;
+use p3_matrix::dense::RowMajorMatrix;
 use rand::Rng;
 
 use crate::multitier_page_rw_checker::page_controller::{
-    LessThanTupleParams, PageController, PageTreeParams,
+    MyLessThanTupleParams, PageController, PageTreeParams,
 };
 use crate::page_rw_checker::page_controller::{OpType, Operation};
 use crate::pagebtree::{PageBTree, PageBTreePages};
@@ -29,6 +33,9 @@ use super::page_controller;
 
 pub const BABYBEAR_COMMITMENT_LEN: usize = 8;
 pub const DECOMP_BITS: usize = 6;
+const MAX_VAL: u32 = 0x78000001 / 2;
+
+type Val = BabyBear;
 
 #[test]
 fn multitier_page_rw_no_new_keys() {
@@ -99,6 +106,7 @@ where
 
     let init_path_bus = 3;
     let final_path_bus = 4;
+    let ops_bus_index = 5;
 
     let init_param = PageTreeParams {
         path_bus_index: init_path_bus,
@@ -116,18 +124,18 @@ where
         internal_page_height: page_height,
     };
 
-    let less_than_tuple_param = LessThanTupleParams {
-        range_max: 1 << DECOMP_BITS,
-        limb_bits: vec![20; idx_len],
+    let less_than_tuple_param = MyLessThanTupleParams {
+        limb_bits: 20,
         decomp: DECOMP_BITS,
     };
 
     let range_checker = Arc::new(RangeCheckerGateChip::new(lt_bus_index, 1 << DECOMP_BITS));
 
-    let mut page_controller: PageController<BabyBearPoseidon2Config, BABYBEAR_COMMITMENT_LEN> =
-        PageController::new(
+    let mut page_controller: PageController<BABYBEAR_COMMITMENT_LEN> =
+        PageController::new::<BabyBearPoseidon2Config>(
             data_bus_index,
             internal_data_bus_index,
+            ops_bus_index,
             lt_bus_index,
             idx_len,
             data_len,
@@ -136,7 +144,7 @@ where
             less_than_tuple_param,
             range_checker,
         );
-
+    let ops_sender = DummyInteractionAir::new(idx_len + data_len + 2, true, ops_bus_index);
     let mut keygen_builder = MultiStarkKeygenBuilder::new(&engine.config);
 
     let mut init_leaf_data_ptrs = vec![];
@@ -265,6 +273,8 @@ where
 
     keygen_builder.add_air(&page_controller.range_checker.air, 1 << DECOMP_BITS, 0);
 
+    keygen_builder.add_air(&ops_sender, num_ops, 0);
+
     let partial_pk = keygen_builder.generate_partial_pk();
     let (init_pages, init_root_is_leaf, final_pages, final_root_is_leaf, ops) = generate_inputs(
         idx_len,
@@ -285,6 +295,8 @@ where
         final_root_is_leaf,
         0,
         &ops,
+        num_ops,
+        &ops_sender,
         &mut page_controller,
         &mut trace_builder,
         &partial_pk,
@@ -307,10 +319,9 @@ fn load_page_test(
     final_root_is_leaf: bool,
     final_root_idx: usize,
     ops: &Vec<Operation>,
-    page_controller: &mut page_controller::PageController<
-        BabyBearPoseidon2Config,
-        BABYBEAR_COMMITMENT_LEN,
-    >,
+    num_ops: usize,
+    ops_sender: &DummyInteractionAir,
+    page_controller: &mut page_controller::PageController<BABYBEAR_COMMITMENT_LEN>,
     trace_builder: &mut TraceCommitmentBuilder<BabyBearPoseidon2Config>,
     partial_pk: &MultiStarkPartialProvingKey<BabyBearPoseidon2Config>,
     trace_degree: usize,
@@ -333,6 +344,23 @@ fn load_page_test(
     let init_root = main_trace.init_root_signal_trace.clone();
     let final_root = main_trace.final_root_signal_trace.clone();
     let range_trace = page_controller.range_checker.generate_trace();
+    let ops_sender_trace = RowMajorMatrix::new(
+        ops.iter()
+            .flat_map(|op| {
+                iter::once(Val::one())
+                    .chain(iter::once(Val::from_canonical_usize(op.clk)))
+                    .chain(op.idx.iter().map(|x| Val::from_canonical_u32(*x)))
+                    .chain(op.data.iter().map(|x| Val::from_canonical_u32(*x)))
+                    .chain(iter::once(Val::from_canonical_u8(op.op_type.clone() as u8)))
+            })
+            .chain(
+                iter::repeat_with(|| iter::repeat(Val::zero()).take(1 + ops_sender.field_width()))
+                    .take(num_ops - ops.len())
+                    .flatten(),
+            )
+            .collect(),
+        1 + ops_sender.field_width(),
+    );
     trace_builder.clear();
 
     for trace in data_trace.init_leaf_chip_traces.iter() {
@@ -371,6 +399,7 @@ fn load_page_test(
     trace_builder.load_trace(init_root);
     trace_builder.load_trace(final_root);
     trace_builder.load_trace(range_trace);
+    trace_builder.load_trace(ops_sender_trace);
     trace_builder.commit_current();
 
     let mut airs: Vec<&dyn AnyRap<BabyBearPoseidon2Config>> = vec![];
@@ -390,6 +419,7 @@ fn load_page_test(
     airs.push(&page_controller.init_root_signal);
     airs.push(&page_controller.final_root_signal);
     airs.push(&page_controller.range_checker.air);
+    airs.push(ops_sender);
     let partial_vk = partial_pk.partial_vk();
     let main_trace_data = trace_builder.view(&partial_vk, airs.clone());
 
@@ -420,6 +450,7 @@ fn load_page_test(
         pis.push(c.to_vec());
     }
     pis.push(vec![]);
+    pis.push(vec![]);
     let prover = engine.prover();
     let verifier = engine.verifier();
 
@@ -440,7 +471,6 @@ fn generate_no_new_keys(
     num_ops: usize,
     committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
 ) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
-    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
     const MAX_LIMB_VAL: u32 = 1 << 20;
     let mut rng = create_seeded_rng();
     let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
@@ -522,7 +552,6 @@ fn generate_new_keys(
     num_ops: usize,
     committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
 ) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
-    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
     const MAX_LIMB_VAL: u32 = 1 << 20;
     let mut rng = create_seeded_rng();
     let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
@@ -588,7 +617,6 @@ fn generate_mixed_ops(
     num_ops: usize,
     committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
 ) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
-    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
     const MAX_LIMB_VAL: u32 = 1 << 20;
     let mut rng = create_seeded_rng();
     let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
@@ -686,7 +714,6 @@ fn generate_mixed_ops_remove_first_leaf(
     num_ops: usize,
     committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
 ) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
-    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
     const MAX_LIMB_VAL: u32 = 1 << 20;
     let mut rng = create_seeded_rng();
     let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
@@ -791,7 +818,6 @@ fn generate_mixed_ops_empty_start(
     num_ops: usize,
     committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
 ) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
-    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
     const MAX_LIMB_VAL: u32 = 1 << 20;
     let mut rng = create_seeded_rng();
     let mut btree = PageBTree::<16, 16, BABYBEAR_COMMITMENT_LEN>::new(
@@ -870,7 +896,6 @@ fn generate_large_tree_no_new_keys(
     num_ops: usize,
     committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
 ) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
-    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
     let mut rng = create_seeded_rng();
     let mut btree = PageBTree::<32, 32, BABYBEAR_COMMITMENT_LEN>::load(vec![
         639955356, 1577306122, 107201956, 1528176068, 704402408, 1775238984, 169542638, 1916258191,
@@ -926,7 +951,6 @@ fn generate_large_tree_new_keys(
     num_ops: usize,
     committer: &mut TraceCommitter<BabyBearPoseidon2Config>,
 ) -> (PageBTreePages, bool, PageBTreePages, bool, Vec<Operation>) {
-    const MAX_VAL: u32 = 0x78000001; // The prime used by BabyBear
     let mut rng = create_seeded_rng();
     let mut btree = PageBTree::<32, 32, BABYBEAR_COMMITMENT_LEN>::load(vec![
         639955356, 1577306122, 107201956, 1528176068, 704402408, 1775238984, 169542638, 1916258191,

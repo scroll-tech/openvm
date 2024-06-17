@@ -1,13 +1,14 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashSet};
 use std::sync::Arc;
 
 use afs_stark_backend::config::Com;
 use afs_stark_backend::prover::trace::{ProverTraceData, TraceCommitter};
-use p3_field::{AbstractField, PrimeField64};
+use p3_field::{AbstractField, Field, PrimeField64};
 use p3_matrix::dense::{DenseMatrix, RowMajorMatrix};
 
 use p3_uni_stark::{StarkGenericConfig, Val};
 
+use crate::common::page::Page;
 use crate::page_rw_checker::offline_checker::OfflineChecker;
 use crate::page_rw_checker::page_controller::Operation;
 use crate::range_gate::RangeCheckerGateChip;
@@ -26,9 +27,8 @@ pub struct PageTreeParams {
 }
 
 #[derive(Clone)]
-pub struct LessThanTupleParams {
-    pub range_max: u32,
-    pub limb_bits: Vec<usize>,
+pub struct MyLessThanTupleParams {
+    pub limb_bits: usize,
     pub decomp: usize,
 }
 
@@ -334,10 +334,7 @@ pub struct PageControllerParams {
     pub final_tree_params: PageTreeParams,
 }
 
-pub struct PageController<SC: StarkGenericConfig, const COMMITMENT_LEN: usize>
-where
-    Val<SC>: AbstractField + PrimeField64,
-{
+pub struct PageController<const COMMITMENT_LEN: usize> {
     pub init_root_signal: RootSignalChip<COMMITMENT_LEN>,
     pub init_leaf_chips: Vec<LeafPageChip<COMMITMENT_LEN>>,
     pub init_internal_chips: Vec<InternalPageChip<COMMITMENT_LEN>>,
@@ -346,28 +343,29 @@ where
     pub final_leaf_chips: Vec<LeafPageChip<COMMITMENT_LEN>>,
     pub final_internal_chips: Vec<InternalPageChip<COMMITMENT_LEN>>,
     pub params: PageControllerParams,
-    pub data_trace: Option<PageControllerDataTrace<SC, COMMITMENT_LEN>>,
-    pub main_trace: Option<PageControllerMainTrace<SC, COMMITMENT_LEN>>,
-    pub commit: Option<PageControllerCommit<SC>>,
+    // pub data_trace: Option<PageControllerDataTrace<SC, COMMITMENT_LEN>>,
+    // pub main_trace: Option<PageControllerMainTrace<SC, COMMITMENT_LEN>>,
+    // pub commit: Option<PageControllerCommit<SC>>,
     pub range_checker: Arc<RangeCheckerGateChip>,
 }
 
-impl<SC: StarkGenericConfig, const COMMITMENT_LEN: usize> PageController<SC, COMMITMENT_LEN>
-where
-    Val<SC>: AbstractField + PrimeField64,
-    Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
-{
-    pub fn new(
+impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
+    pub fn new<SC: StarkGenericConfig>(
         data_bus_index: usize,
         internal_data_bus_index: usize,
+        ops_bus_index: usize,
         lt_bus_index: usize,
         idx_len: usize,
         data_len: usize,
         init_param: PageTreeParams,
         final_param: PageTreeParams,
-        less_than_tuple_param: LessThanTupleParams,
+        less_than_tuple_param: MyLessThanTupleParams,
         range_checker: Arc<RangeCheckerGateChip>,
-    ) -> Self {
+    ) -> Self
+    where
+        Val<SC>: AbstractField + PrimeField64,
+        Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
+    {
         Self {
             init_leaf_chips: vec![
                 LeafPageChip::new(
@@ -392,7 +390,16 @@ where
                 );
                 init_param.internal_cap
             ],
-            offline_checker: OfflineChecker::new(data_bus_index, idx_len, data_len),
+            offline_checker: OfflineChecker::new(
+                data_bus_index,
+                lt_bus_index,
+                ops_bus_index,
+                idx_len,
+                data_len,
+                less_than_tuple_param.limb_bits,
+                Val::<SC>::bits() - 1,
+                less_than_tuple_param.decomp.clone(),
+            ),
             final_leaf_chips: vec![
                 LeafPageChip::new(
                     final_param.path_bus_index,
@@ -418,7 +425,6 @@ where
             ],
             init_root_signal: RootSignalChip::new(init_param.path_bus_index, true, idx_len),
             final_root_signal: RootSignalChip::new(final_param.path_bus_index, false, idx_len),
-            commit: None,
             params: PageControllerParams {
                 idx_len,
                 data_len,
@@ -426,23 +432,30 @@ where
                 init_tree_params: init_param,
                 final_tree_params: final_param,
             },
-            data_trace: None,
-            main_trace: None,
             range_checker,
         }
     }
 
-    fn gen_ops_trace(
+    fn gen_ops_trace<SC: StarkGenericConfig>(
         &self,
-        mega_page: &mut Vec<Vec<u32>>,
+        mega_page: &mut Page,
         ops: &[Operation],
+        range_checker: Arc<RangeCheckerGateChip>,
         trace_degree: usize,
-    ) -> RowMajorMatrix<Val<SC>> {
-        self.offline_checker
-            .generate_trace::<SC>(mega_page, ops.to_owned(), trace_degree)
+    ) -> RowMajorMatrix<Val<SC>>
+    where
+        Val<SC>: AbstractField + PrimeField64,
+        Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
+    {
+        self.offline_checker.generate_trace::<SC>(
+            mega_page,
+            ops.to_owned(),
+            range_checker,
+            trace_degree,
+        )
     }
 
-    pub fn load_page_and_ops(
+    pub fn load_page_and_ops<SC: StarkGenericConfig>(
         &mut self,
         init_leaf_pages: Vec<Vec<Vec<u32>>>,
         init_internal_pages: Vec<Vec<Vec<u32>>>,
@@ -460,7 +473,11 @@ where
         PageControllerMainTrace<SC, COMMITMENT_LEN>,
         PageControllerCommit<SC>,
         PageControllerProverData<SC>,
-    ) {
+    )
+    where
+        Val<SC>: AbstractField + PrimeField64,
+        Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
+    {
         let init_leaf_height = self.params.init_tree_params.leaf_page_height;
         let init_internal_height = self.params.init_tree_params.internal_page_height;
         let final_leaf_height = self.params.final_tree_params.leaf_page_height;
@@ -483,7 +500,7 @@ where
                 vec![0; 2 + 2 * self.params.idx_len + self.params.commitment_len];
                 final_internal_height
             ];
-
+        let internal_indices = ops.iter().map(|op| op.idx.clone()).collect();
         let (init_tree_products, mega_page) = make_tree_products(
             trace_committer,
             &init_leaf_pages,
@@ -497,13 +514,15 @@ where
             init_root_is_leaf,
             init_root_idx,
             self.params.idx_len,
+            self.params.data_len,
             self.range_checker.clone(),
+            &internal_indices,
             true,
         );
         let mut mega_page = mega_page.unwrap();
         mega_page.resize(
             mega_page.len() + 3 * ops.len(),
-            vec![0; 2 + self.params.idx_len + self.params.data_len],
+            vec![0; 1 + self.params.idx_len + self.params.data_len],
         );
         let (final_tree_products, _) = make_tree_products(
             trace_committer,
@@ -518,11 +537,19 @@ where
             final_root_is_leaf,
             final_root_idx,
             self.params.idx_len,
+            self.params.data_len,
             self.range_checker.clone(),
+            &internal_indices,
             false,
         );
-
-        let offline_checker_trace = self.gen_ops_trace(&mut mega_page, &ops, trace_degree);
+        let mut mega_page =
+            Page::from_2d_vec(&mega_page, self.params.idx_len, self.params.data_len);
+        let offline_checker_trace = self.gen_ops_trace::<SC>(
+            &mut mega_page,
+            &ops,
+            self.range_checker.clone(),
+            trace_degree,
+        );
 
         let data_trace = PageControllerDataTrace {
             init_leaf_chip_traces: init_tree_products.leaf.data_traces,
@@ -557,6 +584,7 @@ where
     }
 }
 
+/// internal_indices are relevant for final page generation only
 fn make_tree_products<SC: StarkGenericConfig, const COMMITMENT_LEN: usize>(
     committer: &mut TraceCommitter<SC>,
     leaf_pages: &[Vec<Vec<u32>>],
@@ -570,7 +598,9 @@ fn make_tree_products<SC: StarkGenericConfig, const COMMITMENT_LEN: usize>(
     root_is_leaf: bool,
     root_idx: usize,
     idx_len: usize,
+    data_len: usize,
     range_checker: Arc<RangeCheckerGateChip>,
+    internal_indices: &HashSet<Vec<u32>>,
     make_mega_page: bool,
 ) -> (TreeProducts<SC, COMMITMENT_LEN>, Option<Vec<Vec<u32>>>)
 where
@@ -611,11 +641,13 @@ where
             .collect();
         let page = leaf_pages[i].clone();
         let range = tree.leaf_ranges[i].clone();
-        let tmp = leaf_chips[i].generate_main_trace::<Val<SC>>(
-            page,
+        let page = Page::from_2d_vec_multitier(&page, idx_len, data_len);
+        let tmp = leaf_chips[i].generate_main_trace::<SC>(
+            &page,
             commit,
             range,
             range_checker.clone(),
+            &internal_indices,
         );
         leaf_prods.main_traces.push(tmp);
     }

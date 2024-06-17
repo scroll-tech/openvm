@@ -1,7 +1,7 @@
 use crate::{
-    is_less_than_tuple::columns::IsLessThanTupleAuxCols,
-    multitier_page_rw_checker::page_controller::LessThanTupleParams,
-    page_rw_checker::page_chip::columns::PageCols,
+    common::page_cols::PageCols, is_less_than_tuple::columns::IsLessThanTupleAuxCols,
+    multitier_page_rw_checker::page_controller::MyLessThanTupleParams,
+    page_rw_checker::my_final_page::columns::MyFinalPageAuxCols,
 };
 
 #[derive(Clone)]
@@ -18,15 +18,11 @@ pub struct LeafDataCols<T> {
 
 #[derive(Clone)]
 pub struct LeafPageSubAirCols<T> {
-    pub key_start: IsLessThanTupleAuxCols<T>,
-    pub end_key: IsLessThanTupleAuxCols<T>,
+    pub idx_start: IsLessThanTupleAuxCols<T>,
+    pub end_idx: IsLessThanTupleAuxCols<T>,
+    pub final_page_aux: MyFinalPageAuxCols<T>,
 }
 
-// pub struct LeafPageCacheCols<T> {
-//     pub is_alloc: T, // indicates if row is allocated
-//     pub idx: Vec<T>,
-//     pub data: Vec<T>,
-// }
 #[derive(Clone)]
 pub struct RangeInclusionCols<T> {
     pub start: Vec<T>,
@@ -49,7 +45,7 @@ impl<T> LeafPageCols<T> {
         data_len: usize,
         commitment_len: usize,
         is_init: bool,
-        is_less_than_tuple_params: LessThanTupleParams,
+        is_less_than_tuple_params: MyLessThanTupleParams,
     ) -> Self
     where
         T: Clone,
@@ -77,7 +73,7 @@ impl<T> LeafPageMetadataCols<T> {
         idx_len: usize,
         commitment_len: usize,
         is_init: bool,
-        is_less_than_tuple_params: LessThanTupleParams,
+        is_less_than_tuple_params: MyLessThanTupleParams,
     ) -> Self
     where
         T: Clone,
@@ -99,21 +95,27 @@ impl<T> LeafPageMetadataCols<T> {
             new_start += 2 * idx_len + 2;
             let mut aux_allocs = vec![];
             let aux_size = IsLessThanTupleAuxCols::<T>::get_width(
-                is_less_than_tuple_params.limb_bits.clone(),
+                vec![is_less_than_tuple_params.limb_bits; idx_len],
                 is_less_than_tuple_params.decomp,
                 idx_len,
             );
             for i in 0..2 {
                 aux_allocs.push(IsLessThanTupleAuxCols::from_slice(
                     &cols[new_start + i * aux_size..new_start + (i + 1) * aux_size],
-                    is_less_than_tuple_params.limb_bits.clone(),
+                    vec![is_less_than_tuple_params.limb_bits; idx_len],
                     is_less_than_tuple_params.decomp,
                     idx_len,
                 ))
             }
             let subair_cols = LeafPageSubAirCols {
-                key_start: aux_allocs[0].clone(),
-                end_key: aux_allocs[1].clone(),
+                idx_start: aux_allocs[0].clone(),
+                end_idx: aux_allocs[1].clone(),
+                final_page_aux: MyFinalPageAuxCols::from_slice(
+                    &cols[new_start + 2 * aux_size..],
+                    is_less_than_tuple_params.limb_bits,
+                    is_less_than_tuple_params.decomp,
+                    idx_len,
+                ),
             };
             LeafPageMetadataCols {
                 own_commitment: cols[0..commitment_len].to_vec(),

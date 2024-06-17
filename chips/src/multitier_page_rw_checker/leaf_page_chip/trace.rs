@@ -1,10 +1,12 @@
-use std::sync::Arc;
+use std::{collections::HashSet, sync::Arc};
 
-use p3_field::PrimeField64;
+use p3_field::{AbstractField, PrimeField, PrimeField64};
 use p3_matrix::dense::RowMajorMatrix;
+use p3_uni_stark::{StarkGenericConfig, Val};
 
 use crate::{
-    is_less_than_tuple::columns::IsLessThanTupleCols, range_gate::RangeCheckerGateChip,
+    common::page::Page, is_less_than_tuple::columns::IsLessThanTupleCols,
+    multitier_page_rw_checker::leaf_page_chip::MyPageAir, range_gate::RangeCheckerGateChip,
     sub_chip::LocalTraceInstructions,
 };
 
@@ -21,35 +23,47 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
         )
     }
 
-    pub fn generate_main_trace<F: PrimeField64>(
+    pub fn generate_main_trace<SC: StarkGenericConfig>(
         &self,
-        page: Vec<Vec<u32>>,
+        page: &Page,
         commit: Vec<u32>,
         range: (Vec<u32>, Vec<u32>),
         range_checker: Arc<RangeCheckerGateChip>,
-    ) -> RowMajorMatrix<F> {
+        internal_indices: &HashSet<Vec<u32>>,
+    ) -> RowMajorMatrix<Val<SC>>
+    where
+        Val<SC>: PrimeField64 + PrimeField,
+    {
         assert!(commit.len() == COMMITMENT_LEN);
+        let mut final_page_aux_rows = match &self.page_chip {
+            MyPageAir::Final(f) => {
+                f.gen_aux_trace::<SC>(page, range_checker.clone(), internal_indices)
+            }
+            _ => RowMajorMatrix::new(vec![], 1),
+        };
         RowMajorMatrix::new(
-            page.iter()
-                .flat_map(|row| {
+            page.rows
+                .iter()
+                .enumerate()
+                .flat_map(|(i, row)| {
                     let mut trace_row = vec![];
                     trace_row.extend(commit.clone());
                     if !self.is_init {
                         trace_row.extend(range.0.clone());
                         trace_row.extend(range.1.clone());
                         trace_row.extend(vec![0; 2]);
-                        let mut trace_row: Vec<F> = trace_row
+                        let mut trace_row: Vec<Val<SC>> = trace_row
                             .into_iter()
-                            .map(|i| F::from_wrapped_u32(i))
+                            .map(|i| Val::<SC>::from_canonical_u32(i))
                             .collect();
                         {
-                            let tuple: IsLessThanTupleCols<F> = self
+                            let tuple: IsLessThanTupleCols<Val<SC>> = self
                                 .is_less_than_tuple_air
                                 .clone()
                                 .unwrap()
-                                .key_start
+                                .idx_start
                                 .generate_trace_row((
-                                    row[2..2 + self.idx_len].to_vec(),
+                                    row.idx.to_vec(),
                                     range.0.clone(),
                                     range_checker.clone(),
                                 ));
@@ -59,14 +73,14 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
                             trace_row.extend(aux.flatten());
                         }
                         {
-                            let tuple: IsLessThanTupleCols<F> = self
+                            let tuple: IsLessThanTupleCols<Val<SC>> = self
                                 .is_less_than_tuple_air
                                 .clone()
                                 .unwrap()
-                                .end_key
+                                .end_idx
                                 .generate_trace_row((
                                     range.1.clone(),
-                                    row[2..2 + self.idx_len].to_vec(),
+                                    row.idx.to_vec(),
                                     range_checker.clone(),
                                 ));
                             let aux = tuple.aux;
@@ -74,12 +88,15 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
                             trace_row[COMMITMENT_LEN + 2 * range.0.len() + 1] = io.tuple_less_than;
                             trace_row.extend(aux.flatten());
                         }
+                        {
+                            trace_row.append(&mut final_page_aux_rows.row_mut(i).to_vec());
+                        }
                         trace_row
                     } else {
                         trace_row
                             .into_iter()
-                            .map(|i| F::from_wrapped_u32(i))
-                            .collect::<Vec<F>>()
+                            .map(|i| Val::<SC>::from_wrapped_u32(i))
+                            .collect::<Vec<Val<SC>>>()
                     }
                 })
                 .collect(),
@@ -96,8 +113,8 @@ impl<const COMMITMENT_LEN: usize> LeafPageChip<COMMITMENT_LEN> {
 
 // #[derive(Clone)]
 // pub struct LeafPageSubAirCols<T> {
-//     pub key_start: IsLessThanTupleAuxCols<T>,
-//     pub end_key: IsLessThanTupleAuxCols<T>,
+//     pub idx_start: IsLessThanTupleAuxCols<T>,
+//     pub end_idx: IsLessThanTupleAuxCols<T>,
 // }
 
 // #[derive(Clone)]
