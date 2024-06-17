@@ -36,6 +36,7 @@ pub struct InternalPageAir<const COMMITMENT_LEN: usize> {
     is_less_than_tuple_param: MyLessThanTupleParams,
     is_init: bool,
     idx_len: usize,
+    id: u32,
 }
 
 impl<const COMMITMENT_LEN: usize> InternalPageAir<COMMITMENT_LEN> {
@@ -46,6 +47,7 @@ impl<const COMMITMENT_LEN: usize> InternalPageAir<COMMITMENT_LEN> {
         lt_bus_index: usize,
         idx_len: usize,
         is_init: bool,
+        id: u32,
     ) -> Self {
         let subairs = if is_init {
             None
@@ -72,6 +74,7 @@ impl<const COMMITMENT_LEN: usize> InternalPageAir<COMMITMENT_LEN> {
             is_init,
             is_less_than_tuple_param,
             is_less_than_tuple_air: subairs,
+            id,
         }
     }
 
@@ -82,7 +85,7 @@ impl<const COMMITMENT_LEN: usize> InternalPageAir<COMMITMENT_LEN> {
     // for both indices
     // we must also assert that the ranges are sorted
     pub fn air_width(&self) -> usize {
-        7 + 2 * self.idx_len                    // mult stuff and data
+        9 + 2 * self.idx_len                    // mult stuff and data
             + 2 * COMMITMENT_LEN                // child commitment and own commitment
             + (1 - self.is_init as usize)
                 * (3 * self.idx_len             // prove sort + range inclusion columns

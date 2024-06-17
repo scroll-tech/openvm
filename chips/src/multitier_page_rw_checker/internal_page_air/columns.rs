@@ -50,6 +50,8 @@ pub struct ProveSortCols<T> {
 #[derive(Clone)]
 pub struct InternalPageMetadataCols<T> {
     pub own_commitment: Vec<T>,
+    pub id: T,
+    pub child_id: T,
     pub mult: T,
     pub mult_alloc: T,
     pub mult_alloc_minus_one: T,
@@ -117,17 +119,19 @@ impl<T> InternalPageMetadataCols<T> {
         if is_init {
             InternalPageMetadataCols {
                 own_commitment: cols[0..commitment_len].to_vec(),
-                mult: cols[commitment_len].clone(),
-                mult_alloc: cols[commitment_len + 1].clone(),
-                mult_alloc_is_1: cols[commitment_len + 2].clone(),
-                mult_alloc_minus_one: cols[commitment_len + 3].clone(),
-                mult_minus_one_alloc: cols[commitment_len + 4].clone(),
+                id: cols[commitment_len].clone(),
+                child_id: cols[commitment_len + 1].clone(),
+                mult: cols[commitment_len + 2].clone(),
+                mult_alloc: cols[commitment_len + 3].clone(),
+                mult_alloc_is_1: cols[commitment_len + 4].clone(),
+                mult_alloc_minus_one: cols[commitment_len + 5].clone(),
+                mult_minus_one_alloc: cols[commitment_len + 6].clone(),
                 prove_sort_cols: None,
                 range_inclusion_cols: None,
                 subchip_aux_cols: None,
             }
         } else {
-            let mut new_start = commitment_len + 5;
+            let mut new_start = commitment_len + 7;
             let prove_sort_cols = ProveSortCols {
                 next_idx: cols[new_start..new_start + idx_len].to_vec(),
                 end_less_than_next: cols[new_start + idx_len].clone(),
@@ -172,11 +176,13 @@ impl<T> InternalPageMetadataCols<T> {
             };
             InternalPageMetadataCols {
                 own_commitment: cols[0..commitment_len].to_vec(),
-                mult: cols[commitment_len].clone(),
-                mult_alloc: cols[commitment_len + 1].clone(),
-                mult_alloc_is_1: cols[commitment_len + 2].clone(),
-                mult_alloc_minus_one: cols[commitment_len + 3].clone(),
-                mult_minus_one_alloc: cols[commitment_len + 4].clone(),
+                id: cols[commitment_len].clone(),
+                child_id: cols[commitment_len + 1].clone(),
+                mult: cols[commitment_len + 2].clone(),
+                mult_alloc: cols[commitment_len + 3].clone(),
+                mult_alloc_is_1: cols[commitment_len + 4].clone(),
+                mult_alloc_minus_one: cols[commitment_len + 5].clone(),
+                mult_minus_one_alloc: cols[commitment_len + 6].clone(),
                 prove_sort_cols: Some(prove_sort_cols),
                 range_inclusion_cols: Some(range_inclusion_cols),
                 subchip_aux_cols: Some(subair_cols),

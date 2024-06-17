@@ -217,14 +217,6 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         } else {
             let min_key = kv_pairs[0].0.clone();
             let max_key = kv_pairs[kv_pairs.len() - 1].0.clone();
-            // for (k, _) in &kv_pairs {
-            //     if cmp(&min_key, k) > 0 {
-            //         min_key = k.to_vec();
-            //     }
-            //     if cmp(k, &max_key) > 0 {
-            //         max_key = k.to_vec();
-            //     }
-            // }
             Self {
                 kv_pairs,
                 min_key,
@@ -306,7 +298,6 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
             let mut row = Vec::new();
             row.push(1);
             row.push(1);
-            // row.push(1);
             for k in &self.kv_pairs[i].0 {
                 row.push(*k);
             }
@@ -319,7 +310,6 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         for t in &mut trace {
             t.resize(2 + key_len + val_len, 0);
         }
-        // println!("THIS IS THE TRACE OF A LEAF NODE: {:?}", trace.clone());
         self.trace = Some(trace.clone());
         trace
     }
@@ -694,7 +684,6 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         for t in &mut trace {
             t.resize(2 + 2 * key_len + COMMITMENT_LEN, 0);
         }
-        // println!("THIS IS THE TRACE OF AN INTERNAL NODE: {:?}", trace);
         self.trace = Some(trace.clone());
         trace
     }

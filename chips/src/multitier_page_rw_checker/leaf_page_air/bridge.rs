@@ -1,3 +1,5 @@
+use std::iter;
+
 use afs_stark_backend::interaction::{AirBridge, Interaction};
 use p3_air::VirtualPairCol;
 use p3_field::PrimeField64;
@@ -18,6 +20,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageAir<COMMITMENT_LEN> {
         if self.is_init {
             let virtual_cols = (col_indices.metadata.own_commitment)
                 .into_iter()
+                .chain(iter::once(col_indices.metadata.id))
                 .map(VirtualPairCol::single_main)
                 .collect::<Vec<_>>();
 
@@ -33,6 +36,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageAir<COMMITMENT_LEN> {
                 .into_iter()
                 .chain(range_inclusion_cols.end)
                 .chain(col_indices.metadata.own_commitment)
+                .chain(iter::once(col_indices.metadata.id))
                 .map(VirtualPairCol::single_main)
                 .collect::<Vec<_>>();
 

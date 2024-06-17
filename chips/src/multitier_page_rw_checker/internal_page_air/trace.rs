@@ -26,6 +26,7 @@ impl<const COMMITMENT_LEN: usize> InternalPageAir<COMMITMENT_LEN> {
         &self,
         page: Vec<Vec<u32>>,
         commit: Vec<u32>,
+        child_ids: Vec<u32>,
         mults: Vec<u32>,
         range: (Vec<u32>, Vec<u32>),
         range_checker: Arc<RangeCheckerGateChip>,
@@ -38,12 +39,15 @@ impl<const COMMITMENT_LEN: usize> InternalPageAir<COMMITMENT_LEN> {
                 .flat_map(|(i, (row, mult))| {
                     let mut trace_row = vec![];
                     trace_row.extend(commit.clone());
+                    trace_row.push(self.id);
+                    trace_row.push(child_ids[i]);
                     trace_row.push(mult);
                     trace_row.push(mult * row[1]);
                     trace_row.push((mult * row[1] == 1) as u32);
                     // dummy value
                     trace_row.push(0);
                     trace_row.push(row[1] * mult - row[1]);
+                    println!("{:?}", trace_row);
                     let next = if i < page.len() - 1 {
                         page[i + 1][2..2 + self.idx_len].to_vec()
                     } else {
@@ -68,7 +72,7 @@ impl<const COMMITMENT_LEN: usize> InternalPageAir<COMMITMENT_LEN> {
                                 let lt_cols =
                                     air.generate_trace_row((idx1, idx2, range_checker.clone()));
                                 trace_row.extend(lt_cols.aux.flatten());
-                                trace_row[COMMITMENT_LEN + 5 + self.idx_len + lt_res_idx] =
+                                trace_row[COMMITMENT_LEN + 7 + self.idx_len + lt_res_idx] =
                                     lt_cols.io.tuple_less_than;
                             };
                         gen_aux(
@@ -115,14 +119,14 @@ impl<const COMMITMENT_LEN: usize> InternalPageAir<COMMITMENT_LEN> {
                                 .generate_trace_row(F::from_wrapped_u32(mult * row[1]) - F::one())
                                 .inv,
                         );
-                        trace_row[COMMITMENT_LEN + 3] = trace_row[COMMITMENT_LEN + 1] - F::one();
+                        trace_row[COMMITMENT_LEN + 5] = trace_row[COMMITMENT_LEN + 3] - F::one();
                         trace_row
                     } else {
                         let mut trace_row = trace_row
                             .into_iter()
                             .map(|i| F::from_wrapped_u32(i))
                             .collect_vec();
-                        trace_row[COMMITMENT_LEN + 3] = trace_row[COMMITMENT_LEN + 1] - F::one();
+                        trace_row[COMMITMENT_LEN + 5] = trace_row[COMMITMENT_LEN + 3] - F::one();
                         trace_row
                     }
                 })

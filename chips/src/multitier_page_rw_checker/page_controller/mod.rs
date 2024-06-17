@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use afs_stark_backend::config::Com;
 use afs_stark_backend::prover::trace::{ProverTraceData, TraceCommitter};
+use itertools::Itertools;
 use p3_field::{AbstractField, Field, PrimeField64};
 use p3_matrix::dense::{DenseMatrix, RowMajorMatrix};
 
@@ -54,6 +55,7 @@ where
 {
     pub _root: Node,
     pub mults: Vec<Vec<u32>>,
+    pub child_ids: Vec<Vec<u32>>,
     pub leaf_ranges: Vec<(Vec<u32>, Vec<u32>)>,
     pub internal_ranges: Vec<(Vec<u32>, Vec<u32>)>,
     pub root_range: (Vec<u32>, Vec<u32>),
@@ -75,15 +77,18 @@ where
         commitment_to_node: &BTreeMap<Vec<Val<SC>>, Node>,
         mega_page: &mut Vec<Vec<u32>>,
         mults: &mut Vec<Vec<u32>>,
+        child_ids: &mut Vec<Vec<u32>>,
         idx_len: usize,
         cur_node: Node,
     ) -> u32 {
         if !cur_node.0 {
             let mut ans = 0;
             let mut mult = vec![];
+            let mut child_id = vec![];
             for row in &internal_pages[cur_node.1] {
                 if row[1] == 0 {
                     mult.push(0);
+                    child_id.push(0);
                 } else {
                     let f_row: Vec<Val<SC>> = row
                         .iter()
@@ -94,6 +99,7 @@ where
                     match next_node {
                         None => {
                             mult.push(1);
+                            child_id.push(0);
                             ans += 1;
                         }
                         Some(n) => {
@@ -112,16 +118,19 @@ where
                                 commitment_to_node,
                                 mega_page,
                                 mults,
+                                child_ids,
                                 idx_len,
                                 n.clone(),
                             );
                             ans += m;
                             mult.push(m);
+                            child_id.push(n.1 as u32);
                         }
                     }
                 }
             }
             mults[cur_node.1] = mult;
+            child_ids[cur_node.1] = child_id;
             ans + 1
         } else {
             let mut ans = 0;
@@ -208,6 +217,7 @@ where
             commitment_to_node.insert(c.clone().to_vec(), Node(false, i));
         }
         let mut mults = vec![vec![0; internal_pages[0].len()]; internal_pages.len()];
+        let mut child_ids = vec![vec![0; internal_pages[0].len()]; internal_pages.len()];
         commitment_to_node.insert(root_commitment.clone().to_vec(), root.clone());
         let mut mega_page = vec![];
         let root_mult = PageTreeGraph::<SC, COMMITMENT_LEN>::dfs(
@@ -218,6 +228,7 @@ where
             &commitment_to_node,
             &mut mega_page,
             &mut mults,
+            &mut child_ids,
             idx_len,
             root.clone(),
         );
@@ -240,6 +251,7 @@ where
             _root: root,
             root_range,
             mults,
+            child_ids,
             root_mult,
             _commitment_to_node: commitment_to_node,
             leaf_ranges,
@@ -364,29 +376,33 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
         Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
     {
         Self {
-            init_leaf_chips: vec![
-                LeafPageAir::new(
-                    init_param.path_bus_index,
-                    data_bus_index,
-                    less_than_tuple_param.clone(),
-                    lt_bus_index,
-                    idx_len,
-                    data_len,
-                    true
-                );
-                init_param.leaf_cap
-            ],
-            init_internal_chips: vec![
-                InternalPageAir::new(
-                    init_param.path_bus_index,
-                    internal_data_bus_index,
-                    less_than_tuple_param.clone(),
-                    lt_bus_index,
-                    idx_len,
-                    true
-                );
-                init_param.internal_cap
-            ],
+            init_leaf_chips: (0..init_param.leaf_cap)
+                .map(|i| {
+                    LeafPageAir::new(
+                        init_param.path_bus_index,
+                        data_bus_index,
+                        less_than_tuple_param.clone(),
+                        lt_bus_index,
+                        idx_len,
+                        data_len,
+                        true,
+                        i as u32,
+                    )
+                })
+                .collect_vec(),
+            init_internal_chips: (0..init_param.internal_cap)
+                .map(|i| {
+                    InternalPageAir::new(
+                        init_param.path_bus_index,
+                        internal_data_bus_index,
+                        less_than_tuple_param.clone(),
+                        lt_bus_index,
+                        idx_len,
+                        true,
+                        i as u32,
+                    )
+                })
+                .collect_vec(),
             offline_checker: OfflineChecker::new(
                 data_bus_index,
                 lt_bus_index,
@@ -397,29 +413,33 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
                 Val::<SC>::bits() - 1,
                 less_than_tuple_param.decomp.clone(),
             ),
-            final_leaf_chips: vec![
-                LeafPageAir::new(
-                    final_param.path_bus_index,
-                    data_bus_index,
-                    less_than_tuple_param.clone(),
-                    lt_bus_index,
-                    idx_len,
-                    data_len,
-                    false
-                );
-                final_param.leaf_cap
-            ],
-            final_internal_chips: vec![
-                InternalPageAir::new(
-                    final_param.path_bus_index,
-                    internal_data_bus_index,
-                    less_than_tuple_param.clone(),
-                    lt_bus_index,
-                    idx_len,
-                    false
-                );
-                final_param.internal_cap
-            ],
+            final_leaf_chips: (0..final_param.leaf_cap)
+                .map(|i| {
+                    LeafPageAir::new(
+                        final_param.path_bus_index,
+                        data_bus_index,
+                        less_than_tuple_param.clone(),
+                        lt_bus_index,
+                        idx_len,
+                        data_len,
+                        false,
+                        i as u32,
+                    )
+                })
+                .collect_vec(),
+            final_internal_chips: (0..final_param.internal_cap)
+                .map(|i| {
+                    InternalPageAir::new(
+                        final_param.path_bus_index,
+                        internal_data_bus_index,
+                        less_than_tuple_param.clone(),
+                        lt_bus_index,
+                        idx_len,
+                        false,
+                        i as u32,
+                    )
+                })
+                .collect_vec(),
             init_root_signal: RootSignalAir::new(init_param.path_bus_index, true, idx_len),
             final_root_signal: RootSignalAir::new(final_param.path_bus_index, false, idx_len),
             params: PageControllerParams {
@@ -657,9 +677,11 @@ where
         let page = internal_pages[i].clone();
         let range = tree.internal_ranges[i].clone();
         let mults = tree.mults[i].clone();
+        let child_ids = tree.child_ids[i].clone();
         let tmp = internal_chips[i].generate_main_trace::<Val<SC>>(
             page,
             commit,
+            child_ids,
             mults,
             range,
             range_checker.clone(),
@@ -679,6 +701,7 @@ where
         .collect();
     let root_signal_trace = root_signal.generate_trace::<Val<SC>>(
         root_commit.clone(),
+        root_idx as u32,
         tree.root_mult - 1,
         tree.root_range.clone(),
     );

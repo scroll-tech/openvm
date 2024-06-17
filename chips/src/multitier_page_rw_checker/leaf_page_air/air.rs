@@ -1,6 +1,6 @@
 use afs_stark_backend::air_builders::PartitionedAirBuilder;
 use p3_air::{Air, AirBuilder, AirBuilderWithPublicValues, BaseAir};
-use p3_field::Field;
+use p3_field::{AbstractField, Field};
 use p3_matrix::Matrix;
 
 use super::{
@@ -41,6 +41,11 @@ where
         for i in 0..COMMITMENT_LEN {
             builder.assert_eq(pi[i], local[i]);
         }
+        // assert that own id is correct
+        builder.assert_eq(
+            local[COMMITMENT_LEN],
+            AB::Expr::from_canonical_u64(self.id as u64),
+        );
         builder.assert_one(cached_data.is_leaf);
         match &self.page_chip {
             MyPageAir::Initial(i) => {
