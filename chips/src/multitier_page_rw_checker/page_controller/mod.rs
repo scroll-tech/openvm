@@ -13,9 +13,9 @@ use crate::page_rw_checker::offline_checker::OfflineChecker;
 use crate::page_rw_checker::page_controller::Operation;
 use crate::range_gate::RangeCheckerGateChip;
 
-use super::internal_page_chip::InternalPageChip;
-use super::leaf_page_chip::LeafPageChip;
-use super::root_signal_chip::RootSignalChip;
+use super::internal_page_air::InternalPageAir;
+use super::leaf_page_air::LeafPageAir;
+use super::root_signal_air::RootSignalAir;
 
 #[derive(Clone)]
 pub struct PageTreeParams {
@@ -335,17 +335,14 @@ pub struct PageControllerParams {
 }
 
 pub struct PageController<const COMMITMENT_LEN: usize> {
-    pub init_root_signal: RootSignalChip<COMMITMENT_LEN>,
-    pub init_leaf_chips: Vec<LeafPageChip<COMMITMENT_LEN>>,
-    pub init_internal_chips: Vec<InternalPageChip<COMMITMENT_LEN>>,
+    pub init_root_signal: RootSignalAir<COMMITMENT_LEN>,
+    pub init_leaf_chips: Vec<LeafPageAir<COMMITMENT_LEN>>,
+    pub init_internal_chips: Vec<InternalPageAir<COMMITMENT_LEN>>,
     pub offline_checker: OfflineChecker,
-    pub final_root_signal: RootSignalChip<COMMITMENT_LEN>,
-    pub final_leaf_chips: Vec<LeafPageChip<COMMITMENT_LEN>>,
-    pub final_internal_chips: Vec<InternalPageChip<COMMITMENT_LEN>>,
+    pub final_root_signal: RootSignalAir<COMMITMENT_LEN>,
+    pub final_leaf_chips: Vec<LeafPageAir<COMMITMENT_LEN>>,
+    pub final_internal_chips: Vec<InternalPageAir<COMMITMENT_LEN>>,
     pub params: PageControllerParams,
-    // pub data_trace: Option<PageControllerDataTrace<SC, COMMITMENT_LEN>>,
-    // pub main_trace: Option<PageControllerMainTrace<SC, COMMITMENT_LEN>>,
-    // pub commit: Option<PageControllerCommit<SC>>,
     pub range_checker: Arc<RangeCheckerGateChip>,
 }
 
@@ -368,7 +365,7 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
     {
         Self {
             init_leaf_chips: vec![
-                LeafPageChip::new(
+                LeafPageAir::new(
                     init_param.path_bus_index,
                     data_bus_index,
                     less_than_tuple_param.clone(),
@@ -380,7 +377,7 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
                 init_param.leaf_cap
             ],
             init_internal_chips: vec![
-                InternalPageChip::new(
+                InternalPageAir::new(
                     init_param.path_bus_index,
                     internal_data_bus_index,
                     less_than_tuple_param.clone(),
@@ -401,7 +398,7 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
                 less_than_tuple_param.decomp.clone(),
             ),
             final_leaf_chips: vec![
-                LeafPageChip::new(
+                LeafPageAir::new(
                     final_param.path_bus_index,
                     data_bus_index,
                     less_than_tuple_param.clone(),
@@ -413,7 +410,7 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
                 final_param.leaf_cap
             ],
             final_internal_chips: vec![
-                InternalPageChip::new(
+                InternalPageAir::new(
                     final_param.path_bus_index,
                     internal_data_bus_index,
                     less_than_tuple_param.clone(),
@@ -423,8 +420,8 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
                 );
                 final_param.internal_cap
             ],
-            init_root_signal: RootSignalChip::new(init_param.path_bus_index, true, idx_len),
-            final_root_signal: RootSignalChip::new(final_param.path_bus_index, false, idx_len),
+            init_root_signal: RootSignalAir::new(init_param.path_bus_index, true, idx_len),
+            final_root_signal: RootSignalAir::new(final_param.path_bus_index, false, idx_len),
             params: PageControllerParams {
                 idx_len,
                 data_len,
@@ -588,12 +585,12 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
 fn make_tree_products<SC: StarkGenericConfig, const COMMITMENT_LEN: usize>(
     committer: &mut TraceCommitter<SC>,
     leaf_pages: &[Vec<Vec<u32>>],
-    leaf_chips: &[LeafPageChip<COMMITMENT_LEN>],
+    leaf_chips: &[LeafPageAir<COMMITMENT_LEN>],
     blank_leaf_page: &[Vec<u32>],
     internal_pages: &[Vec<Vec<u32>>],
-    internal_chips: &[InternalPageChip<COMMITMENT_LEN>],
+    internal_chips: &[InternalPageAir<COMMITMENT_LEN>],
     blank_internal_page: &[Vec<u32>],
-    root_signal: &RootSignalChip<COMMITMENT_LEN>,
+    root_signal: &RootSignalAir<COMMITMENT_LEN>,
     params: &PageTreeParams,
     root_is_leaf: bool,
     root_idx: usize,
