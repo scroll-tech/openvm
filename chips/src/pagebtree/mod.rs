@@ -1,7 +1,7 @@
 use std::{
-    fs::{File, OpenOptions},
-    io::{BufReader, BufWriter, Write},
-    path::{Path, PathBuf},
+    fs::File,
+    io::{BufReader, BufWriter, Read, Write},
+    path::Path,
 };
 
 use afs_stark_backend::{config::Com, prover::trace::TraceCommitter};
@@ -110,12 +110,14 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         let s = self.commit.iter().fold("".to_owned(), |acc, x| {
             acc.to_owned() + &format!("{:08x}", x)
         });
-        let file = match File::open("src/pagebtree/leaf/".to_owned() + &s + ".json") {
+        let file = match File::open("src/pagebtree/leaf/".to_owned() + &s + ".trace") {
             Err(_) => return None,
             Ok(file) => file,
         };
         let mut reader = BufReader::new(file);
-        let trace: Vec<Vec<u32>> = serde_json::from_reader(&mut reader).unwrap();
+        let mut encoded_trace = vec![];
+        reader.read_to_end(&mut encoded_trace).unwrap();
+        let trace: Vec<Vec<u32>> = bincode::deserialize(&encoded_trace).unwrap();
         let mut kv_pairs = vec![];
         if trace[0][0] == 0 {
             panic!();
@@ -139,12 +141,14 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         let s = self.commit.iter().fold("".to_owned(), |acc, x| {
             acc.to_owned() + &format!("{:08x}", x)
         });
-        let file = match File::open("src/pagebtree/internal/".to_owned() + &s + ".json") {
+        let file = match File::open("src/pagebtree/internal/".to_owned() + &s + ".trace") {
             Err(_) => return None,
             Ok(file) => file,
         };
         let mut reader = BufReader::new(file);
-        let trace: Vec<Vec<u32>> = serde_json::from_reader(&mut reader).unwrap();
+        let mut encoded_trace = vec![];
+        reader.read_to_end(&mut encoded_trace).unwrap();
+        let trace: Vec<Vec<u32>> = bincode::deserialize(&encoded_trace).unwrap();
         if trace[0][0] == 1 {
             panic!();
         }
@@ -352,11 +356,11 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         let s = commit.iter().fold("".to_owned(), |acc, x| {
             acc.to_owned() + &format!("{:08x}", x.as_canonical_u32())
         });
-        if Path::new(&("src/pagebtree/leaf/".to_owned() + &s + ".json")).is_file() {
-            let file = File::create("src/pagebtree/leaf/".to_owned() + &s + ".json").unwrap();
+        if !Path::new(&("src/pagebtree/leaf/".to_owned() + &s + ".trace")).is_file() {
+            let file = File::create("src/pagebtree/leaf/".to_owned() + &s + ".trace").unwrap();
             let mut writer = BufWriter::new(file);
-            let _ = serde_json::to_writer(&mut writer, &self.trace.clone().unwrap());
-            let _ = writer.flush();
+            let encoded_trace = bincode::serialize(&self.trace.as_ref().unwrap()).unwrap();
+            writer.write(&encoded_trace).unwrap();
         }
     }
 }
@@ -744,17 +748,11 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         let s = commit.iter().fold("".to_owned(), |acc, x| {
             acc.to_owned() + &format!("{:08x}", x.as_canonical_u32())
         });
-        if !Path::new(&("src/pagebtree/internal/".to_owned() + &s + ".json")).is_file() {
-            let s: String = "src/pagebtree/internal/".to_owned() + &s + ".json";
-            let path = PathBuf::from(&s);
-            let file = OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .open(path)
-                .unwrap();
+        if !Path::new(&("src/pagebtree/internal/".to_owned() + &s + ".trace")).is_file() {
+            let file = File::create("src/pagebtree/internal/".to_owned() + &s + ".trace").unwrap();
             let mut writer = BufWriter::new(file);
-            let _ = serde_json::to_writer(&mut writer, &self.trace.clone().unwrap());
-            let _ = writer.flush();
+            let encoded_trace = bincode::serialize(&self.trace.as_ref().unwrap()).unwrap();
+            writer.write(&encoded_trace).unwrap();
         }
     }
 
@@ -817,12 +815,14 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         let s = root_commit.iter().fold("".to_owned(), |acc, x| {
             acc.to_owned() + &format!("{:08x}", x)
         });
-        let file = match File::open("src/pagebtree/root/".to_owned() + &s + ".json") {
+        let file = match File::open("src/pagebtree/root/".to_owned() + &s + ".trace") {
             Err(_) => return None,
             Ok(file) => file,
         };
         let mut reader = BufReader::new(file);
-        let info: PageBTreeRootInfo = serde_json::from_reader(&mut reader).unwrap();
+        let mut encoded_info = vec![];
+        reader.read_to_end(&mut encoded_info).unwrap();
+        let info: PageBTreeRootInfo = bincode::deserialize(&encoded_info).unwrap();
         assert!(info.commitment_len == COMMITMENT_LEN);
         assert!(info.max_internal == MAX_INTERNAL);
         assert!(info.max_leaf == MAX_LEAF);
@@ -968,7 +968,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         let s = commit.iter().fold("".to_owned(), |acc, x| {
             acc.to_owned() + &format!("{:08x}", x)
         });
-        let file = File::create("src/pagebtree/root/".to_owned() + &s + ".json").unwrap();
+        let file = File::create("src/pagebtree/root/".to_owned() + &s + ".trace").unwrap();
         let root_info = PageBTreeRootInfo {
             max_internal: MAX_INTERNAL,
             max_leaf: MAX_LEAF,
@@ -984,8 +984,8 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
             min_key: self.min_key(),
         };
         let mut writer = BufWriter::new(file);
-        let _ = serde_json::to_writer(&mut writer, &root_info);
-        let _ = writer.flush();
+        let encoded_info = bincode::serialize(&root_info).unwrap();
+        writer.write(&encoded_info).unwrap();
         self.root[0].commit_all(
             committer,
             self.leaf_page_height,
