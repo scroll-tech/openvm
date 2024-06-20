@@ -119,12 +119,12 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         reader.read_to_end(&mut encoded_trace).unwrap();
         let trace: Vec<Vec<u32>> = bincode::deserialize(&encoded_trace).unwrap();
         let mut kv_pairs = vec![];
-        if trace[0][0] == 0 {
+        if trace[0][0] > 1 {
             panic!();
         }
         for row in &trace {
-            if row[1] == 1 {
-                kv_pairs.push((row[2..2 + key_len].to_vec(), row[2 + key_len..].to_vec()));
+            if row[0] == 1 {
+                kv_pairs.push((row[1..1 + key_len].to_vec(), row[1 + key_len..].to_vec()));
             }
         }
         Some(PageBTreeLeafNode {
@@ -149,7 +149,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         let mut encoded_trace = vec![];
         reader.read_to_end(&mut encoded_trace).unwrap();
         let trace: Vec<Vec<u32>> = bincode::deserialize(&encoded_trace).unwrap();
-        if trace[0][0] == 1 {
+        if trace[0][0] != 2 {
             panic!();
         }
         let mut keys = vec![];
@@ -301,7 +301,6 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         for i in 0..self.kv_pairs.len() {
             let mut row = Vec::new();
             row.push(1);
-            row.push(1);
             for k in &self.kv_pairs[i].0 {
                 row.push(*k);
             }
@@ -310,9 +309,9 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
             }
             trace.push(row);
         }
-        trace.resize(page_height, vec![1]);
+        trace.resize(page_height, vec![]);
         for t in &mut trace {
-            t.resize(2 + key_len + val_len, 0);
+            t.resize(1 + key_len + val_len, 0);
         }
         self.trace = Some(trace.clone());
         trace
@@ -671,7 +670,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
         let mut trace = Vec::new();
         for i in 0..self.children.len() {
             let mut row = Vec::new();
-            row.push(0);
+            row.push(2);
             row.push(1);
             for k in self.children[i].min_key() {
                 row.push(k);
@@ -684,7 +683,7 @@ impl<const MAX_INTERNAL: usize, const MAX_LEAF: usize, const COMMITMENT_LEN: usi
             row.extend(child_commit.clone());
             trace.push(row);
         }
-        trace.resize(page_height, vec![]);
+        trace.resize(page_height, vec![2]);
         for t in &mut trace {
             t.resize(2 + 2 * key_len + COMMITMENT_LEN, 0);
         }
