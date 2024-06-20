@@ -211,15 +211,12 @@ impl<const COMMITMENT_LEN: usize> PageBTreeLeafNode<COMMITMENT_LEN> {
     }
 
     fn search(&self, key: &[u32]) -> Option<Vec<u32>> {
-        for (k, v) in &self.kv_pairs {
-            let c = cmp(k, key);
-            if c > 0 {
-                return None;
-            } else if c == 0 {
-                return Some(v.clone());
-            }
+        let (i, is_eq) = binsearch_kv(&self.kv_pairs, key);
+        if is_eq {
+            Some(self.kv_pairs[i - 1].1.clone())
+        } else {
+            None
         }
-        None
     }
 
     fn update(
@@ -245,24 +242,18 @@ impl<const COMMITMENT_LEN: usize> PageBTreeLeafNode<COMMITMENT_LEN> {
     }
     // assumes we have space
     fn add_kv(&mut self, key: &Vec<u32>, val: &Vec<u32>) {
-        if self.kv_pairs.is_empty() {
-            self.min_key.clone_from(key);
-        }
-        for (i, (k, _)) in self.kv_pairs.iter().enumerate() {
-            let c = cmp(k, key);
-            if c > 0 {
-                self.kv_pairs.insert(i, (key.clone(), val.to_vec()));
-                if i == 0 {
-                    self.min_key.clone_from(key);
-                }
-                return;
-            } else if c == 0 {
-                self.kv_pairs[i].1.clone_from(val);
-                return;
+        let (i, is_eq) = binsearch_kv(&self.kv_pairs, key);
+        if is_eq {
+            self.kv_pairs[i - 1].1 = val.to_vec();
+        } else {
+            if i == 0 {
+                self.min_key = key.clone();
             }
+            if i == self.kv_pairs.len() {
+                self.max_key = key.clone();
+            }
+            self.kv_pairs.insert(i, (key.to_vec(), val.to_vec()));
         }
-        self.kv_pairs.push((key.to_vec(), val.to_vec()));
-        self.max_key.clone_from(key);
     }
 
     fn consistency_check(&self) {
@@ -489,20 +480,11 @@ impl<const COMMITMENT_LEN: usize> PageBTreeInternalNode<COMMITMENT_LEN> {
     }
 
     fn search(&mut self, key: &Vec<u32>, loaded_pages: &mut PageBTreePages) -> Option<Vec<u32>> {
-        for (i, k) in self.keys.iter().enumerate() {
-            let c = cmp(k, key);
-            if c > 0 {
-                if let PageBTreeNode::Unloaded(u) = &self.children[i] {
-                    self.children[i] = u.load(key.len(), loaded_pages).unwrap();
-                }
-                return self.children[i].search(key, loaded_pages);
-            }
+        let i = binsearch(&self.keys, key);
+        if let PageBTreeNode::Unloaded(u) = &self.children[i] {
+            self.children[i] = u.load(key.len(), loaded_pages).unwrap();
         }
-        let last_idx = self.keys.len();
-        if let PageBTreeNode::Unloaded(u) = &self.children[last_idx] {
-            self.children[last_idx] = u.load(key.len(), loaded_pages).unwrap();
-        }
-        self.children[self.keys.len()].search(key, loaded_pages)
+        self.children[i].search(key, loaded_pages)
     }
 
     fn update(
@@ -512,28 +494,13 @@ impl<const COMMITMENT_LEN: usize> PageBTreeInternalNode<COMMITMENT_LEN> {
         loaded_pages: &mut PageBTreePages,
     ) -> Option<(Vec<u32>, PageBTreeNode<COMMITMENT_LEN>)> {
         self.trace = None;
-        for (i, k) in self.keys.iter().enumerate() {
-            let c = cmp(k, key);
-            if c > 0 {
-                let mut ret = None;
-                if let PageBTreeNode::Unloaded(u) = &self.children[i] {
-                    self.children[i] = u.load(key.len(), loaded_pages).unwrap();
-                }
-                if let Some((k, node)) = self.children[i].update(key, val, loaded_pages) {
-                    ret = self.add_key(&k, node, i + 1);
-                };
-                self.min_key = self.children[0].min_key();
-                self.max_key = self.children[self.children.len() - 1].max_key();
-                return ret;
-            }
-        }
         let mut ret = None;
-        let last_idx = self.children.len() - 1;
-        if let PageBTreeNode::Unloaded(u) = &self.children[last_idx] {
-            self.children[last_idx] = u.load(key.len(), loaded_pages).unwrap();
+        let i = binsearch(&self.keys, &key);
+        if let PageBTreeNode::Unloaded(u) = &self.children[i] {
+            self.children[i] = u.load(key.len(), loaded_pages).unwrap();
         }
-        if let Some((k, node)) = self.children[last_idx].update(key, val, loaded_pages) {
-            ret = self.add_key(&k, node, last_idx + 1);
+        if let Some((k, node)) = self.children[i].update(key, val, loaded_pages) {
+            ret = self.add_key(&k, node, i + 1);
         };
         self.min_key = self.children[0].min_key();
         self.max_key = self.children[self.children.len() - 1].max_key();
@@ -896,5 +863,39 @@ fn cmp(key1: &[u32], key2: &[u32]) -> i32 {
         0
     } else {
         2 * ((key1[i] > key2[i]) as i32) - 1
+    }
+}
+
+fn binsearch(keys: &Vec<Vec<u32>>, k: &[u32]) -> usize {
+    let mut hi = keys.len() + 1;
+    let mut lo = 0;
+    // invariant is lo <= ans < hi
+    while hi > lo + 1 {
+        let mid = (hi + lo) / 2 - 1;
+        if cmp(&keys[mid], k) > 0 {
+            hi = mid + 1;
+        } else {
+            lo = mid + 1;
+        }
+    }
+    lo
+}
+
+fn binsearch_kv(kv_pairs: &Vec<(Vec<u32>, Vec<u32>)>, k: &[u32]) -> (usize, bool) {
+    let mut hi = kv_pairs.len() + 1;
+    let mut lo = 0;
+    // invariant is lo <= ans < hi
+    while hi > lo + 1 {
+        let mid = (hi + lo) / 2 - 1;
+        if cmp(&kv_pairs[mid].0, k) > 0 {
+            hi = mid + 1;
+        } else {
+            lo = mid + 1;
+        }
+    }
+    if lo == 0 {
+        (lo, false)
+    } else {
+        (lo, cmp(&kv_pairs[lo - 1].0, k) == 0)
     }
 }
