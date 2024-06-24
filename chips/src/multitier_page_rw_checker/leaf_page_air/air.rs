@@ -45,7 +45,7 @@ where
         // assert that own id is correct
         builder.assert_eq(
             local[COMMITMENT_LEN],
-            AB::Expr::from_canonical_u64(self.id as u64),
+            AB::Expr::from_canonical_u64(self.air_id as u64),
         );
         match &self.page_chip {
             MyPageAir::Initial(i) => {

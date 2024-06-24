@@ -50,7 +50,10 @@ where
             builder.assert_eq(*p, metadata.own_commitment[i]);
         }
         // assert that own id is correct
-        builder.assert_eq(metadata.id, AB::Expr::from_canonical_u64(self.id as u64));
+        builder.assert_eq(
+            metadata.air_id,
+            AB::Expr::from_canonical_u64(self.air_id as u64),
+        );
         builder.assert_eq(cached_data.internal_marker, AB::Expr::from_canonical_u64(2));
         builder.assert_eq(metadata.mult_alloc, cached_data.is_alloc * metadata.mult);
         builder.assert_eq(
@@ -67,11 +70,11 @@ where
             // will do the allocated rows are at the top check later probably
 
             let prove_sort_cols = metadata.prove_sort_cols.unwrap();
-            for i in 0..self.idx_len {
-                builder.when_transition().assert_zero(
-                    next_data.is_alloc * (next_data.start[i] - prove_sort_cols.next_idx[i]),
-                );
-            }
+            // for i in 0..self.idx_len {
+            //     builder.when_transition().assert_zero(
+            //         next_data.is_alloc * (next_data.start[i] - prove_sort_cols.next_idx[i]),
+            //     );
+            // }
             builder.when_transition().assert_zero(
                 next_data.is_alloc
                     * (prove_sort_cols.end_less_than_next
@@ -81,8 +84,7 @@ where
             let range_inclusion_cols = metadata.range_inclusion_cols.unwrap();
             let less_than_start = range_inclusion_cols.less_than_start;
             let greater_than_end = range_inclusion_cols.greater_than_end;
-            builder.assert_zero(cached_data.is_alloc * (less_than_start.0 + greater_than_end.0));
-            builder.assert_zero(cached_data.is_alloc * (less_than_start.1 + greater_than_end.1));
+            builder.assert_zero(cached_data.is_alloc * (less_than_start + greater_than_end));
             builder.assert_bool(cached_data.is_alloc);
             let subair_aux_cols = metadata.subchip_aux_cols.unwrap();
             let subairs = self.is_less_than_tuple_air.clone().unwrap();
@@ -90,7 +92,7 @@ where
                 let io = IsLessThanTupleIOCols {
                     x: cached_data.start.clone(),
                     y: range_inclusion_cols.start.clone(),
-                    tuple_less_than: range_inclusion_cols.less_than_start.0,
+                    tuple_less_than: range_inclusion_cols.less_than_start,
                 };
                 let aux = subair_aux_cols.idx1_start.clone();
                 SubAir::eval(&subairs.idx1_start, builder, io, aux);
@@ -98,26 +100,8 @@ where
             {
                 let io = IsLessThanTupleIOCols {
                     x: range_inclusion_cols.end.clone(),
-                    y: cached_data.start.clone(),
-                    tuple_less_than: range_inclusion_cols.greater_than_end.0,
-                };
-                let aux = subair_aux_cols.end_idx1.clone();
-                SubAir::eval(&subairs.end_idx1, builder, io, aux);
-            }
-            {
-                let io = IsLessThanTupleIOCols {
-                    x: cached_data.end.clone(),
-                    y: range_inclusion_cols.start.clone(),
-                    tuple_less_than: range_inclusion_cols.less_than_start.1,
-                };
-                let aux = subair_aux_cols.idx2_start.clone();
-                SubAir::eval(&subairs.idx2_start, builder, io, aux);
-            }
-            {
-                let io = IsLessThanTupleIOCols {
-                    x: range_inclusion_cols.end.clone(),
                     y: cached_data.end.clone(),
-                    tuple_less_than: range_inclusion_cols.greater_than_end.1,
+                    tuple_less_than: range_inclusion_cols.greater_than_end,
                 };
                 let aux = subair_aux_cols.end_idx2.clone();
                 SubAir::eval(&subairs.end_idx2, builder, io, aux);
@@ -125,11 +109,11 @@ where
             {
                 let io = IsLessThanTupleIOCols {
                     x: cached_data.end.clone(),
-                    y: prove_sort_cols.next_idx.clone(),
+                    y: next_data.start.clone(),
                     tuple_less_than: prove_sort_cols.end_less_than_next,
                 };
-                let aux = subair_aux_cols.end_next.clone();
-                SubAir::eval(&subairs.end_next, builder, io, aux);
+                let aux = subair_aux_cols.idx2_next.clone();
+                SubAir::eval(&subairs.idx2_next, builder, io, aux);
             }
             {
                 let io = IsLessThanTupleIOCols {
@@ -137,8 +121,8 @@ where
                     y: cached_data.start.clone(),
                     tuple_less_than: prove_sort_cols.end_less_than_start,
                 };
-                let aux = subair_aux_cols.end_start.clone();
-                SubAir::eval(&subairs.end_start, builder, io, aux);
+                let aux = subair_aux_cols.idx2_idx1.clone();
+                SubAir::eval(&subairs.idx2_idx1, builder, io, aux);
             }
             {
                 let io = IsZeroIOCols {

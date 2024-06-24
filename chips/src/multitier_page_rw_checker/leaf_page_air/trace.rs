@@ -48,14 +48,14 @@ impl<const COMMITMENT_LEN: usize> LeafPageAir<COMMITMENT_LEN> {
                 .flat_map(|(i, row)| {
                     let mut trace_row = vec![];
                     trace_row.extend(commit.clone());
-                    trace_row.push(self.id);
+                    trace_row.push(self.air_id);
                     if !self.is_init {
                         trace_row.extend(range.0.clone());
                         trace_row.extend(range.1.clone());
                         trace_row.extend(vec![0; 2]);
                         let mut trace_row: Vec<Val<SC>> = trace_row
                             .into_iter()
-                            .map(|i| Val::<SC>::from_canonical_u32(i))
+                            .map(Val::<SC>::from_canonical_u32)
                             .collect();
                         {
                             let tuple: IsLessThanTupleCols<Val<SC>> = self
@@ -96,7 +96,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageAir<COMMITMENT_LEN> {
                     } else {
                         trace_row
                             .into_iter()
-                            .map(|i| Val::<SC>::from_wrapped_u32(i))
+                            .map(Val::<SC>::from_wrapped_u32)
                             .collect::<Vec<Val<SC>>>()
                     }
                 })

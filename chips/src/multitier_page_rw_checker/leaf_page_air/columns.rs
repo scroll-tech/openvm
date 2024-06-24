@@ -32,7 +32,7 @@ pub struct RangeInclusionCols<T> {
 #[derive(Clone)]
 pub struct LeafPageMetadataCols<T> {
     pub own_commitment: Vec<T>,
-    pub id: T,
+    pub air_id: T,
     pub range_inclusion_cols: Option<RangeInclusionCols<T>>,
     pub subchip_aux_cols: Option<LeafPageSubAirCols<T>>,
 }
@@ -76,7 +76,7 @@ impl<T> LeafPageMetadataCols<T> {
         if is_init {
             LeafPageMetadataCols {
                 own_commitment: cols[0..commitment_len].to_vec(),
-                id: cols[commitment_len].clone(),
+                air_id: cols[commitment_len].clone(),
                 range_inclusion_cols: None,
                 subchip_aux_cols: None,
             }
@@ -115,7 +115,7 @@ impl<T> LeafPageMetadataCols<T> {
             };
             LeafPageMetadataCols {
                 own_commitment: cols[0..commitment_len].to_vec(),
-                id: cols[commitment_len].clone(),
+                air_id: cols[commitment_len].clone(),
                 range_inclusion_cols: Some(range_inclusion_cols),
                 subchip_aux_cols: Some(subair_cols),
             }

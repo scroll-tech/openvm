@@ -53,7 +53,7 @@ where
         // Making sure the page is in the proper format
 
         // Ensuring that rcv_mult is always 1 or 3 times is_alloc (ensures it's always 0, 1, or 3) on the next row (which has net effect of being on every row)
-        let local_is_alloc = io[1].is_alloc.clone();
+        let local_is_alloc = io[1].is_alloc;
         let local_rcv_mult = aux.rcv_mult;
         SubAir::eval(&self.final_air, builder, io, aux.final_page_aux_cols);
         builder.assert_zero(

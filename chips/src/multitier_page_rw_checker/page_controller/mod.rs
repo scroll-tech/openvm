@@ -411,7 +411,7 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
                 data_len,
                 less_than_tuple_param.limb_bits,
                 Val::<SC>::bits() - 1,
-                less_than_tuple_param.decomp.clone(),
+                less_than_tuple_param.decomp,
             ),
             final_leaf_chips: (0..final_param.leaf_cap)
                 .map(|i| {
@@ -661,7 +661,7 @@ where
             commit,
             range,
             range_checker.clone(),
-            &internal_indices,
+            internal_indices,
         );
         leaf_prods.main_traces.push(tmp);
     }

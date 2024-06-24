@@ -44,7 +44,7 @@ pub struct LeafPageAir<const COMMITMENT_LEN: usize> {
     is_init: bool,
     idx_len: usize,
     data_len: usize,
-    id: u32,
+    air_id: u32,
 }
 
 #[derive(Clone)]
@@ -62,7 +62,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageAir<COMMITMENT_LEN> {
         idx_len: usize,
         data_len: usize,
         is_init: bool,
-        id: u32,
+        air_id: u32,
     ) -> Self {
         if is_init {
             Self {
@@ -74,7 +74,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageAir<COMMITMENT_LEN> {
                 is_init,
                 is_less_than_tuple_air: None,
                 is_less_than_tuple_param,
-                id,
+                air_id,
             }
         } else {
             Self {
@@ -97,7 +97,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageAir<COMMITMENT_LEN> {
                     ),
                 }),
                 is_less_than_tuple_param,
-                id,
+                air_id,
             }
         }
     }

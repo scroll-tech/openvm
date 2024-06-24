@@ -20,7 +20,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageAir<COMMITMENT_LEN> {
         if self.is_init {
             let virtual_cols = (col_indices.metadata.own_commitment)
                 .into_iter()
-                .chain(iter::once(col_indices.metadata.id))
+                .chain(iter::once(col_indices.metadata.air_id))
                 .map(VirtualPairCol::single_main)
                 .collect::<Vec<_>>();
 
@@ -36,7 +36,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageAir<COMMITMENT_LEN> {
                 .into_iter()
                 .chain(range_inclusion_cols.end)
                 .chain(col_indices.metadata.own_commitment)
-                .chain(iter::once(col_indices.metadata.id))
+                .chain(iter::once(col_indices.metadata.air_id))
                 .map(VirtualPairCol::single_main)
                 .collect::<Vec<_>>();
 

@@ -22,16 +22,12 @@ pub struct PtrPageCols<T> {
 pub struct InternalPageSubAirCols<T> {
     // check if the 1st idx of this row is less than the lower bound assigned to this page -> want this to be false
     pub idx1_start: IsLessThanTupleAuxCols<T>,
-    // check if the upper bound assigned to this page is less than the 1st idx of this row -> want this to be false
-    pub end_idx1: IsLessThanTupleAuxCols<T>,
-    // check if the 2nd idx of this row is less than the lower bound assigned to this page -> want this to be false
-    pub idx2_start: IsLessThanTupleAuxCols<T>,
     // check if the upper bound assigned to this page is less than the 2nd idx of this row -> want this to be false
     pub end_idx2: IsLessThanTupleAuxCols<T>,
     // check if the 2nd idx of this row is less than the 1st idx of this row -> want this to be false
-    pub end_start: IsLessThanTupleAuxCols<T>,
+    pub idx2_idx1: IsLessThanTupleAuxCols<T>,
     // check if the 2nd idx of this row is less than the 1st idx of the next -> want this to be true
-    pub end_next: IsLessThanTupleAuxCols<T>,
+    pub idx2_next: IsLessThanTupleAuxCols<T>,
     // aux for is_zero of mult_minus_one_alloc
     pub mult_inv: T,
 }
@@ -41,13 +37,12 @@ pub struct InternalPageSubAirCols<T> {
 pub struct TwoRangeInclusionCols<T> {
     pub start: Vec<T>,
     pub end: Vec<T>,
-    pub less_than_start: (T, T),
-    pub greater_than_end: (T, T),
+    pub less_than_start: T,
+    pub greater_than_end: T,
 }
 
 #[derive(Clone)]
 pub struct ProveSortCols<T> {
-    pub next_idx: Vec<T>,
     // we want this to be true
     pub end_less_than_next: T,
     // we want this to be false
@@ -57,8 +52,8 @@ pub struct ProveSortCols<T> {
 #[derive(Clone)]
 pub struct InternalPageMetadataCols<T> {
     pub own_commitment: Vec<T>,
-    pub id: T,
-    pub child_id: T,
+    pub air_id: T,
+    pub child_air_id: T,
     pub mult: T,
     pub mult_alloc: T,
     pub mult_alloc_minus_one: T,
@@ -126,8 +121,8 @@ impl<T> InternalPageMetadataCols<T> {
         if is_init {
             InternalPageMetadataCols {
                 own_commitment: cols[0..commitment_len].to_vec(),
-                id: cols[commitment_len].clone(),
-                child_id: cols[commitment_len + 1].clone(),
+                air_id: cols[commitment_len].clone(),
+                child_air_id: cols[commitment_len + 1].clone(),
                 mult: cols[commitment_len + 2].clone(),
                 mult_alloc: cols[commitment_len + 3].clone(),
                 mult_alloc_is_1: cols[commitment_len + 4].clone(),
@@ -140,31 +135,24 @@ impl<T> InternalPageMetadataCols<T> {
         } else {
             let mut new_start = commitment_len + 7;
             let prove_sort_cols = ProveSortCols {
-                next_idx: cols[new_start..new_start + idx_len].to_vec(),
-                end_less_than_next: cols[new_start + idx_len].clone(),
-                end_less_than_start: cols[new_start + idx_len + 1].clone(),
+                end_less_than_next: cols[new_start].clone(),
+                end_less_than_start: cols[new_start + 1].clone(),
             };
-            new_start += idx_len + 2;
+            new_start += 2;
             let range_inclusion_cols = TwoRangeInclusionCols {
                 start: cols[new_start..new_start + idx_len].to_vec(),
                 end: cols[new_start + idx_len..new_start + 2 * idx_len].to_vec(),
-                less_than_start: (
-                    cols[new_start + 2 * idx_len].clone(),
-                    cols[new_start + 2 * idx_len + 2].clone(),
-                ),
-                greater_than_end: (
-                    cols[new_start + 2 * idx_len + 1].clone(),
-                    cols[new_start + 2 * idx_len + 3].clone(),
-                ),
+                less_than_start: cols[new_start + 2 * idx_len].clone(),
+                greater_than_end: cols[new_start + 2 * idx_len + 1].clone(),
             };
-            new_start += 2 * idx_len + 4;
+            new_start += 2 * idx_len + 2;
             let mut aux_allocs = vec![];
             let aux_size = IsLessThanTupleAuxCols::<T>::get_width(
                 vec![is_less_than_tuple_params.limb_bits; idx_len],
                 is_less_than_tuple_params.decomp,
                 idx_len,
             );
-            for i in 0..6 {
+            for i in 0..4 {
                 aux_allocs.push(IsLessThanTupleAuxCols::from_slice(
                     &cols[new_start + i * aux_size..new_start + (i + 1) * aux_size],
                     vec![is_less_than_tuple_params.limb_bits; idx_len],
@@ -174,17 +162,15 @@ impl<T> InternalPageMetadataCols<T> {
             }
             let subair_cols = InternalPageSubAirCols {
                 idx1_start: aux_allocs[0].clone(),
-                end_idx1: aux_allocs[1].clone(),
-                idx2_start: aux_allocs[2].clone(),
-                end_idx2: aux_allocs[3].clone(),
-                end_next: aux_allocs[4].clone(),
-                end_start: aux_allocs[5].clone(),
-                mult_inv: cols[new_start + 6 * aux_size].clone(),
+                end_idx2: aux_allocs[1].clone(),
+                idx2_next: aux_allocs[2].clone(),
+                idx2_idx1: aux_allocs[3].clone(),
+                mult_inv: cols[new_start + 4 * aux_size].clone(),
             };
             InternalPageMetadataCols {
                 own_commitment: cols[0..commitment_len].to_vec(),
-                id: cols[commitment_len].clone(),
-                child_id: cols[commitment_len + 1].clone(),
+                air_id: cols[commitment_len].clone(),
+                child_air_id: cols[commitment_len + 1].clone(),
                 mult: cols[commitment_len + 2].clone(),
                 mult_alloc: cols[commitment_len + 3].clone(),
                 mult_alloc_is_1: cols[commitment_len + 4].clone(),

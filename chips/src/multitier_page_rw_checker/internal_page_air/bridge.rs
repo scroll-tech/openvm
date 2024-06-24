@@ -18,7 +18,7 @@ impl<const COMMITMENT_LEN: usize> InternalPageAir<COMMITMENT_LEN> {
         if self.is_init {
             let virtual_cols = (col_indices.metadata.own_commitment)
                 .into_iter()
-                .chain(iter::once(col_indices.metadata.id))
+                .chain(iter::once(col_indices.metadata.air_id))
                 .map(VirtualPairCol::single_main)
                 .collect::<Vec<_>>();
 
@@ -34,7 +34,7 @@ impl<const COMMITMENT_LEN: usize> InternalPageAir<COMMITMENT_LEN> {
                 .into_iter()
                 .chain(range_inclusion_cols.end)
                 .chain(col_indices.metadata.own_commitment)
-                .chain(iter::once(col_indices.metadata.id))
+                .chain(iter::once(col_indices.metadata.air_id))
                 .map(VirtualPairCol::single_main)
                 .collect::<Vec<_>>();
 
@@ -72,7 +72,7 @@ impl<const COMMITMENT_LEN: usize> InternalPageAir<COMMITMENT_LEN> {
         if self.is_init {
             let virtual_cols = (col_indices.cache_cols.commitment)
                 .into_iter()
-                .chain(iter::once(col_indices.metadata.child_id))
+                .chain(iter::once(col_indices.metadata.child_air_id))
                 .map(VirtualPairCol::single_main)
                 .collect::<Vec<_>>();
 
@@ -88,7 +88,7 @@ impl<const COMMITMENT_LEN: usize> InternalPageAir<COMMITMENT_LEN> {
                 .into_iter()
                 .chain(col_indices.cache_cols.end)
                 .chain(col_indices.cache_cols.commitment)
-                .chain(iter::once(col_indices.metadata.child_id))
+                .chain(iter::once(col_indices.metadata.child_air_id))
                 .map(VirtualPairCol::single_main)
                 .collect::<Vec<_>>();
 
@@ -130,31 +130,9 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirBridge<F>
                     io: IsLessThanTupleIOCols {
                         x: col_indices.cache_cols.start.clone(),
                         y: range_inclusion.start.clone(),
-                        tuple_less_than: range_inclusion.less_than_start.0,
+                        tuple_less_than: range_inclusion.less_than_start,
                     },
                     aux: subair_aux.idx1_start,
-                },
-            ));
-            interactions.extend(SubAirBridge::sends(
-                &subairs.end_idx1,
-                IsLessThanTupleCols {
-                    io: IsLessThanTupleIOCols {
-                        x: range_inclusion.end.clone(),
-                        y: col_indices.cache_cols.start.clone(),
-                        tuple_less_than: range_inclusion.greater_than_end.0,
-                    },
-                    aux: subair_aux.end_idx1,
-                },
-            ));
-            interactions.extend(SubAirBridge::sends(
-                &subairs.idx2_start,
-                IsLessThanTupleCols {
-                    io: IsLessThanTupleIOCols {
-                        x: col_indices.cache_cols.end.clone(),
-                        y: range_inclusion.start.clone(),
-                        tuple_less_than: range_inclusion.less_than_start.1,
-                    },
-                    aux: subair_aux.idx2_start,
                 },
             ));
             interactions.extend(SubAirBridge::sends(
@@ -163,31 +141,31 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirBridge<F>
                     io: IsLessThanTupleIOCols {
                         x: range_inclusion.end.clone(),
                         y: col_indices.cache_cols.end.clone(),
-                        tuple_less_than: range_inclusion.greater_than_end.1,
+                        tuple_less_than: range_inclusion.greater_than_end,
                     },
                     aux: subair_aux.end_idx2,
                 },
             ));
             interactions.extend(SubAirBridge::sends(
-                &subairs.end_next,
+                &subairs.idx2_next,
                 IsLessThanTupleCols {
                     io: IsLessThanTupleIOCols {
                         x: col_indices.cache_cols.end.clone(),
-                        y: prove_sort.next_idx.clone(),
+                        y: col_indices.cache_cols.start.clone(),
                         tuple_less_than: prove_sort.end_less_than_next,
                     },
-                    aux: subair_aux.end_next,
+                    aux: subair_aux.idx2_next,
                 },
             ));
             interactions.extend(SubAirBridge::sends(
-                &subairs.end_start,
+                &subairs.idx2_idx1,
                 IsLessThanTupleCols {
                     io: IsLessThanTupleIOCols {
                         x: col_indices.cache_cols.end.clone(),
                         y: col_indices.cache_cols.start.clone(),
                         tuple_less_than: prove_sort.end_less_than_start,
                     },
-                    aux: subair_aux.end_start,
+                    aux: subair_aux.idx2_idx1,
                 },
             ));
         }
