@@ -221,8 +221,8 @@ impl<const COMMITMENT_LEN: usize> PageBTreeLeafNode<COMMITMENT_LEN> {
 
     fn update(
         &mut self,
-        key: &Vec<u32>,
-        val: &Vec<u32>,
+        key: &[u32],
+        val: &[u32],
     ) -> Option<(Vec<u32>, PageBTreeNode<COMMITMENT_LEN>)> {
         self.trace = None;
         self.add_kv(key, val);
@@ -241,16 +241,16 @@ impl<const COMMITMENT_LEN: usize> PageBTreeLeafNode<COMMITMENT_LEN> {
         }
     }
     // assumes we have space
-    fn add_kv(&mut self, key: &Vec<u32>, val: &Vec<u32>) {
+    fn add_kv(&mut self, key: &[u32], val: &[u32]) {
         let (i, is_eq) = binsearch_kv(&self.kv_pairs, key);
         if is_eq {
             self.kv_pairs[i - 1].1 = val.to_vec();
         } else {
             if i == 0 {
-                self.min_key = key.clone();
+                self.min_key = key.to_vec();
             }
             if i == self.kv_pairs.len() {
-                self.max_key = key.clone();
+                self.max_key = key.to_vec();
             }
             self.kv_pairs.insert(i, (key.to_vec(), val.to_vec()));
         }
@@ -321,7 +321,7 @@ impl<const COMMITMENT_LEN: usize> PageBTreeLeafNode<COMMITMENT_LEN> {
             let file = File::create("src/pagebtree/leaf/".to_owned() + &s + ".trace").unwrap();
             let mut writer = BufWriter::new(file);
             let encoded_trace = bincode::serialize(&self.trace.as_ref().unwrap()).unwrap();
-            writer.write(&encoded_trace).unwrap();
+            writer.write_all(&encoded_trace).unwrap();
         }
     }
 }
@@ -495,7 +495,7 @@ impl<const COMMITMENT_LEN: usize> PageBTreeInternalNode<COMMITMENT_LEN> {
     ) -> Option<(Vec<u32>, PageBTreeNode<COMMITMENT_LEN>)> {
         self.trace = None;
         let mut ret = None;
-        let i = binsearch(&self.keys, &key);
+        let i = binsearch(&self.keys, key);
         if let PageBTreeNode::Unloaded(u) = &self.children[i] {
             self.children[i] = u.load(key.len(), loaded_pages).unwrap();
         }
@@ -645,7 +645,7 @@ impl<const COMMITMENT_LEN: usize> PageBTreeInternalNode<COMMITMENT_LEN> {
             let file = File::create("src/pagebtree/internal/".to_owned() + &s + ".trace").unwrap();
             let mut writer = BufWriter::new(file);
             let encoded_trace = bincode::serialize(&self.trace.as_ref().unwrap()).unwrap();
-            writer.write(&encoded_trace).unwrap();
+            writer.write_all(&encoded_trace).unwrap();
         }
     }
 
@@ -681,7 +681,7 @@ impl<const COMMITMENT_LEN: usize> PageBTree<COMMITMENT_LEN> {
             trace: None,
         };
         let leaf = PageBTreeNode::Leaf(leaf);
-        let tree = PageBTree {
+        PageBTree {
             limb_bits,
             key_len,
             val_len,
@@ -690,8 +690,7 @@ impl<const COMMITMENT_LEN: usize> PageBTree<COMMITMENT_LEN> {
             leaf_page_height,
             internal_page_height,
             depth: 1,
-        };
-        tree
+        }
     }
 
     pub fn load(root_commit: Vec<u32>) -> Option<Self> {
@@ -848,7 +847,7 @@ impl<const COMMITMENT_LEN: usize> PageBTree<COMMITMENT_LEN> {
         };
         let mut writer = BufWriter::new(file);
         let encoded_info = bincode::serialize(&root_info).unwrap();
-        writer.write(&encoded_info).unwrap();
+        writer.write_all(&encoded_info).unwrap();
         self.root[0].commit_all(committer, self.key_len, self.val_len);
     }
 }
@@ -866,7 +865,7 @@ fn cmp(key1: &[u32], key2: &[u32]) -> i32 {
     }
 }
 
-fn binsearch(keys: &Vec<Vec<u32>>, k: &[u32]) -> usize {
+fn binsearch(keys: &[Vec<u32>], k: &[u32]) -> usize {
     let mut hi = keys.len() + 1;
     let mut lo = 0;
     // invariant is lo <= ans < hi
@@ -881,7 +880,7 @@ fn binsearch(keys: &Vec<Vec<u32>>, k: &[u32]) -> usize {
     lo
 }
 
-fn binsearch_kv(kv_pairs: &Vec<(Vec<u32>, Vec<u32>)>, k: &[u32]) -> (usize, bool) {
+fn binsearch_kv(kv_pairs: &[(Vec<u32>, Vec<u32>)], k: &[u32]) -> (usize, bool) {
     let mut hi = kv_pairs.len() + 1;
     let mut lo = 0;
     // invariant is lo <= ans < hi

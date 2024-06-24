@@ -35,8 +35,8 @@ pub fn update_tree() {
         let i = rng.gen::<u32>() % 100;
         let my_ans = tree.search(&vec![i]);
         let real_ans = truth.get(&i);
-        if my_ans == None {
-            assert!(real_ans == None);
+        if my_ans.is_none() {
+            assert!(real_ans.is_none());
         } else {
             assert!(my_ans.unwrap()[0] == *real_ans.unwrap());
         }
@@ -82,8 +82,8 @@ pub fn update_tree_key_len() {
         let j = rng.gen::<u32>() % 100;
         let my_ans = tree.search(&vec![i, j]);
         let real_ans = truth.get(&vec![i, j]);
-        if my_ans == None {
-            assert!(real_ans == None);
+        if my_ans.is_none() {
+            assert!(real_ans.is_none());
         } else {
             let my_ans = my_ans.unwrap();
             let real_ans = real_ans.unwrap();
@@ -144,8 +144,8 @@ pub fn wide_tree() {
         let j = rng.gen::<u32>() % 100;
         let my_ans = tree.search(&vec![i, j]);
         let real_ans = truth.get(&vec![i, j]);
-        if my_ans == None {
-            assert!(real_ans == None);
+        if my_ans.is_none() {
+            assert!(real_ans.is_none());
         } else {
             let my_ans = my_ans.unwrap();
             let real_ans = real_ans.unwrap();
@@ -230,8 +230,8 @@ pub fn make_a_large_tree() {
     let limb_bits = 20;
     let mut tree = PageBTree::<8>::new(limb_bits, key_len, val_len, 32, 32);
     let mut rng = create_seeded_rng();
-    const BIG_TREE_SIZE: usize = 1000_000;
-    const BIG_TREE_MAX_KEY: u32 = 1000_000;
+    const BIG_TREE_SIZE: usize = 1_000_000;
+    const BIG_TREE_MAX_KEY: u32 = 1_000_000;
     for i in 0..BIG_TREE_SIZE {
         if i % 10000 == 0 {
             println!("Processed {:?} entries...", i);
