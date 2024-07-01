@@ -5,7 +5,7 @@ use p3_matrix::Matrix;
 
 use super::{
     columns::{LeafPageCols, LeafPageMetadataCols},
-    LeafPageAir, MyPageAir,
+    LeafPageAir, PageRWAir,
 };
 use crate::{
     common::page_cols::PageCols,
@@ -48,10 +48,10 @@ where
             AB::Expr::from_canonical_u64(self.air_id as u64),
         );
         match &self.page_chip {
-            MyPageAir::Initial(i) => {
+            PageRWAir::Initial(i) => {
                 SubAir::eval(i, builder, cached_data, ());
             }
-            MyPageAir::Final(f) => {
+            PageRWAir::Final(f) => {
                 let metadata = LeafPageMetadataCols::from_slice(
                     &local,
                     self.idx_len,

@@ -6,7 +6,7 @@ use p3_uni_stark::{StarkGenericConfig, Val};
 
 use crate::{
     common::page::Page, is_less_than_tuple::columns::IsLessThanTupleCols,
-    multitier_page_rw_checker::leaf_page_air::MyPageAir, range_gate::RangeCheckerGateChip,
+    multitier_page_rw_checker::leaf_page_air::PageRWAir, range_gate::RangeCheckerGateChip,
     sub_chip::LocalTraceInstructions,
 };
 
@@ -36,7 +36,7 @@ impl<const COMMITMENT_LEN: usize> LeafPageAir<COMMITMENT_LEN> {
     {
         assert!(commit.len() == COMMITMENT_LEN);
         let mut final_page_aux_rows = match &self.page_chip {
-            MyPageAir::Final(f) => {
+            PageRWAir::Final(f) => {
                 f.gen_aux_trace::<SC>(page, range_checker.clone(), internal_indices)
             }
             _ => RowMajorMatrix::new(vec![], 1),

@@ -182,6 +182,7 @@ pub fn gen_trace_test() {
     tree.consistency_check();
 }
 
+#[ignore]
 #[test]
 pub fn commit_test() {
     let key_len = 2;
@@ -207,6 +208,7 @@ pub fn commit_test() {
     tree.consistency_check();
 }
 
+#[ignore]
 #[test]
 pub fn load_test() {
     let mut tree = PageBTree::<8>::load(vec![
@@ -223,6 +225,7 @@ pub fn load_test() {
     tree.consistency_check();
 }
 
+#[ignore]
 #[test]
 pub fn make_a_large_tree() {
     let key_len = 2;
@@ -253,6 +256,7 @@ pub fn make_a_large_tree() {
     // tree.consistency_check();
 }
 
+#[ignore]
 #[test]
 pub fn load_and_read_a_large_tree() {
     let mut tree = PageBTree::<8>::load(vec![

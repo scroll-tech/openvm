@@ -3,6 +3,7 @@ use p3_air::{Air, AirBuilder, BaseAir};
 use p3_field::{AbstractField, Field};
 use p3_matrix::Matrix;
 
+use super::columns::IndexedPageWriteAuxCols;
 use super::{columns::IndexedPageWriteCols, IndexedPageWriteAir};
 use crate::sub_chip::AirConfig;
 use crate::{common::page_cols::PageCols, sub_chip::SubAir};
@@ -41,12 +42,12 @@ where
     }
 }
 
-impl<AB: AirBuilder + PartitionedAirBuilder> SubAir<AB> for MyFinalPageAir
+impl<AB: AirBuilder + PartitionedAirBuilder> SubAir<AB> for IndexedPageWriteAir
 where
     AB::M: Clone,
 {
     type IoView = [PageCols<AB::Var>; 2];
-    type AuxView = MyFinalPageAuxCols<AB::Var>;
+    type AuxView = IndexedPageWriteAuxCols<AB::Var>;
 
     fn eval(&self, builder: &mut AB, io: Self::IoView, aux: Self::AuxView) {
         // Making sure the page is in the proper format

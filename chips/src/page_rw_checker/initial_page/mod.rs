@@ -1,12 +1,8 @@
 pub mod air;
 pub mod bridge;
 
-<<<<<<< HEAD:chips/src/page_rw_checker/my_initial_page/mod.rs
-#[derive(Debug, Clone)]
-pub struct MyInitialPageAir {
-=======
+#[derive(Clone, Debug)]
 pub struct PageReadAir {
->>>>>>> 035bc81f49a1f889b4597aa3b5658ba0895af57e:chips/src/page_rw_checker/initial_page/mod.rs
     page_bus: usize,
     idx_len: usize,
     data_len: usize,

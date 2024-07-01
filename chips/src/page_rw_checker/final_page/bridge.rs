@@ -29,15 +29,15 @@ impl<F: PrimeField> AirBridge<F> for IndexedPageWriteAir {
     }
 }
 
-impl<F: PrimeField> SubAirBridge<F> for MyFinalPageAir {
+impl<F: PrimeField> SubAirBridge<F> for IndexedPageWriteAir {
     /// Sends interactions required by IsLessThanTuple SubAir
-    fn sends(&self, col_indices: MyFinalPageCols<usize>) -> Vec<Interaction<F>> {
+    fn sends(&self, col_indices: IndexedPageWriteCols<usize>) -> Vec<Interaction<F>> {
         SubAirBridge::sends(&self.final_air, col_indices.final_page_cols)
     }
 
     /// Receives page rows (idx, data) for all rows with multiplicity rcv_mult on page_bus
     /// Some of this is sent by PageRWAir and some by OfflineChecker
-    fn receives(&self, col_indices: MyFinalPageCols<usize>) -> Vec<Interaction<F>> {
+    fn receives(&self, col_indices: IndexedPageWriteCols<usize>) -> Vec<Interaction<F>> {
         let page_cols = col_indices.final_page_cols.page_cols;
         let rcv_mult = col_indices.rcv_mult;
         let page_cols = to_vcols(&[page_cols.idx, page_cols.data].concat());

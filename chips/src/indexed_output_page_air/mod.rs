@@ -8,13 +8,8 @@ pub mod trace;
 #[cfg(test)]
 pub mod tests;
 
-<<<<<<< HEAD:chips/src/final_page/mod.rs
 #[derive(Clone, Debug)]
-pub struct FinalPageAir {
-=======
-#[derive(Clone)]
 pub struct IndexedOutputPageAir {
->>>>>>> 035bc81f49a1f889b4597aa3b5658ba0895af57e:chips/src/indexed_output_page_air/mod.rs
     range_bus_index: usize,
 
     pub idx_len: usize,

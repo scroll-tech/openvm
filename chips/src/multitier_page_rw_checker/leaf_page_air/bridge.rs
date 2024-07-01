@@ -5,10 +5,10 @@ use p3_air::VirtualPairCol;
 use p3_field::PrimeField64;
 
 use super::columns::LeafPageCols;
-use super::{LeafPageAir, MyPageAir};
-use crate::final_page::columns::FinalPageCols;
+use super::{LeafPageAir, PageRWAir};
+use crate::indexed_output_page_air::columns::IndexedOutputPageCols;
 use crate::is_less_than_tuple::columns::{IsLessThanTupleCols, IsLessThanTupleIOCols};
-use crate::page_rw_checker::my_final_page::columns::MyFinalPageCols;
+use crate::page_rw_checker::final_page::columns::IndexedPageWriteCols;
 use crate::sub_chip::SubAirBridge;
 
 impl<const COMMITMENT_LEN: usize> LeafPageAir<COMMITMENT_LEN> {
@@ -53,14 +53,14 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirBridge<F> for LeafPageA
     fn receives(&self, col_indices: LeafPageCols<usize>) -> Vec<Interaction<F>> {
         let mut interactions = vec![];
         match &self.page_chip {
-            MyPageAir::Initial(i) => {
+            PageRWAir::Initial(i) => {
                 interactions.extend(SubAirBridge::receives(i, col_indices.cache_cols.clone()));
             }
-            MyPageAir::Final(f) => {
+            PageRWAir::Final(f) => {
                 interactions.extend(SubAirBridge::receives(
                     f,
-                    MyFinalPageCols {
-                        final_page_cols: FinalPageCols {
+                    IndexedPageWriteCols {
+                        final_page_cols: IndexedOutputPageCols {
                             page_cols: col_indices.cache_cols.clone(),
                             aux_cols: col_indices
                                 .metadata
@@ -89,14 +89,14 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirBridge<F> for LeafPageA
     fn sends(&self, col_indices: LeafPageCols<usize>) -> Vec<Interaction<F>> {
         let mut interactions = vec![];
         match &self.page_chip {
-            MyPageAir::Initial(i) => {
+            PageRWAir::Initial(i) => {
                 interactions.extend(SubAirBridge::sends(i, col_indices.cache_cols.clone()));
             }
-            MyPageAir::Final(f) => {
+            PageRWAir::Final(f) => {
                 interactions.extend(SubAirBridge::sends(
                     f,
-                    MyFinalPageCols {
-                        final_page_cols: FinalPageCols {
+                    IndexedPageWriteCols {
+                        final_page_cols: IndexedOutputPageCols {
                             page_cols: col_indices.cache_cols.clone(),
                             aux_cols: col_indices
                                 .metadata

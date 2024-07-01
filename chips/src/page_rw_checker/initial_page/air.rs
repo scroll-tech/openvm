@@ -19,7 +19,7 @@ impl<AB: AirBuilder> Air<AB> for PageReadAir {
     fn eval(&self, _builder: &mut AB) {}
 }
 
-impl<AB: AirBuilder> SubAir<AB> for MyInitialPageAir
+impl<AB: AirBuilder> SubAir<AB> for PageReadAir
 where
     AB::M: Clone,
 {
