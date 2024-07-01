@@ -4,7 +4,6 @@ use crate::{is_less_than_tuple::{columns::IsLessThanTupleAuxCols, IsLessThanTupl
 
 use super::page_controller::MyLessThanTupleParams;
 
-
 pub mod air;
 pub mod bridge;
 pub mod columns;
