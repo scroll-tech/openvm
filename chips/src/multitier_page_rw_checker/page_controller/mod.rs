@@ -69,6 +69,7 @@ where
     Val<SC>: AbstractField + PrimeField64,
     Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
 {
+    #[allow(clippy::too_many_arguments)]
     pub fn dfs(
         leaf_pages: &[Vec<Vec<u32>>],
         internal_pages: &[Vec<Vec<u32>>],
@@ -358,6 +359,7 @@ pub struct PageController<const COMMITMENT_LEN: usize> {
     pub range_checker: Arc<RangeCheckerGateChip>,
 }
 
+#[allow(clippy::too_many_arguments)]
 impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
     pub fn new<SC: StarkGenericConfig>(
         data_bus_index: usize,
@@ -598,6 +600,7 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 /// internal_indices are relevant for final page generation only
 fn make_tree_products<SC: StarkGenericConfig, const COMMITMENT_LEN: usize>(
     committer: &mut TraceCommitter<SC>,

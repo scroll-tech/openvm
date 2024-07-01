@@ -308,6 +308,7 @@ where
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn load_page_test(
     engine: &BabyBearPoseidon2Engine,
     init_leaf_pages: Vec<Vec<Vec<u32>>>,
@@ -318,7 +319,7 @@ fn load_page_test(
     final_internal_pages: Vec<Vec<Vec<u32>>>,
     final_root_is_leaf: bool,
     final_root_idx: usize,
-    ops: &Vec<Operation>,
+    ops: &[Operation],
     num_ops: usize,
     ops_sender: &DummyInteractionAir,
     page_controller: &mut page_controller::PageController<BABYBEAR_COMMITMENT_LEN>,
@@ -336,7 +337,7 @@ fn load_page_test(
         final_internal_pages,
         final_root_is_leaf,
         final_root_idx,
-        ops.clone(),
+        ops.to_vec(),
         trace_degree,
         &mut trace_builder.committer,
     );
@@ -455,12 +456,10 @@ fn load_page_test(
     let verifier = engine.verifier();
 
     let mut challenger = engine.new_challenger();
-    let proof = prover.prove(&mut challenger, &partial_pk, main_trace_data, &pis);
+    let proof = prover.prove(&mut challenger, partial_pk, main_trace_data, &pis);
 
     let mut challenger = engine.new_challenger();
-    let result = verifier.verify(&mut challenger, partial_vk, airs, proof, &pis);
-
-    result
+    verifier.verify(&mut challenger, partial_vk, airs, proof, &pis)
 }
 
 fn generate_no_new_keys(
@@ -508,8 +507,7 @@ fn generate_no_new_keys(
     clks.sort();
 
     let mut ops: Vec<Operation> = vec![];
-    for i in 0..num_ops {
-        let clk = clks[i];
+    for clk in clks {
         let idx = idx_data_map
             .iter()
             .nth(rng.gen::<usize>() % idx_data_map.len())
@@ -588,8 +586,7 @@ fn generate_new_keys(
         .collect();
     clks.sort();
     let mut ops: Vec<Operation> = vec![];
-    for i in 0..num_ops {
-        let clk = clks[i];
+    for clk in clks {
         let mut idx;
         loop {
             idx = (0..idx_len)
@@ -653,8 +650,7 @@ fn generate_mixed_ops(
         .collect();
     clks.sort();
     let mut ops: Vec<Operation> = vec![];
-    for i in 0..num_ops {
-        let clk = clks[i];
+    for clk in clks {
         if rng.gen::<bool>() {
             let mut idx;
             loop {
@@ -749,8 +745,7 @@ fn generate_mixed_ops_remove_first_leaf(
         .collect();
     clks.sort();
     let mut ops: Vec<Operation> = vec![];
-    for i in 0..num_ops {
-        let clk = clks[i];
+    for clk in clks {
         if rng.gen::<bool>() {
             let mut idx;
             loop {
@@ -835,8 +830,7 @@ fn generate_mixed_ops_empty_start(
         .collect();
     clks.sort();
     let mut ops: Vec<Operation> = vec![];
-    for i in 0..num_ops {
-        let clk = clks[i];
+    for (i, clk) in clks.into_iter().enumerate() {
         if rng.gen::<bool>() || i == 0 {
             let mut idx;
             loop {
@@ -912,9 +906,7 @@ fn generate_large_tree_no_new_keys(
         .collect();
     clks.sort();
     let mut ops: Vec<Operation> = vec![];
-    for i in 0..num_ops {
-        let clk = clks[i];
-
+    for clk in clks {
         let idx = existing_keys[rng.gen::<usize>() % existing_keys.len()].clone();
 
         let op_type = {
@@ -956,14 +948,13 @@ fn generate_large_tree_new_keys(
         639955356, 1577306122, 107201956, 1528176068, 704402408, 1775238984, 169542638, 1916258191,
     ])
     .unwrap();
-    let existing_keys = vec![vec![534524, 887809], vec![380587, 701877]];
+    let existing_keys = [vec![534524, 887809], vec![380587, 701877]];
     let mut clks: Vec<usize> = (0..num_ops)
         .map(|_| rng.gen::<usize>() % (MAX_VAL as usize))
         .collect();
     clks.sort();
     let mut ops: Vec<Operation> = vec![];
-    for i in 0..num_ops {
-        let clk = clks[i];
+    for (i, clk) in clks.into_iter().enumerate() {
         if rng.gen::<bool>() || i == 0 {
             let idx = (0..idx_len)
                 .map(|_| rng.gen::<u32>() % 1000 + 1000000)

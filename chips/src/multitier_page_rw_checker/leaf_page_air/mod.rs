@@ -53,6 +53,7 @@ pub struct LeafPageSubAirs {
     pub end_idx: IsLessThanTupleAir,
 }
 
+#[allow(clippy::too_many_arguments)]
 impl<const COMMITMENT_LEN: usize> LeafPageAir<COMMITMENT_LEN> {
     pub fn new(
         path_bus_index: usize,
