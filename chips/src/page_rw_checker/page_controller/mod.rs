@@ -238,7 +238,7 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         let final_page_aux_trace = self.final_chip.gen_aux_trace::<SC>(
             &page,
             self.range_checker.clone(),
-            final_write_indices,
+            &final_write_indices,
         );
         trace_span.exit();
 

@@ -38,6 +38,17 @@ impl Page {
         }
     }
 
+    pub fn from_2d_vec_multitier(page: &[Vec<u32>], idx_len: usize, data_len: usize) -> Self {
+        Self {
+            rows: page
+                .iter()
+                .map(|row| {
+                    assert!(row.len() == 2 + idx_len + data_len);
+                    PageCols::from_slice(&row[1..], idx_len, data_len)
+                })
+                .collect(),
+        }
+    }
     /// Returns a random page with the given parameters in the proper format
     /// Note that max_idx and max_data are not inclusive
     pub fn random(
