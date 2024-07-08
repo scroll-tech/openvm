@@ -11,6 +11,7 @@ pub mod is_less_than_tuple_bits;
 pub mod is_zero;
 pub mod keccak_permute;
 pub mod merkle_proof;
+pub mod page_air;
 pub mod page_read;
 pub mod page_rw_checker;
 /// Chip to range check a value has less than a fixed number of bits

@@ -4,6 +4,7 @@ use std::{
     ops::{Index, IndexMut},
 };
 
+use itertools::Itertools;
 use p3_field::PrimeField;
 use p3_matrix::dense::RowMajorMatrix;
 use rand::Rng;
@@ -178,6 +179,10 @@ impl Page {
             self.width(),
         )
     }
+
+    pub fn resize(&mut self, new_len: usize, value: PageCols<u32>) {
+        self.rows.resize(new_len, value);
+    }
 }
 
 /// Provides indexing by a row index
@@ -235,5 +240,12 @@ impl fmt::Display for Page {
             writeln!(f, "{:?}", row)?;
         }
         Ok(())
+    }
+}
+
+pub fn merge_pages(pages: &[Page]) -> Page {
+    let raw_pages = pages.iter().map(|p| p.rows.clone()).collect_vec();
+    Page {
+        rows: raw_pages.concat(),
     }
 }

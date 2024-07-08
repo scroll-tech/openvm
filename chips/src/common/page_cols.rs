@@ -25,3 +25,13 @@ impl<T: Clone> PageCols<T> {
             .collect()
     }
 }
+
+impl PageCols<u32> {
+    pub fn blank(idx_len: usize, data_len: usize) -> Self {
+        PageCols {
+            is_alloc: 0,
+            idx: vec![0; idx_len],
+            data: vec![0; data_len],
+        }
+    }
+}

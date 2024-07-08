@@ -9,6 +9,7 @@ members = [
     "logical-interface",
     "vm",
     "vm/bin",
+    "operators"
 ]
 resolver = "2"
 
