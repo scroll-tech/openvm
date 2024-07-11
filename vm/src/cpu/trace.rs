@@ -8,6 +8,7 @@ use afs_chips::{
 };
 
 use crate::memory::{compose, decompose};
+use crate::poseidon2::Poseidon2Chip;
 use crate::{field_extension::FieldExtensionArithmeticChip, vm::VirtualMachine};
 
 use super::{
@@ -178,6 +179,10 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
                 }};
             }
 
+            if opcode != PRINTF && !vm.options().enabled_instructions().contains(&opcode) {
+                return Err(ExecutionError::DisabledOperation(opcode));
+            }
+
             match opcode {
                 // d[a] <- e[d[c] + b]
                 LOADW => {
@@ -216,30 +221,25 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
                     next_pc = pc;
                 }
                 opcode @ (FADD | FSUB | FMUL | FDIV) => {
-                    if vm.options().field_arithmetic_enabled {
-                        // read from d[b] and e[c]
-                        let operand1 = read!(d, b);
-                        let operand2 = read!(e, c);
-                        // write to d[a]
-                        let result = vm
-                            .field_arithmetic_chip
-                            .calculate(opcode, (operand1, operand2));
-                        write!(d, a, result);
-                    } else {
-                        return Err(ExecutionError::DisabledOperation(opcode));
-                    }
+                    // read from d[b] and e[c]
+                    let operand1 = read!(d, b);
+                    let operand2 = read!(e, c);
+                    // write to d[a]
+                    let result = vm
+                        .field_arithmetic_chip
+                        .calculate(opcode, (operand1, operand2));
+                    write!(d, a, result);
                 }
                 FAIL => return Err(ExecutionError::Fail(pc_usize)),
                 PRINTF => {
                     let value = read!(d, a);
                     println!("{}", value);
                 }
-                opcode @ (FE4ADD | FE4SUB | BBE4MUL | BBE4INV) => {
-                    if vm.options().field_extension_enabled {
-                        FieldExtensionArithmeticChip::calculate(
-                            vm, timestamp, opcode, a, b, c, d, e,
-                        );
-                    }
+                FE4ADD | FE4SUB | BBE4MUL | BBE4INV => {
+                    FieldExtensionArithmeticChip::calculate(vm, timestamp, instruction);
+                }
+                PERM_POS2 | COMP_POS2 => {
+                    Poseidon2Chip::<16, _>::poseidon2_perm(vm, timestamp, instruction);
                 }
                 HINT => {
                     if witness_idx >= vm.witness_stream.len() {
