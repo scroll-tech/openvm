@@ -3,9 +3,9 @@ use core::marker::PhantomData;
 use std::collections::HashMap;
 use std::hash::Hash;
 
-use p3_field::AbstractField;
 use p3_field::ExtensionField;
 use p3_field::Field;
+use p3_field::{AbstractExtensionField, AbstractField};
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -1239,7 +1239,7 @@ impl<C: Config> Variable<C> for Ext<C::F, C::EF> {
 
 impl<C: Config> MemVariable<C> for Ext<C::F, C::EF> {
     fn size_of() -> usize {
-        1
+        C::EF::D
     }
 
     fn load(&self, ptr: Ptr<C::N>, index: MemIndex<C::N>, builder: &mut Builder<C>) {
