@@ -65,6 +65,7 @@ macro_rules! run_perm_ops {
             vec![],
             vec![],
         );
+        let mut segment = &mut vm.segments[0];
 
         let write_ops: [[WriteOps; 16]; $num_ops] = core::array::from_fn(|i| {
             core::array::from_fn(|j| {
@@ -87,7 +88,8 @@ macro_rules! run_perm_ops {
         });
 
         write_ops.iter().flatten().for_each(|op| {
-            vm.memory_chip
+            segment
+                .memory_chip
                 .write_word(op.clk, op.ad_s, op.address, op.data);
         });
 
@@ -96,7 +98,7 @@ macro_rules! run_perm_ops {
         (0..$num_ops).for_each(|i| {
             let start_timestamp = 16 * $num_ops + (time_per * i);
             Poseidon2Chip::<16, BabyBear>::poseidon2_perm(
-                &mut vm,
+                &mut segment,
                 start_timestamp,
                 $instructions[i],
             );
@@ -145,9 +147,11 @@ macro_rules! run_perm_ops {
             5 + 1,
         );
 
-        let memory_chip_trace = vm.memory_chip.generate_trace(vm.range_checker.clone());
-        let range_checker_trace = vm.range_checker.generate_trace();
-        let poseidon2_trace = vm.poseidon2_chip.generate_trace();
+        let memory_chip_trace = segment
+            .memory_chip
+            .generate_trace(segment.range_checker.clone());
+        let range_checker_trace = segment.range_checker.generate_trace();
+        let poseidon2_trace = segment.poseidon2_chip.generate_trace();
 
         let traces = vec![
             range_checker_trace,
@@ -204,9 +208,9 @@ fn poseidon2_chip_random_50_test() {
     engine
         .run_simple_test(
             vec![
-                &vm.range_checker.air,
-                &vm.memory_chip.air,
-                &vm.poseidon2_chip,
+                &vm.segments[0].range_checker.air,
+                &vm.segments[0].memory_chip.air,
+                &vm.segments[0].poseidon2_chip,
                 &dummy_cpu_memory,
                 &dummy_cpu_poseidon2,
             ],
@@ -241,9 +245,9 @@ fn poseidon2_negative_test() {
         assert_eq!(
             engine.run_simple_test(
                 vec![
-                    &vm.range_checker.air,
-                    &vm.memory_chip.air,
-                    &vm.poseidon2_chip,
+                    &vm.segments[0].range_checker.air,
+                    &vm.segments[0].memory_chip.air,
+                    &vm.segments[0].poseidon2_chip,
                     &dummy_cpu_memory,
                     &dummy_cpu_poseidon2,
                 ],

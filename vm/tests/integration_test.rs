@@ -35,8 +35,8 @@ fn air_test(
         witness_stream,
     );
 
-    let traces = vm.traces().unwrap();
-    let chips = get_chips(&vm);
+    let traces = vm.segments[0].traces().unwrap();
+    let chips = get_chips(&vm.segments[0]);
     run_simple_test_no_pis(chips, traces).expect("Verification failed");
 }
 
@@ -59,9 +59,9 @@ fn air_test_with_poseidon2(
         vec![],
     );
 
-    let max_log_degree = vm.max_log_degree().unwrap();
-    let traces = vm.traces().unwrap();
-    let chips = get_chips(&vm);
+    let max_log_degree = vm.segments[0].max_log_degree().unwrap();
+    let traces = vm.segments[0].traces().unwrap();
+    let chips = get_chips(&vm.segments[0]);
 
     let perm = random_perm();
     let fri_params = fri_params_with_80_bits_of_security()[1];

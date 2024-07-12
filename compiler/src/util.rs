@@ -42,7 +42,7 @@ pub fn execute_program<const WORD_SIZE: usize, F: PrimeField32>(
         program,
         input_stream,
     );
-    vm.traces().unwrap();
+    vm.segments[0].traces().unwrap();
 }
 
 pub fn display_program<F: PrimeField32>(program: &[Instruction<F>]) {
@@ -103,9 +103,9 @@ pub fn execute_and_prove_program<const WORD_SIZE: usize>(
         program,
         input_stream,
     );
-    let max_log_degree = vm.max_log_degree().unwrap();
-    let traces = vm.traces().unwrap();
-    let chips = get_chips(&vm);
+    let max_log_degree = vm.segments[0].max_log_degree().unwrap();
+    let traces = vm.segments[0].traces().unwrap();
+    let chips = get_chips(&vm.segments[0]);
 
     let perm = random_perm();
     // blowup factor 8 for poseidon2 chip

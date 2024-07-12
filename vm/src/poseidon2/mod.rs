@@ -1,3 +1,7 @@
+use crate::cpu::trace::Instruction;
+use crate::cpu::OpCode;
+use crate::cpu::OpCode::*;
+use crate::vm::ExecutionSegment;
 use p3_field::Field;
 use p3_field::PrimeField32;
 
@@ -7,11 +11,7 @@ use columns::{Poseidon2ChipCols, Poseidon2ChipIoCols};
 use poseidon2_air::poseidon2::Poseidon2Air;
 use poseidon2_air::poseidon2::Poseidon2Config;
 
-use crate::cpu::trace::Instruction;
-use crate::cpu::OpCode;
-use crate::cpu::OpCode::*;
 use crate::poseidon2::columns::Poseidon2ChipAuxCols;
-use crate::vm::VirtualMachine;
 
 #[cfg(test)]
 pub mod tests;
@@ -80,7 +80,7 @@ impl<F: PrimeField32> Poseidon2Chip<WIDTH, F> {
     /// the given instruction using the subair, storing it in `rows`. Then, writes output to memory,
     /// truncating if the instruction is a compression.
     pub fn poseidon2_perm<const WORD_SIZE: usize>(
-        vm: &mut VirtualMachine<WORD_SIZE, F>,
+        vm: &mut ExecutionSegment<WORD_SIZE, F>,
         start_timestamp: usize,
         instruction: Instruction<F>,
     ) {
