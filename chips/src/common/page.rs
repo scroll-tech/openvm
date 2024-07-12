@@ -92,6 +92,12 @@ impl Page {
         Page { rows }
     }
 
+    pub fn blank(idx_len: usize, data_len: usize, height: usize) -> Self {
+        Page {
+            rows: vec![PageCols::new(0, vec![0; idx_len], vec![0; data_len]); height],
+        }
+    }
+
     pub fn idx_len(&self) -> usize {
         self.rows[0].idx.len()
     }

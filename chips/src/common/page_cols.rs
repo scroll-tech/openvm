@@ -2,7 +2,7 @@ use std::iter;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, derive_new::new)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, derive_new::new)]
 pub struct PageCols<T> {
     pub is_alloc: T, // indicates if row is allocated
     pub idx: Vec<T>,
@@ -32,6 +32,50 @@ impl PageCols<u32> {
             is_alloc: 0,
             idx: vec![0; idx_len],
             data: vec![0; data_len],
+        }
+    }
+}
+
+impl Ord for PageCols<u32> {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        if self.is_alloc > other.is_alloc {
+            return std::cmp::Ordering::Less;
+        }
+        if self.is_alloc < other.is_alloc {
+            return std::cmp::Ordering::Greater;
+        }
+        let mut i = 0;
+        while i < self.idx.len() && self.idx[i] == other.idx[i] {
+            i += 1;
+        }
+        if i == self.idx.len() {
+            std::cmp::Ordering::Equal
+        } else if self.idx[i] > other.idx[i] {
+            std::cmp::Ordering::Greater
+        } else {
+            std::cmp::Ordering::Less
+        }
+    }
+}
+
+impl PartialOrd for PageCols<u32> {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        if self.is_alloc > other.is_alloc {
+            return Some(std::cmp::Ordering::Less);
+        }
+        if self.is_alloc < other.is_alloc {
+            return Some(std::cmp::Ordering::Greater);
+        }
+        let mut i = 0;
+        while i < self.idx.len() && self.idx[i] == other.idx[i] {
+            i += 1;
+        }
+        if i == self.idx.len() {
+            Some(std::cmp::Ordering::Equal)
+        } else if self.idx[i] > other.idx[i] {
+            Some(std::cmp::Ordering::Greater)
+        } else {
+            Some(std::cmp::Ordering::Less)
         }
     }
 }

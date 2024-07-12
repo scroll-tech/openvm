@@ -25,7 +25,7 @@ fn load_page_test(
     trace_builder: &mut TraceCommitmentBuilder<BabyBearPoseidon2Config>,
     partial_pk: &MultiStarkPartialProvingKey<BabyBearPoseidon2Config>,
 ) -> Result<(), VerificationError> {
-    let (init_page_pdata, final_page_pdata) = page_controller.load_page_and_ops(
+    let (init_page_pdata, final_page_pdata) = page_controller.load_pages(
         init_pages,
         final_pages,
         None,
@@ -114,7 +114,41 @@ fn equal_page_content_test() {
     let prover = MultiTraceStarkProver::new(&engine.config);
     let mut trace_builder = TraceCommitmentBuilder::new(prover.pcs());
 
-    // Testing a fully allocated page
+    load_page_test(
+        &engine,
+        &init_pages,
+        &final_pages,
+        &mut page_controller,
+        &mut trace_builder,
+        &partial_pk,
+    )
+    .expect("Verification failed");
+
+    let mut start = 0;
+    let init_pages = init_page_heights
+        .clone()
+        .into_iter()
+        .map(|h| {
+            let p = Page {
+                rows: initial_page.rows[start..start + h].to_vec(),
+            };
+            start += h;
+            p
+        })
+        .collect_vec();
+    start = 0;
+    let final_pages = final_page_heights
+        .clone()
+        .into_iter()
+        .map(|h| {
+            let p = Page {
+                rows: final_page.rows[start..start + h].to_vec(),
+            };
+            start += h;
+            p
+        })
+        .collect_vec();
+
     load_page_test(
         &engine,
         &init_pages,
@@ -174,6 +208,6 @@ fn equal_page_content_test() {
 
     assert!(
         result.is_err(),
-        "Expected to fail when allocating too many indices"
+        "Expected to fail when contents are not equal"
     );
 }

@@ -71,7 +71,7 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         }
     }
 
-    pub fn load_page_and_ops(
+    pub fn load_pages(
         &mut self,
         init_pages: &[Page],
         final_pages: &[Page],

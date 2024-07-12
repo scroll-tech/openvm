@@ -50,7 +50,8 @@ impl<SC: StarkGenericConfig> PageController<SC> {
             ),
         }
     }
-    pub fn load_page_and_ops(
+
+    pub fn load_pages(
         &mut self,
         pages: &[Page],
         page_pdata: Option<Vec<Arc<ProverTraceData<SC>>>>,
@@ -61,7 +62,7 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         Val<SC>: PrimeField,
     {
         let remaining = self.gen_remaining(pages);
-        self.epc_page_controller.load_page_and_ops(
+        self.epc_page_controller.load_pages(
             pages,
             &[remaining],
             page_pdata,

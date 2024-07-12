@@ -852,7 +852,7 @@ impl<const COMMITMENT_LEN: usize> PageBTree<COMMITMENT_LEN> {
     }
 }
 
-fn cmp(key1: &[u32], key2: &[u32]) -> i32 {
+pub fn cmp(key1: &[u32], key2: &[u32]) -> i32 {
     assert!(key1.len() == key2.len());
     let mut i = 0;
     while i < key1.len() && key1[i] == key2[i] {

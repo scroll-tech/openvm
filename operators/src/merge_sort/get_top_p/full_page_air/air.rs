@@ -29,7 +29,6 @@ where
     AB::M: Clone,
 {
     fn eval(&self, builder: &mut AB) {
-        // only constrain that own_commitment is accurate
         // partition is physical page data vs metadata
         let main: &<AB as AirBuilder>::M = &builder.partitioned_main()[1].clone();
         let local = main.row_slice(0);

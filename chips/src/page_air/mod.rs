@@ -19,6 +19,10 @@ impl PageAir {
         }
     }
 
+    pub fn idx_len(&self) -> usize {
+        self.idx_len
+    }
+
     pub fn air_width(&self) -> usize {
         1 + self.idx_len + self.data_len
     }
