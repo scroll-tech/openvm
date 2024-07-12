@@ -1,4 +1,3 @@
-use std::collections::VecDeque;
 use std::sync::Arc;
 
 use afs_chips::range_gate::RangeCheckerGateChip;
@@ -23,13 +22,16 @@ use crate::{
     program::ProgramChip,
 };
 
-use self::config::VmConfig;
+use self::config::VmParamsConfig;
 
 pub mod config;
 
 pub struct VirtualMachine<const WORD_SIZE: usize, F: PrimeField32> {
-    pub config: VmConfig,
+    pub config: VmParamsConfig,
+    pub segments: Vec<ExecutionSegment<WORD_SIZE, F>>,
+}
 
+pub struct ExecutionSegment<const WORD_SIZE: usize, F: PrimeField32> {
     pub cpu_air: CpuAir<WORD_SIZE>,
     pub program_chip: ProgramChip<F>,
     pub memory_chip: MemoryChip<WORD_SIZE, F>,
@@ -37,13 +39,33 @@ pub struct VirtualMachine<const WORD_SIZE: usize, F: PrimeField32> {
     pub field_extension_chip: FieldExtensionArithmeticChip<WORD_SIZE, F>,
     pub range_checker: Arc<RangeCheckerGateChip>,
     pub poseidon2_chip: Poseidon2Chip<16, F>,
-    pub input_stream: VecDeque<Vec<F>>,
+    pub witness_stream: Vec<Vec<F>>,
+    pub vm: VirtualMachine<WORD_SIZE, F>,
 
     traces: Vec<DenseMatrix<F>>,
 }
 
 impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
-    pub fn new(config: VmConfig, program: Vec<Instruction<F>>, input_stream: Vec<Vec<F>>) -> Self {
+    pub fn new_segment(
+        self,
+        program: Vec<Instruction<F>>,
+        witness_stream: Vec<Vec<F>>,
+    ) -> ExecutionSegment<WORD_SIZE, F> {
+        ExecutionSegment::new(self, program, witness_stream)
+    }
+
+    pub fn options(&self) -> CpuOptions {
+        self.config.cpu_options()
+    }
+}
+
+impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
+    pub fn new(
+        vm: VirtualMachine<WORD_SIZE, F>,
+        program: Vec<Instruction<F>>,
+        witness_stream: Vec<Vec<F>>,
+    ) -> Self {
+        let config = vm.config;
         let decomp = config.decomp;
         let limb_bits = config.limb_bits;
 
@@ -60,7 +82,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
         );
 
         Self {
-            config,
+            vm,
             cpu_air,
             program_chip,
             memory_chip,
@@ -69,29 +91,25 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
             range_checker,
             poseidon2_chip,
             traces: vec![],
-            input_stream: VecDeque::from(input_stream),
+            witness_stream,
         }
     }
 
-    pub fn options(&self) -> CpuOptions {
-        self.config.cpu_options()
-    }
-
     fn generate_traces(&mut self) -> Result<Vec<DenseMatrix<F>>, ExecutionError> {
-        let cpu_trace = CpuAir::generate_trace(self)?;
+        let cpu_trace = CpuAir::generate_trace(&mut self.vm)?;
         let mut result = vec![
             cpu_trace,
             self.program_chip.generate_trace(),
             self.memory_chip.generate_trace(self.range_checker.clone()),
             self.range_checker.generate_trace(),
         ];
-        if self.options().field_arithmetic_enabled {
+        if self.vm.options().field_arithmetic_enabled {
             result.push(self.field_arithmetic_chip.generate_trace());
         }
-        if self.options().field_extension_enabled {
+        if self.vm.options().field_extension_enabled {
             result.push(self.field_extension_chip.generate_trace());
         }
-        if self.options().poseidon2_enabled() {
+        if self.vm.options().poseidon2_enabled() {
             result.push(self.poseidon2_chip.generate_trace());
         }
         Ok(result)
@@ -104,22 +122,6 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
         Ok(self.traces.clone())
     }
 
-    /*fn max_trace_heights(&self) -> Vec<usize> {
-        let max_operations = self.config.max_operations;
-        let max_program_length = self.config.max_program_length;
-        let result = [
-            max_operations,
-            max_program_length,
-            3 * max_operations,
-            max_operations,
-            max_operations,
-        ];
-        result
-            .iter()
-            .map(|height| height.next_power_of_two())
-            .collect()
-    }*/
-
     pub fn max_log_degree(&mut self) -> Result<usize, ExecutionError> {
         let mut checker_trace_degree = 0;
         for trace in self.traces()? {
@@ -130,25 +132,25 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
 }
 
 pub fn get_chips<const WORD_SIZE: usize, SC: StarkGenericConfig>(
-    vm: &VirtualMachine<WORD_SIZE, Val<SC>>,
+    segment: &ExecutionSegment<WORD_SIZE, Val<SC>>,
 ) -> Vec<&dyn AnyRap<SC>>
 where
     Val<SC>: PrimeField32,
 {
     let mut result: Vec<&dyn AnyRap<SC>> = vec![
-        &vm.cpu_air,
-        &vm.program_chip.air,
-        &vm.memory_chip.air,
-        &vm.range_checker.air,
+        &segment.cpu_air,
+        &segment.program_chip.air,
+        &segment.memory_chip.air,
+        &segment.range_checker.air,
     ];
-    if vm.options().field_arithmetic_enabled {
-        result.push(&vm.field_arithmetic_chip.air as &dyn AnyRap<SC>);
+    if segment.vm.options().field_arithmetic_enabled {
+        result.push(&segment.field_arithmetic_chip.air as &dyn AnyRap<SC>);
     }
-    if vm.options().field_extension_enabled {
-        result.push(&vm.field_extension_chip.air as &dyn AnyRap<SC>);
+    if segment.vm.options().field_extension_enabled {
+        result.push(&segment.field_extension_chip.air as &dyn AnyRap<SC>);
     }
-    if vm.options().poseidon2_enabled() {
-        result.push(&vm.poseidon2_chip as &dyn AnyRap<SC>);
+    if segment.vm.options().poseidon2_enabled() {
+        result.push(&segment.poseidon2_chip as &dyn AnyRap<SC>);
     }
     result
 }
