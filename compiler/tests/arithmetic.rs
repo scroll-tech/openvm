@@ -7,6 +7,7 @@ use afs_compiler::asm::AsmBuilder;
 use afs_compiler::ir::{Ext, Felt, SymbolicExt};
 use afs_compiler::ir::{ExtConst, Var};
 
+#[allow(dead_code)]
 const WORD_SIZE: usize = 1;
 
 #[test]
