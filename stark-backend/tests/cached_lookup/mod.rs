@@ -9,7 +9,6 @@ use afs_test_utils::interaction::dummy_interaction_air::DummyInteractionAir;
 use p3_baby_bear::BabyBear;
 use p3_field::AbstractField;
 use p3_matrix::dense::RowMajorMatrix;
-use p3_util::log2_ceil_usize;
 
 use crate::config;
 
@@ -23,16 +22,8 @@ pub fn prove_and_verify_indexless_lookups(
     sender: Vec<(u32, Vec<u32>)>,
     receiver: Vec<(u32, Vec<u32>)>,
 ) -> Result<(), VerificationError> {
-    let sender_degree = sender.len();
-    let receiver_degree = receiver.len();
-    let [sender_log_degree, receiver_log_degree] =
-        [sender_degree, receiver_degree].map(log2_ceil_usize);
-
     let perm = config::baby_bear_poseidon2::random_perm();
-    let config = config::baby_bear_poseidon2::default_config(
-        &perm,
-        sender_log_degree.max(receiver_log_degree),
-    );
+    let config = config::baby_bear_poseidon2::default_config(&perm);
 
     let sender_air = DummyInteractionAir::new(sender[0].1.len(), true, 0);
     let receiver_air = DummyInteractionAir::new(receiver[0].1.len(), false, 0);

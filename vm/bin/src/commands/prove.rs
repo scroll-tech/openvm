@@ -56,7 +56,7 @@ impl ProveCommand {
         let instructions = parse_asm_file(Path::new(&self.asm_file_path.clone()))?;
         let mut vm = VirtualMachine::<WORD_SIZE, _>::new(config, instructions, vec![]);
 
-        let engine = config::baby_bear_poseidon2::default_engine(vm.max_log_degree()?);
+        let engine = config::baby_bear_poseidon2::default_engine();
         let encoded_pk = read_from_path(&Path::new(&self.keys_folder.clone()).join("partial.pk"))?;
         let partial_pk: MultiStarkPartialProvingKey<BabyBearPoseidon2Config> =
             bincode::deserialize(&encoded_pk)?;

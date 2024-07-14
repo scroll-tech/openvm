@@ -102,7 +102,6 @@ pub fn end_to_end_test<const WORD_SIZE: usize, EF: ExtensionField<BabyBear> + Tw
         program,
         witness_stream,
     );
-    let max_log_degree = vm.max_log_degree().unwrap();
     let traces = vm.traces().unwrap();
     let chips = get_chips(&vm);
 
@@ -113,7 +112,7 @@ pub fn end_to_end_test<const WORD_SIZE: usize, EF: ExtensionField<BabyBear> + Tw
     } else {
         fri_params_with_80_bits_of_security()[1]
     };
-    let engine = engine_from_perm(perm, max_log_degree, fri_params);
+    let engine = engine_from_perm(perm, fri_params);
 
     let num_chips = chips.len();
 

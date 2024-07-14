@@ -4,7 +4,6 @@ use p3_baby_bear::BabyBear;
 use p3_field::AbstractField;
 use p3_matrix::dense::RowMajorMatrix;
 use p3_matrix::Matrix;
-use p3_util::log2_strict_usize;
 use rand::Rng;
 use rand::RngCore;
 
@@ -160,11 +159,9 @@ macro_rules! run_perm_ops {
         ];
 
         // engine generation
-        let max_trace_height = traces.iter().map(|trace| trace.height()).max().unwrap();
-        let max_log_degree = log2_strict_usize(max_trace_height);
         let perm = random_perm();
         let fri_params = fri_params_with_80_bits_of_security()[1];
-        let engine = engine_from_perm(perm, max_log_degree, fri_params);
+        let engine = engine_from_perm(perm, fri_params);
 
         (vm, engine, dummy_cpu_memory, dummy_cpu_poseidon2, traces)
     }};

@@ -120,9 +120,7 @@ fn inner_join_test() {
             decomp,
         );
 
-    let engine = config::baby_bear_poseidon2::default_engine(
-        decomp.max(log_t1_height.max(log_t2_height) + 1),
-    );
+    let engine = config::baby_bear_poseidon2::default_engine();
     let mut keygen_builder = MultiStarkKeygenBuilder::new(&engine.config);
 
     ij_controller.set_up_keygen_builder(&mut keygen_builder);

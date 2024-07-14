@@ -4,8 +4,7 @@ use crate::group_by::group_by_input::GroupByOperation;
 use itertools::Itertools;
 use p3_baby_bear::BabyBear;
 use p3_field::AbstractField;
-use p3_util::log2_strict_usize;
-use std::{cmp::max, sync::Arc};
+use std::sync::Arc;
 
 use afs_stark_backend::{
     keygen::{types::MultiStarkPartialProvingKey, MultiStarkKeygenBuilder},
@@ -325,9 +324,7 @@ fn test_static_values() {
     ];
     let page = Page::from_2d_vec(&page_vec, 0, 8);
     let page_width = page_vec[0].len();
-    let height = page_vec.len();
     let limb_bits = 10;
-    let degree = log2_strict_usize(height);
     let idx_decomp = 4;
     let internal_bus = 0;
     let output_bus = 1;
@@ -346,7 +343,7 @@ fn test_static_values() {
         sorted,
         op,
     );
-    let engine = config::baby_bear_poseidon2::default_engine(degree);
+    let engine = config::baby_bear_poseidon2::default_engine();
     let mut keygen_builder = MultiStarkKeygenBuilder::new(&engine.config);
 
     page_controller.set_up_keygen_builder(&mut keygen_builder);
@@ -400,8 +397,7 @@ fn test_random_values() {
         op,
     );
 
-    let engine =
-        config::baby_bear_poseidon2::default_engine(max(test.log_page_height, test.idx_decomp));
+    let engine = config::baby_bear_poseidon2::default_engine();
     let mut keygen_builder = MultiStarkKeygenBuilder::new(&engine.config);
 
     test.set_up_keygen_builder(&mut keygen_builder, &page_controller);
@@ -483,8 +479,7 @@ fn group_by_sorted_test() {
         op,
     );
 
-    let engine =
-        config::baby_bear_poseidon2::default_engine(max(test.log_page_height, test.idx_decomp));
+    let engine = config::baby_bear_poseidon2::default_engine();
     let mut keygen_builder = MultiStarkKeygenBuilder::new(&engine.config);
 
     page_controller.set_up_keygen_builder(&mut keygen_builder);

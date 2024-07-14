@@ -64,13 +64,12 @@ fn air_test_with_poseidon2(
         vec![],
     );
 
-    let max_log_degree = vm.max_log_degree().unwrap();
     let traces = vm.traces().unwrap();
     let chips = get_chips(&vm);
 
     let perm = random_perm();
     let fri_params = fri_params_with_80_bits_of_security()[1];
-    let engine = engine_from_perm(perm, max_log_degree, fri_params);
+    let engine = engine_from_perm(perm, fri_params);
 
     let num_chips = chips.len();
 

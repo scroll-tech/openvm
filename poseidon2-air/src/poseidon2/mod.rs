@@ -8,9 +8,9 @@ pub mod tests;
 
 use self::columns::Poseidon2Cols;
 use lazy_static::lazy_static;
-use p3_baby_bear::BabyBear;
-use p3_baby_bear::POSEIDON2_INTERNAL_MATRIX_DIAG_16_BABYBEAR_MONTY;
+use p3_baby_bear::{BabyBear, BabyBearDiffusionMatrixParameters, BabyBearParameters};
 use p3_field::{AbstractField, PrimeField32};
+use p3_monty_31::DiffusionMatrixParameters;
 use zkhash::ark_ff::PrimeField as _;
 use zkhash::fields::babybear::FpBabyBear as HorizenBabyBear;
 use zkhash::poseidon2::poseidon2_instance_babybear::{MAT_DIAG16_M_1, RC16};
@@ -275,6 +275,8 @@ impl<F: PrimeField32> Default for Poseidon2Config<16, F> {
         Self::new_p3_baby_bear_16()
     }
 }
+
+pub const POSEIDON2_INTERNAL_MATRIX_DIAG_16_BABYBEAR_MONTY: [BabyBear; 16] = <BabyBearDiffusionMatrixParameters as DiffusionMatrixParameters<BabyBearParameters, 16>>::INTERNAL_DIAG_MONTY;
 
 lazy_static! {
     static ref HL_BABYBEAR_EXT_CONST_16: Vec<[BabyBear; 16]> =

@@ -122,7 +122,7 @@ fn final_page_chip_test() {
     );
     let range_checker = Arc::new(RangeCheckerGateChip::new(range_bus_index, 1 << idx_decomp));
 
-    let engine = config::baby_bear_poseidon2::default_engine(log_page_height.max(idx_decomp));
+    let engine = config::baby_bear_poseidon2::default_engine();
 
     let mut keygen_builder = MultiStarkKeygenBuilder::new(&engine.config);
 

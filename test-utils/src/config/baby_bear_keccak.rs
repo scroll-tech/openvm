@@ -1,8 +1,7 @@
 use afs_stark_backend::{rap::AnyRap, verifier::VerificationError};
 use p3_baby_bear::BabyBear;
 use p3_keccak::Keccak256Hash;
-use p3_matrix::{dense::DenseMatrix, Matrix};
-use p3_util::log2_strict_usize;
+use p3_matrix::dense::DenseMatrix;
 
 use crate::engine::StarkEngine;
 
@@ -17,14 +16,14 @@ pub type BabyBearKeccakConfig = BabyBearByteHashConfig<Keccak256Hash>;
 pub type BabyBearKeccakEngine = BabyBearByteHashEngine<Keccak256Hash>;
 
 /// `pcs_log_degree` is the upper bound on the log_2(PCS polynomial degree).
-pub fn default_engine(pcs_log_degree: usize) -> BabyBearKeccakEngine {
-    baby_bear_bytehash::default_engine(pcs_log_degree, Keccak256Hash)
+pub fn default_engine() -> BabyBearKeccakEngine {
+    baby_bear_bytehash::default_engine(Keccak256Hash)
 }
 
 /// `pcs_log_degree` is the upper bound on the log_2(PCS polynomial degree).
-pub fn default_config(pcs_log_degree: usize) -> BabyBearKeccakConfig {
+pub fn default_config() -> BabyBearKeccakConfig {
     let fri_params = default_fri_params();
-    config_from_byte_hash(Keccak256Hash, pcs_log_degree, fri_params)
+    config_from_byte_hash(Keccak256Hash, fri_params)
 }
 
 /// Runs a single end-to-end test for a given set of chips and traces.
@@ -39,9 +38,7 @@ pub fn run_simple_test(
     traces: Vec<DenseMatrix<BabyBear>>,
     public_values: Vec<Vec<BabyBear>>,
 ) -> Result<(), VerificationError> {
-    let max_trace_height = traces.iter().map(|trace| trace.height()).max().unwrap();
-    let max_log_degree = log2_strict_usize(max_trace_height);
-    let engine = default_engine(max_log_degree);
+    let engine = default_engine();
     engine.run_simple_test(chips, traces, public_values)
 }
 

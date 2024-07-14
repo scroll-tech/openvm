@@ -52,23 +52,22 @@ where
 }
 
 /// `pcs_log_degree` is the upper bound on the log_2(PCS polynomial degree).
-pub fn default_engine<H>(pcs_log_degree: usize, byte_hash: H) -> BabyBearByteHashEngine<H>
+pub fn default_engine<H>(byte_hash: H) -> BabyBearByteHashEngine<H>
 where
     H: CryptographicHasher<u8, [u8; 32]> + Clone,
 {
     let fri_params = default_fri_params();
-    engine_from_byte_hash(byte_hash, pcs_log_degree, fri_params)
+    engine_from_byte_hash(byte_hash, fri_params)
 }
 
 pub fn engine_from_byte_hash<H>(
     byte_hash: H,
-    pcs_log_degree: usize,
     fri_params: FriParameters,
 ) -> BabyBearByteHashEngine<H>
 where
     H: CryptographicHasher<u8, [u8; 32]> + Clone,
 {
-    let config = config_from_byte_hash(byte_hash.clone(), pcs_log_degree, fri_params);
+    let config = config_from_byte_hash(byte_hash.clone(), fri_params);
     BabyBearByteHashEngine {
         config,
         byte_hash,
@@ -78,7 +77,6 @@ where
 
 pub fn config_from_byte_hash<H>(
     byte_hash: H,
-    pcs_log_degree: usize,
     fri_params: FriParameters,
 ) -> BabyBearByteHashConfig<H>
 where
@@ -95,6 +93,6 @@ where
         proof_of_work_bits: fri_params.proof_of_work_bits,
         mmcs: challenge_mmcs,
     };
-    let pcs = Pcs::new(pcs_log_degree, dft, val_mmcs, fri_config);
+    let pcs = Pcs::new(dft, val_mmcs, fri_config);
     BabyBearByteHashConfig::new(pcs)
 }

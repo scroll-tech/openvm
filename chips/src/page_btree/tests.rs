@@ -171,9 +171,7 @@ pub fn gen_trace_test() {
         let l = rng.gen::<u32>() % 10;
         tree.update(&[i, j], &[k, l]);
     }
-    let log_page_height = 3;
-    let log_num_requests = 32;
-    let engine = config::baby_bear_poseidon2::default_engine(log_page_height.max(log_num_requests));
+    let engine = config::baby_bear_poseidon2::default_engine();
 
     let prover = MultiTraceStarkProver::new(&engine.config);
     let trace_builder: TraceCommitmentBuilder<BabyBearPoseidon2Config> =
@@ -197,9 +195,7 @@ pub fn commit_test() {
         let l = rng.gen::<u32>() % 10;
         tree.update(&[i, j], &[k, l]);
     }
-    let log_page_height = 3;
-    let log_num_requests = 32;
-    let engine = config::baby_bear_poseidon2::default_engine(log_page_height.max(log_num_requests));
+    let engine = config::baby_bear_poseidon2::default_engine();
 
     let prover = MultiTraceStarkProver::new(&engine.config);
     let trace_builder: TraceCommitmentBuilder<BabyBearPoseidon2Config> =
@@ -245,9 +241,7 @@ pub fn make_a_large_tree() {
         let l = rng.gen::<u32>() % 100;
         tree.update(&[i, j], &[k, l, l]);
     }
-    let log_page_height = 3;
-    let log_num_requests = 32;
-    let engine = config::baby_bear_poseidon2::default_engine(log_page_height.max(log_num_requests));
+    let engine = config::baby_bear_poseidon2::default_engine();
 
     let prover = MultiTraceStarkProver::new(&engine.config);
     let trace_builder: TraceCommitmentBuilder<BabyBearPoseidon2Config> =

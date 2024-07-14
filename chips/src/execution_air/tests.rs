@@ -165,9 +165,7 @@ fn execution_air_test() {
     let ops_sender = ExecutionAir::new(ops_bus_index, idx_len, data_len);
     // let ops_sender = DummyInteractionAir::new(idx_len + data_len + 2, true, ops_bus_index);
 
-    let engine = config::baby_bear_poseidon2::default_engine(
-        idx_decomp.max(log_page_height.max(2 + log_num_ops)),
-    );
+    let engine = config::baby_bear_poseidon2::default_engine();
     let mut keygen_builder = MultiStarkKeygenBuilder::new(&engine.config);
 
     page_controller.set_up_keygen_builder(&mut keygen_builder, &ops_sender);

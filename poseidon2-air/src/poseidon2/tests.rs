@@ -9,15 +9,11 @@ use afs_test_utils::engine::StarkEngine;
 use afs_test_utils::interaction::dummy_interaction_air::DummyInteractionAir;
 use afs_test_utils::utils::create_seeded_rng;
 use ark_ff::PrimeField as _;
-use p3_baby_bear::{
-    BabyBear, DiffusionMatrixBabyBear, POSEIDON2_INTERNAL_MATRIX_DIAG_16_BABYBEAR_MONTY,
-};
+use p3_baby_bear::{BabyBear, DiffusionMatrixBabyBear};
 use p3_field::{AbstractField, Field, PrimeField32};
 use p3_matrix::dense::RowMajorMatrix;
-use p3_matrix::Matrix;
 use p3_poseidon2::{Poseidon2, Poseidon2ExternalMatrixGeneral};
 use p3_symmetric::Permutation;
-use p3_util::log2_strict_usize;
 use rand::RngCore;
 use rand::SeedableRng;
 use rand::{
@@ -29,7 +25,7 @@ use zkhash::fields::babybear::FpBabyBear as HorizenBabyBear;
 use zkhash::poseidon2::poseidon2::Poseidon2 as HorizenPoseidon2;
 use zkhash::poseidon2::poseidon2_instance_babybear::POSEIDON2_BABYBEAR_16_PARAMS;
 
-use crate::poseidon2::Poseidon2Air;
+use crate::poseidon2::{Poseidon2Air, POSEIDON2_INTERNAL_MATRIX_DIAG_16_BABYBEAR_MONTY};
 
 #[test]
 fn test_poseidon2_default() {
@@ -66,7 +62,7 @@ fn test_poseidon2_default() {
         Poseidon2ExternalMatrixGeneral,
         num_int_rounds,
         HL_BABYBEAR_INT_CONST_16.to_vec(),
-        DiffusionMatrixBabyBear,
+        DiffusionMatrixBabyBear::default(),
     );
     for output in outputs.iter_mut() {
         poseidon2.permute_mut(output);
@@ -92,11 +88,9 @@ fn test_poseidon2_default() {
     let traces = vec![poseidon2_trace.clone(), dummy_trace.clone()];
 
     // engine generation
-    let max_trace_height = traces.iter().map(|trace| trace.height()).max().unwrap();
-    let max_log_degree = log2_strict_usize(max_trace_height);
     let perm = random_perm();
     let fri_params = fri_params_with_80_bits_of_security()[1];
-    let engine = engine_from_perm(perm, max_log_degree, fri_params);
+    let engine = engine_from_perm(perm, fri_params);
 
     // positive test
     engine
@@ -181,7 +175,7 @@ fn test_poseidon2() {
         Poseidon2ExternalMatrixGeneral,
         num_int_rounds,
         internal_constants.clone(),
-        DiffusionMatrixBabyBear,
+        DiffusionMatrixBabyBear::default(),
     );
     for output in outputs.iter_mut() {
         poseidon2.permute_mut(output);
@@ -207,11 +201,9 @@ fn test_poseidon2() {
     let traces = vec![poseidon2_trace.clone(), dummy_trace.clone()];
 
     // engine generation
-    let max_trace_height = traces.iter().map(|trace| trace.height()).max().unwrap();
-    let max_log_degree = log2_strict_usize(max_trace_height);
     let perm = random_perm();
     let fri_params = fri_params_with_80_bits_of_security()[1];
-    let engine = engine_from_perm(perm, max_log_degree, fri_params);
+    let engine = engine_from_perm(perm, fri_params);
 
     // positive test
     engine

@@ -8,12 +8,11 @@ use p3_dft::Radix2DitParallel;
 use p3_field::extension::BinomialExtensionField;
 use p3_field::Field;
 use p3_fri::{FriConfig, TwoAdicFriPcs};
-use p3_matrix::{dense::DenseMatrix, Matrix};
+use p3_matrix::dense::DenseMatrix;
 use p3_merkle_tree::FieldMerkleTreeMmcs;
 use p3_poseidon2::{Poseidon2, Poseidon2ExternalMatrixGeneral};
 use p3_symmetric::{CryptographicPermutation, PaddingFreeSponge, TruncatedPermutation};
 use p3_uni_stark::StarkConfig;
-use p3_util::log2_strict_usize;
 use rand::{rngs::StdRng, SeedableRng};
 
 use crate::engine::{StarkEngine, StarkEngineWithHashInstrumentation};
@@ -41,7 +40,7 @@ type Compress<P> = TruncatedPermutation<P, 2, DIGEST_WIDTH, WIDTH>;
 type ValMmcs<P> =
     FieldMerkleTreeMmcs<PackedVal, <Val as Field>::Packing, Hash<P>, Compress<P>, DIGEST_WIDTH>;
 type ChallengeMmcs<P> = ExtensionMmcs<Val, Challenge, ValMmcs<P>>;
-pub type Challenger<P> = DuplexChallenger<Val, P, WIDTH>;
+pub type Challenger<P> = DuplexChallenger<Val, P, WIDTH, RATE>;
 type Dft = Radix2DitParallel;
 type Pcs<P> = TwoAdicFriPcs<Val, Dft, ValMmcs<P>, ChallengeMmcs<P>>;
 
@@ -107,30 +106,26 @@ where
 }
 
 /// `pcs_log_degree` is the upper bound on the log_2(PCS polynomial degree).
-pub fn default_engine(pcs_log_degree: usize) -> BabyBearPoseidon2Engine {
+pub fn default_engine() -> BabyBearPoseidon2Engine {
     let perm = random_perm();
     let fri_params = default_fri_params();
-    engine_from_perm(perm, pcs_log_degree, fri_params)
+    engine_from_perm(perm, fri_params)
 }
 
 /// `pcs_log_degree` is the upper bound on the log_2(PCS polynomial degree).
-pub fn default_config(perm: &Perm, pcs_log_degree: usize) -> BabyBearPoseidon2Config {
+pub fn default_config(perm: &Perm) -> BabyBearPoseidon2Config {
     // target 80 bits of security, with conjectures:
     let fri_params = default_fri_params();
-    config_from_perm(perm, pcs_log_degree, fri_params)
+    config_from_perm(perm, fri_params)
 }
 
-pub fn engine_from_perm<P>(
-    perm: P,
-    pcs_log_degree: usize,
-    fri_params: FriParameters,
-) -> BabyBearPermutationEngine<P>
+pub fn engine_from_perm<P>(perm: P, fri_params: FriParameters) -> BabyBearPermutationEngine<P>
 where
     P: CryptographicPermutation<[Val; WIDTH]>
         + CryptographicPermutation<[PackedVal; WIDTH]>
         + Clone,
 {
-    let config = config_from_perm(&perm, pcs_log_degree, fri_params);
+    let config = config_from_perm(&perm, fri_params);
     BabyBearPermutationEngine {
         config,
         perm,
@@ -138,11 +133,7 @@ where
     }
 }
 
-pub fn config_from_perm<P>(
-    perm: &P,
-    pcs_log_degree: usize,
-    fri_params: FriParameters,
-) -> BabyBearPermutationConfig<P>
+pub fn config_from_perm<P>(perm: &P, fri_params: FriParameters) -> BabyBearPermutationConfig<P>
 where
     P: CryptographicPermutation<[Val; WIDTH]>
         + CryptographicPermutation<[PackedVal; WIDTH]>
@@ -159,7 +150,7 @@ where
         proof_of_work_bits: fri_params.proof_of_work_bits,
         mmcs: challenge_mmcs,
     };
-    let pcs = Pcs::new(pcs_log_degree, dft, val_mmcs, fri_config);
+    let pcs = Pcs::new(dft, val_mmcs, fri_config);
     BabyBearPermutationConfig::new(pcs)
 }
 
@@ -168,7 +159,7 @@ pub fn random_perm() -> Perm {
     let mut rng = StdRng::from_seed(seed);
     Perm::new_from_rng_128(
         Poseidon2ExternalMatrixGeneral,
-        DiffusionMatrixBabyBear,
+        DiffusionMatrixBabyBear::default(),
         &mut rng,
     )
 }
@@ -190,9 +181,7 @@ pub fn run_simple_test(
     traces: Vec<DenseMatrix<BabyBear>>,
     public_values: Vec<Vec<BabyBear>>,
 ) -> Result<(), VerificationError> {
-    let max_trace_height = traces.iter().map(|trace| trace.height()).max().unwrap();
-    let max_log_degree = log2_strict_usize(max_trace_height);
-    let engine = default_engine(max_log_degree);
+    let engine = default_engine();
     engine.run_simple_test(chips, traces, public_values)
 }
 

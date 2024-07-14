@@ -61,7 +61,7 @@ impl VerifyCommand {
     pub fn execute_helper(&self, config: VmConfig) -> Result<()> {
         println!("Verifying proof file: {}", self.proof_file);
         let instructions = parse_asm_file(Path::new(&self.asm_file_path))?;
-        let mut vm = VirtualMachine::<WORD_SIZE, _>::new(config, instructions, vec![]);
+        let vm = VirtualMachine::<WORD_SIZE, _>::new(config, instructions, vec![]);
         let encoded_vk = read_from_path(&Path::new(&self.keys_folder).join("partial.vk"))?;
         let partial_vk: MultiStarkPartialVerifyingKey<BabyBearPoseidon2Config> =
             bincode::deserialize(&encoded_vk)?;
@@ -69,7 +69,7 @@ impl VerifyCommand {
         let encoded_proof = read_from_path(Path::new(&self.proof_file))?;
         let proof: Proof<BabyBearPoseidon2Config> = bincode::deserialize(&encoded_proof)?;
 
-        let engine = config::baby_bear_poseidon2::default_engine(vm.max_log_degree()?);
+        let engine = config::baby_bear_poseidon2::default_engine();
 
         let chips = get_chips(&vm);
         let num_chips = chips.len();

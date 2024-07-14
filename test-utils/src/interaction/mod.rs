@@ -19,9 +19,8 @@ pub fn verify_interactions(
     airs: Vec<&dyn AnyRap<BabyBearPoseidon2Config>>,
     pis: Vec<Vec<Val>>,
 ) -> Result<(), VerificationError> {
-    let log_trace_degree = 3;
     let perm = config::baby_bear_poseidon2::random_perm();
-    let config = config::baby_bear_poseidon2::default_config(&perm, log_trace_degree);
+    let config = config::baby_bear_poseidon2::default_config(&perm);
 
     let mut keygen_builder = MultiStarkKeygenBuilder::new(&config);
     for (air, pis) in airs.iter().zip_eq(&pis) {
