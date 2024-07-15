@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex};
 
 use itertools::Itertools;
 use p3_challenger::{CanObserve, FieldChallenger};
-use p3_commit::Pcs;
+use p3_commit::{Pcs, PolynomialSpace};
 use p3_field::AbstractExtensionField;
 use p3_matrix::Matrix;
 use p3_maybe_rayon::prelude::*;
@@ -313,6 +313,10 @@ impl<'c, SC: StarkGenericConfig> MultiTraceStarkProver<'c, SC> {
         let alpha: SC::Challenge = challenger.sample_ext_element();
         tracing::debug!("alpha: {alpha:?}");
 
+        let degrees = trace_views
+            .iter()
+            .map(|view| view.domain.size())
+            .collect_vec();
         let quotient_degrees = partial_pk
             .per_air
             .iter()
@@ -401,6 +405,7 @@ impl<'c, SC: StarkGenericConfig> MultiTraceStarkProver<'c, SC> {
             .collect_vec();
 
         Proof {
+            degrees,
             commitments,
             opening,
             exposed_values_after_challenge,
