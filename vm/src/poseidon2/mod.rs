@@ -6,8 +6,6 @@ use p3_field::Field;
 use p3_field::PrimeField32;
 
 use afs_chips::is_zero::IsZeroAir;
-use afs_chips::sub_chip::LocalTraceInstructions;
-use columns::{Poseidon2ChipCols, Poseidon2ChipIoCols};
 use poseidon2_air::poseidon2::Poseidon2Air;
 use poseidon2_air::poseidon2::Poseidon2Config;
 
