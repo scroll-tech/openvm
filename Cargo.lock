@@ -560,6 +560,7 @@ dependencies = [
  "p3-keccak",
  "p3-uni-stark",
  "p3-util",
+ "predicate",
  "rand",
  "serde",
  "tracing",
@@ -2374,6 +2375,7 @@ dependencies = [
  "p3-uni-stark",
  "p3-util",
  "serde",
+ "tracing",
 ]
 
 [[package]]

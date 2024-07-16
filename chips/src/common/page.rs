@@ -22,7 +22,7 @@ use super::page_cols::PageCols;
 /// - Unallocated rows are all zeros
 #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub struct Page {
-    pub rows: Vec<PageCols<u32>>,
+    rows: Vec<PageCols<u32>>,
 }
 
 impl Page {
@@ -36,6 +36,10 @@ impl Page {
                 })
                 .collect(),
         }
+    }
+
+    pub fn from_page_cols(rows: Vec<PageCols<u32>>) -> Self {
+        Self { rows }
     }
 
     pub fn from_2d_vec_non_leaf(page: &[Vec<u32>], idx_len: usize, data_len: usize) -> Self {
@@ -52,6 +56,10 @@ impl Page {
 
     pub fn to_2d_vec(&self) -> Vec<Vec<u32>> {
         self.rows.iter().map(|row| row.to_vec()).collect()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.rows.is_empty()
     }
 
     /// Returns a random page with the given parameters in the proper format
@@ -204,6 +212,14 @@ impl Page {
 
     pub fn resize(&mut self, new_len: usize, value: PageCols<u32>) {
         self.rows.resize(new_len, value);
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = &PageCols<u32>> {
+        self.rows.iter()
+    }
+
+    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut PageCols<u32>> {
+        self.rows.iter_mut()
     }
 }
 
