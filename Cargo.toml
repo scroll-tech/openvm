@@ -11,7 +11,7 @@ members = [
     "logical-interface",
     "vm",
     "vm/bin",
-    "operators"
+    "operators",
     "poseidon2-air",
 ]
 resolver = "2"

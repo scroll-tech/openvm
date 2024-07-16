@@ -67,6 +67,10 @@ impl FullIndexedOutputPageAir {
         }
     }
 
+    pub fn limb_bits(&self) -> usize {
+        self.is_less_than_tuple_param.limb_bits
+    }
+
     // if self.is_final, we need to include range data to establish sortedness
     // in particular, for each idx, prove the idx lies in the start and end.
     // we then need extra columns that contain results of is_less_than comparisons

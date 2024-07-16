@@ -33,7 +33,7 @@ fn load_page_test(
         &mut trace_builder.committer,
     );
 
-    let proof = page_controller.prove(
+    let (proof, _) = page_controller.prove(
         engine,
         partial_pk,
         trace_builder,

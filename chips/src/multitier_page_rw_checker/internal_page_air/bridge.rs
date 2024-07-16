@@ -46,22 +46,13 @@ impl<const COMMITMENT_LEN: usize> InternalPageAir<COMMITMENT_LEN> {
         }
     }
 
-<<<<<<< HEAD
-    fn custom_sends_or_receives<F: PrimeField64>(
-=======
     fn custom_sends_or_receives_data<F: PrimeField64>(
->>>>>>> 7263686b232458084dcca858f04df6a820b3b2f1
         &self,
         col_indices: InternalPageCols<usize>,
     ) -> Vec<Interaction<F>> {
         let virtual_cols = iter::once(col_indices.cache_cols.is_alloc)
-<<<<<<< HEAD
-            .chain(col_indices.cache_cols.start)
-            .chain(col_indices.cache_cols.end)
-=======
             .chain(col_indices.cache_cols.child_start)
             .chain(col_indices.cache_cols.child_end)
->>>>>>> 7263686b232458084dcca858f04df6a820b3b2f1
             .chain(col_indices.cache_cols.commitment)
             .map(VirtualPairCol::single_main)
             .collect::<Vec<_>>();
@@ -93,15 +84,9 @@ impl<const COMMITMENT_LEN: usize> InternalPageAir<COMMITMENT_LEN> {
         } else {
             let virtual_cols = col_indices
                 .cache_cols
-<<<<<<< HEAD
-                .start
-                .into_iter()
-                .chain(col_indices.cache_cols.end)
-=======
                 .child_start
                 .into_iter()
                 .chain(col_indices.cache_cols.child_end)
->>>>>>> 7263686b232458084dcca858f04df6a820b3b2f1
                 .chain(col_indices.cache_cols.commitment)
                 .chain(iter::once(col_indices.metadata.child_air_id))
                 .map(VirtualPairCol::single_main)
@@ -123,11 +108,7 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirBridge<F>
         let mut interactions = vec![];
         interactions.extend(self.custom_receives_path(col_indices.clone()));
         if !self.is_init {
-<<<<<<< HEAD
-            interactions.extend(self.custom_sends_or_receives(col_indices.clone()));
-=======
             interactions.extend(self.custom_sends_or_receives_data(col_indices.clone()));
->>>>>>> 7263686b232458084dcca858f04df6a820b3b2f1
         }
         interactions
     }
@@ -136,30 +117,18 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirBridge<F>
         let mut interactions = vec![];
         interactions.extend(self.custom_sends_path(col_indices.clone()));
         if self.is_init {
-<<<<<<< HEAD
-            interactions.extend(self.custom_sends_or_receives(col_indices.clone()));
-        }
-        if !self.is_init {
-            let subairs = self.is_less_than_tuple_air.clone().unwrap();
-            let subair_aux = col_indices.metadata.subchip_aux_cols.clone().unwrap();
-=======
             interactions.extend(self.custom_sends_or_receives_data(col_indices.clone()));
         }
         if !self.is_init {
             let subairs = self.is_less_than_tuple_air.clone().unwrap();
             let subair_aux = col_indices.metadata.subair_aux_cols.clone().unwrap();
->>>>>>> 7263686b232458084dcca858f04df6a820b3b2f1
             let range_inclusion = col_indices.metadata.range_inclusion_cols.clone().unwrap();
             let prove_sort = col_indices.metadata.prove_sort_cols.clone().unwrap();
             interactions.extend(SubAirBridge::sends(
                 &subairs.idx1_start,
                 IsLessThanTupleCols {
                     io: IsLessThanTupleIOCols {
-<<<<<<< HEAD
-                        x: col_indices.cache_cols.start.clone(),
-=======
                         x: col_indices.cache_cols.child_start.clone(),
->>>>>>> 7263686b232458084dcca858f04df6a820b3b2f1
                         y: range_inclusion.start.clone(),
                         tuple_less_than: range_inclusion.less_than_start,
                     },
@@ -171,11 +140,7 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirBridge<F>
                 IsLessThanTupleCols {
                     io: IsLessThanTupleIOCols {
                         x: range_inclusion.end.clone(),
-<<<<<<< HEAD
-                        y: col_indices.cache_cols.end.clone(),
-=======
                         y: col_indices.cache_cols.child_end.clone(),
->>>>>>> 7263686b232458084dcca858f04df6a820b3b2f1
                         tuple_less_than: range_inclusion.greater_than_end,
                     },
                     aux: subair_aux.end_idx2,
@@ -185,13 +150,8 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirBridge<F>
                 &subairs.idx2_next,
                 IsLessThanTupleCols {
                     io: IsLessThanTupleIOCols {
-<<<<<<< HEAD
-                        x: col_indices.cache_cols.end.clone(),
-                        y: col_indices.cache_cols.start.clone(),
-=======
                         x: col_indices.cache_cols.child_end.clone(),
                         y: col_indices.cache_cols.child_start.clone(),
->>>>>>> 7263686b232458084dcca858f04df6a820b3b2f1
                         tuple_less_than: prove_sort.end_less_than_next,
                     },
                     aux: subair_aux.idx2_next,
@@ -201,13 +161,8 @@ impl<F: PrimeField64, const COMMITMENT_LEN: usize> SubAirBridge<F>
                 &subairs.idx2_idx1,
                 IsLessThanTupleCols {
                     io: IsLessThanTupleIOCols {
-<<<<<<< HEAD
-                        x: col_indices.cache_cols.end.clone(),
-                        y: col_indices.cache_cols.start.clone(),
-=======
                         x: col_indices.cache_cols.child_end.clone(),
                         y: col_indices.cache_cols.child_start.clone(),
->>>>>>> 7263686b232458084dcca858f04df6a820b3b2f1
                         tuple_less_than: prove_sort.end_less_than_start,
                     },
                     aux: subair_aux.idx2_idx1,

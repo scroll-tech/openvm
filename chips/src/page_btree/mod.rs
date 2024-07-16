@@ -896,7 +896,7 @@ fn binsearch_kv(kv_pairs: &[(Vec<u32>, Vec<u32>)], k: &[u32]) -> (usize, bool) {
     }
 }
 
-fn commit_to_str<SC: StarkGenericConfig>(commit: &[Val<SC>]) -> String
+pub fn commit_to_str<SC: StarkGenericConfig>(commit: &[Val<SC>]) -> String
 where
     Val<SC>: PrimeField32 + AbstractField,
 {
@@ -905,7 +905,7 @@ where
     })
 }
 
-fn commit_u32_to_str(commit: &[u32]) -> String {
+pub fn commit_u32_to_str(commit: &[u32]) -> String {
     commit.iter().fold("".to_owned(), |acc, x| {
         acc.to_owned() + &format!("{:08x}", x)
     })

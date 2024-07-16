@@ -16,7 +16,7 @@ use afs_stark_backend::{
 };
 use afs_test_utils::engine::StarkEngine;
 use itertools::Itertools;
-use p3_field::{AbstractField, Field, PrimeField};
+use p3_field::{AbstractField, Field, PrimeField, PrimeField64};
 use p3_matrix::dense::{DenseMatrix, RowMajorMatrix};
 use p3_uni_stark::{Domain, StarkGenericConfig, Val};
 use tracing::info_span;
@@ -136,6 +136,20 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         (init_page_pdata, final_page_pdata)
     }
 
+    pub fn airs(&self) -> Vec<&dyn AnyRap<SC>>
+    where
+        Val<SC>: PrimeField + PrimeField64,
+    {
+        let mut airs: Vec<&dyn AnyRap<SC>> = vec![];
+        for c in &self.init_page_chips {
+            airs.push(c);
+        }
+        for c in &self.final_page_chips {
+            airs.push(c);
+        }
+        airs
+    }
+
     /// Sets up keygen with the different trace partitions for the chips
     /// init_chip, final_chip, offline_checker, range_checker, and the
     /// ops_sender, which is passed in
@@ -184,9 +198,9 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         trace_builder: &mut TraceCommitmentBuilder<SC>,
         init_page_pdata: Vec<Arc<ProverTraceData<SC>>>,
         final_page_pdata: Vec<Arc<ProverTraceData<SC>>>,
-    ) -> Proof<SC>
+    ) -> (Proof<SC>, Vec<Vec<Val<SC>>>)
     where
-        Val<SC>: PrimeField,
+        Val<SC>: PrimeField + PrimeField64,
         Domain<SC>: Send + Sync,
         SC::Pcs: Sync,
         Domain<SC>: Send + Sync,
@@ -228,20 +242,15 @@ impl<SC: StarkGenericConfig> PageController<SC> {
 
         let partial_vk = partial_pk.partial_vk();
 
-        let mut airs: Vec<&dyn AnyRap<SC>> = vec![];
-        for c in &self.init_page_chips {
-            airs.push(c);
-        }
-        for c in &self.final_page_chips {
-            airs.push(c);
-        }
-
-        let main_trace_data = trace_builder.view(&partial_vk, airs);
+        let main_trace_data = trace_builder.view(&partial_vk, self.airs());
 
         let pis = vec![vec![]; partial_vk.per_air.len()];
         let prover = engine.prover();
         let mut challenger = engine.new_challenger();
-        prover.prove(&mut challenger, partial_pk, main_trace_data, &pis)
+        (
+            prover.prove(&mut challenger, partial_pk, main_trace_data, &pis),
+            pis,
+        )
     }
 
     /// This function takes a proof (returned by the prove function) and verifies it
@@ -252,21 +261,14 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         proof: Proof<SC>,
     ) -> Result<(), VerificationError>
     where
-        Val<SC>: PrimeField,
+        Val<SC>: PrimeField + PrimeField64,
     {
         let verifier = engine.verifier();
 
         let pis = vec![vec![]; partial_vk.per_air.len()];
 
         let mut challenger = engine.new_challenger();
-        let mut airs: Vec<&dyn AnyRap<SC>> = vec![];
-        for c in &self.init_page_chips {
-            airs.push(c);
-        }
-        for c in &self.final_page_chips {
-            airs.push(c);
-        }
-        verifier.verify(&mut challenger, partial_vk, airs, proof, &pis)
+        verifier.verify(&mut challenger, partial_vk, self.airs(), proof, &pis)
     }
 
     fn gen_page_trace(&self, page: &Page) -> DenseMatrix<Val<SC>>
