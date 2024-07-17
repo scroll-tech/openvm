@@ -52,7 +52,14 @@ impl<const WORD_SIZE: usize, AB: InteractionBuilder> Air<AB> for CpuAir<WORD_SIZ
         let next: &[AB::Var] = (*next).borrow();
         let next_cols = CpuCols::<WORD_SIZE, AB::Var>::from_slice(next, self.options);
         let CpuCols { io, aux } = local_cols;
-        let CpuCols { io: next_io, .. } = next_cols;
+        let CpuCols {
+            io: next_io,
+            aux:
+                CpuAuxCols {
+                    operation_flags: next_operation_flags,
+                    ..
+                },
+        } = next_cols;
 
         let CpuIoCols {
             timestamp,
@@ -218,6 +225,20 @@ impl<const WORD_SIZE: usize, AB: InteractionBuilder> Air<AB> for CpuAir<WORD_SIZ
             .when_transition()
             .when(AB::Expr::one() - read0_equals_read1)
             .assert_eq(next_pc, pc + c);
+
+        // NOP
+        let nop_flag = operation_flags[&NOP];
+        let next_nop_flag = next_operation_flags[&NOP];
+        let mut transition = builder.when_transition();
+        transition.when(nop_flag).assert_eq(next_pc, pc);
+        transition.when(next_nop_flag).assert_eq(next_pc, pc);
+
+        transition
+            .when(nop_flag)
+            .assert_eq(next_timestamp, timestamp);
+        transition
+            .when(next_nop_flag)
+            .assert_eq(next_timestamp, timestamp);
 
         // TERMINATE
         let terminate_flag = operation_flags[&TERMINATE];

@@ -127,6 +127,7 @@ fn max_accesses_per_instruction(opcode: OpCode) -> usize {
         }
         SHINTW => 3,
         HINT_INPUT | HINT_BITS => 0,
+        NOP => 0,
         _ => panic!(),
     }
 }
