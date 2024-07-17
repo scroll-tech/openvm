@@ -58,6 +58,8 @@ pub enum OpCode {
     HINT_INPUT = 19,
     /// Phantom instruction to prepare the little-endian bit decomposition of a variable for hinting.
     HINT_BITS = 20,
+
+    NOP = 100,
 }
 
 impl OpCode {
@@ -90,6 +92,8 @@ impl OpCode {
             19 => Some(HINT_INPUT),
             20 => Some(HINT_BITS),
 
+            100 => Some(NOP),
+
             _ => None,
         }
     }
@@ -99,8 +103,8 @@ use crate::field_extension::FieldExtensionArithmeticAir;
 use crate::poseidon2::Poseidon2Chip;
 use OpCode::*;
 
-pub const CORE_INSTRUCTIONS: [OpCode; 9] = [
-    LOADW, STOREW, JAL, BEQ, BNE, TERMINATE, SHINTW, HINT_INPUT, HINT_BITS,
+pub const CORE_INSTRUCTIONS: [OpCode; 10] = [
+    LOADW, STOREW, JAL, BEQ, BNE, TERMINATE, SHINTW, HINT_INPUT, HINT_BITS, NOP,
 ];
 pub const FIELD_ARITHMETIC_INSTRUCTIONS: [OpCode; 4] = [FADD, FSUB, FMUL, FDIV];
 pub const FIELD_EXTENSION_INSTRUCTIONS: [OpCode; 4] = [FE4ADD, FE4SUB, BBE4MUL, BBE4INV];
