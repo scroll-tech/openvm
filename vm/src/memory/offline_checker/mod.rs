@@ -1,5 +1,6 @@
 use std::{array::from_fn, collections::HashMap};
 
+use afs_chips::is_equal_vec::columns::IsEqualVecAuxCols;
 use p3_field::PrimeField32;
 
 use afs_chips::is_less_than_tuple::columns::IsLessThanTupleAuxCols;
@@ -26,7 +27,7 @@ impl<const WORD_SIZE: usize> OfflineChecker<WORD_SIZE> {
 
     pub fn air_width(&self) -> usize {
         10 + self.mem_width()
-            + 2 * WORD_SIZE
+            + IsEqualVecAuxCols::<usize>::get_width(WORD_SIZE)
             + IsLessThanTupleAuxCols::<usize>::get_width(
                 self.addr_clk_limb_bits.clone(),
                 self.decomp,
