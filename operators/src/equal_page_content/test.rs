@@ -25,14 +25,21 @@ fn load_page_test(
     trace_builder: &mut TraceCommitmentBuilder<BabyBearPoseidon2Config>,
     partial_pk: &MultiStarkPartialProvingKey<BabyBearPoseidon2Config>,
 ) -> Result<(), VerificationError> {
-    let (init_page_pdata, final_page_pdata) = page_controller.load_pages(
+    let (mut init_page_pdata, mut final_page_pdata) = page_controller.load_pages(
         init_pages,
         final_pages,
-        None,
-        None,
+        vec![None; init_pages.len()],
+        vec![None; final_pages.len()],
         &mut trace_builder.committer,
     );
-
+    let init_page_pdata = init_page_pdata
+        .iter_mut()
+        .map(|p| p.take().unwrap())
+        .collect_vec();
+    let final_page_pdata = final_page_pdata
+        .iter_mut()
+        .map(|p| p.take().unwrap())
+        .collect_vec();
     let (proof, _) = page_controller.prove(
         engine,
         partial_pk,
@@ -99,8 +106,8 @@ fn equal_page_content_test() {
         page_bus_index,
         idx_len,
         data_len,
-        init_page_heights.clone(),
-        final_page_heights.clone(),
+        init_page_heights.len(),
+        final_page_heights.len(),
     );
     let engine = config::baby_bear_poseidon2::default_engine(
         idx_decomp.max(log_page_height.max(3 + log_num_ops)),

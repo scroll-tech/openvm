@@ -36,9 +36,7 @@ where
     Val<SC>: AbstractField,
 {
     init_page_chips: Vec<PageAir>,
-    init_page_heights: Vec<usize>,
     final_page_chips: Vec<PageAir>,
-    final_page_heights: Vec<usize>,
 
     traces: Option<EqualPageContentTraces<Val<SC>>>,
     commitments: Option<EqualPageContentCommitments<SC>>,
@@ -49,8 +47,8 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         page_bus_index: usize,
         idx_len: usize,
         data_len: usize,
-        init_page_heights: Vec<usize>,
-        final_page_heights: Vec<usize>,
+        num_init_pages: usize,
+        num_final_pages: usize,
     ) -> Self
     where
         Val<SC>: Field,
@@ -58,14 +56,12 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         Self {
             init_page_chips: vec![
                 PageAir::new(page_bus_index, true, idx_len, data_len);
-                init_page_heights.len()
+                num_init_pages
             ],
-            init_page_heights,
             final_page_chips: vec![
                 PageAir::new(page_bus_index, false, idx_len, data_len);
-                final_page_heights.len()
+                num_final_pages
             ],
-            final_page_heights,
             traces: None,
             commitments: None,
         }
@@ -75,10 +71,13 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         &mut self,
         init_pages: &[Page],
         final_pages: &[Page],
-        init_page_pdata: Option<Vec<Arc<ProverTraceData<SC>>>>,
-        final_page_pdata: Option<Vec<Arc<ProverTraceData<SC>>>>,
+        init_page_pdata: Vec<Option<Arc<ProverTraceData<SC>>>>,
+        final_page_pdata: Vec<Option<Arc<ProverTraceData<SC>>>>,
         trace_committer: &mut TraceCommitter<SC>,
-    ) -> (Vec<Arc<ProverTraceData<SC>>>, Vec<Arc<ProverTraceData<SC>>>)
+    ) -> (
+        Vec<Option<Arc<ProverTraceData<SC>>>>,
+        Vec<Option<Arc<ProverTraceData<SC>>>>,
+    )
     where
         Val<SC>: PrimeField,
     {
@@ -97,21 +96,23 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         trace_span.exit();
 
         let trace_commit_span = info_span!("Trace commitment").entered();
-        let init_page_pdata = match init_page_pdata {
-            Some(prover_data) => prover_data,
-            None => init_page_traces
-                .iter()
-                .map(|t| Arc::new(trace_committer.commit(vec![t.clone()])))
-                .collect_vec(),
-        };
+        let init_page_pdata = init_page_pdata
+            .iter()
+            .zip(init_page_traces.iter())
+            .map(|(pdata, t)| match pdata {
+                Some(_) => pdata.clone(),
+                None => Some(Arc::new(trace_committer.commit(vec![t.clone()]))),
+            })
+            .collect_vec();
 
-        let final_page_pdata = match final_page_pdata {
-            Some(prover_data) => prover_data,
-            None => final_page_traces
-                .iter()
-                .map(|t| Arc::new(trace_committer.commit(vec![t.clone()])))
-                .collect_vec(),
-        };
+        let final_page_pdata = final_page_pdata
+            .iter()
+            .zip(final_page_traces.iter())
+            .map(|(pdata, t)| match pdata {
+                Some(_) => pdata.clone(),
+                None => Some(Arc::new(trace_committer.commit(vec![t.clone()]))),
+            })
+            .collect_vec();
         trace_commit_span.exit();
 
         self.traces = Some(EqualPageContentTraces {
@@ -121,11 +122,11 @@ impl<SC: StarkGenericConfig> PageController<SC> {
 
         let init_page_commitments = init_page_pdata
             .iter()
-            .map(|p| p.commit.clone())
+            .map(|p| p.clone().unwrap().commit.clone())
             .collect_vec();
         let final_page_commitments = final_page_pdata
             .iter()
-            .map(|p| p.commit.clone())
+            .map(|p| p.clone().unwrap().commit.clone())
             .collect_vec();
 
         self.commitments = Some(EqualPageContentCommitments {
@@ -168,20 +169,11 @@ impl<SC: StarkGenericConfig> PageController<SC> {
             .map(|c| keygen_builder.add_cached_main_matrix(c.air_width()))
             .collect_vec();
 
-        for ((p, c), h) in init_page_ptrs
-            .iter()
-            .zip(self.init_page_chips.iter())
-            .zip(self.init_page_heights.iter())
-        {
-            keygen_builder.add_partitioned_air(c, *h, 0, vec![*p])
+        for (p, c) in init_page_ptrs.iter().zip(self.init_page_chips.iter()) {
+            keygen_builder.add_partitioned_air(c, 0, vec![*p])
         }
-
-        for ((p, c), h) in final_page_ptrs
-            .iter()
-            .zip(self.final_page_chips.iter())
-            .zip(self.final_page_heights.iter())
-        {
-            keygen_builder.add_partitioned_air(c, *h, 0, vec![*p])
+        for (p, c) in final_page_ptrs.iter().zip(self.final_page_chips.iter()) {
+            keygen_builder.add_partitioned_air(c, 0, vec![*p])
         }
     }
 
@@ -268,7 +260,7 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         let pis = vec![vec![]; partial_vk.per_air.len()];
 
         let mut challenger = engine.new_challenger();
-        verifier.verify(&mut challenger, partial_vk, self.airs(), proof, &pis)
+        verifier.verify(&mut challenger, &partial_vk, self.airs(), &proof, &pis)
     }
 
     fn gen_page_trace(&self, page: &Page) -> DenseMatrix<Val<SC>>

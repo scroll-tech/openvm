@@ -22,7 +22,7 @@ use super::page_cols::PageCols;
 /// - Unallocated rows are all zeros
 #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub struct Page {
-    rows: Vec<PageCols<u32>>,
+    pub rows: Vec<PageCols<u32>>,
 }
 
 impl Page {

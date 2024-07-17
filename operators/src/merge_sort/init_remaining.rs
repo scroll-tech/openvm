@@ -30,24 +30,17 @@ where
 }
 
 impl<SC: StarkGenericConfig> PageController<SC> {
-    pub fn new(
-        page_bus_index: usize,
-        idx_len: usize,
-        data_len: usize,
-        page_height: usize,
-        k: usize,
-    ) -> Self
+    pub fn new(page_bus_index: usize, idx_len: usize, data_len: usize, k: usize) -> Self
     where
         Val<SC>: Field,
     {
-        let rem_height = (k - 1).next_power_of_two() * page_height;
         Self {
             epc_page_controller: EPCPageController::new(
                 page_bus_index,
                 idx_len,
                 data_len,
-                vec![page_height; k - 1],
-                vec![rem_height],
+                k - 1,
+                1,
             ),
         }
     }
@@ -56,10 +49,13 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         &mut self,
         pages: &[Page],
         remaining: Page,
-        page_pdata: Option<Vec<Arc<ProverTraceData<SC>>>>,
-        remaining_page_pdata: Option<Vec<Arc<ProverTraceData<SC>>>>,
+        page_pdata: Vec<Option<Arc<ProverTraceData<SC>>>>,
+        remaining_page_pdata: Vec<Option<Arc<ProverTraceData<SC>>>>,
         trace_committer: &mut TraceCommitter<SC>,
-    ) -> (Vec<Arc<ProverTraceData<SC>>>, Vec<Arc<ProverTraceData<SC>>>)
+    ) -> (
+        Vec<Option<Arc<ProverTraceData<SC>>>>,
+        Vec<Option<Arc<ProverTraceData<SC>>>>,
+    )
     where
         Val<SC>: PrimeField,
     {
