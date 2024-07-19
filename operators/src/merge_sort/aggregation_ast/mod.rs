@@ -1,6 +1,5 @@
 pub mod prove;
 pub mod provider;
-pub mod trace;
 pub mod verify;
 
 #[cfg(test)]

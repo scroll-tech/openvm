@@ -1,9 +1,6 @@
 use std::sync::Arc;
 
-use afs_chips::common::{
-    page::{merge_pages, Page},
-    page_cols::PageCols,
-};
+use afs_chips::common::{page::Page, page_cols::PageCols};
 use afs_stark_backend::{
     config::{Com, PcsProof, PcsProverData},
     keygen::{
@@ -18,10 +15,13 @@ use afs_stark_backend::{
     verifier::VerificationError,
 };
 use afs_test_utils::engine::StarkEngine;
+use itertools::Itertools;
 use p3_field::{AbstractField, Field, PrimeField, PrimeField64};
 use p3_uni_stark::{Domain, StarkGenericConfig, Val};
 
 use crate::equal_page_content::page_controller::PageController as EPCPageController;
+
+use super::deterministic_page_sort;
 pub struct PageController<SC: StarkGenericConfig>
 where
     Val<SC>: AbstractField,
@@ -132,11 +132,22 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         self.epc_page_controller.verify(engine, partial_vk, proof)
     }
 
-    pub fn gen_remaining(&self, pages: &[Page]) -> Page
+    pub fn gen_remaining(&self, pages: &[Page], pages_are_sorted: &[bool]) -> Page
     where
         Val<SC>: PrimeField,
     {
-        let mut rem_pages = merge_pages(pages);
+        let pages = pages
+            .iter()
+            .zip(pages_are_sorted.iter())
+            .map(|(p, s)| {
+                let mut p = p.clone();
+                if !s {
+                    p.rows.sort()
+                };
+                p
+            })
+            .collect_vec();
+        let mut rem_pages = deterministic_page_sort(&pages);
         let len = rem_pages.rows.len();
         let idx_len = pages[0][0].idx.len();
         let data_len = pages[0][0].data.len();

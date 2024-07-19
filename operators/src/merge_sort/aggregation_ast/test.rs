@@ -1,4 +1,8 @@
-use std::sync::Arc;
+use std::{
+    fs::{create_dir_all, remove_dir_all},
+    sync::Arc,
+    time::Instant,
+};
 
 use afs_chips::{
     common::page::{merge_pages, Page},
@@ -24,11 +28,13 @@ use super::{
 };
 
 const BABYBEAR_COMMITMENT_LEN: usize = 8;
+const LIMB_BITS: usize = 20;
 
 pub fn test<P: PageProvider + ProverTraceDataProvider<BabyBearPoseidon2Config>>(
     provider: &mut P,
     params: PageControllerParams,
     num_pages: usize,
+    fullness_fraction_denom: usize,
 ) {
     let blank_commit = params.blank_commit.clone();
     let mut rng = create_seeded_rng();
@@ -47,12 +53,15 @@ pub fn test<P: PageProvider + ProverTraceDataProvider<BabyBearPoseidon2Config>>(
                 max_idx,
                 max_idx,
                 page_height,
-                page_height / 2,
+                page_height / fullness_fraction_denom,
             )
         })
         .collect_vec();
+    let sort_time = Instant::now();
     let mut merge_page = merge_pages(&pages);
     merge_page.rows.sort();
+    let duration = sort_time.elapsed();
+    println!("Normal Sorting took {:?}", duration);
     let deg = log2_strict_usize((k - 1).next_power_of_two() * page_height).max(8);
     let engine = config::baby_bear_poseidon2::default_engine(deg);
 
@@ -95,6 +104,7 @@ pub fn test<P: PageProvider + ProverTraceDataProvider<BabyBearPoseidon2Config>>(
     );
     let pks = ProvingKeys::new(&engine, &page_controllers);
     let vks = VerifyingKeys::new(&engine, &page_controllers);
+    let prove_time = Instant::now();
     let (main, mut indexed_table) = MergeSortMain::generate_main(
         provider,
         &engine,
@@ -103,7 +113,12 @@ pub fn test<P: PageProvider + ProverTraceDataProvider<BabyBearPoseidon2Config>>(
         &pks,
         init_table.clone(),
     );
+    let duration = prove_time.elapsed();
+    println!("Proving took {:?}", duration);
+    let verify_time = Instant::now();
     verify_merge_sort_main(&engine, &page_controllers, &vks, init_table, main);
+    let duration = verify_time.elapsed();
+    println!("Verifying took {:?}", duration);
     indexed_table.resize(
         num_pages,
         DataFrameRow {
@@ -154,7 +169,8 @@ pub fn setup_test(
 
 #[test]
 pub fn small_test() {
-    let params = setup_test(32, 2, 2, 20, 2);
+    create_dir_all("src/merge_sort/aggregation_ast/data").unwrap();
+    let params = setup_test(32, 2, 2, LIMB_BITS, 2);
     // let mut provider = BTreeMapPageLoader::new(params.blank_commit.clone());
     let mut provider = DiskPageLoader::new(
         "src/merge_sort/aggregation_ast/data".to_string(),
@@ -162,5 +178,82 @@ pub fn small_test() {
         2,
         params.blank_commit.clone(),
     );
-    test(&mut provider, params, 10);
+    test(&mut provider, params, 10, 2);
+}
+
+#[test]
+pub fn k_is_3_test() {
+    create_dir_all("src/merge_sort/aggregation_ast/data").unwrap();
+    let params = setup_test(32, 2, 2, LIMB_BITS, 3);
+    // let mut provider = BTreeMapPageLoader::new(params.blank_commit.clone());
+    let mut provider = DiskPageLoader::new(
+        "src/merge_sort/aggregation_ast/data".to_string(),
+        2,
+        2,
+        params.blank_commit.clone(),
+    );
+    test(&mut provider, params, 10, 2);
+    remove_dir_all("src/merge_sort/aggregation_ast/data").unwrap();
+}
+
+#[test]
+pub fn quite_empty_test() {
+    create_dir_all("src/merge_sort/aggregation_ast/data").unwrap();
+    let params = setup_test(32, 2, 2, LIMB_BITS, 2);
+    // let mut provider = BTreeMapPageLoader::new(params.blank_commit.clone());
+    let mut provider = DiskPageLoader::new(
+        "src/merge_sort/aggregation_ast/data".to_string(),
+        2,
+        2,
+        params.blank_commit.clone(),
+    );
+    test(&mut provider, params, 10, 5);
+    remove_dir_all("src/merge_sort/aggregation_ast/data").unwrap();
+}
+
+#[test]
+pub fn actually_empty_test() {
+    create_dir_all("src/merge_sort/aggregation_ast/data").unwrap();
+    let params = setup_test(32, 2, 2, LIMB_BITS, 2);
+    // let mut provider = BTreeMapPageLoader::new(params.blank_commit.clone());
+    let mut provider = DiskPageLoader::new(
+        "src/merge_sort/aggregation_ast/data".to_string(),
+        2,
+        2,
+        params.blank_commit.clone(),
+    );
+    test(&mut provider, params, 10, 33);
+    remove_dir_all("src/merge_sort/aggregation_ast/data").unwrap();
+}
+
+#[test]
+pub fn quite_full_test() {
+    create_dir_all("src/merge_sort/aggregation_ast/data").unwrap();
+    let params = setup_test(32, 2, 2, LIMB_BITS, 2);
+    // let mut provider = BTreeMapPageLoader::new(params.blank_commit.clone());
+    let mut provider = DiskPageLoader::new(
+        "src/merge_sort/aggregation_ast/data".to_string(),
+        2,
+        2,
+        params.blank_commit.clone(),
+    );
+    test(&mut provider, params, 10, 1);
+    remove_dir_all("src/merge_sort/aggregation_ast/data").unwrap();
+}
+
+#[test]
+pub fn large_page_test() {
+    create_dir_all("src/merge_sort/aggregation_ast/data").unwrap();
+    // let params = setup_test(1048576, 16, 32, LIMB_BITS, 2);
+    let params = setup_test(1_048_576, 16, 32, LIMB_BITS, 2);
+
+    // let mut provider = BTreeMapPageLoader::new(params.blank_commit.clone());
+    let mut provider = DiskPageLoader::new(
+        "src/merge_sort/aggregation_ast/data".to_string(),
+        16,
+        32,
+        params.blank_commit.clone(),
+    );
+    test(&mut provider, params, 10, 2);
+    remove_dir_all("src/merge_sort/aggregation_ast/data").unwrap();
 }

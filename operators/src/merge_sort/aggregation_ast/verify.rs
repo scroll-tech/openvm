@@ -183,7 +183,7 @@ impl<SC: StarkGenericConfig> VerifyingKeys<SC> {
         let pks = ProvingKeys::new(engine, page_controllers);
         Self {
             init_remaining: pks.init_remaining.partial_vk(),
-            get_top_p: pks.init_remaining.partial_vk(),
+            get_top_p: pks.get_top_p.partial_vk(),
             split_remaining: pks.split_remaining.partial_vk(),
         }
     }
@@ -220,7 +220,7 @@ where
         &self,
         engine: &dyn StarkEngine<SC>,
         page_controllers: &Self::PageControllers,
-        veryfying_keys: &Self::VerifyingKeys,
+        verifying_keys: &Self::VerifyingKeys,
         input: Self::Input,
     ) -> Self::Output;
 }
@@ -263,13 +263,12 @@ where
         match self {
             InitRemainingGTP::Init(verifier_inputs) => {
                 let init_remaining_vk = &vks.init_remaining;
-
                 for i in 0..k - 1 {
                     let input_com =
                         get_commitment_from_proof(&verifier_inputs.proof, &vks.init_remaining, i);
                     let buf_com = &input.buf[i].commitment;
-                    for (b, i) in buf_com.iter().zip(input_com) {
-                        assert_eq!(*b, i);
+                    for (b, c) in buf_com.iter().zip(input_com) {
+                        assert_eq!(*b, c);
                     }
                 }
                 verifier_inputs.verify(
@@ -278,7 +277,7 @@ where
                     init_remaining_vk,
                 );
                 let remaining_com =
-                    get_commitment_from_proof(&verifier_inputs.proof, &vks.init_remaining, k);
+                    get_commitment_from_proof(&verifier_inputs.proof, &vks.init_remaining, k - 1);
                 InitRemainingGTPOutput {
                     remaining: remaining_com,
                     indexed_table: vec![],
@@ -300,7 +299,7 @@ where
                     vks,
                     Self::Input {
                         buf: input.buf,
-                        m: input.m,
+                        m: input.m - 1,
                     },
                 );
                 let init_remaining_com = get_commitment_from_proof(&tail.proof, &vks.get_top_p, 0); // check consistency of init_remaining
@@ -325,7 +324,7 @@ where
                 let remaining_com = get_commitment_from_proof(&tail.proof, &vks.get_top_p, 2);
                 InitRemainingGTPOutput {
                     remaining: remaining_com,
-                    indexed_table: vec![],
+                    indexed_table,
                 }
             }
         }
@@ -439,10 +438,17 @@ where
         let k = page_controllers.params.k;
         let idx_len = page_controllers.params.idx_len;
         let blank_commit = page_controllers.params.blank_commit.clone();
-        let mut tables = self.merge_sorts.iter().fold(vec![], |mut t, merge_sort| {
-            t.push(merge_sort.verify(engine, page_controllers, vks, input));
-            t
-        });
+        let parts = self.merge_sorts.len();
+        let len = input.len();
+        let mut tables = vec![];
+        for (i, m_sort) in self.merge_sorts.iter().enumerate() {
+            tables.push(m_sort.verify(
+                engine,
+                page_controllers,
+                vks,
+                &input[i * len / parts..(i + 1) * len / parts],
+            ));
+        }
         tables.resize(
             k,
             vec![DataFrameRow {
@@ -451,9 +457,7 @@ where
                 commitment: blank_commit.clone(),
             }],
         );
-        let sorted = deterministic_table_sort(tables);
-        println!("sorted: {:?}", sorted);
-        sorted
+        deterministic_table_sort(tables)
     }
 }
 
@@ -532,7 +536,7 @@ where
 {
     let limb_bits = page_controllers.params.limb_bits;
     let idx_len = page_controllers.params.idx_len;
-    let table = commitments
+    let mut table = commitments
         .iter()
         .map(|c| DataFrameRow {
             start: vec![0; idx_len],
@@ -540,6 +544,13 @@ where
             commitment: c.clone(),
         })
         .collect_vec();
+    if table.len() == 1 {
+        table.push(DataFrameRow {
+            start: vec![0; idx_len],
+            end: vec![(1 << limb_bits) - 1; idx_len],
+            commitment: page_controllers.params.blank_commit.clone(),
+        })
+    }
     main.merge_sort
         .verify(engine, page_controllers, vks, &table)
 }

@@ -20,6 +20,7 @@ use rand::Rng;
 
 use super::page_controller::{PageController, SplitRemainingProverData};
 
+#[allow(clippy::too_many_arguments)]
 fn load_page_test(
     engine: &BabyBearPoseidon2Engine,
     remaining: &Page,
@@ -118,7 +119,7 @@ fn split_remaining_test() {
     let prover = MultiTraceStarkProver::new(&engine.config);
     let mut trace_builder = TraceCommitmentBuilder::new(prover.pcs());
 
-    let output_pages = page_controller.generate_output_pages(&remaining, &input_page);
+    let output_pages = page_controller.generate_output_pages(&remaining, &input_page, false);
 
     load_page_test(
         &engine,

@@ -1,9 +1,9 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Instant};
 
 use afs_chips::{common::page::Page, page_btree::cmp};
 use afs_stark_backend::{
     config::{Com, PcsProof, PcsProverData},
-    keygen::{types::MultiStarkPartialVerifyingKey, MultiStarkKeygenBuilder},
+    keygen::types::MultiStarkPartialVerifyingKey,
     prover::{
         trace::{ProverTraceData, TraceCommitmentBuilder},
         types::Proof,
@@ -17,7 +17,6 @@ use p3_uni_stark::{Domain, StarkGenericConfig, Val};
 use tracing::info_span;
 
 use crate::merge_sort::{
-    aggregation_ast::verify::{get_commitment_from_proof, VerifyingKeys},
     get_top_p::page_controller::GetTopProverData,
     split_remaining::page_controller::SplitRemainingProverData,
 };
@@ -87,6 +86,8 @@ where
     PcsProof<SC>: Send + Sync,
     Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
 {
+    // if number of pages is 1, pad to 2
+    // Essentially, we want to tell our page_controllers whether their input pages will be sorted to avoid redundant sorting
     pub fn generate_main<P: PageProvider + ProverTraceDataProvider<SC>>(
         provider: &mut P,
         engine: &impl StarkEngine<SC>,
@@ -99,7 +100,7 @@ where
         let data_len = page_controllers.params.data_len;
         let height = page_controllers.params.page_height;
         let limb_bits = page_controllers.params.limb_bits;
-        let new_table = table
+        let mut new_table = table
             .iter()
             .map(|p| DataFrameRow {
                 start: vec![0; idx_len],
@@ -112,7 +113,14 @@ where
         let blank_commit = pdata_to_commit_u32(&blank_pdata);
         provider.add_page_with_commitment(&blank_commit, &blank_page);
         provider.add_pdata_with_commitment(&blank_commit, blank_pdata);
-        let (merge_sort, indexed_table) = Self::generate_merge_sort(
+        if new_table.len() == 1 {
+            new_table.push(DataFrameRow {
+                start: vec![0; idx_len],
+                end: vec![(1 << limb_bits) - 1; idx_len],
+                commitment: blank_commit.clone(),
+            });
+        }
+        let (merge_sort, indexed_table, _) = Self::generate_merge_sort(
             provider,
             engine,
             trace_builder,
@@ -133,13 +141,13 @@ where
         pks: &ProvingKeys<SC>,
         table_slice: &[DataFrameRow<u32>],
         blank_commit: &Vec<u32>,
-    ) -> (MergeSort<SC>, Vec<DataFrameRow<u32>>) {
+    ) -> (MergeSort<SC>, Vec<DataFrameRow<u32>>, bool) {
         let k = page_controllers.params.k;
         let idx_len = page_controllers.params.idx_len;
         let limb_bits = page_controllers.params.limb_bits;
         let len = table_slice.len();
         if len == 1 || len == 0 {
-            (MergeSort::Single(), table_slice.to_vec())
+            (MergeSort::Single(), table_slice.to_vec(), false)
         } else {
             let (pre_merge, mut buf) = Self::generate_pre_merge(
                 provider,
@@ -152,11 +160,14 @@ where
             );
             let cur_len = buf.len();
             for _ in cur_len..k {
-                buf.push(DataFrameRow {
-                    start: vec![(1 << limb_bits) - 1; idx_len],
-                    end: vec![(1 << limb_bits) - 1; idx_len],
-                    commitment: blank_commit.clone(),
-                });
+                buf.push((
+                    DataFrameRow {
+                        start: vec![(1 << limb_bits) - 1; idx_len],
+                        end: vec![(1 << limb_bits) - 1; idx_len],
+                        commitment: blank_commit.clone(),
+                    },
+                    true,
+                ));
             }
             let (finish_merge, indexed_table) = Self::generate_finish_merge(
                 provider,
@@ -172,6 +183,7 @@ where
                     finish: finish_merge,
                 },
                 indexed_table,
+                true,
             )
         }
     }
@@ -185,7 +197,7 @@ where
         pks: &ProvingKeys<SC>,
         table_slice: &[DataFrameRow<u32>],
         blank_commit: &Vec<u32>,
-    ) -> (PreMerge<SC>, Vec<DataFrameRow<u32>>) {
+    ) -> (PreMerge<SC>, Vec<(DataFrameRow<u32>, bool)>) {
         let k = page_controllers.params.k;
         let len = table_slice.len();
         let idx_len = page_controllers.params.idx_len;
@@ -204,21 +216,24 @@ where
             })
             .collect_vec();
         let mut tables = vec![vec![]; k];
-        for (i, (_, table)) in merge_sorts.iter_mut().enumerate() {
-            tables[i].append(table);
+        for (i, (_, table, is_sorted)) in merge_sorts.iter_mut().enumerate() {
+            tables[i].append(&mut table.iter().map(|r| (r.clone(), *is_sorted)).collect_vec());
         }
         tables.resize(
             k,
-            vec![DataFrameRow {
-                start: vec![0; idx_len],
-                end: vec![0; idx_len],
-                commitment: blank_commit.clone(),
-            }],
+            vec![(
+                DataFrameRow {
+                    start: vec![0; idx_len],
+                    end: vec![0; idx_len],
+                    commitment: blank_commit.clone(),
+                },
+                true,
+            )],
         );
-        let buf = deterministic_table_sort(tables);
+        let buf = deterministic_table_sort_with_bool(tables);
         let merge_sorts = merge_sorts
             .into_iter()
-            .map(|(m, _)| Arc::new(m))
+            .map(|(m, _, _)| Arc::new(m))
             .collect_vec();
         (PreMerge { merge_sorts }, buf)
     }
@@ -229,7 +244,7 @@ where
         trace_builder: &mut TraceCommitmentBuilder<SC>,
         page_controllers: &mut PageControllers<SC, COMMITMENT_LEN>,
         pks: &ProvingKeys<SC>,
-        buf: &[DataFrameRow<u32>],
+        buf: &[(DataFrameRow<u32>, bool)],
     ) -> (FinishMerge<SC>, Vec<DataFrameRow<u32>>) {
         let k = page_controllers.params.k;
         let m = buf.len() - k;
@@ -242,30 +257,37 @@ where
             buf,
             m,
         );
+        let split_remaining = Instant::now();
+        let page_gen = Instant::now();
         let input_page = provider
-            .load_page_by_commitment(&buf[buf.len() - 1].commitment)
+            .load_page_by_commitment(&buf[buf.len() - 1].0.commitment)
             .unwrap();
         let init_remaining = provider
             .load_page_by_commitment(&remaining_commitment)
             .unwrap();
         let input_pdata = provider
-            .load_pdata_by_commitment(&buf[buf.len() - 1].commitment)
+            .load_pdata_by_commitment(&buf[buf.len() - 1].0.commitment)
             .unwrap();
         let init_remaining_pdata = provider
             .load_pdata_by_commitment(&remaining_commitment)
             .unwrap();
-        provider.remove_page_by_commitment(&buf[buf.len() - 1].commitment);
+        provider.remove_page_by_commitment(&buf[buf.len() - 1].0.commitment);
         provider.remove_page_by_commitment(&remaining_commitment);
-        provider.remove_pdata_by_commitment(&buf[buf.len() - 1].commitment);
+        provider.remove_pdata_by_commitment(&buf[buf.len() - 1].0.commitment);
         provider.remove_pdata_by_commitment(&remaining_commitment);
-        let output_pages = page_controllers
-            .split_remaining
-            .generate_output_pages(&init_remaining, &input_page);
+        let output_pages = page_controllers.split_remaining.generate_output_pages(
+            &init_remaining,
+            &input_page,
+            buf[buf.len() - 1].1,
+        );
+        let duration = page_gen.elapsed();
+        println!("Split Remaining Page gen took {:?}", duration);
         let pdata = SplitRemainingProverData {
             remaining_pdata: Some(init_remaining_pdata),
             input_page_pdata: Some(input_pdata),
             output_page_pdata: vec![None; k],
         };
+        let page_load = Instant::now();
         let mut pdata = page_controllers.split_remaining.load_pages(
             &init_remaining,
             &input_page,
@@ -273,6 +295,8 @@ where
             pdata,
             &mut trace_builder.committer,
         );
+        let duration = page_load.elapsed();
+        println!("Split Remaining Page load took {:?}", duration);
         let output_commits = pdata
             .output_page_pdata
             .iter()
@@ -286,12 +310,15 @@ where
             provider.add_page_with_commitment(c, p);
             *pdata = Some(provider.add_pdata_with_commitment(c, pdata.take().unwrap()));
         }
+        let prove_time = Instant::now();
         let (proof, pis) = page_controllers.split_remaining.prove(
             engine,
             &pks.split_remaining,
             trace_builder,
             pdata,
         );
+        let duration = prove_time.elapsed();
+        println!("Split Remaining proving took {:?}", duration);
         let mut kept = k;
         while kept >= 2 && pis[kept][0] == Val::<SC>::zero() {
             // if pis[1 + kept][0] == Val::<SC>::zero() {
@@ -324,6 +351,8 @@ where
             });
         }
         let split = VerifierInputs { proof, pis };
+        let duration = split_remaining.elapsed();
+        println!("Split Remaining took {:?}", duration);
         (FinishMerge { init_gtp, split }, indexed_table)
     }
 
@@ -334,17 +363,18 @@ where
         trace_builder: &mut TraceCommitmentBuilder<SC>,
         page_controllers: &mut PageControllers<SC, COMMITMENT_LEN>,
         pks: &ProvingKeys<SC>,
-        buf: &[DataFrameRow<u32>],
+        buf: &[(DataFrameRow<u32>, bool)],
         m: usize,
     ) -> (InitRemainingGTP<SC>, Vec<u32>, Vec<DataFrameRow<u32>>) {
         let k = page_controllers.params.k;
         if m == 0 {
+            let init_remaining_gtp = Instant::now();
             let init_pages = buf
                 .iter()
                 .take(k - 1)
                 .map(|c| {
-                    let page = provider.load_page_by_commitment(&c.commitment).unwrap();
-                    provider.remove_page_by_commitment(&c.commitment);
+                    let page = provider.load_page_by_commitment(&c.0.commitment).unwrap();
+                    provider.remove_page_by_commitment(&c.0.commitment);
                     page
                 })
                 .collect_vec();
@@ -352,12 +382,15 @@ where
                 .iter()
                 .take(k - 1)
                 .map(|c| {
-                    let pdata = provider.load_pdata_by_commitment(&c.commitment).unwrap();
-                    provider.remove_page_by_commitment(&c.commitment);
+                    let pdata = provider.load_pdata_by_commitment(&c.0.commitment).unwrap();
+                    provider.remove_page_by_commitment(&c.0.commitment);
                     Some(pdata)
                 })
                 .collect_vec();
-            let remaining_page = page_controllers.init_remaining.gen_remaining(&init_pages);
+            let inputs_are_sorted = buf[0..k - 1].iter().map(|r| r.1).collect_vec();
+            let remaining_page = page_controllers
+                .init_remaining
+                .gen_remaining(&init_pages, &inputs_are_sorted);
             let (mut init_page_pdata, mut remaining_pdata) =
                 page_controllers.init_remaining.load_pages(
                     &init_pages,
@@ -383,6 +416,8 @@ where
                 remaining_pdata,
             );
             let init = VerifierInputs { proof, pis };
+            let duration = init_remaining_gtp.elapsed();
+            println!("Init Remaining took {:?}", duration);
             (InitRemainingGTP::Init(init), remaining_commit, vec![])
         } else {
             let (prev, init_remaining_commit, mut indexed_table) = Self::generate_init_remaining(
@@ -394,21 +429,23 @@ where
                 buf,
                 m - 1,
             );
+            let gtp = Instant::now();
             let tail_idx = k - 2 + m;
             let input_page = provider
-                .load_page_by_commitment(&buf[tail_idx].commitment)
+                .load_page_by_commitment(&buf[tail_idx].0.commitment)
                 .unwrap();
+            let input_page_is_sorted = buf[tail_idx].1;
             let init_remaining = provider
                 .load_page_by_commitment(&init_remaining_commit)
                 .unwrap();
             let (final_remaining_page, top_p_page) = page_controllers
                 .get_top_p
-                .generate_output_pages(&init_remaining, &input_page);
-            let input_page_pdata = provider.load_pdata_by_commitment(&buf[tail_idx].commitment);
+                .generate_output_pages(&init_remaining, &input_page, input_page_is_sorted);
+            let input_page_pdata = provider.load_pdata_by_commitment(&buf[tail_idx].0.commitment);
             let init_remaining_pdata = provider.load_pdata_by_commitment(&init_remaining_commit);
             provider.remove_page_by_commitment(&init_remaining_commit);
-            provider.remove_page_by_commitment(&buf[tail_idx].commitment);
-            provider.remove_pdata_by_commitment(&buf[tail_idx].commitment);
+            provider.remove_page_by_commitment(&buf[tail_idx].0.commitment);
+            provider.remove_pdata_by_commitment(&buf[tail_idx].0.commitment);
             provider.remove_pdata_by_commitment(&init_remaining_commit);
             let pdata = GetTopProverData {
                 init_remaining_pdata,
@@ -457,6 +494,8 @@ where
                 commitment: top_p_commit,
             });
             let tail = VerifierInputs { proof, pis };
+            let duration = gtp.elapsed();
+            println!("Get Top P took {:?}", duration);
             (
                 InitRemainingGTP::InitGTP {
                     head: Arc::new(prev),
@@ -595,6 +634,36 @@ pub fn deterministic_table_sort(tables: Vec<Vec<DataFrameRow<u32>>>) -> Vec<Data
             {
                 best_idx = i as i32;
                 smallest_start = &table[*idx].start;
+            }
+        }
+        if best_idx == -1 {
+            break;
+        } else {
+            buf.push(tables[best_idx as usize][cur_idx[best_idx as usize]].clone());
+            cur_idx[best_idx as usize] += 1;
+        }
+    }
+    sort_span.exit();
+    buf
+}
+
+// not going to use a heap because k usually is equal to 2
+pub fn deterministic_table_sort_with_bool(
+    tables: Vec<Vec<(DataFrameRow<u32>, bool)>>,
+) -> Vec<(DataFrameRow<u32>, bool)> {
+    let k = tables.len();
+    let mut buf = vec![];
+    let mut cur_idx = vec![0; k];
+    let sort_span = info_span!("Sort k indexed tables").entered();
+    loop {
+        let mut best_idx = -1;
+        let mut smallest_start = &vec![];
+        for (i, (table, idx)) in tables.iter().zip(cur_idx.iter()).enumerate() {
+            if cur_idx[i] < table.len()
+                && (best_idx == -1 || cmp(&table[*idx].0.start, smallest_start) < 0)
+            {
+                best_idx = i as i32;
+                smallest_start = &table[*idx].0.start;
             }
         }
         if best_idx == -1 {

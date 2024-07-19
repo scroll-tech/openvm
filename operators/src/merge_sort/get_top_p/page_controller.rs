@@ -26,6 +26,8 @@ use p3_matrix::dense::RowMajorMatrix;
 use p3_uni_stark::{Domain, StarkGenericConfig, Val};
 use tracing::info_span;
 
+use crate::merge_sort::deterministic_page_sort;
+
 use super::full_page_air::FullIndexedOutputPageAir;
 
 struct GetTopTraces<F> {
@@ -325,10 +327,18 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         verifier.verify(&mut challenger, &partial_vk, self.airs(), &proof, &pis)
     }
 
-    pub fn generate_output_pages(&self, init_remaining: &Page, input_page: &Page) -> (Page, Page) {
-        let mut new_page = merge_pages(&[init_remaining.clone(), input_page.clone()]);
+    pub fn generate_output_pages(
+        &self,
+        init_remaining: &Page,
+        input_page: &Page,
+        input_page_is_sorted: bool,
+    ) -> (Page, Page) {
+        let mut input_page = input_page.clone();
+        if !input_page_is_sorted {
+            input_page.rows.sort()
+        };
+        let mut new_page = deterministic_page_sort(&[init_remaining.clone(), input_page.clone()]);
         let page_height = input_page.height();
-        new_page.rows.sort();
         let final_remaining = Page {
             rows: new_page.rows.split_off(page_height),
         };

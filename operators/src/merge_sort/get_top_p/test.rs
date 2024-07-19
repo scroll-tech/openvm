@@ -18,6 +18,7 @@ use rand::Rng;
 
 use super::page_controller::{GetTopProverData, PageController};
 
+#[allow(clippy::too_many_arguments)]
 fn load_page_test(
     engine: &BabyBearPoseidon2Engine,
     init_remaining: &Page,
@@ -31,8 +32,8 @@ fn load_page_test(
     let pdata = page_controller.load_pages(
         init_remaining,
         input_page,
-        &final_remaining,
-        &top_p,
+        final_remaining,
+        top_p,
         GetTopProverData {
             init_remaining_pdata: None,
             input_page_pdata: None,
@@ -113,7 +114,7 @@ fn get_top_p_test() {
     let mut trace_builder = TraceCommitmentBuilder::new(prover.pcs());
 
     let (mut final_remaining, mut top_p) =
-        page_controller.generate_output_pages(&init_remaining, &input_page);
+        page_controller.generate_output_pages(&init_remaining, &input_page, false);
 
     load_page_test(
         &engine,

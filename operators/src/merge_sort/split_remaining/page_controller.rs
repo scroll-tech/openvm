@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Instant};
 
 use afs_chips::{
     common::page::{merge_pages, Page},
@@ -26,6 +26,8 @@ use p3_field::{AbstractField, Field, PrimeField, PrimeField64};
 use p3_matrix::dense::RowMajorMatrix;
 use p3_uni_stark::{Domain, StarkGenericConfig, Val};
 use tracing::info_span;
+
+use crate::merge_sort::deterministic_page_sort;
 
 use super::is_full_page_air::IsFullIndexedOutputPageAir;
 
@@ -154,7 +156,6 @@ impl<SC: StarkGenericConfig> PageController<SC> {
             .zip(ranges)
             .map(|(f, r)| (*f as u32, r.0, r.1))
             .collect_vec();
-        println!("PIS: {:?}", pis);
         self.output_pis = Some(pis);
         trace_span.exit();
 
@@ -348,9 +349,17 @@ impl<SC: StarkGenericConfig> PageController<SC> {
         verifier.verify(&mut challenger, &partial_vk, self.airs(), &proof, &pis)
     }
 
-    pub fn generate_output_pages(&self, init_remaining: &Page, input_page: &Page) -> Vec<Page> {
-        let mut new_page = merge_pages(&[init_remaining.clone(), input_page.clone()]);
-        new_page.rows.sort();
+    pub fn generate_output_pages(
+        &self,
+        init_remaining: &Page,
+        input_page: &Page,
+        input_page_is_sorted: bool,
+    ) -> Vec<Page> {
+        let mut input_page = input_page.clone();
+        if !input_page_is_sorted {
+            input_page.rows.sort()
+        };
+        let new_page = deterministic_page_sort(&[init_remaining.clone(), input_page.clone()]);
         let output_pages = new_page
             .rows
             .chunks(input_page.height())
