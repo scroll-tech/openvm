@@ -11,6 +11,7 @@ Cargo.lock
 **/root
 **/leaf
 **/internal
+**/aggregation_ast/data
 
 .cache/
 
