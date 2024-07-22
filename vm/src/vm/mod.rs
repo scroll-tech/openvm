@@ -79,7 +79,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
             .last_mut()
             .unwrap()
             .cpu_chip
-            .transfer_state(cpu_state);
+            .transfer_state(cpu_state, true);
         self.segments
             .last_mut()
             .unwrap()
@@ -95,11 +95,11 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
         let mut result = vec![];
         loop {
             result.extend(self.segments.last_mut().unwrap().generate_traces()?);
+            // Add additional traces for committing
+            result.extend(self.segments.last_mut().unwrap().generate_commitments()?);
             if self.segments.last_mut().unwrap().cpu_chip.is_done {
                 break;
             }
-            // Add additional traces for committing, if needed
-            result.extend(self.segments.last_mut().unwrap().generate_commitments()?);
             self.next_segment();
         }
         self.traces = result;
@@ -120,6 +120,21 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
             checker_trace_degree = std::cmp::max(checker_trace_degree, trace.height());
         }
         Ok(log2_strict_usize(checker_trace_degree))
+    }
+
+    pub fn get_pis(&self) -> Vec<Vec<F>> {
+        let initial: Vec<Vec<F>> = self
+            .segments
+            .iter()
+            .flat_map(|segment| segment.get_pis())
+            .collect();
+
+        initial
+            .into_iter()
+            .zip(self.traces.iter())
+            .filter(|(_, trace)| !trace.values.is_empty())
+            .map(|(initial_elem, _)| initial_elem)
+            .collect()
     }
 }
 

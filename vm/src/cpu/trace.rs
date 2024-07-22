@@ -309,8 +309,10 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
             }
         }
 
-        vm.cpu_chip
-            .transfer_state((clock_cycle, timestamp, pc.as_canonical_u64() as usize));
+        vm.cpu_chip.transfer_state(
+            (clock_cycle, timestamp, pc.as_canonical_u64() as usize),
+            false,
+        );
         vm.hint_stream = hint_stream;
 
         if !vm.cpu_chip.is_done {

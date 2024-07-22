@@ -185,6 +185,8 @@ pub struct CpuChip<const WORD_SIZE: usize, F: Clone> {
     pub pc: usize,
     pub clock_cycle: usize,
     pub timestamp: usize,
+    start_pc: usize,
+    pub pis: Vec<F>,
 }
 
 impl<const WORD_SIZE: usize, F: Clone> CpuChip<WORD_SIZE, F> {
@@ -196,6 +198,8 @@ impl<const WORD_SIZE: usize, F: Clone> CpuChip<WORD_SIZE, F> {
             pc: 0,
             clock_cycle: 0,
             timestamp: 0,
+            start_pc: 0,
+            pis: vec![],
         }
     }
 
@@ -207,9 +211,18 @@ impl<const WORD_SIZE: usize, F: Clone> CpuChip<WORD_SIZE, F> {
         (self.clock_cycle, self.timestamp, self.pc)
     }
 
-    pub fn transfer_state(&mut self, state: (usize, usize, usize)) {
+    pub fn transfer_state(&mut self, state: (usize, usize, usize), start: bool) {
         self.clock_cycle = state.0;
         self.timestamp = state.1;
         self.pc = state.2;
+        if start {
+            self.start_pc = state.2;
+        }
+    }
+
+    pub fn get_pcs(&self) -> (usize, usize) {
+        let first_row_pc = self.start_pc;
+        let last_row_pc = self.pc;
+        (first_row_pc, last_row_pc)
     }
 }

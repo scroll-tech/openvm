@@ -141,7 +141,33 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
 
     /// Generate Merkle proof/memory diff traces
     pub fn generate_commitments(&mut self) -> Result<Vec<DenseMatrix<F>>, ExecutionError> {
+        let (first_row_pc, last_row_pc) = self.cpu_chip.get_pcs();
+        self.cpu_chip
+            .pis
+            .push(F::from_canonical_usize(first_row_pc));
+        self.cpu_chip.pis.push(F::from_canonical_usize(last_row_pc));
         Ok(vec![])
+    }
+
+    pub fn get_num_chips(&self) -> usize {
+        let mut result: usize = 4;
+        if self.config.cpu_options().field_arithmetic_enabled {
+            result += 1;
+        }
+        if self.config.cpu_options().field_extension_enabled {
+            result += 1;
+        }
+        if self.config.cpu_options().poseidon2_enabled() {
+            result += 1;
+        }
+        result
+    }
+
+    pub fn get_pis(&self) -> Vec<Vec<F>> {
+        let len = self.get_num_chips();
+        let mut result: Vec<Vec<F>> = vec![vec![]; len];
+        result[0].clone_from(&self.cpu_chip.pis);
+        result
     }
 }
 
@@ -166,5 +192,6 @@ where
     if segment.config.cpu_options().poseidon2_enabled() {
         result.push(&segment.poseidon2_chip as &dyn AnyRap<SC>);
     }
+    assert!(result.len() == segment.get_num_chips());
     result
 }

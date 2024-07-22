@@ -1,7 +1,7 @@
 use std::borrow::Borrow;
 
 use afs_stark_backend::interaction::InteractionBuilder;
-use p3_air::{Air, AirBuilder, BaseAir};
+use p3_air::{Air, AirBuilder, AirBuilderWithPublicValues, BaseAir};
 use p3_field::{AbstractField, Field};
 use p3_matrix::Matrix;
 
@@ -38,9 +38,15 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
     }
 }
 
-impl<const WORD_SIZE: usize, AB: InteractionBuilder> Air<AB> for CpuAir<WORD_SIZE> {
+impl<const WORD_SIZE: usize, AB: AirBuilderWithPublicValues + InteractionBuilder> Air<AB>
+    for CpuAir<WORD_SIZE>
+{
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
+        let pis = builder.public_values();
+
+        let start_pc = pis[0];
+        let end_pc = pis[1];
 
         let inst_width = AB::F::from_canonical_usize(INST_WIDTH);
 
@@ -80,6 +86,10 @@ impl<const WORD_SIZE: usize, AB: InteractionBuilder> Air<AB> for CpuAir<WORD_SIZ
         let read1 = &accesses[0];
         let read2 = &accesses[1];
         let write = &accesses[CPU_MAX_READS_PER_CYCLE];
+
+        // assert that the start pc is correct
+        builder.when_first_row().assert_eq(pc, start_pc);
+        builder.when_last_row().assert_eq(pc, end_pc);
 
         // set correct operation flag
         for &flag in operation_flags.values() {
