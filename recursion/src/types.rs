@@ -1,16 +1,16 @@
-use afs_stark_backend::commit::MatrixCommitmentPointers;
-use afs_stark_backend::config::Com;
 use p3_field::{AbstractField, PrimeField32, TwoAdicField};
 use p3_uni_stark::{StarkGenericConfig, Val};
+use p3_util::log2_strict_usize;
 
 use afs_compiler::asm::AsmConfig;
 use afs_compiler::ir::{Array, Builder, Config, Ext, ExtConst, Felt, Var};
 use afs_compiler::prelude::*;
+use afs_stark_backend::commit::MatrixCommitmentPointers;
+use afs_stark_backend::config::Com;
 use afs_stark_backend::keygen::types::{
     CommitmentToAirGraph, MultiStarkPartialVerifyingKey, StarkPartialVerifyingKey, TraceWidth,
 };
 use afs_stark_backend::prover::types::Proof;
-use p3_util::log2_strict_usize;
 
 use crate::challenger::DuplexChallengerVariable;
 use crate::fri::types::{DigestVariable, TwoAdicPcsProofVariable};
@@ -133,6 +133,7 @@ pub struct AxiomCommitmentsVariable<C: Config> {
 pub struct AxiomProofVariable<C: Config> {
     pub commitments: AxiomCommitmentsVariable<C>,
     pub opening: OpeningProofVariable<C>,
+    #[allow(clippy::type_complexity)]
     pub exposed_values_after_challenge: Array<C, Array<C, Array<C, Ext<C::F, C::EF>>>>,
 }
 
@@ -142,6 +143,7 @@ pub struct OpeningProofVariable<C: Config> {
     pub values: OpenedValuesVariable<C>,
 }
 
+#[allow(clippy::type_complexity)]
 #[derive(DslVariable, Clone)]
 pub struct OpenedValuesVariable<C: Config> {
     pub preprocessed: Array<C, AdjacentOpenedValuesVariable<C>>,

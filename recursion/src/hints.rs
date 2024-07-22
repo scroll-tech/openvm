@@ -219,7 +219,7 @@ impl Hintable<InnerConfig> for Vec<Vec<InnerChallenge>> {
         let mut stream = Vec::new();
 
         let len = InnerVal::from_canonical_usize(self.len());
-        stream.push(vec![len.into()]);
+        stream.push(vec![len]);
 
         self.iter().for_each(|arr| {
             let comm = Vec::<InnerChallenge>::write(arr);
@@ -383,11 +383,13 @@ impl Hintable<InnerConfig> for Commitments<BabyBearPoseidon2Config> {
 
 #[cfg(test)]
 mod test {
-    use crate::hints::{Hintable, InnerChallenge, InnerVal};
+    use p3_field::AbstractField;
+
     use afs_compiler::asm::AsmBuilder;
     use afs_compiler::ir::{Ext, Felt, Var};
     use afs_compiler::util::execute_program;
-    use p3_field::AbstractField;
+
+    use crate::hints::{Hintable, InnerChallenge, InnerVal};
 
     #[test]
     fn test_var_array() {
