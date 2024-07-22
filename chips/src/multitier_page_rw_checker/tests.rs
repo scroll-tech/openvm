@@ -268,22 +268,23 @@ where
     keygen_builder.add_air(&ops_sender, 0);
 
     let partial_pk = keygen_builder.generate_partial_pk();
-    let (init_pages, init_root_is_leaf, final_pages, final_root_is_leaf, ops) = generate_inputs(
-        idx_len,
-        data_len,
-        page_height,
-        limb_bits,
-        num_ops,
-        &mut trace_builder.committer,
-    );
+    let (mut init_pages, init_root_is_leaf, mut final_pages, final_root_is_leaf, ops) =
+        generate_inputs(
+            idx_len,
+            data_len,
+            page_height,
+            limb_bits,
+            num_ops,
+            &mut trace_builder.committer,
+        );
     let res = load_page_test(
         &engine,
-        init_pages.leaf_pages.clone(),
-        init_pages.internal_pages.clone(),
+        &mut init_pages.leaf_pages,
+        init_pages.internal_pages,
         init_root_is_leaf,
         0,
-        final_pages.leaf_pages.clone(),
-        final_pages.internal_pages.clone(),
+        &mut final_pages.leaf_pages,
+        final_pages.internal_pages,
         final_root_is_leaf,
         0,
         &ops,
@@ -303,11 +304,11 @@ where
 #[allow(clippy::too_many_arguments)]
 fn load_page_test(
     engine: &BabyBearPoseidon2Engine,
-    init_leaf_pages: Vec<Vec<Vec<u32>>>,
+    init_leaf_pages: &mut [Vec<Vec<u32>>],
     init_internal_pages: Vec<Vec<Vec<u32>>>,
     init_root_is_leaf: bool,
     init_root_idx: usize,
-    final_leaf_pages: Vec<Vec<Vec<u32>>>,
+    final_leaf_pages: &mut [Vec<Vec<u32>>],
     final_internal_pages: Vec<Vec<Vec<u32>>>,
     final_root_is_leaf: bool,
     final_root_idx: usize,
@@ -333,9 +334,9 @@ fn load_page_test(
         trace_degree,
         &mut trace_builder.committer,
     );
-    let offline_checker_trace = main_trace.offline_checker_trace.clone();
-    let init_root = main_trace.init_root_signal_trace.clone();
-    let final_root = main_trace.final_root_signal_trace.clone();
+    let offline_checker_trace = main_trace.offline_checker_trace;
+    let init_root = main_trace.init_root_signal_trace;
+    let final_root = main_trace.final_root_signal_trace;
     let range_trace = page_controller.range_checker.generate_trace();
     let ops_sender_trace = RowMajorMatrix::new(
         ops.iter()
@@ -388,7 +389,7 @@ fn load_page_test(
         trace_builder.load_trace(trace.clone());
     }
 
-    trace_builder.load_trace(offline_checker_trace.clone());
+    trace_builder.load_trace(offline_checker_trace);
     trace_builder.load_trace(init_root);
     trace_builder.load_trace(final_root);
     trace_builder.load_trace(range_trace);

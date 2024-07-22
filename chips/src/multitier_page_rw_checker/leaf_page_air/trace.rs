@@ -14,8 +14,27 @@ use super::LeafPageAir;
 
 impl<const COMMITMENT_LEN: usize> LeafPageAir<COMMITMENT_LEN> {
     // The trace is the whole page (including the is_alloc column)
-    pub fn generate_cached_trace<F: PrimeField64>(&self, page: Page) -> RowMajorMatrix<F> {
+    pub fn generate_cached_trace_from_page<F: PrimeField64>(
+        &self,
+        page: &Page,
+    ) -> RowMajorMatrix<F> {
         page.gen_trace()
+    }
+
+    pub fn generate_cached_trace_from_2d_vec<F: PrimeField64>(
+        &self,
+        page: &[Vec<u32>],
+    ) -> RowMajorMatrix<F> {
+        RowMajorMatrix::new(
+            page.iter()
+                .flat_map(|row| {
+                    row.iter()
+                        .map(|n: &u32| F::from_wrapped_u32(*n))
+                        .collect::<Vec<F>>()
+                })
+                .collect(),
+            1 + self.idx_len + self.data_len,
+        )
     }
 
     pub fn generate_main_trace<SC: StarkGenericConfig>(
