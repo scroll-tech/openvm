@@ -1,10 +1,9 @@
-
-use afs_chips::range_gate::RangeCheckerGateChip;
 use afs_stark_backend::rap::AnyRap;
 use p3_field::PrimeField32;
 use p3_matrix::{dense::DenseMatrix, Matrix};
 use p3_uni_stark::{StarkGenericConfig, Val};
 use p3_util::log2_strict_usize;
+use std::collections::VecDeque;
 
 mod segment;
 pub use segment::{get_chips, ExecutionSegment};
@@ -25,7 +24,7 @@ pub const DEFAULT_MAX_LEN: usize = 1 << 20;
 pub struct VirtualMachine<const WORD_SIZE: usize, F: PrimeField32> {
     pub config: VmConfig,
     pub program: Vec<Instruction<F>>,
-    pub witness_stream: Vec<Vec<F>>,
+    pub input_stream: Vec<Vec<F>>,
     pub segments: Vec<Box<ExecutionSegment<WORD_SIZE, F>>>,
     pub traces: Vec<DenseMatrix<F>>,
     // NOT PUBLIC by design, adjust only for testing
@@ -33,15 +32,11 @@ pub struct VirtualMachine<const WORD_SIZE: usize, F: PrimeField32> {
 }
 
 impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
-    pub fn new(
-        config: VmConfig,
-        program: Vec<Instruction<F>>,
-        witness_stream: Vec<Vec<F>>,
-    ) -> Self {
+    pub fn new(config: VmConfig, program: Vec<Instruction<F>>, input_stream: Vec<Vec<F>>) -> Self {
         let mut vm = Self {
             config,
             program,
-            witness_stream,
+            input_stream,
             segments: vec![],
             traces: vec![],
             max_len: DEFAULT_MAX_LEN,
@@ -57,8 +52,17 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
 
     pub fn new_segment(&mut self) {
         let program = self.program.clone();
-        let witness_stream = self.witness_stream.clone();
-        let mut segment = ExecutionSegment::new(self, program, witness_stream);
+        let input_stream = if let Some(segment) = self.segments.last() {
+            segment.input_stream.clone()
+        } else {
+            VecDeque::from(self.input_stream.clone())
+        };
+        let hint_stream = if let Some(segment) = self.segments.last() {
+            segment.hint_stream.clone()
+        } else {
+            VecDeque::new()
+        };
+        let mut segment = ExecutionSegment::new(self, program, input_stream, hint_stream);
         if self.max_len != DEFAULT_MAX_LEN {
             segment.set_test_segments(self.max_len);
         }

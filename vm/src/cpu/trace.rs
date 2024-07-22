@@ -116,7 +116,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
         let mut timestamp: usize = vm.cpu_chip.timestamp;
         let mut pc = F::from_canonical_usize(vm.cpu_chip.pc);
 
-        let mut hint_stream = VecDeque::new();
+        let mut hint_stream = vm.hint_stream.clone();
 
         loop {
             let pc_usize = pc.as_canonical_u64() as usize;
@@ -311,6 +311,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
 
         vm.cpu_chip
             .transfer_state((clock_cycle, timestamp, pc.as_canonical_u64() as usize));
+        vm.hint_stream = hint_stream;
 
         if !vm.cpu_chip.is_done {
             Self::pad_rows(vm);

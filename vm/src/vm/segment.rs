@@ -33,6 +33,7 @@ pub struct ExecutionSegment<const WORD_SIZE: usize, F: PrimeField32> {
     pub range_checker: Arc<RangeCheckerGateChip>,
     pub poseidon2_chip: Poseidon2Chip<16, F>,
     pub input_stream: VecDeque<Vec<F>>,
+    pub hint_stream: VecDeque<F>,
 
     traces: Vec<DenseMatrix<F>>,
     max_len: usize,
@@ -42,7 +43,8 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
     pub fn new(
         vm: &mut VirtualMachine<WORD_SIZE, F>,
         program: Vec<Instruction<F>>,
-        witness_stream: Vec<Vec<F>>,
+        input_stream: VecDeque<Vec<F>>,
+        hint_stream: VecDeque<F>,
     ) -> Self {
         let config = vm.config;
         let decomp = config.decomp;
@@ -71,7 +73,8 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
             range_checker,
             poseidon2_chip,
             traces: vec![],
-            input_stream: VecDeque::from(witness_stream),
+            input_stream,
+            hint_stream,
             max_len: 1 << 20,
         }
     }
