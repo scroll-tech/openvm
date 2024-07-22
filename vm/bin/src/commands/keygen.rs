@@ -10,7 +10,7 @@ use afs_test_utils::{
 };
 use clap::Parser;
 use color_eyre::eyre::Result;
-use stark_vm::vm::{config::VmConfig, get_chips, VirtualMachine};
+use stark_vm::vm::{config::VmConfig, get_all_chips, VirtualMachine};
 
 use crate::asm::parse_asm_file;
 
@@ -40,7 +40,7 @@ pub struct KeygenCommand {
 
 impl KeygenCommand {
     /// Execute the `keygen` command
-    pub fn execute(self, config: VmParamsConfig) -> Result<()> {
+    pub fn execute(self, config: VmConfig) -> Result<()> {
         let start = Instant::now();
         self.execute_helper(config)?;
         let duration = start.elapsed();
@@ -48,13 +48,13 @@ impl KeygenCommand {
         Ok(())
     }
 
-    fn execute_helper(self, config: VmParamsConfig) -> Result<()> {
+    fn execute_helper(self, config: VmConfig) -> Result<()> {
         let instructions = parse_asm_file(Path::new(&self.asm_file_path.clone()))?;
         let mut vm = VirtualMachine::<WORD_SIZE, _>::new(config, instructions, vec![]);
         let engine = config::baby_bear_poseidon2::default_engine(vm.segments[0].max_log_degree()?);
         let mut keygen_builder = engine.keygen_builder();
 
-        let chips = get_chips(&vm);
+        let chips = get_all_chips(&vm);
 
         for chip in chips {
             keygen_builder.add_air(chip, 0);

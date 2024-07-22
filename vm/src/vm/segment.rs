@@ -1,9 +1,10 @@
 use afs_stark_backend::config::{StarkGenericConfig, Val};
 use afs_stark_backend::rap::AnyRap;
+use std::collections::VecDeque;
 use std::sync::Arc;
 
 use super::VirtualMachine;
-use super::VmParamsConfig;
+use super::VmConfig;
 use crate::{
     cpu::{
         trace::{ExecutionError, Instruction},
@@ -23,7 +24,7 @@ use p3_matrix::{dense::DenseMatrix, Matrix};
 use p3_util::log2_strict_usize;
 
 pub struct ExecutionSegment<const WORD_SIZE: usize, F: PrimeField32> {
-    pub config: VmParamsConfig,
+    pub config: VmConfig,
     pub cpu_chip: CpuChip<WORD_SIZE, F>,
     pub program_chip: ProgramChip<F>,
     pub memory_chip: MemoryChip<WORD_SIZE, F>,
@@ -31,7 +32,7 @@ pub struct ExecutionSegment<const WORD_SIZE: usize, F: PrimeField32> {
     pub field_extension_chip: FieldExtensionArithmeticChip<WORD_SIZE, F>,
     pub range_checker: Arc<RangeCheckerGateChip>,
     pub poseidon2_chip: Poseidon2Chip<16, F>,
-    pub witness_stream: Vec<Vec<F>>,
+    pub input_stream: VecDeque<Vec<F>>,
 
     traces: Vec<DenseMatrix<F>>,
     max_len: usize,
@@ -70,7 +71,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
             range_checker,
             poseidon2_chip,
             traces: vec![],
-            witness_stream,
+            input_stream: VecDeque::from(witness_stream),
             max_len: 1 << 20,
         }
     }

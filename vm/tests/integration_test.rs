@@ -9,7 +9,7 @@ use afs_test_utils::engine::StarkEngine;
 use stark_vm::cpu::trace::Instruction;
 use stark_vm::cpu::OpCode::*;
 use stark_vm::vm::config::VmConfig;
-use stark_vm::vm::get_chips;
+use stark_vm::vm::get_all_chips;
 use stark_vm::vm::VirtualMachine;
 
 const WORD_SIZE: usize = 1;

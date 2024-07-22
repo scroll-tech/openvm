@@ -1,3 +1,4 @@
+use std::collections::hash_map::Entry;
 use std::{array::from_fn, collections::HashMap};
 
 use afs_chips::is_equal_vec::columns::IsEqualVecAuxCols;

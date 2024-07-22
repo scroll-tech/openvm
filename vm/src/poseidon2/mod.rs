@@ -9,7 +9,8 @@ use afs_chips::is_zero::IsZeroAir;
 use poseidon2_air::poseidon2::Poseidon2Air;
 use poseidon2_air::poseidon2::Poseidon2Config;
 
-use crate::poseidon2::columns::Poseidon2ChipAuxCols;
+use crate::poseidon2::columns::{Poseidon2ChipAuxCols, Poseidon2ChipCols, Poseidon2ChipIoCols};
+use afs_chips::sub_chip::LocalTraceInstructions;
 
 #[cfg(test)]
 pub mod tests;
