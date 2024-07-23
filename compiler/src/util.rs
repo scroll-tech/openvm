@@ -7,7 +7,7 @@ use afs_test_utils::config::fri_params::{
     fri_params_fast_testing, fri_params_with_80_bits_of_security,
 };
 use afs_test_utils::engine::StarkEngine;
-use stark_vm::vm::get_chips;
+use stark_vm::vm::get_all_chips;
 use stark_vm::{
     cpu::trace::Instruction,
     vm::{config::VmConfig, VirtualMachine},
@@ -42,7 +42,7 @@ pub fn execute_program<const WORD_SIZE: usize, F: PrimeField32>(
         program,
         input_stream,
     );
-    vm.segments[0].traces().unwrap();
+    vm.execute().unwrap();
 }
 
 pub fn display_program<F: PrimeField32>(program: &[Instruction<F>]) {
@@ -103,9 +103,12 @@ pub fn execute_and_prove_program<const WORD_SIZE: usize>(
         program,
         input_stream,
     );
-    let max_log_degree = vm.segments[0].max_log_degree().unwrap();
-    let traces = vm.segments[0].traces().unwrap();
-    let chips = get_chips(&vm.segments[0]);
+    vm.execute().unwrap();
+    let traces = vm.get_traces();
+    let chips = get_all_chips(&vm);
+    let pis = vm.get_pis();
+
+    let max_log_degree = vm.max_log_degree().unwrap();
 
     let perm = random_perm();
     // blowup factor 8 for poseidon2 chip
@@ -116,10 +119,8 @@ pub fn execute_and_prove_program<const WORD_SIZE: usize>(
     };
     let engine = engine_from_perm(perm, max_log_degree, fri_params);
 
-    let num_chips = chips.len();
-
     setup_tracing();
     engine
-        .run_simple_test(chips, traces, vec![vec![]; num_chips])
+        .run_simple_test(chips, traces, pis)
         .expect("Verification failed");
 }

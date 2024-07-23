@@ -2,7 +2,9 @@ use p3_baby_bear::BabyBear;
 use p3_field::AbstractField;
 
 use afs_test_utils::config::baby_bear_poseidon2::{engine_from_perm, random_perm, run_simple_test};
-use afs_test_utils::config::fri_params::fri_params_with_80_bits_of_security;
+use afs_test_utils::config::fri_params::{
+    fri_params_fast_testing, fri_params_with_80_bits_of_security,
+};
 use afs_test_utils::engine::StarkEngine;
 use stark_vm::cpu::trace::Instruction;
 use stark_vm::cpu::OpCode::*;
@@ -71,7 +73,11 @@ fn air_test_with_poseidon2(
     let max_log_degree = vm.max_log_degree().unwrap();
 
     let perm = random_perm();
-    let fri_params = fri_params_with_80_bits_of_security()[1];
+    let fri_params = if matches!(std::env::var("AXIOM_FAST_TEST"), Ok(x) if &x == "1") {
+        fri_params_fast_testing()[1]
+    } else {
+        fri_params_with_80_bits_of_security()[1]
+    };
     let engine = engine_from_perm(perm, max_log_degree, fri_params);
 
     engine
