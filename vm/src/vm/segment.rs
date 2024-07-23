@@ -1,6 +1,6 @@
+use super::VirtualMachineState;
 use afs_stark_backend::config::{StarkGenericConfig, Val};
 use afs_stark_backend::rap::AnyRap;
-use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::sync::Arc;
 
@@ -9,7 +9,7 @@ use super::VmConfig;
 use crate::{
     cpu::{
         trace::{ExecutionError, Instruction},
-        CpuChip, CpuOptions, CpuState, POSEIDON2_BUS, RANGE_CHECKER_BUS,
+        CpuChip, CpuOptions, POSEIDON2_BUS, RANGE_CHECKER_BUS,
     },
     field_arithmetic::FieldArithmeticChip,
     field_extension::FieldExtensionArithmeticChip,
@@ -44,10 +44,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
     pub fn new(
         vm: &mut VirtualMachine<WORD_SIZE, F>,
         program: Vec<Instruction<F>>,
-        input_stream: VecDeque<Vec<F>>,
-        hint_stream: VecDeque<F>,
-        state: CpuState,
-        memory: HashMap<(F, F), F>,
+        state: VirtualMachineState<F>,
     ) -> Self {
         let config = vm.config;
         let decomp = config.decomp;
@@ -57,9 +54,9 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
 
         // TODO: reduce cloning
         let mut cpu_chip = CpuChip::new(config.cpu_options());
-        cpu_chip.set_state(state, true);
+        cpu_chip.set_state(state.state, true);
         let program_chip = ProgramChip::new(program.clone());
-        let memory_chip = MemoryChip::new(limb_bits, limb_bits, limb_bits, decomp, memory);
+        let memory_chip = MemoryChip::new(limb_bits, limb_bits, limb_bits, decomp, state.memory);
         let field_arithmetic_chip = FieldArithmeticChip::new();
         let field_extension_chip = FieldExtensionArithmeticChip::new();
         let poseidon2_chip = Poseidon2Chip::from_poseidon2_config(
@@ -77,8 +74,8 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
             range_checker,
             poseidon2_chip,
             traces: vec![],
-            input_stream,
-            hint_stream,
+            input_stream: state.input_stream,
+            hint_stream: state.hint_stream,
             max_len: 1 << 20,
         }
     }
@@ -123,7 +120,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         Ok(result)
     }
 
-    /// TODO: reduce cloning
+    // TODO: reduce cloning
     pub fn traces(&mut self) -> Result<Vec<DenseMatrix<F>>, ExecutionError> {
         if self.traces.is_empty() {
             self.traces = self.generate_traces()?;
@@ -145,11 +142,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
 
     /// Generate Merkle proof/memory diff traces
     pub fn generate_commitments(&mut self) -> Result<Vec<DenseMatrix<F>>, ExecutionError> {
-        let (first_row_pc, last_row_pc) = self.cpu_chip.get_pcs();
-        self.cpu_chip
-            .pis
-            .push(F::from_canonical_usize(first_row_pc));
-        self.cpu_chip.pis.push(F::from_canonical_usize(last_row_pc));
+        self.cpu_chip.get_pcs();
         Ok(vec![])
     }
 

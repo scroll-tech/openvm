@@ -26,11 +26,17 @@ pub const DEFAULT_MAX_LEN: usize = 1 << 20;
 pub struct VirtualMachine<const WORD_SIZE: usize, F: PrimeField32> {
     pub config: VmConfig,
     pub program: Vec<Instruction<F>>,
-    pub input_stream: Vec<Vec<F>>,
     pub segments: Vec<Box<ExecutionSegment<WORD_SIZE, F>>>,
     pub traces: Vec<DenseMatrix<F>>,
     // NOT PUBLIC by design, adjust only for testing
     max_len: usize,
+}
+
+pub struct VirtualMachineState<F: PrimeField32> {
+    state: CpuState,
+    memory: HashMap<(F, F), F>,
+    input_stream: VecDeque<Vec<F>>,
+    hint_stream: VecDeque<F>,
 }
 
 impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
@@ -38,12 +44,16 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
         let mut vm = Self {
             config,
             program,
-            input_stream,
             segments: vec![],
             traces: vec![],
             max_len: DEFAULT_MAX_LEN,
         };
-        vm.new_segment(CpuState::default(), HashMap::new());
+        vm.new_segment(VirtualMachineState {
+            state: CpuState::default(),
+            memory: HashMap::new(),
+            input_stream: VecDeque::from(input_stream),
+            hint_stream: VecDeque::new(),
+        });
         vm
     }
 
@@ -52,47 +62,27 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
         self.segments[0].set_test_segments(max_len);
     }
 
-    pub fn new_segment(&mut self, state: CpuState, memory: HashMap<(F, F), F>) {
+    pub fn new_segment(&mut self, state: VirtualMachineState<F>) {
         let program = self.program.clone();
-        let input_stream = if let Some(segment) = self.segments.last() {
-            segment.input_stream.clone()
-        } else {
-            VecDeque::from(self.input_stream.clone())
-        };
-        let hint_stream = if let Some(segment) = self.segments.last() {
-            segment.hint_stream.clone()
-        } else {
-            VecDeque::new()
-        };
-        let mut segment =
-            ExecutionSegment::new(self, program, input_stream, hint_stream, state, memory);
+        let mut segment = ExecutionSegment::new(self, program, state);
         if self.max_len != DEFAULT_MAX_LEN {
             segment.set_test_segments(self.max_len);
         }
         self.segments.push(Box::new(segment));
     }
 
+    pub fn get_state(&self) -> VirtualMachineState<F> {
+        VirtualMachineState {
+            state: self.segments.last().unwrap().cpu_chip.get_state(),
+            memory: self.segments.last().unwrap().memory_chip.get_memory(),
+            input_stream: self.segments.last().unwrap().input_stream.clone(),
+            hint_stream: self.segments.last().unwrap().hint_stream.clone(),
+        }
+    }
+
     pub fn next_segment(&mut self) {
-        let mem_state = self.segments.last().unwrap().memory_chip.get_memory();
-        let cpu_state = self.segments.last().unwrap().cpu_chip.get_state();
-        let hint_stream = self.segments.last().unwrap().hint_stream.clone();
-        let input_stream = self.segments.last().unwrap().input_stream.clone();
-
-        self.new_segment(cpu_state, mem_state);
-
-        self.segments.last_mut().unwrap().hint_stream = hint_stream;
-        self.segments.last_mut().unwrap().input_stream = input_stream;
-
-        // self.segments
-        //     .last_mut()
-        //     .unwrap()
-        //     .cpu_chip
-        //     .transfer_state(cpu_state, true);
-        // self.segments
-        //     .last_mut()
-        //     .unwrap()
-        //     .memory_chip
-        //     .install_memory(mem_state);
+        let state = self.get_state();
+        self.new_segment(state);
     }
 
     pub fn options(&self) -> CpuOptions {

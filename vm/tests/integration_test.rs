@@ -14,7 +14,7 @@ use stark_vm::vm::VirtualMachine;
 
 const WORD_SIZE: usize = 1;
 const LIMB_BITS: usize = 30;
-const DECOMP: usize = 15;
+const DECOMP: usize = 5;
 
 fn air_test(
     field_arithmetic_enabled: bool,

@@ -6,7 +6,7 @@ use crate::vm::config::VmConfig;
 use crate::vm::VirtualMachine;
 use afs_chips::is_zero::IsZeroAir;
 use afs_stark_backend::verifier::VerificationError;
-use afs_test_utils::config::baby_bear_poseidon2::run_simple_test_no_pis;
+use afs_test_utils::config::baby_bear_poseidon2::run_simple_test;
 use afs_test_utils::interaction::dummy_interaction_air::DummyInteractionAir;
 use p3_baby_bear::BabyBear;
 use p3_field::{AbstractField, PrimeField64};
@@ -282,8 +282,11 @@ fn air_test_change<
     }
     let arithmetic_trace = RowMajorMatrix::new(arithmetic_rows, 5);
 
+    vm.segments[0].cpu_chip.get_pcs();
+    let cpu_pi = vm.segments[0].cpu_chip.pis.clone();
+
     let test_result = if field_arithmetic_enabled {
-        run_simple_test_no_pis(
+        run_simple_test(
             vec![
                 &vm.segments[0].cpu_chip.air,
                 &program_air,
@@ -291,11 +294,13 @@ fn air_test_change<
                 &arithmetic_air,
             ],
             vec![trace, program_trace, memory_trace, arithmetic_trace],
+            vec![cpu_pi, vec![], vec![], vec![]],
         )
     } else {
-        run_simple_test_no_pis(
+        run_simple_test(
             vec![&vm.segments[0].cpu_chip.air, &program_air, &memory_air],
             vec![trace, program_trace, memory_trace],
+            vec![cpu_pi, vec![], vec![]],
         )
     };
 

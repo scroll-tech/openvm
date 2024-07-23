@@ -1,5 +1,6 @@
 use enum_utils::FromStr;
 use p3_baby_bear::BabyBear;
+use p3_field::PrimeField32;
 
 #[cfg(test)]
 pub mod tests;
@@ -230,10 +231,15 @@ impl<const WORD_SIZE: usize, F: Clone> CpuChip<WORD_SIZE, F> {
             self.start_pc = state.pc;
         }
     }
+}
 
-    pub fn get_pcs(&self) -> (usize, usize) {
+impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
+    pub fn get_pcs(&mut self) {
         let first_row_pc = self.start_pc;
         let last_row_pc = self.pc;
-        (first_row_pc, last_row_pc)
+        self.pis = vec![
+            F::from_canonical_usize(first_row_pc),
+            F::from_canonical_usize(last_row_pc),
+        ];
     }
 }
