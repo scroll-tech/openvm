@@ -140,6 +140,13 @@ pub struct CpuOptions {
     pub perm_poseidon2_enabled: bool,
 }
 
+#[derive(Default, Clone, Copy)]
+pub struct CpuState {
+    clock_cycle: usize,
+    timestamp: usize,
+    pc: usize,
+}
+
 impl CpuOptions {
     pub fn poseidon2_enabled(&self) -> bool {
         self.compress_poseidon2_enabled || self.perm_poseidon2_enabled
@@ -207,16 +214,20 @@ impl<const WORD_SIZE: usize, F: Clone> CpuChip<WORD_SIZE, F> {
         self.rows.len()
     }
 
-    pub fn get_state(&self) -> (usize, usize, usize) {
-        (self.clock_cycle, self.timestamp, self.pc)
+    pub fn get_state(&self) -> CpuState {
+        CpuState {
+            clock_cycle: self.clock_cycle,
+            timestamp: self.timestamp,
+            pc: self.pc,
+        }
     }
 
-    pub fn transfer_state(&mut self, state: (usize, usize, usize), start: bool) {
-        self.clock_cycle = state.0;
-        self.timestamp = state.1;
-        self.pc = state.2;
+    pub fn set_state(&mut self, state: CpuState, start: bool) {
+        self.clock_cycle = state.clock_cycle;
+        self.timestamp = state.timestamp;
+        self.pc = state.pc;
         if start {
-            self.start_pc = state.2;
+            self.start_pc = state.pc;
         }
     }
 

@@ -50,6 +50,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> MemoryChip<WORD_SIZE, F> {
         pointer_limb_bits: usize,
         clk_limb_bits: usize,
         decomp: usize,
+        memory: HashMap<(F, F), F>,
     ) -> Self {
         Self {
             air: OfflineChecker {
@@ -57,7 +58,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> MemoryChip<WORD_SIZE, F> {
                 decomp,
             },
             accesses: vec![],
-            memory: HashMap::new(),
+            memory,
             last_timestamp: None,
         }
     }

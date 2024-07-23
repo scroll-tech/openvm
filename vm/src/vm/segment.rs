@@ -1,5 +1,6 @@
 use afs_stark_backend::config::{StarkGenericConfig, Val};
 use afs_stark_backend::rap::AnyRap;
+use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::sync::Arc;
 
@@ -8,7 +9,7 @@ use super::VmConfig;
 use crate::{
     cpu::{
         trace::{ExecutionError, Instruction},
-        CpuChip, CpuOptions, POSEIDON2_BUS, RANGE_CHECKER_BUS,
+        CpuChip, CpuOptions, CpuState, POSEIDON2_BUS, RANGE_CHECKER_BUS,
     },
     field_arithmetic::FieldArithmeticChip,
     field_extension::FieldExtensionArithmeticChip,
@@ -45,6 +46,8 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         program: Vec<Instruction<F>>,
         input_stream: VecDeque<Vec<F>>,
         hint_stream: VecDeque<F>,
+        state: CpuState,
+        memory: HashMap<(F, F), F>,
     ) -> Self {
         let config = vm.config;
         let decomp = config.decomp;
@@ -53,9 +56,10 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         let range_checker = Arc::new(RangeCheckerGateChip::new(RANGE_CHECKER_BUS, 1 << decomp));
 
         // TODO: reduce cloning
-        let cpu_chip = CpuChip::new(config.cpu_options());
+        let mut cpu_chip = CpuChip::new(config.cpu_options());
+        cpu_chip.set_state(state, true);
         let program_chip = ProgramChip::new(program.clone());
-        let memory_chip = MemoryChip::new(limb_bits, limb_bits, limb_bits, decomp);
+        let memory_chip = MemoryChip::new(limb_bits, limb_bits, limb_bits, decomp, memory);
         let field_arithmetic_chip = FieldArithmeticChip::new();
         let field_extension_chip = FieldExtensionArithmeticChip::new();
         let poseidon2_chip = Poseidon2Chip::from_poseidon2_config(

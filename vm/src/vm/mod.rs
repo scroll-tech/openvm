@@ -1,8 +1,10 @@
+use crate::cpu::CpuState;
 use afs_stark_backend::rap::AnyRap;
 use p3_field::PrimeField32;
 use p3_matrix::{dense::DenseMatrix, Matrix};
 use p3_uni_stark::{StarkGenericConfig, Val};
 use p3_util::log2_strict_usize;
+use std::collections::HashMap;
 use std::collections::VecDeque;
 
 mod segment;
@@ -41,7 +43,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
             traces: vec![],
             max_len: DEFAULT_MAX_LEN,
         };
-        vm.new_segment();
+        vm.new_segment(CpuState::default(), HashMap::new());
         vm
     }
 
@@ -50,7 +52,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
         self.segments[0].set_test_segments(max_len);
     }
 
-    pub fn new_segment(&mut self) {
+    pub fn new_segment(&mut self, state: CpuState, memory: HashMap<(F, F), F>) {
         let program = self.program.clone();
         let input_stream = if let Some(segment) = self.segments.last() {
             segment.input_stream.clone()
@@ -62,7 +64,8 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
         } else {
             VecDeque::new()
         };
-        let mut segment = ExecutionSegment::new(self, program, input_stream, hint_stream);
+        let mut segment =
+            ExecutionSegment::new(self, program, input_stream, hint_stream, state, memory);
         if self.max_len != DEFAULT_MAX_LEN {
             segment.set_test_segments(self.max_len);
         }
@@ -72,19 +75,24 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
     pub fn next_segment(&mut self) {
         let mem_state = self.segments.last().unwrap().memory_chip.get_memory();
         let cpu_state = self.segments.last().unwrap().cpu_chip.get_state();
+        let hint_stream = self.segments.last().unwrap().hint_stream.clone();
+        let input_stream = self.segments.last().unwrap().input_stream.clone();
 
-        self.new_segment();
+        self.new_segment(cpu_state, mem_state);
 
-        self.segments
-            .last_mut()
-            .unwrap()
-            .cpu_chip
-            .transfer_state(cpu_state, true);
-        self.segments
-            .last_mut()
-            .unwrap()
-            .memory_chip
-            .install_memory(mem_state);
+        self.segments.last_mut().unwrap().hint_stream = hint_stream;
+        self.segments.last_mut().unwrap().input_stream = input_stream;
+
+        // self.segments
+        //     .last_mut()
+        //     .unwrap()
+        //     .cpu_chip
+        //     .transfer_state(cpu_state, true);
+        // self.segments
+        //     .last_mut()
+        //     .unwrap()
+        //     .memory_chip
+        //     .install_memory(mem_state);
     }
 
     pub fn options(&self) -> CpuOptions {
