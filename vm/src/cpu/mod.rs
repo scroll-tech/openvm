@@ -142,6 +142,7 @@ pub struct CpuOptions {
 }
 
 #[derive(Default, Clone, Copy)]
+/// State of the CPU.
 pub struct CpuState {
     clock_cycle: usize,
     timestamp: usize,
@@ -176,6 +177,7 @@ impl CpuOptions {
 }
 
 #[derive(Default, Clone)]
+/// Air for the CPU. Carries no state and does not own execution.
 pub struct CpuAir<const WORD_SIZE: usize> {
     pub options: CpuOptions,
 }
@@ -186,6 +188,7 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
     }
 }
 
+/// Chip for the CPU. Carries all state and owns execution.
 pub struct CpuChip<const WORD_SIZE: usize, F: Clone> {
     pub air: CpuAir<WORD_SIZE>,
     pub rows: Vec<Vec<F>>,
@@ -193,7 +196,9 @@ pub struct CpuChip<const WORD_SIZE: usize, F: Clone> {
     pub pc: usize,
     pub clock_cycle: usize,
     pub timestamp: usize,
+    /// Program counter at the start of the current segment.
     start_pc: usize,
+    /// Public inputs for the current segment.
     pub pis: Vec<F>,
 }
 
@@ -215,6 +220,7 @@ impl<const WORD_SIZE: usize, F: Clone> CpuChip<WORD_SIZE, F> {
         self.rows.len()
     }
 
+    /// Retrieves the current state of the CPU.
     pub fn get_state(&self) -> CpuState {
         CpuState {
             clock_cycle: self.clock_cycle,
@@ -223,6 +229,7 @@ impl<const WORD_SIZE: usize, F: Clone> CpuChip<WORD_SIZE, F> {
         }
     }
 
+    /// Sets the current state of the CPU.
     pub fn set_state(&mut self, state: CpuState, start: bool) {
         self.clock_cycle = state.clock_cycle;
         self.timestamp = state.timestamp;
@@ -234,7 +241,10 @@ impl<const WORD_SIZE: usize, F: Clone> CpuChip<WORD_SIZE, F> {
 }
 
 impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
-    pub fn get_pcs(&mut self) {
+    /// Writes the public inputs for the current segment (beginning and end program counters).
+    ///
+    /// Should only be called after segment end.
+    pub fn set_pvs(&mut self) {
         let first_row_pc = self.start_pc;
         let last_row_pc = self.pc;
         self.pis = vec![

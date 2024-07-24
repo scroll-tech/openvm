@@ -282,7 +282,7 @@ fn air_test_change<
     }
     let arithmetic_trace = RowMajorMatrix::new(arithmetic_rows, 5);
 
-    vm.segments[0].cpu_chip.get_pcs();
+    vm.segments[0].cpu_chip.set_pvs();
     let cpu_pi = vm.segments[0].cpu_chip.pis.clone();
 
     let test_result = if field_arithmetic_enabled {

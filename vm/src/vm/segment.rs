@@ -135,7 +135,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
     ///
     /// For now, only publishes program counter public values
     pub fn generate_commitments(&mut self) -> Result<Vec<DenseMatrix<F>>, ExecutionError> {
-        self.cpu_chip.get_pcs();
+        self.cpu_chip.set_pvs();
         Ok(vec![])
     }
 

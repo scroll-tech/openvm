@@ -309,6 +309,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
             }
         }
 
+        // Update CPU chip state with all changes from this segment.
         vm.cpu_chip.set_state(
             CpuState {
                 clock_cycle,
@@ -329,6 +330,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
         ))
     }
 
+    /// Pad with NOP rows.
     pub fn pad_rows(vm: &mut ExecutionSegment<WORD_SIZE, F>) {
         let pc = F::from_canonical_usize(vm.cpu_chip.pc);
         let timestamp = F::from_canonical_usize(vm.cpu_chip.timestamp);

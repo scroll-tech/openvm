@@ -10,8 +10,6 @@ pub struct VmConfig {
     pub perm_poseidon2_enabled: bool,
     pub limb_bits: usize,
     pub decomp: usize,
-    /*pub max_program_length: usize,
-    pub max_operations: usize,*/
 }
 
 impl VmConfig {
