@@ -105,7 +105,11 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         let mut result = vec![
             cpu_trace,
             self.program_chip.generate_trace(),
-            self.memory_chip.generate_trace(self.range_checker.clone()),
+            if self.memory_chip.accesses.is_empty() {
+                DenseMatrix::default(0, 0)
+            } else {
+                self.memory_chip.generate_trace(self.range_checker.clone())
+            },
             self.range_checker.generate_trace(),
         ];
         if self.config.cpu_options().field_arithmetic_enabled {
@@ -187,7 +191,7 @@ where
         result.push(&segment.field_extension_chip.air as &dyn AnyRap<SC>);
     }
     if segment.config.cpu_options().poseidon2_enabled() {
-        result.push(&segment.poseidon2_chip as &dyn AnyRap<SC>);
+        result.push(&segment.poseidon2_chip.air as &dyn AnyRap<SC>);
     }
     assert!(result.len() == segment.get_num_chips());
     result

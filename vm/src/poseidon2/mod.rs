@@ -2,19 +2,11 @@ use crate::cpu::trace::Instruction;
 use crate::cpu::OpCode;
 use crate::cpu::OpCode::*;
 use crate::vm::ExecutionSegment;
-use p3_field::Field;
 use p3_field::PrimeField32;
 
 use columns::{Poseidon2VmCols, Poseidon2VmIoCols};
 use poseidon2_air::poseidon2::Poseidon2Air;
 use poseidon2_air::poseidon2::Poseidon2Config;
-
-use crate::cpu::trace::Instruction;
-use crate::cpu::OpCode;
-use crate::cpu::OpCode::*;
-use crate::poseidon2::columns::{Poseidon2ChipAuxCols, Poseidon2ChipCols, Poseidon2ChipIoCols};
-use crate::vm::VirtualMachine;
-use afs_chips::sub_chip::LocalTraceInstructions;
 
 #[cfg(test)]
 pub mod tests;
@@ -68,10 +60,6 @@ impl<const WIDTH: usize, F: PrimeField32> Poseidon2VmAir<WIDTH, F> {
             e,
             cmp: F::from_bool(opcode == COMP_POS2),
         }
-    }
-
-    pub fn current_height(&self) -> usize {
-        self.rows.len()
     }
 }
 
@@ -160,5 +148,9 @@ impl<F: PrimeField32> Poseidon2Chip<WIDTH, F> {
     pub fn max_accesses_per_instruction(opcode: OpCode) -> usize {
         assert!(opcode == COMP_POS2 || opcode == PERM_POS2);
         3 + (2 * WIDTH)
+    }
+
+    pub fn current_height(&self) -> usize {
+        self.rows.len()
     }
 }
