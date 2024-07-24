@@ -300,7 +300,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
             timestamp += max_accesses_per_instruction(opcode);
 
             clock_cycle += 1;
-            if opcode == TERMINATE && clock_cycle.is_power_of_two() {
+            if opcode == TERMINATE && vm.cpu_chip.current_height().is_power_of_two() {
                 vm.cpu_chip.is_done = true;
                 break;
             }

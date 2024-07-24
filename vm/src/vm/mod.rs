@@ -10,8 +10,6 @@ use std::collections::VecDeque;
 mod segment;
 pub use segment::{get_chips, ExecutionSegment};
 
-pub enum Void {}
-
 use crate::cpu::{
     trace::{ExecutionError, Instruction},
     CpuOptions,

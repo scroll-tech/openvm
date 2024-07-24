@@ -76,7 +76,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
             traces: vec![],
             input_stream: state.input_stream,
             hint_stream: state.hint_stream,
-            max_len: 1 << 20,
+            max_len: vm.max_len,
         }
     }
 
@@ -85,17 +85,15 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
     }
 
     pub fn switch_segments(&mut self) -> Result<bool, ExecutionError> {
-        // let heights = [
-        //     self.cpu_chip.current_height(),
-        //     self.memory_chip.current_height(),
-        //     self.field_arithmetic_chip.current_height(),
-        //     self.field_extension_chip.current_height(),
-        //     self.poseidon2_chip.current_height(),
-        // ];
-        // let max_height = *heights.iter().max().unwrap();
-        // let maximum = (1 << 20) - 100;
-        // let maximum = 4;
-        Ok(self.cpu_chip.current_height() == self.max_len)
+        let heights = [
+            self.cpu_chip.current_height(),
+            self.memory_chip.current_height(),
+            self.field_arithmetic_chip.current_height(),
+            self.field_extension_chip.current_height(),
+            self.poseidon2_chip.current_height(),
+        ];
+        let max_height = *heights.iter().max().unwrap();
+        Ok(max_height >= self.max_len)
     }
 
     /// Execution is determined by CPU trace generation, in turn determined by segment::continue_execution()

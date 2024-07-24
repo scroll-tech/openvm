@@ -41,7 +41,6 @@ fn air_test(
     let chips = get_all_chips(&vm);
     let pis = vm.get_pis();
 
-    // run_simple_test_no_pis(chips, traces).expect("Verification failed");
     run_simple_test(chips, traces, pis).expect("Verification failed");
 }
 
@@ -63,7 +62,7 @@ fn air_test_with_poseidon2(
         program,
         vec![],
     );
-    vm.set_test_segments(4);
+    vm.set_test_segments(6);
 
     vm.execute().unwrap();
     let traces = vm.get_traces();
