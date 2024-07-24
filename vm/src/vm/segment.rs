@@ -21,8 +21,7 @@ use afs_chips::range_gate::RangeCheckerGateChip;
 use poseidon2_air::poseidon2::Poseidon2Config;
 
 use p3_field::PrimeField32;
-use p3_matrix::{dense::DenseMatrix, Matrix};
-use p3_util::log2_strict_usize;
+use p3_matrix::dense::DenseMatrix;
 
 pub struct ExecutionSegment<const WORD_SIZE: usize, F: PrimeField32> {
     pub config: VmConfig,
@@ -36,11 +35,11 @@ pub struct ExecutionSegment<const WORD_SIZE: usize, F: PrimeField32> {
     pub input_stream: VecDeque<Vec<F>>,
     pub hint_stream: VecDeque<F>,
 
-    traces: Vec<DenseMatrix<F>>,
     max_len: usize,
 }
 
 impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
+    /// Creates a new execution segment from a program and initial state, using parent VM config
     pub fn new(
         vm: &mut VirtualMachine<WORD_SIZE, F>,
         program: Vec<Instruction<F>>,
@@ -73,18 +72,27 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
             field_extension_chip,
             range_checker,
             poseidon2_chip,
-            traces: vec![],
             input_stream: state.input_stream,
             hint_stream: state.hint_stream,
             max_len: vm.max_len,
         }
     }
 
+    /// Used to adjust the max_len; max_len should only be set for testing purposes
+    ///
+    /// Default value is 1 << 20 - 100
     pub fn set_test_segments(&mut self, max_len: usize) {
         self.max_len = max_len;
     }
 
-    pub fn switch_segments(&mut self) -> Result<bool, ExecutionError> {
+    pub fn options(&self) -> CpuOptions {
+        self.config.cpu_options()
+    }
+
+    /// Returns bool of whether to switch to next segment or not. This is called every clock cycle inside of CPU trace generation.
+    ///
+    /// Default config: switch if any runtime chip height exceeds 1<<20 - 100
+    pub fn stop_execution(&mut self) -> bool {
         let heights = [
             self.cpu_chip.current_height(),
             self.memory_chip.current_height(),
@@ -93,11 +101,12 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
             self.poseidon2_chip.current_height(),
         ];
         let max_height = *heights.iter().max().unwrap();
-        Ok(max_height >= self.max_len)
+        max_height >= self.max_len
     }
 
-    /// Execution is determined by CPU trace generation, in turn determined by segment::continue_execution()
-    /// which determines whether to continue execution or not
+    /// Called by VM to generate traces for current segment.
+    ///
+    /// Execution is handled by CPU trace generation. Stopping is triggered by stop_execution()
     pub fn generate_traces(&mut self) -> Result<Vec<DenseMatrix<F>>, ExecutionError> {
         let cpu_trace = CpuChip::generate_trace(self)?;
         let mut result = vec![
@@ -122,27 +131,9 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         Ok(result)
     }
 
-    // TODO: reduce cloning
-    pub fn traces(&mut self) -> Result<Vec<DenseMatrix<F>>, ExecutionError> {
-        if self.traces.is_empty() {
-            self.traces = self.generate_traces()?;
-        }
-        Ok(self.traces.clone())
-    }
-
-    pub fn max_log_degree(&mut self) -> Result<usize, ExecutionError> {
-        let mut checker_trace_degree = 0;
-        for trace in self.traces()? {
-            checker_trace_degree = std::cmp::max(checker_trace_degree, trace.height());
-        }
-        Ok(log2_strict_usize(checker_trace_degree))
-    }
-
-    pub fn options(&self) -> CpuOptions {
-        self.config.cpu_options()
-    }
-
-    /// Generate Merkle proof/memory diff traces
+    /// Generate Merkle proof/memory diff traces, and publish public values
+    ///
+    /// For now, only publishes program counter public values
     pub fn generate_commitments(&mut self) -> Result<Vec<DenseMatrix<F>>, ExecutionError> {
         self.cpu_chip.get_pcs();
         Ok(vec![])
@@ -162,6 +153,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         result
     }
 
+    /// Returns public values for all chips in this segment
     pub fn get_pis(&self) -> Vec<Vec<F>> {
         let len = self.get_num_chips();
         let mut result: Vec<Vec<F>> = vec![vec![]; len];
@@ -170,6 +162,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
     }
 }
 
+/// Global function to get chips from a segment
 pub fn get_chips<const WORD_SIZE: usize, SC: StarkGenericConfig>(
     segment: &ExecutionSegment<WORD_SIZE, Val<SC>>,
 ) -> Vec<&dyn AnyRap<SC>>

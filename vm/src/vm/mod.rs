@@ -19,7 +19,7 @@ use self::config::VmConfig;
 
 pub mod config;
 
-pub const DEFAULT_MAX_LEN: usize = 1 << 20;
+pub const DEFAULT_MAX_LEN: usize = (1 << 20) - 100;
 
 pub struct VirtualMachine<const WORD_SIZE: usize, F: PrimeField32> {
     pub config: VmConfig,
