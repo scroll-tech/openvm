@@ -1,5 +1,6 @@
 use crate::cpu::ExecutionState;
 use afs_stark_backend::rap::AnyRap;
+use itertools::Itertools;
 use p3_field::PrimeField32;
 use p3_matrix::{dense::DenseMatrix, Matrix};
 use p3_uni_stark::{StarkGenericConfig, Val};
@@ -90,11 +91,12 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
 
     /// Retrieves the current state of the VM by querying the last segment.
     pub fn get_state(&self) -> VirtualMachineState<F> {
+        let last_seg = self.segments.last().unwrap();
         VirtualMachineState {
-            state: self.segments.last().unwrap().cpu_chip.state,
-            memory: self.segments.last().unwrap().memory_chip.get_memory(),
-            input_stream: self.segments.last().unwrap().input_stream.clone(),
-            hint_stream: self.segments.last().unwrap().hint_stream.clone(),
+            state: last_seg.cpu_chip.state,
+            memory: last_seg.memory_chip.memory_clone(),
+            input_stream: last_seg.input_stream.clone(),
+            hint_stream: last_seg.hint_stream.clone(),
         }
     }
 
@@ -117,24 +119,30 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
     pub fn execute(&mut self) -> Result<(), ExecutionError> {
         let mut result = vec![];
         loop {
-            result.extend(self.segments.last_mut().unwrap().generate_traces()?);
-            result.extend(self.segments.last_mut().unwrap().generate_commitments()?);
-            if self.segments.last_mut().unwrap().cpu_chip.state.is_done {
+            let last_seg = self.segments.last_mut().unwrap();
+            result.extend(last_seg.generate_traces()?);
+            result.extend(last_seg.generate_commitments()?);
+            if last_seg.cpu_chip.state.is_done {
                 break;
             }
             self.next_segment();
         }
         self.traces = result;
+
+        // Debug assertion that trace heights are within the max_len
         let prog_height = self.traces[1].height();
         let range_checker_height = self.traces[3].height();
         for trace in &self.traces {
             assert!(
+                // some +1 because some traces have multiple rows added in a single instruction
+                // +1 may need to be adjusted in case 5 rows are added at once
                 (trace.height() <= (self.max_len + 1).next_power_of_two())
                     || (trace.height() == prog_height)
                     || (trace.height() == range_checker_height),
                 "Trace height exceeds max_len"
             );
         }
+
         Ok(())
     }
 
@@ -158,15 +166,15 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
 
     /// Retrieves the public inputs from the VM's segments, filtering by nonempty traces.
     pub fn get_pis(&self) -> Vec<Vec<F>> {
-        let initial: Vec<Vec<F>> = self
+        let all_pis: Vec<Vec<F>> = self
             .segments
             .iter()
             .flat_map(|segment| segment.get_pis())
             .collect();
 
-        initial
+        all_pis
             .into_iter()
-            .zip(self.traces.iter())
+            .zip_eq(self.traces.iter())
             .filter(|(_, trace)| !trace.values.is_empty())
             .map(|(initial_elem, _)| initial_elem)
             .collect()
@@ -190,7 +198,7 @@ where
     let chips: Vec<_> = vm
         .traces
         .iter()
-        .zip(chips)
+        .zip_eq(chips)
         .filter(|(trace, _)| !trace.values.is_empty())
         .map(|(_, chip)| chip)
         .collect();
