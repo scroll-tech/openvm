@@ -22,8 +22,10 @@ pub mod trace;
 /// Poseidon2 Air, VM version.
 ///
 /// Carries the subair for subtrace generation. Sticking to the conventions, this struct carries no state.
+/// `direct` determines whether direct interactions are enabled. By default they are on.
 pub struct Poseidon2VmAir<const WIDTH: usize, F: Clone> {
     pub inner: Poseidon2Air<WIDTH, F>,
+    direct: bool, // Whether direct interactions are enabled.
 }
 
 /// Poseidon2 Chip.
@@ -38,7 +40,20 @@ impl<const WIDTH: usize, F: PrimeField32> Poseidon2VmAir<WIDTH, F> {
     /// Construct from Poseidon2 config and bus index.
     pub fn from_poseidon2_config(config: Poseidon2Config<WIDTH, F>, bus_index: usize) -> Self {
         let inner = Poseidon2Air::<WIDTH, F>::from_config(config, bus_index);
-        Self { inner }
+        Self {
+            inner,
+            direct: true,
+        }
+    }
+
+    /// By default direct bus is on. If `continuations = OFF`, this should be called.
+    pub fn set_direct(&mut self, direct: bool) {
+        self.direct = direct;
+    }
+
+    /// By default direct bus is on. If `continuations = OFF`, this should be called.
+    pub fn disable_direct(&mut self) {
+        self.direct = false;
     }
 
     /// Number of interactions through opcode bus.
