@@ -13,7 +13,7 @@ use crate::{field_extension::FieldExtensionArithmeticChip, vm::ExecutionSegment}
 
 use super::{
     columns::{CpuAuxCols, CpuCols, CpuIoCols, MemoryAccessCols},
-    max_accesses_per_instruction, CpuChip, CpuState,
+    max_accesses_per_instruction, CpuChip, ExecutionState,
     OpCode::{self, *},
     CPU_MAX_ACCESSES_PER_CYCLE, CPU_MAX_READS_PER_CYCLE, CPU_MAX_WRITES_PER_CYCLE, INST_WIDTH,
 };
@@ -312,7 +312,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
 
         // Update CPU chip state with all changes from this segment.
         vm.cpu_chip.set_state(
-            CpuState {
+            ExecutionState {
                 clock_cycle,
                 timestamp,
                 pc: pc.as_canonical_u64() as usize,

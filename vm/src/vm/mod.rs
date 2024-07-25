@@ -1,4 +1,4 @@
-use crate::cpu::CpuState;
+use crate::cpu::ExecutionState;
 use afs_stark_backend::rap::AnyRap;
 use p3_field::PrimeField32;
 use p3_matrix::{dense::DenseMatrix, Matrix};
@@ -43,7 +43,7 @@ pub struct VirtualMachine<const WORD_SIZE: usize, F: PrimeField32> {
 /// Hint stream cannot be added to during execution, but must be copied because it is popped from.
 pub struct VirtualMachineState<F: PrimeField32> {
     /// Current state of the CPU
-    state: CpuState,
+    state: ExecutionState,
     /// Current memory of the CPU
     memory: HashMap<(F, F), F>,
     /// Input stream of the CPU
@@ -65,7 +65,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
             max_len: DEFAULT_MAX_LEN,
         };
         vm.new_segment(VirtualMachineState {
-            state: CpuState::default(),
+            state: ExecutionState::default(),
             memory: HashMap::new(),
             input_stream: VecDeque::from(input_stream),
             hint_stream: VecDeque::new(),

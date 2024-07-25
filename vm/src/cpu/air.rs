@@ -41,6 +41,7 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
 impl<const WORD_SIZE: usize, AB: AirBuilderWithPublicValues + InteractionBuilder> Air<AB>
     for CpuAir<WORD_SIZE>
 {
+    // TODO: continuation verification checks program counters match up [INT-1732]
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
         let pis = builder.public_values();
@@ -302,11 +303,6 @@ impl<const WORD_SIZE: usize, AB: AirBuilderWithPublicValues + InteractionBuilder
             is_equal_vec_io_cols,
             is_equal_vec_aux,
         );
-
-        // make sure program starts at beginning
-        // TODO: fix beginning constraints
-        // builder.when_first_row().assert_zero(pc);
-        // builder.when_first_row().assert_zero(timestamp);
 
         // update the timestamp correctly
         for (&opcode, &flag) in operation_flags.iter() {

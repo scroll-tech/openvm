@@ -143,7 +143,7 @@ pub struct CpuOptions {
 
 #[derive(Default, Clone, Copy)]
 /// State of the CPU.
-pub struct CpuState {
+pub struct ExecutionState {
     pub clock_cycle: usize,
     pub timestamp: usize,
     pub pc: usize,
@@ -193,9 +193,9 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
 pub struct CpuChip<const WORD_SIZE: usize, F: Clone> {
     pub air: CpuAir<WORD_SIZE>,
     pub rows: Vec<Vec<F>>,
-    pub state: CpuState,
+    pub state: ExecutionState,
     /// Program counter at the start of the current segment.
-    pub start_state: CpuState,
+    pub start_state: ExecutionState,
     /// Public inputs for the current segment.
     pub pis: Vec<F>,
 }
@@ -205,8 +205,8 @@ impl<const WORD_SIZE: usize, F: Clone> CpuChip<WORD_SIZE, F> {
         Self {
             air: CpuAir::new(options),
             rows: vec![],
-            state: CpuState::default(),
-            start_state: CpuState::default(),
+            state: ExecutionState::default(),
+            start_state: ExecutionState::default(),
             pis: vec![],
         }
     }
@@ -216,7 +216,7 @@ impl<const WORD_SIZE: usize, F: Clone> CpuChip<WORD_SIZE, F> {
     }
 
     /// Sets the current state of the CPU.
-    pub fn set_state(&mut self, state: CpuState, start: bool) {
+    pub fn set_state(&mut self, state: ExecutionState, start: bool) {
         self.state = state;
         if start {
             self.start_state = state;
