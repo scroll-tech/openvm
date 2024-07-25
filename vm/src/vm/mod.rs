@@ -94,7 +94,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
     /// Retrieves the current state of the VM by querying the last segment.
     pub fn get_state(&self) -> VirtualMachineState<F> {
         VirtualMachineState {
-            state: self.segments.last().unwrap().cpu_chip.get_state(),
+            state: self.segments.last().unwrap().cpu_chip.state,
             memory: self.segments.last().unwrap().memory_chip.get_memory(),
             input_stream: self.segments.last().unwrap().input_stream.clone(),
             hint_stream: self.segments.last().unwrap().hint_stream.clone(),
@@ -122,7 +122,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
         loop {
             result.extend(self.segments.last_mut().unwrap().generate_traces()?);
             result.extend(self.segments.last_mut().unwrap().generate_commitments()?);
-            if self.segments.last_mut().unwrap().cpu_chip.is_done {
+            if self.segments.last_mut().unwrap().cpu_chip.state.is_done {
                 break;
             }
             self.next_segment();

@@ -144,9 +144,10 @@ pub struct CpuOptions {
 #[derive(Default, Clone, Copy)]
 /// State of the CPU.
 pub struct CpuState {
-    clock_cycle: usize,
-    timestamp: usize,
-    pc: usize,
+    pub clock_cycle: usize,
+    pub timestamp: usize,
+    pub pc: usize,
+    pub is_done: bool,
 }
 
 impl CpuOptions {
@@ -192,12 +193,9 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
 pub struct CpuChip<const WORD_SIZE: usize, F: Clone> {
     pub air: CpuAir<WORD_SIZE>,
     pub rows: Vec<Vec<F>>,
-    pub is_done: bool,
-    pub pc: usize,
-    pub clock_cycle: usize,
-    pub timestamp: usize,
+    pub state: CpuState,
     /// Program counter at the start of the current segment.
-    start_pc: usize,
+    pub start_state: CpuState,
     /// Public inputs for the current segment.
     pub pis: Vec<F>,
 }
@@ -207,11 +205,8 @@ impl<const WORD_SIZE: usize, F: Clone> CpuChip<WORD_SIZE, F> {
         Self {
             air: CpuAir::new(options),
             rows: vec![],
-            is_done: false,
-            pc: 0,
-            clock_cycle: 0,
-            timestamp: 0,
-            start_pc: 0,
+            state: CpuState::default(),
+            start_state: CpuState::default(),
             pis: vec![],
         }
     }
@@ -220,22 +215,11 @@ impl<const WORD_SIZE: usize, F: Clone> CpuChip<WORD_SIZE, F> {
         self.rows.len()
     }
 
-    /// Retrieves the current state of the CPU.
-    pub fn get_state(&self) -> CpuState {
-        CpuState {
-            clock_cycle: self.clock_cycle,
-            timestamp: self.timestamp,
-            pc: self.pc,
-        }
-    }
-
     /// Sets the current state of the CPU.
     pub fn set_state(&mut self, state: CpuState, start: bool) {
-        self.clock_cycle = state.clock_cycle;
-        self.timestamp = state.timestamp;
-        self.pc = state.pc;
+        self.state = state;
         if start {
-            self.start_pc = state.pc;
+            self.start_state = state;
         }
     }
 }
@@ -245,8 +229,8 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
     ///
     /// Should only be called after segment end.
     pub fn set_pvs(&mut self) {
-        let first_row_pc = self.start_pc;
-        let last_row_pc = self.pc;
+        let first_row_pc = self.start_state.pc;
+        let last_row_pc = self.state.pc;
         self.pis = vec![
             F::from_canonical_usize(first_row_pc),
             F::from_canonical_usize(last_row_pc),

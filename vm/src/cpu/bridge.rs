@@ -24,7 +24,7 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
         builder.push_send(
             READ_INSTRUCTION_BUS,
             [io.pc, io.opcode, io.op_a, io.op_b, io.op_c, io.d, io.e],
-            AB::Expr::from(AB::F::one()) - operation_flags[&OpCode::NOP],
+            AB::Expr::one() - operation_flags[&OpCode::NOP],
         );
 
         for (i, access) in accesses.into_iter().enumerate() {

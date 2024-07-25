@@ -112,11 +112,12 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
     pub fn generate_trace(
         vm: &mut ExecutionSegment<WORD_SIZE, F>,
     ) -> Result<RowMajorMatrix<F>, ExecutionError> {
-        let mut clock_cycle: usize = vm.cpu_chip.clock_cycle;
-        let mut timestamp: usize = vm.cpu_chip.timestamp;
-        let mut pc = F::from_canonical_usize(vm.cpu_chip.pc);
+        let mut clock_cycle: usize = vm.cpu_chip.state.clock_cycle;
+        let mut timestamp: usize = vm.cpu_chip.state.timestamp;
+        let mut pc = F::from_canonical_usize(vm.cpu_chip.state.pc);
 
         let mut hint_stream = vm.hint_stream.clone();
+        let mut is_done = false;
 
         loop {
             let pc_usize = pc.as_canonical_u64() as usize;
@@ -301,7 +302,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
 
             clock_cycle += 1;
             if opcode == TERMINATE && vm.cpu_chip.current_height().is_power_of_two() {
-                vm.cpu_chip.is_done = true;
+                is_done = true;
                 break;
             }
             if vm.stop_execution() {
@@ -315,12 +316,13 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
                 clock_cycle,
                 timestamp,
                 pc: pc.as_canonical_u64() as usize,
+                is_done,
             },
             false,
         );
         vm.hint_stream = hint_stream;
 
-        if !vm.cpu_chip.is_done {
+        if !is_done {
             Self::pad_rows(vm);
         }
 
@@ -332,8 +334,8 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
 
     /// Pad with NOP rows.
     pub fn pad_rows(vm: &mut ExecutionSegment<WORD_SIZE, F>) {
-        let pc = F::from_canonical_usize(vm.cpu_chip.pc);
-        let timestamp = F::from_canonical_usize(vm.cpu_chip.timestamp);
+        let pc = F::from_canonical_usize(vm.cpu_chip.state.pc);
+        let timestamp = F::from_canonical_usize(vm.cpu_chip.state.timestamp);
         let nop_row =
             CpuCols::<WORD_SIZE, F>::nop_row(vm.options(), pc, timestamp).flatten(vm.options());
         let correct_len = (vm.cpu_chip.rows.len() + 1).next_power_of_two();
