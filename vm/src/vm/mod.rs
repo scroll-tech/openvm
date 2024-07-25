@@ -32,7 +32,7 @@ pub const DEFAULT_MAX_LEN: usize = (1 << 20) - 100;
 pub struct VirtualMachine<const WORD_SIZE: usize, F: PrimeField32> {
     pub config: VmConfig,
     pub program: Vec<Instruction<F>>,
-    pub segments: Vec<Box<ExecutionSegment<WORD_SIZE, F>>>,
+    pub segments: Vec<ExecutionSegment<WORD_SIZE, F>>,
     pub traces: Vec<DenseMatrix<F>>,
 
     // NOT PUBLIC by design, adjust only for testing
@@ -85,7 +85,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
     pub fn new_segment(&mut self, state: VirtualMachineState<F>) {
         let program = self.program.clone();
         let segment = ExecutionSegment::new(self, program, state);
-        self.segments.push(Box::new(segment));
+        self.segments.push(segment);
     }
 
     /// Retrieves the current state of the VM by querying the last segment.
