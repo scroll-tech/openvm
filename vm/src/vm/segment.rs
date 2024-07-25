@@ -78,10 +78,10 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         }
     }
 
-    /// Used to adjust the max_len; max_len should only be set for testing purposes
+    /// Used to adjust the max_len
     ///
     /// Default value is 1 << 20 - 100
-    pub fn set_test_segments(&mut self, max_len: usize) {
+    pub fn adjust_max_len(&mut self, max_len: usize) {
         self.max_len = max_len;
     }
 
@@ -92,7 +92,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
     /// Returns bool of whether to switch to next segment or not. This is called every clock cycle inside of CPU trace generation.
     ///
     /// Default config: switch if any runtime chip height exceeds 1<<20 - 100
-    pub fn stop_execution(&mut self) -> bool {
+    pub fn should_segment(&mut self) -> bool {
         let heights = [
             self.cpu_chip.current_height(),
             self.memory_chip.current_height(),
@@ -106,7 +106,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
 
     /// Called by VM to generate traces for current segment.
     ///
-    /// Execution is handled by CPU trace generation. Stopping is triggered by stop_execution()
+    /// Execution is handled by CPU trace generation. Stopping is triggered by should_segment()
     pub fn generate_traces(&mut self) -> Result<Vec<DenseMatrix<F>>, ExecutionError> {
         let cpu_trace = CpuChip::generate_trace(self)?;
         let mut result = vec![

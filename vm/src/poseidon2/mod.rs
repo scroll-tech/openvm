@@ -1,8 +1,9 @@
+use p3_field::PrimeField32;
+
 use crate::cpu::trace::Instruction;
 use crate::cpu::OpCode;
 use crate::cpu::OpCode::*;
 use crate::vm::ExecutionSegment;
-use p3_field::PrimeField32;
 
 use columns::{Poseidon2VmCols, Poseidon2VmIoCols};
 use poseidon2_air::poseidon2::Poseidon2Air;

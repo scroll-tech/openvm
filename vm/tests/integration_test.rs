@@ -16,6 +16,7 @@ const WORD_SIZE: usize = 1;
 const LIMB_BITS: usize = 30;
 const DECOMP: usize = 5;
 
+#[cfg(test)]
 fn air_test(
     field_arithmetic_enabled: bool,
     field_extension_enabled: bool,
@@ -34,7 +35,7 @@ fn air_test(
         program,
         witness_stream,
     );
-    vm.set_test_segments(7);
+    vm.adjust_max_len(7);
 
     vm.execute().unwrap();
     let traces = vm.get_traces();
@@ -44,6 +45,7 @@ fn air_test(
     run_simple_test(chips, traces, pis).expect("Verification failed");
 }
 
+#[cfg(test)]
 fn air_test_with_poseidon2(
     field_arithmetic_enabled: bool,
     field_extension_enabled: bool,
@@ -62,7 +64,7 @@ fn air_test_with_poseidon2(
         program,
         vec![],
     );
-    vm.set_test_segments(6);
+    vm.adjust_max_len(6);
 
     vm.execute().unwrap();
     let traces = vm.get_traces();

@@ -305,7 +305,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
                 is_done = true;
                 break;
             }
-            if vm.stop_execution() {
+            if vm.should_segment() {
                 break;
             }
         }

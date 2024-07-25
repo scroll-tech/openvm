@@ -24,7 +24,7 @@ pub const DEFAULT_MAX_LEN: usize = (1 << 20) - 100;
 /// Parent struct that holds all execution segments, program, config.
 ///
 /// Key method is `execute()` which runs the VM. Segment switching is handled by
-/// `ExecutionSegment::stop_execution()`, called every CPU clock cycle, which when `true`
+/// `ExecutionSegment::should_segment()`, called every CPU clock cycle, which when `true`
 ///  triggers `VirtualMachine::next_segment()`.
 ///
 /// Traces are stored in the VM, but chips, traces, and public values should be retrieved using
@@ -73,10 +73,10 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
         vm
     }
 
-    /// Sets the max length of the VM. This should only be used for testing purposes.
-    pub fn set_test_segments(&mut self, max_len: usize) {
+    /// Sets the max length of the VM.
+    pub fn adjust_max_len(&mut self, max_len: usize) {
         self.max_len = max_len;
-        self.segments[0].set_test_segments(max_len);
+        self.segments[0].adjust_max_len(max_len);
     }
 
     /// Create a new segment with a given state.
@@ -84,10 +84,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
     /// The segment will be created from the given state and the program.
     pub fn new_segment(&mut self, state: VirtualMachineState<F>) {
         let program = self.program.clone();
-        let mut segment = ExecutionSegment::new(self, program, state);
-        if self.max_len != DEFAULT_MAX_LEN {
-            segment.set_test_segments(self.max_len);
-        }
+        let segment = ExecutionSegment::new(self, program, state);
         self.segments.push(Box::new(segment));
     }
 
@@ -128,6 +125,16 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
             self.next_segment();
         }
         self.traces = result;
+        let prog_height = self.traces[1].height();
+        let range_checker_height = self.traces[3].height();
+        for trace in &self.traces {
+            assert!(
+                (trace.height() <= (self.max_len + 1).next_power_of_two())
+                    || (trace.height() == prog_height)
+                    || (trace.height() == range_checker_height),
+                "Trace height exceeds max_len"
+            );
+        }
         Ok(())
     }
 
