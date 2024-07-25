@@ -4,7 +4,7 @@ use crate::field_arithmetic::ArithmeticOperation;
 use crate::memory::{decompose, MemoryAccess, OpType};
 use crate::vm::config::VmConfig;
 use crate::vm::{ExecutionSegment, VirtualMachine};
-use afs_chips::is_zero::IsZeroAir;
+use afs_primitives::is_zero::IsZeroAir;
 use afs_stark_backend::verifier::VerificationError;
 use afs_test_utils::config::baby_bear_poseidon2::run_simple_test;
 use afs_test_utils::interaction::dummy_interaction_air::DummyInteractionAir;

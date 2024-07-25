@@ -17,7 +17,7 @@ use crate::{
     poseidon2::Poseidon2Chip,
     program::ProgramChip,
 };
-use afs_chips::range_gate::RangeCheckerGateChip;
+use afs_primitives::range_gate::RangeCheckerGateChip;
 use poseidon2_air::poseidon2::Poseidon2Config;
 
 use p3_field::PrimeField32;

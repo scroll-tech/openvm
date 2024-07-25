@@ -1,8 +1,8 @@
 use std::{array::from_fn, collections::BTreeMap};
 
 use super::trace::disabled_memory_cols;
-use afs_chips::is_equal_vec::{columns::IsEqualVecAuxCols, IsEqualVecAir};
-use afs_chips::sub_chip::LocalTraceInstructions;
+use afs_primitives::is_equal_vec::{columns::IsEqualVecAuxCols, IsEqualVecAir};
+use afs_primitives::sub_chip::LocalTraceInstructions;
 use itertools::Itertools;
 use p3_field::{Field, PrimeField64};
 
@@ -163,7 +163,7 @@ impl<const WORD_SIZE: usize, T: Clone> CpuAuxCols<WORD_SIZE, T> {
         options.num_enabled_instructions()
             + (CPU_MAX_ACCESSES_PER_CYCLE * MemoryAccessCols::<WORD_SIZE, T>::get_width())
             + 1
-            + IsEqualVecAuxCols::<T>::get_width(WORD_SIZE)
+            + IsEqualVecAuxCols::<T>::width(WORD_SIZE)
     }
 }
 

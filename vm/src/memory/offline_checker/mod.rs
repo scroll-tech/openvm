@@ -1,7 +1,7 @@
 use std::collections::hash_map::Entry;
 use std::{array::from_fn, collections::HashMap};
 
-use afs_chips::offline_checker::OfflineChecker;
+use afs_primitives::offline_checker::OfflineChecker;
 use p3_field::PrimeField32;
 
 use crate::cpu::{MEMORY_BUS, RANGE_CHECKER_BUS};
