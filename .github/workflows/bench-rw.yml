@@ -1,4 +1,4 @@
-name: Sample workflow to use EC2 instances on demand
+name: Run single page r/w benchmark
 
 on:
   workflow_dispatch:
@@ -47,7 +47,9 @@ jobs:
 
   bench-new:
     name: Run benchmark on workflow ref/branch
-    needs: bench-main # only start this one after bench-main is done
+    needs:
+      - start-runner
+      - bench-main # wait for bench-main to finish
     runs-on: ${{ needs.start-runner.outputs.label }} # run the job on the newly created runner
     steps:
       - uses: actions/checkout@v4
