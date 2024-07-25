@@ -1,15 +1,13 @@
-name: Default Unit Tests
+name: DB Unit Tests
 
 on:
   push:
     branches: ["main"]
   pull_request:
     branches: ["main"]
-    paths-ignore:
+    paths:
       - "stark-backend/**"
       - "db/**"
-      - "vm/**"
-      - "compiler/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
@@ -30,6 +28,7 @@ jobs:
         with:
           cache-on-failure: true
 
-      - name: Run unit tests
+      - name: Run DB unit tests
+        working-directory: db/page
         run: |
-          cargo test --workspace --exclude afs-stark-backend --exclude afs-page --exclude stark-vm --exclude afs-compiler --exclude afs-recursion
+          cargo t --features parallel
