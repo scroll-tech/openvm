@@ -51,11 +51,17 @@ pub enum ChipType {
     Poseidon2,
 }
 
-pub struct ChipData<'a, const WORD_SIZE: usize> {
+/// Struct that holds the return state of the VM. StarkConfig is hardcoded to BabyBearPoseidon2Config.
+pub struct ExecutionResult<const WORD_SIZE: usize> {
+    /// Traces of the VM
     pub traces: Vec<DenseMatrix<BabyBear>>,
+    /// Public inputs of the VM
     pub pis: Vec<Vec<BabyBear>>,
-    pub chips: Vec<Box<dyn AnyRap<BabyBearPoseidon2Config> + 'a>>,
+    /// Boxed chips of the VM
+    pub boxed_chips: Vec<Box<dyn AnyRap<BabyBearPoseidon2Config>>>,
+    /// Types of the chips
     pub chip_types: Vec<ChipType>,
+    /// Maximum log degree of the VM
     pub max_log_degree: usize,
 }
 
@@ -137,7 +143,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
 /// and `cpu_chip.is_done`. Between every segment, the VM will call `generate_commitments()` and then
 /// `next_segment()`.
 impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
-    pub fn execute<'a>(mut self) -> Result<ChipData<'a, WORD_SIZE>, ExecutionError> {
+    pub fn execute(mut self) -> Result<ExecutionResult<WORD_SIZE>, ExecutionError> {
         let mut traces = vec![];
         loop {
             let last_seg = self.segments.last_mut().unwrap();
@@ -153,6 +159,8 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
         let mut chips: Vec<Box<dyn AnyRap<BabyBearPoseidon2Config>>> = vec![];
         let mut types = vec![];
 
+        // Iterate over each segment and add its public inputs, types, and chips to the result,
+        // skipping empty traces.
         for (i, segment) in self.segments.into_iter().enumerate() {
             if !traces[i].values.is_empty() {
                 pis.extend(segment.get_pis());
@@ -182,10 +190,10 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
         let max_log_degree =
             log2_strict_usize(traces.iter().map(|trace| trace.height()).max().unwrap());
 
-        let chip_data = ChipData {
+        let chip_data = ExecutionResult {
             traces,
             pis,
-            chips,
+            boxed_chips: chips,
             chip_types: types,
             max_log_degree,
         };
@@ -193,6 +201,7 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
         Ok(chip_data)
     }
 
+    /// Convert the VM's chips from Boxes to concrete types.
     pub fn get_chips(
         chips: &[Box<dyn AnyRap<BabyBearPoseidon2Config>>],
     ) -> Vec<&dyn AnyRap<BabyBearPoseidon2Config>> {

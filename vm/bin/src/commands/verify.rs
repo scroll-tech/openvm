@@ -7,7 +7,7 @@ use afs_test_utils::{
 };
 use clap::Parser;
 use color_eyre::eyre::Result;
-use stark_vm::vm::{config::VmConfig, ChipData, VirtualMachine};
+use stark_vm::vm::{config::VmConfig, ExecutionResult, VirtualMachine};
 
 use crate::{
     asm::parse_asm_file,
@@ -69,10 +69,10 @@ impl VerifyCommand {
         let encoded_proof = read_from_path(Path::new(&self.proof_file))?;
         let proof: Proof<BabyBearPoseidon2Config> = bincode::deserialize(&encoded_proof)?;
 
-        let ChipData {
+        let ExecutionResult {
             max_log_degree,
             pis,
-            chips,
+            boxed_chips: chips,
             ..
         } = vm.execute()?;
         let engine = config::baby_bear_poseidon2::default_engine(max_log_degree);

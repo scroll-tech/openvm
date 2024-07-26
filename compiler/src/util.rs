@@ -7,7 +7,7 @@ use afs_test_utils::config::fri_params::{
     fri_params_fast_testing, fri_params_with_80_bits_of_security,
 };
 use afs_test_utils::engine::StarkEngine;
-use stark_vm::vm::ChipData;
+use stark_vm::vm::ExecutionResult;
 use stark_vm::{
     cpu::trace::Instruction,
     vm::{config::VmConfig, VirtualMachine},
@@ -29,7 +29,7 @@ pub fn canonical_i32_to_field<F: PrimeField32>(x: i32) -> F {
 pub fn execute_program<'a, const WORD_SIZE: usize>(
     program: Vec<Instruction<BabyBear>>,
     input_stream: Vec<Vec<BabyBear>>,
-) -> ChipData<'a, WORD_SIZE> {
+) -> ExecutionResult<'a, WORD_SIZE> {
     let vm = VirtualMachine::<WORD_SIZE, _>::new(
         VmConfig {
             field_arithmetic_enabled: true,
@@ -103,9 +103,9 @@ pub fn execute_and_prove_program<const WORD_SIZE: usize>(
         program,
         input_stream,
     );
-    let ChipData {
+    let ExecutionResult {
         max_log_degree,
-        chips,
+        boxed_chips: chips,
         traces,
         pis,
         ..

@@ -9,7 +9,7 @@ use afs_test_utils::engine::StarkEngine;
 use stark_vm::cpu::trace::Instruction;
 use stark_vm::cpu::OpCode::*;
 use stark_vm::vm::config::VmConfig;
-use stark_vm::vm::ChipData;
+use stark_vm::vm::ExecutionResult;
 use stark_vm::vm::VirtualMachine;
 
 const WORD_SIZE: usize = 1;
@@ -37,8 +37,11 @@ fn air_test(
     );
     vm.adjust_max_len(7);
 
-    let ChipData {
-        chips, traces, pis, ..
+    let ExecutionResult {
+        boxed_chips: chips,
+        traces,
+        pis,
+        ..
     } = vm.execute().unwrap();
     let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
 
@@ -66,9 +69,9 @@ fn air_test_with_poseidon2(
     );
     vm.adjust_max_len(6);
 
-    let ChipData {
+    let ExecutionResult {
         max_log_degree,
-        chips,
+        boxed_chips: chips,
         traces,
         pis,
         ..

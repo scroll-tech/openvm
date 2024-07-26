@@ -9,7 +9,7 @@ use afs_test_utils::{
 };
 use clap::Parser;
 use color_eyre::eyre::Result;
-use stark_vm::vm::{config::VmConfig, ChipData, VirtualMachine};
+use stark_vm::vm::{config::VmConfig, ExecutionResult, VirtualMachine};
 
 use crate::{
     asm::parse_asm_file,
@@ -66,7 +66,11 @@ impl ProveCommand {
         let prover = engine.prover();
         let mut trace_builder = TraceCommitmentBuilder::new(prover.pcs());
 
-        let ChipData { traces, chips, .. } = result;
+        let ExecutionResult {
+            traces,
+            boxed_chips: chips,
+            ..
+        } = result;
         for trace in traces {
             trace_builder.load_trace(trace);
         }
