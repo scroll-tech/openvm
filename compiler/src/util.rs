@@ -26,10 +26,10 @@ pub fn canonical_i32_to_field<F: PrimeField32>(x: i32) -> F {
     }
 }
 
-pub fn execute_program<'a, const WORD_SIZE: usize>(
+pub fn execute_program<const WORD_SIZE: usize>(
     program: Vec<Instruction<BabyBear>>,
     input_stream: Vec<Vec<BabyBear>>,
-) -> ExecutionResult<'a, WORD_SIZE> {
+) -> ExecutionResult<WORD_SIZE> {
     let vm = VirtualMachine::<WORD_SIZE, _>::new(
         VmConfig {
             field_arithmetic_enabled: true,
