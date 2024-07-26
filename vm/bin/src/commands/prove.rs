@@ -1,7 +1,7 @@
 use std::{path::Path, time::Instant};
 
 use afs_stark_backend::{
-    keygen::types::MultiStarkProvingKey, prover::trace::TraceCommitmentBuilder,
+    keygen::types::MultiStarkProvingKey, prover::trace::TraceCommitmentBuilder, rap::AnyRap,
 };
 use afs_test_utils::{
     config::{self, baby_bear_poseidon2::BabyBearPoseidon2Config},
@@ -9,7 +9,7 @@ use afs_test_utils::{
 };
 use clap::Parser;
 use color_eyre::eyre::Result;
-use stark_vm::vm::{config::VmConfig, execute, VirtualMachine};
+use stark_vm::vm::{config::VmConfig, VirtualMachine};
 
 use crate::{
     asm::parse_asm_file,
@@ -56,9 +56,8 @@ impl ProveCommand {
         let instructions = parse_asm_file(Path::new(&self.asm_file_path.clone()))?;
         let vm = VirtualMachine::<WORD_SIZE, _>::new(config, instructions, vec![]);
 
-        let result = execute(vm)?;
-        let data = result.get_results();
-        let engine = config::baby_bear_poseidon2::default_engine(result.max_log_degree());
+        let result = vm.execute()?;
+        let engine = config::baby_bear_poseidon2::default_engine(result.max_log_degree);
         let encoded_pk = read_from_path(&Path::new(&self.keys_folder.clone()).join("pk"))?;
         let pk: MultiStarkProvingKey<BabyBearPoseidon2Config> = bincode::deserialize(&encoded_pk)?;
 
@@ -67,12 +66,17 @@ impl ProveCommand {
         let prover = engine.prover();
         let mut trace_builder = TraceCommitmentBuilder::new(prover.pcs());
 
-        for trace in data.traces {
-            trace_builder.load_trace(trace);
+        for trace in result.traces.iter() {
+            // TODO: fix this
+            trace_builder.load_trace(trace.clone());
         }
         trace_builder.commit_current();
 
-        let chips = data.chips;
+        let chips = result
+            .chips
+            .iter()
+            .map(|x| &**x)
+            .collect::<Vec<&dyn AnyRap<_>>>();
         let num_chips = chips.len();
 
         let main_trace_data = trace_builder.view(&vk, chips);

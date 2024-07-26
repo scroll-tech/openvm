@@ -1,3 +1,4 @@
+use afs_stark_backend::rap::AnyRap;
 use afs_test_utils::config::setup_tracing;
 use p3_baby_bear::BabyBear;
 use p3_field::{ExtensionField, PrimeField32, TwoAdicField};
@@ -7,7 +8,7 @@ use afs_test_utils::config::fri_params::{
     fri_params_fast_testing, fri_params_with_80_bits_of_security,
 };
 use afs_test_utils::engine::StarkEngine;
-use stark_vm::vm::get_all_chips;
+use stark_vm::vm::ChipData;
 use stark_vm::{
     cpu::trace::Instruction,
     vm::{config::VmConfig, VirtualMachine},
@@ -26,11 +27,11 @@ pub fn canonical_i32_to_field<F: PrimeField32>(x: i32) -> F {
     }
 }
 
-pub fn execute_program<const WORD_SIZE: usize, F: PrimeField32>(
-    program: Vec<Instruction<F>>,
-    input_stream: Vec<Vec<F>>,
-) {
-    let mut vm = VirtualMachine::<WORD_SIZE, _>::new(
+pub fn execute_program<'a, const WORD_SIZE: usize>(
+    program: Vec<Instruction<BabyBear>>,
+    input_stream: Vec<Vec<BabyBear>>,
+) -> ChipData<'a, WORD_SIZE> {
+    let vm = VirtualMachine::<WORD_SIZE, _>::new(
         VmConfig {
             field_arithmetic_enabled: true,
             field_extension_enabled: true,
@@ -42,7 +43,7 @@ pub fn execute_program<const WORD_SIZE: usize, F: PrimeField32>(
         program,
         input_stream,
     );
-    vm.execute().unwrap();
+    vm.execute().unwrap()
 }
 
 pub fn display_program<F: PrimeField32>(program: &[Instruction<F>]) {
@@ -91,7 +92,7 @@ pub fn execute_and_prove_program<const WORD_SIZE: usize>(
     program: Vec<Instruction<BabyBear>>,
     input_stream: Vec<Vec<BabyBear>>,
 ) {
-    let mut vm = VirtualMachine::<WORD_SIZE, _>::new(
+    let vm = VirtualMachine::<WORD_SIZE, _>::new(
         VmConfig {
             field_arithmetic_enabled: true,
             field_extension_enabled: true,
@@ -103,12 +104,15 @@ pub fn execute_and_prove_program<const WORD_SIZE: usize>(
         program,
         input_stream,
     );
-    vm.execute().unwrap();
-    let traces = vm.get_traces();
-    let chips = get_all_chips(&vm);
-    let pis = vm.get_pis();
-
-    let max_log_degree = vm.max_log_degree().unwrap();
+    let result = vm.execute().unwrap();
+    let traces = result.traces;
+    let chips = result
+        .chips
+        .iter()
+        .map(|x| &**x)
+        .collect::<Vec<&dyn AnyRap<_>>>();
+    let pis = result.pis;
+    let max_log_degree = result.max_log_degree;
 
     let perm = random_perm();
     // blowup factor 8 for poseidon2 chip

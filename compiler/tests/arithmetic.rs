@@ -94,7 +94,7 @@ fn test_compiler_arithmetic() {
 
     // generate program with only base field operations
     let program = builder.clone().compile_isa::<WORD_SIZE>();
-    execute_program::<WORD_SIZE, _>(program, vec![]);
+    execute_program::<WORD_SIZE>(program, vec![]);
 
     // let options = CompilerOptions {
     //     compile_prints: true,
@@ -135,7 +135,7 @@ fn test_compiler_arithmetic_2() {
     builder.halt();
 
     let program = builder.clone().compile_isa::<WORD_SIZE>();
-    execute_program::<WORD_SIZE, _>(program, vec![]);
+    execute_program::<WORD_SIZE>(program, vec![]);
 }
 
 #[test]
@@ -174,5 +174,5 @@ fn test_in_place_arithmetic() {
         field_arithmetic_enabled: true,
         field_extension_enabled: true,
     });
-    execute_program::<WORD_SIZE, _>(program, vec![]);
+    execute_program::<WORD_SIZE>(program, vec![]);
 }

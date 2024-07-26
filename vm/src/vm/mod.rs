@@ -1,8 +1,9 @@
 use crate::cpu::ExecutionState;
 use afs_stark_backend::rap::AnyRap;
+use afs_test_utils::config::baby_bear_poseidon2::BabyBearPoseidon2Config;
+use p3_baby_bear::BabyBear;
 use p3_field::PrimeField32;
 use p3_matrix::{dense::DenseMatrix, Matrix};
-use p3_uni_stark::{StarkGenericConfig, Val};
 use p3_util::log2_strict_usize;
 use std::collections::HashMap;
 use std::collections::VecDeque;
@@ -38,16 +39,6 @@ pub struct VirtualMachine<const WORD_SIZE: usize, F: PrimeField32> {
     max_len: usize,
 }
 
-pub struct ExecutionResult<const WORD_SIZE: usize, SC: StarkGenericConfig>
-where
-    Val<SC>: PrimeField32,
-{
-    segments: Vec<ExecutionSegment<WORD_SIZE, Val<SC>>>,
-    traces: Vec<DenseMatrix<Val<SC>>>,
-    pis: Vec<Vec<Val<SC>>>,
-    max_len: usize,
-}
-
 /// Enum representing the different types of chips used in the VM
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ChipType {
@@ -60,11 +51,12 @@ pub enum ChipType {
     Poseidon2,
 }
 
-pub struct ChipData<'a, const WORD_SIZE: usize, SC: StarkGenericConfig> {
-    pub traces: Vec<DenseMatrix<Val<SC>>>,
-    pub pis: Vec<Vec<Val<SC>>>,
-    pub chips: Vec<&'a dyn AnyRap<SC>>,
+pub struct ChipData<'a, const WORD_SIZE: usize> {
+    pub traces: Vec<DenseMatrix<BabyBear>>,
+    pub pis: Vec<Vec<BabyBear>>,
+    pub chips: Vec<Box<dyn AnyRap<BabyBearPoseidon2Config> + 'a>>,
     pub chip_types: Vec<ChipType>,
+    pub max_log_degree: usize,
 }
 
 /// Struct that holds the current state of the VM. For now, includes memory, input stream, and hint stream.
@@ -144,59 +136,30 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
 /// Executes the VM by calling `ExecutionSegment::generate_traces()` until the CPU hits `TERMINATE`
 /// and `cpu_chip.is_done`. Between every segment, the VM will call `generate_commitments()` and then
 /// `next_segment()`.
-pub fn execute<const WORD_SIZE: usize, SC: StarkGenericConfig>(
-    mut vm: VirtualMachine<WORD_SIZE, Val<SC>>,
-) -> Result<ExecutionResult<WORD_SIZE, SC>, ExecutionError>
-where
-    Val<SC>: PrimeField32,
-{
-    let mut traces = vec![];
-    loop {
-        let last_seg = vm.segments.last_mut().unwrap();
-        traces.extend(last_seg.generate_traces()?);
-        traces.extend(last_seg.generate_commitments()?);
-        if last_seg.cpu_chip.state.is_done {
-            break;
+impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
+    pub fn execute<'a>(mut self) -> Result<ChipData<'a, WORD_SIZE>, ExecutionError> {
+        let mut traces = vec![];
+        loop {
+            let last_seg = self.segments.last_mut().unwrap();
+            traces.extend(last_seg.generate_traces()?);
+            traces.extend(last_seg.generate_commitments()?);
+            if last_seg.cpu_chip.state.is_done {
+                break;
+            }
+            self.next_segment();
         }
-        vm.next_segment();
-    }
-    let pis = vm
-        .segments
-        .iter()
-        .flat_map(|segment| segment.get_pis())
-        .collect::<Vec<_>>();
 
-    Ok(ExecutionResult {
-        segments: vm.segments,
-        traces,
-        pis,
-        max_len: vm.max_len,
-    })
-}
+        let mut pis = vec![];
+        let mut chips: Vec<Box<dyn AnyRap<BabyBearPoseidon2Config>>> = vec![];
+        let mut types = vec![];
 
-impl<const WORD_SIZE: usize, SC: StarkGenericConfig> ExecutionResult<WORD_SIZE, SC>
-where
-    Val<SC>: PrimeField32,
-{
-    pub fn get_results(&self) -> ChipData<WORD_SIZE, SC> {
-        let traces = self.traces.clone();
-        let pis = self.pis.clone();
-        let types = self
-            .segments
-            .iter()
-            .flat_map(|segment| segment.get_types())
-            .collect::<Vec<ChipType>>();
-        let chips = self
-            .segments
-            .iter()
-            .flat_map(|segment| get_chips::<WORD_SIZE, SC>(segment))
-            .collect::<Vec<_>>();
-
-        let non_empty_indices: Vec<usize> = traces
-            .iter()
-            .enumerate()
-            .filter_map(|(i, trace)| (!trace.values.is_empty()).then_some(i))
-            .collect();
+        for (i, segment) in self.segments.into_iter().enumerate() {
+            if !traces[i].values.is_empty() {
+                pis.extend(segment.get_pis());
+                types.extend(segment.get_types());
+                chips.extend(get_chips::<WORD_SIZE, BabyBearPoseidon2Config>(segment));
+            }
+        }
 
         // Assert that trace heights are within the max_len, except for Program and RangeChecker
         // +31 is needed because Poseidon2Permute adds 32 rows to memory at once
@@ -216,23 +179,28 @@ where
                 );
             });
 
-        ChipData {
-            traces: non_empty_indices
-                .iter()
-                .map(|&i| traces[i].clone())
-                .collect(),
-            pis: non_empty_indices.iter().map(|&i| pis[i].clone()).collect(),
-            chips: non_empty_indices.iter().map(|&i| chips[i]).collect(),
-            chip_types: non_empty_indices.iter().map(|&i| types[i]).collect(),
-        }
-    }
+        let max_log_degree =
+            log2_strict_usize(traces.iter().map(|trace| trace.height()).max().unwrap());
 
-    /// Retrieves the maximum log degree of the VM's trace.
-    pub fn max_log_degree(&self) -> usize {
-        let mut checker_trace_degree = 0;
-        for trace in &self.traces {
-            checker_trace_degree = std::cmp::max(checker_trace_degree, trace.height());
-        }
-        log2_strict_usize(checker_trace_degree)
+        // let chips: Vec<&(dyn AnyRap<BabyBearPoseidon2Config> + 'a)> = box_chips
+        //     .iter()
+        //     .map(|x| &**x)
+        //     .collect::<Vec<&(dyn AnyRap<_> + 'a)>>();
+
+        let chip_data = ChipData {
+            traces,
+            pis,
+            chips,
+            chip_types: types,
+            max_log_degree,
+        };
+
+        Ok(chip_data)
     }
 }
+
+// impl<const WORD_SIZE: usize> ChipData<WORD_SIZE> {
+//     pub fn chips(&self) -> Vec<&dyn AnyRap<BabyBearPoseidon2Config>> {
+//         self.chips.iter().map(|x| &**x).collect()
+//     }
+// }

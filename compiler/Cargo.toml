@@ -16,6 +16,8 @@ p3-baby-bear = { workspace = true }
 backtrace = "0.3.71"
 afs-test-utils = { path = "../test-utils" }
 stark-vm = { path = "../vm" }
+p3-uni-stark = { workspace = true }
+afs-stark-backend = { path = "../stark-backend", default-features = false }
 
 [dev-dependencies]
 p3-challenger = { workspace = true }

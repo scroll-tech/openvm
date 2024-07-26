@@ -1,13 +1,13 @@
 use std::{path::Path, time::Instant};
 
-use afs_stark_backend::{keygen::types::MultiStarkVerifyingKey, prover::types::Proof};
+use afs_stark_backend::{keygen::types::MultiStarkVerifyingKey, prover::types::Proof, rap::AnyRap};
 use afs_test_utils::{
     config::{self, baby_bear_poseidon2::BabyBearPoseidon2Config},
     engine::StarkEngine,
 };
 use clap::Parser;
 use color_eyre::eyre::Result;
-use stark_vm::vm::{config::VmConfig, execute, VirtualMachine};
+use stark_vm::vm::{config::VmConfig, VirtualMachine};
 
 use crate::{
     asm::parse_asm_file,
@@ -69,12 +69,15 @@ impl VerifyCommand {
         let encoded_proof = read_from_path(Path::new(&self.proof_file))?;
         let proof: Proof<BabyBearPoseidon2Config> = bincode::deserialize(&encoded_proof)?;
 
-        let result = execute(vm)?;
-        let data = result.get_results();
-        let engine = config::baby_bear_poseidon2::default_engine(result.max_log_degree());
+        let result = vm.execute()?;
+        let engine = config::baby_bear_poseidon2::default_engine(result.max_log_degree);
 
-        let chips = data.chips;
-        let pis = data.pis;
+        let pis = result.pis.clone();
+        let chips = result
+            .chips
+            .iter()
+            .map(|x| &**x)
+            .collect::<Vec<&dyn AnyRap<_>>>();
 
         let mut challenger = engine.new_challenger();
         let verifier = engine.verifier();

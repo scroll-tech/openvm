@@ -1,6 +1,7 @@
 use p3_baby_bear::BabyBear;
 use p3_field::AbstractField;
 
+use afs_stark_backend::rap::AnyRap;
 use afs_test_utils::config::baby_bear_poseidon2::{engine_from_perm, random_perm, run_simple_test};
 use afs_test_utils::config::fri_params::{
     fri_params_fast_testing, fri_params_with_80_bits_of_security,
@@ -9,7 +10,7 @@ use afs_test_utils::engine::StarkEngine;
 use stark_vm::cpu::trace::Instruction;
 use stark_vm::cpu::OpCode::*;
 use stark_vm::vm::config::VmConfig;
-use stark_vm::vm::{execute, VirtualMachine};
+use stark_vm::vm::VirtualMachine;
 
 const WORD_SIZE: usize = 1;
 const LIMB_BITS: usize = 30;
@@ -22,8 +23,6 @@ fn air_test(
     program: Vec<Instruction<BabyBear>>,
     witness_stream: Vec<Vec<BabyBear>>,
 ) {
-    use stark_vm::vm::execute;
-
     let mut vm = VirtualMachine::<WORD_SIZE, _>::new(
         VmConfig {
             field_arithmetic_enabled,
@@ -38,10 +37,14 @@ fn air_test(
     );
     vm.adjust_max_len(7);
 
-    let result = execute(vm).unwrap();
-    let chip_data = result.get_results();
+    let result = vm.execute().unwrap();
+    let chips = result
+        .chips
+        .iter()
+        .map(|x| &**x)
+        .collect::<Vec<&dyn AnyRap<_>>>();
 
-    run_simple_test(chip_data.chips, chip_data.traces, chip_data.pis).expect("Verification failed");
+    run_simple_test(chips, result.traces, result.pis).expect("Verification failed");
 }
 
 #[cfg(test)]
@@ -65,9 +68,7 @@ fn air_test_with_poseidon2(
     );
     vm.adjust_max_len(6);
 
-    let result = execute(vm).unwrap();
-    let max_log_degree = result.max_log_degree();
-    let chip_data = result.get_results();
+    let result = vm.execute().unwrap();
 
     let perm = random_perm();
     let fri_params = if matches!(std::env::var("AXIOM_FAST_TEST"), Ok(x) if &x == "1") {
@@ -75,10 +76,15 @@ fn air_test_with_poseidon2(
     } else {
         fri_params_with_80_bits_of_security()[1]
     };
-    let engine = engine_from_perm(perm, max_log_degree, fri_params);
+    let engine = engine_from_perm(perm, result.max_log_degree, fri_params);
 
+    let chips = result
+        .chips
+        .iter()
+        .map(|x| &**x)
+        .collect::<Vec<&dyn AnyRap<_>>>();
     engine
-        .run_simple_test(chip_data.chips, chip_data.traces, chip_data.pis)
+        .run_simple_test(chips, result.traces, result.pis)
         .expect("Verification failed");
 }
 
