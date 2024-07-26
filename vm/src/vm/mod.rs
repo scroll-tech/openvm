@@ -1,6 +1,5 @@
 use crate::cpu::ExecutionState;
 use afs_stark_backend::rap::AnyRap;
-use itertools::Itertools;
 use p3_field::PrimeField32;
 use p3_matrix::{dense::DenseMatrix, Matrix};
 use p3_uni_stark::{StarkGenericConfig, Val};
@@ -38,6 +37,34 @@ pub struct VirtualMachine<const WORD_SIZE: usize, F: PrimeField32> {
 
     // NOT PUBLIC by design, adjust only for testing
     max_len: usize,
+}
+
+pub struct ExecutionResult<const WORD_SIZE: usize, SC: StarkGenericConfig>
+where
+    Val<SC>: PrimeField32,
+{
+    segments: Vec<ExecutionSegment<WORD_SIZE, Val<SC>>>,
+    traces: Vec<DenseMatrix<Val<SC>>>,
+    pis: Vec<Vec<Val<SC>>>,
+}
+
+/// Enum representing the different types of chips used in the VM
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ChipType {
+    Cpu,
+    Program,
+    Memory,
+    RangeChecker,
+    FieldArithmetic,
+    FieldExtension,
+    Poseidon2,
+}
+
+pub struct ChipData<'a, const WORD_SIZE: usize, SC: StarkGenericConfig> {
+    pub traces: Vec<DenseMatrix<Val<SC>>>,
+    pub pis: Vec<Vec<Val<SC>>>,
+    pub chips: Vec<&'a dyn AnyRap<SC>>,
+    pub chip_types: Vec<ChipType>,
 }
 
 /// Struct that holds the current state of the VM. For now, includes memory, input stream, and hint stream.
@@ -112,95 +139,107 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
     pub fn options(&self) -> CpuOptions {
         self.config.cpu_options()
     }
+}
 
-    /// Executes the VM by calling `ExecutionSegment::generate_traces()` until the CPU hits `TERMINATE`
-    /// and `cpu_chip.is_done`. Between every segment, the VM will call `generate_commitments()` and then
-    /// `next_segment()`.
-    pub fn execute(&mut self) -> Result<(), ExecutionError> {
-        let mut result = vec![];
-        loop {
-            let last_seg = self.segments.last_mut().unwrap();
-            result.extend(last_seg.generate_traces()?);
-            result.extend(last_seg.generate_commitments()?);
-            if last_seg.cpu_chip.state.is_done {
-                break;
-            }
-            self.next_segment();
+// impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
+//     /// Retrieves the non-empty traces from the VM.
+//     pub fn get_traces(&self) -> Vec<DenseMatrix<F>> {
+//         self.traces
+//             .clone()
+//             .into_iter()
+//             .filter(|trace| !trace.values.is_empty())
+//             .collect()
+//     }
+// }
+
+/// Executes the VM by calling `ExecutionSegment::generate_traces()` until the CPU hits `TERMINATE`
+/// and `cpu_chip.is_done`. Between every segment, the VM will call `generate_commitments()` and then
+/// `next_segment()`.
+pub fn execute<const WORD_SIZE: usize, SC: StarkGenericConfig>(
+    mut vm: VirtualMachine<WORD_SIZE, Val<SC>>,
+) -> Result<ExecutionResult<WORD_SIZE, SC>, ExecutionError>
+where
+    Val<SC>: PrimeField32,
+{
+    let mut traces = vec![];
+    loop {
+        let last_seg = vm.segments.last_mut().unwrap();
+        traces.extend(last_seg.generate_traces()?);
+        traces.extend(last_seg.generate_commitments()?);
+        if last_seg.cpu_chip.state.is_done {
+            break;
         }
-        self.traces = result;
-
-        // Debug assertion that trace heights are within the max_len
-        let prog_height = self.traces[1].height();
-        let range_checker_height = self.traces[3].height();
-        for trace in &self.traces {
-            assert!(
-                // some +1 because some traces have multiple rows added in a single instruction
-                // +1 may need to be adjusted in case 5 rows are added at once
-                (trace.height() <= (self.max_len + 1).next_power_of_two())
-                    || (trace.height() == prog_height)
-                    || (trace.height() == range_checker_height),
-                "Trace height exceeds max_len"
-            );
-        }
-
-        Ok(())
+        vm.next_segment();
     }
+    let pis = vm
+        .segments
+        .iter()
+        .flat_map(|segment| segment.get_pis())
+        .collect::<Vec<_>>();
 
-    /// Retrieves the non-empty traces from the VM.
-    pub fn get_traces(&self) -> Vec<DenseMatrix<F>> {
-        self.traces
-            .clone()
-            .into_iter()
-            .filter(|trace| !trace.values.is_empty())
-            .collect()
+    // TODO: replace/move this
+    // // Debug assertion that trace heights are within the max_len
+    // let prog_height = vm.traces[1].height();
+    // let range_checker_height = vm.traces[3].height();
+    // for trace in &vm.traces {
+    //     assert!(
+    //         // some +1 because some traces have multiple rows added in a single instruction
+    //         // +1 may need to be adjusted in case 3 rows are added at once
+    //         (trace.height() <= (vm.max_len + 1).next_power_of_two())
+    //             || (trace.height() == prog_height)
+    //             || (trace.height() == range_checker_height),
+    //         "Trace height exceeds max_len"
+    //     );
+    // }
+
+    Ok(ExecutionResult {
+        segments: vm.segments,
+        traces,
+        pis,
+    })
+}
+
+impl<const WORD_SIZE: usize, SC: StarkGenericConfig> ExecutionResult<WORD_SIZE, SC>
+where
+    Val<SC>: PrimeField32,
+{
+    pub fn get_results(&self) -> ChipData<WORD_SIZE, SC> {
+        let traces = self.traces.clone();
+        let pis = self.pis.clone();
+        let types = self
+            .segments
+            .iter()
+            .flat_map(|segment| segment.get_types())
+            .collect::<Vec<ChipType>>();
+        let chips = self
+            .segments
+            .iter()
+            .flat_map(|segment| get_chips::<WORD_SIZE, SC>(segment))
+            .collect::<Vec<_>>();
+
+        let non_empty_indices: Vec<usize> = traces
+            .iter()
+            .enumerate()
+            .filter_map(|(i, trace)| (!trace.values.is_empty()).then_some(i))
+            .collect();
+
+        ChipData {
+            traces: non_empty_indices
+                .iter()
+                .map(|&i| traces[i].clone())
+                .collect(),
+            pis: non_empty_indices.iter().map(|&i| pis[i].clone()).collect(),
+            chips: non_empty_indices.iter().map(|&i| chips[i]).collect(),
+            chip_types: non_empty_indices.iter().map(|&i| types[i]).collect(),
+        }
     }
 
     /// Retrieves the maximum log degree of the VM's trace.
-    pub fn max_log_degree(&self) -> Result<usize, ExecutionError> {
+    pub fn max_log_degree(&self) -> usize {
         let mut checker_trace_degree = 0;
         for trace in &self.traces {
             checker_trace_degree = std::cmp::max(checker_trace_degree, trace.height());
         }
-        Ok(log2_strict_usize(checker_trace_degree))
+        log2_strict_usize(checker_trace_degree)
     }
-
-    /// Retrieves the public inputs from the VM's segments, filtering by nonempty traces.
-    pub fn get_pis(&self) -> Vec<Vec<F>> {
-        let all_pis: Vec<Vec<F>> = self
-            .segments
-            .iter()
-            .flat_map(|segment| segment.get_pis())
-            .collect();
-
-        all_pis
-            .into_iter()
-            .zip_eq(self.traces.iter())
-            .filter(|(_, trace)| !trace.values.is_empty())
-            .map(|(initial_elem, _)| initial_elem)
-            .collect()
-    }
-}
-
-/// Retrieves all chips from the VM's segments, filtering by nonempty traces. Cannot be made into
-/// struct method because of generics.
-pub fn get_all_chips<const WORD_SIZE: usize, SC: StarkGenericConfig>(
-    vm: &VirtualMachine<WORD_SIZE, Val<SC>>,
-) -> Vec<&dyn AnyRap<SC>>
-where
-    Val<SC>: PrimeField32,
-{
-    let chips: Vec<_> = vm
-        .segments
-        .iter()
-        .flat_map(|segment| get_chips::<WORD_SIZE, SC>(segment))
-        .collect();
-
-    let chips: Vec<_> = vm
-        .traces
-        .iter()
-        .zip_eq(chips)
-        .filter(|(trace, _)| !trace.values.is_empty())
-        .map(|(_, chip)| chip)
-        .collect();
-    chips
 }

@@ -1,3 +1,4 @@
+use super::ChipType;
 use super::VirtualMachineState;
 use afs_stark_backend::config::{StarkGenericConfig, Val};
 use afs_stark_backend::rap::AnyRap;
@@ -135,7 +136,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
     ///
     /// For now, only publishes program counter public values
     pub fn generate_commitments(&mut self) -> Result<Vec<DenseMatrix<F>>, ExecutionError> {
-        self.cpu_chip.set_pvs();
+        // self.cpu_chip.generate_pvs();
         Ok(vec![])
     }
 
@@ -158,6 +159,25 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         let len = self.get_num_chips();
         let mut result: Vec<Vec<F>> = vec![vec![]; len];
         result[0].clone_from(&self.cpu_chip.pis);
+        result
+    }
+    pub fn get_types(&self) -> Vec<ChipType> {
+        let mut result: Vec<ChipType> = vec![
+            ChipType::Cpu,
+            ChipType::Program,
+            ChipType::Memory,
+            ChipType::RangeChecker,
+        ];
+        if self.config.cpu_options().field_arithmetic_enabled {
+            result.push(ChipType::FieldArithmetic);
+        }
+        if self.config.cpu_options().field_extension_enabled {
+            result.push(ChipType::FieldExtension);
+        }
+        if self.config.cpu_options().poseidon2_enabled() {
+            result.push(ChipType::Poseidon2);
+        }
+        assert!(result.len() == self.get_num_chips());
         result
     }
 }

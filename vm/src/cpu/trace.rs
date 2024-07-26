@@ -321,6 +321,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
             false,
         );
         vm.hint_stream = hint_stream;
+        vm.cpu_chip.generate_pvs();
 
         if !is_done {
             Self::pad_rows(vm);

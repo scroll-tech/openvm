@@ -7,7 +7,7 @@ use afs_test_utils::{
 };
 use clap::Parser;
 use color_eyre::eyre::Result;
-use stark_vm::vm::{config::VmConfig, get_all_chips, VirtualMachine};
+use stark_vm::vm::{config::VmConfig, execute, VirtualMachine};
 
 use crate::{
     asm::parse_asm_file,
@@ -69,20 +69,16 @@ impl VerifyCommand {
         let encoded_proof = read_from_path(Path::new(&self.proof_file))?;
         let proof: Proof<BabyBearPoseidon2Config> = bincode::deserialize(&encoded_proof)?;
 
-        let engine = config::baby_bear_poseidon2::default_engine(vm.max_log_degree()?);
+        let result = execute(vm)?;
+        let data = result.get_results();
+        let engine = config::baby_bear_poseidon2::default_engine(result.max_log_degree());
 
-        let chips = get_all_chips(&vm);
-        let num_chips = chips.len();
+        let chips = data.chips;
+        let pis = data.pis;
 
         let mut challenger = engine.new_challenger();
         let verifier = engine.verifier();
-        let result = verifier.verify(
-            &mut challenger,
-            &vk,
-            chips,
-            &proof,
-            &vec![vec![]; num_chips],
-        );
+        let result = verifier.verify(&mut challenger, &vk, chips, &proof, &pis);
 
         if result.is_err() {
             println!("Verification Unsuccessful");

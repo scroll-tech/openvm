@@ -229,7 +229,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
     /// Writes the public inputs for the current segment (beginning and end program counters).
     ///
     /// Should only be called after segment end.
-    pub fn set_pvs(&mut self) {
+    fn generate_pvs(&mut self) {
         let first_row_pc = self.start_state.pc;
         let last_row_pc = self.state.pc;
         self.pis = vec![

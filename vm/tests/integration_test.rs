@@ -9,8 +9,7 @@ use afs_test_utils::engine::StarkEngine;
 use stark_vm::cpu::trace::Instruction;
 use stark_vm::cpu::OpCode::*;
 use stark_vm::vm::config::VmConfig;
-use stark_vm::vm::get_all_chips;
-use stark_vm::vm::VirtualMachine;
+use stark_vm::vm::{execute, VirtualMachine};
 
 const WORD_SIZE: usize = 1;
 const LIMB_BITS: usize = 30;
@@ -23,6 +22,8 @@ fn air_test(
     program: Vec<Instruction<BabyBear>>,
     witness_stream: Vec<Vec<BabyBear>>,
 ) {
+    use stark_vm::vm::execute;
+
     let mut vm = VirtualMachine::<WORD_SIZE, _>::new(
         VmConfig {
             field_arithmetic_enabled,
@@ -37,12 +38,10 @@ fn air_test(
     );
     vm.adjust_max_len(7);
 
-    vm.execute().unwrap();
-    let traces = vm.get_traces();
-    let chips = get_all_chips(&vm);
-    let pis = vm.get_pis();
+    let result = execute(vm).unwrap();
+    let chip_data = result.get_results();
 
-    run_simple_test(chips, traces, pis).expect("Verification failed");
+    run_simple_test(chip_data.chips, chip_data.traces, chip_data.pis).expect("Verification failed");
 }
 
 #[cfg(test)]
@@ -66,12 +65,9 @@ fn air_test_with_poseidon2(
     );
     vm.adjust_max_len(6);
 
-    vm.execute().unwrap();
-    let traces = vm.get_traces();
-    let chips = get_all_chips(&vm);
-    let pis = vm.get_pis();
-
-    let max_log_degree = vm.max_log_degree().unwrap();
+    let result = execute(vm).unwrap();
+    let max_log_degree = result.max_log_degree();
+    let chip_data = result.get_results();
 
     let perm = random_perm();
     let fri_params = if matches!(std::env::var("AXIOM_FAST_TEST"), Ok(x) if &x == "1") {
@@ -82,7 +78,7 @@ fn air_test_with_poseidon2(
     let engine = engine_from_perm(perm, max_log_degree, fri_params);
 
     engine
-        .run_simple_test(chips, traces, pis)
+        .run_simple_test(chip_data.chips, chip_data.traces, chip_data.pis)
         .expect("Verification failed");
 }
 
