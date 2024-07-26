@@ -149,7 +149,8 @@ pub enum AsmInstruction<F, EF> {
 
     LessThan(i32, i32, i32),
 
-    CycleTracker(String),
+    CycleTrackerStart(String),
+    CycleTrackerEnd(String),
 }
 
 impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
@@ -1070,8 +1071,11 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
             AsmInstruction::RegisterPublicValue(val) => {
                 write!(f, "register_public_value ({})fp", val)
             }
-            AsmInstruction::CycleTracker(name) => {
-                write!(f, "cycle-tracker {}", name)
+            AsmInstruction::CycleTrackerStart(name) => {
+                write!(f, "cycle_tracker_start {}", name)
+            }
+            AsmInstruction::CycleTrackerEnd(name) => {
+                write!(f, "cycle_tracker_end {}", name)
             }
         }
     }
