@@ -35,7 +35,6 @@ pub struct VirtualMachine<const WORD_SIZE: usize, F: PrimeField32> {
     pub segments: Vec<ExecutionSegment<WORD_SIZE, F>>,
     pub traces: Vec<DenseMatrix<F>>,
 
-    // NOT PUBLIC by design, adjust only for testing
     max_len: usize,
 }
 
@@ -46,6 +45,7 @@ where
     segments: Vec<ExecutionSegment<WORD_SIZE, Val<SC>>>,
     traces: Vec<DenseMatrix<Val<SC>>>,
     pis: Vec<Vec<Val<SC>>>,
+    max_len: usize,
 }
 
 /// Enum representing the different types of chips used in the VM
@@ -141,17 +141,6 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
     }
 }
 
-// impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
-//     /// Retrieves the non-empty traces from the VM.
-//     pub fn get_traces(&self) -> Vec<DenseMatrix<F>> {
-//         self.traces
-//             .clone()
-//             .into_iter()
-//             .filter(|trace| !trace.values.is_empty())
-//             .collect()
-//     }
-// }
-
 /// Executes the VM by calling `ExecutionSegment::generate_traces()` until the CPU hits `TERMINATE`
 /// and `cpu_chip.is_done`. Between every segment, the VM will call `generate_commitments()` and then
 /// `next_segment()`.
@@ -177,25 +166,11 @@ where
         .flat_map(|segment| segment.get_pis())
         .collect::<Vec<_>>();
 
-    // TODO: replace/move this
-    // // Debug assertion that trace heights are within the max_len
-    // let prog_height = vm.traces[1].height();
-    // let range_checker_height = vm.traces[3].height();
-    // for trace in &vm.traces {
-    //     assert!(
-    //         // some +1 because some traces have multiple rows added in a single instruction
-    //         // +1 may need to be adjusted in case 3 rows are added at once
-    //         (trace.height() <= (vm.max_len + 1).next_power_of_two())
-    //             || (trace.height() == prog_height)
-    //             || (trace.height() == range_checker_height),
-    //         "Trace height exceeds max_len"
-    //     );
-    // }
-
     Ok(ExecutionResult {
         segments: vm.segments,
         traces,
         pis,
+        max_len: vm.max_len,
     })
 }
 
@@ -222,6 +197,24 @@ where
             .enumerate()
             .filter_map(|(i, trace)| (!trace.values.is_empty()).then_some(i))
             .collect();
+
+        // Assert that trace heights are within the max_len, except for Program and RangeChecker
+        // +31 is needed because Poseidon2Permute adds 32 rows to memory at once
+        traces
+            .iter()
+            .zip(types.iter())
+            .filter(|(_, chip_type)| {
+                **chip_type != ChipType::Program && **chip_type != ChipType::RangeChecker
+            })
+            .for_each(|(trace, chip_type)| {
+                assert!(
+                    trace.height() <= (self.max_len + 31).next_power_of_two(),
+                    "Trace height for {:?} exceeds max_len. Height: {}, Max: {}",
+                    chip_type,
+                    trace.height(),
+                    self.max_len
+                );
+            });
 
         ChipData {
             traces: non_empty_indices
