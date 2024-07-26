@@ -4,7 +4,6 @@ use std::{
     time::Instant,
 };
 
-use afs_stark_backend::rap::AnyRap;
 use afs_test_utils::{
     config::{self},
     engine::StarkEngine,
@@ -56,11 +55,7 @@ impl KeygenCommand {
         let engine = config::baby_bear_poseidon2::default_engine(result.max_log_degree);
         let mut keygen_builder = engine.keygen_builder();
 
-        let chips = result
-            .chips
-            .iter()
-            .map(|x| &**x)
-            .collect::<Vec<&dyn AnyRap<_>>>();
+        let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&result.chips);
 
         for chip in chips {
             keygen_builder.add_air(chip, 0);
