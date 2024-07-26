@@ -13,7 +13,7 @@ pub enum AsmInstruction<F, EF> {
 
     /// Load word (dst, src, index, offset, size).
     ///
-    /// Load a value from the address stored at src(fp) into dstfp).
+    /// Load a value from the address stored at src(fp) into dst(fp).
     LoadF(i32, i32, i32, F, F),
     LoadFI(i32, i32, F, F, F),
 
@@ -62,17 +62,8 @@ pub enum AsmInstruction<F, EF> {
     /// Add extension, dst = lhs + rhs.
     AddE(i32, i32, i32),
 
-    /// Add immediate extension, dst = lhs + rhs.
-    AddEI(i32, i32, EF),
-
-    /// Add field element with an immediate extension, dst = lhs + rhs.
-    AddEFFI(i32, i32, EF),
-
     /// Subtract extension, dst = lhs - rhs.
     SubE(i32, i32, i32),
-
-    /// Subtract immediate extension, dst = lhs - rhs.
-    SubEI(i32, i32, EF),
 
     /// Subtract value from immediate extension, dst = lhs - rhs.
     SubEIN(i32, EF, i32),
@@ -938,19 +929,10 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
                 )
             }
             AsmInstruction::AddE(dst, lhs, rhs) => {
-                write!(f, "eadd  ({})fp, ({})fp, ({})fp", dst, lhs, rhs)
-            }
-            AsmInstruction::AddEI(dst, lhs, rhs) => {
-                write!(f, "eaddi ({})fp, ({})fp, {}", dst, lhs, rhs)
-            }
-            AsmInstruction::AddEFFI(dst, lhs, rhs) => {
-                write!(f, "eefaddi ({})fp, ({})fp, {}", dst, lhs, rhs)
+                write!(f, "eadd ({})fp, ({})fp, ({})fp", dst, lhs, rhs)
             }
             AsmInstruction::SubE(dst, lhs, rhs) => {
                 write!(f, "esub  ({})fp, ({})fp, ({})fp", dst, lhs, rhs)
-            }
-            AsmInstruction::SubEI(dst, lhs, rhs) => {
-                write!(f, "esubi ({})fp, ({})fp, {}", dst, lhs, rhs)
             }
             AsmInstruction::SubEIN(dst, lhs, rhs) => {
                 write!(f, "esubin ({})fp, {}, ({})fp", dst, lhs, rhs)
