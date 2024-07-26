@@ -182,11 +182,6 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
         let max_log_degree =
             log2_strict_usize(traces.iter().map(|trace| trace.height()).max().unwrap());
 
-        // let chips: Vec<&(dyn AnyRap<BabyBearPoseidon2Config> + 'a)> = box_chips
-        //     .iter()
-        //     .map(|x| &**x)
-        //     .collect::<Vec<&(dyn AnyRap<_> + 'a)>>();
-
         let chip_data = ChipData {
             traces,
             pis,
@@ -197,10 +192,10 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
 
         Ok(chip_data)
     }
-}
 
-// impl<const WORD_SIZE: usize> ChipData<WORD_SIZE> {
-//     pub fn chips(&self) -> Vec<&dyn AnyRap<BabyBearPoseidon2Config>> {
-//         self.chips.iter().map(|x| &**x).collect()
-//     }
-// }
+    pub fn get_chips(
+        chips: &[Box<dyn AnyRap<BabyBearPoseidon2Config>>],
+    ) -> Vec<&dyn AnyRap<BabyBearPoseidon2Config>> {
+        chips.iter().map(|x| &**x).collect()
+    }
+}

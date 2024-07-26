@@ -1,7 +1,7 @@
 use std::{path::Path, time::Instant};
 
 use afs_stark_backend::{
-    keygen::types::MultiStarkProvingKey, prover::trace::TraceCommitmentBuilder, rap::AnyRap,
+    keygen::types::MultiStarkProvingKey, prover::trace::TraceCommitmentBuilder,
 };
 use afs_test_utils::{
     config::{self, baby_bear_poseidon2::BabyBearPoseidon2Config},
@@ -72,7 +72,7 @@ impl ProveCommand {
         }
         trace_builder.commit_current();
 
-        let chips = chips.iter().map(|x| &**x).collect::<Vec<&dyn AnyRap<_>>>();
+        let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
         let num_chips = chips.len();
 
         let main_trace_data = trace_builder.view(&vk, chips);
