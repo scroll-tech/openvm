@@ -90,6 +90,25 @@ impl VerifierProgram<InnerConfig> {
             ..Default::default()
         })
     }
+
+    pub fn aggregate_segments(
+        raps: Vec<&dyn DynRapForRecursion<InnerConfig>>,
+        constants: MultiStarkVerificationAdvice<InnerConfig>,
+        fri_params: &FriParameters,
+    ) -> Vec<Instruction<BabyBear>> {
+        let mut builder = Builder::<InnerConfig>::default();
+
+        let input: VerifierProgramInputVariable<_> = builder.uninit();
+        VerifierProgramInput::<BabyBearPoseidon2Config>::witness(&input, &mut builder);
+
+        let pcs = TwoAdicFriPcsVariable {
+            config: const_fri_config(&mut builder, fri_params),
+        };
+        Self::verify(&mut builder, &pcs, raps, constants, &input);
+
+        const WORD_SIZE: usize = 1;
+        builder.compile_isa::<WORD_SIZE>()
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
