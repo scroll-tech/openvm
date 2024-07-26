@@ -306,8 +306,8 @@ impl<const WORD_SIZE: usize, AB: AirBuilderWithPublicValues + InteractionBuilder
 
         // update the timestamp correctly
         for (&opcode, &flag) in operation_flags.iter() {
-            if opcode != TERMINATE {
-                builder.when_transition().when(flag).assert_eq(
+            if opcode != TERMINATE && opcode != NOP {
+                builder.when(flag).assert_eq(
                     next_timestamp,
                     timestamp + AB::F::from_canonical_usize(max_accesses_per_instruction(opcode)),
                 )

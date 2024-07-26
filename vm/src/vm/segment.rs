@@ -52,10 +52,9 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
 
         let range_checker = Arc::new(RangeCheckerGateChip::new(RANGE_CHECKER_BUS, 1 << decomp));
 
-        // TODO: reduce cloning
         let mut cpu_chip = CpuChip::new(config.cpu_options());
         cpu_chip.set_state(state.state, true);
-        let program_chip = ProgramChip::new(program.clone());
+        let program_chip = ProgramChip::new(program);
         let memory_chip = MemoryChip::new(limb_bits, limb_bits, limb_bits, decomp, state.memory);
         let field_arithmetic_chip = FieldArithmeticChip::new();
         let field_extension_chip = FieldExtensionArithmeticChip::new();
@@ -190,6 +189,7 @@ pub fn get_chips<const WORD_SIZE: usize, SC: StarkGenericConfig>(
 where
     Val<SC>: PrimeField32,
 {
+    let num_chips = segment.get_num_chips();
     let mut result: Vec<Box<dyn AnyRap<SC>>> = vec![
         Box::new(segment.cpu_chip.air),
         Box::new(segment.program_chip.air),
@@ -205,6 +205,6 @@ where
     if segment.config.cpu_options().poseidon2_enabled() {
         result.push(Box::new(segment.poseidon2_chip.air));
     }
-    // assert!(result.len() == segment.get_num_chips());
+    assert!(result.len() == num_chips);
     result
 }

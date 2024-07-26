@@ -7,6 +7,7 @@ use p3_matrix::{dense::DenseMatrix, Matrix};
 use p3_util::log2_strict_usize;
 use std::collections::HashMap;
 use std::collections::VecDeque;
+use std::ops::Deref;
 
 mod segment;
 pub use segment::{get_chips, ExecutionSegment};
@@ -24,12 +25,12 @@ pub const DEFAULT_MAX_LEN: usize = (1 << 20) - 100;
 
 /// Parent struct that holds all execution segments, program, config.
 ///
-/// Key method is `execute()` which runs the VM. Segment switching is handled by
+/// Key method is `vm.execute()` which consumes the VM and returns a `ExecutionResult` struct. Segment switching is handled by
 /// `ExecutionSegment::should_segment()`, called every CPU clock cycle, which when `true`
 ///  triggers `VirtualMachine::next_segment()`.
 ///
-/// Traces are stored in the VM, but chips, traces, and public values should be retrieved using
-/// `get_chips()`, `get_traces()`, and `get_pis()` respectively.
+/// Chips, traces, and public values should be retrieved by unpacking the `ExecutionResult` struct.
+/// `VirtualMachine::get_chips()` can be used to convert the boxes of chips to concrete chips.
 pub struct VirtualMachine<const WORD_SIZE: usize, F: PrimeField32> {
     pub config: VmConfig,
     pub program: Vec<Instruction<F>>,
@@ -115,7 +116,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
     }
 
     /// Retrieves the current state of the VM by querying the last segment.
-    pub fn get_state(&self) -> VirtualMachineState<F> {
+    pub fn current_state(&self) -> VirtualMachineState<F> {
         let last_seg = self.segments.last().unwrap();
         VirtualMachineState {
             state: last_seg.cpu_chip.state,
@@ -129,7 +130,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
     ///
     /// This is done by querying the last segment's state and creating a new segment from it.
     pub fn next_segment(&mut self) {
-        let state = self.get_state();
+        let state = self.current_state();
         self.new_segment(state);
     }
 
@@ -156,7 +157,7 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
         }
 
         let mut pis = vec![];
-        let mut chips: Vec<Box<dyn AnyRap<BabyBearPoseidon2Config>>> = vec![];
+        let mut chips = vec![];
         let mut types = vec![];
 
         // Iterate over each segment and add its public inputs, types, and chips to the result,
@@ -174,8 +175,8 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
         traces
             .iter()
             .zip(types.iter())
-            .filter(|(_, chip_type)| {
-                **chip_type != ChipType::Program && **chip_type != ChipType::RangeChecker
+            .filter(|(_, &chip_type)| {
+                chip_type != ChipType::Program && chip_type != ChipType::RangeChecker
             })
             .for_each(|(trace, chip_type)| {
                 assert!(
@@ -205,6 +206,6 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
     pub fn get_chips(
         chips: &[Box<dyn AnyRap<BabyBearPoseidon2Config>>],
     ) -> Vec<&dyn AnyRap<BabyBearPoseidon2Config>> {
-        chips.iter().map(|x| &**x).collect()
+        chips.iter().map(|x| x.deref()).collect()
     }
 }
