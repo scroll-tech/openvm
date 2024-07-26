@@ -1,4 +1,3 @@
-use afs_stark_backend::rap::AnyRap;
 use afs_test_utils::config::setup_tracing;
 use p3_baby_bear::BabyBear;
 use p3_field::{ExtensionField, PrimeField32, TwoAdicField};
@@ -104,15 +103,14 @@ pub fn execute_and_prove_program<const WORD_SIZE: usize>(
         program,
         input_stream,
     );
-    let result = vm.execute().unwrap();
-    let traces = result.traces;
-    let chips = result
-        .chips
-        .iter()
-        .map(|x| &**x)
-        .collect::<Vec<&dyn AnyRap<_>>>();
-    let pis = result.pis;
-    let max_log_degree = result.max_log_degree;
+    let ChipData {
+        max_log_degree,
+        chips,
+        traces,
+        pis,
+        ..
+    } = vm.execute().unwrap();
+    let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
 
     let perm = random_perm();
     // blowup factor 8 for poseidon2 chip

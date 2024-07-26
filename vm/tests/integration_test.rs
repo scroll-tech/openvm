@@ -1,7 +1,6 @@
 use p3_baby_bear::BabyBear;
 use p3_field::AbstractField;
 
-use afs_stark_backend::rap::AnyRap;
 use afs_test_utils::config::baby_bear_poseidon2::{engine_from_perm, random_perm, run_simple_test};
 use afs_test_utils::config::fri_params::{
     fri_params_fast_testing, fri_params_with_80_bits_of_security,
@@ -10,6 +9,7 @@ use afs_test_utils::engine::StarkEngine;
 use stark_vm::cpu::trace::Instruction;
 use stark_vm::cpu::OpCode::*;
 use stark_vm::vm::config::VmConfig;
+use stark_vm::vm::ChipData;
 use stark_vm::vm::VirtualMachine;
 
 const WORD_SIZE: usize = 1;
@@ -37,14 +37,12 @@ fn air_test(
     );
     vm.adjust_max_len(7);
 
-    let result = vm.execute().unwrap();
-    let chips = result
-        .chips
-        .iter()
-        .map(|x| &**x)
-        .collect::<Vec<&dyn AnyRap<_>>>();
+    let ChipData {
+        chips, traces, pis, ..
+    } = vm.execute().unwrap();
+    let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
 
-    run_simple_test(chips, result.traces, result.pis).expect("Verification failed");
+    run_simple_test(chips, traces, pis).expect("Verification failed");
 }
 
 #[cfg(test)]
@@ -68,7 +66,13 @@ fn air_test_with_poseidon2(
     );
     vm.adjust_max_len(6);
 
-    let result = vm.execute().unwrap();
+    let ChipData {
+        max_log_degree,
+        chips,
+        traces,
+        pis,
+        ..
+    } = vm.execute().unwrap();
 
     let perm = random_perm();
     let fri_params = if matches!(std::env::var("AXIOM_FAST_TEST"), Ok(x) if &x == "1") {
@@ -76,15 +80,11 @@ fn air_test_with_poseidon2(
     } else {
         fri_params_with_80_bits_of_security()[1]
     };
-    let engine = engine_from_perm(perm, result.max_log_degree, fri_params);
+    let engine = engine_from_perm(perm, max_log_degree, fri_params);
 
-    let chips = result
-        .chips
-        .iter()
-        .map(|x| &**x)
-        .collect::<Vec<&dyn AnyRap<_>>>();
+    let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
     engine
-        .run_simple_test(chips, result.traces, result.pis)
+        .run_simple_test(chips, traces, pis)
         .expect("Verification failed");
 }
 
