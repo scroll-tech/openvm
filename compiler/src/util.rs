@@ -105,7 +105,7 @@ pub fn execute_and_prove_program<const WORD_SIZE: usize>(
     );
     let ExecutionResult {
         max_log_degree,
-        boxed_chips: chips,
+        chips,
         traces,
         pis,
         ..

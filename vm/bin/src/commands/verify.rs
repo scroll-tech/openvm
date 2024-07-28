@@ -72,7 +72,7 @@ impl VerifyCommand {
         let ExecutionResult {
             max_log_degree,
             pis,
-            boxed_chips: chips,
+            chips,
             ..
         } = vm.execute()?;
         let engine = config::baby_bear_poseidon2::default_engine(max_log_degree);

@@ -68,7 +68,7 @@ impl ProveCommand {
 
         let ExecutionResult {
             traces,
-            boxed_chips: chips,
+            chips,
             ..
         } = result;
         for trace in traces {

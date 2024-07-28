@@ -53,7 +53,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         let range_checker = Arc::new(RangeCheckerGateChip::new(RANGE_CHECKER_BUS, 1 << decomp));
 
         let mut cpu_chip = CpuChip::new(config.cpu_options());
-        cpu_chip.set_state(state.state, true);
+        cpu_chip.from_state(state.state);
         let program_chip = ProgramChip::new(program);
         let memory_chip = MemoryChip::new(limb_bits, limb_bits, limb_bits, decomp, state.memory);
         let field_arithmetic_chip = FieldArithmeticChip::new();
@@ -81,7 +81,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
     /// Used to adjust the max_len
     ///
     /// Default value is 1 << 20 - 100
-    pub fn adjust_max_len(&mut self, max_len: usize) {
+    pub fn set_max_len(&mut self, max_len: usize) {
         self.max_len = max_len;
     }
 

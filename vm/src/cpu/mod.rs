@@ -217,11 +217,14 @@ impl<const WORD_SIZE: usize, F: Clone> CpuChip<WORD_SIZE, F> {
     }
 
     /// Sets the current state of the CPU.
-    pub fn set_state(&mut self, state: ExecutionState, start: bool) {
+    pub fn set_state(&mut self, state: ExecutionState) {
         self.state = state;
-        if start {
-            self.start_state = state;
-        }
+    }
+
+    /// Sets the current state of the CPU.
+    pub fn from_state(&mut self, state: ExecutionState) {
+        self.state = state;
+        self.start_state = state;
     }
 }
 

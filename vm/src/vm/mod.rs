@@ -59,7 +59,7 @@ pub struct ExecutionResult<const WORD_SIZE: usize> {
     /// Public inputs of the VM
     pub pis: Vec<Vec<BabyBear>>,
     /// Boxed chips of the VM
-    pub boxed_chips: Vec<Box<dyn AnyRap<BabyBearPoseidon2Config>>>,
+    pub chips: Vec<Box<dyn AnyRap<BabyBearPoseidon2Config>>>,
     /// Types of the chips
     pub chip_types: Vec<ChipType>,
     /// Maximum log degree of the VM
@@ -91,7 +91,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
             traces: vec![],
             max_len: DEFAULT_MAX_LEN,
         };
-        vm.new_segment(VirtualMachineState {
+        vm.segment(VirtualMachineState {
             state: ExecutionState::default(),
             memory: HashMap::new(),
             input_stream: VecDeque::from(input_stream),
@@ -103,13 +103,13 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
     /// Sets the max length of the VM.
     pub fn adjust_max_len(&mut self, max_len: usize) {
         self.max_len = max_len;
-        self.segments[0].adjust_max_len(max_len);
+        self.segments[0].set_max_len(max_len);
     }
 
     /// Create a new segment with a given state.
     ///
     /// The segment will be created from the given state and the program.
-    pub fn new_segment(&mut self, state: VirtualMachineState<F>) {
+    pub fn segment(&mut self, state: VirtualMachineState<F>) {
         let program = self.program.clone();
         let segment = ExecutionSegment::new(self, program, state);
         self.segments.push(segment);
@@ -124,14 +124,6 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
             input_stream: last_seg.input_stream.clone(),
             hint_stream: last_seg.hint_stream.clone(),
         }
-    }
-
-    /// Create a new segment with the current state of the VM.
-    ///
-    /// This is done by querying the last segment's state and creating a new segment from it.
-    pub fn next_segment(&mut self) {
-        let state = self.current_state();
-        self.new_segment(state);
     }
 
     /// Retrieves the CPU options from the VM's config.
@@ -153,7 +145,8 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
             if last_seg.cpu_chip.state.is_done {
                 break;
             }
-            self.next_segment();
+            let state = self.current_state();
+            self.segment(state);
         }
 
         let mut pis = vec![];
@@ -194,7 +187,7 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
         let chip_data = ExecutionResult {
             traces,
             pis,
-            boxed_chips: chips,
+            chips,
             chip_types: types,
             max_log_degree,
         };

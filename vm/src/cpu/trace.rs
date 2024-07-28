@@ -311,15 +311,12 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
         }
 
         // Update CPU chip state with all changes from this segment.
-        vm.cpu_chip.set_state(
-            ExecutionState {
-                clock_cycle,
-                timestamp,
-                pc: pc.as_canonical_u64() as usize,
-                is_done,
-            },
-            false,
-        );
+        vm.cpu_chip.set_state(ExecutionState {
+            clock_cycle,
+            timestamp,
+            pc: pc.as_canonical_u64() as usize,
+            is_done,
+        });
         vm.hint_stream = hint_stream;
         vm.cpu_chip.generate_pvs();
 

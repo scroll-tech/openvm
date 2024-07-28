@@ -38,7 +38,7 @@ fn air_test(
     vm.adjust_max_len(7);
 
     let ExecutionResult {
-        boxed_chips: chips,
+        chips,
         traces,
         pis,
         ..
@@ -71,7 +71,7 @@ fn air_test_with_poseidon2(
 
     let ExecutionResult {
         max_log_degree,
-        boxed_chips: chips,
+        chips,
         traces,
         pis,
         ..
