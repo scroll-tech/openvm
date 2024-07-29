@@ -121,7 +121,7 @@ pub fn run_recursive_test(
     let vparams = make_verification_params(&any_raps, traces, &pvs);
 
     let (program, witness_stream) = build_verification_program(rec_raps, pvs, vparams);
-    execute_program::<1, _>(program, witness_stream);
+    execute_program::<1>(program, witness_stream);
 }
 
 pub fn sort_chips<'a>(
