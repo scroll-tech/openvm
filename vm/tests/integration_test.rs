@@ -38,9 +38,9 @@ fn air_test(
     vm.adjust_max_len(7);
 
     let ExecutionResult {
-        chips,
-        traces,
-        pis,
+        nonempty_chips: chips,
+        nonempty_traces: traces,
+        nonempty_pis: pis,
         ..
     } = vm.execute().unwrap();
     let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
@@ -71,9 +71,9 @@ fn air_test_with_poseidon2(
 
     let ExecutionResult {
         max_log_degree,
-        chips,
-        traces,
-        pis,
+        nonempty_chips: chips,
+        nonempty_traces: traces,
+        nonempty_pis: pis,
         ..
     } = vm.execute().unwrap();
 

@@ -67,8 +67,8 @@ impl ProveCommand {
         let mut trace_builder = TraceCommitmentBuilder::new(prover.pcs());
 
         let ExecutionResult {
-            traces,
-            chips,
+            nonempty_traces: traces,
+            nonempty_chips: chips,
             ..
         } = result;
         for trace in traces {

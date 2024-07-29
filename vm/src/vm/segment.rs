@@ -5,7 +5,6 @@ use afs_stark_backend::rap::AnyRap;
 use std::collections::VecDeque;
 use std::sync::Arc;
 
-use super::VirtualMachine;
 use super::VmConfig;
 use crate::{
     cpu::{
@@ -42,11 +41,11 @@ pub struct ExecutionSegment<const WORD_SIZE: usize, F: PrimeField32> {
 impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
     /// Creates a new execution segment from a program and initial state, using parent VM config
     pub fn new(
-        vm: &mut VirtualMachine<WORD_SIZE, F>,
+        config: VmConfig,
         program: Vec<Instruction<F>>,
         state: VirtualMachineState<F>,
+        max_len: usize,
     ) -> Self {
-        let config = vm.config;
         let decomp = config.decomp;
         let limb_bits = config.limb_bits;
 
@@ -74,7 +73,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
             poseidon2_chip,
             input_stream: state.input_stream,
             hint_stream: state.hint_stream,
-            max_len: vm.max_len,
+            max_len,
         }
     }
 
@@ -104,7 +103,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         max_height >= self.max_len
     }
 
-    /// Called by VM to generate traces for current segment.
+    /// Called by VM to generate traces for current segment. Includes empty traces.
     ///
     /// Execution is handled by CPU trace generation. Stopping is triggered by should_segment()
     pub fn generate_traces(&mut self) -> Result<Vec<DenseMatrix<F>>, ExecutionError> {
@@ -185,6 +184,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
 /// Global function to get chips from a segment
 pub fn get_chips<const WORD_SIZE: usize, SC: StarkGenericConfig>(
     segment: ExecutionSegment<WORD_SIZE, Val<SC>>,
+    inclusion_mask: &[bool],
 ) -> Vec<Box<dyn AnyRap<SC>>>
 where
     Val<SC>: PrimeField32,
@@ -205,6 +205,19 @@ where
     if segment.config.cpu_options().poseidon2_enabled() {
         result.push(Box::new(segment.poseidon2_chip.air));
     }
+
     assert!(result.len() == num_chips);
+
+    inclusion_mask
+        .iter()
+        .enumerate()
+        .rev()
+        .filter(|(_, inclusion)| !*inclusion)
+        .map(|(index, _)| index)
+        .for_each(|index| {
+            result.remove(index);
+        });
+
+    assert!(result.len() == inclusion_mask.iter().filter(|&x| *x).count());
     result
 }

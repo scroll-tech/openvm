@@ -105,9 +105,9 @@ pub fn execute_and_prove_program<const WORD_SIZE: usize>(
     );
     let ExecutionResult {
         max_log_degree,
-        chips,
-        traces,
-        pis,
+        nonempty_chips: chips,
+        nonempty_traces: traces,
+        nonempty_pis: pis,
         ..
     } = vm.execute().unwrap();
     let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
