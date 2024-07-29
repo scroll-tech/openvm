@@ -76,14 +76,14 @@ macro_rules! run_perm_ops {
                     WriteOps {
                         clk: 16 * i + j,
                         ad_s: $instructions[i].e,
-                        address: $instructions[i].op_a + BabyBear::from_canonical_usize(j),
+                        address: $instructions[i].op_b + BabyBear::from_canonical_usize(j),
                         data: [$data[i][j]],
                     }
                 } else {
                     WriteOps {
                         clk: 16 * i + j,
                         ad_s: $instructions[i].e,
-                        address: $instructions[i].op_b + BabyBear::from_canonical_usize(j - 8),
+                        address: $instructions[i].op_c + BabyBear::from_canonical_usize(j - 8),
                         data: [$data[i][j]],
                     }
                 }
@@ -103,7 +103,7 @@ macro_rules! run_perm_ops {
             Poseidon2Chip::<16, BabyBear>::poseidon2_perm(
                 &mut segment,
                 start_timestamp,
-                $instructions[i],
+                $instructions[i].clone(),
             );
         });
 
@@ -118,7 +118,7 @@ macro_rules! run_perm_ops {
                     .flat_map(|i| {
                         Poseidon2VmAir::<16, BabyBear>::make_io_cols(
                             16 * $num_ops + (time_per * i),
-                            $instructions[i],
+                            $instructions[i].clone(),
                         )
                         .flatten()
                         .iter()
@@ -200,6 +200,7 @@ fn random_instructions<const NUM_OPS: usize>() -> [Instruction<BabyBear>; NUM_OP
             op_c: c,
             d: BabyBear::zero(),
             e,
+            debug: String::new(),
         }
     })
 }

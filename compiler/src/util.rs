@@ -30,18 +30,7 @@ pub fn execute_program<const WORD_SIZE: usize>(
     program: Vec<Instruction<BabyBear>>,
     input_stream: Vec<Vec<BabyBear>>,
 ) -> ExecutionResult<WORD_SIZE> {
-    let vm = VirtualMachine::<WORD_SIZE, _>::new(
-        VmConfig {
-            field_arithmetic_enabled: true,
-            field_extension_enabled: true,
-            limb_bits: 28,
-            decomp: 4,
-            compress_poseidon2_enabled: true,
-            perm_poseidon2_enabled: true,
-        },
-        program,
-        input_stream,
-    );
+    let vm = VirtualMachine::<WORD_SIZE, _>::new(VmConfig::default(), program, input_stream);
     vm.execute().unwrap()
 }
 
@@ -54,8 +43,12 @@ pub fn display_program<F: PrimeField32>(program: &[Instruction<F>]) {
             op_c,
             d,
             e,
+            debug,
         } = instruction;
-        println!("{:?} {} {} {} {} {}", opcode, op_a, op_b, op_c, d, e);
+        println!(
+            "{:?} {} {} {} {} {} {}",
+            opcode, op_a, op_b, op_c, d, e, debug
+        );
     }
 }
 
@@ -68,10 +61,11 @@ pub fn display_program_with_pc<F: PrimeField32>(program: &[Instruction<F>]) {
             op_c,
             d,
             e,
+            debug,
         } = instruction;
         println!(
-            "{} | {:?} {} {} {} {} {}",
-            pc, opcode, op_a, op_b, op_c, d, e
+            "{} | {:?} {} {} {} {} {} {}",
+            pc, opcode, op_a, op_b, op_c, d, e, debug
         );
     }
 }

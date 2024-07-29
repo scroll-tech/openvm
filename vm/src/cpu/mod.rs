@@ -61,6 +61,11 @@ pub enum OpCode {
     /// Phantom instruction to prepare the little-endian bit decomposition of a variable for hinting.
     HINT_BITS = 20,
 
+    /// Phantom instruction to start tracing
+    CT_START = 21,
+    /// Phantom instruction to end tracing
+    CT_END = 22,
+
     NOP = 100,
 }
 
@@ -94,6 +99,9 @@ impl OpCode {
             19 => Some(HINT_INPUT),
             20 => Some(HINT_BITS),
 
+            21 => Some(CT_START),
+            22 => Some(CT_END),
+
             100 => Some(NOP),
 
             _ => None,
@@ -105,8 +113,8 @@ use crate::field_extension::FieldExtensionArithmeticAir;
 use crate::poseidon2::Poseidon2Chip;
 use OpCode::*;
 
-pub const CORE_INSTRUCTIONS: [OpCode; 10] = [
-    LOADW, STOREW, JAL, BEQ, BNE, TERMINATE, SHINTW, HINT_INPUT, HINT_BITS, NOP,
+pub const CORE_INSTRUCTIONS: [OpCode; 12] = [
+    LOADW, STOREW, JAL, BEQ, BNE, TERMINATE, SHINTW, HINT_INPUT, HINT_BITS, CT_START, CT_END, NOP,
 ];
 pub const FIELD_ARITHMETIC_INSTRUCTIONS: [OpCode; 4] = [FADD, FSUB, FMUL, FDIV];
 pub const FIELD_EXTENSION_INSTRUCTIONS: [OpCode; 4] = [FE4ADD, FE4SUB, BBE4MUL, BBE4INV];
@@ -129,6 +137,7 @@ fn max_accesses_per_instruction(opcode: OpCode) -> usize {
         }
         SHINTW => 3,
         HINT_INPUT | HINT_BITS => 0,
+        CT_START | CT_END => 0,
         NOP => 0,
         _ => panic!(),
     }
