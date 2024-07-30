@@ -65,56 +65,56 @@ where
     );
 
     // reciprocals is height x all_interactions.len()
-    // let mut reciprocals = vec![EF::zero(); height * all_interactions.len()];
-    // reciprocals
-    //     .par_chunks_mut(all_interactions.len())
-    //     .enumerate()
-    //     .for_each(|(i, r)| {
-    //         let evaluator = Evaluator {
-    //             preprocessed,
-    //             partitioned_main,
-    //             public_values,
-    //             height,
-    //             local_index: i,
-    //         };
-    //         for (j, interaction) in all_interactions.iter().enumerate() {
-    //             let alpha = alphas[interaction.bus_index];
-    //             debug_assert!(interaction.fields.len() <= betas.len());
-    //             let mut fields = interaction.fields.iter();
-    //             let mut rlc =
-    //                 alpha + evaluator.eval_expr(fields.next().expect("fields should not be empty"));
-    //             for (expr, &beta) in fields.zip(betas.iter().skip(1)) {
-    //                 rlc += beta * evaluator.eval_expr(expr);
-    //             }
-    //             r[j] = rlc;
-    //         }
-    //     });
-    let reciprocals: Vec<EF> = (0..height)
-        .into_par_iter()
-        .flat_map(|n| -> Vec<_> {
+    let mut reciprocals = vec![EF::zero(); height * all_interactions.len()];
+    reciprocals
+        .par_chunks_mut(all_interactions.len())
+        .enumerate()
+        .for_each(|(i, r)| {
             let evaluator = Evaluator {
                 preprocessed,
                 partitioned_main,
                 public_values,
                 height,
-                local_index: n,
+                local_index: i,
             };
-            all_interactions
-                .iter()
-                .map(|interaction| {
-                    let alpha = alphas[interaction.bus_index];
-                    debug_assert!(interaction.fields.len() <= betas.len());
-                    let mut fields = interaction.fields.iter();
-                    let mut rlc = alpha
-                        + evaluator.eval_expr(fields.next().expect("fields should not be empty"));
-                    for (expr, &beta) in fields.zip(betas.iter().skip(1)) {
-                        rlc += beta * evaluator.eval_expr(expr);
-                    }
-                    rlc
-                })
-                .collect()
-        })
-        .collect();
+            for (j, interaction) in all_interactions.iter().enumerate() {
+                let alpha = alphas[interaction.bus_index];
+                debug_assert!(interaction.fields.len() <= betas.len());
+                let mut fields = interaction.fields.iter();
+                let mut rlc =
+                    alpha + evaluator.eval_expr(fields.next().expect("fields should not be empty"));
+                for (expr, &beta) in fields.zip(betas.iter().skip(1)) {
+                    rlc += beta * evaluator.eval_expr(expr);
+                }
+                r[j] = rlc;
+            }
+        });
+    // let reciprocals: Vec<EF> = (0..height)
+    //     .into_par_iter()
+    //     .flat_map(|n| -> Vec<_> {
+    //         let evaluator = Evaluator {
+    //             preprocessed,
+    //             partitioned_main,
+    //             public_values,
+    //             height,
+    //             local_index: n,
+    //         };
+    //         all_interactions
+    //             .iter()
+    //             .map(|interaction| {
+    //                 let alpha = alphas[interaction.bus_index];
+    //                 debug_assert!(interaction.fields.len() <= betas.len());
+    //                 let mut fields = interaction.fields.iter();
+    //                 let mut rlc = alpha
+    //                     + evaluator.eval_expr(fields.next().expect("fields should not be empty"));
+    //                 for (expr, &beta) in fields.zip(betas.iter().skip(1)) {
+    //                     rlc += beta * evaluator.eval_expr(expr);
+    //                 }
+    //                 rlc
+    //             })
+    //             .collect()
+    //     })
+    //     .collect();
     // Zero should be vanishingly unlikely if alpha, beta are properly pseudo-randomized
     // The logup reciprocals should never be zero, so trace generation should panic if
     // trying to divide by zero.
