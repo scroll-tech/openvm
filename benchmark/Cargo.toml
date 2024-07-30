@@ -36,11 +36,18 @@ p3-maybe-rayon = { workspace = true }
 
 [dev-dependencies]
 criterion = "0.5.1"
+p3-challenger = { workspace = true }
+p3-matrix = { workspace = true }
+p3-commit = { workspace = true }
 pprof = { version = "0.13", features = ["criterion", "flamegraph"] }
 
 
 [[bench]]
 name = "single_rw_trace_gen"
+harness = false
+
+[[bench]]
+name = "permutation_trace_gen"
 harness = false
 
 [features]

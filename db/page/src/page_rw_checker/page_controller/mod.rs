@@ -16,6 +16,7 @@ use afs_stark_backend::{
     verifier::VerificationError,
 };
 use afs_test_utils::engine::StarkEngine;
+use getset::Getters;
 use p3_field::{AbstractField, Field, PrimeField, PrimeField64};
 use p3_matrix::dense::{DenseMatrix, RowMajorMatrix};
 use p3_uni_stark::{Domain, StarkGenericConfig, Val};
@@ -67,10 +68,15 @@ impl<F: PrimeField64> OfflineCheckerOperation<F> for Operation {
     }
 }
 
-struct PageRWTraces<F> {
+#[derive(Getters)]
+pub struct PageRWTraces<F> {
+    #[getset(get = "pub")]
     init_page_trace: RowMajorMatrix<F>,
+    #[getset(get = "pub")]
     final_page_trace: RowMajorMatrix<F>,
+    #[getset(get = "pub")]
     final_page_aux_trace: RowMajorMatrix<F>,
+    #[getset(get = "pub")]
     offline_checker_trace: RowMajorMatrix<F>,
 }
 
@@ -153,14 +159,19 @@ struct PageCommitments<SC: StarkGenericConfig> {
 /// Note that in all of those cases b>0 => a=b and c>0 => d=c as wanted. The above tuples cover exactly all cases we support.
 ///
 /// This proves that the list of operations gets us from the initial page to the final page exactly, which is all we want.
+#[derive(Getters)]
 pub struct PageController<SC: StarkGenericConfig>
 where
     Val<SC>: AbstractField,
 {
+    #[getset(get = "pub")]
     init_chip: PageReadAir,
+    #[getset(get = "pub")]
     offline_checker: PageOfflineChecker,
+    #[getset(get = "pub")]
     final_chip: IndexedPageWriteAir,
 
+    #[getset(get = "pub")]
     traces: Option<PageRWTraces<Val<SC>>>,
     page_commitments: Option<PageCommitments<SC>>,
 
