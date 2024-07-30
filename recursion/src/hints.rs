@@ -14,9 +14,9 @@ use afs_stark_backend::prover::types::{Commitments, Proof};
 use afs_test_utils::config::baby_bear_poseidon2::BabyBearPoseidon2Config;
 
 use crate::types::{
-    AdjacentOpenedValuesVariable, CommitmentsVariable, InnerConfig, OpenedValuesVariable,
-    OpeningProofVariable, StarkProofVariable, TraceWidthVariable, VerifierInput,
-    VerifierInputVariable,
+    AdjacentOpenedValuesVariable, AggregationVerifierInput, AggregationVerifierInputVariable,
+    CommitmentsVariable, InnerConfig, OpenedValuesVariable, OpeningProofVariable,
+    StarkProofVariable, TraceWidthVariable, VerifierInput, VerifierInputVariable,
 };
 
 pub type InnerVal = BabyBear;
@@ -159,6 +159,29 @@ impl Hintable<InnerConfig> for VerifierInput<BabyBearPoseidon2Config> {
         stream.extend(self.proof.write());
         stream.extend(self.log_degree_per_air.write());
         stream.extend(self.public_values.write());
+
+        stream
+    }
+}
+
+impl Hintable<InnerConfig> for AggregationVerifierInput<BabyBearPoseidon2Config> {
+    type HintVariable = AggregationVerifierInputVariable<InnerConfig>;
+
+    fn read(builder: &mut Builder<InnerConfig>) -> Self::HintVariable {
+        let verifier_inputs = VerifierInput::<BabyBearPoseidon2Config>::read(builder);
+        let chip_ids = Vec::<Vec<usize>>::read(builder);
+
+        AggregationVerifierInputVariable {
+            verifier_inputs,
+            chip_ids,
+        }
+    }
+
+    fn write(&self) -> Vec<Vec<InnerVal>> {
+        let mut stream = Vec::new();
+
+        stream.extend(self.verifier_inputs.write());
+        stream.extend(self.chip_ids.write());
 
         stream
     }

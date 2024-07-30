@@ -35,6 +35,17 @@ pub struct VerifierInputVariable<C: Config> {
     pub public_values: Array<C, Array<C, Felt<C::F>>>,
 }
 
+pub struct AggregationVerifierInput<SC: StarkGenericConfig> {
+    pub verifier_inputs: VerifierInput<SC>,
+    pub chip_ids: Vec<Vec<usize>>,
+}
+
+#[derive(DslVariable, Clone)]
+pub struct AggregationVerifierInputVariable<C: Config> {
+    pub verifier_inputs: VerifierInputVariable<C>,
+    pub chip_ids: Array<C, Array<C, Var<C::N>>>,
+}
+
 #[derive(DslVariable, Clone)]
 pub struct TraceWidthVariable<C: Config> {
     pub preprocessed: Array<C, Var<C::N>>,
