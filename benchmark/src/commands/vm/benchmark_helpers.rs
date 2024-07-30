@@ -36,7 +36,13 @@ pub fn run_recursive_test_benchmark(
 
     let log_degree = log2_strict_usize(trace_heights.clone().into_iter().max().unwrap());
 
-    let fri_params = fri_params_fast_testing()[0];
+    // FRI params to prove `any_raps` with
+    // log_blowup_factor = 1
+    let fri_params = if matches!(std::env::var("AXIOM_FAST_TEST"), Ok(x) if &x == "1") {
+        fri_params_fast_testing()[2]
+    } else {
+        fri_params_with_80_bits_of_security()[2]
+    };
     let perm = default_perm();
     let engine = engine_from_perm(perm, log_degree, fri_params);
 
@@ -55,13 +61,13 @@ pub fn run_recursive_test_benchmark(
 
     // span for starting trace geneartion to proof finishes outside of eDSL
     let trace_and_prove_span =
-        info_span!("Benchmark trace commitment and prove outside of eDSL").entered();
+        info_span!("Benchmark trace commitment and prove before recursion").entered();
 
     // span for trace generation
     let trace_commitment_span = info_span!("Benchmark trace commitment").entered();
     let mut trace_builder = TraceCommitmentBuilder::new(prover.pcs());
     for trace in traces.clone() {
-        trace_builder.load_trace(trace.clone());
+        trace_builder.load_trace(trace);
     }
     trace_builder.commit_current();
     trace_commitment_span.exit();
@@ -124,7 +130,7 @@ pub fn vm_benchmark_execute_and_prove<const WORD_SIZE: usize>(
         max_log_degree,
         nonempty_chips: chips,
         nonempty_traces: traces,
-        nonempty_pis: pis,
+        nonempty_pis: public_values,
         ..
     } = vm.execute().unwrap();
     vm_execute_span.exit();
@@ -144,18 +150,6 @@ pub fn vm_benchmark_execute_and_prove<const WORD_SIZE: usize>(
 
     assert_eq!(chips.len(), traces.len());
 
-    let prover = engine.prover();
-
-    let trace_commitment_span = info_span!("Benchmark trace commitment").entered();
-    let mut trace_builder = TraceCommitmentBuilder::new(prover.pcs());
-    for trace in traces {
-        trace_builder.load_trace(trace);
-    }
-    trace_builder.commit_current();
-    trace_commitment_span.exit();
-
-    let public_values = pis;
-
     let keygen_span = info_span!("Benchmark keygen").entered();
     let mut keygen_builder = engine.keygen_builder();
 
@@ -166,6 +160,16 @@ pub fn vm_benchmark_execute_and_prove<const WORD_SIZE: usize>(
     let pk = keygen_builder.generate_pk();
     let vk = pk.vk();
     keygen_span.exit();
+
+    let prover = engine.prover();
+
+    let trace_commitment_span = info_span!("Benchmark trace commitment").entered();
+    let mut trace_builder = TraceCommitmentBuilder::new(prover.pcs());
+    for trace in traces {
+        trace_builder.load_trace(trace);
+    }
+    trace_builder.commit_current();
+    trace_commitment_span.exit();
 
     let main_trace_data = trace_builder.view(&vk, chips.to_vec());
 
