@@ -158,7 +158,6 @@ where
             config.page.data_bytes,
             height,
         );
-
         let zk_ops = instructions
             .operations
             .iter()
