@@ -3,7 +3,7 @@ use std::sync::Arc;
 use benchmark::utils::bench::{gen_ops_sender_trace, generate_page_and_ops, get_dummy_ptd};
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
-use pprof::criterion::{Output, PProfProfiler}; // Add this line
+use pprof::criterion::{Output, PProfProfiler};
 
 use afs_page::page_rw_checker::page_controller::PageController;
 use afs_stark_backend::{
@@ -17,7 +17,7 @@ use afs_test_utils::{
 
 pub fn trace_gen_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("trace gen");
-    group.sample_size(10);
+    group.sample_size(100);
 
     let idx_len = 16;
     let data_len = 512;

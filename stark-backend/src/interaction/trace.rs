@@ -65,6 +65,30 @@ where
     );
 
     // reciprocals is height x all_interactions.len()
+    // let mut reciprocals = vec![EF::zero(); height * all_interactions.len()];
+    // reciprocals
+    //     .par_chunks_mut(all_interactions.len())
+    //     .enumerate()
+    //     .for_each(|(i, r)| {
+    //         let evaluator = Evaluator {
+    //             preprocessed,
+    //             partitioned_main,
+    //             public_values,
+    //             height,
+    //             local_index: i,
+    //         };
+    //         for (j, interaction) in all_interactions.iter().enumerate() {
+    //             let alpha = alphas[interaction.bus_index];
+    //             debug_assert!(interaction.fields.len() <= betas.len());
+    //             let mut fields = interaction.fields.iter();
+    //             let mut rlc =
+    //                 alpha + evaluator.eval_expr(fields.next().expect("fields should not be empty"));
+    //             for (expr, &beta) in fields.zip(betas.iter().skip(1)) {
+    //                 rlc += beta * evaluator.eval_expr(expr);
+    //             }
+    //             r[j] = rlc;
+    //         }
+    //     });
     let reciprocals: Vec<EF> = (0..height)
         .into_par_iter()
         .flat_map(|n| -> Vec<_> {
@@ -94,16 +118,26 @@ where
     // Zero should be vanishingly unlikely if alpha, beta are properly pseudo-randomized
     // The logup reciprocals should never be zero, so trace generation should panic if
     // trying to divide by zero.
-    let perm_values = p3_field::batch_multiplicative_inverse(&reciprocals);
+    let old_perm_values = p3_field::batch_multiplicative_inverse(&reciprocals);
     drop(reciprocals);
     // Need to add the `phi` column to perm_values as a RowMajorMatrix
     // TODO[jpw]: is there a more memory efficient way to do this?
-    let perm_values = perm_values
-        .into_iter()
-        .chunks(all_interactions.len())
-        .into_iter()
-        .flat_map(|row| row.chain(iter::once(EF::zero())))
-        .collect();
+
+    // let perm_values = old_perm_values
+    //     .into_iter()
+    //     .chunks(all_interactions.len())
+    //     .into_iter()
+    //     .flat_map(|row| row.chain(iter::once(EF::zero())))
+    //     .collect();
+    let mut perm_values = vec![EF::zero(); height * perm_width];
+    perm_values
+        .par_chunks_mut(perm_width)
+        .enumerate()
+        .for_each(|(i, row)| {
+            row[..all_interactions.len()].copy_from_slice(
+                &old_perm_values[i * all_interactions.len()..(i + 1) * all_interactions.len()],
+            );
+        });
     let mut perm = RowMajorMatrix::new(perm_values, perm_width);
 
     let _span = tracing::info_span!("compute logup partial sums").entered();

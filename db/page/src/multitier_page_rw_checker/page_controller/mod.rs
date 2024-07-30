@@ -2,13 +2,21 @@ use std::collections::HashSet;
 use std::sync::Arc;
 
 use afs_primitives::range_gate::RangeCheckerGateChip;
-use afs_stark_backend::config::Com;
-use afs_stark_backend::prover::trace::{ProverTraceData, TraceCommitter};
+use afs_stark_backend::config::{Com, PcsProof, PcsProverData};
+use afs_stark_backend::keygen::types::{MultiStarkProvingKey, MultiStarkVerifyingKey};
+use afs_stark_backend::keygen::MultiStarkKeygenBuilder;
+use afs_stark_backend::prover::trace::{ProverTraceData, TraceCommitmentBuilder, TraceCommitter};
+use afs_stark_backend::prover::types::Proof;
+use afs_stark_backend::rap::AnyRap;
+use afs_stark_backend::verifier::VerificationError;
+use afs_test_utils::engine::StarkEngine;
 use itertools::Itertools;
-use p3_field::{AbstractField, Field, PrimeField64};
+use p3_field::{AbstractField, Field, PrimeField, PrimeField64};
 use p3_matrix::dense::{DenseMatrix, RowMajorMatrix};
-use p3_uni_stark::{StarkGenericConfig, Val};
+use p3_uni_stark::{Domain, StarkGenericConfig, Val};
+use tracing::info_span;
 
+use crate::common::page_cols::PageCols;
 use crate::{
     common::page::Page, page_rw_checker::offline_checker::PageOfflineChecker,
     page_rw_checker::page_controller::Operation,
@@ -54,7 +62,7 @@ where
     pub commitments: Com<SC>,
 }
 
-struct NodeProducts<SC: StarkGenericConfig, const COMMITMENT_LEN: usize>
+pub struct NodeProducts<SC: StarkGenericConfig, const COMMITMENT_LEN: usize>
 where
     Val<SC>: AbstractField + PrimeField64,
 {
@@ -121,7 +129,10 @@ pub struct PageControllerParams {
     pub final_tree_params: PageTreeParams,
 }
 
-pub struct PageController<const COMMITMENT_LEN: usize> {
+pub struct PageController<SC: StarkGenericConfig, const COMMITMENT_LEN: usize>
+where
+    Val<SC>: AbstractField + PrimeField64,
+{
     pub init_root_signal: RootSignalAir<COMMITMENT_LEN>,
     pub init_leaf_chips: Vec<LeafPageAir<COMMITMENT_LEN>>,
     pub init_internal_chips: Vec<InternalPageAir<COMMITMENT_LEN>>,
@@ -131,11 +142,18 @@ pub struct PageController<const COMMITMENT_LEN: usize> {
     pub final_internal_chips: Vec<InternalPageAir<COMMITMENT_LEN>>,
     pub params: PageControllerParams,
     pub range_checker: Arc<RangeCheckerGateChip>,
+    main_traces: Option<PageControllerMainTrace<SC, COMMITMENT_LEN>>,
+    data_traces: Option<PageControllerDataTrace<SC, COMMITMENT_LEN>>,
+    commits: Option<PageControllerCommit<SC>>,
 }
 
 #[allow(clippy::too_many_arguments)]
-impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
-    pub fn new<SC: StarkGenericConfig>(
+impl<SC: StarkGenericConfig, const COMMITMENT_LEN: usize> PageController<SC, COMMITMENT_LEN>
+where
+    Val<SC>: AbstractField + PrimeField64,
+    Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
+{
+    pub fn new(
         data_bus_index: usize,
         internal_data_bus_index: usize,
         ops_bus_index: usize,
@@ -146,11 +164,7 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
         final_param: PageTreeParams,
         less_than_tuple_param: MyLessThanTupleParams,
         range_checker: Arc<RangeCheckerGateChip>,
-    ) -> Self
-    where
-        Val<SC>: AbstractField + PrimeField64,
-        Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
-    {
+    ) -> Self {
         Self {
             init_leaf_chips: (0..init_param.leaf_cap)
                 .map(|i| {
@@ -226,20 +240,19 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
                 final_tree_params: final_param,
             },
             range_checker,
+            main_traces: None,
+            data_traces: None,
+            commits: None,
         }
     }
 
-    fn gen_ops_trace<SC: StarkGenericConfig>(
+    fn gen_ops_trace(
         &self,
         mega_page: &mut Page,
         ops: &[Operation],
         range_checker: Arc<RangeCheckerGateChip>,
         trace_degree: usize,
-    ) -> RowMajorMatrix<Val<SC>>
-    where
-        Val<SC>: AbstractField + PrimeField64,
-        Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
-    {
+    ) -> RowMajorMatrix<Val<SC>> {
         self.offline_checker.generate_trace::<SC>(
             mega_page,
             ops.to_owned(),
@@ -248,7 +261,7 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
         )
     }
 
-    pub fn load_page_and_ops<SC: StarkGenericConfig>(
+    pub fn load_page_and_ops(
         &mut self,
         init_leaf_pages: Vec<Vec<Vec<u32>>>,
         init_internal_pages: Vec<Vec<Vec<u32>>>,
@@ -258,19 +271,19 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
         final_internal_pages: Vec<Vec<Vec<u32>>>,
         final_root_is_leaf: bool,
         final_root_idx: usize,
-        ops: Vec<Operation>,
+        ops: &[Operation],
         trace_degree: usize,
         trace_committer: &mut TraceCommitter<SC>,
-    ) -> (
-        PageControllerDataTrace<SC, COMMITMENT_LEN>,
-        PageControllerMainTrace<SC, COMMITMENT_LEN>,
-        PageControllerCommit<SC>,
-        PageControllerProverData<SC>,
-    )
-    where
-        Val<SC>: AbstractField + PrimeField64,
-        Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
-    {
+        init_cached_data: Option<(
+            NodeProducts<SC, COMMITMENT_LEN>,
+            NodeProducts<SC, COMMITMENT_LEN>,
+        )>,
+        final_cached_data: Option<(
+            NodeProducts<SC, COMMITMENT_LEN>,
+            NodeProducts<SC, COMMITMENT_LEN>,
+        )>,
+    ) -> PageControllerProverData<SC> {
+        let trace_span = info_span!("Load page trace generation").entered();
         let init_leaf_height = self.params.init_tree_params.leaf_page_height;
         let init_internal_height = self.params.init_tree_params.internal_page_height;
         let final_leaf_height = self.params.final_tree_params.leaf_page_height;
@@ -291,14 +304,26 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
             .resize(2 + 2 * self.params.idx_len + self.params.commitment_len, 0);
         let blank_final_internal = vec![blank_final_internal_row; final_internal_height];
         let internal_indices = ops.iter().map(|op| op.idx.clone()).collect();
+        let init_leaf_pages = init_leaf_pages
+            .into_iter()
+            .map(|p| Page::from_2d_vec_consume(p, self.params.idx_len, self.params.data_len))
+            .collect_vec();
+        let final_leaf_pages = final_leaf_pages
+            .into_iter()
+            .map(|p| Page::from_2d_vec_consume(p, self.params.idx_len, self.params.data_len))
+            .collect_vec();
+        let blank_init_leaf =
+            Page::from_2d_vec_consume(blank_init_leaf, self.params.idx_len, self.params.data_len);
+        let blank_final_leaf =
+            Page::from_2d_vec_consume(blank_final_leaf, self.params.idx_len, self.params.data_len);
         let (init_tree_products, mega_page) = make_tree_products(
             trace_committer,
-            &init_leaf_pages,
+            init_leaf_pages,
             &self.init_leaf_chips,
-            &blank_init_leaf,
-            &init_internal_pages,
+            blank_init_leaf,
+            init_internal_pages,
             &self.init_internal_chips,
-            &blank_init_internal,
+            blank_init_internal,
             &self.init_root_signal,
             &self.params.init_tree_params,
             init_root_is_leaf,
@@ -308,20 +333,25 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
             self.range_checker.clone(),
             &internal_indices,
             true,
+            init_cached_data,
         );
         let mut mega_page = mega_page.unwrap();
-        mega_page.resize(
-            mega_page.len() + 3 * ops.len(),
-            vec![0; 1 + self.params.idx_len + self.params.data_len],
+        mega_page.rows.resize(
+            mega_page.rows.len() + 3 * ops.len(),
+            PageCols::new(
+                0,
+                vec![0; self.params.idx_len],
+                vec![0; self.params.data_len],
+            ),
         );
         let (final_tree_products, _) = make_tree_products(
             trace_committer,
-            &final_leaf_pages,
+            final_leaf_pages,
             &self.final_leaf_chips,
-            &blank_final_leaf,
-            &final_internal_pages,
+            blank_final_leaf,
+            final_internal_pages,
             &self.final_internal_chips,
-            &blank_final_internal,
+            blank_final_internal,
             &self.final_root_signal,
             &self.params.final_tree_params,
             final_root_is_leaf,
@@ -331,15 +361,16 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
             self.range_checker.clone(),
             &internal_indices,
             false,
+            final_cached_data,
         );
-        let mut mega_page =
-            Page::from_2d_vec(&mega_page, self.params.idx_len, self.params.data_len);
-        let offline_checker_trace = self.gen_ops_trace::<SC>(
+        let offline_checker_span = info_span!("Ops Trace Generation").entered();
+        let offline_checker_trace = self.gen_ops_trace(
             &mut mega_page,
-            &ops,
+            ops,
             self.range_checker.clone(),
             trace_degree,
         );
+        offline_checker_span.exit();
 
         let data_trace = PageControllerDataTrace {
             init_leaf_chip_traces: init_tree_products.leaf.data_traces,
@@ -370,7 +401,304 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
             final_leaf_page: final_tree_products.leaf.prover_data,
             final_internal_page: final_tree_products.internal.prover_data,
         };
-        (data_trace, main_trace, commitments, prover_data)
+        trace_span.exit();
+        self.main_traces = Some(main_trace);
+        self.data_traces = Some(data_trace);
+        self.commits = Some(commitments);
+        prover_data
+    }
+
+    pub fn set_up_keygen_builder(
+        &self,
+        keygen_builder: &mut MultiStarkKeygenBuilder<SC>,
+        ops_sender: &dyn AnyRap<SC>,
+    ) {
+        let mut init_leaf_data_ptrs = vec![];
+
+        let mut init_internal_data_ptrs = vec![];
+        let mut init_internal_main_ptrs = vec![];
+
+        let mut final_leaf_data_ptrs = vec![];
+        let mut final_leaf_main_ptrs = vec![];
+
+        let mut final_internal_data_ptrs = vec![];
+        let mut final_internal_main_ptrs = vec![];
+
+        for _ in 0..self.params.init_tree_params.leaf_cap {
+            init_leaf_data_ptrs.push(
+                keygen_builder.add_cached_main_matrix(self.init_leaf_chips[0].cached_width()),
+            );
+        }
+
+        for _ in 0..self.params.init_tree_params.internal_cap {
+            init_internal_data_ptrs.push(
+                keygen_builder.add_cached_main_matrix(self.init_internal_chips[0].cached_width()),
+            );
+        }
+
+        for _ in 0..self.params.final_tree_params.leaf_cap {
+            final_leaf_data_ptrs.push(
+                keygen_builder.add_cached_main_matrix(self.final_leaf_chips[0].cached_width()),
+            );
+        }
+
+        for _ in 0..self.params.final_tree_params.internal_cap {
+            final_internal_data_ptrs.push(
+                keygen_builder.add_cached_main_matrix(self.final_internal_chips[0].cached_width()),
+            );
+        }
+
+        for _ in 0..self.params.init_tree_params.internal_cap {
+            init_internal_main_ptrs
+                .push(keygen_builder.add_main_matrix(self.init_internal_chips[0].main_width()));
+        }
+
+        for _ in 0..self.params.final_tree_params.leaf_cap {
+            final_leaf_main_ptrs
+                .push(keygen_builder.add_main_matrix(self.final_leaf_chips[0].main_width()));
+        }
+
+        for _ in 0..self.params.final_tree_params.internal_cap {
+            final_internal_main_ptrs
+                .push(keygen_builder.add_main_matrix(self.final_internal_chips[0].main_width()));
+        }
+
+        let ops_ptr = keygen_builder.add_main_matrix(self.offline_checker.air_width());
+
+        let init_root_ptr = keygen_builder.add_main_matrix(self.init_root_signal.air_width());
+        let final_root_ptr = keygen_builder.add_main_matrix(self.final_root_signal.air_width());
+
+        for (chip, ptr) in self
+            .init_leaf_chips
+            .iter()
+            .zip(init_leaf_data_ptrs.into_iter())
+        {
+            keygen_builder.add_partitioned_air(chip, COMMITMENT_LEN, vec![ptr]);
+        }
+
+        for i in 0..self.params.init_tree_params.internal_cap {
+            keygen_builder.add_partitioned_air(
+                &self.init_internal_chips[i],
+                COMMITMENT_LEN,
+                vec![init_internal_data_ptrs[i], init_internal_main_ptrs[i]],
+            );
+        }
+
+        for i in 0..self.params.final_tree_params.leaf_cap {
+            keygen_builder.add_partitioned_air(
+                &self.final_leaf_chips[i],
+                COMMITMENT_LEN,
+                vec![final_leaf_data_ptrs[i], final_leaf_main_ptrs[i]],
+            );
+        }
+
+        for i in 0..self.params.final_tree_params.internal_cap {
+            keygen_builder.add_partitioned_air(
+                &self.final_internal_chips[i],
+                COMMITMENT_LEN,
+                vec![final_internal_data_ptrs[i], final_internal_main_ptrs[i]],
+            );
+        }
+
+        keygen_builder.add_partitioned_air(&self.offline_checker, 0, vec![ops_ptr]);
+
+        keygen_builder.add_partitioned_air(
+            &self.init_root_signal,
+            COMMITMENT_LEN,
+            vec![init_root_ptr],
+        );
+
+        keygen_builder.add_partitioned_air(
+            &self.final_root_signal,
+            COMMITMENT_LEN,
+            vec![final_root_ptr],
+        );
+
+        keygen_builder.add_air(&self.range_checker.air, 0);
+
+        keygen_builder.add_air(ops_sender, 0);
+    }
+    /// This function clears the trace_builder, loads in the traces for all involved chips
+    /// (including the range_checker and the ops_sender, which is passed in along with its trace),
+    /// commits them, and then generates the proof.
+    /// cached_traces_prover_data is a vector of ProverTraceData object for the cached pages
+    /// (init_page, final_page), which is returned by load_page_and_ops
+    #[allow(clippy::too_many_arguments)]
+    pub fn prove(
+        &mut self,
+        engine: &impl StarkEngine<SC>,
+        pk: &MultiStarkProvingKey<SC>,
+        trace_builder: &mut TraceCommitmentBuilder<SC>,
+        prover_data: PageControllerProverData<SC>,
+        ops_sender: &dyn AnyRap<SC>,
+        ops_sender_trace: DenseMatrix<Val<SC>>,
+    ) -> (Proof<SC>, Vec<Vec<Val<SC>>>)
+    where
+        Val<SC>: PrimeField,
+        Domain<SC>: Send + Sync,
+        SC::Pcs: Sync,
+        Domain<SC>: Send + Sync,
+        PcsProverData<SC>: Send + Sync,
+        Com<SC>: Send + Sync,
+        SC::Challenge: Send + Sync,
+        PcsProof<SC>: Send + Sync,
+    {
+        let main_trace = self.main_traces.take().unwrap();
+        let data_trace = self.data_traces.take().unwrap();
+        let commits = self.commits.take().unwrap();
+
+        trace_builder.clear();
+
+        let offline_checker_trace = main_trace.offline_checker_trace;
+        let init_root = main_trace.init_root_signal_trace;
+        let final_root = main_trace.final_root_signal_trace;
+        let range_trace = self.range_checker.generate_trace();
+
+        for (tr, pd) in data_trace
+            .init_leaf_chip_traces
+            .into_iter()
+            .zip_eq(prover_data.init_leaf_page)
+        {
+            trace_builder.load_cached_trace(tr, pd);
+        }
+
+        for (tr, pd) in data_trace
+            .init_internal_chip_traces
+            .into_iter()
+            .zip_eq(prover_data.init_internal_page)
+        {
+            trace_builder.load_cached_trace(tr, pd);
+        }
+
+        for (tr, pd) in data_trace
+            .final_leaf_chip_traces
+            .into_iter()
+            .zip_eq(prover_data.final_leaf_page)
+        {
+            trace_builder.load_cached_trace(tr, pd);
+        }
+
+        for (tr, pd) in data_trace
+            .final_internal_chip_traces
+            .into_iter()
+            .zip_eq(prover_data.final_internal_page)
+        {
+            trace_builder.load_cached_trace(tr, pd);
+        }
+        for tr in main_trace.init_internal_chip_main_traces.into_iter() {
+            trace_builder.load_trace(tr);
+        }
+
+        for tr in main_trace.final_leaf_chip_main_traces.into_iter() {
+            trace_builder.load_trace(tr);
+        }
+
+        for tr in main_trace.final_internal_chip_main_traces.into_iter() {
+            trace_builder.load_trace(tr);
+        }
+        trace_builder.load_trace(offline_checker_trace);
+        trace_builder.load_trace(init_root);
+        trace_builder.load_trace(final_root);
+        trace_builder.load_trace(range_trace);
+        trace_builder.load_trace(ops_sender_trace);
+
+        tracing::info_span!("Prove trace commitment").in_scope(|| trace_builder.commit_current());
+
+        let mut airs: Vec<&dyn AnyRap<SC>> = vec![];
+        for chip in &self.init_leaf_chips {
+            airs.push(chip);
+        }
+        for chip in &self.init_internal_chips {
+            airs.push(chip);
+        }
+        for chip in &self.final_leaf_chips {
+            airs.push(chip);
+        }
+        for chip in &self.final_internal_chips {
+            airs.push(chip);
+        }
+        airs.push(&self.offline_checker);
+        airs.push(&self.init_root_signal);
+        airs.push(&self.final_root_signal);
+        airs.push(&self.range_checker.air);
+        airs.push(ops_sender);
+        let vk = pk.vk();
+        let main_trace_data = trace_builder.view(&vk, airs.clone());
+
+        let mut pis = vec![];
+        for c in commits.init_leaf_page_commitments {
+            let c: [Val<SC>; COMMITMENT_LEN] = c.into();
+            pis.push(c.to_vec());
+        }
+        for c in commits.init_internal_page_commitments {
+            let c: [Val<SC>; COMMITMENT_LEN] = c.into();
+            pis.push(c.to_vec());
+        }
+        for c in commits.final_leaf_page_commitments {
+            let c: [Val<SC>; COMMITMENT_LEN] = c.into();
+            pis.push(c.to_vec());
+        }
+        for c in commits.final_internal_page_commitments {
+            let c: [Val<SC>; COMMITMENT_LEN] = c.into();
+            pis.push(c.to_vec());
+        }
+        pis.push(vec![]);
+        {
+            let c: [Val<SC>; COMMITMENT_LEN] = commits.init_root_commitment.into();
+            pis.push(c.to_vec());
+        }
+        {
+            let c: [Val<SC>; COMMITMENT_LEN] = commits.final_root_commitment.into();
+            pis.push(c.to_vec());
+        }
+        pis.push(vec![]);
+        pis.push(vec![]);
+        let prover = engine.prover();
+        let mut challenger = engine.new_challenger();
+        (
+            prover.prove(&mut challenger, pk, main_trace_data, &pis),
+            pis,
+        )
+    }
+
+    /// This function takes a proof (returned by the prove function) and verifies it
+    pub fn verify(
+        &self,
+        engine: &impl StarkEngine<SC>,
+        vk: &MultiStarkVerifyingKey<SC>,
+        proof: &Proof<SC>,
+        pis: &[Vec<Val<SC>>],
+        ops_sender: &dyn AnyRap<SC>,
+    ) -> Result<(), VerificationError>
+    where
+        Val<SC>: PrimeField,
+    {
+        let verifier = engine.verifier();
+
+        let mut challenger = engine.new_challenger();
+        verifier.verify(&mut challenger, vk, self.airs(ops_sender), proof, pis)
+    }
+
+    pub fn airs<'a>(&'a self, ops_sender: &'a dyn AnyRap<SC>) -> Vec<&'a dyn AnyRap<SC>> {
+        let mut airs: Vec<&dyn AnyRap<SC>> = vec![];
+        for chip in &self.init_leaf_chips {
+            airs.push(chip);
+        }
+        for chip in &self.init_internal_chips {
+            airs.push(chip);
+        }
+        for chip in &self.final_leaf_chips {
+            airs.push(chip);
+        }
+        for chip in &self.final_internal_chips {
+            airs.push(chip);
+        }
+        airs.push(&self.offline_checker);
+        airs.push(&self.init_root_signal);
+        airs.push(&self.final_root_signal);
+        airs.push(&self.range_checker.air);
+        airs.push(ops_sender);
+        airs
     }
 }
 
@@ -378,12 +706,12 @@ impl<const COMMITMENT_LEN: usize> PageController<COMMITMENT_LEN> {
 /// internal_indices are relevant for final page generation only
 fn make_tree_products<SC: StarkGenericConfig, const COMMITMENT_LEN: usize>(
     committer: &mut TraceCommitter<SC>,
-    leaf_pages: &[Vec<Vec<u32>>],
+    leaf_pages: Vec<Page>,
     leaf_chips: &[LeafPageAir<COMMITMENT_LEN>],
-    blank_leaf_page: &[Vec<u32>],
-    internal_pages: &[Vec<Vec<u32>>],
+    blank_leaf_page: Page,
+    internal_pages: Vec<Vec<Vec<u32>>>,
     internal_chips: &[InternalPageAir<COMMITMENT_LEN>],
-    blank_internal_page: &[Vec<u32>],
+    blank_internal_page: Vec<Vec<u32>>,
     root_signal: &RootSignalAir<COMMITMENT_LEN>,
     params: &PageTreeParams,
     root_is_leaf: bool,
@@ -393,46 +721,58 @@ fn make_tree_products<SC: StarkGenericConfig, const COMMITMENT_LEN: usize>(
     range_checker: Arc<RangeCheckerGateChip>,
     internal_indices: &HashSet<Vec<u32>>,
     make_mega_page: bool,
-) -> (TreeProducts<SC, COMMITMENT_LEN>, Option<Vec<Vec<u32>>>)
+    cached_data: Option<(
+        NodeProducts<SC, COMMITMENT_LEN>,
+        NodeProducts<SC, COMMITMENT_LEN>,
+    )>,
+) -> (TreeProducts<SC, COMMITMENT_LEN>, Option<Page>)
 where
     Val<SC>: AbstractField + PrimeField64,
     Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
 {
     let mut leaf_pages = leaf_pages.to_vec();
     let mut internal_pages = internal_pages.to_vec();
-    leaf_pages.resize(params.leaf_cap, blank_leaf_page.to_vec());
+    leaf_pages.resize(params.leaf_cap, blank_leaf_page.clone());
     internal_pages.resize(params.internal_cap, blank_internal_page.to_vec());
     let leaf_trace = leaf_pages
         .iter()
         .zip(leaf_chips.iter())
-        .map(|(page, chip)| {
-            chip.generate_cached_trace::<Val<SC>>(Page::from_2d_vec(page, idx_len, data_len))
-        })
+        .map(|(page, chip)| chip.generate_cached_trace_from_page::<Val<SC>>(page))
         .collect::<Vec<_>>();
 
     let internal_trace = internal_pages
         .iter()
         .zip(internal_chips.iter())
-        .map(|(page, chip)| chip.generate_cached_trace::<Val<SC>>(page.clone()))
+        .map(|(page, chip)| chip.generate_cached_trace::<Val<SC>>(page))
         .collect::<Vec<_>>();
-
-    let mut leaf_prods = gen_products(committer, leaf_trace);
-    let mut internal_prods = gen_products(committer, internal_trace);
-
+    let (mut leaf_prods, mut internal_prods) = if cached_data.is_some() {
+        let mut data = cached_data.unwrap();
+        data.0.data_traces = leaf_trace;
+        data.1.data_traces = internal_trace;
+        (data.0, data.1)
+    } else {
+        (
+            gen_products(committer, leaf_trace),
+            gen_products(committer, internal_trace),
+        )
+    };
+    let tree_span = info_span!("Tree DFS").entered();
     let tree = PageTreeGraph::<SC, COMMITMENT_LEN>::new(
         &leaf_pages,
         &internal_pages,
+        internal_indices,
         &leaf_prods.commitments,
         &internal_prods.commitments,
         (root_is_leaf, root_idx),
         idx_len,
+        data_len,
     );
-    for i in 0..leaf_prods.commitments.len() {
-        let page = leaf_pages[i].clone();
+    tree_span.exit();
+    let main_trace_span = info_span!("Main Trace Generation").entered();
+    for (i, page) in leaf_pages.into_iter().enumerate() {
         let range = tree.leaf_ranges[i].clone();
-        let page = Page::from_2d_vec(&page, idx_len, data_len);
         let tmp = leaf_chips[i].generate_main_trace::<SC>(
-            &page,
+            page,
             range,
             range_checker.clone(),
             internal_indices,
@@ -440,20 +780,18 @@ where
         leaf_prods.main_traces.push(tmp);
     }
 
-    for i in 0..internal_prods.commitments.len() {
-        let page = internal_pages[i].clone();
+    for (i, page) in internal_pages.into_iter().enumerate() {
         let range = tree.internal_ranges[i].clone();
-        let mults = tree.mults[i].clone();
-        let child_ids = tree.child_ids[i].clone();
         let tmp = internal_chips[i].generate_main_trace::<Val<SC>>(
             page,
-            child_ids,
-            mults,
+            &tree.child_ids[i],
+            &tree.mults[i],
             range,
             range_checker.clone(),
         );
         internal_prods.main_traces.push(tmp);
     }
+    main_trace_span.exit();
     let root_commitment = if root_is_leaf {
         leaf_prods.commitments[root_idx].clone()
     } else {
@@ -503,6 +841,23 @@ where
     }
 }
 
+pub fn gen_some_products_from_prover_data<SC: StarkGenericConfig, const COMMITMENT_LEN: usize>(
+    data: Vec<ProverTraceData<SC>>,
+) -> NodeProducts<SC, COMMITMENT_LEN>
+where
+    Val<SC>: AbstractField + PrimeField64,
+    Com<SC>: Into<[Val<SC>; COMMITMENT_LEN]>,
+{
+    let commitments = commitment_from_data(&data);
+
+    NodeProducts {
+        data_traces: vec![],
+        main_traces: vec![],
+        prover_data: data,
+        commitments,
+    }
+}
+
 fn data_from_trace<SC: StarkGenericConfig>(
     committer: &mut TraceCommitter<SC>,
     traces: &[RowMajorMatrix<Val<SC>>],
@@ -513,7 +868,7 @@ fn data_from_trace<SC: StarkGenericConfig>(
         .collect::<Vec<_>>()
 }
 
-fn commitment_from_data<SC: StarkGenericConfig>(data: &[ProverTraceData<SC>]) -> Vec<Com<SC>> {
+pub fn commitment_from_data<SC: StarkGenericConfig>(data: &[ProverTraceData<SC>]) -> Vec<Com<SC>> {
     data.iter()
         .map(|data| data.commit.clone())
         .collect::<Vec<_>>()

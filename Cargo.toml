@@ -1,6 +1,8 @@
 [workspace]
 members = [
+    "bin/common",
     "bin/afs",
+    "bin/afs-1b",
     "bin/olap",
     "benchmark",
     "db/page",

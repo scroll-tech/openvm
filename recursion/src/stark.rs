@@ -1,6 +1,5 @@
 use std::any::{type_name, Any};
 
-use afs_stark_backend::air_builders::symbolic::{SymbolicConstraints, SymbolicRapBuilder};
 use itertools::Itertools;
 use p3_air::BaseAir;
 use p3_baby_bear::BabyBear;
@@ -10,6 +9,7 @@ use p3_matrix::dense::RowMajorMatrixView;
 use p3_matrix::stack::VerticalPair;
 
 use afs_compiler::ir::{Array, Builder, Config, Ext, ExtConst, Felt, SymbolicExt, Usize, Var};
+use afs_stark_backend::air_builders::symbolic::{SymbolicConstraints, SymbolicRapBuilder};
 use afs_stark_backend::prover::opener::AdjacentOpenedValues;
 use afs_stark_backend::rap::Rap;
 use afs_test_utils::config::{baby_bear_poseidon2::BabyBearPoseidon2Config, FriParameters};
@@ -23,7 +23,7 @@ use crate::fri::{TwoAdicFriPcsVariable, TwoAdicMultiplicativeCosetVariable};
 use crate::hints::Hintable;
 use crate::types::{
     AdjacentOpenedValuesVariable, CommitmentsVariable, InnerConfig, MultiStarkVerificationAdvice,
-    StarkVerificationAdvice, VerifierProgramInput, VerifierProgramInputVariable, PROOF_MAX_NUM_PVS,
+    StarkVerificationAdvice, VerifierInput, VerifierInputVariable, PROOF_MAX_NUM_PVS,
 };
 use crate::utils::const_fri_config;
 
@@ -68,13 +68,13 @@ impl VerifierProgram<InnerConfig> {
     ) -> Vec<Instruction<BabyBear>> {
         let mut builder = Builder::<InnerConfig>::default();
 
-        let input: VerifierProgramInputVariable<_> = builder.uninit();
-        VerifierProgramInput::<BabyBearPoseidon2Config>::witness(&input, &mut builder);
+        let input: VerifierInputVariable<_> = builder.uninit();
+        VerifierInput::<BabyBearPoseidon2Config>::witness(&input, &mut builder);
 
         let pcs = TwoAdicFriPcsVariable {
             config: const_fri_config(&mut builder, fri_params),
         };
-        Self::verify(&mut builder, &pcs, raps, constants, &input);
+        StarkVerifier::verify(&mut builder, &pcs, raps, constants, &input);
 
         const WORD_SIZE: usize = 1;
         builder.compile_isa::<WORD_SIZE>()
@@ -90,6 +90,48 @@ impl<C: Config> StarkVerifier<C>
 where
     C::F: TwoAdicField,
 {
+    /// Reference: [afs_stark_backend::verifier::MultiTraceStarkVerifier::verify].
+    pub fn verify(
+        builder: &mut Builder<C>,
+        pcs: &TwoAdicFriPcsVariable<C>,
+        raps: Vec<&dyn DynRapForRecursion<C>>,
+        constants: MultiStarkVerificationAdvice<C>,
+        input: &VerifierInputVariable<C>,
+    ) {
+        let proof = &input.proof;
+
+        let cumulative_sum: Ext<C::F, C::EF> = builder.eval(C::F::zero());
+        let num_phases = constants.num_challenges_to_sample.len();
+        // Currently only support 0 or 1 phase is supported.
+        assert!(num_phases <= 1);
+        // Tmp solution to support 0 or 1 phase.
+        if num_phases > 0 {
+            builder
+                .range(0, proof.exposed_values_after_challenge.len())
+                .for_each(|i, builder| {
+                    let exposed_values = builder.get(&proof.exposed_values_after_challenge, i);
+
+                    // Verifier does not support more than 1 challenge phase
+                    builder.assert_usize_eq(exposed_values.len(), 1);
+
+                    let values = builder.get(&exposed_values, 0);
+
+                    // Only exposed value should be cumulative sum
+                    builder.assert_usize_eq(values.len(), 1);
+
+                    let summand = builder.get(&values, 0);
+                    builder.assign(cumulative_sum, cumulative_sum + summand);
+                });
+        }
+        builder.assert_ext_eq(cumulative_sum, C::EF::zero().cons());
+
+        let mut challenger = DuplexChallengerVariable::new(builder);
+
+        Self::verify_raps(builder, pcs, raps, constants, &mut challenger, input);
+
+        builder.halt();
+    }
+
     /// Reference: [afs_stark_backend::verifier::MultiTraceStarkVerifier::verify_raps].
     pub fn verify_raps(
         builder: &mut Builder<C>,
@@ -97,14 +139,14 @@ where
         raps: Vec<&dyn DynRapForRecursion<C>>,
         vk: MultiStarkVerificationAdvice<C>,
         challenger: &mut DuplexChallengerVariable<C>,
-        input: &VerifierProgramInputVariable<C>,
+        input: &VerifierInputVariable<C>,
     ) where
         C::F: TwoAdicField,
         C::EF: TwoAdicField,
     {
         Self::validate_inputs(builder, &raps, &vk, input);
 
-        let VerifierProgramInputVariable::<C> {
+        let VerifierInputVariable::<C> {
             proof,
             log_degree_per_air,
             public_values,
@@ -196,7 +238,7 @@ where
         for i in 0..num_airs {
             let log_degree = builder.get(log_degree_per_air, i);
 
-            let domain = pcs.natural_domain_for_log_degree(builder, Usize::Var(log_degree));
+            let domain = pcs.natural_domain_for_log_degree(builder, log_degree);
             builder.set_value(&mut trace_domains, i, domain.clone());
 
             let mut trace_points = builder.dyn_array::<Ext<_, _>>(2);
@@ -204,11 +246,8 @@ where
             builder.set_value(&mut trace_points, 0, zeta);
             builder.set_value(&mut trace_points, 1, zeta_next);
 
-            let log_quotient_degree: Var<_> = builder.constant(C::N::from_canonical_usize(
-                vk.per_air[i].log_quotient_degree(),
-            ));
-            let quotient_degree: Var<_> =
-                builder.constant(C::N::from_canonical_usize(vk.per_air[i].quotient_degree));
+            let log_quotient_degree = Usize::Const(vk.per_air[i].log_quotient_degree());
+            let quotient_degree = Usize::Const(vk.per_air[i].quotient_degree);
             let log_quotient_size: Usize<_> = builder.eval(log_degree + log_quotient_degree);
             let quotient_domain =
                 domain.create_disjoint_domain(builder, log_quotient_size, Some(pcs.config.clone()));
@@ -259,7 +298,7 @@ where
                     points: trace_points.clone(),
                 };
 
-                let mut mats: Array<_, TwoAdicPcsMatsVariable<_>> = builder.dyn_array(num_airs);
+                let mut mats: Array<_, TwoAdicPcsMatsVariable<_>> = builder.dyn_array(1);
                 builder.set_value(&mut mats, 0, prep_mat);
 
                 builder.set_value(
@@ -722,7 +761,7 @@ where
         builder: &mut Builder<C>,
         raps: &[&dyn DynRapForRecursion<C>],
         vk: &MultiStarkVerificationAdvice<C>,
-        input: &VerifierProgramInputVariable<C>,
+        input: &VerifierInputVariable<C>,
     ) {
         assert_eq!(raps.len(), vk.per_air.len());
         let num_airs = raps.len();
@@ -730,7 +769,7 @@ where
         // Currently only support 0 or 1 phase is supported.
         assert!(num_phases <= 1);
 
-        let VerifierProgramInputVariable::<C> {
+        let VerifierInputVariable::<C> {
             proof,
             log_degree_per_air,
             public_values,

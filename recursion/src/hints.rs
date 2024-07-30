@@ -15,8 +15,8 @@ use afs_test_utils::config::baby_bear_poseidon2::BabyBearPoseidon2Config;
 
 use crate::types::{
     AdjacentOpenedValuesVariable, CommitmentsVariable, InnerConfig, OpenedValuesVariable,
-    OpeningProofVariable, StarkProofVariable, TraceWidthVariable, VerifierProgramInput,
-    VerifierProgramInputVariable,
+    OpeningProofVariable, StarkProofVariable, TraceWidthVariable, VerifierInput,
+    VerifierInputVariable,
 };
 
 pub type InnerVal = BabyBear;
@@ -132,15 +132,21 @@ impl<I: VecAutoHintable<InnerConfig>> Hintable<InnerConfig> for Vec<I> {
     }
 }
 
-impl Hintable<InnerConfig> for VerifierProgramInput<BabyBearPoseidon2Config> {
-    type HintVariable = VerifierProgramInputVariable<InnerConfig>;
+impl Hintable<InnerConfig> for VerifierInput<BabyBearPoseidon2Config> {
+    type HintVariable = VerifierInputVariable<InnerConfig>;
 
     fn read(builder: &mut Builder<InnerConfig>) -> Self::HintVariable {
         let proof = Proof::<BabyBearPoseidon2Config>::read(builder);
-        let log_degree_per_air = Vec::<usize>::read(builder);
+        let raw_log_degree_per_air = Vec::<usize>::read(builder);
+        // A hacky way to cast ptr.
+        let log_degree_per_air = if let Array::Dyn(ptr, len) = raw_log_degree_per_air {
+            Array::Dyn(ptr, len)
+        } else {
+            unreachable!();
+        };
         let public_values = Vec::<Vec<InnerVal>>::read(builder);
 
-        VerifierProgramInputVariable {
+        VerifierInputVariable {
             proof,
             log_degree_per_air,
             public_values,
@@ -169,6 +175,21 @@ impl Hintable<InnerConfig> for Vec<usize> {
         vec![self
             .iter()
             .map(|x| InnerVal::from_canonical_usize(*x))
+            .collect()]
+    }
+}
+
+impl Hintable<InnerConfig> for Vec<u8> {
+    type HintVariable = Array<InnerConfig, Var<InnerVal>>;
+
+    fn read(builder: &mut Builder<InnerConfig>) -> Self::HintVariable {
+        builder.hint_vars()
+    }
+
+    fn write(&self) -> Vec<Vec<InnerVal>> {
+        vec![self
+            .iter()
+            .map(|x| InnerVal::from_canonical_u8(*x))
             .collect()]
     }
 }
@@ -282,9 +303,7 @@ impl Hintable<InnerConfig> for Proof<BabyBearPoseidon2Config> {
     }
 }
 
-impl Hintable<InnerConfig>
-    for afs_stark_backend::prover::opener::OpeningProof<BabyBearPoseidon2Config>
-{
+impl Hintable<InnerConfig> for OpeningProof<BabyBearPoseidon2Config> {
     type HintVariable = OpeningProofVariable<InnerConfig>;
 
     fn read(builder: &mut Builder<InnerConfig>) -> Self::HintVariable {
@@ -416,7 +435,7 @@ mod test {
         builder.halt();
 
         let program = builder.compile_isa::<1>();
-        execute_program::<1, _>(program, stream);
+        execute_program::<1>(program, stream);
     }
 
     #[test]
@@ -463,6 +482,6 @@ mod test {
         builder.halt();
 
         let program = builder.compile_isa::<1>();
-        execute_program::<1, _>(program, stream);
+        execute_program::<1>(program, stream);
     }
 }
