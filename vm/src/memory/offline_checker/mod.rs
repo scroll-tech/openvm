@@ -14,6 +14,7 @@ mod columns;
 #[cfg(test)]
 mod tests;
 mod trace;
+pub mod utils;
 
 pub struct MemoryOfflineChecker {
     pub offline_checker: OfflineChecker,

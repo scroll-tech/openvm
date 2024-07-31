@@ -12,7 +12,10 @@ use p3_matrix::dense::RowMajorMatrix;
 
 use crate::cpu::{MEMORY_BUS, MEMORY_INTERACTION_BUS, RANGE_CHECKER_BUS};
 
+use crate::memory::offline_checker::columns::MemoryOfflineCheckerCols;
 use crate::memory::offline_checker::{MemoryAccess, MemoryChip, OpType};
+
+use super::utils::gen_dummy_oc_interaction_trace;
 
 const WORD_SIZE: usize = 3;
 const ADDR_SPACE_LIMB_BITS: usize = 8;
@@ -24,6 +27,27 @@ const IDX_LEN: usize = 2;
 const DATA_LEN: usize = 3;
 
 const TRACE_DEGREE: usize = 16;
+
+#[test]
+fn test_flatten_fromslice_roundtrip() {
+    let memory_chip = MemoryChip::<WORD_SIZE, BabyBear>::new(
+        ADDR_SPACE_LIMB_BITS,
+        POINTER_LIMB_BITS,
+        CLK_LIMB_BITS,
+        DECOMP,
+        HashMap::new(),
+    );
+
+    let num_cols = MemoryOfflineCheckerCols::<usize>::width(&memory_chip.air);
+    let all_cols = (0..num_cols).collect::<Vec<usize>>();
+
+    let cols_numbered = MemoryOfflineCheckerCols::<usize>::from_slice(&all_cols, &memory_chip.air);
+    let flattened = cols_numbered.flatten();
+
+    assert_eq!(flattened, all_cols);
+
+    assert_eq!(num_cols, flattened.len());
+}
 
 fn gen_requester_trace(
     ops: &[MemoryAccess<WORD_SIZE, BabyBear>],
@@ -52,45 +76,6 @@ fn gen_requester_trace(
     )
 }
 
-fn gen_dummy_oc_interaction_trace(
-    ops: &mut [MemoryAccess<WORD_SIZE, BabyBear>],
-    width: usize,
-) -> RowMajorMatrix<BabyBear> {
-    ops.sort_by_key(|op| (op.address_space, op.address, op.timestamp));
-    let mut rows = vec![];
-    for i in 0..ops.len() {
-        let is_first_access = (i == 0)
-            || (ops[i].address_space != ops[i - 1].address_space
-                && ops[i].address != ops[i - 1].address);
-        let is_first_access = BabyBear::from_bool(is_first_access);
-
-        let is_final_access = (i == ops.len() - 1)
-            || (ops[i].address_space != ops[i + 1].address_space)
-            || (ops[i].address != ops[i + 1].address);
-        let is_final_access = BabyBear::from_bool(is_final_access);
-
-        let is_first_read = is_first_access * BabyBear::from_canonical_u8(1 - ops[i].op_type as u8);
-        let mut rec_fields = vec![is_first_read * BabyBear::neg_one(), BabyBear::one()];
-        rec_fields.extend(vec![ops[i].address_space, ops[i].address]);
-        rec_fields.extend(ops[i].data);
-
-        let mut send_fields = vec![is_final_access, BabyBear::neg_one()];
-        send_fields.extend(vec![ops[i].address_space, ops[i].address]);
-        send_fields.extend(ops[i].data);
-
-        rows.extend(rec_fields);
-        rows.extend(send_fields);
-    }
-
-    rows.extend(
-        iter::repeat_with(|| iter::repeat(BabyBear::zero()).take(width))
-            .take(2 * (TRACE_DEGREE - ops.len()))
-            .flatten(),
-    );
-
-    RowMajorMatrix::new(rows, width)
-}
-
 #[test]
 fn test_offline_checker() {
     let range_checker = Arc::new(RangeCheckerGateChip::new(RANGE_CHECKER_BUS, RANGE_MAX));
@@ -109,7 +94,7 @@ fn test_offline_checker() {
     let dummy_oc_interaction_air =
         DummyInteractionAir::new(1 + IDX_LEN + DATA_LEN, true, MEMORY_INTERACTION_BUS);
 
-    let mut ops: Vec<MemoryAccess<WORD_SIZE, BabyBear>> = vec![
+    let ops: Vec<MemoryAccess<WORD_SIZE, BabyBear>> = vec![
         MemoryAccess {
             timestamp: 1,
             op_type: OpType::Write,
@@ -207,9 +192,11 @@ fn test_offline_checker() {
 
     let trace = memory_chip.generate_trace(range_checker.clone());
     let range_checker_trace = range_checker.generate_trace();
-    let requester_trace = gen_requester_trace(&ops, requester.field_width() + 1);
-    let dummy_oc_interaction_trace =
-        gen_dummy_oc_interaction_trace(&mut ops, dummy_oc_interaction_air.field_width() + 1);
+    let requester_trace = gen_requester_trace(&memory_chip.accesses, requester.field_width() + 1);
+    let dummy_oc_interaction_trace = gen_dummy_oc_interaction_trace(
+        &mut memory_chip.accesses,
+        dummy_oc_interaction_air.field_width() + 1,
+    );
 
     run_simple_test_no_pis(
         vec![
@@ -255,19 +242,13 @@ fn test_offline_checker_valid_first_read() {
     // read before writing, but first operation in block so should pass
     memory_chip.accesses[0].op_type = OpType::Read;
 
-    let mut ops = vec![MemoryAccess {
-        timestamp: 0,
-        op_type: OpType::Read,
-        address_space: BabyBear::one(),
-        address: BabyBear::zero(),
-        data: [BabyBear::zero(), BabyBear::zero(), BabyBear::zero()],
-    }];
-
     let memory_trace = memory_chip.generate_trace(range_checker.clone());
     let range_checker_trace = range_checker.generate_trace();
-    let requester_trace = gen_requester_trace(&ops, requester.field_width() + 1);
-    let dummy_oc_interaction_trace =
-        gen_dummy_oc_interaction_trace(&mut ops, dummy_oc_interaction_air.field_width() + 1);
+    let requester_trace = gen_requester_trace(&memory_chip.accesses, requester.field_width() + 1);
+    let dummy_oc_interaction_trace = gen_dummy_oc_interaction_trace(
+        &mut memory_chip.accesses,
+        dummy_oc_interaction_air.field_width() + 1,
+    );
 
     run_simple_test_no_pis(
         vec![
@@ -304,7 +285,7 @@ fn test_offline_checker_negative_data_mismatch() {
     let dummy_oc_interaction_air =
         DummyInteractionAir::new(1 + IDX_LEN + DATA_LEN, true, MEMORY_INTERACTION_BUS);
 
-    let mut ops: Vec<MemoryAccess<WORD_SIZE, BabyBear>> = vec![
+    let ops: Vec<MemoryAccess<WORD_SIZE, BabyBear>> = vec![
         MemoryAccess {
             timestamp: 0,
             op_type: OpType::Write,
@@ -346,9 +327,11 @@ fn test_offline_checker_negative_data_mismatch() {
     let trace = memory_chip.generate_trace(range_checker.clone());
 
     let range_checker_trace = range_checker.generate_trace();
-    let requester_trace = gen_requester_trace(&ops, requester.field_width() + 1);
-    let dummy_oc_interaction_trace =
-        gen_dummy_oc_interaction_trace(&mut ops, dummy_oc_interaction_air.field_width() + 1);
+    let requester_trace = gen_requester_trace(&memory_chip.accesses, requester.field_width() + 1);
+    let dummy_oc_interaction_trace = gen_dummy_oc_interaction_trace(
+        &mut memory_chip.accesses,
+        dummy_oc_interaction_air.field_width() + 1,
+    );
 
     USE_DEBUG_BUILDER.with(|debug| {
         *debug.lock().unwrap() = false;

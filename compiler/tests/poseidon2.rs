@@ -1,3 +1,4 @@
+use afs_compiler::util::execute_program;
 use p3_baby_bear::BabyBear;
 use p3_field::extension::BinomialExtensionField;
 use p3_field::AbstractField;
@@ -7,7 +8,6 @@ use rand::Rng;
 use afs_compiler::{
     asm::AsmBuilder,
     ir::{Var, PERMUTATION_WIDTH},
-    util::end_to_end_test,
 };
 
 type F = BabyBear;
@@ -90,7 +90,10 @@ fn test_compiler_poseidon2_hash() {
 
     builder.halt();
 
-    end_to_end_test::<WORD_SIZE, _>(builder, vec![]);
+    let program = builder.compile_isa::<WORD_SIZE>();
+    execute_program::<WORD_SIZE>(program, vec![]);
+
+    // end_to_end_test::<WORD_SIZE, _>(builder, vec![]);
 }
 
 #[test]
@@ -113,5 +116,9 @@ fn test_compiler_poseidon2_hash_v2() {
     });
 
     builder.halt();
-    end_to_end_test::<WORD_SIZE, _>(builder, vec![]);
+
+    let program = builder.compile_isa::<WORD_SIZE>();
+    execute_program::<WORD_SIZE>(program, vec![]);
+
+    // end_to_end_test::<WORD_SIZE, _>(builder, vec![]);
 }

@@ -126,7 +126,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> MemoryChip<WORD_SIZE, F> {
                         false,
                         false,
                         dummy_op.clone(),
-                        self.accesses[self.accesses.len() - 1].clone(),
+                        dummy_op.clone(),
                         range_checker.clone(),
                     ),
                 )
@@ -134,10 +134,6 @@ impl<const WORD_SIZE: usize, F: PrimeField32> MemoryChip<WORD_SIZE, F> {
             );
             rows_len += 1;
             rows[rows_len - 1].push(F::zero());
-        }
-
-        for i in 0..rows.len() {
-            println!("row {}: {:?}", i, rows[i]);
         }
 
         RowMajorMatrix::new(rows.concat(), self.air.air_width())

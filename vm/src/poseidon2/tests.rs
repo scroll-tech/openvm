@@ -21,7 +21,8 @@ use afs_test_utils::utils::create_seeded_rng;
 use crate::cpu::trace::Instruction;
 use crate::cpu::OpCode::{COMP_POS2, PERM_POS2};
 use crate::cpu::POSEIDON2_DIRECT_BUS;
-use crate::cpu::{MEMORY_BUS, POSEIDON2_BUS};
+use crate::cpu::{MEMORY_BUS, MEMORY_INTERACTION_BUS, POSEIDON2_BUS};
+use crate::memory::offline_checker::utils::gen_dummy_oc_interaction_trace;
 use crate::memory::tree::Hasher;
 use crate::vm::config::{VmConfig, DEFAULT_MAX_SEGMENT_LEN};
 use crate::vm::VirtualMachine;
@@ -161,6 +162,13 @@ macro_rules! run_perm_ops {
             5 + 1,
         );
 
+        // 4 = 1 + IDX_LEN (2) + DATA_LEN (1)
+        let dummy_oc_interaction_air = DummyInteractionAir::new(4, true, MEMORY_INTERACTION_BUS);
+        let dummy_oc_interaction_trace = gen_dummy_oc_interaction_trace(
+            &mut segment.memory_chip.accesses,
+            dummy_oc_interaction_air.field_width() + 1,
+        );
+
         let memory_chip_trace = segment
             .memory_chip
             .generate_trace(segment.range_checker.clone());
@@ -173,6 +181,7 @@ macro_rules! run_perm_ops {
             poseidon2_trace,
             dummy_cpu_memory_trace,
             dummy_cpu_poseidon2_trace,
+            dummy_oc_interaction_trace,
         ];
 
         // engine generation
@@ -182,7 +191,14 @@ macro_rules! run_perm_ops {
         let fri_params = fri_params_with_80_bits_of_security()[1];
         let engine = engine_from_perm(perm, max_log_degree, fri_params);
 
-        (vm, engine, dummy_cpu_memory, dummy_cpu_poseidon2, traces)
+        (
+            vm,
+            engine,
+            dummy_cpu_memory,
+            dummy_cpu_poseidon2,
+            dummy_oc_interaction_air,
+            traces,
+        )
     }};
 }
 
@@ -211,15 +227,13 @@ fn random_instructions<const NUM_OPS: usize>() -> [Instruction<BabyBear>; NUM_OP
 #[test]
 fn poseidon2_chip_random_50_test() {
     let mut rng = create_seeded_rng();
-    const NUM_OPS: usize = 1;
+    const NUM_OPS: usize = 50;
     let instructions: [Instruction<BabyBear>; NUM_OPS] = random_instructions::<NUM_OPS>();
     let data: [[BabyBear; 16]; NUM_OPS] =
         from_fn(|_| from_fn(|_| BabyBear::from_canonical_u32(rng.next_u32() % (1 << 30))));
 
-    let (vm, engine, dummy_cpu_memory, dummy_cpu_poseidon2, traces) =
+    let (vm, engine, dummy_cpu_memory, dummy_cpu_poseidon2, dummy_oc_interaction_air, traces) =
         run_perm_ops!(instructions, NUM_OPS, data);
-
-    // println!("{:?}", traces[1]);
 
     // positive test
     engine
@@ -230,9 +244,10 @@ fn poseidon2_chip_random_50_test() {
                 &vm.segments[0].poseidon2_chip.air,
                 &dummy_cpu_memory,
                 &dummy_cpu_poseidon2,
+                &dummy_oc_interaction_air,
             ],
             traces,
-            vec![vec![]; 5],
+            vec![vec![]; 6],
         )
         .expect("Verification failed");
 }
@@ -246,7 +261,7 @@ fn poseidon2_negative_test() {
     let data: [[BabyBear; 16]; NUM_OPS] =
         from_fn(|_| from_fn(|_| BabyBear::from_canonical_u32(rng.next_u32() % (1 << 30))));
 
-    let (vm, engine, dummy_cpu_memory, dummy_cpu_poseidon2, mut traces) =
+    let (vm, engine, dummy_cpu_memory, dummy_cpu_poseidon2, dummy_oc_interaction_air, mut traces) =
         run_perm_ops!(instructions, NUM_OPS, data);
     let poseidon2_trace_index = 2;
 
@@ -267,9 +282,10 @@ fn poseidon2_negative_test() {
                     &vm.segments[0].poseidon2_chip.air,
                     &dummy_cpu_memory,
                     &dummy_cpu_poseidon2,
+                    &dummy_oc_interaction_air,
                 ],
                 traces.clone(),
-                vec![vec![]; 5],
+                vec![vec![]; 6],
             ),
             Err(VerificationError::OodEvaluationMismatch),
             "Expected constraint to fail"
