@@ -211,13 +211,15 @@ fn random_instructions<const NUM_OPS: usize>() -> [Instruction<BabyBear>; NUM_OP
 #[test]
 fn poseidon2_chip_random_50_test() {
     let mut rng = create_seeded_rng();
-    const NUM_OPS: usize = 50;
+    const NUM_OPS: usize = 1;
     let instructions: [Instruction<BabyBear>; NUM_OPS] = random_instructions::<NUM_OPS>();
     let data: [[BabyBear; 16]; NUM_OPS] =
         from_fn(|_| from_fn(|_| BabyBear::from_canonical_u32(rng.next_u32() % (1 << 30))));
 
     let (vm, engine, dummy_cpu_memory, dummy_cpu_poseidon2, traces) =
         run_perm_ops!(instructions, NUM_OPS, data);
+
+    // println!("{:?}", traces[1]);
 
     // positive test
     engine

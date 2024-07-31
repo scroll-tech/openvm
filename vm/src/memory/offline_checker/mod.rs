@@ -11,6 +11,8 @@ use super::MemoryAccess;
 mod air;
 mod bridge;
 mod columns;
+#[cfg(test)]
+mod tests;
 mod trace;
 
 pub struct MemoryOfflineChecker {

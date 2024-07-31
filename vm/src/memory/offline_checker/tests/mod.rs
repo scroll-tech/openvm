@@ -10,9 +10,9 @@ use p3_baby_bear::BabyBear;
 use p3_field::AbstractField;
 use p3_matrix::dense::RowMajorMatrix;
 
-use crate::cpu::{MEMORY_BUS, RANGE_CHECKER_BUS};
+use crate::cpu::{MEMORY_BUS, MEMORY_INTERACTION_BUS, RANGE_CHECKER_BUS};
 
-use super::{offline_checker::MemoryChip, MemoryAccess, OpType};
+use crate::memory::offline_checker::{MemoryAccess, MemoryChip, OpType};
 
 const WORD_SIZE: usize = 3;
 const ADDR_SPACE_LIMB_BITS: usize = 8;
@@ -20,8 +20,76 @@ const POINTER_LIMB_BITS: usize = 8;
 const CLK_LIMB_BITS: usize = 8;
 const DECOMP: usize = 4;
 const RANGE_MAX: u32 = 1 << DECOMP;
+const IDX_LEN: usize = 2;
+const DATA_LEN: usize = 3;
 
 const TRACE_DEGREE: usize = 16;
+
+fn gen_requester_trace(
+    ops: &[MemoryAccess<WORD_SIZE, BabyBear>],
+    width: usize,
+) -> RowMajorMatrix<BabyBear> {
+    RowMajorMatrix::new(
+        ops.iter()
+            .flat_map(|op: &MemoryAccess<WORD_SIZE, BabyBear>| {
+                [
+                    BabyBear::one(),
+                    BabyBear::from_canonical_usize(op.timestamp),
+                    BabyBear::from_canonical_u8(op.op_type as u8),
+                    op.address_space,
+                    op.address,
+                ]
+                .into_iter()
+                .chain(op.data.iter().cloned())
+            })
+            .chain(
+                iter::repeat_with(|| iter::repeat(BabyBear::zero()).take(width))
+                    .take(TRACE_DEGREE - ops.len())
+                    .flatten(),
+            )
+            .collect(),
+        width,
+    )
+}
+
+fn gen_dummy_oc_interaction_trace(
+    ops: &mut [MemoryAccess<WORD_SIZE, BabyBear>],
+    width: usize,
+) -> RowMajorMatrix<BabyBear> {
+    ops.sort_by_key(|op| (op.address_space, op.address, op.timestamp));
+    let mut rows = vec![];
+    for i in 0..ops.len() {
+        let is_first_access = (i == 0)
+            || (ops[i].address_space != ops[i - 1].address_space
+                && ops[i].address != ops[i - 1].address);
+        let is_first_access = BabyBear::from_bool(is_first_access);
+
+        let is_final_access = (i == ops.len() - 1)
+            || (ops[i].address_space != ops[i + 1].address_space)
+            || (ops[i].address != ops[i + 1].address);
+        let is_final_access = BabyBear::from_bool(is_final_access);
+
+        let is_first_read = is_first_access * BabyBear::from_canonical_u8(1 - ops[i].op_type as u8);
+        let mut rec_fields = vec![is_first_read * BabyBear::neg_one(), BabyBear::one()];
+        rec_fields.extend(vec![ops[i].address_space, ops[i].address]);
+        rec_fields.extend(ops[i].data);
+
+        let mut send_fields = vec![is_final_access, BabyBear::neg_one()];
+        send_fields.extend(vec![ops[i].address_space, ops[i].address]);
+        send_fields.extend(ops[i].data);
+
+        rows.extend(rec_fields);
+        rows.extend(send_fields);
+    }
+
+    rows.extend(
+        iter::repeat_with(|| iter::repeat(BabyBear::zero()).take(width))
+            .take(2 * (TRACE_DEGREE - ops.len()))
+            .flatten(),
+    );
+
+    RowMajorMatrix::new(rows, width)
+}
 
 #[test]
 fn test_offline_checker() {
@@ -38,8 +106,10 @@ fn test_offline_checker() {
         true,
         MEMORY_BUS,
     );
+    let dummy_oc_interaction_air =
+        DummyInteractionAir::new(1 + IDX_LEN + DATA_LEN, true, MEMORY_INTERACTION_BUS);
 
-    let ops: Vec<MemoryAccess<WORD_SIZE, BabyBear>> = vec![
+    let mut ops: Vec<MemoryAccess<WORD_SIZE, BabyBear>> = vec![
         MemoryAccess {
             timestamp: 1,
             op_type: OpType::Write,
@@ -137,33 +207,23 @@ fn test_offline_checker() {
 
     let trace = memory_chip.generate_trace(range_checker.clone());
     let range_checker_trace = range_checker.generate_trace();
-    let requester_trace = RowMajorMatrix::new(
-        ops.iter()
-            .flat_map(|op: &MemoryAccess<WORD_SIZE, BabyBear>| {
-                [
-                    BabyBear::one(),
-                    BabyBear::from_canonical_usize(op.timestamp),
-                    BabyBear::from_canonical_u8(op.op_type as u8),
-                    op.address_space,
-                    op.address,
-                ]
-                .into_iter()
-                .chain(op.data.iter().cloned())
-            })
-            .chain(
-                iter::repeat_with(|| {
-                    iter::repeat(BabyBear::zero()).take(1 + requester.field_width())
-                })
-                .take(TRACE_DEGREE - ops.len())
-                .flatten(),
-            )
-            .collect(),
-        1 + requester.field_width(),
-    );
+    let requester_trace = gen_requester_trace(&ops, requester.field_width() + 1);
+    let dummy_oc_interaction_trace =
+        gen_dummy_oc_interaction_trace(&mut ops, dummy_oc_interaction_air.field_width() + 1);
 
     run_simple_test_no_pis(
-        vec![&memory_chip.air, &range_checker.air, &requester],
-        vec![trace, range_checker_trace, requester_trace],
+        vec![
+            &memory_chip.air,
+            &range_checker.air,
+            &requester,
+            &dummy_oc_interaction_air,
+        ],
+        vec![
+            trace,
+            range_checker_trace,
+            requester_trace,
+            dummy_oc_interaction_trace,
+        ],
     )
     .expect("Verification failed");
 }
@@ -183,6 +243,8 @@ fn test_offline_checker_valid_first_read() {
         true,
         MEMORY_BUS,
     );
+    let dummy_oc_interaction_air =
+        DummyInteractionAir::new(1 + IDX_LEN + DATA_LEN, true, MEMORY_INTERACTION_BUS);
 
     memory_chip.write_word(
         0,
@@ -193,34 +255,33 @@ fn test_offline_checker_valid_first_read() {
     // read before writing, but first operation in block so should pass
     memory_chip.accesses[0].op_type = OpType::Read;
 
+    let mut ops = vec![MemoryAccess {
+        timestamp: 0,
+        op_type: OpType::Read,
+        address_space: BabyBear::one(),
+        address: BabyBear::zero(),
+        data: [BabyBear::zero(), BabyBear::zero(), BabyBear::zero()],
+    }];
+
     let memory_trace = memory_chip.generate_trace(range_checker.clone());
     let range_checker_trace = range_checker.generate_trace();
-    let requester_trace = RowMajorMatrix::new(
-        memory_chip
-            .accesses
-            .iter()
-            .flat_map(|op: &MemoryAccess<WORD_SIZE, BabyBear>| {
-                iter::once(BabyBear::one())
-                    .chain(iter::once(BabyBear::from_canonical_usize(op.timestamp)))
-                    .chain(iter::once(BabyBear::from_canonical_u8(op.op_type as u8)))
-                    .chain(iter::once(op.address_space))
-                    .chain(iter::once(op.address))
-                    .chain(op.data.iter().cloned())
-            })
-            .chain(
-                iter::repeat_with(|| {
-                    iter::repeat(BabyBear::zero()).take(1 + requester.field_width())
-                })
-                .take(TRACE_DEGREE - memory_chip.accesses.len())
-                .flatten(),
-            )
-            .collect(),
-        1 + requester.field_width(),
-    );
+    let requester_trace = gen_requester_trace(&ops, requester.field_width() + 1);
+    let dummy_oc_interaction_trace =
+        gen_dummy_oc_interaction_trace(&mut ops, dummy_oc_interaction_air.field_width() + 1);
 
     run_simple_test_no_pis(
-        vec![&memory_chip.air, &range_checker.air, &requester],
-        vec![memory_trace, range_checker_trace, requester_trace],
+        vec![
+            &memory_chip.air,
+            &range_checker.air,
+            &requester,
+            &dummy_oc_interaction_air,
+        ],
+        vec![
+            memory_trace,
+            range_checker_trace,
+            requester_trace,
+            dummy_oc_interaction_trace,
+        ],
     )
     .expect("Verification failed");
 }
@@ -240,8 +301,10 @@ fn test_offline_checker_negative_data_mismatch() {
         true,
         MEMORY_BUS,
     );
+    let dummy_oc_interaction_air =
+        DummyInteractionAir::new(1 + IDX_LEN + DATA_LEN, true, MEMORY_INTERACTION_BUS);
 
-    let ops: Vec<MemoryAccess<WORD_SIZE, BabyBear>> = vec![
+    let mut ops: Vec<MemoryAccess<WORD_SIZE, BabyBear>> = vec![
         MemoryAccess {
             timestamp: 0,
             op_type: OpType::Write,
@@ -283,34 +346,27 @@ fn test_offline_checker_negative_data_mismatch() {
     let trace = memory_chip.generate_trace(range_checker.clone());
 
     let range_checker_trace = range_checker.generate_trace();
-    let requester_trace = RowMajorMatrix::new(
-        ops.iter()
-            .flat_map(|op: &MemoryAccess<WORD_SIZE, BabyBear>| {
-                iter::once(BabyBear::one())
-                    .chain(iter::once(BabyBear::from_canonical_usize(op.timestamp)))
-                    .chain(iter::once(BabyBear::from_canonical_u8(op.op_type as u8)))
-                    .chain(iter::once(op.address_space))
-                    .chain(iter::once(op.address))
-                    .chain(op.data.iter().cloned())
-            })
-            .chain(
-                iter::repeat_with(|| {
-                    iter::repeat(BabyBear::zero()).take(1 + requester.field_width())
-                })
-                .take(TRACE_DEGREE - ops.len())
-                .flatten(),
-            )
-            .collect(),
-        1 + requester.field_width(),
-    );
+    let requester_trace = gen_requester_trace(&ops, requester.field_width() + 1);
+    let dummy_oc_interaction_trace =
+        gen_dummy_oc_interaction_trace(&mut ops, dummy_oc_interaction_air.field_width() + 1);
 
     USE_DEBUG_BUILDER.with(|debug| {
         *debug.lock().unwrap() = false;
     });
     assert_eq!(
         run_simple_test_no_pis(
-            vec![&memory_chip.air, &range_checker.air, &requester,],
-            vec![trace, range_checker_trace, requester_trace],
+            vec![
+                &memory_chip.air,
+                &range_checker.air,
+                &requester,
+                &dummy_oc_interaction_air,
+            ],
+            vec![
+                trace,
+                range_checker_trace,
+                requester_trace,
+                dummy_oc_interaction_trace
+            ],
         ),
         Err(VerificationError::OodEvaluationMismatch),
         "Expected verification to fail, but it passed"

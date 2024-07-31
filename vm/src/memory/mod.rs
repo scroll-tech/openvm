@@ -6,8 +6,6 @@ pub mod expand;
 pub mod offline_checker;
 
 pub mod interface;
-#[cfg(test)]
-pub mod tests;
 pub mod tree;
 
 #[derive(PartialEq, Copy, Clone, Debug, Eq)]
