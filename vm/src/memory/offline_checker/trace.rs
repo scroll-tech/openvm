@@ -1,7 +1,8 @@
 use std::sync::Arc;
 
-use afs_primitives::offline_checker::OfflineCheckerChip;
+use afs_primitives::offline_checker::OfflineCheckerOperation;
 use afs_primitives::range_gate::RangeCheckerGateChip;
+use afs_primitives::{offline_checker::OfflineCheckerChip, sub_chip::LocalTraceInstructions};
 use p3_field::PrimeField32;
 use p3_matrix::dense::RowMajorMatrix;
 #[cfg(feature = "parallel")]
@@ -38,13 +39,103 @@ impl<const WORD_SIZE: usize, F: PrimeField32> MemoryChip<WORD_SIZE, F> {
             data: [F::zero(); WORD_SIZE],
         };
 
-        let mut offline_checker_chip = OfflineCheckerChip::new(self.air.offline_checker.clone());
+        let offline_checker_chip = OfflineCheckerChip::new(self.air.offline_checker.clone());
 
-        offline_checker_chip.generate_trace(
-            range_checker,
-            self.accesses.clone(),
-            dummy_op,
-            self.accesses.len().next_power_of_two(),
-        )
+        // offline_checker_chip.generate_trace(
+        //     range_checker,
+        //     self.accesses.clone(),
+        //     dummy_op,
+        //     self.accesses.len().next_power_of_two(),
+        // )
+
+        let mut rows: Vec<Vec<F>> = vec![];
+        let mut rows_len = 0;
+        let trace_degree = self.accesses.len().next_power_of_two();
+
+        let mut prev_idx: Vec<F> = vec![];
+        if !self.accesses.is_empty() {
+            rows.push(
+                LocalTraceInstructions::generate_trace_row(
+                    &offline_checker_chip,
+                    (
+                        true,
+                        true,
+                        true,
+                        self.accesses[0].clone(),
+                        dummy_op.clone(),
+                        range_checker.clone(),
+                    ),
+                )
+                .flatten(),
+            );
+            prev_idx = self.accesses[0].get_idx();
+            rows_len += 1;
+        }
+
+        for i in 1..self.accesses.len() {
+            if self.accesses[i].get_idx() != prev_idx {
+                rows[rows_len - 1].push(F::one());
+            } else {
+                rows[rows_len - 1].push(F::zero());
+            }
+            rows.push(
+                LocalTraceInstructions::generate_trace_row(
+                    &offline_checker_chip,
+                    (
+                        false,
+                        true,
+                        true,
+                        self.accesses[i].clone(),
+                        self.accesses[i - 1].clone(),
+                        range_checker.clone(),
+                    ),
+                )
+                .flatten(),
+            );
+            prev_idx = self.accesses[i].get_idx();
+            rows_len += 1;
+        }
+
+        rows[rows_len - 1].push(F::one());
+
+        if self.accesses.len() < trace_degree {
+            rows.push(
+                LocalTraceInstructions::generate_trace_row(
+                    &offline_checker_chip,
+                    (
+                        false,
+                        false,
+                        false,
+                        dummy_op.clone(),
+                        self.accesses[self.accesses.len() - 1].clone(),
+                        range_checker.clone(),
+                    ),
+                )
+                .flatten(),
+            );
+            rows_len += 1;
+            rows[rows_len - 1].push(F::zero());
+        }
+
+        for _i in 1..(trace_degree - self.accesses.len()) {
+            rows.push(
+                LocalTraceInstructions::generate_trace_row(
+                    &offline_checker_chip,
+                    (
+                        false,
+                        false,
+                        false,
+                        dummy_op.clone(),
+                        self.accesses[self.accesses.len() - 1].clone(),
+                        range_checker.clone(),
+                    ),
+                )
+                .flatten(),
+            );
+            rows_len += 1;
+            rows[rows_len - 1].push(F::zero());
+        }
+
+        RowMajorMatrix::new(rows.concat(), self.air.air_width())
     }
 }

@@ -7,7 +7,7 @@ use p3_air::{Air, AirBuilder, BaseAir};
 use p3_field::{AbstractField, Field, PrimeField32};
 use p3_matrix::Matrix;
 
-use super::{MemoryChip, MemoryOfflineChecker};
+use super::{columns::MemoryOfflineCheckerCols, MemoryChip, MemoryOfflineChecker};
 
 impl<const WORD_SIZE: usize, F: PrimeField32> AirConfig for MemoryChip<WORD_SIZE, F> {
     type Cols<T> = OfflineCheckerCols<T>;
@@ -26,23 +26,39 @@ impl<AB: PartitionedAirBuilder + InteractionBuilder> Air<AB> for MemoryOfflineCh
     fn eval(&self, builder: &mut AB) {
         let main = &builder.main();
 
-        let local_cols = OfflineCheckerCols::from_slice(&main.row_slice(0), &self.offline_checker);
-        let next_cols = OfflineCheckerCols::from_slice(&main.row_slice(1), &self.offline_checker);
+        let local_cols = MemoryOfflineCheckerCols::from_slice(&main.row_slice(0), self);
+        let next_cols = MemoryOfflineCheckerCols::from_slice(&main.row_slice(1), self);
 
-        builder.assert_bool(local_cols.op_type);
+        builder.assert_bool(local_cols.offline_checker_cols.op_type);
 
         // loop over data_len
         // is_valid * (1 - op_type) * same_idx * (x[i] - y[i])
         for i in 0..self.offline_checker.data_len {
             // NOTE: constraint degree is 4
             builder.when_transition().assert_zero(
-                next_cols.is_valid.into()
-                    * (AB::Expr::one() - next_cols.op_type.into())
-                    * next_cols.same_idx.into()
-                    * (local_cols.data[i] - next_cols.data[i]),
+                next_cols.offline_checker_cols.is_valid.into()
+                    * (AB::Expr::one() - next_cols.offline_checker_cols.op_type.into())
+                    * next_cols.offline_checker_cols.same_idx.into()
+                    * (local_cols.offline_checker_cols.data[i]
+                        - next_cols.offline_checker_cols.data[i]),
             );
         }
 
-        SubAir::eval(&self.offline_checker, builder, (local_cols, next_cols), ());
+        // constrain that is_final_access is 1 when the index changes
+        builder.assert_eq(
+            AB::Expr::one() - next_cols.offline_checker_cols.same_idx,
+            local_cols.is_final_access,
+        );
+
+        self.eval_interactions(builder, &local_cols, &next_cols);
+        SubAir::eval(
+            &self.offline_checker,
+            builder,
+            (
+                local_cols.offline_checker_cols,
+                next_cols.offline_checker_cols,
+            ),
+            (),
+        );
     }
 }

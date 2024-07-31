@@ -9,6 +9,8 @@ use crate::memory::{compose, decompose, OpType};
 use super::MemoryAccess;
 
 mod air;
+mod bridge;
+mod columns;
 mod trace;
 
 pub struct MemoryOfflineChecker {
