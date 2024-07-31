@@ -10,7 +10,6 @@ impl MemoryOfflineChecker {
         &self,
         builder: &mut AB,
         local: &MemoryOfflineCheckerCols<AB::Var>,
-        next: &MemoryOfflineCheckerCols<AB::Var>,
     ) {
         let mut send_fields = vec![AB::Expr::one()];
         send_fields.extend(
@@ -49,7 +48,7 @@ impl MemoryOfflineChecker {
                 .map(|data| (*data).into()),
         );
         // receive when final access in a block
-        let rec_count = AB::Expr::one() - next.offline_checker_cols.same_idx;
+        let rec_count = local.is_final_access;
         builder.push_receive(MEMORY_INTERACTION_BUS, rec_fields, rec_count);
     }
 }

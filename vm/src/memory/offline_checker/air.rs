@@ -50,7 +50,7 @@ impl<AB: PartitionedAirBuilder + InteractionBuilder> Air<AB> for MemoryOfflineCh
             local_cols.is_final_access,
         );
 
-        self.eval_interactions(builder, &local_cols, &next_cols);
+        self.eval_interactions(builder, &local_cols);
         SubAir::eval(
             &self.offline_checker,
             builder,
