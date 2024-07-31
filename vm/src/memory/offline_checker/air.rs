@@ -45,7 +45,7 @@ impl<AB: PartitionedAirBuilder + InteractionBuilder> Air<AB> for MemoryOfflineCh
         }
 
         // constrain that is_final_access is 1 when the index changes
-        builder.assert_eq(
+        builder.when_transition().assert_eq(
             AB::Expr::one() - next_cols.offline_checker_cols.same_idx,
             local_cols.is_final_access,
         );

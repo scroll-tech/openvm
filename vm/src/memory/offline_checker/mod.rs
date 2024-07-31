@@ -19,7 +19,7 @@ pub struct MemoryOfflineChecker {
 
 impl MemoryOfflineChecker {
     pub fn air_width(&self) -> usize {
-        OfflineChecker::air_width(&self.offline_checker)
+        OfflineChecker::air_width(&self.offline_checker) + 1
     }
 }
 
