@@ -39,22 +39,23 @@ pub fn generate_configs() -> Vec<PageConfig> {
         // fri_params_with_80_bits_of_security()[0],
         // fri_params_with_80_bits_of_security()[1],
         fri_params_with_80_bits_of_security()[2],
+        fri_params_with_80_bits_of_security()[3],
         // fri_params_with_100_bits_of_security()[0],
         // fri_params_with_100_bits_of_security()[1],
     ];
-    let idx_bytes_vec = vec![32];
+    let idx_bytes_vec = vec![4, 32];
     let data_bytes_vec = vec![32, 256, 1024];
 
     let height_vec = vec![65536, 262_144, 1_048_576];
     // let height_vec = vec![256, 1024]; // Run a mini-benchmark for testing
 
     // max_rw_ops as the number of log_2 of height
-    let max_rw_ops_shift_vec = vec![0, 1, 2, 3, 4];
+    let max_rw_ops_shift_vec = vec![0]; // vec![0, 1, 2, 3, 4];
 
     let engine_vec = vec![
-        EngineType::BabyBearPoseidon2,
+        // EngineType::BabyBearPoseidon2,
         // EngineType::BabyBearBlake3,
-        // EngineType::BabyBearKeccak,
+        EngineType::BabyBearKeccak,
     ];
 
     let mut configs = Vec::new();
@@ -67,11 +68,11 @@ pub fn generate_configs() -> Vec<PageConfig> {
         &height_vec,
         &max_rw_ops_shift_vec,
     ) {
-        if (*height > 1000000 && (fri_params.log_blowup > 2 || *data_bytes > 512))
-            || (*height > 500000 && fri_params.log_blowup >= 3)
-        {
-            continue;
-        }
+        // if (*height > 1000000 && (fri_params.log_blowup > 2 || *data_bytes > 512))
+        //     || (*height > 500000 && fri_params.log_blowup >= 3)
+        // {
+        //     continue;
+        // }
         let config = PageConfig {
             page: PageParamsConfig {
                 index_bytes: *idx_bytes,
