@@ -1,0 +1,5 @@
+{
+    "rust-analyzer.runnables.extraEnv": {
+        "RUN_SLOW_TESTS": "1"
+    }
+}
