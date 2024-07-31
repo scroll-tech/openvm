@@ -168,20 +168,20 @@ impl Hintable<InnerConfig> for AggregationVerifierInput<BabyBearPoseidon2Config>
     type HintVariable = AggregationVerifierInputVariable<InnerConfig>;
 
     fn read(builder: &mut Builder<InnerConfig>) -> Self::HintVariable {
-        let verifier_inputs = VerifierInput::<BabyBearPoseidon2Config>::read(builder);
-        let chip_ids = Vec::<Vec<usize>>::read(builder);
+        let verifier_input_1 = VerifierInput::<BabyBearPoseidon2Config>::read(builder);
+        let verifier_input_2 = VerifierInput::<BabyBearPoseidon2Config>::read(builder);
 
         AggregationVerifierInputVariable {
-            verifier_inputs,
-            chip_ids,
+            verifier_input_1,
+            verifier_input_2,
         }
     }
 
     fn write(&self) -> Vec<Vec<InnerVal>> {
         let mut stream = Vec::new();
 
-        stream.extend(self.verifier_inputs.write());
-        stream.extend(self.chip_ids.write());
+        stream.extend(self.verifier_input_1.write());
+        stream.extend(self.verifier_input_2.write());
 
         stream
     }

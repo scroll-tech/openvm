@@ -36,14 +36,14 @@ pub struct VerifierInputVariable<C: Config> {
 }
 
 pub struct AggregationVerifierInput<SC: StarkGenericConfig> {
-    pub verifier_inputs: VerifierInput<SC>,
-    pub chip_ids: Vec<Vec<usize>>,
+    pub verifier_input_1: VerifierInput<SC>,
+    pub verifier_input_2: VerifierInput<SC>,
 }
 
 #[derive(DslVariable, Clone)]
 pub struct AggregationVerifierInputVariable<C: Config> {
-    pub verifier_inputs: VerifierInputVariable<C>,
-    pub chip_ids: Array<C, Array<C, Var<C::N>>>,
+    pub verifier_input_1: VerifierInputVariable<C>,
+    pub verifier_input_2: VerifierInputVariable<C>,
 }
 
 #[derive(DslVariable, Clone)]
@@ -89,11 +89,13 @@ pub struct AdjacentOpenedValuesVariable<C: Config> {
     pub next: Array<C, Ext<C::F, C::EF>>,
 }
 
+#[derive(Clone)]
 pub struct VerifierSinglePreprocessedDataInProgram<C: Config> {
     pub commit: Vec<C::F>,
 }
 
 /// Constants determined by AIRs.
+#[derive(Clone)]
 pub struct StarkVerificationAdvice<C: Config> {
     /// Preprocessed trace data, if any
     pub preprocessed_data: Option<VerifierSinglePreprocessedDataInProgram<C>>,
@@ -158,6 +160,7 @@ impl<C: Config> StarkVerificationAdvice<C> {
 }
 
 /// Constants determined by multiple AIRs.
+#[derive(Clone)]
 pub struct MultiStarkVerificationAdvice<C: Config> {
     pub per_air: Vec<StarkVerificationAdvice<C>>,
     /// Number of multi-matrix commitments that hold commitments to the partitioned main trace matrices across all AIRs.

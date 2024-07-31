@@ -1,3 +1,4 @@
+use afs_compiler::prelude::*;
 use afs_recursion::stark::{get_rec_raps, sort_chips};
 use afs_test_utils::config::fri_params::{
     fri_params_fast_testing, fri_params_with_80_bits_of_security,
@@ -5,36 +6,16 @@ use afs_test_utils::config::fri_params::{
 use p3_baby_bear::BabyBear;
 use p3_field::extension::BinomialExtensionField;
 use p3_field::AbstractField;
+use p3_field::PrimeField32;
 use std::ops::Deref;
 
-use afs_compiler::asm::AsmBuilder;
-use afs_compiler::ir::Var;
-use stark_vm::cpu::trace::Instruction;
+use afs_recursion::stark::DynRapForRecursion;
 use stark_vm::vm::config::VmConfig;
-use stark_vm::vm::{ExecutionResult, VirtualMachine};
+use stark_vm::vm::{ExecutionResult, ExecutionSegment, VirtualMachine};
+
+use crate::common::{fibonacci_program, sort_chips};
 
 mod common;
-
-fn fibonacci_program(a: u32, b: u32, n: u32) -> Vec<Instruction<BabyBear>> {
-    type F = BabyBear;
-    type EF = BinomialExtensionField<BabyBear, 4>;
-
-    let mut builder = AsmBuilder::<F, EF>::default();
-
-    let prev: Var<_> = builder.constant(F::from_canonical_u32(a));
-    let next: Var<_> = builder.constant(F::from_canonical_u32(b));
-
-    for _ in 0..n {
-        let tmp: Var<_> = builder.uninit();
-        builder.assign(tmp, next);
-        builder.assign(next, prev + next);
-        builder.assign(prev, tmp);
-    }
-
-    builder.halt();
-
-    builder.compile_isa::<1>()
-}
 
 #[test]
 fn test_fibonacci_program_verify() {

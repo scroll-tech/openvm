@@ -26,9 +26,8 @@ use crate::fri::types::{TwoAdicPcsMatsVariable, TwoAdicPcsRoundVariable};
 use crate::fri::{TwoAdicFriPcsVariable, TwoAdicMultiplicativeCosetVariable};
 use crate::hints::Hintable;
 use crate::types::{
-    AdjacentOpenedValuesVariable, AggregationVerifierInput, AggregationVerifierInputVariable,
-    CommitmentsVariable, InnerConfig, MultiStarkVerificationAdvice, StarkVerificationAdvice,
-    VerifierInput, VerifierInputVariable, PROOF_MAX_NUM_PVS,
+    AdjacentOpenedValuesVariable, CommitmentsVariable, InnerConfig, MultiStarkVerificationAdvice,
+    StarkVerificationAdvice, VerifierInput, VerifierInputVariable, PROOF_MAX_NUM_PVS,
 };
 use crate::utils::const_fri_config;
 
@@ -90,71 +89,6 @@ impl VerifierProgram<InnerConfig> {
             enable_cycle_tracker: true,
             ..Default::default()
         })
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct AggregationVerifierProgram<InnerConfig> {
-    _phantom: std::marker::PhantomData<InnerConfig>,
-}
-
-impl AggregationVerifierProgram<InnerConfig> {
-    pub fn build(
-        raps: Vec<&dyn DynRapForRecursion<InnerConfig>>,
-        constants: MultiStarkVerificationAdvice<InnerConfig>,
-        fri_params: &FriParameters,
-    ) -> Vec<Instruction<BabyBear>> {
-        let mut builder = Builder::<InnerConfig>::default();
-
-        let input: AggregationVerifierInputVariable<_> = builder.uninit();
-        AggregationVerifierInput::<BabyBearPoseidon2Config>::witness(&input, &mut builder);
-
-        let pcs = TwoAdicFriPcsVariable {
-            config: const_fri_config(&mut builder, fri_params),
-        };
-        StarkVerifier::verify(&mut builder, &pcs, raps, constants, &input.verifier_inputs);
-
-        let mut init_pcs: Array<_, Felt<_>> =
-            builder.dyn_array(input.verifier_inputs.public_values.len());
-        let mut final_pcs: Array<_, Felt<_>> =
-            builder.dyn_array(input.verifier_inputs.public_values.len());
-
-        let num_traces = input
-            .verifier_inputs
-            .public_values
-            .len()
-            .materialize(&mut builder);
-        let num_minus_one = builder.eval(num_traces - <InnerConfig as Config>::F::one());
-
-        let init_index: Var<_> = builder.eval(<InnerConfig as Config>::F::zero());
-        builder.range(0, num_traces).for_each(|i, builder| {
-            let pv = builder.get(&input.verifier_inputs.public_values, i);
-            let ids = builder.get(&input.chip_ids, i);
-
-            builder
-                .if_eq(ids.len(), <InnerConfig as Config>::F::two())
-                .then(|builder| {
-                    let init_pc = builder.get(&pv, 0);
-                    let final_pc = builder.get(&pv, 1);
-                    builder.set(&mut init_pcs, init_index, init_pc);
-                    builder.set(&mut final_pcs, init_index, final_pc);
-                    builder.assign(init_index, init_index + <InnerConfig as Config>::F::one());
-                })
-        });
-
-        let first_pc = builder.get(&init_pcs, 0);
-        builder.assert_eq(first_pc, <InnerConfig as Config>::F::zero());
-        let last_pc = builder.get(&final_pcs, num_minus_one);
-
-        builder.range(0, num_minus_one).for_each(|i, builder| {
-            let index: Var<_> = i.materialize(builder);
-            let final_pc = builder.get(&final_pcs, index);
-            let init_pc = builder.get(&init_pcs, index + <InnerConfig as Config>::F::one());
-            builder.assert_eq(init_pc, final_pc);
-        });
-
-        const WORD_SIZE: usize = 1;
-        builder.compile_isa::<WORD_SIZE>()
     }
 }
 
@@ -837,7 +771,7 @@ where
         )
     }
 
-    fn validate_inputs(
+    pub fn validate_inputs(
         builder: &mut Builder<C>,
         raps: &[&dyn DynRapForRecursion<C>],
         vk: &MultiStarkVerificationAdvice<C>,
