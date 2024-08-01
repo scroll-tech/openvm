@@ -7,7 +7,6 @@ use p3_baby_bear::BabyBear;
 use p3_field::extension::BinomialExtensionField;
 use p3_field::AbstractField;
 use p3_field::PrimeField32;
-use std::ops::Deref;
 
 use afs_recursion::stark::DynRapForRecursion;
 use stark_vm::vm::config::VmConfig;
@@ -37,7 +36,10 @@ fn test_fibonacci_program_verify() {
         ..
     } = vm.execute().unwrap();
 
-    let chips = chips.iter().map(|x| x.deref()).collect();
+    let chips: Vec<_> = chips.into_iter().flatten().collect();
+    let chips = VirtualMachine::<1, _>::get_chips(&chips);
+    let traces = traces.concat();
+    let pvs = pvs.concat();
     let (chips, rec_raps, traces, pvs) = sort_chips(chips, rec_raps, traces, pvs);
 
     // blowup factor = 3

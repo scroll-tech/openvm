@@ -246,6 +246,7 @@ pub fn sort_chips<'a>(
     (chips, rec_raps, traces, pvs)
 }
 
+#[allow(dead_code)]
 pub fn sort_chips_with_id<'a>(
     chips: Vec<&'a dyn AnyRap<BabyBearPoseidon2Config>>,
     rec_raps: Vec<&'a dyn DynRapForRecursion<InnerConfig>>,

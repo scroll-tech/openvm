@@ -11,8 +11,6 @@ use std::ops::Deref;
 
 mod segment;
 pub use segment::{get_chips, ExecutionSegment};
-mod split_execution;
-// pub use split_execution::SplitExecutionResult;
 
 use crate::cpu::{
     trace::{ExecutionError, Instruction},
