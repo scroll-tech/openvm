@@ -61,13 +61,14 @@ where
         sels.is_transition.push(Val::<SC>::default());
         sels.inv_zeroifier.push(Val::<SC>::default());
     }
-
-    (0..quotient_size)
-        .into_par_iter()
-        .step_by(PackedVal::<SC>::WIDTH)
-        .flat_map_iter(|i_start| {
+    let width = min(PackedVal::<SC>::WIDTH, quotient_size);
+    let mut buf = vec![SC::Challenge::zero(); quotient_size];
+    buf.par_chunks_mut(PackedVal::<SC>::WIDTH)
+        .enumerate()
+        .for_each(|(i, r)| {
             let wrap = |i| i % quotient_size;
-            let i_range = i_start..i_start + PackedVal::<SC>::WIDTH;
+            let i_start = i * width;
+            let i_range = i_start..(i_start + width);
 
             let is_first_row = *PackedVal::<SC>::from_slice(&sels.is_first_row[i_range.clone()]);
             let is_last_row = *PackedVal::<SC>::from_slice(&sels.is_last_row[i_range.clone()]);
@@ -167,13 +168,12 @@ where
             let quotient = folder.accumulator * inv_zeroifier;
 
             // "Transpose" D packed base coefficients into WIDTH scalar extension coefficients.
-            let width = min(PackedVal::<SC>::WIDTH, quotient_size);
-            (0..width).map(move |idx_in_packing| {
+            for (idx_in_packing, c) in r.iter_mut().enumerate() {
                 let quotient_value = (0..<SC::Challenge as AbstractExtensionField<Val<SC>>>::D)
                     .map(|coeff_idx| quotient.as_base_slice()[coeff_idx].as_slice()[idx_in_packing])
-                    .collect::<Vec<_>>();
-                SC::Challenge::from_base_slice(&quotient_value)
-            })
-        })
-        .collect()
+                    .collect::<Vec<_>>(); // TODO[jpw]: don't use vec
+                *c = SC::Challenge::from_base_slice(&quotient_value);
+            }
+        });
+    buf
 }
