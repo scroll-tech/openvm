@@ -56,3 +56,27 @@ fn test_fibonacci_program_verify() {
     let vm = VirtualMachine::<1, _>::new(vm_config, fib_verification_program, input_stream);
     vm.execute().unwrap();
 }
+
+pub fn get_rec_raps<const WORD_SIZE: usize, C: Config>(
+    vm: &ExecutionSegment<WORD_SIZE, C::F>,
+) -> Vec<&dyn DynRapForRecursion<C>>
+where
+    C::F: PrimeField32,
+{
+    let mut result: Vec<&dyn DynRapForRecursion<C>> = vec![
+        &vm.cpu_chip.air,
+        &vm.program_chip.air,
+        &vm.memory_chip.air,
+        &vm.range_checker.air,
+    ];
+    if vm.options().field_arithmetic_enabled {
+        result.push(&vm.field_arithmetic_chip.air);
+    }
+    if vm.options().field_extension_enabled {
+        result.push(&vm.field_extension_chip.air as &dyn DynRapForRecursion<C>);
+    }
+    if vm.options().poseidon2_enabled() {
+        result.push(&vm.poseidon2_chip.air);
+    }
+    result
+}
