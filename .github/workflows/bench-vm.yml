@@ -2,13 +2,13 @@ name: Run Fibonacci Air recursion benchmark
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches: ["main"]
-    paths:
-      - "stark-backend/**"
-      - "vm/**"
-      - "compiler/**"
-      - "recursion/**"
+  # pull_request:
+  #   branches: ["main"]
+  #   paths:
+  #     - "stark-backend/**"
+  #     - "vm/**"
+  #     - "compiler/**"
+  #     - "recursion/**"
 
 jobs:
   start-runner:

@@ -2,11 +2,11 @@ name: Run single page r/w benchmark
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches: ["main"]
-    paths:
-      - "stark-backend/**"
-      - "db/**"
+  # pull_request:
+  #   branches: ["main"]
+  #   paths:
+  #     - "stark-backend/**"
+  #     - "db/**"
 
 jobs:
   start-runner:
