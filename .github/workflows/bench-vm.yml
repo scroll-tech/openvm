@@ -1,4 +1,4 @@
-name: Run single page r/w benchmark
+name: Run Fibonacci Air recursion benchmark
 
 on:
   workflow_dispatch:
@@ -6,7 +6,9 @@ on:
     branches: ["main"]
     paths:
       - "stark-backend/**"
-      - "db/**"
+      - "vm/**"
+      - "compiler/**"
+      - "recursion/**"
 
 jobs:
   start-runner:
@@ -47,25 +49,25 @@ jobs:
 
       - name: Run benchmark
         run: |
-          RUSTFLAGS="-Ctarget-cpu=native" cargo run --release --bin benchmark --features parallel -- rw -r 90 -w 10 --config-folder benchmark/config/single_rw
+          RUSTFLAGS="-Ctarget-cpu=native" cargo run --release --bin benchmark --features parallel -- vm_verify_fibair -n 16
 
       - name: Get previous benchmark value
         id: get-previous-benchmark
         run: |
-          echo "::set-output name=previous-benchmark::$(cat benchmark/github/results/single_rw.json)"
+          echo "::set-output name=previous-benchmark::$(cat benchmark/github/results/vm_verify_fibair.json)"
 
       - name: Update benchmark value
         id: update-benchmark
         run: |
-          mv benchmark/tmp/_result.json benchmark/github/results/single_rw.json
-          echo "::set-output name=new-benchmark::$(cat benchmark/github/results/single_rw.json)"
+          mv benchmark/tmp/_result.json benchmark/github/results/vm_verify_fibair.json
+          echo "::set-output name=new-benchmark::$(cat benchmark/github/results/vm_verify_fibair.json)"
 
       - name: Commit and push changes
         if: github.event_name == 'pull_request'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add benchmark/github/results/single_rw.json
+          git add benchmark/github/results/vm_verify_fibair.json
           git commit -m "Update benchmark"
           git push
 
