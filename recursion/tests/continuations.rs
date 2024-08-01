@@ -14,11 +14,11 @@ use crate::common::{fibonacci_program, sort_chips_mut};
 mod common;
 
 #[test]
-fn test_fibonacci_program_verify() {
+fn test_fibonacci_program_continuations_verify() {
     let fib_program = fibonacci_program(0, 1, 32);
 
     let vm_config = VmConfig {
-        max_segment_len: 1000,
+        max_segment_len: 100,
         ..Default::default()
     };
 
@@ -70,7 +70,7 @@ fn test_fibonacci_program_verify() {
 
 pub fn get_rec_raps<'a, const WORD_SIZE: usize, C: Config>(
     chip_types: &[Vec<ChipType>],
-    segments: &'a Vec<ExecutionSegment<WORD_SIZE, C::F>>,
+    segments: &'a [ExecutionSegment<WORD_SIZE, C::F>],
 ) -> Vec<Vec<&'a dyn DynRapForRecursion<C>>>
 where
     C::F: PrimeField32,
