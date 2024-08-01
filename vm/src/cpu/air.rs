@@ -1,12 +1,13 @@
 use std::borrow::Borrow;
 
-use p3_air::{Air, AirBuilder, BaseAir};
+use afs_stark_backend::interaction::InteractionBuilder;
+use p3_air::{Air, AirBuilder, AirBuilderWithPublicValues, BaseAir};
 use p3_field::{AbstractField, Field};
 use p3_matrix::Matrix;
 
-use afs_chips::{
-    is_equal_vec::{columns::IsEqualVecIOCols, IsEqualVecAir},
-    is_zero::{columns::IsZeroIOCols, IsZeroAir},
+use afs_primitives::{
+    is_equal_vec::{columns::IsEqualVecIoCols, IsEqualVecAir},
+    is_zero::{columns::IsZeroIoCols, IsZeroAir},
     sub_chip::SubAir,
 };
 
@@ -37,9 +38,16 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
     }
 }
 
-impl<const WORD_SIZE: usize, AB: AirBuilder> Air<AB> for CpuAir<WORD_SIZE> {
+impl<const WORD_SIZE: usize, AB: AirBuilderWithPublicValues + InteractionBuilder> Air<AB>
+    for CpuAir<WORD_SIZE>
+{
+    // TODO: continuation verification checks program counters match up [INT-1732]
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
+        let pis = builder.public_values();
+
+        let start_pc = pis[0];
+        let end_pc = pis[1];
 
         let inst_width = AB::F::from_canonical_usize(INST_WIDTH);
 
@@ -71,6 +79,7 @@ impl<const WORD_SIZE: usize, AB: AirBuilder> Air<AB> for CpuAir<WORD_SIZE> {
 
         let CpuAuxCols {
             operation_flags,
+            public_value_flags,
             accesses,
             read0_equals_read1,
             is_equal_vec_aux,
@@ -79,6 +88,10 @@ impl<const WORD_SIZE: usize, AB: AirBuilder> Air<AB> for CpuAir<WORD_SIZE> {
         let read1 = &accesses[0];
         let read2 = &accesses[1];
         let write = &accesses[CPU_MAX_READS_PER_CYCLE];
+
+        // assert that the start pc is correct
+        builder.when_first_row().assert_eq(pc, start_pc);
+        builder.when_last_row().assert_eq(pc, end_pc);
 
         // set correct operation flag
         for &flag in operation_flags.values() {
@@ -146,6 +159,22 @@ impl<const WORD_SIZE: usize, AB: AirBuilder> Air<AB> for CpuAir<WORD_SIZE> {
             .when_transition()
             .assert_eq(next_pc, pc + inst_width);
 
+        // SHINTW: e[d[a] + b] <- ?
+        let shintw_flag = operation_flags[&SHINTW];
+        read1_enabled_check = read1_enabled_check + shintw_flag;
+        write_enabled_check = write_enabled_check + shintw_flag;
+
+        let mut when_shintw = builder.when(shintw_flag);
+        when_shintw.assert_eq(read1.address_space, d);
+        when_shintw.assert_eq(read1.address, a);
+
+        when_shintw.assert_eq(write.address_space, e);
+        self.assert_compose(&mut when_shintw, read1.data, write.address - b);
+
+        when_shintw
+            .when_transition()
+            .assert_eq(next_pc, pc + inst_width);
+
         // JAL: d[a] <- pc + INST_WIDTH, pc <- pc + b
         let jal_flag = operation_flags[&JAL];
         write_enabled_check = write_enabled_check + jal_flag;
@@ -202,10 +231,46 @@ impl<const WORD_SIZE: usize, AB: AirBuilder> Air<AB> for CpuAir<WORD_SIZE> {
             .when(AB::Expr::one() - read0_equals_read1)
             .assert_eq(next_pc, pc + c);
 
+        // NOP constraints same pc and timestamp as next row
+        let nop_flag = operation_flags[&NOP];
+        let mut when_nop = builder.when(nop_flag);
+        when_nop.when_transition().assert_eq(next_pc, pc);
+        when_nop
+            .when_transition()
+            .assert_eq(next_timestamp, timestamp);
+
         // TERMINATE
         let terminate_flag = operation_flags[&TERMINATE];
         let mut when_terminate = builder.when(terminate_flag);
         when_terminate.when_transition().assert_eq(next_pc, pc);
+
+        // PUBLISH
+
+        let publish_flag = operation_flags[&PUBLISH];
+        read1_enabled_check = read1_enabled_check + publish_flag;
+        read2_enabled_check = read2_enabled_check + publish_flag;
+
+        let mut sum_flags = AB::Expr::zero();
+        let mut match_public_value_index = AB::Expr::zero();
+        let mut match_public_value = AB::Expr::zero();
+        for (i, &flag) in public_value_flags.iter().enumerate() {
+            builder.assert_bool(flag);
+            sum_flags = sum_flags + flag;
+            match_public_value_index += flag * AB::F::from_canonical_usize(i);
+            match_public_value += flag * builder.public_values()[i + 2].into();
+        }
+
+        let mut when_publish = builder.when(publish_flag);
+
+        when_publish.assert_one(sum_flags);
+        self.assert_compose(&mut when_publish, read1.data, match_public_value_index);
+        self.assert_compose(&mut when_publish, read2.data, match_public_value);
+
+        when_publish.assert_eq(read1.address_space, d);
+        when_publish.assert_eq(read1.address, a);
+
+        when_publish.assert_eq(read2.address_space, e);
+        when_publish.assert_eq(read2.address, b);
 
         // arithmetic operations
         if self.options.field_arithmetic_enabled {
@@ -237,7 +302,7 @@ impl<const WORD_SIZE: usize, AB: AirBuilder> Air<AB> for CpuAir<WORD_SIZE> {
         // immediate calculation
 
         for access in [&read1, &read2, &write] {
-            let is_zero_io = IsZeroIOCols {
+            let is_zero_io = IsZeroIoCols {
                 x: access.address_space,
                 is_zero: access.is_immediate,
             };
@@ -256,10 +321,10 @@ impl<const WORD_SIZE: usize, AB: AirBuilder> Air<AB> for CpuAir<WORD_SIZE> {
 
         // evaluate equality between read1 and read2
 
-        let is_equal_vec_io_cols = IsEqualVecIOCols {
+        let is_equal_vec_io_cols = IsEqualVecIoCols {
             x: read1.data.to_vec(),
             y: read2.data.to_vec(),
-            prod: read0_equals_read1,
+            is_equal: read0_equals_read1,
         };
         SubAir::eval(
             &IsEqualVecAir::new(WORD_SIZE),
@@ -268,13 +333,9 @@ impl<const WORD_SIZE: usize, AB: AirBuilder> Air<AB> for CpuAir<WORD_SIZE> {
             is_equal_vec_aux,
         );
 
-        // make sure program starts at beginning
-        builder.when_first_row().assert_zero(pc);
-        builder.when_first_row().assert_zero(timestamp);
-
         // update the timestamp correctly
         for (&opcode, &flag) in operation_flags.iter() {
-            if opcode != TERMINATE {
+            if opcode != TERMINATE && opcode != NOP {
                 builder.when(flag).assert_eq(
                     next_timestamp,
                     timestamp + AB::F::from_canonical_usize(max_accesses_per_instruction(opcode)),
@@ -282,14 +343,18 @@ impl<const WORD_SIZE: usize, AB: AirBuilder> Air<AB> for CpuAir<WORD_SIZE> {
             }
         }
 
-        // make sure program terminates
-        builder
-            .when_last_row()
-            .assert_eq(opcode, AB::Expr::from_canonical_usize(TERMINATE as usize));
+        // make sure program terminates or shards with NOP
+        builder.when_last_row().assert_zero(
+            (opcode - AB::Expr::from_canonical_usize(TERMINATE as usize))
+                * (opcode - AB::Expr::from_canonical_usize(NOP as usize)),
+        );
 
         // check accesses enabled
         builder.assert_eq(read1.enabled, read1_enabled_check);
         builder.assert_eq(read2.enabled, read2_enabled_check);
         builder.assert_eq(write.enabled, write_enabled_check);
+
+        // Turn on all interactions
+        self.eval_interactions(builder, io, accesses, &operation_flags);
     }
 }

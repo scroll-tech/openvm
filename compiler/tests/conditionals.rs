@@ -3,8 +3,8 @@ use p3_field::extension::BinomialExtensionField;
 use p3_field::AbstractField;
 
 use afs_compiler::asm::AsmBuilder;
-use afs_compiler::ir::Var;
-use afs_compiler::util::end_to_end_test;
+use afs_compiler::ir::{Usize, Var};
+use afs_compiler::util::execute_program;
 use stark_vm::cpu::WORD_SIZE;
 
 type F = BabyBear;
@@ -53,20 +53,8 @@ fn test_compiler_conditionals() {
 
     builder.halt();
 
-    //let program = builder.compile_isa::<WORD_SIZE>();
-    //display_program(&program);
-    //execute_program::<WORD_SIZE, _>(program, vec![]);
-    end_to_end_test::<WORD_SIZE, _>(builder, vec![]);
-
-    // let code = builder.compile_asm();
-    // println!("{}", code);
-
-    // let program = builder.compile();
-    // let program = code.machine_code();
-
-    // let config = SC::default();
-    // let mut runtime = Runtime::<F, EF, _>::new(&program, config.perm.clone());
-    // runtime.run();
+    let program = builder.compile_isa::<WORD_SIZE>();
+    execute_program::<WORD_SIZE>(program, vec![]);
 }
 
 #[test]
@@ -94,18 +82,40 @@ fn test_compiler_conditionals_v2() {
 
     builder.halt();
 
-    // let program = builder.compile_isa::<WORD_SIZE>();
-    // display_program(&program);
-    // execute_program::<WORD_SIZE, _>(program, vec![]);
-    end_to_end_test::<WORD_SIZE, _>(builder, vec![]);
+    let program = builder.compile_isa::<WORD_SIZE>();
+    execute_program::<WORD_SIZE>(program, vec![]);
+}
 
-    // let code = builder.compile_asm();
-    // println!("{}", code);
+#[test]
+fn test_compiler_conditionals_const() {
+    let mut builder = AsmBuilder::<F, EF>::default();
 
-    // let program = builder.compile();
-    // let program = code.machine_code();
+    let zero: Usize<_> = builder.eval(0);
+    let one: Usize<_> = builder.eval(1);
+    let two: Usize<_> = builder.eval(2);
+    let three: Usize<_> = builder.eval(3);
+    let four: Usize<_> = builder.eval(4);
 
-    // let config = SC::default();
-    // let mut runtime = Runtime::<F, EF, _>::new(&program, config.perm.clone());
-    // runtime.run();
+    // 1 instruction to evaluate the variable.
+    let c: Var<_> = builder.eval(F::zero());
+    builder.if_ne(zero, one).then(|builder| {
+        builder.if_eq(zero, zero).then(|builder| {
+            builder.if_eq(one, one).then(|builder| {
+                builder.if_eq(two, two).then(|builder| {
+                    builder.if_eq(three, three).then(|builder| {
+                        builder
+                            .if_eq(four, four)
+                            // 1 instruction to assign the variable.
+                            .then(|builder| builder.assign(c, F::one()))
+                    })
+                })
+            })
+        })
+    });
+
+    assert_eq!(
+        builder.operations.vec.len(),
+        2,
+        "Constant conditionals should be optimized"
+    );
 }

@@ -1,17 +1,29 @@
 use p3_field::AbstractField;
 
-use super::{Array, Builder, Config, DslIr, Felt, Usize, Var};
+use super::{Array, Builder, Config, DslIr, Felt, MemIndex, Usize, Var};
 
 pub const NUM_BITS: usize = 31;
 
 impl<C: Config> Builder<C> {
     /// Converts a variable to bits.
     pub fn num2bits_v(&mut self, num: Var<C::N>) -> Array<C, Var<C::N>> {
+        self.push(DslIr::HintBitsV(num));
+
         let output = self.dyn_array::<Var<_>>(NUM_BITS);
-        self.push(DslIr::HintBitsV(output.clone(), num));
+        let ptr = match output {
+            Array::Dyn(ptr, _) => ptr,
+            Array::Fixed(_) => unreachable!(),
+        };
 
         let sum: Var<_> = self.eval(C::N::zero());
         for i in 0..NUM_BITS {
+            let index = MemIndex {
+                index: Usize::Const(i),
+                offset: 0,
+                size: 1,
+            };
+            self.push(DslIr::StoreHintWord(ptr, index));
+
             let bit = self.get(&output, i);
             self.assert_var_eq(bit * (bit - C::N::one()), C::N::zero());
             self.assign(sum, sum + bit * C::N::from_canonical_u32(1 << i));
@@ -38,11 +50,23 @@ impl<C: Config> Builder<C> {
 
     /// Converts a felt to bits.
     pub fn num2bits_f(&mut self, num: Felt<C::F>) -> Array<C, Var<C::N>> {
+        self.push(DslIr::HintBitsF(num));
+
         let output = self.dyn_array::<Var<_>>(NUM_BITS);
-        self.push(DslIr::HintBitsF(output.clone(), num));
+        let ptr = match output {
+            Array::Dyn(ptr, _) => ptr,
+            Array::Fixed(_) => unreachable!(),
+        };
 
         let sum: Felt<_> = self.eval(C::F::zero());
         for i in 0..NUM_BITS {
+            let index = MemIndex {
+                index: Usize::Const(i),
+                offset: 0,
+                size: 1,
+            };
+            self.push(DslIr::StoreHintWord(ptr, index));
+
             let bit = self.get(&output, i);
             self.assert_var_eq(bit * (bit - C::N::one()), C::N::zero());
             self.if_eq(bit, C::N::one()).then(|builder| {
@@ -118,7 +142,7 @@ impl<C: Config> Builder<C> {
 
         let mut result_bits = self.dyn_array::<Var<_>>(NUM_BITS);
         self.range(0, bit_len).for_each(|i, builder| {
-            let index: Var<C::N> = builder.eval(bit_len - i - C::N::one());
+            let index: Usize<_> = builder.eval(bit_len - i - 1);
             let entry = builder.get(index_bits, index);
             builder.set_value(&mut result_bits, i, entry);
         });

@@ -1,24 +1,27 @@
+use std::collections::VecDeque;
 use std::{collections::BTreeMap, error::Error, fmt::Display};
 
 use p3_field::{Field, PrimeField32, PrimeField64};
 use p3_matrix::dense::RowMajorMatrix;
 
-use afs_chips::{
+use afs_primitives::{
     is_equal_vec::IsEqualVecAir, is_zero::IsZeroAir, sub_chip::LocalTraceInstructions,
 };
 
+use crate::cpu::trace::ExecutionError::{PublicValueIndexOutOfBounds, PublicValueNotEqual};
 use crate::memory::{compose, decompose};
 use crate::poseidon2::Poseidon2Chip;
-use crate::{field_extension::FieldExtensionArithmeticChip, vm::VirtualMachine};
+use crate::vm::cycle_tracker::CycleTracker;
+use crate::{field_extension::FieldExtensionArithmeticChip, vm::ExecutionSegment};
 
 use super::{
     columns::{CpuAuxCols, CpuCols, CpuIoCols, MemoryAccessCols},
-    max_accesses_per_instruction, CpuAir,
+    max_accesses_per_instruction, CpuChip, ExecutionState,
     OpCode::{self, *},
     CPU_MAX_ACCESSES_PER_CYCLE, CPU_MAX_READS_PER_CYCLE, CPU_MAX_WRITES_PER_CYCLE, INST_WIDTH,
 };
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, derive_new::new)]
+#[derive(Clone, Debug, PartialEq, Eq, derive_new::new)]
 pub struct Instruction<F> {
     pub opcode: OpCode,
     pub op_a: F,
@@ -26,7 +29,9 @@ pub struct Instruction<F> {
     pub op_c: F,
     pub d: F,
     pub e: F,
+    pub debug: String,
 }
+
 pub fn isize_to_field<F: Field>(value: isize) -> F {
     if value < 0 {
         return F::neg_one() * F::from_canonical_usize(value.unsigned_abs());
@@ -50,12 +55,25 @@ impl<F: Field> Instruction<F> {
             op_c: isize_to_field::<F>(op_c),
             d: isize_to_field::<F>(d),
             e: isize_to_field::<F>(e),
+            debug: String::new(),
+        }
+    }
+
+    pub fn debug(opcode: OpCode, debug: &str) -> Self {
+        Self {
+            opcode,
+            op_a: F::zero(),
+            op_b: F::zero(),
+            op_c: F::zero(),
+            d: F::zero(),
+            e: F::zero(),
+            debug: String::from(debug),
         }
     }
 }
 
-fn disabled_memory_cols<const WORD_SIZE: usize, F: PrimeField64>() -> MemoryAccessCols<WORD_SIZE, F>
-{
+pub fn disabled_memory_cols<const WORD_SIZE: usize, F: PrimeField64>(
+) -> MemoryAccessCols<WORD_SIZE, F> {
     memory_access_to_cols(false, F::one(), F::zero(), [F::zero(); WORD_SIZE])
 }
 
@@ -83,7 +101,10 @@ pub enum ExecutionError {
     Fail(usize),
     PcOutOfBounds(usize, usize),
     DisabledOperation(usize, OpCode),
-    HintOutOfBounds(usize, usize, usize),
+    HintOutOfBounds(usize),
+    EndOfInputStream(usize),
+    PublicValueIndexOutOfBounds(usize, usize, usize),
+    PublicValueNotEqual(usize, usize, usize, usize),
 }
 
 impl Display for ExecutionError {
@@ -98,10 +119,26 @@ impl Display for ExecutionError {
             ExecutionError::DisabledOperation(pc, op) => {
                 write!(f, "at pc = {}, opcode {:?} was not enabled", pc, op)
             }
-            ExecutionError::HintOutOfBounds(pc, witness_idx, witness_len) => write!(
+            ExecutionError::HintOutOfBounds(pc) => write!(f, "at pc = {}", pc),
+            ExecutionError::EndOfInputStream(pc) => write!(f, "at pc = {}", pc),
+            ExecutionError::PublicValueIndexOutOfBounds(
+                pc,
+                num_public_values,
+                public_value_index,
+            ) => write!(
                 f,
-                "at pc = {}, witness index = {} out of bounds for witness_stream of length {}",
-                pc, witness_idx, witness_len
+                "at pc = {}, tried to publish into index {} when num_public_values = {}",
+                pc, public_value_index, num_public_values
+            ),
+            ExecutionError::PublicValueNotEqual(
+                pc,
+                public_value_index,
+                existing_value,
+                new_value,
+            ) => write!(
+                f,
+                "at pc = {}, tried to publish value {} into index {}, but already had {}",
+                pc, new_value, public_value_index, existing_value
             ),
         }
     }
@@ -109,17 +146,17 @@ impl Display for ExecutionError {
 
 impl Error for ExecutionError {}
 
-impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
-    pub fn generate_trace<F: PrimeField32>(
-        vm: &mut VirtualMachine<WORD_SIZE, F>,
+impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
+    pub fn generate_trace(
+        vm: &mut ExecutionSegment<WORD_SIZE, F>,
     ) -> Result<RowMajorMatrix<F>, ExecutionError> {
-        let mut rows = vec![];
+        let mut clock_cycle: usize = vm.cpu_chip.state.clock_cycle;
+        let mut timestamp: usize = vm.cpu_chip.state.timestamp;
+        let mut pc = F::from_canonical_usize(vm.cpu_chip.state.pc);
 
-        let mut clock_cycle: usize = 0;
-        let mut timestamp: usize = 0;
-        let mut pc = F::zero();
-
-        let mut witness_idx = 0;
+        let mut hint_stream = vm.hint_stream.clone();
+        let mut cycle_tracker = CycleTracker::<F>::new();
+        let mut is_done = false;
 
         loop {
             let pc_usize = pc.as_canonical_u64() as usize;
@@ -132,6 +169,7 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
             let c = instruction.op_c;
             let d = instruction.d;
             let e = instruction.e;
+            let debug = instruction.debug.clone();
 
             let io = CpuIoCols {
                 timestamp: F::from_canonical_usize(timestamp),
@@ -188,6 +226,8 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
                 return Err(ExecutionError::DisabledOperation(pc_usize, opcode));
             }
 
+            let mut public_value_flags = vec![F::zero(); vm.public_values.len()];
+
             match opcode {
                 // d[a] <- e[d[c] + b]
                 LOADW => {
@@ -222,8 +262,33 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
                         next_pc = pc + c;
                     }
                 }
-                TERMINATE => {
+                TERMINATE | NOP => {
                     next_pc = pc;
+                }
+                PUBLISH => {
+                    let public_value_index = read!(d, a).as_canonical_u64() as usize;
+                    let value = read!(e, b);
+                    if public_value_index >= vm.public_values.len() {
+                        return Err(PublicValueIndexOutOfBounds(
+                            pc_usize,
+                            vm.public_values.len(),
+                            public_value_index,
+                        ));
+                    }
+                    public_value_flags[public_value_index] = F::one();
+                    match vm.public_values[public_value_index] {
+                        None => vm.public_values[public_value_index] = Some(value),
+                        Some(exising_value) => {
+                            if value != exising_value {
+                                return Err(PublicValueNotEqual(
+                                    pc_usize,
+                                    public_value_index,
+                                    exising_value.as_canonical_u64() as usize,
+                                    value.as_canonical_u64() as usize,
+                                ));
+                            }
+                        }
+                    }
                 }
                 opcode @ (FADD | FSUB | FMUL | FDIV) => {
                     // read from d[b] and e[c]
@@ -246,18 +311,48 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
                 PERM_POS2 | COMP_POS2 => {
                     Poseidon2Chip::<16, _>::poseidon2_perm(vm, timestamp, instruction);
                 }
-                HINT => {
-                    if witness_idx >= vm.witness_stream.len() {
-                        return Err(ExecutionError::HintOutOfBounds(
-                            pc_usize,
-                            witness_idx,
-                            vm.witness_stream.len(),
-                        ));
-                    }
-                    let next_input = &vm.witness_stream[witness_idx];
-                    witness_idx += 1;
-                    vm.memory_chip.write_hint(a, d, e, next_input);
+                HINT_INPUT => {
+                    let hint = match vm.input_stream.pop_front() {
+                        Some(hint) => hint,
+                        None => return Err(ExecutionError::EndOfInputStream(pc_usize)),
+                    };
+                    hint_stream = VecDeque::new();
+                    hint_stream.push_back(F::from_canonical_usize(hint.len()));
+                    hint_stream.extend(hint);
                 }
+                HINT_BITS => {
+                    let val = vm.memory_chip.unsafe_read_elem(d, a);
+                    let mut val = val.as_canonical_u32();
+
+                    hint_stream = VecDeque::new();
+                    for _ in 0..32 {
+                        hint_stream.push_back(F::from_canonical_u32(val & 1));
+                        val >>= 1;
+                    }
+                }
+                // e[d[a] + b] <- hint_stream.next()
+                SHINTW => {
+                    let hint = match hint_stream.pop_front() {
+                        Some(hint) => hint,
+                        None => return Err(ExecutionError::HintOutOfBounds(pc_usize)),
+                    };
+                    let base_pointer = read!(d, a);
+                    write!(e, base_pointer + b, hint);
+                }
+                CT_START => cycle_tracker.start(
+                    debug,
+                    vm.cpu_chip.rows.len(),
+                    clock_cycle,
+                    timestamp,
+                    &vm.metrics(),
+                ),
+                CT_END => cycle_tracker.end(
+                    debug,
+                    vm.cpu_chip.rows.len(),
+                    clock_cycle,
+                    timestamp,
+                    &vm.metrics(),
+                ),
             };
 
             let mut operation_flags = BTreeMap::new();
@@ -270,31 +365,62 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
                 (accesses[0].data.to_vec(), accesses[1].data.to_vec()),
             );
 
-            let read0_equals_read1 = is_equal_vec_cols.io.prod;
+            let read0_equals_read1 = is_equal_vec_cols.io.is_equal;
             let is_equal_vec_aux = is_equal_vec_cols.aux;
 
             let aux = CpuAuxCols {
                 operation_flags,
+                public_value_flags,
                 accesses,
                 read0_equals_read1,
                 is_equal_vec_aux,
             };
 
             let cols = CpuCols { io, aux };
-            rows.extend(cols.flatten(vm.options()));
+            vm.cpu_chip.rows.push(cols.flatten(vm.options()));
 
             pc = next_pc;
             timestamp += max_accesses_per_instruction(opcode);
 
             clock_cycle += 1;
-            if opcode == TERMINATE && clock_cycle.is_power_of_two() {
+            if opcode == TERMINATE && vm.cpu_chip.current_height().is_power_of_two() {
+                is_done = true;
+                break;
+            }
+            if vm.should_segment() {
                 break;
             }
         }
 
+        cycle_tracker.print();
+
+        // Update CPU chip state with all changes from this segment.
+        vm.cpu_chip.set_state(ExecutionState {
+            clock_cycle,
+            timestamp,
+            pc: pc.as_canonical_u64() as usize,
+            is_done,
+        });
+        vm.hint_stream = hint_stream;
+        vm.cpu_chip.generate_pvs();
+
+        if !is_done {
+            Self::pad_rows(vm);
+        }
+
         Ok(RowMajorMatrix::new(
-            rows,
+            vm.cpu_chip.rows.concat(),
             CpuCols::<WORD_SIZE, F>::get_width(vm.options()),
         ))
+    }
+
+    /// Pad with NOP rows.
+    pub fn pad_rows(vm: &mut ExecutionSegment<WORD_SIZE, F>) {
+        let pc = F::from_canonical_usize(vm.cpu_chip.state.pc);
+        let timestamp = F::from_canonical_usize(vm.cpu_chip.state.timestamp);
+        let nop_row =
+            CpuCols::<WORD_SIZE, F>::nop_row(vm.options(), pc, timestamp).flatten(vm.options());
+        let correct_len = (vm.cpu_chip.rows.len() + 1).next_power_of_two();
+        vm.cpu_chip.rows.resize(correct_len, nop_row);
     }
 }

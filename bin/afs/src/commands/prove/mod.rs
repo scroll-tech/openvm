@@ -1,18 +1,19 @@
 use std::{marker::PhantomData, sync::Arc, time::Instant};
 
-use afs_chips::{
+use afs_page::{
     execution_air::ExecutionAir,
     page_rw_checker::page_controller::{OpType, Operation, PageController},
 };
 use afs_stark_backend::{
     config::{Com, PcsProof, PcsProverData},
-    keygen::types::MultiStarkPartialProvingKey,
+    keygen::types::MultiStarkProvingKey,
     prover::trace::{ProverTraceData, TraceCommitmentBuilder},
 };
 use afs_test_utils::{
     engine::StarkEngine,
     page_config::{PageConfig, PageMode},
 };
+use bin_common::utils::io::{read_from_path, write_bytes};
 use clap::Parser;
 use color_eyre::eyre::Result;
 use logical_interface::{
@@ -20,7 +21,7 @@ use logical_interface::{
         types::{AfsOperation, InputFileOp},
         AfsInputFile,
     },
-    afs_interface::AfsInterface,
+    afs_interface::{utils::string_to_table_id, AfsInterface},
     mock_db::MockDb,
     table::codec::fixed_bytes::FixedBytesCodec,
     utils::{fixed_bytes_to_u16_vec, string_to_u8_vec},
@@ -30,9 +31,7 @@ use p3_uni_stark::{Domain, StarkGenericConfig, Val};
 use serde::de::DeserializeOwned;
 use tracing::info_span;
 
-use crate::commands::{read_from_path, write_bytes};
-
-use super::create_prefix;
+use crate::RANGE_CHECK_BITS;
 
 /// `afs prove` command
 /// Uses information from config.toml to generate a proof of the changes made by a .afi file to a table
@@ -104,10 +103,9 @@ where
         keys_folder: String,
         cache_folder: String,
         silent: bool,
-        // durations: Option<&mut (Duration, Duration)>,
     ) -> Result<()> {
         let start = Instant::now();
-        let prefix = create_prefix(config);
+        let prefix = config.generate_filename();
         match config.page.mode {
             PageMode::ReadWrite => Self::execute_rw(
                 config,
@@ -118,7 +116,6 @@ where
                 keys_folder,
                 cache_folder,
                 silent,
-                // durations,
             )?,
             PageMode::ReadOnly => panic!(),
         }
@@ -161,7 +158,6 @@ where
             config.page.data_bytes,
             height,
         );
-
         let zk_ops = instructions
             .operations
             .iter()
@@ -176,7 +172,7 @@ where
 
         let checker_trace_degree = config.page.max_rw_ops * 4;
         let idx_limb_bits = config.page.bits_per_fe;
-        let idx_decomp = 8;
+        let idx_decomp = RANGE_CHECK_BITS;
 
         let mut page_controller: PageController<SC> = PageController::new(
             page_bus_index,
@@ -191,8 +187,9 @@ where
         let prover = engine.prover();
         let mut trace_builder = TraceCommitmentBuilder::new(prover.pcs());
 
+        let table_id_full = string_to_table_id(table_id.clone()).to_string();
         let init_prover_data_encoded =
-            read_from_path(cache_folder.clone() + "/" + &table_id + ".cache.bin").unwrap();
+            read_from_path(cache_folder.clone() + "/" + &table_id_full + ".cache.bin").unwrap();
         let init_prover_data: ProverTraceData<SC> =
             bincode::deserialize(&init_prover_data_encoded).unwrap();
 
@@ -200,24 +197,22 @@ where
             &page_init,
             Some(Arc::new(init_prover_data)),
             None,
-            zk_ops.clone(),
+            &zk_ops,
             checker_trace_degree,
             &mut trace_builder.committer,
         );
 
         // Generating trace for ops_sender and making sure it has height num_ops
-        let trace_span = info_span!("Prove.generate_trace").entered();
+        let trace_span = info_span!("Generate ops_sender trace").entered();
         let ops_sender_trace = ops_sender.generate_trace(&zk_ops, config.page.max_rw_ops);
         trace_span.exit();
 
-        let encoded_pk =
-            read_from_path(keys_folder.clone() + "/" + &prefix + ".partial.pk").unwrap();
-        let partial_pk: MultiStarkPartialProvingKey<SC> =
-            bincode::deserialize(&encoded_pk).unwrap();
+        let encoded_pk = read_from_path(keys_folder.clone() + "/" + &prefix + ".pk").unwrap();
+        let pk: MultiStarkProvingKey<SC> = bincode::deserialize(&encoded_pk).unwrap();
 
         let proof = page_controller.prove(
             engine,
-            &partial_pk,
+            &pk,
             &mut trace_builder,
             init_page_pdata,
             final_page_pdata,
@@ -297,8 +292,8 @@ fn afi_op_conv(
         InputFileOp::InnerJoin => {
             panic!("InnerJoin not supported yet")
         }
-        InputFileOp::Where => {
-            panic!("Where not supported yet")
+        InputFileOp::Filter => {
+            panic!("Filter not supported yet")
         }
     }
 }

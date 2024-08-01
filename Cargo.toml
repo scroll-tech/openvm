@@ -1,17 +1,21 @@
 [workspace]
 members = [
-    "chips",
+    "bin/common",
+    "bin/afs",
+    "bin/afs-1b",
+    "bin/olap",
+    "benchmark",
+    "db/page",
+    "primitives",
     "compiler",
+    "derive",
+    "logical-interface",
+    "poseidon2-air",
+    "recursion",
     "stark-backend",
     "test-utils",
-    "derive",
-    "bin/afs",
-    "bin/predicate",
-    "benchmark",
-    "logical-interface",
     "vm",
     "vm/bin",
-    "poseidon2-air",
 ]
 resolver = "2"
 
@@ -20,19 +24,43 @@ version = "0.1.0"
 authors = ["Intrinsic Technologies"]
 edition = "2021"
 
+# Fastest runtime configuration
 [profile.release]
 opt-level = 3
+lto = "thin"
+debug = "line-tables-only"
+strip = true
+panic = "unwind"
+codegen-units = 16
 
-[profile.bench]
-opt-level = 3
-
-[profile.fast]
+[profile.profiling]
 inherits = "release"
-debug = true
+debug = 2
+strip = false
+
+# Make sure debug symbols are in the bench profile for flamegraphs
+[profile.bench]
+inherits = "profiling"
+
+# This will compile slowly
+[profile.maxperf]
+inherits = "release"
+lto = "fat"
+codegen-units = 1
+
+# For O3 optimization but still fast(ish) compile times
+[profile.fast]
+inherits = "dev"
+opt-level = 3
+# Set this to 1 or 2 to get more useful backtraces
+debug = 1
 debug-assertions = true
+# better recompile times
+incremental = true
+lto = "thin"
 
 [workspace.dependencies]
-p3-air = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" } # branch fix/two_adic_pcs_verify_height1 until issue is fixed
+p3-air = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" } # branch "fix/two_adic_pcs_verify_height1" until issue fixed
 p3-field = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
 p3-commit = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
 p3-matrix = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
@@ -50,12 +78,11 @@ p3-blake3 = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
 p3-mds = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
 p3-merkle-tree = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
 p3-monty-31 = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
+p3-poseidon = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
 p3-poseidon2 = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
 p3-symmetric = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
 p3-uni-stark = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
-p3-maybe-rayon = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04", features = [
-    "parallel",
-] }
+p3-maybe-rayon = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" } # the "parallel" feature is NOT on by default to allow single-threaded benchmarking
 p3-bn254-fr = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
 zkhash = { git = "https://github.com/HorizenLabs/poseidon2.git", rev = "bb476b9" }
 

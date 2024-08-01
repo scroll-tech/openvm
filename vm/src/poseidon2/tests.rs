@@ -4,6 +4,7 @@ use p3_baby_bear::BabyBear;
 use p3_field::AbstractField;
 use p3_matrix::dense::RowMajorMatrix;
 use p3_matrix::Matrix;
+use poseidon2_air::poseidon2::Poseidon2Config;
 use rand::Rng;
 use rand::RngCore;
 
@@ -18,11 +19,13 @@ use afs_test_utils::utils::create_seeded_rng;
 
 use crate::cpu::trace::Instruction;
 use crate::cpu::OpCode::{COMP_POS2, PERM_POS2};
+use crate::cpu::POSEIDON2_DIRECT_BUS;
 use crate::cpu::{MEMORY_BUS, POSEIDON2_BUS};
-use crate::vm::config::{VmConfig, VmParamsConfig};
+use crate::memory::tree::Hasher;
+use crate::vm::config::{VmConfig, DEFAULT_MAX_SEGMENT_LEN};
 use crate::vm::VirtualMachine;
 
-use super::{make_io_cols, Poseidon2Chip};
+use super::{Poseidon2Chip, Poseidon2VmAir};
 
 const WORD_SIZE: usize = 1;
 const LIMB_BITS: usize = 16;
@@ -54,18 +57,19 @@ macro_rules! run_perm_ops {
         // default VM with poseidon2 enabled
         let mut vm = VirtualMachine::<1, BabyBear>::new(
             VmConfig {
-                vm: VmParamsConfig {
-                    field_arithmetic_enabled: true,
-                    field_extension_enabled: false,
-                    compress_poseidon2_enabled: true,
-                    perm_poseidon2_enabled: true,
-                    limb_bits: LIMB_BITS,
-                    decomp: DECOMP,
-                },
+                field_arithmetic_enabled: true,
+                field_extension_enabled: false,
+                compress_poseidon2_enabled: true,
+                perm_poseidon2_enabled: true,
+                limb_bits: LIMB_BITS,
+                decomp: DECOMP,
+                num_public_values: 4,
+                max_segment_len: DEFAULT_MAX_SEGMENT_LEN,
             },
             vec![],
             vec![],
         );
+        let mut segment = &mut vm.segments[0];
 
         let write_ops: [[WriteOps; 16]; $num_ops] = core::array::from_fn(|i| {
             core::array::from_fn(|j| {
@@ -73,14 +77,14 @@ macro_rules! run_perm_ops {
                     WriteOps {
                         clk: 16 * i + j,
                         ad_s: $instructions[i].e,
-                        address: $instructions[i].op_a + BabyBear::from_canonical_usize(j),
+                        address: $instructions[i].op_b + BabyBear::from_canonical_usize(j),
                         data: [$data[i][j]],
                     }
                 } else {
                     WriteOps {
                         clk: 16 * i + j,
                         ad_s: $instructions[i].e,
-                        address: $instructions[i].op_b + BabyBear::from_canonical_usize(j - 8),
+                        address: $instructions[i].op_c + BabyBear::from_canonical_usize(j - 8),
                         data: [$data[i][j]],
                     }
                 }
@@ -88,7 +92,8 @@ macro_rules! run_perm_ops {
         });
 
         write_ops.iter().flatten().for_each(|op| {
-            vm.memory_chip
+            segment
+                .memory_chip
                 .write_word(op.clk, op.ad_s, op.address, op.data);
         });
 
@@ -97,32 +102,41 @@ macro_rules! run_perm_ops {
         (0..$num_ops).for_each(|i| {
             let start_timestamp = 16 * $num_ops + (time_per * i);
             Poseidon2Chip::<16, BabyBear>::poseidon2_perm(
-                &mut vm,
+                &mut segment,
                 start_timestamp,
-                $instructions[i],
+                $instructions[i].clone(),
             );
         });
 
         let dummy_cpu_poseidon2 = DummyInteractionAir::new(
-            Poseidon2Chip::<16, BabyBear>::interaction_width(),
+            Poseidon2VmAir::<16, BabyBear>::opcode_interaction_width(),
             true,
             POSEIDON2_BUS,
         );
         let dummy_cpu_poseidon2_trace = RowMajorMatrix::new(
             {
-                let mut vec: Vec<_> = (0..$num_ops)
+                let mut vec: Vec<BabyBear> = (0..$num_ops)
                     .flat_map(|i| {
-                        make_io_cols(16 * $num_ops + (time_per * i), $instructions[i]).flatten()
+                        Poseidon2VmAir::<16, BabyBear>::make_io_cols(
+                            16 * $num_ops + (time_per * i),
+                            $instructions[i].clone(),
+                        )
+                        .flatten()
+                        .iter()
+                        .enumerate()
+                        .filter(|&(index, _)| index != 1)
+                        .map(|(_, value)| *value)
+                        .collect::<Vec<BabyBear>>()
                     })
                     .collect();
                 for _ in 0..(tot_ops - $num_ops)
-                    * (Poseidon2Chip::<16, BabyBear>::interaction_width() + 1)
+                    * (Poseidon2VmAir::<16, BabyBear>::opcode_interaction_width() + 1)
                 {
                     vec.push(BabyBear::zero());
                 }
                 vec
             },
-            Poseidon2Chip::<16, BabyBear>::interaction_width() + 1,
+            Poseidon2VmAir::<16, BabyBear>::opcode_interaction_width() + 1,
         );
 
         let dummy_cpu_memory = DummyInteractionAir::new(5, true, MEMORY_BUS);
@@ -146,9 +160,11 @@ macro_rules! run_perm_ops {
             5 + 1,
         );
 
-        let memory_chip_trace = vm.memory_chip.generate_trace(vm.range_checker.clone());
-        let range_checker_trace = vm.range_checker.generate_trace();
-        let poseidon2_trace = vm.poseidon2_chip.generate_trace();
+        let memory_chip_trace = segment
+            .memory_chip
+            .generate_trace(segment.range_checker.clone());
+        let range_checker_trace = segment.range_checker.generate_trace();
+        let poseidon2_trace = segment.poseidon2_chip.generate_trace();
 
         let traces = vec![
             range_checker_trace,
@@ -183,6 +199,7 @@ fn random_instructions<const NUM_OPS: usize>() -> [Instruction<BabyBear>; NUM_OP
             op_c: c,
             d: BabyBear::zero(),
             e,
+            debug: String::new(),
         }
     })
 }
@@ -203,9 +220,9 @@ fn poseidon2_chip_random_50_test() {
     engine
         .run_simple_test(
             vec![
-                &vm.range_checker.air,
-                &vm.memory_chip.air,
-                &vm.poseidon2_chip,
+                &vm.segments[0].range_checker.air,
+                &vm.segments[0].memory_chip.air,
+                &vm.segments[0].poseidon2_chip.air,
                 &dummy_cpu_memory,
                 &dummy_cpu_poseidon2,
             ],
@@ -240,9 +257,9 @@ fn poseidon2_negative_test() {
         assert_eq!(
             engine.run_simple_test(
                 vec![
-                    &vm.range_checker.air,
-                    &vm.memory_chip.air,
-                    &vm.poseidon2_chip,
+                    &vm.segments[0].range_checker.air,
+                    &vm.segments[0].memory_chip.air,
+                    &vm.segments[0].poseidon2_chip.air,
                     &dummy_cpu_memory,
                     &dummy_cpu_poseidon2,
                 ],
@@ -254,4 +271,63 @@ fn poseidon2_negative_test() {
         );
         traces[poseidon2_trace_index].row_mut(height)[width] -= rand;
     }
+}
+
+/// Test that the direct bus interactions work.
+#[test]
+fn poseidon2_direct_test() {
+    let mut rng = create_seeded_rng();
+    const NUM_OPS: usize = 50;
+    const CHUNKS: usize = 8;
+    let correct_height = NUM_OPS.next_power_of_two();
+    let hashes: [([BabyBear; CHUNKS], [BabyBear; CHUNKS]); NUM_OPS] = from_fn(|_| {
+        (
+            from_fn(|_| BabyBear::from_canonical_u32(rng.next_u32() % (1 << 30))),
+            from_fn(|_| BabyBear::from_canonical_u32(rng.next_u32() % (1 << 30))),
+        )
+    });
+    let mut chip = Poseidon2Chip::<16, BabyBear>::from_poseidon2_config(
+        Poseidon2Config::default(),
+        POSEIDON2_BUS,
+    );
+
+    let outs: [[BabyBear; CHUNKS]; NUM_OPS] = from_fn(|i| chip.hash(hashes[i].0, hashes[i].1));
+
+    let width = Poseidon2VmAir::<16, BabyBear>::direct_interaction_width();
+
+    let dummy_direct_cpu = DummyInteractionAir::new(width, true, POSEIDON2_DIRECT_BUS);
+
+    let mut dummy_direct_cpu_trace = RowMajorMatrix::new(
+        outs.iter()
+            .enumerate()
+            .flat_map(|(i, out)| {
+                vec![BabyBear::one()]
+                    .into_iter()
+                    .chain(hashes[i].0)
+                    .chain(hashes[i].1)
+                    .chain(out.iter().cloned())
+            })
+            .collect::<Vec<_>>(),
+        width + 1,
+    );
+    dummy_direct_cpu_trace.values.extend(vec![
+        BabyBear::zero();
+        (width + 1) * (correct_height - NUM_OPS)
+    ]);
+
+    let chip_trace = chip.generate_trace();
+
+    // engine generation
+    let perm = random_perm();
+    let fri_params = fri_params_with_80_bits_of_security()[1];
+    let engine = engine_from_perm(perm, fri_params);
+
+    // positive test
+    engine
+        .run_simple_test(
+            vec![&dummy_direct_cpu, &chip.air],
+            vec![dummy_direct_cpu_trace, chip_trace],
+            vec![vec![]; 2],
+        )
+        .expect("Verification failed");
 }

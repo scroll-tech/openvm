@@ -2,11 +2,13 @@ use p3_air::{Air, BaseAir, PairBuilder};
 use p3_field::Field;
 use p3_matrix::dense::RowMajorMatrix;
 
+use afs_stark_backend::interaction::InteractionBuilder;
+
 use super::{columns::ProgramPreprocessedCols, ProgramAir};
 
 impl<F: Field> BaseAir<F> for ProgramAir<F> {
     fn width(&self) -> usize {
-        ProgramPreprocessedCols::<F>::get_width() + 1
+        1
     }
 
     fn preprocessed_trace(&self) -> Option<RowMajorMatrix<F>> {
@@ -30,6 +32,8 @@ impl<F: Field> BaseAir<F> for ProgramAir<F> {
     }
 }
 
-impl<AB: PairBuilder> Air<AB> for ProgramAir<AB::F> {
-    fn eval(&self, _: &mut AB) {}
+impl<AB: PairBuilder + InteractionBuilder> Air<AB> for ProgramAir<AB::F> {
+    fn eval(&self, builder: &mut AB) {
+        self.eval_interactions(builder);
+    }
 }

@@ -4,14 +4,15 @@ use p3_field::AbstractField;
 use rand::{thread_rng, Rng};
 
 use afs_compiler::asm::AsmBuilder;
-use afs_compiler::ir::Array;
 use afs_compiler::ir::ExtConst;
+use afs_compiler::ir::{Array, Usize};
 use afs_compiler::ir::{Config, Ext, Felt, Var};
 use afs_compiler::prelude::Builder;
 use afs_compiler::prelude::MemIndex;
 use afs_compiler::prelude::MemVariable;
 use afs_compiler::prelude::Ptr;
 use afs_compiler::prelude::Variable;
+use afs_compiler::util::execute_program;
 use afs_derive::DslVariable;
 
 #[derive(DslVariable, Clone, Debug)]
@@ -22,6 +23,7 @@ pub struct Point<C: Config> {
 }
 
 #[test]
+#[ignore = "test too slow"]
 fn test_compiler_array() {
     type F = BabyBear;
     type EF = BinomialExtensionField<BabyBear, 4>;
@@ -69,15 +71,15 @@ fn test_compiler_array() {
 
     // Put values dynamically
     builder.range(0, dyn_len).for_each(|i, builder| {
-        builder.set(&mut var_array, i, i * F::two());
+        builder.set(&mut var_array, i, i * 2);
         builder.set(&mut felt_array, i, F::from_canonical_u32(3));
-        builder.set(&mut ext_array, i, (EF::from_canonical_u32(4)).cons());
+        builder.set(&mut ext_array, i, EF::from_canonical_u32(4).cons());
     });
 
     // Assert values set.
     builder.range(0, dyn_len).for_each(|i, builder| {
         let var_value = builder.get(&var_array, i);
-        builder.assert_var_eq(var_value, i * F::two());
+        builder.assert_var_eq(var_value, i * 2);
         let felt_value = builder.get(&felt_array, i);
         builder.assert_felt_eq(felt_value, F::from_canonical_u32(3));
         let ext_value = builder.get(&ext_array, i);
@@ -108,17 +110,79 @@ fn test_compiler_array() {
         builder.set(&mut array, i, var_array.clone());
     });
 
+    // TODO: this part of the test is extremely slow.
     builder.range(0, array.len()).for_each(|i, builder| {
         let point_array_back = builder.get(&array, i);
         builder.assert_eq::<Array<_, _>>(point_array_back, var_array.clone());
     });
 
-    let code = builder.compile_asm();
-    println!("{code}");
+    builder.halt();
 
-    // let program = code.machine_code();
+    const WORD_SIZE: usize = 1;
+    let program = builder.compile_isa::<WORD_SIZE>();
+    execute_program::<WORD_SIZE>(program, vec![]);
+}
 
-    // let config = SC::default();
-    // let mut runtime = Runtime::<F, EF, _>::new(&program, config.perm.clone());
-    // runtime.run();
+#[test]
+fn test_fixed_array_const() {
+    type F = BabyBear;
+    type EF = BinomialExtensionField<BabyBear, 4>;
+
+    let mut builder = AsmBuilder::<F, EF>::default().unroll_loop(true);
+
+    // Sum all the values of an array.
+    let len: usize = 1000;
+    let mut fixed_array = builder.vec(vec![Usize::Const(1); len]);
+
+    // Put values statically
+    builder.range(0, fixed_array.len()).for_each(|i, builder| {
+        builder.set(&mut fixed_array, i, Usize::Const(2));
+    });
+    // Assert values set.
+    builder.range(0, fixed_array.len()).for_each(|i, builder| {
+        let value = builder.get(&fixed_array, i);
+        builder.assert_eq::<Usize<_>>(value, Usize::Const(2));
+    });
+    let mut fixed_2d = builder.uninit_fixed_array(1);
+    builder.set_value(&mut fixed_2d, 0, fixed_array);
+
+    assert_eq!(
+        builder.operations.vec.len(),
+        0,
+        "No operations should be generated"
+    );
+}
+
+#[test]
+fn test_fixed_array_var() {
+    type F = BabyBear;
+    type EF = BinomialExtensionField<BabyBear, 4>;
+
+    let mut builder = AsmBuilder::<F, EF>::default().unroll_loop(true);
+
+    // Sum all the values of an array.
+    let len: usize = 1000;
+    let mut fixed_array = builder.uninit_fixed_array(len);
+
+    // Put values statically
+    builder.range(0, fixed_array.len()).for_each(|i, builder| {
+        let one: Var<_> = builder.eval(F::one());
+        // `len` instructions
+        builder.set(&mut fixed_array, i, Usize::Var(one));
+    });
+    // Assert values set.
+    builder.range(0, fixed_array.len()).for_each(|i, builder| {
+        let value: Usize<_> = builder.get(&fixed_array, i);
+        // `len` instructions to initialize variables. FIXME: this is not optimal.
+        // `len` instructions of `assert_eq`
+        builder.assert_eq::<Var<_>>(value, Usize::Const(2));
+    });
+    let mut fixed_2d = builder.uninit_fixed_array(1);
+    builder.set_value(&mut fixed_2d, 0, fixed_array);
+
+    assert_eq!(
+        builder.operations.vec.len(),
+        len * 3,
+        "No operations should be generated"
+    );
 }

@@ -9,10 +9,10 @@ use afs_stark_backend::config::PcsProverData;
 use afs_test_utils::config::baby_bear_blake3::BabyBearBlake3Engine;
 use afs_test_utils::config::baby_bear_bytehash::engine_from_byte_hash;
 use afs_test_utils::config::baby_bear_keccak::BabyBearKeccakEngine;
-use afs_test_utils::config::baby_bear_poseidon2::engine_from_perm;
-use afs_test_utils::config::baby_bear_poseidon2::random_perm;
+use afs_test_utils::config::baby_bear_poseidon2;
 use afs_test_utils::config::baby_bear_poseidon2::BabyBearPoseidon2Engine;
-use afs_test_utils::config::EngineType;
+use afs_test_utils::config::goldilocks_poseidon::GoldilocksPoseidonEngine;
+use afs_test_utils::config::{goldilocks_poseidon, EngineType};
 use afs_test_utils::engine::StarkEngine;
 use afs_test_utils::page_config::PageConfig;
 use clap::Parser;
@@ -130,8 +130,15 @@ pub fn run(config: &PageConfig) {
             Cli::run_with_engine(config, &engine)
         }
         EngineType::BabyBearPoseidon2 => {
-            let perm = random_perm();
-            let engine: BabyBearPoseidon2Engine = engine_from_perm(perm, fri_params);
+            let perm = baby_bear_poseidon2::default_perm();
+            let engine: BabyBearPoseidon2Engine =
+                baby_bear_poseidon2::engine_from_perm(perm, fri_params);
+            Cli::run_with_engine(config, &engine)
+        }
+        EngineType::GoldilocksPoseidon => {
+            let perm = goldilocks_poseidon::random_perm();
+            let engine: GoldilocksPoseidonEngine =
+                goldilocks_poseidon::engine_from_perm(perm, fri_params);
             Cli::run_with_engine(config, &engine)
         }
     }

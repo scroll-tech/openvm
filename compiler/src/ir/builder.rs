@@ -4,7 +4,7 @@ use backtrace::Backtrace;
 use p3_field::AbstractField;
 
 use super::{
-    Array, Config, DslIr, Ext, Felt, FromConstant, MemIndex, MemVariable, Ptr, SymbolicExt,
+    Array, Config, DslIr, Ext, Felt, FromConstant, MemIndex, MemVariable, SymbolicExt,
     SymbolicFelt, SymbolicUsize, SymbolicVar, Usize, Var, Variable,
 };
 
@@ -87,6 +87,13 @@ impl<T> IntoIterator for TracedVec<T> {
     }
 }
 
+#[derive(Debug, Copy, Clone, Default)]
+pub struct BuilderFlags {
+    pub(crate) debug: bool,
+    /// If true, the loop with constant start and end will be unrolled.
+    pub(crate) unroll_loop: bool,
+}
+
 /// A builder for the DSL.
 ///
 /// Can compile to both assembly and a set of constraints.
@@ -100,7 +107,7 @@ pub struct Builder<C: Config> {
     pub(crate) witness_var_count: u32,
     pub(crate) witness_felt_count: u32,
     pub(crate) witness_ext_count: u32,
-    pub(crate) debug: bool,
+    pub(crate) flags: BuilderFlags,
     pub(crate) is_sub_builder: bool,
 }
 
@@ -111,7 +118,7 @@ impl<C: Config> Builder<C> {
         felt_count: u32,
         ext_count: u32,
         nb_public_values: Option<Var<C::N>>,
-        debug: bool,
+        flags: BuilderFlags,
     ) -> Self {
         Self {
             felt_count,
@@ -124,9 +131,15 @@ impl<C: Config> Builder<C> {
             witness_ext_count: 0,
             operations: Default::default(),
             nb_public_values,
-            debug,
+            flags,
             is_sub_builder: true,
         }
+    }
+
+    /// Enable `unroll_loop` flag for the builder.
+    pub fn unroll_loop(mut self, enable: bool) -> Self {
+        self.flags.unroll_loop = enable;
+        self
     }
 
     /// Pushes an operation to the builder.
@@ -146,9 +159,7 @@ impl<C: Config> Builder<C> {
 
     /// Evaluates an expression and returns a variable.
     pub fn eval<V: Variable<C>, E: Into<V::Expression>>(&mut self, expr: E) -> V {
-        let dst = V::uninit(self);
-        dst.assign(expr.into(), self);
-        dst
+        V::eval(self, expr)
     }
 
     /// Evaluates a constant expression and returns a variable.
@@ -367,25 +378,35 @@ impl<C: Config> Builder<C> {
         // Allocate space for the length variable. We assume that mem[ptr..] is empty.
         let ptr = self.alloc(Usize::Const(1), 1);
 
-        // Write length + data to memory starting at mem[ptr].
-        self.operations.push(DslIr::Hint(ptr));
+        // Prepare length + data for hinting.
+        self.operations.push(DslIr::HintInputVec());
 
-        // Copy length into local variable.
+        // Write and retrieve length hint.
         let index = MemIndex {
             index: Usize::Const(0),
             offset: 0,
             size: 1,
         };
+        self.operations.push(DslIr::StoreHintWord(ptr, index));
+
         let vlen: Var<C::N> = self.uninit();
         self.load(vlen, ptr, index);
 
-        // Create array of length vlen starting at mem[ptr + 1].
-        let arr_addr: Var<C::N> = self.eval(ptr.address + C::N::one());
-        let arr_ptr = Ptr::<C::N> { address: arr_addr };
-        let arr = Array::Dyn(arr_ptr, Usize::Var(vlen));
+        let arr = self.dyn_array(vlen);
+        let ptr = match arr {
+            Array::Dyn(ptr, _) => ptr,
+            Array::Fixed(_) => unreachable!(),
+        };
 
-        // Now allocate post hoc to advance the free memory pointer.
-        self.push(DslIr::Alloc(ptr, vlen.into(), 1));
+        // Write the content hints directly into the array memory.
+        self.range(0, vlen).for_each(|i, builder| {
+            let index = MemIndex {
+                index: i,
+                offset: 0,
+                size: 1,
+            };
+            builder.operations.push(DslIr::StoreHintWord(ptr, index));
+        });
 
         arr
     }
@@ -403,7 +424,7 @@ impl<C: Config> Builder<C> {
 
         // Simply recast memory as Array<Ext>.
         match flattened {
-            Array::Fixed(_) => panic!("hint array is not dynamic"),
+            Array::Fixed(_) => unreachable!(),
             Array::Dyn(ptr, _) => Array::Dyn(ptr, Usize::Var(len)),
         }
     }
@@ -462,31 +483,35 @@ impl<C: Config> Builder<C> {
         self.operations.push(DslIr::RegisterPublicValue(val));
     }
 
-    /// Register and commits a felt as public value.  This value will be constrained when verified.
-    pub fn commit_public_value(&mut self, val: Felt<C::F>) {
-        assert!(
-            !self.is_sub_builder,
-            "Cannot commit to a public value with a sub builder"
-        );
-        if self.nb_public_values.is_none() {
-            self.nb_public_values = Some(self.eval(C::N::zero()));
-        }
-        let nb_public_values = *self.nb_public_values.as_ref().unwrap();
-
-        self.operations.push(DslIr::Commit(val, nb_public_values));
-        self.assign(nb_public_values, nb_public_values + C::N::one());
-    }
-
-    /// Commits an array of felts in public values.
-    pub fn commit_public_values(&mut self, vals: &Array<C, Felt<C::F>>) {
+    fn get_nb_public_values(&mut self) -> Var<C::N> {
         assert!(
             !self.is_sub_builder,
             "Cannot commit to public values with a sub builder"
         );
+        if self.nb_public_values.is_none() {
+            self.nb_public_values = Some(self.eval(C::N::zero()));
+        }
+        *self.nb_public_values.as_ref().unwrap()
+    }
+
+    fn commit_public_value_and_increment(&mut self, val: Felt<C::F>, nb_public_values: Var<C::N>) {
+        self.operations.push(DslIr::Publish(val, nb_public_values));
+        self.assign(nb_public_values, nb_public_values + C::N::one());
+    }
+
+    /// Register and commits a felt as public value.  This value will be constrained when verified.
+    pub fn commit_public_value(&mut self, val: Felt<C::F>) {
+        let nb_public_values = self.get_nb_public_values();
+        self.commit_public_value_and_increment(val, nb_public_values);
+    }
+
+    /// Commits an array of felts in public values.
+    pub fn commit_public_values(&mut self, vals: &Array<C, Felt<C::F>>) {
+        let nb_public_values = self.get_nb_public_values();
         let len = vals.len();
         self.range(0, len).for_each(|i, builder| {
             let val = builder.get(vals, i);
-            builder.commit_public_value(val);
+            builder.commit_public_value_and_increment(val, nb_public_values);
         });
     }
 
@@ -499,8 +524,14 @@ impl<C: Config> Builder<C> {
             .push(DslIr::CircuitCommitCommitedValuesDigest(var));
     }
 
-    pub fn cycle_tracker(&mut self, name: &str) {
-        self.operations.push(DslIr::CycleTracker(name.to_string()));
+    pub fn cycle_tracker_start(&mut self, name: &str) {
+        self.operations
+            .push(DslIr::CycleTrackerStart(name.to_string()));
+    }
+
+    pub fn cycle_tracker_end(&mut self, name: &str) {
+        self.operations
+            .push(DslIr::CycleTrackerEnd(name.to_string()));
     }
 
     pub fn halt(&mut self) {
@@ -537,7 +568,7 @@ impl<'a, C: Config> IfBuilder<'a, C> {
             self.builder.felt_count,
             self.builder.ext_count,
             self.builder.nb_public_values,
-            self.builder.debug,
+            self.builder.flags,
         );
         f(&mut f_builder);
         let then_instructions = f_builder.operations;
@@ -585,7 +616,7 @@ impl<'a, C: Config> IfBuilder<'a, C> {
             self.builder.felt_count,
             self.builder.ext_count,
             self.builder.nb_public_values,
-            self.builder.debug,
+            self.builder.flags,
         );
 
         // Execute the `then` and `else_then` blocks and collect the instructions.
@@ -597,7 +628,7 @@ impl<'a, C: Config> IfBuilder<'a, C> {
             self.builder.felt_count,
             self.builder.ext_count,
             self.builder.nb_public_values,
-            self.builder.debug,
+            self.builder.flags,
         );
         else_f(&mut else_builder);
         let else_instructions = else_builder.operations;
@@ -723,7 +754,16 @@ impl<'a, C: Config> RangeBuilder<'a, C> {
         self
     }
 
-    pub fn for_each(self, mut f: impl FnMut(Var<C::N>, &mut Builder<C>)) {
+    pub fn for_each(self, mut f: impl FnMut(Usize<C::N>, &mut Builder<C>)) {
+        if self.builder.flags.unroll_loop {
+            if let (Usize::Const(start), Usize::Const(end)) = (self.start, self.end) {
+                for i in (start..end).step_by(self.step_size) {
+                    f(Usize::Const(i), self.builder)
+                }
+                return;
+            }
+        }
+
         let step_size = C::N::from_canonical_usize(self.step_size);
         let loop_variable: Var<C::N> = self.builder.uninit();
         let mut loop_body_builder = Builder::<C>::new_sub_builder(
@@ -731,10 +771,10 @@ impl<'a, C: Config> RangeBuilder<'a, C> {
             self.builder.felt_count,
             self.builder.ext_count,
             self.builder.nb_public_values,
-            self.builder.debug,
+            self.builder.flags,
         );
 
-        f(loop_variable, &mut loop_body_builder);
+        f(Usize::Var(loop_variable), &mut loop_body_builder);
 
         let loop_instructions = loop_body_builder.operations;
 

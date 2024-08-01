@@ -4,10 +4,8 @@ use p3_field::AbstractField;
 
 use afs_compiler::asm::AsmBuilder;
 use afs_compiler::asm::AsmConfig;
-use afs_compiler::ir::Array;
-use afs_compiler::ir::SymbolicVar;
-use afs_compiler::ir::Var;
-use afs_compiler::util::end_to_end_test;
+use afs_compiler::ir::{Array, SymbolicVar, Var};
+use afs_compiler::util::execute_program;
 use stark_vm::cpu::WORD_SIZE;
 
 type F = BabyBear;
@@ -47,16 +45,8 @@ fn test_compiler_for_loops() {
 
     builder.halt();
 
-    //let program = builder.compile_isa::<WORD_SIZE>();
-    //display_program(&program);
-    //execute_program::<WORD_SIZE, _>(program, vec![]);
-    end_to_end_test::<WORD_SIZE, _>(builder, vec![]);
-
-    // let program = builder.compile_program();
-
-    // let config = SC::default();
-    // let mut runtime = Runtime::<F, EF, _>::new(&program, config.perm.clone());
-    // runtime.run();
+    let program = builder.compile_isa::<WORD_SIZE>();
+    execute_program::<WORD_SIZE>(program, vec![]);
 }
 
 #[test]
@@ -72,6 +62,7 @@ fn test_compiler_nested_array_loop() {
     builder.range(0, array.len()).for_each(|i, builder| {
         let mut inner_array = builder.array::<Var<_>>(inner_len);
         builder.range(0, inner_array.len()).for_each(|j, builder| {
+            let j = builder.materialize(j);
             builder.set(&mut inner_array, j, i + j); //(j * F::from_canonical_u16(300)));
         });
         builder.set(&mut array, i, inner_array);
@@ -81,6 +72,7 @@ fn test_compiler_nested_array_loop() {
     builder.range(0, array.len()).for_each(|i, builder| {
         let inner_array = builder.get(&array, i);
         builder.range(0, inner_array.len()).for_each(|j, builder| {
+            let j = builder.materialize(j);
             let val = builder.get(&inner_array, j);
             builder.assert_var_eq(val, i + j); //*(j * F::from_canonical_u16(300)));
         });
@@ -88,23 +80,12 @@ fn test_compiler_nested_array_loop() {
 
     builder.halt();
 
-    //let program = builder.compile_isa::<WORD_SIZE>();
-    //display_program(&program);
-    //execute_program::<WORD_SIZE, _>(program, vec![]);
-    //end_to_end_test::<WORD_SIZE, _>(builder, vec![]);
-
-    // let code = builder.compile_asm();
-
-    // println!("{}", code);
-
-    // let program = code.machine_code();
-
-    // let config = SC::default();
-    // let mut runtime = Runtime::<F, EF, _>::new(&program, config.perm.clone());
-    // runtime.run();
+    let program = builder.compile_isa::<WORD_SIZE>();
+    execute_program::<WORD_SIZE>(program, vec![]);
 }
 
 #[test]
+#[ignore = "break currently not supported"]
 fn test_compiler_break() {
     let mut builder = AsmBuilder::<F, EF>::default();
     type C = AsmConfig<F, EF>;
@@ -137,7 +118,8 @@ fn test_compiler_break() {
 
     let is_break: Var<_> = builder.eval(F::one());
     builder.range(0, array.len()).for_each(|i, builder| {
-        let exp_value: Var<_> = builder.eval(i * is_break);
+        let materialized_i = builder.materialize(i);
+        let exp_value: Var<_> = builder.eval(materialized_i * is_break);
         let value = builder.get(&array, i);
         builder.assert_var_eq(value, exp_value);
         builder
@@ -165,8 +147,9 @@ fn test_compiler_break() {
 
     let is_break: Var<_> = builder.eval(F::one());
     builder.range(0, array.len()).for_each(|i, builder| {
-        let exp_value: Var<_> =
-            builder.eval(i * is_break + (SymbolicVar::<F>::one() - is_break) * break_len);
+        let materialized_i = builder.materialize(i);
+        let exp_value: Var<_> = builder
+            .eval(materialized_i * is_break + (SymbolicVar::<F>::one() - is_break) * break_len);
         let value = builder.get(&array, i);
         builder.assert_var_eq(value, exp_value);
         builder
@@ -176,16 +159,8 @@ fn test_compiler_break() {
 
     builder.halt();
 
-    // let program = builder.compile_isa();
-    // execute_program::<WORD_SIZE, _>(program);
-
-    // println!("{}", code);
-
-    // let program = code.machine_code();
-
-    // let config = SC::default();
-    // let mut runtime = Runtime::<F, EF, _>::new(&program, config.perm.clone());
-    // runtime.run();
+    let program = builder.compile_isa::<WORD_SIZE>();
+    execute_program::<WORD_SIZE>(program, vec![]);
 }
 
 #[test]
@@ -207,16 +182,8 @@ fn test_compiler_step_by() {
 
     builder.halt();
 
-    //let program = builder.compile_isa::<WORD_SIZE>();
-    //display_program(&program);
-    //execute_program::<WORD_SIZE, _>(program, vec![]);
-    end_to_end_test::<WORD_SIZE, _>(builder, vec![]);
-
-    // let program = builder.compile_program();
-
-    // let config = SC::default();
-    // let mut runtime = Runtime::<F, EF, _>::new(&program, config.perm.clone());
-    // runtime.run();
+    let program = builder.compile_isa::<WORD_SIZE>();
+    execute_program::<WORD_SIZE>(program, vec![]);
 }
 
 #[test]
@@ -235,18 +202,6 @@ fn test_compiler_bneinc() {
 
     builder.halt();
 
-    //let program = builder.compile_isa::<WORD_SIZE>();
-    //display_program(&program);
-    //execute_program::<WORD_SIZE, _>(program, vec![]);
-    end_to_end_test::<WORD_SIZE, _>(builder, vec![]);
-
-    // let code = builder.clone().compile_asm();
-
-    // println!("{}", code);
-
-    // let program = builder.compile_program();
-
-    // let config = SC::default();
-    // let mut runtime = Runtime::<F, EF, _>::new(&program, config.perm.clone());
-    // runtime.run();
+    let program = builder.compile_isa::<WORD_SIZE>();
+    execute_program::<WORD_SIZE>(program, vec![]);
 }

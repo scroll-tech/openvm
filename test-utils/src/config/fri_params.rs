@@ -3,9 +3,9 @@ use std::env;
 use super::FriParameters;
 
 pub fn default_fri_params() -> FriParameters {
-    // blowup factor = 4
+    // blowup factor = 3
     if matches!(env::var("AXIOM_FAST_TEST"), Ok(x) if &x == "1") {
-        fri_params_fast_testing()[2]
+        fri_params_fast_testing()[1]
     } else {
         fri_params_with_80_bits_of_security()[2]
     }
@@ -29,6 +29,11 @@ pub fn fri_params_with_80_bits_of_security() -> Vec<FriParameters> {
             num_queries: 103,
             proof_of_work_bits: 0,
         },
+        FriParameters {
+            log_blowup: 1,
+            num_queries: 290,
+            proof_of_work_bits: 0,
+        },
     ]
 }
 
@@ -43,6 +48,16 @@ pub fn fri_params_with_100_bits_of_security() -> Vec<FriParameters> {
         FriParameters {
             log_blowup: 3,
             num_queries: 80,
+            proof_of_work_bits: 0,
+        },
+        FriParameters {
+            log_blowup: 2,
+            num_queries: 129,
+            proof_of_work_bits: 0,
+        },
+        FriParameters {
+            log_blowup: 1,
+            num_queries: 361,
             proof_of_work_bits: 0,
         },
     ]
@@ -63,6 +78,11 @@ pub fn fri_params_fast_testing() -> Vec<FriParameters> {
         },
         FriParameters {
             log_blowup: 2,
+            num_queries: 2,
+            proof_of_work_bits: 0,
+        },
+        FriParameters {
+            log_blowup: 1,
             num_queries: 2,
             proof_of_work_bits: 0,
         },

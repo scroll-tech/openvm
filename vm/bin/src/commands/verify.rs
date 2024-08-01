@@ -1,13 +1,13 @@
 use std::{path::Path, time::Instant};
 
-use afs_stark_backend::{keygen::types::MultiStarkPartialVerifyingKey, prover::types::Proof};
+use afs_stark_backend::{keygen::types::MultiStarkVerifyingKey, prover::types::Proof};
 use afs_test_utils::{
     config::{self, baby_bear_poseidon2::BabyBearPoseidon2Config},
     engine::StarkEngine,
 };
 use clap::Parser;
 use color_eyre::eyre::Result;
-use stark_vm::vm::{config::VmConfig, get_chips, VirtualMachine};
+use stark_vm::vm::{config::VmConfig, ExecutionResult, VirtualMachine};
 
 use crate::{
     asm::parse_asm_file,
@@ -62,27 +62,25 @@ impl VerifyCommand {
         println!("Verifying proof file: {}", self.proof_file);
         let instructions = parse_asm_file(Path::new(&self.asm_file_path))?;
         let vm = VirtualMachine::<WORD_SIZE, _>::new(config, instructions, vec![]);
-        let encoded_vk = read_from_path(&Path::new(&self.keys_folder).join("partial.vk"))?;
-        let partial_vk: MultiStarkPartialVerifyingKey<BabyBearPoseidon2Config> =
+        let encoded_vk = read_from_path(&Path::new(&self.keys_folder).join("vk"))?;
+        let vk: MultiStarkVerifyingKey<BabyBearPoseidon2Config> =
             bincode::deserialize(&encoded_vk)?;
 
         let encoded_proof = read_from_path(Path::new(&self.proof_file))?;
         let proof: Proof<BabyBearPoseidon2Config> = bincode::deserialize(&encoded_proof)?;
 
+        let ExecutionResult {
+            nonempty_pis: pis,
+            nonempty_chips: chips,
+            ..
+        } = vm.execute()?;
         let engine = config::baby_bear_poseidon2::default_engine();
 
-        let chips = get_chips(&vm);
-        let num_chips = chips.len();
+        let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
 
         let mut challenger = engine.new_challenger();
         let verifier = engine.verifier();
-        let result = verifier.verify(
-            &mut challenger,
-            partial_vk,
-            chips,
-            proof,
-            &vec![vec![]; num_chips],
-        );
+        let result = verifier.verify(&mut challenger, &vk, chips, &proof, &pis);
 
         if result.is_err() {
             println!("Verification Unsuccessful");

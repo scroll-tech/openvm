@@ -1,6 +1,6 @@
 use std::fs::{self, File};
 
-use afs_stark_backend::{keygen::types::MultiStarkPartialVerifyingKey, prover::types::Proof};
+use afs_stark_backend::{keygen::types::MultiStarkVerifyingKey, prover::types::Proof};
 use afs_test_utils::{
     config::{
         baby_bear_poseidon2::{self, engine_from_perm},
@@ -26,7 +26,7 @@ use super::prove::{get_data_sizes, prove, BenchParams};
 
 fn instrumented_verify<SC: StarkGenericConfig, E: StarkEngineWithHashInstrumentation<SC>>(
     engine: &mut E,
-    vk: MultiStarkPartialVerifyingKey<SC>,
+    vk: MultiStarkVerifyingKey<SC>,
     air: DummyInteractionAir,
     proof: Proof<SC>,
     pis: Vec<Vec<Val<SC>>>,
@@ -39,7 +39,7 @@ fn instrumented_verify<SC: StarkGenericConfig, E: StarkEngineWithHashInstrumenta
     let verifier = engine.verifier();
     // Do not check cumulative sum
     verifier
-        .verify_raps(&mut challenger, vk, vec![&air], proof, &pis)
+        .verify_raps(&mut challenger, &vk, vec![&air], &proof, &pis)
         .unwrap();
 
     let bench_params = BenchParams {

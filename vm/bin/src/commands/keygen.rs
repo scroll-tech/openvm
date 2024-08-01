@@ -10,7 +10,7 @@ use afs_test_utils::{
 };
 use clap::Parser;
 use color_eyre::eyre::Result;
-use stark_vm::vm::{config::VmConfig, get_chips, VirtualMachine};
+use stark_vm::vm::{config::VmConfig, VirtualMachine};
 
 use crate::asm::parse_asm_file;
 
@@ -18,7 +18,7 @@ use super::{write_bytes, WORD_SIZE};
 
 /// `afs keygen` command
 /// Uses information from config.toml to generate partial proving and verifying keys and
-/// saves them to the specified `output-folder` as *.partial.pk and *.partial.vk.
+/// saves them to the specified `output-folder` as *.pk and *.vk.
 #[derive(Debug, Parser)]
 pub struct KeygenCommand {
     #[arg(
@@ -51,22 +51,23 @@ impl KeygenCommand {
     fn execute_helper(self, config: VmConfig) -> Result<()> {
         let instructions = parse_asm_file(Path::new(&self.asm_file_path.clone()))?;
         let vm = VirtualMachine::<WORD_SIZE, _>::new(config, instructions, vec![]);
+        let result = vm.execute()?;
         let engine = config::baby_bear_poseidon2::default_engine();
         let mut keygen_builder = engine.keygen_builder();
 
-        let chips = get_chips(&vm);
+        let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&result.nonempty_chips);
 
         for chip in chips {
             keygen_builder.add_air(chip, 0);
         }
 
-        let partial_pk = keygen_builder.generate_partial_pk();
-        let partial_vk = partial_pk.partial_vk();
-        let encoded_pk: Vec<u8> = bincode::serialize(&partial_pk)?;
-        let encoded_vk: Vec<u8> = bincode::serialize(&partial_vk)?;
+        let pk = keygen_builder.generate_pk();
+        let vk = pk.vk();
+        let encoded_pk: Vec<u8> = bincode::serialize(&pk)?;
+        let encoded_vk: Vec<u8> = bincode::serialize(&vk)?;
         fs::create_dir_all(Path::new(&self.output_folder))?;
-        let pk_path = Path::new(&self.output_folder).join("partial.pk");
-        let vk_path = Path::new(&self.output_folder).join("partial.vk");
+        let pk_path = Path::new(&self.output_folder).join("pk");
+        let vk_path = Path::new(&self.output_folder).join("vk");
         fs::create_dir_all(self.output_folder)?;
         write_bytes(&encoded_pk, &pk_path)?;
         write_bytes(&encoded_vk, &vk_path)?;

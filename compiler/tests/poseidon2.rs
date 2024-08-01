@@ -4,10 +4,11 @@ use p3_field::AbstractField;
 use rand::thread_rng;
 use rand::Rng;
 
-use afs_compiler::asm::AsmBuilder;
-use afs_compiler::ir::Var;
-use afs_compiler::ir::PERMUTATION_WIDTH;
-use afs_compiler::util::end_to_end_test;
+use afs_compiler::{
+    asm::AsmBuilder,
+    ir::{Var, PERMUTATION_WIDTH},
+    util::end_to_end_test,
+};
 
 type F = BabyBear;
 type EF = BinomialExtensionField<BabyBear, 4>;
@@ -89,20 +90,7 @@ fn test_compiler_poseidon2_hash() {
 
     builder.halt();
 
-    // let program = builder.compile_isa::<WORD_SIZE>();
-    // display_program(&program);
-    // execute_program::<WORD_SIZE, _>(program, vec![]);
-
     end_to_end_test::<WORD_SIZE, _>(builder, vec![]);
-
-    // let program = builder.compile_program();
-
-    // let mut runtime = Runtime::<F, EF, _>::new(&program, config.perm.clone());
-    // runtime.run();
-    // println!(
-    //     "The program executed successfully, number of cycles: {}",
-    //     runtime.clk.as_canonical_u32() / 4
-    // );
 }
 
 #[test]
@@ -126,13 +114,4 @@ fn test_compiler_poseidon2_hash_v2() {
 
     builder.halt();
     end_to_end_test::<WORD_SIZE, _>(builder, vec![]);
-
-    // let program = builder.compile_program();
-
-    // let mut runtime = Runtime::<F, EF, _>::new(&program, config.perm.clone());
-    // runtime.run();
-    // println!(
-    //     "The program executed successfully, number of cycles: {}",
-    //     runtime.clk.as_canonical_u32() / 4
-    // );
 }

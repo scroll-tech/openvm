@@ -1,7 +1,7 @@
 use std::{path::Path, time::Instant};
 
 use afs_stark_backend::{
-    keygen::types::MultiStarkPartialProvingKey, prover::trace::TraceCommitmentBuilder,
+    keygen::types::MultiStarkProvingKey, prover::trace::TraceCommitmentBuilder,
 };
 use afs_test_utils::{
     config::{self, baby_bear_poseidon2::BabyBearPoseidon2Config},
@@ -9,7 +9,7 @@ use afs_test_utils::{
 };
 use clap::Parser;
 use color_eyre::eyre::Result;
-use stark_vm::vm::{config::VmConfig, get_chips, VirtualMachine};
+use stark_vm::vm::{config::VmConfig, ExecutionResult, VirtualMachine};
 
 use crate::{
     asm::parse_asm_file,
@@ -54,32 +54,37 @@ impl ProveCommand {
     pub fn execute_helper(&self, config: VmConfig) -> Result<()> {
         println!("Proving program: {}", self.asm_file_path);
         let instructions = parse_asm_file(Path::new(&self.asm_file_path.clone()))?;
-        let mut vm = VirtualMachine::<WORD_SIZE, _>::new(config, instructions, vec![]);
+        let vm = VirtualMachine::<WORD_SIZE, _>::new(config, instructions, vec![]);
 
+        let result = vm.execute()?;
         let engine = config::baby_bear_poseidon2::default_engine();
-        let encoded_pk = read_from_path(&Path::new(&self.keys_folder.clone()).join("partial.pk"))?;
-        let partial_pk: MultiStarkPartialProvingKey<BabyBearPoseidon2Config> =
-            bincode::deserialize(&encoded_pk)?;
+        let encoded_pk = read_from_path(&Path::new(&self.keys_folder.clone()).join("pk"))?;
+        let pk: MultiStarkProvingKey<BabyBearPoseidon2Config> = bincode::deserialize(&encoded_pk)?;
 
-        let partial_vk = partial_pk.partial_vk();
+        let vk = pk.vk();
 
         let prover = engine.prover();
         let mut trace_builder = TraceCommitmentBuilder::new(prover.pcs());
 
-        for trace in vm.traces()? {
+        let ExecutionResult {
+            nonempty_traces: traces,
+            nonempty_chips: chips,
+            ..
+        } = result;
+        for trace in traces {
             trace_builder.load_trace(trace);
         }
         trace_builder.commit_current();
 
-        let chips = get_chips(&vm);
+        let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
         let num_chips = chips.len();
 
-        let main_trace_data = trace_builder.view(&partial_vk, chips);
+        let main_trace_data = trace_builder.view(&vk, chips);
 
         let mut challenger = engine.new_challenger();
         let proof = prover.prove(
             &mut challenger,
-            &partial_pk,
+            &pk,
             main_trace_data,
             &vec![vec![]; num_chips],
         );

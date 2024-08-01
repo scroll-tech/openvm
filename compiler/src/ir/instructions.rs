@@ -90,12 +90,6 @@ pub enum DslIr<C: Config> {
     DivEI(Ext<C::F, C::EF>, Ext<C::F, C::EF>, C::EF),
     /// Divides and extension field immediate and an extension field element (ext = ext field imm / ext).
     DivEIN(Ext<C::F, C::EF>, C::EF, Ext<C::F, C::EF>),
-    /// Divides an extension field element and a field immediate (ext = ext / field imm).
-    DivEFI(Ext<C::F, C::EF>, Ext<C::F, C::EF>, C::F),
-    /// Divides a field immediate and an extension field element (ext = field imm / ext).
-    DivEFIN(Ext<C::F, C::EF>, C::F, Ext<C::F, C::EF>),
-    /// Divides an extension field element and a field element (ext = ext / felt).
-    DivEF(Ext<C::F, C::EF>, Ext<C::F, C::EF>, Felt<C::F>),
 
     // Negations.
     /// Negates a variable (var = -var).
@@ -104,10 +98,6 @@ pub enum DslIr<C: Config> {
     NegF(Felt<C::F>, Felt<C::F>),
     /// Negates an extension field element (ext = -ext).
     NegE(Ext<C::F, C::EF>, Ext<C::F, C::EF>),
-    /// Inverts a variable (var = 1 / var).
-    InvV(Var<C::N>, Var<C::N>),
-    /// Inverts a field element (felt = 1 / felt).
-    InvF(Felt<C::F>, Felt<C::F>),
     /// Inverts an extension field element (ext = 1 / ext).
     InvE(Ext<C::F, C::EF>, Ext<C::F, C::EF>),
 
@@ -205,12 +195,6 @@ pub enum DslIr<C: Config> {
     // CircuitPoseidon2PermuteBabyBear([Felt<C::F>; 16]),
 
     // Miscellaneous instructions.
-    /// Decompose hint operation of a usize into an array. (output = num2bits(usize)).
-    HintBitsU(Array<C, Var<C::N>>, Usize<C::N>),
-    /// Decompose hint operation of a variable into an array. (output = num2bits(var)).
-    HintBitsV(Array<C, Var<C::N>>, Var<C::N>),
-    /// Decompose hint operation of a field element into an array. (output = num2bits(felt)).
-    HintBitsF(Array<C, Var<C::N>>, Felt<C::F>),
     /// Prints a variable.
     PrintV(Var<C::N>),
     /// Prints a field element.
@@ -220,10 +204,17 @@ pub enum DslIr<C: Config> {
     /// Throws an error.
     Error(),
 
-    /// Converts an ext to a slice of felts.
-    HintExt2Felt(Array<C, Felt<C::F>>, Ext<C::F, C::EF>),
-    /// Hint the next array and its length.
-    Hint(Ptr<C::N>),
+    /// Prepare next input vector (preceded by its length) for hinting.
+    HintInputVec(),
+    /// Prepare bit decomposition for hinting.
+    HintBitsU(Usize<C::N>),
+    /// Prepare bit decomposition for hinting.
+    HintBitsV(Var<C::N>),
+    /// Prepare bit decomposition for hinting.
+    HintBitsF(Felt<C::F>),
+
+    StoreHintWord(Ptr<C::N>, MemIndex<C::N>),
+
     /// Witness a variable. Should only be used when target is a gnark circuit.
     WitnessVar(Var<C::N>, u32),
     /// Witness a field element. Should only be used when target is a gnark circuit.
@@ -231,7 +222,7 @@ pub enum DslIr<C: Config> {
     /// Witness an extension field element. Should only be used when target is a gnark circuit.
     WitnessExt(Ext<C::F, C::EF>, u32),
     /// Label a field element as the ith public input.
-    Commit(Felt<C::F>, Var<C::N>),
+    Publish(Felt<C::F>, Var<C::N>),
     /// Registers a field element to the public inputs.
     RegisterPublicValue(Felt<C::F>),
     /// Operation to halt the program. Should be the last instruction in the program.
@@ -271,6 +262,10 @@ pub enum DslIr<C: Config> {
     // Debugging instructions.
     /// Executes less than (var = var < var).  This operation is NOT constrained.
     LessThan(Var<C::N>, Var<C::N>, Var<C::N>),
-    /// Tracks the number of cycles used by a block of code annotated by the string input.
-    CycleTracker(String),
+
+    /// Start the cycle tracker used by a block of code annotated by the string input. Calling this with the same
+    /// string will end the open cycle tracker instance and start a new one with an increasing numeric postfix.
+    CycleTrackerStart(String),
+    /// End the cycle tracker used by a block of code annotated by the string input.
+    CycleTrackerEnd(String),
 }
