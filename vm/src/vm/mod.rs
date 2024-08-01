@@ -11,6 +11,8 @@ use std::ops::Deref;
 
 mod segment;
 pub use segment::{get_chips, ExecutionSegment};
+mod split_execution;
+// pub use split_execution::SplitExecutionResult;
 
 use crate::cpu::{
     trace::{ExecutionError, Instruction},
@@ -51,23 +53,41 @@ pub enum ChipType {
 }
 
 /// Struct that holds the return state of the VM. StarkConfig is hardcoded to BabyBearPoseidon2Config.
+// pub struct ExecutionResult<const WORD_SIZE: usize> {
+//     /// Traces of the VM
+//     pub nonempty_traces: Vec<DenseMatrix<BabyBear>>,
+//     pub all_traces: Vec<DenseMatrix<BabyBear>>,
+//     /// Public inputs of the VM
+//     pub nonempty_pis: Vec<Vec<BabyBear>>,
+//     /// Boxed chips of the VM
+//     pub nonempty_chips: Vec<Box<dyn AnyRap<BabyBearPoseidon2Config>>>,
+//     pub unique_chips: Vec<Box<dyn AnyRap<BabyBearPoseidon2Config>>>,
+//     /// Types of all nonempty chips
+//     pub nonempty_types: Vec<ChipType>,
+//     /// Maximum log degree of the VM
+//     pub max_log_degree: usize,
+//     pub unique_types: Vec<ChipType>,
+// }
+
 pub struct ExecutionResult<const WORD_SIZE: usize> {
     /// Traces of the VM
-    pub nonempty_traces: Vec<DenseMatrix<BabyBear>>,
-    pub all_traces: Vec<DenseMatrix<BabyBear>>,
+    pub nonempty_traces: Vec<Vec<DenseMatrix<BabyBear>>>,
+    pub all_traces: Vec<Vec<DenseMatrix<BabyBear>>>,
     /// Public inputs of the VM
-    pub nonempty_pis: Vec<Vec<BabyBear>>,
+    pub nonempty_pis: Vec<Vec<Vec<BabyBear>>>,
     /// Boxed chips of the VM
-    pub nonempty_chips: Vec<Box<dyn AnyRap<BabyBearPoseidon2Config>>>,
+    pub nonempty_chips: Vec<Vec<Box<dyn AnyRap<BabyBearPoseidon2Config>>>>,
     pub unique_chips: Vec<Box<dyn AnyRap<BabyBearPoseidon2Config>>>,
-    /// Types of the chips
-    pub chip_types: Vec<ChipType>,
+    /// Types of all nonempty chips
+    pub nonempty_types: Vec<Vec<ChipType>>,
     /// Maximum log degree of the VM
     pub max_log_degree: usize,
+    pub unique_types: Vec<ChipType>,
 }
 
 /// Struct that holds the current state of the VM. For now, includes memory, input stream, and hint stream.
 /// Hint stream cannot be added to during execution, but must be copied because it is popped from.
+#[derive(Clone, Default)]
 pub struct VirtualMachineState<F: PrimeField32> {
     /// Current state of the CPU
     state: ExecutionState,
@@ -134,8 +154,10 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
         loop {
             let last_seg = self.segments.last_mut().unwrap();
             last_seg.has_generation_happened = true;
-            traces.extend(last_seg.generate_traces()?);
-            traces.extend(last_seg.generate_commitments()?);
+            let mut new_traces = vec![];
+            new_traces.extend(last_seg.generate_traces()?);
+            new_traces.extend(last_seg.generate_commitments()?);
+            traces.push(new_traces);
             if last_seg.cpu_chip.state.is_done {
                 break;
             }
@@ -147,15 +169,17 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
         let mut types = vec![];
         let num_chips = self.segments[0].get_num_chips();
 
-        let unique_chips = get_chips::<WORD_SIZE, BabyBearPoseidon2Config>(
-            ExecutionSegment::new(self.config, vec![], self.current_state()),
-            &vec![true; num_chips],
-        );
+        let dummy_segment = ExecutionSegment::new(self.config, vec![], self.current_state());
+        let unique_chips =
+            get_chips::<WORD_SIZE, BabyBearPoseidon2Config>(dummy_segment, &vec![true; num_chips]);
+        let dummy_segment: ExecutionSegment<WORD_SIZE, BabyBear> =
+            ExecutionSegment::new(self.config, vec![], self.current_state());
+        let unique_types = dummy_segment.get_types();
 
         // Iterate over each segment and add its public inputs, types, and chips to the result,
         // skipping empty traces.
         for (i, segment) in self.segments.into_iter().enumerate() {
-            let trace_slice = &traces[i * num_chips..(i + 1) * num_chips];
+            let trace_slice = &traces[i];
             let inclusion_mask = trace_slice
                 .iter()
                 .map(|trace| !trace.values.is_empty())
@@ -163,43 +187,63 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
 
             let segment_pis = segment.get_pis();
             let segment_types = segment.get_types();
-            chips.extend(get_chips::<WORD_SIZE, BabyBearPoseidon2Config>(
+            let mut new_pis = vec![];
+            let mut new_types = vec![];
+            chips.push(get_chips::<WORD_SIZE, BabyBearPoseidon2Config>(
                 segment,
                 &inclusion_mask,
             ));
             for index in 0..inclusion_mask.len() {
                 if inclusion_mask[index] {
-                    pis.push(segment_pis[index].clone());
-                    types.push(segment_types[index]);
+                    new_pis.push(segment_pis[index].clone());
+                    new_types.push(segment_types[index]);
                 }
             }
+            pis.push(new_pis);
+            types.push(new_types);
         }
 
         let nonempty_traces = traces
-            .iter()
-            .filter(|trace| !trace.values.is_empty())
-            .cloned()
-            .collect::<Vec<DenseMatrix<BabyBear>>>();
+            .clone()
+            .into_iter()
+            .map(|trace_vec| {
+                trace_vec
+                    .into_iter()
+                    .filter(|trace| !trace.values.is_empty())
+                    .collect::<Vec<DenseMatrix<BabyBear>>>()
+            })
+            .collect::<Vec<Vec<DenseMatrix<BabyBear>>>>();
 
-        let max_log_degree =
-            log2_strict_usize(traces.iter().map(|trace| trace.height()).max().unwrap());
+        let max_log_degree = log2_strict_usize(
+            nonempty_traces
+                .concat()
+                .iter()
+                .map(|trace| trace.height())
+                .max()
+                .unwrap(),
+        );
 
         // Assert that trace heights are within the max_len, except for Program and RangeChecker
         // +31 is needed because Poseidon2Permute adds 32 rows to memory at once
         traces
             .iter()
             .zip(types.iter())
-            .filter(|(_, &chip_type)| {
-                chip_type != ChipType::Program && chip_type != ChipType::RangeChecker
-            })
-            .for_each(|(trace, chip_type)| {
-                assert!(
-                    trace.height() <= (self.config.max_segment_len + 31).next_power_of_two(),
-                    "Trace height for {:?} exceeds max_len. Height: {}, Max: {}",
-                    chip_type,
-                    trace.height(),
-                    self.config.max_segment_len
-                );
+            .for_each(|(sub_traces, sub_chip_types)| {
+                sub_traces
+                    .iter()
+                    .zip(sub_chip_types)
+                    .for_each(|(trace, chip_type)| {
+                        if *chip_type != ChipType::Program && *chip_type != ChipType::RangeChecker {
+                            assert!(
+                                trace.height()
+                                    <= (self.config.max_segment_len + 31).next_power_of_two(),
+                                "Trace height for {:?} exceeds max_len. Height: {}, Max: {}",
+                                chip_type,
+                                trace.height(),
+                                (self.config.max_segment_len + 31).next_power_of_two(),
+                            );
+                        }
+                    });
             });
 
         let chip_data = ExecutionResult {
@@ -208,8 +252,9 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
             nonempty_pis: pis,
             nonempty_chips: chips,
             unique_chips,
-            chip_types: types,
+            nonempty_types: types,
             max_log_degree,
+            unique_types,
         };
 
         Ok(chip_data)
@@ -224,7 +269,10 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
 }
 
 impl<const WORD_SIZE: usize> ExecutionResult<WORD_SIZE> {
-    pub fn get_chips(&self) -> Vec<&dyn AnyRap<BabyBearPoseidon2Config>> {
-        self.nonempty_chips.iter().map(|x| x.deref()).collect()
+    pub fn get_chips(&self) -> Vec<Vec<&dyn AnyRap<BabyBearPoseidon2Config>>> {
+        self.nonempty_chips
+            .iter()
+            .map(|x| x.iter().map(|y| y.deref()).collect())
+            .collect()
     }
 }

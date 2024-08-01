@@ -49,9 +49,11 @@ fn air_test(
         nonempty_pis: pis,
         ..
     } = vm.execute().unwrap();
+
+    let chips: Vec<_> = chips.into_iter().flatten().collect();
     let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
 
-    run_simple_test(chips, traces, pis).expect("Verification failed");
+    run_simple_test(chips, traces.concat(), pis.concat()).expect("Verification failed");
 }
 
 #[cfg(test)]
@@ -92,9 +94,10 @@ fn air_test_with_poseidon2(
     };
     let engine = engine_from_perm(perm, max_log_degree, fri_params);
 
+    let chips: Vec<_> = chips.into_iter().flatten().collect();
     let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
     engine
-        .run_simple_test(chips, traces, pis)
+        .run_simple_test(chips, traces.concat(), pis.concat())
         .expect("Verification failed");
 }
 

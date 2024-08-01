@@ -71,11 +71,12 @@ impl ProveCommand {
             nonempty_chips: chips,
             ..
         } = result;
-        for trace in traces {
+        for trace in traces.concat() {
             trace_builder.load_trace(trace);
         }
         trace_builder.commit_current();
 
+        let chips: Vec<_> = chips.into_iter().flatten().collect();
         let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
         let num_chips = chips.len();
 

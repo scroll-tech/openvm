@@ -55,7 +55,8 @@ impl KeygenCommand {
         let engine = config::baby_bear_poseidon2::default_engine(result.max_log_degree);
         let mut keygen_builder = engine.keygen_builder();
 
-        let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&result.nonempty_chips);
+        let chips: Vec<_> = result.nonempty_chips.into_iter().flatten().collect();
+        let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
 
         for chip in chips {
             keygen_builder.add_air(chip, 0);

@@ -77,11 +77,12 @@ impl VerifyCommand {
         } = vm.execute()?;
         let engine = config::baby_bear_poseidon2::default_engine(max_log_degree);
 
+        let chips: Vec<_> = chips.into_iter().flatten().collect();
         let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
 
         let mut challenger = engine.new_challenger();
         let verifier = engine.verifier();
-        let result = verifier.verify(&mut challenger, &vk, chips, &proof, &pis);
+        let result = verifier.verify(&mut challenger, &vk, chips, &proof, &pis.concat());
 
         if result.is_err() {
             println!("Verification Unsuccessful");

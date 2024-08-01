@@ -128,6 +128,7 @@ pub fn execute_and_prove_program<const WORD_SIZE: usize>(
         nonempty_pis: pis,
         ..
     } = vm.execute().unwrap();
+    let chips: Vec<_> = chips.into_iter().flatten().collect();
     let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
 
     let perm = random_perm();
@@ -141,6 +142,6 @@ pub fn execute_and_prove_program<const WORD_SIZE: usize>(
 
     setup_tracing();
     engine
-        .run_simple_test(chips, traces, pis)
+        .run_simple_test(chips, traces.concat(), pis.concat())
         .expect("Verification failed");
 }
