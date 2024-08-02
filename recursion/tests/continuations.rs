@@ -14,9 +14,9 @@ use afs_recursion::stark::get_rec_raps_by_type;
 
 mod common;
 
-#[ignore = "test is too slow"]
 #[test]
 fn test_fibonacci_program_continuations_verify() {
+    // original program being run
     let fib_program = fibonacci_program(0, 1, 32);
     let vm_config = VmConfig {
         max_segment_len: 100,
@@ -32,6 +32,10 @@ fn test_fibonacci_program_continuations_verify() {
         ..
     } = vm.execute().unwrap();
 
+    // 3 segments are created
+    assert_eq!(chips.len(), 3);
+
+    // get rec_raps
     let mut dummy_vm = VirtualMachine::<1, BabyBear>::new(vm_config, vec![], vec![]);
     for _ in &chip_types {
         dummy_vm.segment(Default::default());
@@ -43,6 +47,7 @@ fn test_fibonacci_program_continuations_verify() {
         .map(|x| x.iter().map(|y| y.deref()).collect())
         .collect();
 
+    // sort objects by trace height in each segment
     for (chips, rec_raps, traces, pvs) in izip!(
         chips.iter_mut(),
         rec_raps.iter_mut(),
@@ -64,10 +69,12 @@ fn test_fibonacci_program_continuations_verify() {
         all_vparams.push(vparams);
     }
 
+    // get pairs
     let rec_raps_arr = [rec_raps.remove(0), rec_raps.remove(0)];
     let pvs_arr = [pvs.remove(0), pvs.remove(0)];
     let vparams_arr = [all_vparams.remove(0), all_vparams.remove(0)];
 
+    // aggregate first two segments
     let (fib_verification_program, input_stream) = common::build_continuations_verification_program(
         rec_raps_arr,
         pvs_arr,
@@ -82,6 +89,7 @@ fn test_fibonacci_program_continuations_verify() {
         ..Default::default()
     };
 
+    // collect aggregation results
     let vm = VirtualMachine::<1, _>::new(vm_config, fib_verification_program, input_stream);
     let ExecutionResult {
         nonempty_traces: mut agg_traces,
@@ -91,6 +99,7 @@ fn test_fibonacci_program_continuations_verify() {
         ..
     } = vm.execute().unwrap();
 
+    // setup for final aggregation
     let dummy_vm = VirtualMachine::<1, BabyBear>::new(vm_config, vec![], vec![]);
     let mut agg_chips: Vec<Vec<&dyn AnyRap<_>>> = agg_chips
         .iter()
@@ -106,11 +115,14 @@ fn test_fibonacci_program_continuations_verify() {
         sort_chips_mut(chips, rec_raps, traces, pvs);
     }
 
-    for (chips, traces, pvs) in izip!(agg_chips, agg_traces, agg_pvs.clone()) {
-        let vparams = common::make_verification_params(&chips, traces, &pvs, fri_params);
-        all_vparams.insert(0, vparams);
-    }
-
+    // arranging objects in the right order
+    let vparams = common::make_verification_params(
+        &agg_chips[0],
+        agg_traces.remove(0),
+        &agg_pvs[0],
+        fri_params,
+    );
+    all_vparams.insert(0, vparams);
     agg_pvs.extend(pvs);
     pvs = agg_pvs;
     agg_rec_raps.extend(rec_raps);
@@ -124,6 +136,7 @@ fn test_fibonacci_program_continuations_verify() {
     let pvs_arr = [pvs.remove(0), pvs.remove(0)];
     let vparams_arr = [all_vparams.remove(0), all_vparams.remove(0)];
 
+    // final aggregation
     let (fib_verification_program, input_stream) = common::build_continuations_verification_program(
         rec_raps_arr,
         pvs_arr,
@@ -131,13 +144,6 @@ fn test_fibonacci_program_continuations_verify() {
         true,
         false,
     );
-
-    let vm_config = VmConfig {
-        max_segment_len: 6000000,
-        num_public_values: 2,
-        ..Default::default()
-    };
-
     let vm = VirtualMachine::<1, _>::new(vm_config, fib_verification_program, input_stream);
     vm.execute().unwrap();
 }
