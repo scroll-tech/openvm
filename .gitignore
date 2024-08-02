@@ -17,6 +17,5 @@ Cargo.lock
 # This directory is used by RustRover (and any other JetBrains IDE)
 .idea/
 
-Rust ICE files
 rustc-ice-2024*
 .vscode/
