@@ -56,6 +56,10 @@ jobs:
         with:
           cache-on-failure: true
 
+      - name: Setup gh command line.
+        if: github.event_name == 'push'
+        uses: actions4gh/setup-gh@v1
+
       - name: Run benchmark
         run: |
           RUSTFLAGS="-Ctarget-cpu=native" cargo run --release --bin benchmark --features parallel -- rw -r 90 -w 10 --config-folder benchmark/config/single_rw

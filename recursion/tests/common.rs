@@ -19,6 +19,7 @@ use afs_recursion::stark::{sort_chips, DynRapForRecursion, VerifierProgram};
 use afs_recursion::types::{
     new_from_multi_vk, AggregationVerifierInput, InnerConfig, VerifierInput,
 };
+use afs_stark_backend::keygen::types::MultiStarkVerifyingKey;
 use afs_stark_backend::prover::trace::TraceCommitmentBuilder;
 use afs_stark_backend::prover::types::Proof;
 use afs_stark_backend::rap::AnyRap;
