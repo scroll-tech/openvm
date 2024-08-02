@@ -147,6 +147,7 @@ pub fn vm_benchmark_execute_and_prove<const WORD_SIZE: usize>(
     } = vm.execute().unwrap();
     vm_execute_span.exit();
 
+    let chips: Vec<_> = chips.into_iter().flatten().collect();
     let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
 
     let perm = default_perm();
@@ -175,7 +176,7 @@ pub fn vm_benchmark_execute_and_prove<const WORD_SIZE: usize>(
     let prove_span = info_span!("Benchmark prove").entered(); // prove includes trace generation
     let trace_commitment_span = info_span!("Benchmark trace commitment").entered();
     let mut trace_builder = TraceCommitmentBuilder::new(prover.pcs());
-    for trace in traces {
+    for trace in traces.concat() {
         trace_builder.load_trace(trace);
     }
     trace_builder.commit_current();
@@ -185,7 +186,12 @@ pub fn vm_benchmark_execute_and_prove<const WORD_SIZE: usize>(
 
     let mut challenger = engine.new_challenger();
 
-    let proof = prover.prove(&mut challenger, &pk, main_trace_data, &public_values);
+    let proof = prover.prove(
+        &mut challenger,
+        &pk,
+        main_trace_data,
+        &public_values.concat(),
+    );
     prove_span.exit();
 
     let mut challenger = engine.new_challenger();
@@ -193,7 +199,7 @@ pub fn vm_benchmark_execute_and_prove<const WORD_SIZE: usize>(
     let verify_span = info_span!("Benchmark verify").entered();
     let verifier = engine.verifier();
     verifier
-        .verify(&mut challenger, &vk, chips, &proof, &public_values)
+        .verify(&mut challenger, &vk, chips, &proof, &public_values.concat())
         .expect("Verification failed");
     verify_span.exit();
 
