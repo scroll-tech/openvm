@@ -78,7 +78,9 @@ impl AggregationVerifierProgram<InnerConfig> {
         let second_final_pc = builder.get(&final_pcs, 1);
 
         builder.assert_felt_eq(first_final_pc, second_init_pc);
-        // TODO: expose first_init, second_final as pvs
+
+        builder.commit_public_value(first_init_pc);
+        builder.commit_public_value(second_final_pc);
 
         builder.halt();
 

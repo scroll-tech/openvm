@@ -1,30 +1,27 @@
-use afs_compiler::prelude::*;
 use afs_stark_backend::rap::AnyRap;
 use afs_test_utils::config::fri_params::{
     fri_params_fast_testing, fri_params_with_80_bits_of_security,
 };
 use itertools::izip;
 use p3_baby_bear::BabyBear;
-use p3_field::PrimeField32;
 use std::ops::Deref;
 
-use afs_recursion::stark::DynRapForRecursion;
 use stark_vm::vm::config::VmConfig;
-use stark_vm::vm::{ChipType, ExecutionResult, ExecutionSegment, VirtualMachine};
+use stark_vm::vm::{ExecutionResult, VirtualMachine};
 
 use crate::common::{fibonacci_program, sort_chips_mut};
+use afs_recursion::stark::get_rec_raps_by_type;
 
 mod common;
 
 #[test]
 fn test_fibonacci_program_continuations_verify() {
-    let fib_program = fibonacci_program(0, 1, 16);
-
+    let fib_program = fibonacci_program(0, 1, 32);
     let vm_config = VmConfig {
-        max_segment_len: 10,
+        max_segment_len: 100,
+        num_public_values: 2,
         ..Default::default()
     };
-
     let vm = VirtualMachine::<1, _>::new(vm_config, fib_program, vec![]);
     let ExecutionResult {
         nonempty_traces: mut traces,
@@ -38,9 +35,8 @@ fn test_fibonacci_program_continuations_verify() {
     for _ in &chip_types {
         dummy_vm.segment(Default::default());
     }
-    let mut rec_raps = get_rec_raps(&chip_types, &dummy_vm.segments);
+    let mut rec_raps = get_rec_raps_by_type(&chip_types, &dummy_vm.segments);
 
-    let mut all_vparams = vec![];
     let mut chips: Vec<Vec<&dyn AnyRap<_>>> = chips
         .iter()
         .map(|x| x.iter().map(|y| y.deref()).collect())
@@ -61,6 +57,7 @@ fn test_fibonacci_program_continuations_verify() {
     } else {
         fri_params_with_80_bits_of_security()[1]
     };
+    let mut all_vparams = vec![];
     for (chips, traces, pvs) in izip!(chips, traces, pvs.clone()) {
         let vparams = common::make_verification_params(&chips, traces, &pvs, fri_params);
         all_vparams.push(vparams);
@@ -80,40 +77,66 @@ fn test_fibonacci_program_continuations_verify() {
 
     let vm_config = VmConfig {
         max_segment_len: 6000000,
+        num_public_values: 2,
+        ..Default::default()
+    };
+
+    let vm = VirtualMachine::<1, _>::new(vm_config, fib_verification_program, input_stream);
+    let ExecutionResult {
+        nonempty_traces: mut agg_traces,
+        nonempty_chips: agg_chips,
+        nonempty_pis: mut agg_pvs,
+        nonempty_types: agg_chip_types,
+        ..
+    } = vm.execute().unwrap();
+
+    let dummy_vm = VirtualMachine::<1, BabyBear>::new(vm_config, vec![], vec![]);
+    let mut agg_chips: Vec<Vec<&dyn AnyRap<_>>> = agg_chips
+        .iter()
+        .map(|x| x.iter().map(|y| y.deref()).collect())
+        .collect();
+    let mut agg_rec_raps = get_rec_raps_by_type(&agg_chip_types, &dummy_vm.segments);
+    for (chips, rec_raps, traces, pvs) in izip!(
+        agg_chips.iter_mut(),
+        agg_rec_raps.iter_mut(),
+        agg_traces.iter_mut(),
+        agg_pvs.iter_mut()
+    ) {
+        sort_chips_mut(chips, rec_raps, traces, pvs);
+    }
+
+    for (chips, traces, pvs) in izip!(agg_chips, agg_traces, agg_pvs.clone()) {
+        let vparams = common::make_verification_params(&chips, traces, &pvs, fri_params);
+        all_vparams.insert(0, vparams);
+    }
+
+    agg_pvs.extend(pvs);
+    pvs = agg_pvs;
+    agg_rec_raps.extend(rec_raps);
+    rec_raps = agg_rec_raps;
+
+    assert_eq!(pvs.len(), 2);
+    assert_eq!(rec_raps.len(), 2);
+    assert_eq!(all_vparams.len(), 2);
+
+    let rec_raps_arr = [rec_raps.remove(0), rec_raps.remove(0)];
+    let pvs_arr = [pvs.remove(0), pvs.remove(0)];
+    let vparams_arr = [all_vparams.remove(0), all_vparams.remove(0)];
+
+    let (fib_verification_program, input_stream) = common::build_continuations_verification_program(
+        rec_raps_arr,
+        pvs_arr,
+        vparams_arr,
+        true,
+        false,
+    );
+
+    let vm_config = VmConfig {
+        max_segment_len: 6000000,
+        num_public_values: 2,
         ..Default::default()
     };
 
     let vm = VirtualMachine::<1, _>::new(vm_config, fib_verification_program, input_stream);
     vm.execute().unwrap();
-}
-
-pub fn get_rec_raps<'a, const WORD_SIZE: usize, C: Config>(
-    chip_types: &[Vec<ChipType>],
-    segments: &'a [ExecutionSegment<WORD_SIZE, C::F>],
-) -> Vec<Vec<&'a dyn DynRapForRecursion<C>>>
-where
-    C::F: PrimeField32,
-{
-    let mut result: Vec<Vec<&dyn DynRapForRecursion<C>>> = vec![];
-
-    for (i, sub_chip_types) in chip_types.iter().enumerate() {
-        let mut sub_result: Vec<&dyn DynRapForRecursion<C>> = vec![];
-        for chip_type in sub_chip_types {
-            match chip_type {
-                ChipType::Cpu => sub_result.push(&segments[i].cpu_chip.air),
-                ChipType::Program => {
-                    sub_result.push(&segments[i].program_chip.air as &dyn DynRapForRecursion<C>)
-                }
-                ChipType::Memory => sub_result.push(&segments[i].memory_chip.air),
-                ChipType::RangeChecker => sub_result.push(&segments[i].range_checker.air),
-                ChipType::FieldArithmetic => {
-                    sub_result.push(&segments[i].field_arithmetic_chip.air)
-                }
-                ChipType::FieldExtension => sub_result.push(&segments[i].field_extension_chip.air),
-                ChipType::Poseidon2 => sub_result.push(&segments[i].poseidon2_chip.air),
-            }
-        }
-        result.push(sub_result);
-    }
-    result
 }

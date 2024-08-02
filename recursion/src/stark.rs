@@ -17,7 +17,7 @@ use afs_stark_backend::rap::{AnyRap, Rap};
 use afs_test_utils::config::{baby_bear_poseidon2::BabyBearPoseidon2Config, FriParameters};
 use p3_matrix::Matrix;
 use stark_vm::cpu::trace::Instruction;
-use stark_vm::vm::ExecutionSegment;
+use stark_vm::vm::{ChipType, ExecutionSegment};
 
 use crate::challenger::{CanObserveVariable, DuplexChallengerVariable, FeltChallenger};
 use crate::commit::{PcsVariable, PolynomialSpaceVariable};
@@ -890,6 +890,37 @@ where
     }
     if vm.options().poseidon2_enabled() {
         result.push(&vm.poseidon2_chip.air);
+    }
+    result
+}
+
+pub fn get_rec_raps_by_type<'a, const WORD_SIZE: usize, C: Config>(
+    chip_types: &[Vec<ChipType>],
+    segments: &'a [ExecutionSegment<WORD_SIZE, C::F>],
+) -> Vec<Vec<&'a dyn DynRapForRecursion<C>>>
+where
+    C::F: PrimeField32,
+{
+    let mut result: Vec<Vec<&dyn DynRapForRecursion<C>>> = vec![];
+
+    for (i, sub_chip_types) in chip_types.iter().enumerate() {
+        let mut sub_result: Vec<&dyn DynRapForRecursion<C>> = vec![];
+        for chip_type in sub_chip_types {
+            match chip_type {
+                ChipType::Cpu => sub_result.push(&segments[i].cpu_chip.air),
+                ChipType::Program => {
+                    sub_result.push(&segments[i].program_chip.air as &dyn DynRapForRecursion<C>)
+                }
+                ChipType::Memory => sub_result.push(&segments[i].memory_chip.air),
+                ChipType::RangeChecker => sub_result.push(&segments[i].range_checker.air),
+                ChipType::FieldArithmetic => {
+                    sub_result.push(&segments[i].field_arithmetic_chip.air)
+                }
+                ChipType::FieldExtension => sub_result.push(&segments[i].field_extension_chip.air),
+                ChipType::Poseidon2 => sub_result.push(&segments[i].poseidon2_chip.air),
+            }
+        }
+        result.push(sub_result);
     }
     result
 }
