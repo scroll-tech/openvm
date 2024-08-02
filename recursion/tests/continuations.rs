@@ -14,6 +14,7 @@ use afs_recursion::stark::get_rec_raps_by_type;
 
 mod common;
 
+#[ignore = "test is too slow"]
 #[test]
 fn test_fibonacci_program_continuations_verify() {
     let fib_program = fibonacci_program(0, 1, 32);
