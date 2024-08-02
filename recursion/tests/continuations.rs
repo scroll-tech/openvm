@@ -15,10 +15,10 @@ mod common;
 
 #[test]
 fn test_fibonacci_program_continuations_verify() {
-    let fib_program = fibonacci_program(0, 1, 32);
+    let fib_program = fibonacci_program(0, 1, 16);
 
     let vm_config = VmConfig {
-        max_segment_len: 100,
+        max_segment_len: 10,
         ..Default::default()
     };
 

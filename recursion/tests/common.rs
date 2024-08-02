@@ -246,6 +246,16 @@ pub fn sort_chips<'a>(
     (chips, rec_raps, traces, pvs)
 }
 
+pub fn apply_perm_mut<T>(perm: &[usize], arr: &mut Vec<T>) {
+    let mut model_perm = (0..arr.len()).collect_vec();
+
+    for i in 0..perm.len() {
+        let dest = model_perm.iter().position(|&x| x == perm[i]).unwrap();
+        arr.swap(i, dest);
+        model_perm.swap(i, dest);
+    }
+}
+
 pub fn sort_chips_mut<'a>(
     chips: &mut Vec<&'a dyn AnyRap<BabyBearPoseidon2Config>>,
     rec_raps: &mut Vec<&'a dyn DynRapForRecursion<InnerConfig>>,
@@ -255,17 +265,10 @@ pub fn sort_chips_mut<'a>(
     let mut indices = (0..traces.len()).collect_vec();
     indices.sort_by_key(|&i| Reverse(traces[i].height()));
 
-    for i in 0..indices.len() {
-        while indices[i] != i {
-            let dest = indices[i];
-
-            indices.swap(i, dest);
-            chips.swap(i, dest);
-            rec_raps.swap(i, dest);
-            traces.swap(i, dest);
-            pvs.swap(i, dest);
-        }
-    }
+    apply_perm_mut(&indices, chips);
+    apply_perm_mut(&indices, rec_raps);
+    apply_perm_mut(&indices, traces);
+    apply_perm_mut(&indices, pvs);
 }
 
 #[allow(dead_code)]
