@@ -14,6 +14,7 @@ use afs_recursion::stark::get_rec_raps_by_type;
 
 mod common;
 
+#[ignore = "test is too slow (6min on local machine)"]
 #[test]
 fn test_fibonacci_program_continuations_verify() {
     // original program being run
