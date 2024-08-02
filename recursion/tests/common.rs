@@ -1,6 +1,7 @@
 use afs_compiler::asm::AsmBuilder;
 use afs_compiler::ir::Var;
 use afs_stark_backend::keygen::types::MultiStarkVerifyingKey;
+use itertools::{izip, Itertools};
 use p3_baby_bear::BabyBear;
 use p3_field::extension::BinomialExtensionField;
 use p3_field::AbstractField;
@@ -121,6 +122,8 @@ pub fn build_continuations_verification_program(
     rec_raps: [Vec<&dyn DynRapForRecursion<InnerConfig>>; 2],
     pvs: [Vec<Vec<InnerVal>>; 2],
     vparams: [VerificationParams<BabyBearPoseidon2Config>; 2],
+    left_agg: bool,
+    right_agg: bool,
 ) -> (Vec<Instruction<BabyBear>>, Vec<Vec<InnerVal>>) {
     let [VerificationParams {
         vk: vk_1,
@@ -167,7 +170,13 @@ pub fn build_continuations_verification_program(
     };
 
     let input_stream = input.write();
-    let program = AggregationVerifierProgram::build(rec_raps, [advice_1, advice_2], &fri_params_1);
+    let program = AggregationVerifierProgram::build(
+        rec_raps,
+        [advice_1, advice_2],
+        &fri_params_1,
+        left_agg,
+        right_agg,
+    );
 
     (program, input_stream)
 }
@@ -189,62 +198,40 @@ pub fn run_recursive_test(
     execute_program::<1>(program, witness_stream);
 }
 
-#[allow(dead_code)]
-pub fn run_continuations_test(
-    any_raps: Vec<Vec<&dyn AnyRap<BabyBearPoseidon2Config>>>,
-    rec_raps: Vec<Vec<&dyn DynRapForRecursion<InnerConfig>>>,
-    traces: Vec<Vec<RowMajorMatrix<BabyBear>>>,
-    pvs: Vec<Vec<Vec<BabyBear>>>,
-) {
-    assert!(any_raps.len() >= 2, "any_raps length is less than 2");
-    assert!(rec_raps.len() >= 2, "rec_raps length is less than 2");
-    assert!(traces.len() >= 2, "traces length is less than 2");
-    assert!(pvs.len() >= 2, "pvs length is less than 2");
+// #[allow(dead_code)]
+// pub fn run_continuations_test(
+//     any_raps: Vec<Vec<&dyn AnyRap<BabyBearPoseidon2Config>>>,
+//     rec_raps: Vec<Vec<&dyn DynRapForRecursion<InnerConfig>>>,
+//     traces: Vec<Vec<RowMajorMatrix<BabyBear>>>,
+//     pvs: Vec<Vec<Vec<BabyBear>>>,
+// ) {
+//     assert!(any_raps.len() >= 2, "any_raps length is less than 2");
+//     assert!(rec_raps.len() >= 2, "rec_raps length is less than 2");
+//     assert!(traces.len() >= 2, "traces length is less than 2");
+//     assert!(pvs.len() >= 2, "pvs length is less than 2");
 
-    let (any_raps_0, any_raps_1, rec_raps_0, rec_raps_1, traces_0, traces_1, pvs_0, pvs_1) = (
-        &any_raps[0],
-        &any_raps[1],
-        &rec_raps[0],
-        &rec_raps[1],
-        &traces[0],
-        &traces[1],
-        &pvs[0],
-        &pvs[1],
-    );
+//     let (any_raps_0, any_raps_1, rec_raps_0, rec_raps_1, traces_0, traces_1, pvs_0, pvs_1) = (
+//         &any_raps[0],
+//         &any_raps[1],
+//         &rec_raps[0],
+//         &rec_raps[1],
+//         &traces[0],
+//         &traces[1],
+//         &pvs[0],
+//         &pvs[1],
+//     );
 
-    let vparams_0 = make_verification_params(any_raps_0, traces_0.clone(), pvs_0);
-    let vparams_1 = make_verification_params(any_raps_1, traces_1.clone(), pvs_1);
+//     let vparams_0 = make_verification_params(any_raps_0, traces_0.clone(), pvs_0, fri_params);
+//     let vparams_1 = make_verification_params(any_raps_1, traces_1.clone(), pvs_1, fri_params);
 
-    let rec_raps_arr = [rec_raps_0.clone(), rec_raps_1.clone()];
-    let pvs_arr = [pvs_0.clone(), pvs_1.clone()];
-    let vparams_arr = [vparams_0, vparams_1];
+//     let rec_raps_arr = [rec_raps_0.clone(), rec_raps_1.clone()];
+//     let pvs_arr = [pvs_0.clone(), pvs_1.clone()];
+//     let vparams_arr = [vparams_0, vparams_1];
 
-    let (program, witness_stream) =
-        build_continuations_verification_program(rec_raps_arr, pvs_arr, vparams_arr);
-    execute_program::<1>(program, witness_stream);
-}
-
-pub fn sort_chips<'a>(
-    chips: Vec<&'a dyn AnyRap<BabyBearPoseidon2Config>>,
-    rec_raps: Vec<&'a dyn DynRapForRecursion<InnerConfig>>,
-    traces: Vec<RowMajorMatrix<BabyBear>>,
-    pvs: Vec<Vec<BabyBear>>,
-) -> (
-    Vec<&'a dyn AnyRap<BabyBearPoseidon2Config>>,
-    Vec<&'a dyn DynRapForRecursion<InnerConfig>>,
-    Vec<RowMajorMatrix<BabyBear>>,
-    Vec<Vec<BabyBear>>,
-) {
-    let mut groups = izip!(chips, rec_raps, traces, pvs).collect_vec();
-    groups.sort_by_key(|(_, _, trace, _)| Reverse(trace.height()));
-
-    let chips = groups.iter().map(|(x, _, _, _)| *x).collect_vec();
-    let rec_raps = groups.iter().map(|(_, x, _, _)| *x).collect_vec();
-    let pvs = groups.iter().map(|(_, _, _, x)| x.clone()).collect_vec();
-    let traces = groups.into_iter().map(|(_, _, x, _)| x).collect_vec();
-
-    (chips, rec_raps, traces, pvs)
-}
+//     let (program, witness_stream) =
+//         build_continuations_verification_program(rec_raps_arr, pvs_arr, vparams_arr, false, false);
+//     execute_program::<1>(program, witness_stream);
+// }
 
 pub fn apply_perm_mut<T>(perm: &[usize], arr: &mut Vec<T>) {
     let mut model_perm = (0..arr.len()).collect_vec();

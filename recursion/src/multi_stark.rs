@@ -26,6 +26,8 @@ impl AggregationVerifierProgram<InnerConfig> {
         raps: [Vec<&dyn DynRapForRecursion<InnerConfig>>; 2],
         constants: [MultiStarkVerificationAdvice<InnerConfig>; 2],
         fri_params: &FriParameters,
+        left_agg: bool,
+        right_agg: bool,
     ) -> Vec<Instruction<BabyBear>> {
         let mut builder = Builder::<InnerConfig>::default();
 
@@ -54,8 +56,8 @@ impl AggregationVerifierProgram<InnerConfig> {
             builder
                 .if_ne(pv_1.len(), <InnerConfig as Config>::F::zero())
                 .then(|builder| {
-                    let init_pc = builder.get(&pv_1, 0);
-                    let final_pc = builder.get(&pv_1, 1);
+                    let init_pc = builder.get(&pv_1, 2 * (left_agg as usize));
+                    let final_pc = builder.get(&pv_1, 1 + 2 * (left_agg as usize));
                     builder.set(&mut init_pcs, 0, init_pc);
                     builder.set(&mut final_pcs, 0, final_pc);
                 });
@@ -63,8 +65,8 @@ impl AggregationVerifierProgram<InnerConfig> {
             builder
                 .if_ne(pv_2.len(), <InnerConfig as Config>::F::zero())
                 .then(|builder| {
-                    let init_pc = builder.get(&pv_2, 0);
-                    let final_pc = builder.get(&pv_2, 1);
+                    let init_pc = builder.get(&pv_2, 2 * (right_agg as usize));
+                    let final_pc = builder.get(&pv_2, 1 + 2 * (right_agg as usize));
                     builder.set(&mut init_pcs, 1, init_pc);
                     builder.set(&mut final_pcs, 1, final_pc);
                 })
@@ -77,6 +79,8 @@ impl AggregationVerifierProgram<InnerConfig> {
 
         builder.assert_felt_eq(first_final_pc, second_init_pc);
         // TODO: expose first_init, second_final as pvs
+
+        builder.halt();
 
         const WORD_SIZE: usize = 1;
         builder.compile_isa::<WORD_SIZE>()

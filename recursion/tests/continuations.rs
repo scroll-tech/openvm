@@ -53,7 +53,7 @@ fn test_fibonacci_program_continuations_verify() {
     }
 
     for (chips, traces, pvs) in izip!(chips, traces, pvs.clone()) {
-        let vparams = common::make_verification_params(&chips, traces, &pvs);
+        let vparams = common::make_verification_params(&chips, traces, &pvs, fri_params);
         all_vparams.push(vparams);
     }
 
@@ -61,8 +61,18 @@ fn test_fibonacci_program_continuations_verify() {
     let pvs_arr = [pvs.remove(0), pvs.remove(0)];
     let vparams_arr = [all_vparams.remove(0), all_vparams.remove(0)];
 
-    let (fib_verification_program, input_stream) =
-        common::build_continuations_verification_program(rec_raps_arr, pvs_arr, vparams_arr);
+    let (fib_verification_program, input_stream) = common::build_continuations_verification_program(
+        rec_raps_arr,
+        pvs_arr,
+        vparams_arr,
+        false,
+        false,
+    );
+
+    let vm_config = VmConfig {
+        max_segment_len: 6000000,
+        ..Default::default()
+    };
 
     let vm = VirtualMachine::<1, _>::new(vm_config, fib_verification_program, input_stream);
     vm.execute().unwrap();
