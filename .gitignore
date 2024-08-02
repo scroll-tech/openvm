@@ -19,3 +19,4 @@ Cargo.lock
 
 Rust ICE files
 rustc-ice-2024*
+.vscode/
