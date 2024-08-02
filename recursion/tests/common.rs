@@ -198,56 +198,59 @@ pub fn run_recursive_test(
     execute_program::<1>(program, witness_stream);
 }
 
-// #[allow(dead_code)]
-// pub fn run_continuations_test(
-//     any_raps: Vec<Vec<&dyn AnyRap<BabyBearPoseidon2Config>>>,
-//     rec_raps: Vec<Vec<&dyn DynRapForRecursion<InnerConfig>>>,
-//     traces: Vec<Vec<RowMajorMatrix<BabyBear>>>,
-//     pvs: Vec<Vec<Vec<BabyBear>>>,
-// ) {
-//     assert!(any_raps.len() >= 2, "any_raps length is less than 2");
-//     assert!(rec_raps.len() >= 2, "rec_raps length is less than 2");
-//     assert!(traces.len() >= 2, "traces length is less than 2");
-//     assert!(pvs.len() >= 2, "pvs length is less than 2");
+#[allow(dead_code)]
+pub fn run_continuations_test(
+    any_raps: Vec<Vec<&dyn AnyRap<BabyBearPoseidon2Config>>>,
+    rec_raps: Vec<Vec<&dyn DynRapForRecursion<InnerConfig>>>,
+    traces: Vec<Vec<RowMajorMatrix<BabyBear>>>,
+    pvs: Vec<Vec<Vec<BabyBear>>>,
+    fri_params: FriParameters,
+) {
+    assert!(any_raps.len() >= 2, "any_raps length is less than 2");
+    assert!(rec_raps.len() >= 2, "rec_raps length is less than 2");
+    assert!(traces.len() >= 2, "traces length is less than 2");
+    assert!(pvs.len() >= 2, "pvs length is less than 2");
 
-//     let (any_raps_0, any_raps_1, rec_raps_0, rec_raps_1, traces_0, traces_1, pvs_0, pvs_1) = (
-//         &any_raps[0],
-//         &any_raps[1],
-//         &rec_raps[0],
-//         &rec_raps[1],
-//         &traces[0],
-//         &traces[1],
-//         &pvs[0],
-//         &pvs[1],
-//     );
+    let (any_raps_0, any_raps_1, rec_raps_0, rec_raps_1, traces_0, traces_1, pvs_0, pvs_1) = (
+        &any_raps[0],
+        &any_raps[1],
+        &rec_raps[0],
+        &rec_raps[1],
+        &traces[0],
+        &traces[1],
+        &pvs[0],
+        &pvs[1],
+    );
 
-//     let vparams_0 = make_verification_params(any_raps_0, traces_0.clone(), pvs_0, fri_params);
-//     let vparams_1 = make_verification_params(any_raps_1, traces_1.clone(), pvs_1, fri_params);
+    let vparams_0 = make_verification_params(any_raps_0, traces_0.clone(), pvs_0, fri_params);
+    let vparams_1 = make_verification_params(any_raps_1, traces_1.clone(), pvs_1, fri_params);
 
-//     let rec_raps_arr = [rec_raps_0.clone(), rec_raps_1.clone()];
-//     let pvs_arr = [pvs_0.clone(), pvs_1.clone()];
-//     let vparams_arr = [vparams_0, vparams_1];
+    let rec_raps_arr = [rec_raps_0.clone(), rec_raps_1.clone()];
+    let pvs_arr = [pvs_0.clone(), pvs_1.clone()];
+    let vparams_arr = [vparams_0, vparams_1];
 
-//     let (program, witness_stream) =
-//         build_continuations_verification_program(rec_raps_arr, pvs_arr, vparams_arr, false, false);
-//     execute_program::<1>(program, witness_stream);
-// }
-
-pub fn apply_perm_mut<T>(perm: &[usize], arr: &mut Vec<T>) {
-    let mut model_perm = (0..arr.len()).collect_vec();
-
-    for i in 0..perm.len() {
-        let dest = model_perm.iter().position(|&x| x == perm[i]).unwrap();
-        arr.swap(i, dest);
-        model_perm.swap(i, dest);
-    }
+    let (program, witness_stream) =
+        build_continuations_verification_program(rec_raps_arr, pvs_arr, vparams_arr, false, false);
+    execute_program::<1>(program, witness_stream);
 }
 
+#[allow(dead_code)]
+pub fn apply_perm_mut<T>(perm: &[usize], arr: &mut [T]) {
+    let mut model_perm = (0..arr.len()).collect_vec();
+
+    perm.iter().enumerate().for_each(|(i, &p)| {
+        let dest = model_perm.iter().position(|&x| x == p).unwrap();
+        arr.swap(i, dest);
+        model_perm.swap(i, dest);
+    });
+}
+
+#[allow(dead_code)]
 pub fn sort_chips_mut<'a>(
-    chips: &mut Vec<&'a dyn AnyRap<BabyBearPoseidon2Config>>,
-    rec_raps: &mut Vec<&'a dyn DynRapForRecursion<InnerConfig>>,
-    traces: &mut Vec<RowMajorMatrix<BabyBear>>,
-    pvs: &mut Vec<Vec<BabyBear>>,
+    chips: &mut [&'a dyn AnyRap<BabyBearPoseidon2Config>],
+    rec_raps: &mut [&'a dyn DynRapForRecursion<InnerConfig>],
+    traces: &mut [RowMajorMatrix<BabyBear>],
+    pvs: &mut [Vec<BabyBear>],
 ) {
     let mut indices = (0..traces.len()).collect_vec();
     indices.sort_by_key(|&i| Reverse(traces[i].height()));
@@ -259,6 +262,7 @@ pub fn sort_chips_mut<'a>(
 }
 
 #[allow(dead_code)]
+#[allow(clippy::type_complexity)]
 pub fn sort_chips_with_id<'a>(
     chips: Vec<&'a dyn AnyRap<BabyBearPoseidon2Config>>,
     rec_raps: Vec<&'a dyn DynRapForRecursion<InnerConfig>>,
@@ -284,6 +288,7 @@ pub fn sort_chips_with_id<'a>(
     (chips, rec_raps, traces, pvs, chip_ids)
 }
 
+#[allow(dead_code)]
 pub fn fibonacci_program(a: u32, b: u32, n: u32) -> Vec<Instruction<BabyBear>> {
     type F = BabyBear;
     type EF = BinomialExtensionField<BabyBear, 4>;
