@@ -41,6 +41,7 @@ pub struct AggregationVerifierInput<SC: StarkGenericConfig> {
 }
 
 #[derive(DslVariable, Clone)]
+// Each field corresponds to exactly one segment. The two segments must be adjacent to each other.
 pub struct AggregationVerifierInputVariable<C: Config> {
     pub verifier_input_1: VerifierInputVariable<C>,
     pub verifier_input_2: VerifierInputVariable<C>,
