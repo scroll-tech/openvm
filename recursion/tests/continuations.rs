@@ -1,5 +1,8 @@
 use afs_compiler::prelude::*;
 use afs_stark_backend::rap::AnyRap;
+use afs_test_utils::config::fri_params::{
+    fri_params_fast_testing, fri_params_with_80_bits_of_security,
+};
 use itertools::izip;
 use p3_baby_bear::BabyBear;
 use p3_field::PrimeField32;
@@ -52,6 +55,12 @@ fn test_fibonacci_program_continuations_verify() {
         sort_chips_mut(chips, rec_raps, traces, pvs);
     }
 
+    // blowup factor = 3
+    let fri_params = if matches!(std::env::var("AXIOM_FAST_TEST"), Ok(x) if &x == "1") {
+        fri_params_fast_testing()[1]
+    } else {
+        fri_params_with_80_bits_of_security()[1]
+    };
     for (chips, traces, pvs) in izip!(chips, traces, pvs.clone()) {
         let vparams = common::make_verification_params(&chips, traces, &pvs, fri_params);
         all_vparams.push(vparams);

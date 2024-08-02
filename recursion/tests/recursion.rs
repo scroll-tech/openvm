@@ -1,16 +1,10 @@
-use afs_compiler::prelude::*;
 use afs_recursion::stark::{get_rec_raps, sort_chips};
 use afs_test_utils::config::fri_params::{
     fri_params_fast_testing, fri_params_with_80_bits_of_security,
 };
-use p3_baby_bear::BabyBear;
-use p3_field::extension::BinomialExtensionField;
-use p3_field::AbstractField;
-use p3_field::PrimeField32;
 
-use afs_recursion::stark::DynRapForRecursion;
 use stark_vm::vm::config::VmConfig;
-use stark_vm::vm::{ExecutionResult, ExecutionSegment, VirtualMachine};
+use stark_vm::vm::{ExecutionResult, VirtualMachine};
 
 use crate::common::fibonacci_program;
 
