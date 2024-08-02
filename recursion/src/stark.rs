@@ -9,6 +9,7 @@ use p3_field::{AbstractExtensionField, AbstractField, PrimeField32, TwoAdicField
 use p3_matrix::dense::{RowMajorMatrix, RowMajorMatrixView};
 use p3_matrix::stack::VerticalPair;
 
+use afs_compiler::conversion::CompilerOptions;
 use afs_compiler::ir::{Array, Builder, Config, Ext, ExtConst, Felt, SymbolicExt, Usize, Var};
 use afs_stark_backend::air_builders::symbolic::{SymbolicConstraints, SymbolicRapBuilder};
 use afs_stark_backend::prover::opener::AdjacentOpenedValues;
@@ -71,6 +72,7 @@ impl VerifierProgram<InnerConfig> {
     ) -> Vec<Instruction<BabyBear>> {
         let mut builder = Builder::<InnerConfig>::default();
 
+        builder.cycle_tracker_start("VerifierProgram");
         let input: VerifierInputVariable<_> = builder.uninit();
         VerifierInput::<BabyBearPoseidon2Config>::witness(&input, &mut builder);
 
@@ -79,8 +81,14 @@ impl VerifierProgram<InnerConfig> {
         };
         StarkVerifier::verify(&mut builder, &pcs, raps, constants, &input);
 
+        builder.cycle_tracker_end("VerifierProgram");
+        builder.halt();
+
         const WORD_SIZE: usize = 1;
-        builder.compile_isa::<WORD_SIZE>()
+        builder.compile_isa_with_options::<WORD_SIZE>(CompilerOptions {
+            enable_cycle_tracker: true,
+            ..Default::default()
+        })
     }
 }
 
@@ -131,8 +139,6 @@ where
         let mut challenger = DuplexChallengerVariable::new(builder);
 
         Self::verify_raps(builder, pcs, raps, constants, &mut challenger, input);
-
-        builder.halt();
     }
 
     /// Reference: [afs_stark_backend::verifier::MultiTraceStarkVerifier::verify_raps].
