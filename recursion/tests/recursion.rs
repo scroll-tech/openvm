@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 use afs_compiler::{asm::AsmBuilder, ir::Var};
-use afs_recursion::stark::{get_rec_raps, sort_chips};
+use afs_recursion::stark::get_rec_raps;
 use afs_test_utils::config::fri_params::{
     fri_params_fast_testing, fri_params_with_80_bits_of_security,
 };
@@ -56,7 +56,6 @@ fn test_fibonacci_program_verify() {
     } = vm.execute().unwrap();
 
     let chips = chips.iter().map(|x| x.deref()).collect();
-    let (chips, rec_raps, traces, pvs) = sort_chips(chips, rec_raps, traces, pvs);
 
     // blowup factor = 3
     let fri_params = if matches!(std::env::var("AXIOM_FAST_TEST"), Ok(x) if &x == "1") {
@@ -64,11 +63,5 @@ fn test_fibonacci_program_verify() {
     } else {
         fri_params_with_80_bits_of_security()[1]
     };
-    let vparams = common::make_verification_params(&chips, traces, &pvs, fri_params);
-
-    let (fib_verification_program, input_stream) =
-        common::build_verification_program(rec_raps, pvs, vparams);
-
-    let vm = VirtualMachine::<1, _>::new(vm_config, fib_verification_program, input_stream);
-    vm.execute().unwrap();
+    common::run_recursive_test(chips, rec_raps, traces, pvs, fri_params);
 }
