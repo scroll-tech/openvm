@@ -12,7 +12,7 @@ on:
           - single_rw
       aws_instance_type:
         type: string
-        required: true
+        required: false
         description: The type of EC2 instance to start
         default: r7g.8xlarge
   workflow_call:
@@ -23,7 +23,7 @@ on:
         description: The name of the benchmark to run
       aws_instance_type:
         type: string
-        required: true
+        required: false
         description: The type of EC2 instance to start
         default: r7g.8xlarge
 
@@ -109,7 +109,9 @@ jobs:
           echo "current_sha=${current_sha}" >> $GITHUB_ENV
 
           RESULT_PATH=benchmark/tmp/_result.md
+          echo "" >> $RESULT_PATH
           echo "AWS Instance Type: [${{ inputs.aws_instance_type }}](https://instances.vantage.sh/aws/ec2/${{ inputs.aws_instance_type }})" >> $RESULT_PATH
+          echo "[Benchmark Workflow](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${{ github.job }}" >> $RESULT_PATH
           s5cmd cp $RESULT_PATH "${{ env.S3_PATH }}/${current_sha}-${{ inputs.benchmark_name }}.md"
 
           new_result="$(<${RESULT_PATH})"

@@ -7,17 +7,15 @@ use super::A0;
 
 #[derive(Debug, Clone)]
 pub enum AsmInstruction<F, EF> {
-    /// Load word (dst, src, index, offset, size).
+    /// Load word (dst, src, offset).
     ///
-    /// Load a value from the address stored at src(fp) into dst(fp).
-    LoadF(i32, i32, i32, F, F),
-    LoadFI(i32, i32, F, F, F),
+    /// Load a value from the address stored at src(fp) + offset into dst(fp).
+    LoadFI(i32, i32, F),
 
-    /// Store word (val, addr, index, offset, size)
+    /// Store word (val, addr, offset)
     ///
-    /// Store a value from val(fp) into the address stored at addr(fp) with given index and offset.
-    StoreF(i32, i32, i32, F, F),
-    StoreFI(i32, i32, F, F, F),
+    /// Store a value from val(fp) into the address stored at addr(fp) + offset.
+    StoreFI(i32, i32, F),
 
     /// Add, dst = lhs + rhs.
     AddF(i32, i32, i32),
@@ -42,18 +40,6 @@ pub enum AsmInstruction<F, EF> {
 
     /// Divide immediate, dst = lhs / rhs.
     DivFI(i32, i32, F),
-
-    /// Load an ext value (dst, src, index, offset, size).
-    ///
-    /// Load a value from the address stored at src(fp) into dst(fp).
-    LoadE(i32, i32, i32, F, F),
-    LoadEI(i32, i32, F, F, F),
-
-    /// Store an ext value (val, addr, index, offset, size).
-    ///
-    /// Store a value from val(fp) into the address stored at addr(fp) with given index and offset.
-    StoreE(i32, i32, i32, F, F),
-    StoreEI(i32, i32, F, F, F),
 
     /// Add extension, dst = lhs + rhs.
     AddE(i32, i32, i32),
@@ -127,9 +113,8 @@ pub enum AsmInstruction<F, EF> {
     /// Bit decompose the field element `src` and add in little endian to hint stream.
     HintBits(i32),
 
-    /// Stores the next hint stream word at `dst`.
-    StoreHintWord(i32, i32, F, F),
-    StoreHintWordI(i32, F, F, F),
+    /// Stores the next hint stream word into value stored at addr + value.
+    StoreHintWordI(i32, F),
 
     /// FRIFold(m, input).
     FriFold(i32, i32),
@@ -157,33 +142,11 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
             AsmInstruction::LessThan(dst, left, right) => {
                 write!(f, "lt  ({})fp, {}, {}", dst, left, right,)
             }
-            AsmInstruction::LoadF(dst, src, index, offset, size) => {
-                write!(
-                    f,
-                    "lw    ({})fp, ({})fp, ({})fp, {}, {}",
-                    dst, src, index, offset, size
-                )
+            AsmInstruction::LoadFI(dst, src, offset) => {
+                write!(f, "lwi   ({})fp, ({})fp, {}", dst, src, offset)
             }
-            AsmInstruction::LoadFI(dst, src, index, offset, size) => {
-                write!(
-                    f,
-                    "lwi   ({})fp, ({})fp, {}, {}, {}",
-                    dst, src, index, offset, size
-                )
-            }
-            AsmInstruction::StoreF(dst, src, index, offset, size) => {
-                write!(
-                    f,
-                    "sw    ({})fp, ({})fp, ({})fp, {}, {}",
-                    dst, src, index, offset, size
-                )
-            }
-            AsmInstruction::StoreFI(dst, src, index, offset, size) => {
-                write!(
-                    f,
-                    "swi   ({})fp, ({})fp, {}, {}, {}",
-                    dst, src, index, offset, size
-                )
+            AsmInstruction::StoreFI(dst, src, offset) => {
+                write!(f, "swi   ({})fp, ({})fp, {}", dst, src, offset)
             }
             AsmInstruction::AddF(dst, lhs, rhs) => {
                 write!(f, "add   ({})fp, ({})fp, ({})fp", dst, lhs, rhs)
@@ -208,34 +171,6 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
             }
             AsmInstruction::DivFI(dst, lhs, rhs) => {
                 write!(f, "divi  ({})fp, ({})fp, {}", dst, lhs, rhs)
-            }
-            AsmInstruction::LoadE(dst, src, index, offset, size) => {
-                write!(
-                    f,
-                    "le    ({})fp, ({})fp, ({})fp, {}, {}",
-                    dst, src, index, offset, size
-                )
-            }
-            AsmInstruction::LoadEI(dst, src, index, offset, size) => {
-                write!(
-                    f,
-                    "lei   ({})fp, ({})fp, {}, {}, {}",
-                    dst, src, index, offset, size
-                )
-            }
-            AsmInstruction::StoreE(dst, src, index, offset, size) => {
-                write!(
-                    f,
-                    "se    ({})fp, ({})fp, ({})fp, {}, {}",
-                    dst, src, index, offset, size
-                )
-            }
-            AsmInstruction::StoreEI(dst, src, index, offset, size) => {
-                write!(
-                    f,
-                    "sei   ({})fp, ({})fp, {}, {}, {}",
-                    dst, src, index, offset, size
-                )
             }
             AsmInstruction::AddE(dst, lhs, rhs) => {
                 write!(f, "eadd ({})fp, ({})fp, ({})fp", dst, lhs, rhs)
@@ -348,11 +283,8 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
                 write!(f, "print_e ({})fp", dst)
             }
             AsmInstruction::HintInputVec() => write!(f, "hint_vec"),
-            AsmInstruction::StoreHintWord(dst, index, offset, size) => {
-                write!(f, "shintw ({})fp ({})fp {} {}", dst, index, offset, size)
-            }
-            AsmInstruction::StoreHintWordI(dst, index, offset, size) => {
-                write!(f, "shintw ({})fp {} {} {}", dst, index, offset, size)
+            AsmInstruction::StoreHintWordI(dst, offset) => {
+                write!(f, "shintw ({})fp {}", dst, offset)
             }
             AsmInstruction::FriFold(m, input_ptr) => {
                 write!(f, "fri_fold ({})fp, ({})fp", m, input_ptr)
