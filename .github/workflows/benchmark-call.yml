@@ -10,12 +10,22 @@ on:
         options:
           - vm_verify_fibair
           - single_rw
+      aws_instance_type:
+        type: string
+        required: true
+        description: The type of EC2 instance to start
+        default: r7g.8xlarge
   workflow_call:
     inputs:
       benchmark_name:
         type: string
         required: true
         description: The name of the benchmark to run
+      aws_instance_type:
+        type: string
+        required: true
+        description: The type of EC2 instance to start
+        default: r7g.8xlarge
 
 env:
   S3_PATH: s3://axiom-workflow-data-staging-us-east-1/benchmark/github/results
@@ -40,7 +50,7 @@ jobs:
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           ec2-image-id: ami-0a071ac3e1220fe60 # arm64-rust-dev-32gb
           # ami-06dd8940c223fd887 # arm64-rust-dev-1024gb
-          ec2-instance-type: r7g.8xlarge
+          ec2-instance-type: ${{ inputs.aws_instance_type }}
           subnet-id: subnet-08094bf4edad62d10 # staging tooling private subnet
           security-group-id: sg-09543a06c701894f8 # allow all outbound
           iam-role-name: github-temp-runner # IAM role name to attach to the created EC2 runner
@@ -99,6 +109,7 @@ jobs:
           echo "current_sha=${current_sha}" >> $GITHUB_ENV
 
           RESULT_PATH=benchmark/tmp/_result.md
+          echo "AWS Instance Type: [${{ inputs.aws_instance_type }}](https://instances.vantage.sh/aws/ec2/${{ inputs.aws_instance_type }})" >> $RESULT_PATH
           s5cmd cp $RESULT_PATH "${{ env.S3_PATH }}/${current_sha}-${{ inputs.benchmark_name }}.md"
 
           new_result="$(<${RESULT_PATH})"
