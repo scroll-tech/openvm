@@ -19,7 +19,7 @@ use afs_test_utils::{
 };
 use color_eyre::eyre;
 use p3_baby_bear::BabyBear;
-use p3_matrix::{dense::RowMajorMatrix, Matrix};
+use p3_matrix::dense::RowMajorMatrix;
 use p3_util::log2_strict_usize;
 use stark_vm::{
     cpu::trace::Instruction,
@@ -44,10 +44,6 @@ pub fn run_recursive_test_benchmark(
 ) -> eyre::Result<()> {
     let num_pvs: Vec<usize> = pvs.iter().map(|pv| pv.len()).collect();
 
-    let trace_heights: Vec<usize> = traces.iter().map(|t| t.height()).collect();
-
-    let log_degree = log2_strict_usize(trace_heights.clone().into_iter().max().unwrap());
-
     // FRI params to prove `any_raps` with
     // log_blowup_factor = 1
     let fri_params = if matches!(std::env::var("AXIOM_FAST_TEST"), Ok(x) if &x == "1") {
@@ -56,7 +52,7 @@ pub fn run_recursive_test_benchmark(
         fri_params_with_80_bits_of_security()[2]
     };
     let perm = default_perm();
-    let engine = engine_from_perm(perm, log_degree, fri_params);
+    let engine = engine_from_perm(perm, fri_params);
 
     let mut keygen_builder = engine.keygen_builder();
     for (&rap, &num_pv) in any_raps.iter().zip(num_pvs.iter()) {
@@ -143,7 +139,6 @@ pub fn vm_benchmark_execute_and_prove<const WORD_SIZE: usize>(
 
     let vm_execute_span = info_span!("Benchmark vm execute").entered();
     let ExecutionResult {
-        max_log_degree,
         nonempty_chips: chips,
         nonempty_traces: traces,
         nonempty_pis: public_values,
@@ -161,7 +156,7 @@ pub fn vm_benchmark_execute_and_prove<const WORD_SIZE: usize>(
     } else {
         fri_params_with_80_bits_of_security()[1]
     };
-    let engine = engine_from_perm(perm, max_log_degree, fri_params);
+    let engine = engine_from_perm(perm, fri_params);
 
     assert_eq!(chips.len(), traces.len());
 

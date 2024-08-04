@@ -10,7 +10,7 @@ use afs_test_utils::config::baby_bear_poseidon2::BabyBearPoseidon2Config;
 use p3_baby_bear::{BabyBear, DiffusionMatrixBabyBear};
 use p3_commit::ExtensionMmcs;
 use p3_field::{extension::BinomialExtensionField, AbstractExtensionField, AbstractField, Field};
-use p3_fri::{BatchOpening, CommitPhaseProofStep, FriProof, QueryProof, TwoAdicFriPcsProof};
+use p3_fri::{BatchOpening, CommitPhaseProofStep, FriProof, QueryProof};
 use p3_merkle_tree::FieldMerkleTreeMmcs;
 use p3_poseidon2::{Poseidon2, Poseidon2ExternalMatrixGeneral};
 use p3_symmetric::{PaddingFreeSponge, TruncatedPermutation};
@@ -40,7 +40,7 @@ pub type InnerBatchOpening = BatchOpening<InnerVal, InnerValMmcs>;
 pub type InputProof = Vec<InnerBatchOpening>; // for MMCS
 pub type InnerQueryProof = QueryProof<InnerChallenge, InnerChallengeMmcs, InputProof>;
 pub type InnerCommitPhaseStep = CommitPhaseProofStep<InnerChallenge, InnerChallengeMmcs>;
-pub type InnerPcsProof = FriProof<InnerChallenge, InnerChallengeMmcs, InnerVal, InputProof>;
+pub type InnerFriProof = FriProof<InnerChallenge, InnerChallengeMmcs, InnerVal, InputProof>;
 
 pub trait Hintable<C: Config> {
     type HintVariable: MemVariable<C>;
@@ -308,7 +308,7 @@ impl Hintable<InnerConfig> for OpeningProof<BabyBearPoseidon2Config> {
     type HintVariable = OpeningProofVariable<InnerConfig>;
 
     fn read(builder: &mut Builder<InnerConfig>) -> Self::HintVariable {
-        let proof = InnerPcsProof::read(builder);
+        let proof = InnerFriProof::read(builder);
         let values = OpenedValues::read(builder);
 
         OpeningProofVariable { proof, values }

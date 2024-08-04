@@ -119,10 +119,6 @@ impl RwCommand {
 }
 
 pub fn run_bench_rw(config: &PageConfig, extra_data: String) -> Result<TraceMetrics> {
-    let checker_trace_degree = config.page.max_rw_ops * 4;
-    let pcs_log_degree = log2_strict_usize(checker_trace_degree)
-        .max(log2_strict_usize(config.page.height))
-        .max(8);
     let fri_params = config.fri_params;
     let engine_type = config.stark_engine.engine;
     match engine_type {

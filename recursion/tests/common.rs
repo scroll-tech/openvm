@@ -18,7 +18,7 @@ use afs_test_utils::{
     engine::StarkEngine,
 };
 use p3_baby_bear::BabyBear;
-use p3_matrix::{dense::RowMajorMatrix, Matrix};
+use p3_matrix::dense::RowMajorMatrix;
 use p3_uni_stark::StarkGenericConfig;
 use p3_util::log2_strict_usize;
 use stark_vm::cpu::trace::Instruction;
@@ -37,10 +37,7 @@ pub fn make_verification_params(
 ) -> VerificationParams<BabyBearPoseidon2Config> {
     let num_pvs: Vec<usize> = pvs.iter().map(|pv| pv.len()).collect();
 
-    let trace_heights: Vec<usize> = traces.iter().map(|t| t.height()).collect();
-    let log_degree = log2_strict_usize(trace_heights.into_iter().max().unwrap());
-
-    let engine = engine_from_perm(default_perm(), log_degree, fri_params);
+    let engine = engine_from_perm(default_perm(), fri_params);
 
     let mut keygen_builder = engine.keygen_builder();
     for (&rap, &num_pv) in raps.iter().zip(num_pvs.iter()) {

@@ -2,7 +2,6 @@ use std::{fs::remove_dir_all, path::Path};
 
 use afs_1b::commands::{
     keygen::KeygenCommand, prove::ProveCommand, verify::VerifyCommand, BABYBEAR_COMMITMENT_LEN,
-    DECOMP_BITS,
 };
 use afs_page::page_btree::PageBTree;
 use afs_stark_backend::{
@@ -21,7 +20,6 @@ use clap::Parser;
 use color_eyre::eyre::Result;
 use p3_field::{PrimeField, PrimeField32, PrimeField64};
 use p3_uni_stark::{Domain, StarkGenericConfig, Val};
-use p3_util::log2_strict_usize;
 use serde::{de::DeserializeOwned, Serialize};
 use tracing::info_span;
 
@@ -126,10 +124,6 @@ impl MultitierRwCommand {
 
 pub fn run_mtrw_bench(config: &MultitierPageConfig, new_tree: String) -> Result<()> {
     let new_tree = new_tree == "true";
-    let checker_trace_degree = config.page.max_rw_ops * 4;
-    let pcs_log_degree = log2_strict_usize(checker_trace_degree)
-        .max(log2_strict_usize(config.page.leaf_height))
-        .max(DECOMP_BITS);
     let fri_params = config.fri_params;
     let engine_type = config.stark_engine.engine;
     match engine_type {
@@ -141,8 +135,7 @@ pub fn run_mtrw_bench(config: &MultitierPageConfig, new_tree: String) -> Result<
         }
         EngineType::BabyBearPoseidon2 => {
             let perm = random_perm();
-            let engine: BabyBearPoseidon2Engine =
-                engine_from_perm(perm, pcs_log_degree, fri_params);
+            let engine: BabyBearPoseidon2Engine = engine_from_perm(perm, fri_params);
             MultitierRwCommand::bench_all(config, &engine, new_tree)
         }
         _ => panic!(),

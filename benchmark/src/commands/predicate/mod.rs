@@ -8,7 +8,9 @@ use afs_test_utils::{
         baby_bear_bytehash::engine_from_byte_hash,
         baby_bear_keccak::BabyBearKeccakEngine,
         baby_bear_poseidon2::{self, BabyBearPoseidon2Engine},
+        baby_bear_sha256_compress::{self, BabyBearSha256CompressionEngine},
         goldilocks_poseidon::{self, GoldilocksPoseidonEngine},
+        m31_sha256_compress::{self, Mersenne31Sha256CompressionEngine},
         EngineType,
     },
     engine::StarkEngine,
@@ -27,7 +29,6 @@ use p3_blake3::Blake3;
 use p3_field::PrimeField64;
 use p3_keccak::Keccak256Hash;
 use p3_uni_stark::{Domain, StarkGenericConfig, Val};
-use p3_util::log2_strict_usize;
 use serde::{de::DeserializeOwned, Serialize};
 use tracing::info_span;
 
@@ -112,10 +113,6 @@ impl PredicateCommand {
 }
 
 pub fn run_bench_predicate(config: &PageConfig, extra_data: String) -> Result<TraceMetrics> {
-    let checker_trace_degree = config.page.max_rw_ops * 4;
-    let pcs_log_degree = log2_strict_usize(checker_trace_degree)
-        .max(log2_strict_usize(config.page.height))
-        .max(8);
     let fri_params = config.fri_params;
     let engine_type = config.stark_engine.engine;
     match engine_type {
@@ -130,12 +127,12 @@ pub fn run_bench_predicate(config: &PageConfig, extra_data: String) -> Result<Tr
         EngineType::BabyBearSha256Compress => {
             let engine: BabyBearSha256CompressionEngine =
                 baby_bear_sha256_compress::engine_from_fri_params(fri_params);
-            RwCommand::bench_all(config, &engine, extra_data)
+            PredicateCommand::bench_all(config, &engine, extra_data)
         }
         EngineType::Mersenne31Sha256Compress => {
             let engine: Mersenne31Sha256CompressionEngine =
                 m31_sha256_compress::engine_from_fri_params(fri_params);
-            RwCommand::bench_all(config, &engine, extra_data)
+            PredicateCommand::bench_all(config, &engine, extra_data)
         }
         EngineType::BabyBearPoseidon2 => {
             let perm = baby_bear_poseidon2::default_perm();

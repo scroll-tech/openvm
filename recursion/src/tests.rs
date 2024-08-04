@@ -119,8 +119,6 @@ fn run_recursive_test(
 ) {
     let num_pvs: Vec<usize> = pvs.iter().map(|pv| pv.len()).collect();
 
-    let trace_heights: Vec<usize> = traces.iter().map(|t| t.height()).collect();
-
     let engine = default_engine();
 
     let mut keygen_builder = engine.keygen_builder();

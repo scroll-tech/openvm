@@ -4,14 +4,14 @@ use afs_compiler::{
 };
 use p3_field::AbstractField;
 
-use super::types::{BatchOpeningVariable, TwoAdicPcsProofVariable};
+use super::types::BatchOpeningVariable;
 use crate::{
     fri::types::{
         DigestVariable, FriCommitPhaseProofStepVariable, FriProofVariable, FriQueryProofVariable,
     },
     hints::{
         Hintable, InnerBatchOpening, InnerChallenge, InnerCommitPhaseStep, InnerDigest,
-        InnerFriProof, InnerPcsProof, InnerQueryProof, InnerVal,
+        InnerFriProof, InnerQueryProof, InnerVal, InputProof,
     },
     types::InnerConfig,
 };
@@ -113,15 +113,17 @@ impl Hintable<C> for InnerQueryProof {
     type HintVariable = FriQueryProofVariable<C>;
 
     fn read(builder: &mut Builder<C>) -> Self::HintVariable {
+        let input_proof = InputProof::read(builder);
         let commit_phase_openings = Vec::<InnerCommitPhaseStep>::read(builder);
         Self::HintVariable {
+            input_proof,
             commit_phase_openings,
         }
     }
 
     fn write(&self) -> Vec<Vec<<C as Config>::F>> {
         let mut stream = Vec::new();
-
+        stream.extend(InputProof::write(&self.input_proof));
         stream.extend(Vec::<InnerCommitPhaseStep>::write(
             &self.commit_phase_openings,
         ));
@@ -264,26 +266,6 @@ impl Hintable<C> for Vec<Vec<InnerBatchOpening>> {
             stream.extend(comm);
         });
 
-        stream
-    }
-}
-
-impl Hintable<C> for InnerPcsProof {
-    type HintVariable = TwoAdicPcsProofVariable<C>;
-
-    fn read(builder: &mut Builder<C>) -> Self::HintVariable {
-        let fri_proof = InnerFriProof::read(builder);
-        let query_openings = Vec::<Vec<InnerBatchOpening>>::read(builder);
-        Self::HintVariable {
-            fri_proof,
-            query_openings,
-        }
-    }
-
-    fn write(&self) -> Vec<Vec<<C as Config>::F>> {
-        let mut stream = Vec::new();
-        stream.extend(self.fri_proof.write());
-        stream.extend(self.query_openings.write());
         stream
     }
 }

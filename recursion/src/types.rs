@@ -14,7 +14,7 @@ use p3_uni_stark::{StarkGenericConfig, Val};
 use p3_util::log2_strict_usize;
 
 use crate::{
-    fri::types::{DigestVariable, TwoAdicPcsProofVariable},
+    fri::types::{DigestVariable, FriProofVariable},
     hints::{InnerChallenge, InnerVal},
 };
 
@@ -62,7 +62,7 @@ pub struct StarkProofVariable<C: Config> {
 
 #[derive(DslVariable, Clone)]
 pub struct OpeningProofVariable<C: Config> {
-    pub proof: TwoAdicPcsProofVariable<C>,
+    pub proof: FriProofVariable<C>,
     pub values: OpenedValuesVariable<C>,
 }
 
