@@ -3,14 +3,13 @@ use p3_baby_bear::BabyBear;
 use p3_keccak::Keccak256Hash;
 use p3_matrix::dense::DenseMatrix;
 
-use crate::engine::StarkEngine;
-
 use super::{
     baby_bear_bytehash::{
         self, config_from_byte_hash, BabyBearByteHashConfig, BabyBearByteHashEngine,
     },
     fri_params::default_fri_params,
 };
+use crate::engine::StarkEngine;
 
 pub type BabyBearKeccakConfig = BabyBearByteHashConfig<Keccak256Hash>;
 pub type BabyBearKeccakEngine = BabyBearByteHashEngine<Keccak256Hash>;

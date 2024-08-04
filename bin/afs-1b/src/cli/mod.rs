@@ -1,20 +1,21 @@
-use crate::commands::keygen::KeygenCommand;
-use crate::commands::prove::ProveCommand;
-use crate::commands::verify::VerifyCommand;
-use crate::commands::{keygen, mock, prove, verify, BABYBEAR_COMMITMENT_LEN};
 use afs_stark_backend::config::{Com, PcsProof, PcsProverData};
-use afs_test_utils::config::baby_bear_poseidon2::{
-    engine_from_perm, random_perm, BabyBearPoseidon2Engine,
+use afs_test_utils::{
+    config::{
+        baby_bear_poseidon2::{engine_from_perm, random_perm, BabyBearPoseidon2Engine},
+        EngineType,
+    },
+    engine::StarkEngine,
+    page_config::MultitierPageConfig,
 };
-use afs_test_utils::config::EngineType;
-use afs_test_utils::engine::StarkEngine;
-use afs_test_utils::page_config::MultitierPageConfig;
-use clap::Parser;
-use clap::Subcommand;
+use clap::{Parser, Subcommand};
 use p3_field::{PrimeField, PrimeField32, PrimeField64};
 use p3_uni_stark::{Domain, StarkGenericConfig, Val};
-use serde::de::DeserializeOwned;
-use serde::Serialize;
+use serde::{de::DeserializeOwned, Serialize};
+
+use crate::commands::{
+    keygen, keygen::KeygenCommand, mock, prove, prove::ProveCommand, verify, verify::VerifyCommand,
+    BABYBEAR_COMMITMENT_LEN,
+};
 
 #[derive(Debug, Parser)]
 #[command(author, version, about = "AFS CLI")]
@@ -94,23 +95,11 @@ pub fn run(config: &MultitierPageConfig) {
     let fri_params = config.fri_params;
     let engine_type = config.stark_engine.engine;
     match engine_type {
-        EngineType::BabyBearBlake3 => {
-            // let engine: BabyBearBlake3Engine =
-            //     engine_from_byte_hash(Blake3, pcs_log_degree, fri_params);
-            // Cli::run_with_engine(config, &engine)
-            panic!()
-        }
-        EngineType::BabyBearKeccak => {
-            // let engine: BabyBearKeccakEngine =
-            //     engine_from_byte_hash(Keccak256Hash, pcs_log_degree, fri_params);
-            // Cli::run_with_engine(config, &engine)
-            panic!()
-        }
         EngineType::BabyBearPoseidon2 => {
             let perm = random_perm();
             let engine: BabyBearPoseidon2Engine = engine_from_perm(perm, fri_params);
             Cli::run_with_engine(config, &engine)
         }
-        _ => panic!(),
+        _ => unimplemented!(),
     }
 }
