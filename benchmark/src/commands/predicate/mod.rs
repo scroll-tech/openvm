@@ -120,25 +120,33 @@ pub fn run_bench_predicate(config: &PageConfig, extra_data: String) -> Result<Tr
     let engine_type = config.stark_engine.engine;
     match engine_type {
         EngineType::BabyBearBlake3 => {
-            let engine: BabyBearBlake3Engine =
-                engine_from_byte_hash(Blake3, pcs_log_degree, fri_params);
+            let engine: BabyBearBlake3Engine = engine_from_byte_hash(Blake3, fri_params);
             PredicateCommand::bench_all(config, &engine, extra_data)
         }
         EngineType::BabyBearKeccak => {
-            let engine: BabyBearKeccakEngine =
-                engine_from_byte_hash(Keccak256Hash, pcs_log_degree, fri_params);
+            let engine: BabyBearKeccakEngine = engine_from_byte_hash(Keccak256Hash, fri_params);
             PredicateCommand::bench_all(config, &engine, extra_data)
+        }
+        EngineType::BabyBearSha256Compress => {
+            let engine: BabyBearSha256CompressionEngine =
+                baby_bear_sha256_compress::engine_from_fri_params(fri_params);
+            RwCommand::bench_all(config, &engine, extra_data)
+        }
+        EngineType::Mersenne31Sha256Compress => {
+            let engine: Mersenne31Sha256CompressionEngine =
+                m31_sha256_compress::engine_from_fri_params(fri_params);
+            RwCommand::bench_all(config, &engine, extra_data)
         }
         EngineType::BabyBearPoseidon2 => {
             let perm = baby_bear_poseidon2::default_perm();
             let engine: BabyBearPoseidon2Engine =
-                baby_bear_poseidon2::engine_from_perm(perm, pcs_log_degree, fri_params);
+                baby_bear_poseidon2::engine_from_perm(perm, fri_params);
             PredicateCommand::bench_all(config, &engine, extra_data)
         }
         EngineType::GoldilocksPoseidon => {
             let perm = goldilocks_poseidon::random_perm();
             let engine: GoldilocksPoseidonEngine =
-                goldilocks_poseidon::engine_from_perm(perm, pcs_log_degree, fri_params);
+                goldilocks_poseidon::engine_from_perm(perm, fri_params);
             PredicateCommand::bench_all(config, &engine, extra_data)
         }
     }

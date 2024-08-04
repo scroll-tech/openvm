@@ -11,7 +11,9 @@ use afs_test_utils::{
         baby_bear_bytehash::engine_from_byte_hash,
         baby_bear_keccak::BabyBearKeccakEngine,
         baby_bear_poseidon2::{self, BabyBearPoseidon2Engine},
+        baby_bear_sha256_compress::{self, BabyBearSha256CompressionEngine},
         goldilocks_poseidon::{self, GoldilocksPoseidonEngine},
+        m31_sha256_compress::{self, Mersenne31Sha256CompressionEngine},
         EngineType,
     },
     engine::StarkEngine,
@@ -130,6 +132,16 @@ pub fn run_bench_rw(config: &PageConfig, extra_data: String) -> Result<TraceMetr
         }
         EngineType::BabyBearKeccak => {
             let engine: BabyBearKeccakEngine = engine_from_byte_hash(Keccak256Hash, fri_params);
+            RwCommand::bench_all(config, &engine, extra_data)
+        }
+        EngineType::BabyBearSha256Compress => {
+            let engine: BabyBearSha256CompressionEngine =
+                baby_bear_sha256_compress::engine_from_fri_params(fri_params);
+            RwCommand::bench_all(config, &engine, extra_data)
+        }
+        EngineType::Mersenne31Sha256Compress => {
+            let engine: Mersenne31Sha256CompressionEngine =
+                m31_sha256_compress::engine_from_fri_params(fri_params);
             RwCommand::bench_all(config, &engine, extra_data)
         }
         EngineType::BabyBearPoseidon2 => {

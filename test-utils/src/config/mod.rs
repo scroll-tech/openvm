@@ -40,5 +40,7 @@ pub enum EngineType {
     BabyBearPoseidon2,
     BabyBearBlake3,
     BabyBearKeccak,
+    BabyBearSha256Compress,
+    Mersenne31Sha256Compress,
     GoldilocksPoseidon,
 }

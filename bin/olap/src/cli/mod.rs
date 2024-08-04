@@ -1,10 +1,14 @@
 use afs_stark_backend::config::{Com, PcsProof, PcsProverData};
 use afs_test_utils::{
     config::{
-        baby_bear_blake3::BabyBearBlake3Engine, baby_bear_bytehash::engine_from_byte_hash,
-        baby_bear_keccak::BabyBearKeccakEngine, baby_bear_poseidon2,
-        baby_bear_poseidon2::BabyBearPoseidon2Engine, goldilocks_poseidon,
-        goldilocks_poseidon::GoldilocksPoseidonEngine, EngineType,
+        baby_bear_blake3::BabyBearBlake3Engine,
+        baby_bear_bytehash::engine_from_byte_hash,
+        baby_bear_keccak::BabyBearKeccakEngine,
+        baby_bear_poseidon2::{self, BabyBearPoseidon2Engine},
+        baby_bear_sha256_compress::{self, BabyBearSha256CompressionEngine},
+        goldilocks_poseidon::{self, GoldilocksPoseidonEngine},
+        m31_sha256_compress::{self, Mersenne31Sha256CompressionEngine},
+        EngineType,
     },
     engine::StarkEngine,
     page_config::PageConfig,
@@ -106,6 +110,16 @@ pub fn run(config: &PageConfig) {
         }
         EngineType::BabyBearKeccak => {
             let engine: BabyBearKeccakEngine = engine_from_byte_hash(Keccak256Hash, fri_params);
+            Cli::run_with_engine(config, &engine)
+        }
+        EngineType::BabyBearSha256Compress => {
+            let engine: BabyBearSha256CompressionEngine =
+                baby_bear_sha256_compress::engine_from_fri_params(fri_params);
+            Cli::run_with_engine(config, &engine)
+        }
+        EngineType::Mersenne31Sha256Compress => {
+            let engine: Mersenne31Sha256CompressionEngine =
+                m31_sha256_compress::engine_from_fri_params(fri_params);
             Cli::run_with_engine(config, &engine)
         }
         EngineType::BabyBearPoseidon2 => {
