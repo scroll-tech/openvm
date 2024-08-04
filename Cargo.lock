@@ -244,6 +244,7 @@ dependencies = [
  "p3-merkle-tree",
  "p3-poseidon",
  "p3-poseidon2",
+ "p3-sha256",
  "p3-symmetric",
  "p3-uni-stark",
  "p3-util",
@@ -2146,6 +2147,15 @@ dependencies = [
  "p3-mds",
  "p3-symmetric",
  "rand",
+]
+
+[[package]]
+name = "p3-sha256"
+version = "0.1.0"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b382e04#b382e048796102f1ce7f092b08412ffd25d932f5"
+dependencies = [
+ "p3-symmetric",
+ "sha2",
 ]
 
 [[package]]

@@ -22,6 +22,7 @@ p3-poseidon = { workspace = true }
 p3-symmetric = { workspace = true }
 p3-blake3 = { workspace = true }
 p3-keccak = { workspace = true }
+p3-sha256 = { workspace = true }
 zkhash = { workspace = true }
 
 itertools = "0.12.1"

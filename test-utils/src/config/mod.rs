@@ -7,6 +7,8 @@ pub mod baby_bear_blake3;
 pub mod baby_bear_bytehash;
 pub mod baby_bear_keccak;
 pub mod baby_bear_poseidon2;
+/// A special config where the compression function does SHA256 without padding.
+pub mod baby_bear_sha256_compress;
 pub mod fri_params;
 pub mod goldilocks_poseidon;
 pub mod instrument;

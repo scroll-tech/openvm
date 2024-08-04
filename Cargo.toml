@@ -80,6 +80,7 @@ p3-merkle-tree = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e0
 p3-monty-31 = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
 p3-poseidon = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
 p3-poseidon2 = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
+p3-sha256 = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
 p3-symmetric = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
 p3-uni-stark = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" }
 p3-maybe-rayon = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b382e04" } # the "parallel" feature is NOT on by default to allow single-threaded benchmarking
