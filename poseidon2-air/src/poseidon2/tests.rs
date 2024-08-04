@@ -11,10 +11,9 @@ use afs_test_utils::{
 use ark_ff::PrimeField as _;
 use p3_baby_bear::{BabyBear, DiffusionMatrixBabyBear};
 use p3_field::{AbstractField, Field, PrimeField32};
-use p3_matrix::{dense::RowMajorMatrix, Matrix};
+use p3_matrix::dense::RowMajorMatrix;
 use p3_poseidon2::{Poseidon2, Poseidon2ExternalMatrixGeneral};
 use p3_symmetric::Permutation;
-use p3_util::log2_strict_usize;
 use rand::{
     distributions::{Distribution, Standard},
     Rng, RngCore, SeedableRng,

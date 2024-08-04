@@ -7,11 +7,13 @@ pub mod baby_bear_blake3;
 pub mod baby_bear_bytehash;
 pub mod baby_bear_keccak;
 pub mod baby_bear_poseidon2;
-/// A special config where the compression function does SHA256 without padding.
+/// A special config with BabyBear where the compression function does SHA256 without padding.
 pub mod baby_bear_sha256_compress;
 pub mod fri_params;
 pub mod goldilocks_poseidon;
 pub mod instrument;
+/// A special config with Mersenne31 and Circle STARK as PCS, where the compression function does SHA256 without padding.
+pub mod m31_sha256_compress;
 
 pub fn setup_tracing() {
     // Set up tracing:
