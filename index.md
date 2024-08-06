@@ -1,11 +1,10 @@
 ---
 # Feel free to add content and custom Front Matter to this file.
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-title: Latest ZK Benchmarks
-layout: home
+layout: default
 ---
 
-# Latest Benchmarks
+# Main
 
 - [VM Verify Fibonacci AIR](benchmarks/vm_verify_fibair.md)
 - [Single Page Filter Scan (<)](benchmarks/single_filter.md)
