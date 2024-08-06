@@ -33,6 +33,9 @@ gem "wdm", "~> 0.1.1", :platforms => [:mingw, :x64_mingw, :mswin]
 # do not have a Java counterpart.
 gem "http_parser.rb", "~> 0.6.0", :platforms => [:jruby]
 
-gem "webrick", "~> 1.8"
-
 gem "faraday-retry", "~> 2.2"
+
+install_if -> { ENV["GITHUB_ACTIONS"] != "true" } do
+    puts "Is GitHub action: #{ENV["GITHUB_ACTIONS"] == "true"}"
+    gem "webrick", "~> 1.8"
+end 
