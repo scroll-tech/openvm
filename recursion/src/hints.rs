@@ -43,12 +43,20 @@ pub type InnerBatchOpening = BatchOpening<InnerVal, InnerValMmcs>;
 pub type InnerPcsProof =
     TwoAdicFriPcsProof<InnerVal, InnerChallenge, InnerValMmcs, InnerChallengeMmcs>;
 
+const WORD_SIZE: usize = 4;
+
+fn emb(x: InnerVal) -> [InnerVal; WORD_SIZE] {
+    let mut word = [InnerVal::zero(); WORD_SIZE];
+    word[0] = x;
+    word
+}
+
 pub trait Hintable<C: Config> {
     type HintVariable: MemVariable<C>;
 
     fn read(builder: &mut Builder<C>) -> Self::HintVariable;
 
-    fn write(&self) -> Vec<Vec<C::F>>;
+    fn write(&self) -> Vec<Vec<C::Word>>;
 
     fn witness(variable: &Self::HintVariable, builder: &mut Builder<C>) {
         let target = Self::read(builder);
@@ -63,8 +71,8 @@ impl Hintable<InnerConfig> for usize {
         builder.hint_var()
     }
 
-    fn write(&self) -> Vec<Vec<InnerVal>> {
-        vec![vec![InnerVal::from_canonical_usize(*self)]]
+    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
+        vec![vec![emb(InnerVal::from_canonical_usize(*self))]]
     }
 }
 
@@ -75,8 +83,8 @@ impl Hintable<InnerConfig> for InnerVal {
         builder.hint_felt()
     }
 
-    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::F>> {
-        vec![vec![*self]]
+    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
+        vec![vec![emb(*self)]]
     }
 }
 
@@ -87,8 +95,10 @@ impl Hintable<InnerConfig> for InnerChallenge {
         builder.hint_ext()
     }
 
-    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::F>> {
-        vec![self.as_base_slice().to_vec()]
+    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
+        let mut word = [InnerVal::zero(); WORD_SIZE];
+        word.copy_from_slice(self.as_base_slice());
+        vec![vec![word]]
     }
 }
 
@@ -119,11 +129,11 @@ impl<I: VecAutoHintable<InnerConfig>> Hintable<InnerConfig> for Vec<I> {
         arr
     }
 
-    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
         let mut stream = Vec::new();
 
         let len = InnerVal::from_canonical_usize(self.len());
-        stream.push(vec![len]);
+        stream.push(vec![emb(len)]);
 
         self.iter().for_each(|i| {
             let comm = I::write(i);
@@ -155,7 +165,7 @@ impl Hintable<InnerConfig> for VerifierInput<BabyBearPoseidon2Config> {
         }
     }
 
-    fn write(&self) -> Vec<Vec<InnerVal>> {
+    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
         let mut stream = Vec::new();
 
         stream.extend(self.proof.write());
@@ -173,10 +183,10 @@ impl Hintable<InnerConfig> for Vec<usize> {
         builder.hint_vars()
     }
 
-    fn write(&self) -> Vec<Vec<InnerVal>> {
+    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
         vec![self
             .iter()
-            .map(|x| InnerVal::from_canonical_usize(*x))
+            .map(|x| emb(InnerVal::from_canonical_usize(*x)))
             .collect()]
     }
 }
@@ -188,10 +198,10 @@ impl Hintable<InnerConfig> for Vec<u8> {
         builder.hint_vars()
     }
 
-    fn write(&self) -> Vec<Vec<InnerVal>> {
+    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
         vec![self
             .iter()
-            .map(|x| InnerVal::from_canonical_u8(*x))
+            .map(|x| emb(InnerVal::from_canonical_u8(*x)))
             .collect()]
     }
 }
@@ -203,8 +213,8 @@ impl Hintable<InnerConfig> for Vec<InnerVal> {
         builder.hint_felts()
     }
 
-    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::F>> {
-        vec![self.clone()]
+    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
+        vec![self.iter().map(|x| emb(*x)).collect()]
     }
 }
 
@@ -215,11 +225,14 @@ impl Hintable<InnerConfig> for Vec<InnerChallenge> {
         builder.hint_exts()
     }
 
-    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
         vec![
-            vec![InnerVal::from_canonical_usize(self.len())],
             self.iter()
-                .flat_map(|x| (*x).as_base_slice().to_vec())
+                .map(|x| {
+                    let mut word = [InnerVal::zero(); WORD_SIZE];
+                    word.copy_from_slice(x.as_base_slice());
+                    word
+                })
                 .collect(),
         ]
     }
@@ -238,11 +251,11 @@ impl Hintable<InnerConfig> for Vec<Vec<InnerChallenge>> {
         arr
     }
 
-    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
         let mut stream = Vec::new();
 
         let len = InnerVal::from_canonical_usize(self.len());
-        stream.push(vec![len]);
+        stream.push(vec![emb(len)]);
 
         self.iter().for_each(|arr| {
             let comm = Vec::<InnerChallenge>::write(arr);
@@ -268,7 +281,7 @@ impl Hintable<InnerConfig> for TraceWidth {
         }
     }
 
-    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
         let mut stream = Vec::new();
 
         stream.extend(self.preprocessed.into_iter().collect::<Vec<_>>().write());
@@ -294,7 +307,7 @@ impl Hintable<InnerConfig> for Proof<BabyBearPoseidon2Config> {
         }
     }
 
-    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
         let mut stream = Vec::new();
 
         stream.extend(self.commitments.write());
@@ -315,7 +328,7 @@ impl Hintable<InnerConfig> for OpeningProof<BabyBearPoseidon2Config> {
         OpeningProofVariable { proof, values }
     }
 
-    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
         let mut stream = Vec::new();
 
         stream.extend(self.proof.write());
@@ -342,7 +355,7 @@ impl Hintable<InnerConfig> for OpenedValues<InnerChallenge> {
         }
     }
 
-    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
         let mut stream = Vec::new();
 
         stream.extend(self.preprocessed.write());
@@ -363,7 +376,7 @@ impl Hintable<InnerConfig> for AdjacentOpenedValues<InnerChallenge> {
         AdjacentOpenedValuesVariable { local, next }
     }
 
-    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
         let mut stream = Vec::new();
         stream.extend(self.local.write());
         stream.extend(self.next.write());
@@ -386,7 +399,7 @@ impl Hintable<InnerConfig> for Commitments<BabyBearPoseidon2Config> {
         }
     }
 
-    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
         let mut stream = Vec::new();
 
         stream.extend(Vec::<InnerDigest>::write(
@@ -421,7 +434,11 @@ mod test {
             InnerVal::from_canonical_usize(3),
         ];
         let stream = Vec::<InnerVal>::write(&x);
-        assert_eq!(stream, vec![x.clone()]);
+        assert_eq!(stream, vec![vec![
+            [InnerVal::from_canonical_usize(1), InnerVal::zero(), InnerVal::zero(), InnerVal::zero()],
+            [InnerVal::from_canonical_usize(2), InnerVal::zero(), InnerVal::zero(), InnerVal::zero()],
+            [InnerVal::from_canonical_usize(3), InnerVal::zero(), InnerVal::zero(), InnerVal::zero()],
+        ]]);
 
         let mut builder = AsmBuilder::<InnerVal, InnerChallenge>::default();
         let arr = Vec::<InnerVal>::read(&mut builder);
@@ -437,8 +454,8 @@ mod test {
 
         builder.halt();
 
-        let program = builder.compile_isa::<1>();
-        execute_program_and_generate_traces::<1>(program, stream);
+        let program = builder.compile_isa::<4>();
+        execute_program_and_generate_traces::<4>(program, stream);
     }
 
     #[test]
@@ -449,26 +466,11 @@ mod test {
             InnerChallenge::from_canonical_usize(3),
         ];
         let stream = Vec::<InnerChallenge>::write(&x);
-        assert_eq!(
-            stream,
-            vec![
-                vec![InnerVal::from_canonical_usize(x.len())],
-                vec![
-                    InnerVal::from_canonical_usize(1),
-                    InnerVal::from_canonical_usize(0),
-                    InnerVal::from_canonical_usize(0),
-                    InnerVal::from_canonical_usize(0),
-                    InnerVal::from_canonical_usize(2),
-                    InnerVal::from_canonical_usize(0),
-                    InnerVal::from_canonical_usize(0),
-                    InnerVal::from_canonical_usize(0),
-                    InnerVal::from_canonical_usize(3),
-                    InnerVal::from_canonical_usize(0),
-                    InnerVal::from_canonical_usize(0),
-                    InnerVal::from_canonical_usize(0),
-                ],
-            ]
-        );
+        assert_eq!(stream, vec![vec![
+            [InnerVal::from_canonical_usize(1), InnerVal::zero(), InnerVal::zero(), InnerVal::zero()],
+            [InnerVal::from_canonical_usize(2), InnerVal::zero(), InnerVal::zero(), InnerVal::zero()],
+            [InnerVal::from_canonical_usize(3), InnerVal::zero(), InnerVal::zero(), InnerVal::zero()],
+        ]]);
 
         let mut builder = AsmBuilder::<InnerVal, InnerChallenge>::default();
         let arr = Vec::<InnerChallenge>::read(&mut builder);
@@ -484,7 +486,7 @@ mod test {
 
         builder.halt();
 
-        let program = builder.compile_isa::<1>();
-        execute_program_and_generate_traces::<1>(program, stream);
+        let program = builder.compile_isa::<4>();
+        execute_program_and_generate_traces::<4>(program, stream);
     }
 }

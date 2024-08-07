@@ -5,10 +5,10 @@ use afs_compiler::{
 };
 use p3_baby_bear::BabyBear;
 use p3_field::{extension::BinomialExtensionField, AbstractField};
-use stark_vm::cpu::WORD_SIZE;
 
 type F = BabyBear;
 type EF = BinomialExtensionField<BabyBear, 4>;
+const WORD_SIZE: usize = 4;
 
 #[test]
 fn test_compiler_for_loops() {
@@ -70,6 +70,7 @@ fn test_compiler_nested_array_loop() {
     builder.range(0, array.len()).for_each(|i, builder| {
         let inner_array = builder.get(&array, i);
         builder.range(0, inner_array.len()).for_each(|j, builder| {
+            let j = builder.materialize(j);
             let val = builder.get(&inner_array, j);
             builder.assert_var_eq(val, i + j); //*(j * F::from_canonical_u16(300)));
         });

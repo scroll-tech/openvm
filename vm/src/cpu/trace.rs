@@ -155,6 +155,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
         let mut clock_cycle: usize = vm.cpu_chip.state.clock_cycle;
         let mut timestamp: usize = vm.cpu_chip.state.timestamp;
         let mut pc = F::from_canonical_usize(vm.cpu_chip.state.pc);
+        let mut prev_pc: usize = 0;
 
         let mut hint_stream = vm.hint_stream.clone();
         let mut cycle_tracker = std::mem::take(&mut vm.cycle_tracker);
@@ -166,7 +167,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
 
             let (instruction, debug_info) = vm.program_chip.get_instruction(pc_usize)?;
 
-            let dsl_instr = match debug_info {
+            let dsl_instr = match debug_info.clone() {
                 Some(debug_info) => debug_info.dsl_instruction,
                 None => String::new(),
             };
@@ -203,6 +204,18 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
 
             macro_rules! read {
                 ($address_space: expr, $address: expr) => {{
+                    if $address_space != F::zero() {
+                        if $address.as_canonical_u32() % (WORD_SIZE as u32) != 0 {
+                            if let Some(debug_info) = debug_info.clone() {
+                                if let Some(mut trace) = debug_info.trace {
+                                    trace.resolve();
+                                    eprintln!("{:?}", trace);
+                                }
+                           }
+                        }
+                        assert_eq!($address.as_canonical_u32() % (WORD_SIZE as u32), 0);
+                    }
+
                     num_reads += 1;
                     assert!(num_reads <= CPU_MAX_READS_PER_CYCLE);
                     let data = vm.memory_chip.read_word(
@@ -212,30 +225,56 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
                     );
                     accesses[num_reads - 1] =
                         memory_access_to_cols(true, $address_space, $address, data);
+                    data
+                }};
+            }
+
+            macro_rules! read_composed {
+                ($address_space: expr, $address: expr) => {{
+                    let data = read!($address_space, $address);
                     compose(data)
                 }};
             }
 
             macro_rules! write {
                 ($address_space: expr, $address: expr, $data: expr) => {{
+                    if $address_space != F::zero() {
+                        if $address.as_canonical_u32() % (WORD_SIZE as u32) != 0 {
+                            if let Some(debug_info) = debug_info.clone() {
+                                if let Some(mut trace) = debug_info.trace {
+                                    trace.resolve();
+                                    eprintln!("{:?}", trace);
+                                }
+                           }
+                        }
+
+                        assert_eq!($address.as_canonical_u32() % (WORD_SIZE as u32), 0);
+                    }
+
                     num_writes += 1;
                     assert!(num_writes <= CPU_MAX_WRITES_PER_CYCLE);
-                    let word = decompose($data);
                     vm.memory_chip.write_word(
                         timestamp + CPU_MAX_READS_PER_CYCLE + (num_writes - 1),
                         $address_space,
                         $address,
-                        word,
+                        $data,
                     );
                     accesses[CPU_MAX_READS_PER_CYCLE + num_writes - 1] =
-                        memory_access_to_cols(true, $address_space, $address, word);
+                        memory_access_to_cols(true, $address_space, $address, $data);
+                }};
+            }
+
+            macro_rules! write_decomposed {
+                ($address_space: expr, $address: expr, $data: expr) => {{
+                    let decomposed = decompose($data);
+                    write!($address_space, $address, decomposed);
                 }};
             }
 
             if opcode == FAIL {
-                return Err(ExecutionError::Fail(pc_usize));
+                return Err(ExecutionError::Fail(prev_pc));
             }
-            if opcode != PRINTF && !vm.options().enabled_instructions().contains(&opcode) {
+            if opcode != PRINTF && opcode != PRINTW && !vm.options().enabled_instructions().contains(&opcode) {
                 return Err(ExecutionError::DisabledOperation(pc_usize, opcode));
             }
 
@@ -244,22 +283,34 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
             match opcode {
                 // d[a] <- e[d[c] + b]
                 LOADW => {
-                    let base_pointer = read!(d, c);
+                    let base_pointer = read_composed!(d, c);
                     let value = read!(e, base_pointer + b);
                     write!(d, a, value);
                 }
                 // e[d[c] + b] <- d[a]
                 STOREW => {
-                    let base_pointer = read!(d, c);
+                    let base_pointer = read_composed!(d, c);
                     let value = read!(d, a);
                     write!(e, base_pointer + b, value);
                 }
+                // e[d[a] + b] <- c
+                STOREC => {
+                    let index = b.as_canonical_u32() as usize;
+                    assert!(index < WORD_SIZE);
+
+                    let ptr = read_composed!(d, a);
+                    let mut data = read!(e, ptr);
+
+                    data[index] = c;
+
+                    write!(e, ptr, data);
+                }
                 // d[a] <- pc + INST_WIDTH, pc <- pc + b
                 JAL => {
-                    write!(d, a, pc + F::from_canonical_usize(INST_WIDTH));
+                    write_decomposed!(d, a, pc + F::from_canonical_usize(INST_WIDTH));
                     next_pc = pc + b;
                 }
-                // If d[a] = e[b], pc <- pc + c
+                // If word[a]_d = word[b]_d, pc <- pc + c
                 BEQ => {
                     let left = read!(d, a);
                     let right = read!(e, b);
@@ -279,8 +330,8 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
                     next_pc = pc;
                 }
                 PUBLISH => {
-                    let public_value_index = read!(d, a).as_canonical_u64() as usize;
-                    let value = read!(e, b);
+                    let public_value_index = read_composed!(d, a).as_canonical_u64() as usize;
+                    let value = read_composed!(e, b);
                     if public_value_index >= vm.public_values.len() {
                         return Err(PublicValueIndexOutOfBounds(
                             pc_usize,
@@ -305,24 +356,28 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
                 }
                 opcode @ (FADD | FSUB | FMUL | FDIV) => {
                     // read from d[b] and e[c]
-                    let operand1 = read!(d, b);
-                    let operand2 = read!(e, c);
+                    let operand1 = read_composed!(d, b);
+                    let operand2 = read_composed!(e, c);
                     // write to d[a]
                     let result = vm
                         .field_arithmetic_chip
                         .calculate(opcode, (operand1, operand2));
-                    write!(d, a, result);
+                    write_decomposed!(d, a, result);
                 }
                 F_LESS_THAN => {
-                    let operand1 = read!(d, b);
-                    let operand2 = read!(e, c);
+                    let operand1 = read_composed!(d, b);
+                    let operand2 = read_composed!(e, c);
                     let result = vm.is_less_than_chip.compare((operand1, operand2));
-                    write!(d, a, result);
+                    write_decomposed!(d, a, result);
                 }
                 FAIL => panic!("Unreachable code"),
                 PRINTF => {
-                    let value = read!(d, a);
+                    let value = read_composed!(d, a);
                     println!("{}", value);
+                }
+                PRINTW => {
+                    let value = read!(d, a);
+                    println!("{:?}", value);
                 }
                 FE4ADD | FE4SUB | BBE4MUL | BBE4INV => {
                     FieldExtensionArithmeticChip::calculate(vm, timestamp, instruction);
@@ -336,7 +391,11 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
                         None => return Err(ExecutionError::EndOfInputStream(pc_usize)),
                     };
                     hint_stream = VecDeque::new();
-                    hint_stream.push_back(F::from_canonical_usize(hint.len()));
+
+                    let mut len_word = [F::zero(); WORD_SIZE];
+                    len_word[0] = F::from_canonical_usize(hint.len());
+                    hint_stream.push_back(len_word);
+
                     hint_stream.extend(hint);
                 }
                 HINT_BITS => {
@@ -345,8 +404,17 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
 
                     hint_stream = VecDeque::new();
                     for _ in 0..32 {
-                        hint_stream.push_back(F::from_canonical_u32(val & 1));
+                        let word = decompose(F::from_canonical_u32(val & 1));
+                        hint_stream.push_back(word);
                         val >>= 1;
+                    }
+                }
+                HINT_EXT2FELT => {
+                    let word = vm.memory_chip.unsafe_read_word(d, a);
+
+                    hint_stream = VecDeque::new();
+                    for x in word {
+                        hint_stream.push_back(decompose(x));
                     }
                 }
                 // e[d[a] + b] <- hint_stream.next()
@@ -355,7 +423,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
                         Some(hint) => hint,
                         None => return Err(ExecutionError::HintOutOfBounds(pc_usize)),
                     };
-                    let base_pointer = read!(d, a);
+                    let base_pointer = read_composed!(d, a);
                     write!(e, base_pointer + b, hint);
                 }
                 CT_START => cycle_tracker.start(debug, vm.metrics.clone()),
@@ -429,6 +497,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
             let cols = CpuCols { io, aux };
             vm.cpu_chip.rows.push(cols.flatten(vm.options()));
 
+            prev_pc = pc_usize;
             pc = next_pc;
             timestamp += max_accesses_per_instruction(opcode);
 

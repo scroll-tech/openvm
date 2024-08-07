@@ -5,7 +5,6 @@ use afs_compiler::{
 };
 use p3_baby_bear::BabyBear;
 use p3_field::{extension::BinomialExtensionField, AbstractField};
-use stark_vm::cpu::WORD_SIZE;
 
 type F = BabyBear;
 type EF = BinomialExtensionField<BabyBear, 4>;
@@ -34,25 +33,19 @@ fn test_io() {
 
     builder.halt();
 
-    let witness_stream: Vec<Vec<F>> = vec![
-        vec![F::zero(), F::zero(), F::one()],
-        vec![F::zero(), F::zero(), F::two()],
-        vec![F::from_canonical_usize(3)],
+    let emb = |x| [x, F::zero(), F::zero(), F::zero()];
+
+    let witness_stream: Vec<Vec<[F; 4]>> = vec![
+        vec![emb(F::zero()), emb(F::zero()), emb(F::one())],
+        vec![emb(F::zero()), emb(F::zero()), emb(F::one())],
         vec![
-            F::zero(),
-            F::zero(),
-            F::zero(),
-            F::one(), // 1
-            F::zero(),
-            F::zero(),
-            F::zero(),
-            F::one(), // 1
-            F::zero(),
-            F::zero(),
-            F::zero(),
-            F::two(), // 2
+            [F::one(), F::zero(), F::zero(), F::zero()],
+            [F::one(), F::zero(), F::one(), F::zero()],
+            [F::two(), F::zero(), F::zero(), F::zero()],
         ],
     ];
+
+    const WORD_SIZE: usize = 4;
 
     let mut compiler = AsmCompiler::new(WORD_SIZE);
     compiler.build(builder.operations);

@@ -65,7 +65,7 @@ impl<C: Config, V: MemVariable<C>> Array<C, V> {
                 assert_eq!(V::size_of(), 1, "only support variables of size 1");
                 let len = RVar::from(len.clone());
                 let shift = shift.into();
-                let new_ptr = builder.eval(*ptr + shift);
+                let new_ptr = builder.eval(*ptr + shift * C::N::from_canonical_usize(4));
                 let new_length = builder.eval(len - shift);
                 Array::Dyn(new_ptr, Usize::Var(new_length))
             }

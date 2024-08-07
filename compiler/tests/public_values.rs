@@ -9,7 +9,7 @@ use p3_field::{extension::BinomialExtensionField, AbstractField};
 type F = BabyBear;
 type EF = BinomialExtensionField<BabyBear, 4>;
 
-const WORD_SIZE: usize = 1;
+const WORD_SIZE: usize = 4;
 
 #[test]
 fn test_compiler_public_values() {
@@ -21,7 +21,7 @@ fn test_compiler_public_values() {
     let a: Felt<_> = builder.constant(public_value_0);
     let b: Felt<_> = builder.constant(public_value_1);
 
-    let dyn_len: Var<_> = builder.eval(F::from_canonical_usize(2));
+    let dyn_len: Var<_> = builder.eval(F::two());
     let mut var_array = builder.dyn_array::<Felt<_>>(dyn_len);
     builder.set(&mut var_array, RVar::zero(), a);
     builder.set(&mut var_array, RVar::one(), b);
@@ -29,6 +29,9 @@ fn test_compiler_public_values() {
     builder.commit_public_values(&var_array);
 
     builder.halt();
+
+    let code = builder.clone().compile_asm::<WORD_SIZE>();
+    println!("{}", code);
 
     let program = builder.compile_isa::<WORD_SIZE>();
     execute_program_with_public_values::<WORD_SIZE>(

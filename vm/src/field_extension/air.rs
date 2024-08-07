@@ -6,20 +6,20 @@ use p3_air::{Air, AirBuilder, BaseAir};
 use p3_field::{AbstractField, Field};
 use p3_matrix::Matrix;
 
-use super::{columns::FieldExtensionArithmeticCols, FieldExtensionArithmeticAir};
+use super::{columns::FieldExtensionArithmeticCols, FieldExtensionArithmetic, FieldExtensionArithmeticAir};
 use crate::field_extension::{BETA, EXTENSION_DEGREE};
 
-impl AirConfig for FieldExtensionArithmeticAir {
+impl<const WORD_SIZE: usize> AirConfig for FieldExtensionArithmeticAir<WORD_SIZE> {
     type Cols<T> = FieldExtensionArithmeticCols<T>;
 }
 
-impl<F: Field> BaseAir<F> for FieldExtensionArithmeticAir {
+impl<const WORD_SIZE: usize, F: Field> BaseAir<F> for FieldExtensionArithmeticAir<WORD_SIZE> {
     fn width(&self) -> usize {
         FieldExtensionArithmeticCols::<F>::get_width()
     }
 }
 
-impl<AB: InteractionBuilder> Air<AB> for FieldExtensionArithmeticAir {
+impl<const WORD_SIZE: usize, AB: InteractionBuilder> Air<AB> for FieldExtensionArithmeticAir<WORD_SIZE> {
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
 
@@ -45,7 +45,7 @@ impl<AB: InteractionBuilder> Air<AB> for FieldExtensionArithmeticAir {
             io.opcode,
             aux.opcode_lo
                 + aux.opcode_hi * AB::Expr::two()
-                + AB::F::from_canonical_u8(FieldExtensionArithmeticAir::BASE_OP),
+                + AB::F::from_canonical_u8(FieldExtensionArithmetic::BASE_OP),
         );
 
         builder.assert_eq(

@@ -5,7 +5,7 @@ use p3_baby_bear::BabyBear;
 use p3_field::PrimeField32;
 use OpCode::*;
 
-use crate::{field_extension::FieldExtensionArithmeticAir, poseidon2::Poseidon2Chip};
+use crate::poseidon2::Poseidon2Chip;
 
 #[cfg(test)]
 pub mod tests;
@@ -16,6 +16,7 @@ pub mod columns;
 pub mod trace;
 
 pub use air::CpuAir;
+use crate::field_extension::FieldExtensionArithmetic;
 
 pub const INST_WIDTH: usize = 1;
 
@@ -31,8 +32,6 @@ pub const IS_LESS_THAN_BUS: usize = 7;
 pub const CPU_MAX_READS_PER_CYCLE: usize = 2;
 pub const CPU_MAX_WRITES_PER_CYCLE: usize = 1;
 pub const CPU_MAX_ACCESSES_PER_CYCLE: usize = CPU_MAX_READS_PER_CYCLE + CPU_MAX_WRITES_PER_CYCLE;
-
-pub const WORD_SIZE: usize = 1;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, FromStr, PartialOrd, Ord)]
 #[repr(usize)]
@@ -50,10 +49,14 @@ pub enum OpCode {
     FMUL = 12,
     FDIV = 13,
 
-    F_LESS_THAN = 14,
+    // e[d[a] + b] <- c
+    STOREC = 14,
+
+    F_LESS_THAN = 15,
 
     FAIL = 20,
     PRINTF = 21,
+    PRINTW = 22,
 
     FE4ADD = 30,
     FE4SUB = 31,
@@ -70,6 +73,8 @@ pub enum OpCode {
     HINT_INPUT = 51,
     /// Phantom instruction to prepare the little-endian bit decomposition of a variable for hinting.
     HINT_BITS = 52,
+    /// Phantom instruction to prepare the base field elements as word for hinting.
+    HINT_EXT2FELT = 53,
 
     /// Phantom instruction to start tracing
     CT_START = 60,
@@ -85,8 +90,8 @@ impl fmt::Display for OpCode {
     }
 }
 
-pub const CORE_INSTRUCTIONS: [OpCode; 13] = [
-    LOADW, STOREW, JAL, BEQ, BNE, TERMINATE, SHINTW, HINT_INPUT, HINT_BITS, PUBLISH, CT_START,
+pub const CORE_INSTRUCTIONS: [OpCode; 15] = [
+    LOADW, STOREW, STOREC, JAL, BEQ, BNE, TERMINATE, SHINTW, HINT_INPUT, HINT_BITS, HINT_EXT2FELT, PUBLISH, CT_START,
     CT_END, NOP,
 ];
 pub const FIELD_ARITHMETIC_INSTRUCTIONS: [OpCode; 4] = [FADD, FSUB, FMUL, FDIV];
@@ -98,7 +103,7 @@ impl OpCode {
         all_opcodes.extend(CORE_INSTRUCTIONS);
         all_opcodes.extend(FIELD_ARITHMETIC_INSTRUCTIONS);
         all_opcodes.extend(FIELD_EXTENSION_INSTRUCTIONS);
-        all_opcodes.extend([FAIL, PRINTF]);
+        all_opcodes.extend([FAIL, PRINTF, PRINTW]);
         all_opcodes.extend([PERM_POS2, COMP_POS2]);
         all_opcodes
     }
@@ -112,7 +117,7 @@ impl OpCode {
 
 fn max_accesses_per_instruction(opcode: OpCode) -> usize {
     match opcode {
-        LOADW | STOREW => 3,
+        LOADW | STOREW | STOREC => 3,
         // JAL only does WRITE, but it is done as timestamp + 2
         JAL => 3,
         BEQ | BNE => 2,
@@ -120,16 +125,16 @@ fn max_accesses_per_instruction(opcode: OpCode) -> usize {
         PUBLISH => 2,
         opcode if FIELD_ARITHMETIC_INSTRUCTIONS.contains(&opcode) => 3,
         opcode if FIELD_EXTENSION_INSTRUCTIONS.contains(&opcode) => {
-            FieldExtensionArithmeticAir::max_accesses_per_instruction(opcode)
+            FieldExtensionArithmetic::max_accesses_per_instruction(opcode)
         }
         F_LESS_THAN => 3,
         FAIL => 0,
-        PRINTF => 1,
+        PRINTF | PRINTW => 1,
         COMP_POS2 | PERM_POS2 => {
             Poseidon2Chip::<16, BabyBear>::max_accesses_per_instruction(opcode)
         }
         SHINTW => 3,
-        HINT_INPUT | HINT_BITS => 0,
+        HINT_INPUT | HINT_BITS | HINT_EXT2FELT => 0,
         CT_START | CT_END => 0,
         NOP => 0,
         _ => panic!(),

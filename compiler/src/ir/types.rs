@@ -2,7 +2,7 @@ use alloc::{format, rc::Rc};
 use core::marker::PhantomData;
 use std::{cell::RefCell, collections::HashMap, hash::Hash};
 
-use p3_field::{AbstractExtensionField, AbstractField, ExtensionField, Field, PrimeField};
+use p3_field::{AbstractField, ExtensionField, Field, PrimeField};
 use serde::{Deserialize, Serialize};
 
 use super::{
@@ -398,7 +398,8 @@ impl<C: Config> Variable<C> for Var<C::N> {
     type Expression = SymbolicVar<C::N>;
 
     fn uninit(builder: &mut Builder<C>) -> Self {
-        builder.stack_ptr += 1;
+        // FIXME: should know word size?
+        builder.stack_ptr += 4;
         Var(builder.stack_ptr, PhantomData)
     }
 
@@ -495,7 +496,7 @@ impl<C: Config> MemVariable<C> for Var<C::N> {
     }
 
     fn load(&self, ptr: Ptr<C::N>, index: MemIndex<C::N>, builder: &mut Builder<C>) {
-        builder.push(DslIr::LoadV(*self, ptr, index));
+        builder.trace_push(DslIr::LoadV(*self, ptr, index));
     }
 
     fn store(&self, ptr: Ptr<<C as Config>::N>, index: MemIndex<C::N>, builder: &mut Builder<C>) {
@@ -514,7 +515,7 @@ impl<C: Config> MemVariable<C> for Usize<C::N> {
                 panic!("Usize::Const should not be loaded");
             }
             Usize::Var(v) => {
-                builder.push(DslIr::LoadV(*v, ptr, index));
+                builder.trace_push(DslIr::LoadV(*v, ptr, index));
             }
         }
     }
@@ -768,7 +769,7 @@ impl<C: Config> Variable<C> for Felt<C::F> {
     type Expression = SymbolicFelt<C::F>;
 
     fn uninit(builder: &mut Builder<C>) -> Self {
-        builder.stack_ptr += 1;
+        builder.stack_ptr += 4;
         Felt(builder.stack_ptr, PhantomData)
     }
 
@@ -1161,7 +1162,7 @@ impl<C: Config> Variable<C> for Ext<C::F, C::EF> {
     type Expression = SymbolicExt<C::F, C::EF>;
 
     fn uninit(builder: &mut Builder<C>) -> Self {
-        builder.stack_ptr += <Self as MemVariable<C>>::size_of() as u32;
+        builder.stack_ptr += 4;
         Ext(builder.stack_ptr, PhantomData)
     }
 
@@ -1254,7 +1255,7 @@ impl<C: Config> Variable<C> for Ext<C::F, C::EF> {
 
 impl<C: Config> MemVariable<C> for Ext<C::F, C::EF> {
     fn size_of() -> usize {
-        C::EF::D
+        1
     }
 
     fn load(&self, ptr: Ptr<C::N>, index: MemIndex<C::N>, builder: &mut Builder<C>) {
@@ -1262,7 +1263,7 @@ impl<C: Config> MemVariable<C> for Ext<C::F, C::EF> {
     }
 
     fn store(&self, ptr: Ptr<<C as Config>::N>, index: MemIndex<C::N>, builder: &mut Builder<C>) {
-        builder.push(DslIr::StoreE(*self, ptr, index));
+        builder.trace_push(DslIr::StoreE(*self, ptr, index));
     }
 }
 

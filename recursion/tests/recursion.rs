@@ -15,6 +15,8 @@ use stark_vm::{
 
 mod common;
 
+const WORD_SIZE: usize = 4;
+
 fn fibonacci_program(a: u32, b: u32, n: u32) -> Program<BabyBear> {
     type F = BabyBear;
     type EF = BinomialExtensionField<BabyBear, 4>;
@@ -33,7 +35,7 @@ fn fibonacci_program(a: u32, b: u32, n: u32) -> Program<BabyBear> {
 
     builder.halt();
 
-    builder.compile_isa::<1>()
+    builder.compile_isa::<WORD_SIZE>()
 }
 
 #[test]
@@ -46,10 +48,10 @@ fn test_fibonacci_program_verify() {
         ..Default::default()
     };
 
-    let dummy_vm = VirtualMachine::<1, _>::new(vm_config, fib_program.clone(), vec![]);
+    let dummy_vm = VirtualMachine::<WORD_SIZE, _>::new(vm_config, fib_program.clone(), vec![]);
     let rec_raps = get_rec_raps(&dummy_vm.segments[0]);
 
-    let vm = VirtualMachine::<1, _>::new(vm_config, fib_program, vec![]);
+    let vm = VirtualMachine::<WORD_SIZE, _>::new(vm_config, fib_program, vec![]);
     let ExecutionAndTraceGenerationResult {
         nonempty_traces: traces,
         nonempty_chips: chips,

@@ -7,15 +7,19 @@ use super::A0;
 
 #[derive(Debug, Clone)]
 pub enum AsmInstruction<F, EF> {
+    Phantom(EF),
+
+    StoreC(usize, i32, F),
+
     /// Load word (dst, src, offset).
     ///
     /// Load a value from the address stored at src(fp) + offset into dst(fp).
-    LoadFI(i32, i32, F),
+    LoadW(i32, i32, F),
 
     /// Store word (val, addr, offset)
     ///
     /// Store a value from val(fp) into the address stored at addr(fp) + offset.
-    StoreFI(i32, i32, F),
+    StoreW(i32, i32, F),
 
     /// Add, dst = lhs + rhs.
     AddF(i32, i32, i32),
@@ -77,14 +81,8 @@ pub enum AsmInstruction<F, EF> {
     /// Branch not equal extension.
     BneE(F, i32, i32),
 
-    /// Branch not equal immediate extension.
-    BneEI(F, i32, EF),
-
     /// Branch equal extension.
     BeqE(F, i32, i32),
-
-    /// Branch equal immediate extension.
-    BeqEI(F, i32, EF),
 
     /// Trap.
     Trap,
@@ -115,10 +113,15 @@ pub enum AsmInstruction<F, EF> {
     /// Add next input vector to hint stream.
     HintInputVec(),
 
-    /// HintBits(dst, src).
+    /// HintBits(src).
     ///
     /// Bit decompose the field element `src` and add in little endian to hint stream.
     HintBits(i32),
+
+    /// HintExt2Felt(src).
+    ///
+    /// Add the base field elements to the hint stream as words.
+    HintExt2Felt(i32),
 
     /// Stores the next hint stream word into value stored at addr + value.
     StoreHintWordI(i32, F),
@@ -146,13 +149,17 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
     pub fn fmt(&self, labels: &BTreeMap<F, String>, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             AsmInstruction::Break(_) => panic!("Unresolved break instruction"),
+            AsmInstruction::Phantom(_) => unreachable!(),
             AsmInstruction::LessThan(dst, left, right) => {
                 write!(f, "lt  ({})fp, {}, {}", dst, left, right,)
             }
-            AsmInstruction::LoadFI(dst, src, offset) => {
+            AsmInstruction::LoadW(dst, src, offset) => {
                 write!(f, "lwi   ({})fp, ({})fp, {}", dst, src, offset)
             }
-            AsmInstruction::StoreFI(dst, src, offset) => {
+            AsmInstruction::StoreC(i, dst, val) => {
+                write!(f, "swc{i}  ({dst})fp, {val}")
+            }
+            AsmInstruction::StoreW(dst, src, offset) => {
                 write!(f, "swi   ({})fp, ({})fp, {}", dst, src, offset)
             }
             AsmInstruction::AddF(dst, lhs, rhs) => {
@@ -186,7 +193,7 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
                 write!(f, "lti  ({})fp, ({})fp, {}", dst, lhs, rhs)
             }
             AsmInstruction::AddE(dst, lhs, rhs) => {
-                write!(f, "eadd ({})fp, ({})fp, ({})fp", dst, lhs, rhs)
+                write!(f, "eadd  ({})fp, ({})fp, ({})fp", dst, lhs, rhs)
             }
             AsmInstruction::SubE(dst, lhs, rhs) => {
                 write!(f, "esub  ({})fp, ({})fp, ({})fp", dst, lhs, rhs)
@@ -195,7 +202,7 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
                 write!(f, "emul  ({})fp, ({})fp, ({})fp", dst, lhs, rhs)
             }
             AsmInstruction::InvE(dst, src) => {
-                write!(f, "einv ({})fp, ({})fp", dst, src)
+                write!(f, "einv  ({})fp, ({})fp", dst, src)
             }
             AsmInstruction::Jump(dst, label) => {
                 write!(
@@ -250,15 +257,6 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
                     rhs
                 )
             }
-            AsmInstruction::BneEI(label, lhs, rhs) => {
-                write!(
-                    f,
-                    "ebnei {}, ({})fp, {}",
-                    labels.get(label).unwrap_or(&format!(".L{}", label)),
-                    lhs,
-                    rhs
-                )
-            }
             AsmInstruction::BeqE(label, lhs, rhs) => {
                 write!(
                     f,
@@ -268,18 +266,10 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
                     rhs
                 )
             }
-            AsmInstruction::BeqEI(label, lhs, rhs) => {
-                write!(
-                    f,
-                    "ebeqi {}, ({})fp, {}",
-                    labels.get(label).unwrap_or(&format!(".L{}", label)),
-                    lhs,
-                    rhs
-                )
-            }
             AsmInstruction::Trap => write!(f, "trap"),
             AsmInstruction::Halt => write!(f, "halt"),
             AsmInstruction::HintBits(dst) => write!(f, "hint_bits ({})fp", dst),
+            AsmInstruction::HintExt2Felt(dst) => write!(f, "hint_ext2felt ({})fp", dst),
             AsmInstruction::Poseidon2Permute(dst, lhs) => {
                 write!(f, "poseidon2_permute ({})fp, ({})fp", dst, lhs)
             }

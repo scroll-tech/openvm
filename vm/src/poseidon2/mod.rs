@@ -98,6 +98,7 @@ impl<F: PrimeField32> Poseidon2Chip<WIDTH, F> {
         let air = Poseidon2VmAir::<WIDTH, F>::from_poseidon2_config(config, bus_index);
         Self { air, rows: vec![] }
     }
+
     /// Key method of Poseidon2Chip.
     ///
     /// Called using `vm` and not `&self`. Reads two chunks from memory and generates a trace row for
@@ -135,14 +136,14 @@ impl<F: PrimeField32> Poseidon2Chip<WIDTH, F> {
         } else {
             // We still need to advance the timestamp to match the interaction constraints.
             timestamp += 1;
-            lhs + F::from_canonical_usize(CHUNK)
+            lhs + F::from_canonical_usize(CHUNK * WORD_SIZE)
         };
 
         let input_state: [F; WIDTH] = array::from_fn(|i| {
             if i < CHUNK {
-                read(e, lhs + F::from_canonical_usize(i), &mut timestamp)
+                read(e, lhs + F::from_canonical_usize(i * WORD_SIZE), &mut timestamp)
             } else {
-                read(e, rhs + F::from_canonical_usize(i - CHUNK), &mut timestamp)
+                read(e, rhs + F::from_canonical_usize((i - CHUNK) * WORD_SIZE), &mut timestamp)
             }
         });
 
@@ -160,7 +161,7 @@ impl<F: PrimeField32> Poseidon2Chip<WIDTH, F> {
 
         for (i, &output_elem) in output.iter().enumerate().take(len) {
             vm.memory_chip
-                .write_elem(timestamp, e, dst + F::from_canonical_usize(i), output_elem);
+                .write_elem(timestamp, e, dst + F::from_canonical_usize(i * WORD_SIZE), output_elem);
             timestamp += 1;
         }
 

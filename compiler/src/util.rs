@@ -13,13 +13,13 @@ use stark_vm::{
     program::Program,
     vm::{config::VmConfig, ExecutionAndTraceGenerationResult, VirtualMachine},
 };
-
+use stark_vm::cpu::trace::ExecutionError;
 use crate::{asm::AsmBuilder, conversion::CompilerOptions};
 
 pub fn execute_program_with_config<const WORD_SIZE: usize>(
     config: VmConfig,
     program: Program<BabyBear>,
-    input_stream: Vec<Vec<BabyBear>>,
+    input_stream: Vec<Vec<[BabyBear; WORD_SIZE]>>,
 ) {
     let vm = VirtualMachine::<WORD_SIZE, _>::new(config, program, input_stream);
     vm.execute().unwrap();
@@ -41,8 +41,9 @@ pub fn prime_field_to_usize<F: PrimeField>(x: F) -> usize {
 
 pub fn execute_program<const WORD_SIZE: usize>(
     program: Program<BabyBear>,
-    input_stream: Vec<Vec<BabyBear>>,
+    input_stream: Vec<Vec<[BabyBear; WORD_SIZE]>>,
 ) {
+    let debug_infos = program.debug_infos.clone();
     let vm = VirtualMachine::<WORD_SIZE, _>::new(
         VmConfig {
             num_public_values: 4,
@@ -52,12 +53,26 @@ pub fn execute_program<const WORD_SIZE: usize>(
         program,
         input_stream,
     );
-    vm.execute().unwrap();
+    match vm.execute() {
+        Err(ExecutionError::Fail(pc)) => {
+            if let Some(debug_info) = &debug_infos[pc] {
+                if let Some(trace) = &debug_info.trace {
+                    eprintln!("{:?}", trace);
+                } else {
+                    eprintln!("no backtrace");
+                }
+            } else {
+                eprintln!("no debug info");
+            }
+            panic!("program failed (pc = {pc})")
+        }
+        _ => {},
+    };
 }
 
 pub fn execute_program_and_generate_traces<const WORD_SIZE: usize>(
     program: Program<BabyBear>,
-    input_stream: Vec<Vec<BabyBear>>,
+    input_stream: Vec<Vec<[BabyBear; WORD_SIZE]>>,
 ) {
     let vm = VirtualMachine::<WORD_SIZE, _>::new(
         VmConfig {
@@ -73,12 +88,13 @@ pub fn execute_program_and_generate_traces<const WORD_SIZE: usize>(
 
 pub fn execute_program_with_public_values<const WORD_SIZE: usize>(
     program: Program<BabyBear>,
-    input_stream: Vec<Vec<BabyBear>>,
+    input_stream: Vec<Vec<[BabyBear; WORD_SIZE]>>,
     public_values: &[(usize, BabyBear)],
 ) {
     let mut vm = VirtualMachine::<WORD_SIZE, _>::new(
         VmConfig {
             num_public_values: 4,
+            max_segment_len: (1 << 25) - 100,
             ..Default::default()
         },
         program,
@@ -127,7 +143,7 @@ pub fn display_program_with_pc<F: PrimeField32>(program: &[Instruction<F>]) {
 }
 pub fn end_to_end_test<const WORD_SIZE: usize, EF: ExtensionField<BabyBear> + TwoAdicField>(
     builder: AsmBuilder<BabyBear, EF>,
-    input_stream: Vec<Vec<BabyBear>>,
+    input_stream: Vec<Vec<[BabyBear; WORD_SIZE]>>,
 ) {
     let program = builder.compile_isa_with_options::<WORD_SIZE>(CompilerOptions {
         compile_prints: false,
@@ -141,11 +157,12 @@ pub fn end_to_end_test<const WORD_SIZE: usize, EF: ExtensionField<BabyBear> + Tw
 
 pub fn execute_and_prove_program<const WORD_SIZE: usize>(
     program: Program<BabyBear>,
-    input_stream: Vec<Vec<BabyBear>>,
+    input_stream: Vec<Vec<[BabyBear; WORD_SIZE]>>,
 ) {
     let vm = VirtualMachine::<WORD_SIZE, _>::new(
         VmConfig {
             num_public_values: 4,
+            max_segment_len: (1 << 25) - 100,
             ..Default::default()
         },
         program,

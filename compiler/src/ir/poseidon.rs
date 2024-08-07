@@ -162,10 +162,10 @@ impl<C: Config> Builder<C> {
         array: &Array<C, Array<C, Ext<C::F, C::EF>>>,
     ) -> Array<C, Felt<C::F>> {
         self.cycle_tracker_start("poseidon2-hash-ext");
-        let hash_rate = HASH_RATE;
         let perm_width = PERMUTATION_WIDTH;
+
         let mut state: Array<C, Felt<C::F>> = self.dyn_array(perm_width);
-        self.range(hash_rate, perm_width).for_each(|i, builder| {
+        self.range(0, perm_width).for_each(|i, builder| {
             builder.set(&mut state, i, C::F::zero());
         });
 

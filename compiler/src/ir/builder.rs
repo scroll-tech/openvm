@@ -5,7 +5,7 @@ use p3_field::AbstractField;
 
 use super::{
     Array, Config, DslIr, Ext, Felt, FromConstant, MemIndex, MemVariable, RVar, SymbolicExt,
-    SymbolicFelt, SymbolicVar, Usize, Var, Variable,
+    SymbolicFelt, SymbolicVar, Var, Variable,
 };
 
 /// TracedVec is a Vec wrapper that records a trace whenever an element is pushed. When extending
@@ -428,21 +428,8 @@ impl<C: Config> Builder<C> {
     }
 
     /// Hint a vector of exts.
-    ///
-    /// Emits two hint opcodes: the first for the number of exts, the second for the list of exts
-    /// themselves.
     pub fn hint_exts(&mut self) -> Array<C, Ext<C::F, C::EF>> {
-        let len = self.hint_var();
-        let flattened = self.hint_felts();
-
-        let size = <Ext<C::F, C::EF> as MemVariable<C>>::size_of();
-        self.assert_eq::<Usize<_>>(flattened.len(), len * C::N::from_canonical_usize(size));
-
-        // Simply recast memory as Array<Ext>.
-        match flattened {
-            Array::Fixed(_) => unreachable!(),
-            Array::Dyn(ptr, _) => Array::Dyn(ptr, Usize::Var(len)),
-        }
+        self.hint_words()
     }
 
     pub fn witness_var(&mut self) -> Var<C::N> {

@@ -212,6 +212,9 @@ pub enum DslIr<C: Config> {
     /// Prepare bit decomposition for hinting.
     HintBitsF(Felt<C::F>),
 
+    /// Prepare felt decomposition for hinting.
+    HintFelts(Ext<C::F, C::EF>),
+
     StoreHintWord(Ptr<C::N>, MemIndex<C::N>),
 
     /// Witness a variable. Should only be used when target is a gnark circuit.

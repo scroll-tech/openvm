@@ -89,7 +89,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> MemoryChip<WORD_SIZE, F> {
         address: F,
         data: [F; WORD_SIZE],
     ) {
-        assert!(address_space != F::zero());
+        assert_ne!(address_space, F::zero());
         if let Some(last_timestamp) = self.last_timestamp {
             assert!(timestamp > last_timestamp);
         }

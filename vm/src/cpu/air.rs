@@ -170,6 +170,32 @@ impl<const WORD_SIZE: usize, AB: AirBuilderWithPublicValues + InteractionBuilder
             .when_transition()
             .assert_eq(next_pc, pc + inst_width);
 
+        // STOREC: e[d[a] + b] <- c, where b < WORD_SIZE. second read and write are at d[a]
+        let storec_flag = operation_flags[&STOREC];
+        read1_enabled_check = read1_enabled_check + storec_flag;
+        read2_enabled_check = read2_enabled_check + storec_flag;
+        write_enabled_check = write_enabled_check + storec_flag;
+
+        let mut when_storec = builder.when(storec_flag);
+        when_storec.assert_eq(read1.address_space, d);
+        when_storec.assert_eq(read1.address, a);
+
+        when_storec.assert_eq(read2.address_space, e);
+        self.assert_compose(&mut when_storec, read1.data, read2.address.into());
+
+        when_storec.assert_eq(write.address_space, e);
+        self.assert_compose(&mut when_storec, read1.data, write.address.into());
+
+        for i in 0..WORD_SIZE {
+            when_storec.when_ne(b, AB::Expr::from_canonical_usize(i)).assert_eq(write.data[i], read2.data[i]);
+            // FIXME: assert that b = i => compose(read2.data) == write_data[i]
+        }
+        // FIXME: assert that b < WORD_SIZE
+
+        when_storec
+            .when_transition()
+            .assert_eq(next_pc, pc + inst_width);
+
         // SHINTW: e[d[a] + b] <- ?
         let shintw_flag = operation_flags[&SHINTW];
         read1_enabled_check = read1_enabled_check + shintw_flag;

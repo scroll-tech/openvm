@@ -1,10 +1,10 @@
 use afs_compiler::{asm::AsmBuilder, ir::Var, util::execute_program_and_generate_traces};
 use p3_baby_bear::BabyBear;
 use p3_field::{extension::BinomialExtensionField, AbstractField};
-use stark_vm::cpu::WORD_SIZE;
 
 type F = BabyBear;
 type EF = BinomialExtensionField<BabyBear, 4>;
+const WORD_SIZE: usize = 4;
 
 #[test]
 fn test_compiler_conditionals() {
@@ -77,6 +77,8 @@ fn test_compiler_conditionals_v2() {
     });
 
     builder.halt();
+
+    const WORD_SIZE: usize = 4;
 
     let program = builder.compile_isa::<WORD_SIZE>();
     execute_program_and_generate_traces::<WORD_SIZE>(program, vec![]);

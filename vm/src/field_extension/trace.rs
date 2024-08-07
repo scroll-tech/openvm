@@ -1,20 +1,17 @@
 use p3_field::{Field, PrimeField32};
 use p3_matrix::dense::RowMajorMatrix;
 
-use super::{
-    columns::{
-        FieldExtensionArithmeticAuxCols, FieldExtensionArithmeticCols,
-        FieldExtensionArithmeticIoCols,
-    },
-    FieldExtensionArithmeticAir, FieldExtensionArithmeticChip, FieldExtensionArithmeticOperation,
-};
+use super::{columns::{
+    FieldExtensionArithmeticAuxCols, FieldExtensionArithmeticCols,
+    FieldExtensionArithmeticIoCols,
+}, FieldExtensionArithmetic, FieldExtensionArithmeticChip, FieldExtensionArithmeticOperation};
 use crate::cpu::OpCode;
 
 /// Constructs a new set of columns (including auxiliary columns) given inputs.
-fn generate_cols<T: Field>(
+fn generate_cols<const WORD_SIZE: usize, T: Field>(
     op: FieldExtensionArithmeticOperation<T>,
 ) -> FieldExtensionArithmeticCols<T> {
-    let opcode_value = op.opcode as u32 - FieldExtensionArithmeticAir::BASE_OP as u32;
+    let opcode_value = op.opcode as u32 - FieldExtensionArithmetic::BASE_OP as u32;
     let opcode_lo_u32 = opcode_value % 2;
     let opcode_hi_u32 = opcode_value / 2;
     let opcode_lo = T::from_canonical_u32(opcode_lo_u32);
@@ -33,11 +30,11 @@ fn generate_cols<T: Field>(
         x[2] + add_sub_coeff * y[2],
         x[3] + add_sub_coeff * y[3],
     ];
-    let product = FieldExtensionArithmeticAir::solve(OpCode::BBE4MUL, x, y).unwrap();
+    let product = FieldExtensionArithmetic::solve(OpCode::BBE4MUL, x, y).unwrap();
     let inv = if x[0] == T::zero() && x[1] == T::zero() && x[2] == T::zero() && x[3] == T::zero() {
         [T::zero(), T::zero(), T::zero(), T::zero()]
     } else {
-        FieldExtensionArithmeticAir::solve(OpCode::BBE4INV, x, y).unwrap()
+        FieldExtensionArithmetic::solve(OpCode::BBE4INV, x, y).unwrap()
     };
 
     FieldExtensionArithmeticCols {
@@ -73,7 +70,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> FieldExtensionArithmeticChip<WORD_
         let mut trace: Vec<F> = self
             .operations
             .iter()
-            .flat_map(|op| generate_cols(*op).flatten())
+            .flat_map(|op| generate_cols::<WORD_SIZE, _>(*op).flatten())
             .collect();
 
         let empty_row: Vec<F> = FieldExtensionArithmeticCols::blank_row().flatten();

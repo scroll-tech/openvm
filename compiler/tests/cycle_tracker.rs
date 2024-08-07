@@ -6,7 +6,6 @@ use afs_compiler::{
 };
 use p3_baby_bear::BabyBear;
 use p3_field::{extension::BinomialExtensionField, AbstractField};
-use stark_vm::cpu::WORD_SIZE;
 
 type F = BabyBear;
 type EF = BinomialExtensionField<BabyBear, 4>;
@@ -42,6 +41,8 @@ fn test_cycle_tracker() {
 
     // after TERMINATE, so this CT_END opcode will not be executed
     builder.cycle_tracker_end("test_unclosed");
+
+    const WORD_SIZE: usize = 4;
 
     let program = builder.compile_isa_with_options::<WORD_SIZE>(CompilerOptions {
         compile_prints: false,

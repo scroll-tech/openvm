@@ -39,7 +39,6 @@ pub struct AsmCompiler<F, EF> {
     contains_break: BTreeSet<F>,
     function_labels: BTreeMap<String, F>,
     trap_label: F,
-    word_size: usize,
 }
 
 impl<F> Var<F> {
@@ -81,7 +80,6 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
             function_labels: BTreeMap::new(),
             break_counter: 0,
             trap_label: F::one(),
-            word_size,
         }
     }
 
@@ -155,7 +153,7 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
                     self.add_felt_exti(dst, lhs, rhs, debug_info);
                 }
                 DslIr::AddEFI(dst, lhs, rhs) => {
-                    self.add_ext_exti(dst, lhs, EF::from_base(rhs), debug_info);
+                    self.add_ext_felti(dst, lhs, rhs, debug_info);
                 }
                 DslIr::SubV(dst, lhs, rhs) => {
                     self.push(
@@ -280,8 +278,7 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
                     );
                 }
                 DslIr::MulEI(dst, lhs, rhs) => {
-                    self.assign_exti(A0, rhs, debug_info.clone());
-                    self.push(AsmInstruction::MulE(dst.fp(), lhs.fp(), A0), debug_info);
+                    self.mul_ext_exti(dst, lhs, rhs, debug_info);
                 }
                 DslIr::MulEF(dst, lhs, rhs) => {
                     self.mul_ext_felt(dst, lhs, rhs, debug_info);
@@ -438,60 +435,60 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
                 }
                 DslIr::LoadV(var, ptr, index) => match index.fp() {
                     IndexTriple::Const(index, offset, size) => self.push(
-                        AsmInstruction::LoadFI(var.fp(), ptr.fp(), index * size + offset),
+                        AsmInstruction::LoadW(var.fp(), ptr.fp(), (index * size + offset) * F::from_canonical_u32(4)),
                         debug_info.clone(),
                     ),
                     IndexTriple::Var(index, offset, size) => {
-                        self.add_scaled(A0, ptr.fp(), index, size, debug_info.clone());
-                        self.push(AsmInstruction::LoadFI(var.fp(), A0, offset), debug_info)
+                        self.add_scaled(A0, ptr.fp(), index, size * F::from_canonical_u32(4), debug_info.clone());
+                        self.push(AsmInstruction::LoadW(var.fp(), A0, offset * F::from_canonical_u32(4)), debug_info)
                     }
                 },
                 DslIr::LoadF(var, ptr, index) => match index.fp() {
                     IndexTriple::Const(index, offset, size) => self.push(
-                        AsmInstruction::LoadFI(var.fp(), ptr.fp(), index * size + offset),
+                        AsmInstruction::LoadW(var.fp(), ptr.fp(), (index * size + offset) * F::from_canonical_u32(4)),
                         debug_info.clone(),
                     ),
                     IndexTriple::Var(index, offset, size) => {
-                        self.add_scaled(A0, ptr.fp(), index, size, debug_info.clone());
-                        self.push(AsmInstruction::LoadFI(var.fp(), A0, offset), debug_info)
+                        self.add_scaled(A0, ptr.fp(), index, size * F::from_canonical_u32(4), debug_info.clone());
+                        self.push(AsmInstruction::LoadW(var.fp(), A0, offset * F::from_canonical_u32(4)), debug_info)
                     }
                 },
                 DslIr::LoadE(var, ptr, index) => match index.fp() {
                     IndexTriple::Const(index, offset, size) => {
-                        self.load_ext(var, ptr.fp(), index * size + offset, debug_info)
+                        self.push(AsmInstruction::LoadW(var.fp(), ptr.fp(), (index * size + offset) * F::from_canonical_u32(4)), debug_info)
                     }
                     IndexTriple::Var(index, offset, size) => {
-                        self.add_scaled(A0, ptr.fp(), index, size, debug_info.clone());
-                        self.load_ext(var, A0, offset, debug_info)
+                        self.add_scaled(A0, ptr.fp(), index, size * F::from_canonical_u32(4), debug_info.clone());
+                        self.push(AsmInstruction::LoadW(var.fp(), A0, offset * F::from_canonical_u32(4)), debug_info)
                     }
                 },
                 DslIr::StoreV(var, ptr, index) => match index.fp() {
                     IndexTriple::Const(index, offset, size) => self.push(
-                        AsmInstruction::StoreFI(var.fp(), ptr.fp(), index * size + offset),
+                        AsmInstruction::StoreW(var.fp(), ptr.fp(), (index * size + offset) * F::from_canonical_u32(4)),
                         debug_info.clone(),
                     ),
                     IndexTriple::Var(index, offset, size) => {
-                        self.add_scaled(A0, ptr.fp(), index, size, debug_info.clone());
-                        self.push(AsmInstruction::StoreFI(var.fp(), A0, offset), debug_info)
+                        self.add_scaled(A0, ptr.fp(), index, size * F::from_canonical_u32(4), debug_info.clone());
+                        self.push(AsmInstruction::StoreW(var.fp(), A0, offset * F::from_canonical_u32(4)), debug_info)
                     }
                 },
                 DslIr::StoreF(var, ptr, index) => match index.fp() {
                     IndexTriple::Const(index, offset, size) => self.push(
-                        AsmInstruction::StoreFI(var.fp(), ptr.fp(), index * size + offset),
+                        AsmInstruction::StoreW(var.fp(), ptr.fp(), (index * size + offset) * F::from_canonical_u32(4)),
                         debug_info.clone(),
                     ),
                     IndexTriple::Var(index, offset, size) => {
-                        self.add_scaled(A0, ptr.fp(), index, size, debug_info.clone());
-                        self.push(AsmInstruction::StoreFI(var.fp(), A0, offset), debug_info)
+                        self.add_scaled(A0, ptr.fp(), index, size * F::from_canonical_u32(4), debug_info.clone());
+                        self.push(AsmInstruction::StoreW(var.fp(), A0, offset * F::from_canonical_u32(4)), debug_info)
                     }
                 },
                 DslIr::StoreE(var, ptr, index) => match index.fp() {
                     IndexTriple::Const(index, offset, size) => {
-                        self.store_ext(var, ptr.fp(), index * size + offset, debug_info)
+                        self.push(AsmInstruction::StoreW(var.fp(), ptr.fp(), (index * size + offset) * F::from_canonical_u32(4)), debug_info)
                     }
                     IndexTriple::Var(index, offset, size) => {
-                        self.add_scaled(A0, ptr.fp(), index, size, debug_info.clone());
-                        self.store_ext(var, A0, offset, debug_info)
+                        self.add_scaled(A0, ptr.fp(), index, size * F::from_canonical_usize(4), debug_info.clone());
+                        self.push(AsmInstruction::StoreW(var.fp(), A0, offset * F::from_canonical_u32(4)), debug_info)
                     }
                 },
                 DslIr::HintBitsF(var) => {
@@ -502,6 +499,9 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
                 }
                 DslIr::HintBitsU(_) => {
                     todo!()
+                }
+                DslIr::HintFelts(ext) => {
+                    self.push(AsmInstruction::HintExt2Felt(ext.fp()), debug_info);
                 }
                 DslIr::Poseidon2PermuteBabyBear(dst, src) => match (dst, src) {
                     (Array::Dyn(dst, _), Array::Dyn(src, _)) => self.push(
@@ -525,12 +525,12 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
                 }
                 DslIr::StoreHintWord(ptr, index) => match index.fp() {
                     IndexTriple::Const(index, offset, size) => self.push(
-                        AsmInstruction::StoreHintWordI(ptr.fp(), size * index + offset),
+                        AsmInstruction::StoreHintWordI(ptr.fp(), (size * index + offset) * F::from_canonical_u32(4)),
                         debug_info.clone(),
                     ),
                     IndexTriple::Var(index, offset, size) => {
-                        self.add_scaled(A0, ptr.fp(), index, size, debug_info.clone());
-                        self.push(AsmInstruction::StoreHintWordI(A0, offset), debug_info)
+                        self.add_scaled(A0, ptr.fp(), index, size * F::from_canonical_u32(4), debug_info.clone());
+                        self.push(AsmInstruction::StoreHintWordI(A0, offset * F::from_canonical_u32(4)), debug_info)
                     }
                 },
                 DslIr::FriFold(m, input_ptr) => {
@@ -580,6 +580,7 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
         }
     }
 
+    /// size in words
     pub fn alloc(
         &mut self,
         ptr: Ptr<F>,
@@ -588,7 +589,7 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
         debug_info: Option<DebugInfo>,
     ) {
         // Load the current heap ptr address to the stack value and advance the heap ptr.
-        let size = F::from_canonical_usize(size);
+        let size = F::from_canonical_usize(size * 4);
         let len = len.into();
         match len {
             RVar::Const(len) => {
@@ -661,6 +662,21 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
             .push(instruction, debug_info);
     }
 
+    fn extend_to_block(
+        &mut self,
+        block_label: F,
+        instructions: Vec<AsmInstruction<F, EF>>,
+        debug_info: Option<DebugInfo>,
+    ) {
+        let basic_block = self.basic_blocks
+            .get_mut(block_label.as_canonical_u32() as usize)
+            .unwrap_or_else(|| panic!("Missing block at label: {:?}", block_label));
+
+        for instruction in instructions {
+            basic_block.push(instruction, debug_info.clone());
+        }
+    }
+
     fn push(&mut self, instruction: AsmInstruction<F, EF>, debug_info: Option<DebugInfo>) {
         self.basic_blocks
             .last_mut()
@@ -712,9 +728,9 @@ impl<'a, F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField>
         compiler.basic_block();
         let after_if_block = compiler.block_label();
 
-        // Get the branch instruction to push to the `current_block`.
-        let instr = Self::branch(lhs, rhs, is_eq, after_if_block);
-        compiler.push_to_block(current_block, instr, debug_info);
+        // Get the instructions ending in branch to push to the `current_block`.
+        let instrs = Self::branch(lhs, rhs, is_eq, after_if_block);
+        compiler.extend_to_block(current_block, instrs, debug_info.clone());
     }
 
     pub fn then_label(self, label: F, debug_info: Option<DebugInfo>) {
@@ -728,9 +744,9 @@ impl<'a, F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField>
         // Get the label for the current block.
         let current_block = compiler.block_label();
 
-        // Get the branch instruction to push to the `current_block`.
-        let instr = Self::branch(lhs, rhs, is_eq, label);
-        compiler.push_to_block(current_block, instr, debug_info);
+        // Get the instructions ending in branch to push to the `current_block`.
+        let instrs = Self::branch(lhs, rhs, is_eq, label);
+        compiler.extend_to_block(current_block, instrs, debug_info.clone());
     }
 
     pub fn then_or_else<ThenFunc, ElseFunc>(
@@ -764,8 +780,8 @@ impl<'a, F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField>
         else_f(compiler);
 
         // Generate the jump instruction to the else block
-        let instr = Self::branch(lhs, rhs, is_eq, else_block);
-        compiler.push_to_block(if_branching_block, instr, debug_info.clone());
+        let instrs = Self::branch(lhs, rhs, is_eq, else_block);
+        compiler.extend_to_block(if_branching_block, instrs, debug_info.clone());
 
         // Generate the block for returning to the main flow.
         compiler.basic_block();
@@ -774,21 +790,29 @@ impl<'a, F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField>
         compiler.push_to_block(last_if_block, instr, debug_info.clone());
     }
 
-    const fn branch(
+    fn branch(
         lhs: i32,
         rhs: ValueOrConst<F, EF>,
         is_eq: bool,
         block: F,
-    ) -> AsmInstruction<F, EF> {
+    ) -> Vec<AsmInstruction<F, EF>> {
         match (rhs, is_eq) {
-            (ValueOrConst::Const(rhs), true) => AsmInstruction::BneI(block, lhs, rhs),
-            (ValueOrConst::Const(rhs), false) => AsmInstruction::BeqI(block, lhs, rhs),
-            (ValueOrConst::ExtConst(rhs), true) => AsmInstruction::BneEI(block, lhs, rhs),
-            (ValueOrConst::ExtConst(rhs), false) => AsmInstruction::BeqEI(block, lhs, rhs),
-            (ValueOrConst::Val(rhs), true) => AsmInstruction::Bne(block, lhs, rhs),
-            (ValueOrConst::Val(rhs), false) => AsmInstruction::Beq(block, lhs, rhs),
-            (ValueOrConst::ExtVal(rhs), true) => AsmInstruction::BneE(block, lhs, rhs),
-            (ValueOrConst::ExtVal(rhs), false) => AsmInstruction::BeqE(block, lhs, rhs),
+            (ValueOrConst::Const(rhs), true) => vec![AsmInstruction::BneI(block, lhs, rhs)],
+            (ValueOrConst::Const(rhs), false) => vec![AsmInstruction::BeqI(block, lhs, rhs)],
+            (ValueOrConst::ExtConst(rhs), true) => {
+                let mut instrs = AsmCompiler::<F, EF>::imme_instructions(A0, rhs);
+                instrs.push(AsmInstruction::Bne(block, lhs, A0));
+                instrs
+            },
+            (ValueOrConst::ExtConst(rhs), false) => {
+                let mut instrs = AsmCompiler::<F, EF>::imme_instructions(A0, rhs);
+                instrs.push(AsmInstruction::Beq(block, lhs, A0));
+                instrs
+            },
+            (ValueOrConst::Val(rhs), true) => vec![AsmInstruction::Bne(block, lhs, rhs)],
+            (ValueOrConst::Val(rhs), false) => vec![AsmInstruction::Beq(block, lhs, rhs)],
+            (ValueOrConst::ExtVal(rhs), true) => vec![AsmInstruction::BneE(block, lhs, rhs)],
+            (ValueOrConst::ExtVal(rhs), false) => vec![AsmInstruction::BeqE(block, lhs, rhs)],
         }
     }
 }
@@ -912,41 +936,36 @@ impl<'a, F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField>
 
 // Ext compiler logic.
 impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCompiler<F, EF> {
-    fn assign_exti(&mut self, dst: i32, imm: EF, debug_info: Option<DebugInfo>) {
+    fn imme_instructions(dst: i32, imm: EF) -> Vec<AsmInstruction<F, EF>> {
         let imm = imm.as_base_slice();
-        for i in 0..EF::D {
-            let j = (i * self.word_size) as i32;
-            self.push(
-                AsmInstruction::AddFI(dst + j, ZERO, imm[i]),
-                debug_info.clone(),
-            );
+
+        let mut result = vec![
+            AsmInstruction::AddFI(dst, ZERO, imm[0])
+        ];
+
+        for i in 1..EF::D {
+            if imm[i] != F::zero() {
+                result.push(AsmInstruction::StoreC(i, dst, imm[i]));
+            }
+        }
+        result
+    }
+
+    fn assign_exti(&mut self, dst: i32, imm: EF, debug_info: Option<DebugInfo>) {
+        for instr in Self::imme_instructions(dst, imm) {
+            self.push(instr, debug_info.clone());
         }
     }
 
-    fn load_ext(&mut self, val: Ext<F, EF>, addr: i32, offset: F, debug_info: Option<DebugInfo>) {
-        for i in 0..EF::D {
-            self.push(
-                AsmInstruction::LoadFI(
-                    val.fp() + (i * self.word_size) as i32,
-                    addr,
-                    offset + F::from_canonical_usize(i * self.word_size),
-                ),
-                debug_info.clone(),
-            )
-        }
-    }
-
-    fn store_ext(&mut self, val: Ext<F, EF>, addr: i32, offset: F, debug_info: Option<DebugInfo>) {
-        for i in 0..EF::D {
-            self.push(
-                AsmInstruction::StoreFI(
-                    val.fp() + (i * self.word_size) as i32,
-                    addr,
-                    offset + F::from_canonical_usize(i * self.word_size),
-                ),
-                debug_info.clone(),
-            )
-        }
+    fn add_ext_felti(
+        &mut self,
+        dst: Ext<F, EF>,
+        lhs: Ext<F, EF>,
+        rhs: F,
+        debug_info: Option<DebugInfo>,
+    ) {
+        self.push(AsmInstruction::AddFI(A0, ZERO, rhs), debug_info.clone());
+        self.push(AsmInstruction::AddE(dst.fp(), lhs.fp(), A0), debug_info);
     }
 
     fn add_ext_exti(
@@ -956,14 +975,19 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
         rhs: EF,
         debug_info: Option<DebugInfo>,
     ) {
-        let rhs = rhs.as_base_slice();
-        for i in 0..EF::D {
-            let j = (i * self.word_size) as i32;
-            self.push(
-                AsmInstruction::AddFI(dst.fp() + j, lhs.fp() + j, rhs[i]),
-                debug_info.clone(),
-            );
-        }
+        self.assign_exti(A0, rhs, debug_info.clone());
+        self.push(AsmInstruction::AddE(dst.fp(), lhs.fp(), A0), debug_info);
+    }
+
+    fn mul_ext_exti(
+        &mut self,
+        dst: Ext<F, EF>,
+        lhs: Ext<F, EF>,
+        rhs: EF,
+        debug_info: Option<DebugInfo>,
+    ) {
+        self.assign_exti(A0, rhs, debug_info.clone());
+        self.push(AsmInstruction::MulE(dst.fp(), lhs.fp(), A0), debug_info);
     }
 
     fn add_ext_felt(
@@ -973,17 +997,7 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
         rhs: Felt<F>,
         debug_info: Option<DebugInfo>,
     ) {
-        self.push(
-            AsmInstruction::AddF(dst.fp(), lhs.fp(), rhs.fp()),
-            debug_info.clone(),
-        );
-        for i in 1..EF::D {
-            let j = (i * self.word_size) as i32;
-            self.push(
-                AsmInstruction::AddFI(dst.fp() + j, lhs.fp() + j, F::zero()),
-                debug_info.clone(),
-            );
-        }
+        self.push(AsmInstruction::AddE(dst.fp(), lhs.fp(), rhs.fp()), debug_info);
     }
 
     fn add_felt_exti(
@@ -993,20 +1007,8 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
         rhs: EF,
         debug_info: Option<DebugInfo>,
     ) {
-        let rhs = rhs.as_base_slice();
-
-        self.push(
-            AsmInstruction::AddFI(dst.fp(), lhs.fp(), rhs[0]),
-            debug_info.clone(),
-        );
-
-        for i in 1..EF::D {
-            let j = (i * self.word_size) as i32;
-            self.push(
-                AsmInstruction::AddFI(dst.fp() + j, ZERO, rhs[i]),
-                debug_info.clone(),
-            );
-        }
+        self.assign_exti(A0, rhs, debug_info.clone());
+        self.push(AsmInstruction::AddE(dst.fp(), lhs.fp(), A0), debug_info);
     }
 
     fn mul_ext_felt(
@@ -1016,13 +1018,7 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
         rhs: Felt<F>,
         debug_info: Option<DebugInfo>,
     ) {
-        for i in 0..EF::D {
-            let j = (i * self.word_size) as i32;
-            self.push(
-                AsmInstruction::MulF(dst.fp() + j, lhs.fp() + j, rhs.fp()),
-                debug_info.clone(),
-            );
-        }
+        self.push(AsmInstruction::MulE(dst.fp(), lhs.fp(), rhs.fp()), debug_info);
     }
 
     fn mul_ext_felti(
@@ -1032,12 +1028,7 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
         rhs: F,
         debug_info: Option<DebugInfo>,
     ) {
-        for i in 0..EF::D {
-            let j = (i * self.word_size) as i32;
-            self.push(
-                AsmInstruction::MulFI(dst.fp() + j, lhs.fp() + j, rhs),
-                debug_info.clone(),
-            );
-        }
+        self.push(AsmInstruction::AddFI(A0, ZERO, rhs), debug_info.clone());
+        self.push(AsmInstruction::MulE(dst.fp(), lhs.fp(), A0), debug_info);
     }
 }

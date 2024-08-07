@@ -14,4 +14,5 @@ impl<F: PrimeField + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> Config
     type N = F;
     type F = F;
     type EF = EF;
+    type Word = [F; 4];
 }

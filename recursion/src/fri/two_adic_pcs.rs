@@ -298,13 +298,13 @@ pub mod tests {
     };
 
     #[allow(dead_code)]
-    const WORD_SIZE: usize = 1;
+    const WORD_SIZE: usize = 4;
 
     #[allow(dead_code)]
     pub fn build_test_fri_with_cols_and_log2_rows(
         nb_cols: usize,
         nb_log2_rows: usize,
-    ) -> (Program<BabyBear>, Vec<Vec<BabyBear>>) {
+    ) -> (Program<BabyBear>, Vec<Vec<[BabyBear; 4]>>) {
         type SC = BabyBearPoseidon2Config;
         type F = Val<SC>;
         type EF = <SC as StarkGenericConfig>::Challenge;

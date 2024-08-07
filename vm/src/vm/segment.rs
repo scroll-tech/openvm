@@ -36,8 +36,8 @@ pub struct ExecutionSegment<const WORD_SIZE: usize, F: PrimeField32> {
     pub range_checker: Arc<RangeCheckerGateChip>,
     pub poseidon2_chip: Poseidon2Chip<16, F>,
     pub is_less_than_chip: IsLessThanChip<F>,
-    pub input_stream: VecDeque<Vec<F>>,
-    pub hint_stream: VecDeque<F>,
+    pub input_stream: VecDeque<Vec<[F; WORD_SIZE]>>,
+    pub hint_stream: VecDeque<[F; WORD_SIZE]>,
     pub has_execution_happened: bool,
     pub public_values: Vec<Option<F>>,
 
@@ -49,7 +49,7 @@ pub struct ExecutionSegment<const WORD_SIZE: usize, F: PrimeField32> {
 
 impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
     /// Creates a new execution segment from a program and initial state, using parent VM config
-    pub fn new(config: VmConfig, program: Program<F>, state: VirtualMachineState<F>) -> Self {
+    pub fn new(config: VmConfig, program: Program<F>, state: VirtualMachineState<WORD_SIZE, F>) -> Self {
         let decomp = config.decomp;
         let limb_bits = config.limb_bits;
 

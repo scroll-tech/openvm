@@ -17,6 +17,7 @@ backtrace = "0.3.71"
 afs-test-utils = { path = "../test-utils" }
 stark-vm = { path = "../vm" }
 strum_macros = "0.26.4"
+log = "0.4.22"
 
 [dev-dependencies]
 p3-challenger = { workspace = true }

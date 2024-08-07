@@ -5,7 +5,6 @@ use afs_compiler::{
 };
 use p3_baby_bear::BabyBear;
 use p3_field::{extension::BinomialExtensionField, AbstractField};
-use stark_vm::cpu::WORD_SIZE;
 
 fn fibonacci(n: u32) -> u32 {
     if n == 0 {
@@ -25,6 +24,8 @@ fn fibonacci(n: u32) -> u32 {
 fn main() {
     type F = BabyBear;
     type EF = BinomialExtensionField<F, 4>;
+    const WORD_SIZE: usize = 4;
+
 
     let n_val = 10;
     let mut builder = AsmBuilder::<F, EF>::default();

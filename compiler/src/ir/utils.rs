@@ -194,18 +194,32 @@ impl<C: Config> Builder<C> {
 
     /// Converts an ext to a slice of felts.
     pub fn ext2felt(&mut self, value: Ext<C::F, C::EF>) -> Array<C, Felt<C::F>> {
+        self.push(DslIr::HintFelts(value));
+
         let result = self.dyn_array(C::EF::D);
         match result {
             Array::Dyn(ptr, _) => {
-                let index = MemIndex {
-                    index: RVar::zero(),
-                    offset: 0,
-                    size: C::EF::D,
+                for i in 0..C::EF::D {
+                    let index = MemIndex {
+                        index: RVar::Const(C::N::from_canonical_usize(i)),
+                        offset: 0,
+                        size: 1,
+                    };
+                    self.push(DslIr::StoreHintWord(ptr, index));
                 };
-                self.store(ptr, index, value);
             }
             Array::Fixed(_) => unreachable!(),
         }
+
+        // SOUNDNESS: Verify the decomposition.
+        let mut reconstructed_ext: Ext<C::F, C::EF> = self.constant(C::EF::zero());
+        for i in 0..C::EF::D {
+            let felt = self.get(&result, i);
+            let monomial: Ext<C::F, C::EF> = self.constant(C::EF::monomial(i));
+            reconstructed_ext = self.eval(reconstructed_ext + monomial * felt);
+        }
+        self.assert_ext_eq(reconstructed_ext, value);
+
         result
     }
 

@@ -83,22 +83,22 @@ pub struct ExecutionAndTraceGenerationResult<const WORD_SIZE: usize> {
 
 /// Struct that holds the current state of the VM. For now, includes memory, input stream, and hint stream.
 /// Hint stream cannot be added to during execution, but must be copied because it is popped from.
-pub struct VirtualMachineState<F: PrimeField32> {
+pub struct VirtualMachineState<const WORD_SIZE: usize, F: PrimeField32> {
     /// Current state of the CPU
     state: ExecutionState,
     /// Current memory of the CPU
     memory: HashMap<(F, F), F>,
     /// Input stream of the CPU
-    input_stream: VecDeque<Vec<F>>,
+    input_stream: VecDeque<Vec<[F; WORD_SIZE]>>,
     /// Hint stream of the CPU
-    hint_stream: VecDeque<F>,
+    hint_stream: VecDeque<[F; WORD_SIZE]>,
 }
 
 impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
     /// Create a new VM with a given config, program, and input stream.
     ///
     /// The VM will start with a single segment, which is created from the initial state of the CPU.
-    pub fn new(config: VmConfig, program: Program<F>, input_stream: Vec<Vec<F>>) -> Self {
+    pub fn new(config: VmConfig, program: Program<F>, input_stream: Vec<Vec<[F; WORD_SIZE]>>) -> Self {
         let mut vm = Self {
             config,
             program,
@@ -120,7 +120,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
     /// Create a new segment with a given state.
     ///
     /// The segment will be created from the given state and the program.
-    pub fn segment(&mut self, state: VirtualMachineState<F>, cycle_tracker: CycleTracker) {
+    pub fn segment(&mut self, state: VirtualMachineState<WORD_SIZE, F>, cycle_tracker: CycleTracker) {
         tracing::debug!(
             "Creating new continuation segment for {} total segments",
             self.segments.len() + 1
@@ -132,7 +132,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
     }
 
     /// Retrieves the current state of the VM by querying the last segment.
-    pub fn current_state(&self) -> VirtualMachineState<F> {
+    pub fn current_state(&self) -> VirtualMachineState<WORD_SIZE, F> {
         let last_seg = self.segments.last().unwrap();
         VirtualMachineState {
             state: last_seg.cpu_chip.state,

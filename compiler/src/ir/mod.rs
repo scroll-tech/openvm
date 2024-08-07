@@ -21,8 +21,14 @@ mod types;
 mod utils;
 mod var;
 
+pub trait FixedArray<T>: Copy + Clone + AsRef<[T]> + AsMut<[T]> /* + (other slice traits) + private::Sealed */ {}
+impl<T: Copy, const N: usize> FixedArray<T> for [T; N] {}
+
 pub trait Config: Clone + Default {
     type N: PrimeField;
     type F: PrimeField + TwoAdicField;
     type EF: ExtensionField<Self::F> + TwoAdicField;
+
+    type Word: FixedArray<Self::F>;
 }
+

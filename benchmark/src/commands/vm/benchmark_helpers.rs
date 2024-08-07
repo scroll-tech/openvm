@@ -123,12 +123,12 @@ pub fn run_recursive_test_benchmark(
     let mut witness_stream = Vec::new();
     witness_stream.extend(input.write());
 
-    vm_benchmark_execute_and_prove::<1>(program, witness_stream, benchmark_name)
+    vm_benchmark_execute_and_prove::<4>(program, witness_stream, benchmark_name)
 }
 
 pub fn vm_benchmark_execute_and_prove<const WORD_SIZE: usize>(
     program: Program<BabyBear>,
-    input_stream: Vec<Vec<BabyBear>>,
+    input_stream: Vec<Vec<[BabyBear; WORD_SIZE]>>,
     benchmark_name: &str,
 ) -> eyre::Result<()> {
     clear_tracing_log(TMP_TRACING_LOG.as_str())?;

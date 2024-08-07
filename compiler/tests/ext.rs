@@ -7,6 +7,8 @@ use p3_baby_bear::BabyBear;
 use p3_field::{extension::BinomialExtensionField, AbstractExtensionField, AbstractField};
 use rand::{thread_rng, Rng};
 
+const WORD_SIZE: usize = 4;
+
 #[test]
 fn test_ext2felt() {
     const D: usize = 4;
@@ -28,9 +30,9 @@ fn test_ext2felt() {
     }
     builder.halt();
 
-    let program = builder.compile_isa::<1>();
+    let program = builder.compile_isa::<WORD_SIZE>();
     display_program(&program.instructions);
-    execute_program_and_generate_traces::<1>(program, vec![]);
+    execute_program_and_generate_traces::<WORD_SIZE>(program, vec![]);
 }
 
 #[test]
@@ -57,7 +59,6 @@ fn test_ext_from_base_slice() {
 
     builder.halt();
 
-    let program = builder.compile_isa::<1>();
-    display_program_with_pc(&program.instructions);
-    execute_program_and_generate_traces::<1>(program, vec![]);
+    let program = builder.compile_isa::<WORD_SIZE>();
+    execute_program_and_generate_traces::<WORD_SIZE>(program, vec![]);
 }

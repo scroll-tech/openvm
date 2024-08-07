@@ -3,7 +3,6 @@ use afs_compiler::{
     ir::{Array, Builder, Config, DIGEST_SIZE},
 };
 use p3_field::AbstractField;
-
 use super::types::{BatchOpeningVariable, TwoAdicPcsProofVariable};
 use crate::{
     fri::types::{
@@ -18,6 +17,12 @@ use crate::{
 
 type C = InnerConfig;
 
+fn emb(x: <C as Config>::F) -> <C as Config>::Word {
+    let mut word = [<C as Config>::F::zero(); 4];
+    word.as_mut()[0] = x;
+    word
+}
+
 impl Hintable<C> for InnerDigest {
     type HintVariable = DigestVariable<C>;
 
@@ -25,9 +30,9 @@ impl Hintable<C> for InnerDigest {
         builder.hint_felts()
     }
 
-    fn write(&self) -> Vec<Vec<InnerVal>> {
+    fn write(&self) -> Vec<Vec<<C as Config>::Word>> {
         let h: [InnerVal; DIGEST_SIZE] = *self;
-        vec![h.to_vec()]
+        vec![h.into_iter().map(emb).collect()]
     }
 }
 
@@ -44,11 +49,11 @@ impl Hintable<C> for Vec<InnerDigest> {
         arr
     }
 
-    fn write(&self) -> Vec<Vec<InnerVal>> {
+    fn write(&self) -> Vec<Vec<<C as Config>::Word>> {
         let mut stream = Vec::new();
 
         let len = InnerVal::from_canonical_usize(self.len());
-        stream.push(vec![len]);
+        stream.push(vec![emb(len)]);
 
         self.iter().for_each(|arr| {
             let comm = InnerDigest::write(arr);
@@ -71,7 +76,7 @@ impl Hintable<C> for InnerCommitPhaseStep {
         }
     }
 
-    fn write(&self) -> Vec<Vec<<C as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<C as Config>::Word>> {
         let mut stream = Vec::new();
 
         stream.extend(vec![self.sibling_value].write());
@@ -94,11 +99,11 @@ impl Hintable<C> for Vec<InnerCommitPhaseStep> {
         arr
     }
 
-    fn write(&self) -> Vec<Vec<<C as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<C as Config>::Word>> {
         let mut stream = Vec::new();
 
         let len = InnerVal::from_canonical_usize(self.len());
-        stream.push(vec![len]);
+        stream.push(vec![emb(len)]);
 
         self.iter().for_each(|arr| {
             let comm = InnerCommitPhaseStep::write(arr);
@@ -119,7 +124,7 @@ impl Hintable<C> for InnerQueryProof {
         }
     }
 
-    fn write(&self) -> Vec<Vec<<C as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<C as Config>::Word>> {
         let mut stream = Vec::new();
 
         stream.extend(Vec::<InnerCommitPhaseStep>::write(
@@ -143,11 +148,11 @@ impl Hintable<C> for Vec<InnerQueryProof> {
         arr
     }
 
-    fn write(&self) -> Vec<Vec<<C as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<C as Config>::Word>> {
         let mut stream = Vec::new();
 
         let len = InnerVal::from_canonical_usize(self.len());
-        stream.push(vec![len]);
+        stream.push(vec![emb(len)]);
 
         self.iter().for_each(|arr| {
             let comm = InnerQueryProof::write(arr);
@@ -174,7 +179,7 @@ impl Hintable<C> for InnerFriProof {
         }
     }
 
-    fn write(&self) -> Vec<Vec<<C as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<C as Config>::Word>> {
         let mut stream = Vec::new();
 
         stream.extend(Vec::<InnerDigest>::write(
@@ -186,7 +191,7 @@ impl Hintable<C> for InnerFriProof {
         ));
         stream.extend(Vec::<InnerQueryProof>::write(&self.query_proofs));
         stream.extend(vec![self.final_poly].write());
-        stream.push(vec![self.pow_witness]);
+        stream.push(vec![emb(self.pow_witness)]);
 
         stream
     }
@@ -204,7 +209,7 @@ impl Hintable<C> for InnerBatchOpening {
         }
     }
 
-    fn write(&self) -> Vec<Vec<<C as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<C as Config>::Word>> {
         let mut stream = Vec::new();
         stream.extend(Vec::<Vec<InnerVal>>::write(&self.opened_values));
         stream.extend(Vec::<InnerDigest>::write(&self.opening_proof));
@@ -225,11 +230,11 @@ impl Hintable<C> for Vec<InnerBatchOpening> {
         arr
     }
 
-    fn write(&self) -> Vec<Vec<<C as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<C as Config>::Word>> {
         let mut stream = Vec::new();
 
         let len = InnerVal::from_canonical_usize(self.len());
-        stream.push(vec![len]);
+        stream.push(vec![emb(len)]);
 
         self.iter().for_each(|arr| {
             let comm = InnerBatchOpening::write(arr);
@@ -253,11 +258,11 @@ impl Hintable<C> for Vec<Vec<InnerBatchOpening>> {
         arr
     }
 
-    fn write(&self) -> Vec<Vec<<C as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<C as Config>::Word>> {
         let mut stream = Vec::new();
 
         let len = InnerVal::from_canonical_usize(self.len());
-        stream.push(vec![len]);
+        stream.push(vec![emb(len)]);
 
         self.iter().for_each(|arr| {
             let comm = Vec::<InnerBatchOpening>::write(arr);
@@ -280,7 +285,7 @@ impl Hintable<C> for InnerPcsProof {
         }
     }
 
-    fn write(&self) -> Vec<Vec<<C as Config>::F>> {
+    fn write(&self) -> Vec<Vec<<C as Config>::Word>> {
         let mut stream = Vec::new();
         stream.extend(self.fri_proof.write());
         stream.extend(self.query_openings.write());

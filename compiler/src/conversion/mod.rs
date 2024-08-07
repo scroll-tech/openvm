@@ -234,8 +234,6 @@ pub fn convert_field_extension<const WORD_SIZE: usize, F: PrimeField32, EF: Exte
 fn convert_print_instruction<const WORD_SIZE: usize, F: PrimeField32, EF: ExtensionField<F>>(
     instruction: AsmInstruction<F, EF>,
 ) -> Vec<Instruction<F>> {
-    let word_size_i32 = WORD_SIZE as i32;
-
     match instruction {
         AsmInstruction::PrintV(src) => vec![inst(
             PRINTF,
@@ -255,32 +253,8 @@ fn convert_print_instruction<const WORD_SIZE: usize, F: PrimeField32, EF: Extens
         )],
         AsmInstruction::PrintE(src) => vec![
             inst(
-                PRINTF,
+                PRINTW,
                 i32_f(src),
-                F::zero(),
-                F::zero(),
-                AS::Memory,
-                AS::Immediate,
-            ),
-            inst(
-                PRINTF,
-                i32_f(src + word_size_i32),
-                F::zero(),
-                F::zero(),
-                AS::Memory,
-                AS::Immediate,
-            ),
-            inst(
-                PRINTF,
-                i32_f(src + 2 * word_size_i32),
-                F::zero(),
-                F::zero(),
-                AS::Memory,
-                AS::Immediate,
-            ),
-            inst(
-                PRINTF,
-                i32_f(src + 3 * word_size_i32),
                 F::zero(),
                 F::zero(),
                 AS::Memory,
@@ -303,7 +277,7 @@ fn convert_instruction<const WORD_SIZE: usize, F: PrimeField32, EF: ExtensionFie
 ) -> Program<F> {
     let instructions = match instruction {
         AsmInstruction::Break(_) => panic!("Unresolved break instruction"),
-        AsmInstruction::LoadFI(dst, src, offset) => vec![
+        AsmInstruction::LoadW(dst, src, offset) => vec![
             // mem[dst] <- mem[mem[src] + offset]
             inst(
                 LOADW,
@@ -314,7 +288,7 @@ fn convert_instruction<const WORD_SIZE: usize, F: PrimeField32, EF: ExtensionFie
                 AS::Memory,
             ),
         ],
-        AsmInstruction::StoreFI(val, addr, offset) => vec![
+        AsmInstruction::StoreW(val, addr, offset) => vec![
             // mem[mem[addr] + offset] <- mem[val]
             inst(
                 STOREW,
@@ -322,6 +296,17 @@ fn convert_instruction<const WORD_SIZE: usize, F: PrimeField32, EF: ExtensionFie
                 offset,
                 i32_f(addr),
                 AS::Memory,
+                AS::Memory,
+            ),
+        ],
+        AsmInstruction::StoreC(i, addr, val) => vec![
+            // mem[mem[addr] + i] <- val
+            inst(
+                STOREC,
+                i32_f(addr),
+                F::from_canonical_usize(i),
+                val,
+                AS::Immediate,
                 AS::Memory,
             ),
         ],
@@ -382,64 +367,27 @@ fn convert_instruction<const WORD_SIZE: usize, F: PrimeField32, EF: ExtensionFie
                 AS::Immediate,
             ),
         ],
-        AsmInstruction::BneE(label, lhs, rhs) => (0..EF::D)
-            .map(|i|
-            // if mem[lhs + i] != mem[rhs +i] for i = 0..4, pc <- labels[label]
+        AsmInstruction::BneE(label, lhs, rhs) => vec![
+            // if mem[lhs] != mem[rhs], pc <- labels[label]
             inst(
                 BNE,
-                i32_f(lhs + ((i * WORD_SIZE) as i32)),
-                i32_f(rhs + ((i * WORD_SIZE) as i32)),
-                labels(label) - (pc + F::from_canonical_usize(i)),
+                i32_f(lhs),
+                i32_f(rhs),
+                labels(label) - pc,
                 AS::Memory,
                 AS::Memory,
-            ))
-            .collect(),
-        AsmInstruction::BneEI(label, lhs, rhs) => (0..EF::D)
-            .map(|i|
-            // if mem[lhs + i] != rhs[i] for i = 0..4, pc <- labels[label]
+            ),
+        ],
+        AsmInstruction::BeqE(label, lhs, rhs) => vec![
             inst(
-                BNE,
-                i32_f(lhs + ((i * WORD_SIZE) as i32)),
-                rhs.as_base_slice()[i],
-                labels(label) - (pc + F::from_canonical_usize(i)),
-                AS::Memory,
-                AS::Immediate,
-            ))
-            .collect(),
-        AsmInstruction::BeqE(label, lhs, rhs) => (0..EF::D)
-            .rev()
-            .map(|i|
-            // if mem[lhs + i] == mem[rhs + i] for i = 0..4, pc <- labels[label]
-            inst(
-                if i == 0 { BEQ } else { BNE },
-                i32_f(lhs + ((i * WORD_SIZE) as i32)),
-                i32_f(rhs + ((i * WORD_SIZE) as i32)),
-                if i == 0 {
-                    labels(label) - (pc + F::from_canonical_usize(EF::D - 1))
-                } else {
-                    F::from_canonical_usize(i + 1)
-                },
+                BEQ,
+                i32_f(lhs),
+                i32_f(rhs),
+                labels(label) - pc,
                 AS::Memory,
                 AS::Memory,
-            ))
-            .collect(),
-        AsmInstruction::BeqEI(label, lhs, rhs) => (0..EF::D)
-            .rev()
-            .map(|i|
-            // if mem[lhs + i] == rhs[i] for i = 0..4, pc <- labels[label]
-            inst(
-                if i == 0 { BEQ } else { BNE },
-                i32_f(lhs + ((i * WORD_SIZE) as i32)),
-                rhs.as_base_slice()[i],
-                if i == 0 {
-                    labels(label) - (pc + F::from_canonical_usize(EF::D - 1))
-                } else {
-                    F::from_canonical_usize(i + 1)
-                },
-                AS::Memory,
-                AS::Immediate,
-            ))
-            .collect(),
+            ),
+        ],
         AsmInstruction::Trap => vec![
             // pc <- -1 (causes trace generation to fail)
             inst(
@@ -472,6 +420,14 @@ fn convert_instruction<const WORD_SIZE: usize, F: PrimeField32, EF: ExtensionFie
         )],
         AsmInstruction::HintBits(src) => vec![inst(
             HINT_BITS,
+            i32_f(src),
+            F::zero(),
+            F::zero(),
+            AS::Memory,
+            AS::Memory,
+        )],
+        AsmInstruction::HintExt2Felt(src) => vec![inst(
+            HINT_EXT2FELT,
             i32_f(src),
             F::zero(),
             F::zero(),

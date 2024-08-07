@@ -84,7 +84,7 @@ pub fn build_verification_program(
     rec_raps: Vec<&dyn DynRapForRecursion<InnerConfig>>,
     pvs: Vec<Vec<InnerVal>>,
     vparams: VerificationParams<BabyBearPoseidon2Config>,
-) -> (Program<BabyBear>, Vec<Vec<InnerVal>>) {
+) -> (Program<BabyBear>, Vec<Vec<[InnerVal; 4]>>) {
     let VerificationParams {
         vk,
         proof,
@@ -126,5 +126,5 @@ pub fn run_recursive_test(
     let vparams = make_verification_params(&any_raps, traces, &pvs, fri_params);
 
     let (program, witness_stream) = build_verification_program(rec_raps, pvs, vparams);
-    execute_and_prove_program::<1>(program, witness_stream);
+    execute_and_prove_program::<4>(program, witness_stream);
 }
