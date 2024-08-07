@@ -1,7 +1,7 @@
 ## Benchmark for VM Verifier for Fibonacci Air
 | Total Cells | Total Prove (ms) | Main Trace Gen (ms) | Perm Trace Gen (ms) | Calc Quotient Values (ms) | Rest of Prove (ms) |
 |-----------------------------|-----------------------|--------------------------|--------------------------|-----------------|----------------|
-| 181_092_352 | 46700.00 | 5070.00 | 238.00 | 5040.00 | 36352.00 |
+| 181_092_352 | 47400.00 | 5070.00 | 224.00 | 5090.00 | 37016.00 |
 
 ### AIR metrics
 | Name | Rows | Cells | Prep Cols | Main Cols | Perm Cols |
@@ -127,6 +127,6 @@
 | TERMINATE            | 27124106   |
 | FADD                 | 42647768   |
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/e0256c69831ed229cfe593c4523fcf77ee1916ea
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/4a1acd5ee5df24b4a555004e513780ed96e94610
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10290896213)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10292117222)
