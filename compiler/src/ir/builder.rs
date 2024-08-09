@@ -267,6 +267,7 @@ impl<C: Config> Builder<C> {
         self.assert_ne::<Ext<C::F, C::EF>>(lhs, rhs);
     }
 
+    /// Compares two variables.
     pub fn lt<LhsExpr: Into<SymbolicVar<C::N>>, RhsExpr: Into<SymbolicVar<C::N>>>(
         &mut self,
         lhs: LhsExpr,
@@ -278,7 +279,7 @@ impl<C: Config> Builder<C> {
         let result = self.uninit();
         let lhs = self.eval(lhs);
         let rhs = self.eval(rhs);
-        self.operations.push(DslIr::LessThan(result, lhs, rhs));
+        self.operations.push(DslIr::LessThanV(result, lhs, rhs));
         result
     }
 

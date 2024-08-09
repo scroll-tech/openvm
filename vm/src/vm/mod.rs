@@ -51,6 +51,7 @@ pub enum ChipType {
     FieldArithmetic,
     FieldExtension,
     Poseidon2,
+    IsLessThan,
 }
 
 pub struct ExecutionResult<const WORD_SIZE: usize> {

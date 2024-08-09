@@ -14,9 +14,13 @@ use poseidon2_air::poseidon2::Poseidon2Config;
 
 use super::{cycle_tracker::CycleTracker, ChipType, VirtualMachineState, VmConfig, VmMetrics};
 use crate::{
-    cpu::{trace::ExecutionError, CpuChip, CpuOptions, POSEIDON2_BUS, RANGE_CHECKER_BUS},
+    cpu::{
+        trace::ExecutionError, CpuChip, CpuOptions, IS_LESS_THAN_BUS, POSEIDON2_BUS,
+        RANGE_CHECKER_BUS,
+    },
     field_arithmetic::FieldArithmeticChip,
     field_extension::FieldExtensionArithmeticChip,
+    is_less_than::IsLessThanChip,
     memory::offline_checker::MemoryChip,
     poseidon2::Poseidon2Chip,
     program::{Program, ProgramChip},
@@ -31,6 +35,7 @@ pub struct ExecutionSegment<const WORD_SIZE: usize, F: PrimeField32> {
     pub field_extension_chip: FieldExtensionArithmeticChip<WORD_SIZE, F>,
     pub range_checker: Arc<RangeCheckerGateChip>,
     pub poseidon2_chip: Poseidon2Chip<16, F>,
+    pub is_less_than_chip: IsLessThanChip<F>,
     pub input_stream: VecDeque<Vec<F>>,
     pub hint_stream: VecDeque<F>,
     pub has_execution_happened: bool,
@@ -59,6 +64,8 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
             Poseidon2Config::<16, F>::new_p3_baby_bear_16(),
             POSEIDON2_BUS,
         );
+        let is_less_than_chip =
+            IsLessThanChip::new(IS_LESS_THAN_BUS, 30, decomp, range_checker.clone());
 
         Self {
             config,
@@ -71,6 +78,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
             field_extension_chip,
             range_checker,
             poseidon2_chip,
+            is_less_than_chip,
             input_stream: state.input_stream,
             hint_stream: state.hint_stream,
             cycle_tracker: CycleTracker::new(),
@@ -125,6 +133,10 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         if self.config.cpu_options().poseidon2_enabled() {
             result.push(self.poseidon2_chip.generate_trace());
         }
+        if self.config.cpu_options().is_less_than_enabled {
+            result.push(self.is_less_than_chip.generate_trace());
+        }
+
         result
     }
 
@@ -145,6 +157,9 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
             result += 1;
         }
         if self.config.cpu_options().poseidon2_enabled() {
+            result += 1;
+        }
+        if self.config.cpu_options().is_less_than_enabled {
             result += 1;
         }
         result
@@ -175,6 +190,9 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         }
         if self.config.cpu_options().poseidon2_enabled() {
             result.push(ChipType::Poseidon2);
+        }
+        if self.config.cpu_options().is_less_than_enabled {
+            result.push(ChipType::IsLessThan);
         }
         assert!(result.len() == self.get_num_chips());
         result
@@ -208,6 +226,10 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
             "poseidon2_chip_rows".to_string(),
             self.poseidon2_chip.rows.len(),
         );
+        metrics.insert(
+            "is_less_than_ops".to_string(),
+            self.is_less_than_chip.rows.len(),
+        );
         metrics
     }
 }
@@ -235,6 +257,9 @@ where
     }
     if segment.config.cpu_options().poseidon2_enabled() {
         result.push(Box::new(segment.poseidon2_chip.air));
+    }
+    if segment.config.cpu_options().is_less_than_enabled {
+        result.push(Box::new(segment.is_less_than_chip.air));
     }
 
     assert!(result.len() == num_chips);
