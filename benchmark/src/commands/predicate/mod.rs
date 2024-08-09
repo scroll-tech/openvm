@@ -8,11 +8,13 @@ use afs_test_utils::{
         baby_bear_bytehash::engine_from_byte_hash,
         baby_bear_keccak::BabyBearKeccakEngine,
         baby_bear_poseidon2::{self, BabyBearPoseidon2Engine},
+        baby_bear_sha256::BabyBearSha256Engine,
         goldilocks_poseidon::{self, GoldilocksPoseidonEngine},
         EngineType,
     },
     engine::StarkEngine,
     page_config::PageConfig,
+    sha256::Sha256,
 };
 use clap::Parser;
 use color_eyre::eyre::Result;
@@ -133,6 +135,11 @@ pub fn run_bench_predicate(config: &PageConfig, extra_data: String) -> Result<Tr
             let perm = baby_bear_poseidon2::default_perm();
             let engine: BabyBearPoseidon2Engine =
                 baby_bear_poseidon2::engine_from_perm(perm, pcs_log_degree, fri_params);
+            PredicateCommand::bench_all(config, &engine, extra_data)
+        }
+        EngineType::BabyBearSha256 => {
+            let engine: BabyBearSha256Engine =
+                engine_from_byte_hash(Sha256, pcs_log_degree, fri_params);
             PredicateCommand::bench_all(config, &engine, extra_data)
         }
         EngineType::GoldilocksPoseidon => {

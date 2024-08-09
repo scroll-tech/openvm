@@ -1,13 +1,17 @@
 use afs_stark_backend::config::{Com, PcsProof, PcsProverData};
 use afs_test_utils::{
     config::{
-        baby_bear_blake3::BabyBearBlake3Engine, baby_bear_bytehash::engine_from_byte_hash,
-        baby_bear_keccak::BabyBearKeccakEngine, baby_bear_poseidon2,
-        baby_bear_poseidon2::BabyBearPoseidon2Engine, goldilocks_poseidon,
-        goldilocks_poseidon::GoldilocksPoseidonEngine, EngineType,
+        baby_bear_blake3::BabyBearBlake3Engine,
+        baby_bear_bytehash::engine_from_byte_hash,
+        baby_bear_keccak::BabyBearKeccakEngine,
+        baby_bear_poseidon2::{self, BabyBearPoseidon2Engine},
+        baby_bear_sha256::BabyBearSha256Engine,
+        goldilocks_poseidon::{self, GoldilocksPoseidonEngine},
+        EngineType,
     },
     engine::StarkEngine,
     page_config::PageConfig,
+    sha256::Sha256,
 };
 use clap::{Parser, Subcommand};
 use p3_blake3::Blake3;
@@ -119,6 +123,11 @@ pub fn run(config: &PageConfig) {
             let perm = baby_bear_poseidon2::default_perm();
             let engine: BabyBearPoseidon2Engine =
                 baby_bear_poseidon2::engine_from_perm(perm, pcs_log_degree, fri_params);
+            Cli::run_with_engine(config, &engine)
+        }
+        EngineType::BabyBearSha256 => {
+            let engine: BabyBearSha256Engine =
+                engine_from_byte_hash(Sha256, pcs_log_degree, fri_params);
             Cli::run_with_engine(config, &engine)
         }
         EngineType::GoldilocksPoseidon => {

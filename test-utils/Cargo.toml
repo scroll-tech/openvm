@@ -26,6 +26,7 @@ zkhash = { workspace = true }
 itertools.workspace = true
 tracing.workspace = true
 
+openssl = { version = "0.10", optional = true } # for sha256
 serde = { version = "1.0", default-features = false, features = [
     "derive",
     "alloc",
@@ -41,3 +42,4 @@ afs-stark-backend = { path = "../stark-backend", default-features = false }
 [features]
 default = []
 parallel = ["afs-stark-backend/parallel"]
+sha256 = ["openssl/vendored"]

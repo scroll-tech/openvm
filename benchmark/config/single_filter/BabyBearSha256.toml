@@ -12,4 +12,4 @@ num_queries = 290
 proof_of_work_bits = 0
 
 [stark_engine]
-engine = "BabyBearKeccak"
+engine = "BabyBearSha256"

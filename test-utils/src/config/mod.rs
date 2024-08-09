@@ -7,6 +7,8 @@ pub mod baby_bear_blake3;
 pub mod baby_bear_bytehash;
 pub mod baby_bear_keccak;
 pub mod baby_bear_poseidon2;
+#[cfg(feature = "sha256")]
+pub mod baby_bear_sha256;
 pub mod fri_params;
 pub mod goldilocks_poseidon;
 pub mod instrument;
@@ -34,6 +36,7 @@ pub struct FriParameters {
 pub enum EngineType {
     #[default]
     BabyBearPoseidon2,
+    BabyBearSha256,
     BabyBearBlake3,
     BabyBearKeccak,
     GoldilocksPoseidon,
