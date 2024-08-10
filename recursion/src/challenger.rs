@@ -322,6 +322,8 @@ mod tests {
         let expected_result: Felt<_> = builder.eval(result);
         builder.assert_felt_eq(expected_result, element);
 
+        builder.halt();
+
         const WORD_SIZE: usize = 4;
 
         let program = builder.compile_isa::<WORD_SIZE>();

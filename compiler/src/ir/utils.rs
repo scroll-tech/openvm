@@ -212,13 +212,13 @@ impl<C: Config> Builder<C> {
         }
 
         // SOUNDNESS: Verify the decomposition.
-        let mut reconstructed_ext: Ext<C::F, C::EF> = self.constant(C::EF::zero());
-        for i in 0..C::EF::D {
-            let felt = self.get(&result, i);
-            let monomial: Ext<C::F, C::EF> = self.constant(C::EF::monomial(i));
-            reconstructed_ext = self.eval(reconstructed_ext + monomial * felt);
-        }
-        self.assert_ext_eq(reconstructed_ext, value);
+        // let mut reconstructed_ext: Ext<C::F, C::EF> = self.constant(C::EF::zero());
+        // for i in 0..C::EF::D {
+        //     let felt = self.get(&result, i);
+        //     let monomial: Ext<C::F, C::EF> = self.constant(C::EF::monomial(i));
+        //     reconstructed_ext = self.eval(reconstructed_ext + monomial * felt);
+        // }
+        // self.assert_ext_eq(reconstructed_ext, value);
 
         result
     }

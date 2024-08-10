@@ -33,7 +33,7 @@ use crate::{
     },
 };
 
-const WORD_SIZE: usize = 1;
+const WORD_SIZE: usize = 4;
 const LIMB_BITS: usize = 24;
 const DECOMP: usize = 8;
 
@@ -51,8 +51,7 @@ impl WriteOps {
             BabyBear::from_bool(true),
             self.ad_s,
             self.address,
-            self.data[0],
-        ]
+        ].into_iter().chain(self.data.into_iter()).collect()
     }
 }
 
@@ -60,7 +59,7 @@ fn run_perm_ops(
     instructions: Vec<Instruction<BabyBear>>,
     data: Vec<[BabyBear; WIDTH]>,
 ) -> (
-    VirtualMachine<1, BabyBear>,
+    VirtualMachine<WORD_SIZE, BabyBear>,
     BabyBearPoseidon2Engine,
     DummyInteractionAir,
     DummyInteractionAir,
@@ -76,7 +75,7 @@ fn run_perm_ops(
     };
 
     // default VM with poseidon2 enabled
-    let mut vm = VirtualMachine::<1, BabyBear>::new(
+    let mut vm = VirtualMachine::<WORD_SIZE, BabyBear>::new(
         VmConfig {
             field_arithmetic_enabled: true,
             field_extension_enabled: false,
@@ -138,14 +137,14 @@ fn run_perm_ops(
                 WriteOps {
                     clk: timestamp,
                     ad_s: instr.e,
-                    address: lhs + BabyBear::from_canonical_usize(j),
+                    address: lhs + BabyBear::from_canonical_usize(j * WORD_SIZE),
                     data: emb(data[i][j]),
                 }
             } else {
                 let address = if instr.opcode == COMP_POS2 {
-                    rhs + BabyBear::from_canonical_usize(j - CHUNK)
+                    rhs + BabyBear::from_canonical_usize((j - CHUNK) * WORD_SIZE)
                 } else {
-                    lhs + BabyBear::from_canonical_usize(j)
+                    lhs + BabyBear::from_canonical_usize(j * WORD_SIZE)
                 };
                 WriteOps {
                     clk: timestamp,
@@ -203,8 +202,8 @@ fn run_perm_ops(
     );
 
     // dummy writes to memory
-    let dummy_cpu_memory = DummyInteractionAir::new(5, true, MEMORY_BUS);
-    let width = 5 + 1; // why?
+    let dummy_cpu_memory = DummyInteractionAir::new(8, true, MEMORY_BUS);
+    let width = 8 + 1; // why?
     let dummy_cpu_memory_trace = RowMajorMatrix::new(
         {
             let height = write_ops.len().next_power_of_two();
@@ -356,6 +355,7 @@ fn poseidon2_direct_test() {
     });
     let mut chip = Poseidon2Chip::<16, BabyBear>::from_poseidon2_config(
         Poseidon2Config::default(),
+        WORD_SIZE,
         POSEIDON2_BUS,
     );
 

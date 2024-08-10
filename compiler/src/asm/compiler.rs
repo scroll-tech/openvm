@@ -153,7 +153,7 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
                     self.add_felt_exti(dst, lhs, rhs, debug_info);
                 }
                 DslIr::AddEFI(dst, lhs, rhs) => {
-                    self.add_ext_felti(dst, lhs, rhs, debug_info);
+                    self.add_ext_exti(dst, lhs, EF::from_base(rhs), debug_info);
                 }
                 DslIr::SubV(dst, lhs, rhs) => {
                     self.push(
@@ -1046,17 +1046,6 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
         for instr in Self::imme_instructions(dst, imm) {
             self.push(instr, debug_info.clone());
         }
-    }
-
-    fn add_ext_felti(
-        &mut self,
-        dst: Ext<F, EF>,
-        lhs: Ext<F, EF>,
-        rhs: F,
-        debug_info: Option<DebugInfo>,
-    ) {
-        self.push(AsmInstruction::AddFI(A0, ZERO, rhs), debug_info.clone());
-        self.push(AsmInstruction::AddE(dst.fp(), lhs.fp(), A0), debug_info);
     }
 
     fn add_ext_exti(
