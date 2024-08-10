@@ -1,10 +1,13 @@
 use p3_field::{Field, PrimeField32};
 use p3_matrix::dense::RowMajorMatrix;
 
-use super::{columns::{
-    FieldExtensionArithmeticAuxCols, FieldExtensionArithmeticCols,
-    FieldExtensionArithmeticIoCols,
-}, FieldExtensionArithmetic, FieldExtensionArithmeticChip, FieldExtensionArithmeticOperation};
+use super::{
+    columns::{
+        FieldExtensionArithmeticAuxCols, FieldExtensionArithmeticCols,
+        FieldExtensionArithmeticIoCols,
+    },
+    FieldExtensionArithmetic, FieldExtensionArithmeticChip, FieldExtensionArithmeticOperation,
+};
 use crate::cpu::OpCode;
 
 /// Constructs a new set of columns (including auxiliary columns) given inputs.

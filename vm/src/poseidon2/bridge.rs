@@ -1,4 +1,5 @@
 use std::iter::once;
+
 use afs_stark_backend::interaction::InteractionBuilder;
 use itertools::izip;
 use p3_field::{AbstractField, Field};
@@ -56,7 +57,11 @@ impl<const WIDTH: usize, F: Field> Poseidon2VmAir<WIDTH, F> {
             timestamp_offset += 1;
 
             let address = if i < chunks { aux.lhs } else { aux.rhs }
-                + F::from_canonical_usize(if i < chunks { i * self.word_size } else { (i - chunks) * self.word_size });
+                + F::from_canonical_usize(if i < chunks {
+                    i * self.word_size
+                } else {
+                    (i - chunks) * self.word_size
+                });
 
             let mut word = vec![AB::Expr::zero(); self.word_size];
             word[0] = aux.internal.io.input[i].into();

@@ -98,7 +98,11 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
     /// Create a new VM with a given config, program, and input stream.
     ///
     /// The VM will start with a single segment, which is created from the initial state of the CPU.
-    pub fn new(config: VmConfig, program: Program<F>, input_stream: Vec<Vec<[F; WORD_SIZE]>>) -> Self {
+    pub fn new(
+        config: VmConfig,
+        program: Program<F>,
+        input_stream: Vec<Vec<[F; WORD_SIZE]>>,
+    ) -> Self {
         let mut vm = Self {
             config,
             program,
@@ -120,7 +124,11 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
     /// Create a new segment with a given state.
     ///
     /// The segment will be created from the given state and the program.
-    pub fn segment(&mut self, state: VirtualMachineState<WORD_SIZE, F>, cycle_tracker: CycleTracker) {
+    pub fn segment(
+        &mut self,
+        state: VirtualMachineState<WORD_SIZE, F>,
+        cycle_tracker: CycleTracker,
+    ) {
         tracing::debug!(
             "Creating new continuation segment for {} total segments",
             self.segments.len() + 1

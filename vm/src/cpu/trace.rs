@@ -211,7 +211,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
                                     trace.resolve();
                                     eprintln!("{:?}", trace);
                                 }
-                           }
+                            }
                         }
                         assert_eq!($address.as_canonical_u32() % (WORD_SIZE as u32), 0);
                     }
@@ -245,7 +245,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
                                     trace.resolve();
                                     eprintln!("{:?}", trace);
                                 }
-                           }
+                            }
                         }
 
                         assert_eq!($address.as_canonical_u32() % (WORD_SIZE as u32), 0);
@@ -274,7 +274,10 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
             if opcode == FAIL {
                 return Err(ExecutionError::Fail(prev_pc));
             }
-            if opcode != PRINTF && opcode != PRINTW && !vm.options().enabled_instructions().contains(&opcode) {
+            if opcode != PRINTF
+                && opcode != PRINTW
+                && !vm.options().enabled_instructions().contains(&opcode)
+            {
                 return Err(ExecutionError::DisabledOperation(pc_usize, opcode));
             }
 

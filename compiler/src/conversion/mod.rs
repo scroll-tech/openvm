@@ -251,16 +251,14 @@ fn convert_print_instruction<const WORD_SIZE: usize, F: PrimeField32, EF: Extens
             AS::Memory,
             AS::Immediate,
         )],
-        AsmInstruction::PrintE(src) => vec![
-            inst(
-                PRINTW,
-                i32_f(src),
-                F::zero(),
-                F::zero(),
-                AS::Memory,
-                AS::Immediate,
-            ),
-        ],
+        AsmInstruction::PrintE(src) => vec![inst(
+            PRINTW,
+            i32_f(src),
+            F::zero(),
+            F::zero(),
+            AS::Memory,
+            AS::Immediate,
+        )],
         _ => panic!(
             "Illegal argument to convert_print_instruction: {:?}",
             instruction
@@ -378,16 +376,14 @@ fn convert_instruction<const WORD_SIZE: usize, F: PrimeField32, EF: ExtensionFie
                 AS::Memory,
             ),
         ],
-        AsmInstruction::BeqE(label, lhs, rhs) => vec![
-            inst(
-                BEQ,
-                i32_f(lhs),
-                i32_f(rhs),
-                labels(label) - pc,
-                AS::Memory,
-                AS::Memory,
-            ),
-        ],
+        AsmInstruction::BeqE(label, lhs, rhs) => vec![inst(
+            BEQ,
+            i32_f(lhs),
+            i32_f(rhs),
+            labels(label) - pc,
+            AS::Memory,
+            AS::Memory,
+        )],
         AsmInstruction::Trap => vec![
             // pc <- -1 (causes trace generation to fail)
             inst(

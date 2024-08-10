@@ -16,6 +16,7 @@ pub mod columns;
 pub mod trace;
 
 pub use air::CpuAir;
+
 use crate::field_extension::FieldExtensionArithmetic;
 
 pub const INST_WIDTH: usize = 1;
@@ -91,8 +92,21 @@ impl fmt::Display for OpCode {
 }
 
 pub const CORE_INSTRUCTIONS: [OpCode; 15] = [
-    LOADW, STOREW, STOREC, JAL, BEQ, BNE, TERMINATE, SHINTW, HINT_INPUT, HINT_BITS, HINT_EXT2FELT, PUBLISH, CT_START,
-    CT_END, NOP,
+    LOADW,
+    STOREW,
+    STOREC,
+    JAL,
+    BEQ,
+    BNE,
+    TERMINATE,
+    SHINTW,
+    HINT_INPUT,
+    HINT_BITS,
+    HINT_EXT2FELT,
+    PUBLISH,
+    CT_START,
+    CT_END,
+    NOP,
 ];
 pub const FIELD_ARITHMETIC_INSTRUCTIONS: [OpCode; 4] = [FADD, FSUB, FMUL, FDIV];
 pub const FIELD_EXTENSION_INSTRUCTIONS: [OpCode; 4] = [FE4ADD, FE4SUB, BBE4MUL, BBE4INV];

@@ -226,15 +226,14 @@ impl Hintable<InnerConfig> for Vec<InnerChallenge> {
     }
 
     fn write(&self) -> Vec<Vec<<InnerConfig as Config>::Word>> {
-        vec![
-            self.iter()
-                .map(|x| {
-                    let mut word = [InnerVal::zero(); WORD_SIZE];
-                    word.copy_from_slice(x.as_base_slice());
-                    word
-                })
-                .collect(),
-        ]
+        vec![self
+            .iter()
+            .map(|x| {
+                let mut word = [InnerVal::zero(); WORD_SIZE];
+                word.copy_from_slice(x.as_base_slice());
+                word
+            })
+            .collect()]
     }
 }
 
@@ -434,11 +433,29 @@ mod test {
             InnerVal::from_canonical_usize(3),
         ];
         let stream = Vec::<InnerVal>::write(&x);
-        assert_eq!(stream, vec![vec![
-            [InnerVal::from_canonical_usize(1), InnerVal::zero(), InnerVal::zero(), InnerVal::zero()],
-            [InnerVal::from_canonical_usize(2), InnerVal::zero(), InnerVal::zero(), InnerVal::zero()],
-            [InnerVal::from_canonical_usize(3), InnerVal::zero(), InnerVal::zero(), InnerVal::zero()],
-        ]]);
+        assert_eq!(
+            stream,
+            vec![vec![
+                [
+                    InnerVal::from_canonical_usize(1),
+                    InnerVal::zero(),
+                    InnerVal::zero(),
+                    InnerVal::zero()
+                ],
+                [
+                    InnerVal::from_canonical_usize(2),
+                    InnerVal::zero(),
+                    InnerVal::zero(),
+                    InnerVal::zero()
+                ],
+                [
+                    InnerVal::from_canonical_usize(3),
+                    InnerVal::zero(),
+                    InnerVal::zero(),
+                    InnerVal::zero()
+                ],
+            ]]
+        );
 
         let mut builder = AsmBuilder::<InnerVal, InnerChallenge>::default();
         let arr = Vec::<InnerVal>::read(&mut builder);
@@ -466,11 +483,29 @@ mod test {
             InnerChallenge::from_canonical_usize(3),
         ];
         let stream = Vec::<InnerChallenge>::write(&x);
-        assert_eq!(stream, vec![vec![
-            [InnerVal::from_canonical_usize(1), InnerVal::zero(), InnerVal::zero(), InnerVal::zero()],
-            [InnerVal::from_canonical_usize(2), InnerVal::zero(), InnerVal::zero(), InnerVal::zero()],
-            [InnerVal::from_canonical_usize(3), InnerVal::zero(), InnerVal::zero(), InnerVal::zero()],
-        ]]);
+        assert_eq!(
+            stream,
+            vec![vec![
+                [
+                    InnerVal::from_canonical_usize(1),
+                    InnerVal::zero(),
+                    InnerVal::zero(),
+                    InnerVal::zero()
+                ],
+                [
+                    InnerVal::from_canonical_usize(2),
+                    InnerVal::zero(),
+                    InnerVal::zero(),
+                    InnerVal::zero()
+                ],
+                [
+                    InnerVal::from_canonical_usize(3),
+                    InnerVal::zero(),
+                    InnerVal::zero(),
+                    InnerVal::zero()
+                ],
+            ]]
+        );
 
         let mut builder = AsmBuilder::<InnerVal, InnerChallenge>::default();
         let arr = Vec::<InnerChallenge>::read(&mut builder);

@@ -6,7 +6,9 @@ use p3_air::{Air, AirBuilder, BaseAir};
 use p3_field::{AbstractField, Field};
 use p3_matrix::Matrix;
 
-use super::{columns::FieldExtensionArithmeticCols, FieldExtensionArithmetic, FieldExtensionArithmeticAir};
+use super::{
+    columns::FieldExtensionArithmeticCols, FieldExtensionArithmetic, FieldExtensionArithmeticAir,
+};
 use crate::field_extension::{BETA, EXTENSION_DEGREE};
 
 impl<const WORD_SIZE: usize> AirConfig for FieldExtensionArithmeticAir<WORD_SIZE> {
@@ -19,7 +21,9 @@ impl<const WORD_SIZE: usize, F: Field> BaseAir<F> for FieldExtensionArithmeticAi
     }
 }
 
-impl<const WORD_SIZE: usize, AB: InteractionBuilder> Air<AB> for FieldExtensionArithmeticAir<WORD_SIZE> {
+impl<const WORD_SIZE: usize, AB: InteractionBuilder> Air<AB>
+    for FieldExtensionArithmeticAir<WORD_SIZE>
+{
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
 

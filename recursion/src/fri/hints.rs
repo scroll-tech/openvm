@@ -3,6 +3,7 @@ use afs_compiler::{
     ir::{Array, Builder, Config, DIGEST_SIZE},
 };
 use p3_field::AbstractField;
+
 use super::types::{BatchOpeningVariable, TwoAdicPcsProofVariable};
 use crate::{
     fri::types::{

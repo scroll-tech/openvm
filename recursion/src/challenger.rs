@@ -280,11 +280,11 @@ impl<C: Config> FeltChallenger<C> for DuplexChallengerVariable<C> {
 mod tests {
     use afs_compiler::{
         asm::{AsmBuilder, AsmConfig},
-        util::execute_program_and_generate_traces,
         ir::Felt,
+        util::execute_program_and_generate_traces,
     };
     use afs_test_utils::{
-        config::{baby_bear_poseidon2::{default_engine, BabyBearPoseidon2Config}},
+        config::baby_bear_poseidon2::{default_engine, BabyBearPoseidon2Config},
         engine::StarkEngine,
     };
     use p3_challenger::{CanObserve, CanSample};

@@ -1,7 +1,7 @@
 use afs_stark_backend::interaction::InteractionBuilder;
-use p3_field::{AbstractField};
+use p3_field::AbstractField;
 
-use super::{columns::FieldExtensionArithmeticCols, EXTENSION_DEGREE, FieldExtensionArithmeticAir};
+use super::{columns::FieldExtensionArithmeticCols, FieldExtensionArithmeticAir, EXTENSION_DEGREE};
 use crate::cpu::{FIELD_EXTENSION_BUS, MEMORY_BUS};
 
 fn eval_rw_interactions<const WORD_SIZE: usize, AB: InteractionBuilder>(
@@ -26,8 +26,8 @@ fn eval_rw_interactions<const WORD_SIZE: usize, AB: InteractionBuilder>(
         addr_space.into(),
         address.into(),
     ]
-        .into_iter()
-        .chain(data.into_iter().map(Into::into));
+    .into_iter()
+    .chain(data.into_iter().map(Into::into));
 
     if access_idx == 1 {
         builder.push_send(MEMORY_BUS, fields, aux.valid_y_read);

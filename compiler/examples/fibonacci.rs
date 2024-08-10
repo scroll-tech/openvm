@@ -26,7 +26,6 @@ fn main() {
     type EF = BinomialExtensionField<F, 4>;
     const WORD_SIZE: usize = 4;
 
-
     let n_val = 10;
     let mut builder = AsmBuilder::<F, EF>::default();
     let a: Felt<_> = builder.eval(F::zero());

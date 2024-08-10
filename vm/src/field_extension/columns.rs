@@ -1,7 +1,7 @@
 use afs_derive::AlignedBorrow;
 use p3_field::Field;
 
-use super::{EXTENSION_DEGREE, FieldExtensionArithmetic};
+use super::{FieldExtensionArithmetic, EXTENSION_DEGREE};
 
 /// Columns for field extension chip.
 ///

@@ -1,11 +1,7 @@
-use afs_compiler::{
-    asm::AsmBuilder,
-    prelude::RVar,
-};
+use afs_compiler::{asm::AsmBuilder, prelude::RVar, util::execute_program};
 use p3_baby_bear::BabyBear;
 use p3_field::extension::BinomialExtensionField;
 use rand::{thread_rng, Rng};
-use afs_compiler::util::execute_program;
 
 type F = BabyBear;
 type EF = BinomialExtensionField<BabyBear, 4>;

@@ -39,7 +39,11 @@ pub struct Poseidon2Chip<const WIDTH: usize, F: PrimeField32> {
 
 impl<const WIDTH: usize, F: PrimeField32> Poseidon2VmAir<WIDTH, F> {
     /// Construct from Poseidon2 config and bus index.
-    pub fn from_poseidon2_config(config: Poseidon2Config<WIDTH, F>, word_size: usize, bus_index: usize) -> Self {
+    pub fn from_poseidon2_config(
+        config: Poseidon2Config<WIDTH, F>,
+        word_size: usize,
+        bus_index: usize,
+    ) -> Self {
         let inner = Poseidon2Air::<WIDTH, F>::from_config(config, bus_index);
         Self {
             inner,
@@ -96,7 +100,11 @@ impl<const WIDTH: usize, F: PrimeField32> Poseidon2VmAir<WIDTH, F> {
 const WIDTH: usize = 16;
 impl<F: PrimeField32> Poseidon2Chip<WIDTH, F> {
     /// Construct from Poseidon2 config and bus index.
-    pub fn from_poseidon2_config(config: Poseidon2Config<WIDTH, F>, word_size: usize, bus_index: usize) -> Self {
+    pub fn from_poseidon2_config(
+        config: Poseidon2Config<WIDTH, F>,
+        word_size: usize,
+        bus_index: usize,
+    ) -> Self {
         let air = Poseidon2VmAir::<WIDTH, F>::from_poseidon2_config(config, word_size, bus_index);
         Self { air, rows: vec![] }
     }
@@ -143,9 +151,17 @@ impl<F: PrimeField32> Poseidon2Chip<WIDTH, F> {
 
         let input_state: [F; WIDTH] = array::from_fn(|i| {
             if i < CHUNK {
-                read(e, lhs + F::from_canonical_usize(i * WORD_SIZE), &mut timestamp)
+                read(
+                    e,
+                    lhs + F::from_canonical_usize(i * WORD_SIZE),
+                    &mut timestamp,
+                )
             } else {
-                read(e, rhs + F::from_canonical_usize((i - CHUNK) * WORD_SIZE), &mut timestamp)
+                read(
+                    e,
+                    rhs + F::from_canonical_usize((i - CHUNK) * WORD_SIZE),
+                    &mut timestamp,
+                )
             }
         });
 
@@ -162,8 +178,12 @@ impl<F: PrimeField32> Poseidon2Chip<WIDTH, F> {
         let len = if opcode == PERM_POS2 { WIDTH } else { CHUNK };
 
         for (i, &output_elem) in output.iter().enumerate().take(len) {
-            vm.memory_chip
-                .write_elem(timestamp, e, dst + F::from_canonical_usize(i * WORD_SIZE), output_elem);
+            vm.memory_chip.write_elem(
+                timestamp,
+                e,
+                dst + F::from_canonical_usize(i * WORD_SIZE),
+                output_elem,
+            );
             timestamp += 1;
         }
 

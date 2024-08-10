@@ -9,11 +9,11 @@ use afs_test_utils::{
 use p3_baby_bear::BabyBear;
 use p3_field::{ExtensionField, PrimeField, PrimeField32, TwoAdicField};
 use stark_vm::{
-    cpu::trace::Instruction,
+    cpu::trace::{ExecutionError, Instruction},
     program::Program,
     vm::{config::VmConfig, ExecutionAndTraceGenerationResult, VirtualMachine},
 };
-use stark_vm::cpu::trace::ExecutionError;
+
 use crate::{asm::AsmBuilder, conversion::CompilerOptions};
 
 pub fn execute_program_with_config<const WORD_SIZE: usize>(
@@ -53,20 +53,17 @@ pub fn execute_program<const WORD_SIZE: usize>(
         program,
         input_stream,
     );
-    match vm.execute() {
-        Err(ExecutionError::Fail(pc)) => {
-            if let Some(debug_info) = &debug_infos[pc] {
-                if let Some(trace) = &debug_info.trace {
-                    eprintln!("{:?}", trace);
-                } else {
-                    eprintln!("no backtrace");
-                }
+    if let Err(ExecutionError::Fail(pc)) = vm.execute() {
+        if let Some(debug_info) = &debug_infos[pc] {
+            if let Some(trace) = &debug_info.trace {
+                eprintln!("{:?}", trace);
             } else {
-                eprintln!("no debug info");
+                eprintln!("no backtrace");
             }
-            panic!("program failed (pc = {pc})")
+        } else {
+            eprintln!("no debug info");
         }
-        _ => {},
+        panic!("program failed (pc = {pc})")
     };
 }
 

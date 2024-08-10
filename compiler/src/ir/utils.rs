@@ -206,7 +206,7 @@ impl<C: Config> Builder<C> {
                         size: 1,
                     };
                     self.push(DslIr::StoreHintWord(ptr, index));
-                };
+                }
             }
             Array::Fixed(_) => unreachable!(),
         }

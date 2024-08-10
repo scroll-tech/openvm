@@ -145,8 +145,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> FieldExtensionArithmeticChip<WORD_
         assert_ne!(d, F::zero());
         assert_ne!(e, F::zero());
 
-        let operand1 =
-            Self::read_extension_element(vm, start_timestamp, d, op_b);
+        let operand1 = Self::read_extension_element(vm, start_timestamp, d, op_b);
         let operand2 = if opcode == OpCode::BBE4INV {
             [F::zero(); EXTENSION_DEGREE]
         } else {
@@ -155,13 +154,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> FieldExtensionArithmeticChip<WORD_
 
         let result = FieldExtensionArithmetic::solve::<F>(opcode, operand1, operand2).unwrap();
 
-        Self::write_extension_element(
-            vm,
-            start_timestamp + 2,
-            d,
-            op_a,
-            result,
-        );
+        Self::write_extension_element(vm, start_timestamp + 2, d, op_a, result);
 
         vm.field_extension_chip
             .operations
@@ -205,6 +198,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> FieldExtensionArithmeticChip<WORD_
 
         let mut word = [F::zero(); WORD_SIZE];
         word[0..EXTENSION_DEGREE].copy_from_slice(&result);
-        vm.memory_chip.write_word(timestamp, address_space, address, word);
+        vm.memory_chip
+            .write_word(timestamp, address_space, address, word);
     }
 }

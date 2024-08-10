@@ -49,7 +49,11 @@ pub struct ExecutionSegment<const WORD_SIZE: usize, F: PrimeField32> {
 
 impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
     /// Creates a new execution segment from a program and initial state, using parent VM config
-    pub fn new(config: VmConfig, program: Program<F>, state: VirtualMachineState<WORD_SIZE, F>) -> Self {
+    pub fn new(
+        config: VmConfig,
+        program: Program<F>,
+        state: VirtualMachineState<WORD_SIZE, F>,
+    ) -> Self {
         let decomp = config.decomp;
         let limb_bits = config.limb_bits;
 

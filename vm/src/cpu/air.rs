@@ -187,7 +187,9 @@ impl<const WORD_SIZE: usize, AB: AirBuilderWithPublicValues + InteractionBuilder
         self.assert_compose(&mut when_storec, read1.data, write.address.into());
 
         for i in 0..WORD_SIZE {
-            when_storec.when_ne(b, AB::Expr::from_canonical_usize(i)).assert_eq(write.data[i], read2.data[i]);
+            when_storec
+                .when_ne(b, AB::Expr::from_canonical_usize(i))
+                .assert_eq(write.data[i], read2.data[i]);
             // FIXME: assert that b = i => compose(read2.data) == write_data[i]
         }
         // FIXME: assert that b < WORD_SIZE

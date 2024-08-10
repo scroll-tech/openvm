@@ -2,12 +2,11 @@ use afs_compiler::{
     asm::{AsmBuilder, AsmCompiler, AsmConfig},
     conversion::{convert_program, CompilerOptions},
     ir::{Builder, Ext, ExtConst, Felt, SymbolicExt, Var},
-    util::execute_program_and_generate_traces,
+    util::{end_to_end_test, execute_program_and_generate_traces},
 };
 use p3_baby_bear::BabyBear;
 use p3_field::{extension::BinomialExtensionField, AbstractExtensionField, AbstractField, Field};
 use rand::{thread_rng, Rng};
-use afs_compiler::util::end_to_end_test;
 use stark_vm::{
     cpu::trace::ExecutionError::Fail,
     vm::{config::VmConfig, VirtualMachine},
@@ -256,7 +255,6 @@ fn test_ext_immediate() {
     builder.assert_ext_eq(x, (ef / f.into()).cons());
 
     builder.halt();
-
 
     let code = builder.clone().compile_asm::<WORD_SIZE>();
     println!("{}", code);

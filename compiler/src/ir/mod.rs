@@ -21,7 +21,7 @@ mod types;
 mod utils;
 mod var;
 
-pub trait FixedArray<T>: Copy + Clone + AsRef<[T]> + AsMut<[T]> /* + (other slice traits) + private::Sealed */ {}
+pub trait FixedArray<T>: Copy + Clone + AsRef<[T]> + AsMut<[T]> {}
 impl<T: Copy, const N: usize> FixedArray<T> for [T; N] {}
 
 pub trait Config: Clone + Default {
@@ -31,4 +31,3 @@ pub trait Config: Clone + Default {
 
     type Word: FixedArray<Self::F>;
 }
-
