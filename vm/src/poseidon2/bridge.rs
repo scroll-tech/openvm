@@ -1,3 +1,4 @@
+use std::iter::once;
 use afs_stark_backend::interaction::InteractionBuilder;
 use itertools::izip;
 use p3_field::{AbstractField, Field};
@@ -34,52 +35,56 @@ impl<const WIDTH: usize, F: Field> Poseidon2VmAir<WIDTH, F> {
             [aux.dst, aux.lhs, aux.rhs],
             [io.is_opcode, io.is_opcode, io.cmp]
         ) {
-            let timestamp = io.clk + AB::F::from_canonical_usize(timestamp_offset);
+            let timestamp = io.clk + F::from_canonical_usize(timestamp_offset);
             timestamp_offset += 1;
 
-            let fields = [
-                timestamp,
-                AB::Expr::from_bool(false),
-                io.d.into(),
-                io_addr.into(),
-                aux_addr.into(),
-            ];
+            let mut word = vec![AB::Expr::zero(); self.word_size];
+            word[0] = aux_addr.into();
+
+            let fields = once(timestamp)
+                .chain(once(AB::Expr::from_bool(false)))
+                .chain(once(io.d.into()))
+                .chain(once(io_addr.into()))
+                .chain(word.iter().cloned());
+
             builder.push_send(MEMORY_BUS, fields, count);
         }
 
         // READ
         for i in 0..WIDTH {
-            let timestamp = io.clk + AB::F::from_canonical_usize(timestamp_offset);
+            let timestamp = io.clk + F::from_canonical_usize(timestamp_offset);
             timestamp_offset += 1;
 
             let address = if i < chunks { aux.lhs } else { aux.rhs }
-                + F::from_canonical_usize(if i < chunks { i } else { i - chunks });
+                + F::from_canonical_usize(if i < chunks { i * self.word_size } else { (i - chunks) * self.word_size });
 
-            let fields = [
-                timestamp,
-                AB::Expr::from_bool(false),
-                io.e.into(),
-                address,
-                aux.internal.io.input[i].into(),
-            ];
+            let mut word = vec![AB::Expr::zero(); self.word_size];
+            word[0] = aux.internal.io.input[i].into();
+
+            let fields = once(timestamp)
+                .chain(once(AB::Expr::from_bool(false)))
+                .chain(once(io.e.into()))
+                .chain(once(address))
+                .chain(word.iter().cloned());
 
             builder.push_send(MEMORY_BUS, fields, io.is_opcode);
         }
 
         // WRITE
         for i in 0..WIDTH {
-            let timestamp = io.clk + AB::F::from_canonical_usize(timestamp_offset);
+            let timestamp = io.clk + F::from_canonical_usize(timestamp_offset);
             timestamp_offset += 1;
 
-            let address = aux.dst + AB::F::from_canonical_usize(i);
+            let address = aux.dst + F::from_canonical_usize(i * self.word_size);
 
-            let fields = [
-                timestamp,
-                AB::Expr::from_bool(true),
-                io.e.into(),
-                address,
-                aux.internal.io.output[i].into(),
-            ];
+            let mut word = vec![AB::Expr::zero(); self.word_size];
+            word[0] = aux.internal.io.output[i].into();
+
+            let fields = once(timestamp)
+                .chain(once(AB::Expr::from_bool(true)))
+                .chain(once(io.e.into()))
+                .chain(once(address))
+                .chain(word.iter().cloned());
 
             let count = if i < chunks {
                 io.is_opcode.into()

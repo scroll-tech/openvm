@@ -1,5 +1,5 @@
 use afs_stark_backend::interaction::InteractionBuilder;
-use p3_field::AbstractField;
+use p3_field::{AbstractField};
 
 use super::{columns::FieldExtensionArithmeticCols, EXTENSION_DEGREE, FieldExtensionArithmeticAir};
 use crate::cpu::{FIELD_EXTENSION_BUS, MEMORY_BUS};

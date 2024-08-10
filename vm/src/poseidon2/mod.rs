@@ -25,6 +25,7 @@ pub mod trace;
 /// `direct` determines whether direct interactions are enabled. By default they are on.
 pub struct Poseidon2VmAir<const WIDTH: usize, F: Clone> {
     pub inner: Poseidon2Air<WIDTH, F>,
+    pub word_size: usize,
     direct: bool, // Whether direct interactions are enabled.
 }
 
@@ -38,11 +39,12 @@ pub struct Poseidon2Chip<const WIDTH: usize, F: PrimeField32> {
 
 impl<const WIDTH: usize, F: PrimeField32> Poseidon2VmAir<WIDTH, F> {
     /// Construct from Poseidon2 config and bus index.
-    pub fn from_poseidon2_config(config: Poseidon2Config<WIDTH, F>, bus_index: usize) -> Self {
+    pub fn from_poseidon2_config(config: Poseidon2Config<WIDTH, F>, word_size: usize, bus_index: usize) -> Self {
         let inner = Poseidon2Air::<WIDTH, F>::from_config(config, bus_index);
         Self {
             inner,
             direct: true,
+            word_size,
         }
     }
 
@@ -94,8 +96,8 @@ impl<const WIDTH: usize, F: PrimeField32> Poseidon2VmAir<WIDTH, F> {
 const WIDTH: usize = 16;
 impl<F: PrimeField32> Poseidon2Chip<WIDTH, F> {
     /// Construct from Poseidon2 config and bus index.
-    pub fn from_poseidon2_config(config: Poseidon2Config<WIDTH, F>, bus_index: usize) -> Self {
-        let air = Poseidon2VmAir::<WIDTH, F>::from_poseidon2_config(config, bus_index);
+    pub fn from_poseidon2_config(config: Poseidon2Config<WIDTH, F>, word_size: usize, bus_index: usize) -> Self {
+        let air = Poseidon2VmAir::<WIDTH, F>::from_poseidon2_config(config, word_size, bus_index);
         Self { air, rows: vec![] }
     }
 

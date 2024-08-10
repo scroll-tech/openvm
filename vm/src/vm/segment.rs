@@ -62,6 +62,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         let field_extension_chip = FieldExtensionArithmeticChip::new();
         let poseidon2_chip = Poseidon2Chip::from_poseidon2_config(
             Poseidon2Config::<16, F>::new_p3_baby_bear_16(),
+            WORD_SIZE,
             POSEIDON2_BUS,
         );
         let is_less_than_chip =

@@ -939,10 +939,10 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
     fn imme_instructions(dst: i32, imm: EF) -> Vec<AsmInstruction<F, EF>> {
         let imm = imm.as_base_slice();
 
+        // Optimization for sparse extension elements when WORD_SIZE >= EXTENSION_DEGREE.
         let mut result = vec![
             AsmInstruction::AddFI(dst, ZERO, imm[0])
         ];
-
         for i in 1..EF::D {
             if imm[i] != F::zero() {
                 result.push(AsmInstruction::StoreC(i, dst, imm[i]));

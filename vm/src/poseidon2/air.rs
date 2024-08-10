@@ -43,7 +43,7 @@ impl<AB: InteractionBuilder, const WIDTH: usize> Air<AB> for Poseidon2VmAir<WIDT
         // if io.cmp is false, then constrain rhs = lhs + CHUNK
         builder.when(cols.io.is_opcode - cols.io.cmp).assert_eq(
             cols.aux.rhs,
-            cols.aux.lhs + AB::F::from_canonical_usize(CHUNK),
+            cols.aux.lhs + AB::F::from_canonical_usize(CHUNK * self.word_size),
         );
     }
 }
