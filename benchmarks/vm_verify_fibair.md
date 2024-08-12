@@ -1,7 +1,7 @@
 ## Benchmark for VM Verifier for Fibonacci Air
 | Total Cells | Total Prove (ms) | Main Trace Gen (ms) | Perm Trace Gen (ms) | Calc Quotient Values (ms) | Rest of Prove (ms) |
 |-----------------------------|-----------------------|--------------------------|--------------------------|-----------------|----------------|
-| 181_092_352 | 46500.00 | 5330.00 | 226.00 | 5030.00 | 35914.00 |
+| 181_092_352 | 46400.00 | 5310.00 | 222.00 | 5070.00 | 35798.00 |
 
 ### AIR metrics
 | Name | Rows | Cells | Prep Cols | Main Cols | Perm Cols |
@@ -22,27 +22,27 @@
 
 | Name | Value |
 |------|-------|
-| cpu_cycles           | 565503     |
+| cpu_cycles           | 565654     |
 | cpu_timestamp        | 0          |
-| field_arithmetic_ops | 284994     |
-| field_extension_ops  | 10898      |
+| field_arithmetic_ops | 285075     |
+| field_extension_ops  | 10908      |
 | is_less_than_ops     | 0          |
-| memory_chip_accesses | 1493333    |
+| memory_chip_accesses | 1493695    |
 | poseidon2_chip_rows  | 3309       |
 | range_checker_count  | 65536      |
 
 #### Opcode metrics
 | Name | Frequency | Trace Cells Contributed |
 |------|-------|-----|
-| FADD                 | 228525     | 41144619   |
+| FADD                 | 228586     | 41154806   |
 | BNE                  | 75452      | 9371216    |
 | LOADW                | 66793      | 11087638   |
 | STOREW               | 62738      | 10414436   |
-| FMUL                 | 48652      | 8321732    |
+| FMUL                 | 48672      | 8325792    |
 | SHINTW               | 33232      | 4320160    |
-| JAL                  | 11943      | 1122642    |
+| JAL                  | 12003      | 1128282    |
 | FSUB                 | 7814       | 1431010    |
-| BBE4MUL              | 5090       | 2682430    |
+| BBE4MUL              | 5100       | 2687700    |
 | HINT_INPUT           | 4769       | 276602     |
 | CT_END               | 3921       | 227418     |
 | CT_START             | 3921       | 227418     |
@@ -70,8 +70,8 @@ How many opcodes each DSL instruction generates:
 | LoadE                | 26610      |
 | LoadF                | 21698      |
 | StoreF               | 15029      |
+| IfEqI                | 13657      |
 | ImmV                 | 13643      |
-| IfEqI                | 13597      |
 | AddEFFI              | 8792       |
 | ImmF                 | 7034       |
 | AddEI                | 5420       |
@@ -80,7 +80,7 @@ How many opcodes each DSL instruction generates:
 | CycleTrackerEnd      | 3921       |
 | CycleTrackerStart    | 3921       |
 | SubVI                | 3900       |
-| MulE                 | 3818       |
+| MulE                 | 3828       |
 | AssertEqV            | 3640       |
 | SubV                 | 3502       |
 | MulV                 | 3430       |
@@ -90,8 +90,8 @@ How many opcodes each DSL instruction generates:
 | AddV                 | 2689       |
 | Poseidon2CompressBabyBear | 2678       |
 | DivE                 | 2476       |
-| AddFI                | 2129       |
-| MulF                 | 2038       |
+| AddFI                | 2190       |
+| MulF                 | 2058       |
 | AddE                 | 1678       |
 | ImmE                 | 1656       |
 | SubVIN               | 824        |
@@ -110,6 +110,6 @@ How many opcodes each DSL instruction generates:
 | MulFI                | 1          |
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/c50053c8d22b924abc4fe7d4effc37a626e42ee1
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/681e71e111a9748b4b4609da5faa36893edd277d
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10341304880)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10352942363)
