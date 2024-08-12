@@ -1,7 +1,7 @@
 ## Benchmark for VM Verifier for Fibonacci Air
 | Total Cells | Total Prove (ms) | Main Trace Gen (ms) | Perm Trace Gen (ms) | Calc Quotient Values (ms) | Rest of Prove (ms) |
 |-----------------------------|-----------------------|--------------------------|--------------------------|-----------------|----------------|
-| 181_092_352 | 46500.00 | 5340.00 | 232.00 | 5030.00 | 35898.00 |
+| 175_587_328 | 45400.00 | 5220.00 | 224.00 | 5080.00 | 34876.00 |
 
 ### AIR metrics
 | Name | Rows | Cells | Prep Cols | Main Cols | Perm Cols |
@@ -10,7 +10,7 @@
 | BabyBear>            | 16_384     | 147_456     | 7     | [1] | [8] |
 | MemoryOfflineChecker | 2_097_152  | 100_663_296 | 0     | [36] | [12] |
 | RangeCheckerGateAir  | 65_536     | 655_360     | 0     | [2] | [8] |
-| FieldArithmeticAir   | 524_288    | 11_010_048  | 0     | [13] | [8] |
+| FieldArithmeticAir   | 262_144    | 5_505_024   | 0     | [13] | [8] |
 | FieldExtensionArithmeticAir | 16_384     | 868_352     | 0     | [37] | [16] |
 | BabyBear>            | 4_096      | 1_687_552   | 0     | [380] | [32] |
 <details>
@@ -22,27 +22,27 @@
 
 | Name | Value |
 |------|-------|
-| cpu_cycles           | 565654     |
+| cpu_cycles           | 565503     |
 | cpu_timestamp        | 0          |
-| field_arithmetic_ops | 285075     |
-| field_extension_ops  | 10908      |
+| field_arithmetic_ops | 246177     |
+| field_extension_ops  | 10898      |
 | is_less_than_ops     | 0          |
-| memory_chip_accesses | 1493695    |
+| memory_chip_accesses | 1454516    |
 | poseidon2_chip_rows  | 3309       |
 | range_checker_count  | 65536      |
 
 #### Opcode metrics
 | Name | Frequency | Trace Cells Contributed |
 |------|-------|-----|
-| FADD                 | 228586     | 41154806   |
+| FADD                 | 189708     | 34662180   |
+| STOREW               | 101555     | 14063234   |
 | BNE                  | 75452      | 9371216    |
 | LOADW                | 66793      | 11087638   |
-| STOREW               | 62738      | 10414436   |
-| FMUL                 | 48672      | 8325792    |
+| FMUL                 | 48652      | 8321732    |
 | SHINTW               | 33232      | 4320160    |
-| JAL                  | 12003      | 1128282    |
+| JAL                  | 11943      | 1122642    |
 | FSUB                 | 7814       | 1431010    |
-| BBE4MUL              | 5100       | 2687700    |
+| BBE4MUL              | 5090       | 2682430    |
 | HINT_INPUT           | 4769       | 276602     |
 | CT_END               | 3921       | 227418     |
 | CT_START             | 3921       | 227418     |
@@ -70,8 +70,8 @@ How many opcodes each DSL instruction generates:
 | LoadE                | 26610      |
 | LoadF                | 21698      |
 | StoreF               | 15029      |
-| IfEqI                | 13657      |
 | ImmV                 | 13643      |
+| IfEqI                | 13597      |
 | AddEFFI              | 8792       |
 | ImmF                 | 7034       |
 | AddEI                | 5420       |
@@ -80,7 +80,7 @@ How many opcodes each DSL instruction generates:
 | CycleTrackerEnd      | 3921       |
 | CycleTrackerStart    | 3921       |
 | SubVI                | 3900       |
-| MulE                 | 3828       |
+| MulE                 | 3818       |
 | AssertEqV            | 3640       |
 | SubV                 | 3502       |
 | MulV                 | 3430       |
@@ -90,8 +90,8 @@ How many opcodes each DSL instruction generates:
 | AddV                 | 2689       |
 | Poseidon2CompressBabyBear | 2678       |
 | DivE                 | 2476       |
-| AddFI                | 2190       |
-| MulF                 | 2058       |
+| AddFI                | 2129       |
+| MulF                 | 2038       |
 | AddE                 | 1678       |
 | ImmE                 | 1656       |
 | SubVIN               | 824        |
@@ -110,6 +110,6 @@ How many opcodes each DSL instruction generates:
 | MulFI                | 1          |
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/63bd4f7aec7fb7ad96ea8ce1175cfaf24c126aff
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/9eb6614909809e967b3f7a045a13714606082389
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10355235737)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10355303773)
