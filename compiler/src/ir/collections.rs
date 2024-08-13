@@ -5,7 +5,7 @@ use itertools::Itertools;
 use p3_field::AbstractField;
 
 use super::{
-    Builder, Config, FromConstant, MemIndex, MemVariable, Ptr, RVar, SymbolicVar, Usize, Var,
+    Builder, Config, FromConstant, MemIndex, MemVariable, Ptr, RVar, Ref, SymbolicVar, Usize, Var,
     Variable,
 };
 
@@ -218,6 +218,42 @@ impl<C: Config> Builder<C> {
                 var
             }
         }
+    }
+
+    fn ptr_at<V: MemVariable<C>, I: Into<RVar<C::N>>>(
+        &mut self,
+        slice: &Array<C, V>,
+        index: I,
+    ) -> Ptr<C::N> {
+        let index = index.into();
+
+        match slice {
+            Array::Fixed(_) => {
+                panic!();
+            }
+            Array::Dyn(ptr, len) => {
+                if self.flags.debug {
+                    let valid = self.lt(index, len.clone());
+                    self.assert_var_eq(valid, C::N::one());
+                }
+                Ptr {
+                    address: self.eval(
+                        ptr.address
+                            + index * RVar::from_field(C::N::from_canonical_usize(V::size_of())),
+                    ),
+                }
+            }
+        }
+    }
+
+    pub fn get_ref<V: MemVariable<C>, I: Into<RVar<C::N>>>(
+        &mut self,
+        slice: &Array<C, V>,
+        index: I,
+    ) -> Ref<C, V> {
+        let index = index.into();
+        let ptr = self.ptr_at(slice, index);
+        Ref::from_ptr(ptr)
     }
 
     pub fn set<V: MemVariable<C>, I: Into<RVar<C::N>>, Expr: Into<V::Expression>>(
