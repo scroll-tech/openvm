@@ -1,13 +1,13 @@
 ## Benchmark for VM Verifier for Fibonacci Air
 | Total Cells | Total Prove (ms) | Main Trace Gen (ms) | Perm Trace Gen (ms) | Calc Quotient Values (ms) | Rest of Prove (ms) |
 |-----------------------------|-----------------------|--------------------------|--------------------------|-----------------|----------------|
-| 176_029_696 | 48900.00 | 5350.00 | 232.00 | 5330.00 | 37988.00 |
+| 148_242_432 | 40600.00 | 4300.00 | 178.00 | 5580.00 | 30542.00 |
 
 ### AIR metrics
 | Name | Rows | Cells | Prep Cols | Main Cols | Perm Cols |
 |------|------|-------|-----------|-----------|-----------|
-| CpuAir<1>            | 1_048_576  | 66_060_288  | 0     | [51] | [12] |
-| BabyBear>            | 65_536     | 589_824     | 7     | [1] | [8] |
+| CpuAir<1>            | 524_288    | 38_273_024  | 0     | [61] | [12] |
+| BabyBear>            | 65_536     | 589_824     | 9     | [1] | [8] |
 | MemoryOfflineChecker | 2_097_152  | 100_663_296 | 0     | [36] | [12] |
 | RangeCheckerGateAir  | 65_536     | 655_360     | 0     | [2] | [8] |
 | FieldArithmeticAir   | 262_144    | 5_505_024   | 0     | [13] | [8] |
@@ -22,56 +22,58 @@
 
 | Name | Value |
 |------|-------|
-| cpu_cycles           | 562695     |
+| cpu_cycles           | 488258     |
 | cpu_timestamp        | 0          |
-| field_arithmetic_ops | 231318     |
+| field_arithmetic_ops | 156881     |
 | field_extension_ops  | 8831       |
 | is_less_than_ops     | 0          |
-| memory_chip_accesses | 1436916    |
+| memory_chip_accesses | 1302577    |
 | poseidon2_chip_rows  | 3309       |
 | range_checker_count  | 65536      |
 
 #### Opcode metrics
 | Name | Frequency | Trace Cells Contributed |
 |------|-------|-----|
-| FADD                 | 171746     | 31640170   |
-| STOREW               | 95350      | 13479964   |
-| LOADW                | 87223      | 13743466   |
-| BNE                  | 75347      | 9357566    |
-| FMUL                 | 50102      | 8616082    |
-| SHINTW               | 33232      | 4320160    |
-| JAL                  | 11941      | 1122454    |
-| FSUB                 | 9467       | 1766569    |
-| HINT_INPUT           | 4769       | 276602     |
-| BBE4MUL              | 4676       | 2464252    |
-| CT_END               | 3921       | 227418     |
-| CT_START             | 3921       | 227418     |
-| BEQ                  | 3429       | 423486     |
-| COMP_POS2            | 2678       | 3775980    |
-| FE4ADD               | 1678       | 884306     |
-| BBE4INV              | 1239       | 474537     |
-| FE4SUB               | 1238       | 652426     |
-| PERM_POS2            | 631        | 1048722    |
-| HINT_BITS            | 104        | 6032       |
-| FDIV                 | 3          | 609        |
-| TERMINATE            | 1          | 58         |
+| FADD                 | 126928     | 24065252   |
+| BNE                  | 75347      | 10261730   |
+| STOREW               | 74004      | 10824576   |
+| LOADW                | 49216      | 8024896    |
+| LOADW2               | 38007      | 8133498    |
+| SHINTW               | 33232      | 4718944    |
+| STOREW2              | 21346      | 4568044    |
+| FMUL                 | 20483      | 3915505    |
+| JAL                  | 11941      | 1265746    |
+| FSUB                 | 9467       | 1880173    |
+| HINT_INPUT           | 4769       | 333830     |
+| BBE4MUL              | 4676       | 2520364    |
+| CT_END               | 3921       | 274470     |
+| CT_START             | 3921       | 274470     |
+| BEQ                  | 3429       | 464634     |
+| COMP_POS2            | 2678       | 3808116    |
+| FE4ADD               | 1678       | 904442     |
+| BBE4INV              | 1239       | 489405     |
+| FE4SUB               | 1238       | 667282     |
+| PERM_POS2            | 631        | 1056294    |
+| HINT_BITS            | 104        | 7280       |
+| FDIV                 | 3          | 645        |
+| TERMINATE            | 1          | 70         |
 
 ### DSL counts
 How many opcodes each DSL instruction generates:
 | Name | Count |
 |------|-------|
 | For                  | 117162     |
-| LoadV                | 64752      |
 | StoreHintWord        | 58471      |
-| StoreE               | 40412      |
 | Alloc                | 39094      |
-| StoreV               | 35464      |
+| StoreE               | 37932      |
 | AddVI                | 34417      |
-| LoadE                | 26610      |
-| LoadF                | 21698      |
-| StoreF               | 15029      |
+| LoadV                | 30112      |
+| LoadE                | 19400      |
+| LoadF                | 17279      |
+| StoreV               | 13846      |
 | ImmV                 | 13640      |
 | IfEqI                | 13597      |
+| StoreF               | 10959      |
 | ImmF                 | 7034       |
 | SubEF                | 6612       |
 | AddEI                | 5420       |
@@ -112,6 +114,6 @@ How many opcodes each DSL instruction generates:
 | MulFI                | 1          |
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/ac563852200f21e9a45aadd4b176dcd8ca6fbe6b
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/48995eaa9444f8432ee9e5c0ce4181bf7fce2c66
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10403465156)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10406542449)
