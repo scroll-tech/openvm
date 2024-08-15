@@ -7,12 +7,10 @@ use p3_field::{AbstractField, Field, TwoAdicField};
 pub use two_adic_pcs::*;
 
 use self::types::{
-    DigestVariable, DimensionsVariable, FriChallengesVariable, FriConfigVariable, FriProofVariable,
+    DimensionsVariable, FriChallengesVariable, FriConfigVariable, FriProofVariable,
     FriQueryProofVariable,
 };
-use crate::challenger::{
-    CanObserveVariable, CanSampleBitsVariable, DuplexChallengerVariable, FeltChallenger,
-};
+use crate::{challenger::ChallengerVariable, digest::DigestVariable};
 
 pub mod domain;
 pub mod hints;
@@ -24,7 +22,7 @@ pub fn verify_shape_and_sample_challenges<C: Config>(
     builder: &mut Builder<C>,
     config: &FriConfigVariable<C>,
     proof: &FriProofVariable<C>,
-    challenger: &mut DuplexChallengerVariable<C>,
+    challenger: &mut impl ChallengerVariable<C>,
 ) -> FriChallengesVariable<C> {
     let mut betas: Array<C, Ext<C::F, C::EF>> = builder.array(proof.commit_phase_commits.len());
 
@@ -32,7 +30,7 @@ pub fn verify_shape_and_sample_challenges<C: Config>(
         .range(0, proof.commit_phase_commits.len())
         .for_each(|i, builder| {
             let comm = builder.get(&proof.commit_phase_commits, i);
-            challenger.observe(builder, comm);
+            challenger.observe_digest(builder, comm);
             let sample = challenger.sample_ext(builder);
             builder.set(&mut betas, i, sample);
         });
@@ -219,6 +217,17 @@ pub fn verify_batch<C: Config>(
     opened_values: &NestedOpenedValues<C>,
     proof: &Array<C, DigestVariable<C>>,
 ) {
+    let commit = if let DigestVariable::Felt(commit) = commit {
+        commit
+    } else {
+        panic!("Expected a Felt commitment");
+    };
+    // Cast DigestVariable into the concrete type.
+    let proof: Array<C, Array<C, Felt<C::F>>> = if let Array::Dyn(ptr, len) = proof {
+        Array::Dyn(*ptr, len.clone())
+    } else {
+        panic!("Expected a dynamic array of Felt commitments");
+    };
     // The index of which table to process next.
     let index: Var<C::N> = builder.eval(C::N::zero());
 
@@ -242,7 +251,7 @@ pub fn verify_batch<C: Config>(
     let left: Ptr<C::N> = builder.uninit();
     let right: Ptr<C::N> = builder.uninit();
     builder.range(0, proof.len()).for_each(|i, builder| {
-        let sibling = builder.get_ptr(proof, i);
+        let sibling = builder.get_ptr(&proof, i);
         let bit = builder.get(&index_bits, i);
 
         builder.if_eq(bit, C::N::one()).then_or_else(

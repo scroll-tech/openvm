@@ -5,23 +5,20 @@ use p3_symmetric::Hash;
 
 use super::{
     types::{
-        DigestVariable, DimensionsVariable, FriConfigVariable, TwoAdicPcsMatsVariable,
-        TwoAdicPcsProofVariable, TwoAdicPcsRoundVariable,
+        DimensionsVariable, FriConfigVariable, TwoAdicPcsMatsVariable, TwoAdicPcsProofVariable,
+        TwoAdicPcsRoundVariable,
     },
     verify_batch, verify_challenges, verify_shape_and_sample_challenges, NestedOpenedValues,
     TwoAdicMultiplicativeCosetVariable,
 };
-use crate::{
-    challenger::{DuplexChallengerVariable, FeltChallenger},
-    commit::PcsVariable,
-};
+use crate::{challenger::ChallengerVariable, commit::PcsVariable, digest::DigestVariable};
 
 pub fn verify_two_adic_pcs<C: Config>(
     builder: &mut Builder<C>,
     config: &FriConfigVariable<C>,
     rounds: Array<C, TwoAdicPcsRoundVariable<C>>,
     proof: TwoAdicPcsProofVariable<C>,
-    challenger: &mut DuplexChallengerVariable<C>,
+    challenger: &mut impl ChallengerVariable<C>,
 ) where
     C::F: TwoAdicField,
     C::EF: TwoAdicField,
@@ -227,7 +224,7 @@ where
         }
 
         Self {
-            batch_commit: commit,
+            batch_commit: DigestVariable::Felt(commit),
             mats,
         }
     }
@@ -238,7 +235,7 @@ pub struct TwoAdicFriPcsVariable<C: Config> {
     pub config: FriConfigVariable<C>,
 }
 
-impl<C: Config> PcsVariable<C, DuplexChallengerVariable<C>> for TwoAdicFriPcsVariable<C>
+impl<C: Config> PcsVariable<C> for TwoAdicFriPcsVariable<C>
 where
     C::F: TwoAdicField,
     C::EF: TwoAdicField,
@@ -263,7 +260,7 @@ where
         builder: &mut Builder<C>,
         rounds: Array<C, TwoAdicPcsRoundVariable<C>>,
         proof: Self::Proof,
-        challenger: &mut DuplexChallengerVariable<C>,
+        challenger: &mut impl ChallengerVariable<C>,
     ) {
         verify_two_adic_pcs(builder, &self.config, rounds, proof, challenger)
     }
@@ -287,8 +284,9 @@ pub mod tests {
     use stark_vm::program::Program;
 
     use crate::{
-        challenger::{CanObserveVariable, DuplexChallengerVariable, FeltChallenger},
+        challenger::{duplex::DuplexChallengerVariable, CanObserveDigest, FeltChallenger},
         commit::PcsVariable,
+        digest::DigestVariable,
         fri::{
             types::TwoAdicPcsRoundVariable, TwoAdicFriPcsVariable,
             TwoAdicMultiplicativeCosetVariable,
@@ -375,8 +373,8 @@ pub mod tests {
         let proofvar = InnerPcsProof::read(&mut builder);
         let mut challenger = DuplexChallengerVariable::new(&mut builder);
         let commit = <[InnerVal; DIGEST_SIZE]>::from(commit).to_vec();
-        let commit = builder.constant::<Array<_, _>>(commit);
-        challenger.observe(&mut builder, commit);
+        let commit = DigestVariable::Felt(builder.constant::<Array<_, _>>(commit));
+        challenger.observe_digest(&mut builder, commit);
         challenger.sample_ext(&mut builder);
         pcs_var.verify(&mut builder, rounds, proofvar, &mut challenger);
         builder.halt();
