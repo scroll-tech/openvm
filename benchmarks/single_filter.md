@@ -1,7 +1,7 @@
 ## Benchmark for Predicate
 | Total Cells | Total Prove (ms) | Main Trace Gen (ms) | Perm Trace Gen (ms) | Calc Quotient Values (ms) | Rest of Prove (ms) |
 |-----------------------------|-----------------------|--------------------------|--------------------------|-----------------|----------------|
-| 19_726_336 | 714.00 | 211.00 | 8.21 | 32.90 | 461.89 |
+| 19_726_336 | 720.00 | 211.00 | 8.08 | 33.40 | 467.52 |
 
 ### AIR metrics
 | Name | Rows | Cells | Prep Cols | Main Cols | Perm Cols |
@@ -10,6 +10,6 @@
 | PageIndexScanOutputAir | 32_768     | 8_716_288   | 0     | [97, 97] | [72] |
 | RangeCheckerGateAir  | 65_536     | 655_360     | 0     | [2] | [8] |
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/c26c3616c6f967cde4c6929fa9f3c45224b68782
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/6dc17a7933096a40ce24a01688655b821c151d2f
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10386616270)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10398813264)
