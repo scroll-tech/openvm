@@ -1,3 +1,4 @@
+use core::panic;
 use std::fmt;
 
 use enum_utils::FromStr;
@@ -28,7 +29,7 @@ pub const POSEIDON2_BUS: usize = 5;
 pub const POSEIDON2_DIRECT_BUS: usize = 6;
 pub const IS_LESS_THAN_BUS: usize = 7;
 
-pub const CPU_MAX_READS_PER_CYCLE: usize = 2;
+pub const CPU_MAX_READS_PER_CYCLE: usize = 3;
 pub const CPU_MAX_WRITES_PER_CYCLE: usize = 1;
 pub const CPU_MAX_ACCESSES_PER_CYCLE: usize = CPU_MAX_READS_PER_CYCLE + CPU_MAX_WRITES_PER_CYCLE;
 
@@ -76,6 +77,9 @@ pub enum OpCode {
     /// Phantom instruction to end tracing
     CT_END = 61,
 
+    LOADW2 = 70,
+    STOREW2 = 71,
+
     NOP = 100,
 }
 
@@ -85,9 +89,9 @@ impl fmt::Display for OpCode {
     }
 }
 
-pub const CORE_INSTRUCTIONS: [OpCode; 13] = [
+pub const CORE_INSTRUCTIONS: [OpCode; 15] = [
     LOADW, STOREW, JAL, BEQ, BNE, TERMINATE, SHINTW, HINT_INPUT, HINT_BITS, PUBLISH, CT_START,
-    CT_END, NOP,
+    CT_END, NOP, LOADW2, STOREW2,
 ];
 pub const FIELD_ARITHMETIC_INSTRUCTIONS: [OpCode; 4] = [FADD, FSUB, FMUL, FDIV];
 pub const FIELD_EXTENSION_INSTRUCTIONS: [OpCode; 4] = [FE4ADD, FE4SUB, BBE4MUL, BBE4INV];
@@ -110,29 +114,31 @@ impl OpCode {
     }
 }
 
-fn max_accesses_per_instruction(opcode: OpCode) -> usize {
+fn timestamp_delta(opcode: OpCode) -> usize {
+    // If an instruction performs a writes, it must change timestamp by WRITE_DELTA.
+    const WRITE_DELTA: usize = CPU_MAX_READS_PER_CYCLE + 1;
     match opcode {
-        LOADW | STOREW => 3,
+        LOADW | STOREW | LOADW2 | STOREW2 => WRITE_DELTA,
         // JAL only does WRITE, but it is done as timestamp + 2
-        JAL => 3,
+        JAL => WRITE_DELTA,
         BEQ | BNE => 2,
         TERMINATE => 0,
         PUBLISH => 2,
-        opcode if FIELD_ARITHMETIC_INSTRUCTIONS.contains(&opcode) => 3,
+        opcode if FIELD_ARITHMETIC_INSTRUCTIONS.contains(&opcode) => WRITE_DELTA,
         opcode if FIELD_EXTENSION_INSTRUCTIONS.contains(&opcode) => {
             FieldExtensionArithmeticAir::max_accesses_per_instruction(opcode)
         }
-        F_LESS_THAN => 3,
+        F_LESS_THAN => WRITE_DELTA,
         FAIL => 0,
         PRINTF => 1,
         COMP_POS2 | PERM_POS2 => {
             Poseidon2Chip::<16, BabyBear>::max_accesses_per_instruction(opcode)
         }
-        SHINTW => 3,
+        SHINTW => WRITE_DELTA,
         HINT_INPUT | HINT_BITS => 0,
         CT_START | CT_END => 0,
         NOP => 0,
-        _ => panic!(),
+        _ => panic!("Unknown opcode: {:?}", opcode),
     }
 }
 
