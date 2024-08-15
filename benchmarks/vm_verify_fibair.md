@@ -1,7 +1,7 @@
 ## Benchmark for VM Verifier for Fibonacci Air
 | Total Cells | Total Prove (ms) | Main Trace Gen (ms) | Perm Trace Gen (ms) | Calc Quotient Values (ms) | Rest of Prove (ms) |
 |-----------------------------|-----------------------|--------------------------|--------------------------|-----------------|----------------|
-| 148_242_432 | 40300.00 | 4290.00 | 168.00 | 5510.00 | 30332.00 |
+| 148_242_432 | 40800.00 | 4320.00 | 170.00 | 5600.00 | 30710.00 |
 
 ### AIR metrics
 | Name | Rows | Cells | Prep Cols | Main Cols | Perm Cols |
@@ -22,19 +22,19 @@
 
 | Name | Value |
 |------|-------|
-| cpu_cycles           | 487843     |
+| cpu_cycles           | 493209     |
 | cpu_timestamp        | 0          |
-| field_arithmetic_ops | 156469     |
+| field_arithmetic_ops | 161835     |
 | field_extension_ops  | 8831       |
 | is_less_than_ops     | 0          |
-| memory_chip_accesses | 1301747    |
+| memory_chip_accesses | 1312479    |
 | poseidon2_chip_rows  | 3309       |
 | range_checker_count  | 65536      |
 
 #### Opcode metrics
 | Name | Frequency | Trace Cells Contributed |
 |------|-------|-----|
-| FADD                 | 126928     | 24065252   |
+| FADD                 | 132294     | 25025766   |
 | BNE                  | 75347      | 10261730   |
 | STOREW               | 74001      | 10824258   |
 | LOADW                | 49216      | 8024896    |
@@ -64,9 +64,9 @@ How many opcodes each DSL instruction generates:
 |------|-------|
 | For                  | 117162     |
 | StoreHintWord        | 58471      |
+| AddVI                | 39783      |
 | Alloc                | 39094      |
 | StoreE               | 37932      |
-| AddVI                | 34417      |
 | LoadV                | 30112      |
 | LoadE                | 19400      |
 | LoadF                | 17279      |
@@ -114,6 +114,6 @@ How many opcodes each DSL instruction generates:
 | MulFI                | 1          |
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/33dad0441967a8c3846a66f9abeca39211c9973e
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/66b459a760da07a1074b762d7b1d1d445ef81217
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10410874778)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10411684880)
