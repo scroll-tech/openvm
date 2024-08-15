@@ -1,7 +1,7 @@
 ## Benchmark for ReadWrite
 | Total Cells | Total Prove (ms) | Main Trace Gen (ms) | Perm Trace Gen (ms) | Calc Quotient Values (ms) | Rest of Prove (ms) |
 |-----------------------------|-----------------------|--------------------------|--------------------------|-----------------|----------------|
-| 38_764_544 | 1500.00 | 291.00 | 20.50 | 172.00 | 1016.50 |
+| 38_764_544 | 1500.00 | 289.00 | 20.90 | 173.00 | 1017.10 |
 
 ### AIR metrics
 | Name | Rows | Cells | Prep Cols | Main Cols | Perm Cols |
@@ -12,6 +12,6 @@
 | RangeCheckerGateAir  | 65_536     | 655_360     | 0     | [2] | [8] |
 | ExecutionAir         | 32_768     | 1_409_024   | 0     | [35] | [8] |
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/ac563852200f21e9a45aadd4b176dcd8ca6fbe6b
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/48995eaa9444f8432ee9e5c0ce4181bf7fce2c66
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10403465194)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10406542441)
