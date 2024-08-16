@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use itertools::Itertools;
-use num_bigint::BigUint;
+use num_bigint_dig::BigUint;
 use p3_air::BaseAir;
 use p3_field::PrimeField64;
 use p3_matrix::dense::RowMajorMatrix;
@@ -44,8 +44,8 @@ impl<F: PrimeField64> LocalTraceInstructions<F> for ModularMultiplicationBigIntA
 
     fn generate_trace_row(&self, input: Self::LocalInput) -> Self::Cols<F> {
         let (a, b, range_checker) = input;
-        assert!(a.bits() <= self.total_bits as u64);
-        assert!(b.bits() <= self.total_bits as u64);
+        assert!(a.bits() <= self.total_bits);
+        assert!(b.bits() <= self.total_bits);
 
         let range_check = |bits: usize, value: usize| {
             let value = value as u32;

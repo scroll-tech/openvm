@@ -18,10 +18,12 @@ backtrace = "0.3.71"
 afs-test-utils = { path = "../test-utils" }
 stark-vm = { path = "../vm" }
 strum_macros = "0.26.4"
-# disable jemalloc to be campatibel with with afs-starkbackend
-snark-verifier-sdk = { workspace = true }
 num-bigint = "0.4.6"
+num-bigint-dig = "0.8.4"
 num-integer = "0.1.46"
+num-traits = "0.2.19"
+# disable jemalloc to be compatible with afs-starkbackend
+snark-verifier-sdk = { workspace = true }
 zkhash = { workspace = true }
 
 [dev-dependencies]

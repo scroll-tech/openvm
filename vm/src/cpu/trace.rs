@@ -20,6 +20,7 @@ use crate::{
     cpu::trace::ExecutionError::{PublicValueIndexOutOfBounds, PublicValueNotEqual},
     field_extension::{columns::FieldExtensionArithmeticCols, FieldExtensionArithmeticChip},
     memory::{compose, decompose},
+    modular_multiplication::ModularMultiplicationChip,
     poseidon2::{columns::Poseidon2VmCols, Poseidon2Chip},
     program::columns::ProgramPreprocessedCols,
     vm::ExecutionSegment,
@@ -376,6 +377,9 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
                 }
                 FE4ADD | FE4SUB | BBE4MUL | BBE4INV => {
                     FieldExtensionArithmeticChip::calculate(vm, timestamp, instruction);
+                }
+                MOD_SECP256K1_ADD | MOD_SECP256K1_SUB | MOD_SECP256K1_MUL | MOD_SECP256K1_DIV => {
+                    ModularMultiplicationChip::calculate(vm, timestamp, instruction);
                 }
                 PERM_POS2 | COMP_POS2 => {
                     Poseidon2Chip::<16, _>::calculate(vm, timestamp, instruction);

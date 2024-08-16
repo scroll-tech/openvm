@@ -13,16 +13,14 @@ use p3_matrix::{
     Matrix,
 };
 
-use super::{
-    columns::MemoryAccessCols,
-    trace::{isize_to_field, Instruction},
-    OpCode::*,
-    ARITHMETIC_BUS, CPU_MAX_READS_PER_CYCLE, MEMORY_BUS, READ_INSTRUCTION_BUS,
-};
+use super::{timestamp_delta, CPU_MAX_READS_PER_CYCLE};
 use crate::{
     cpu::{
-        columns::{CpuCols, CpuIoCols},
-        timestamp_delta, CpuChip, CpuOptions,
+        columns::{CpuCols, CpuIoCols, MemoryAccessCols},
+        trace::{isize_to_field, Instruction},
+        CpuChip, CpuOptions,
+        OpCode::*,
+        ARITHMETIC_BUS, MEMORY_BUS, READ_INSTRUCTION_BUS,
     },
     field_arithmetic::ArithmeticOperation,
     memory::{decompose, MemoryAccess, OpType},
@@ -86,6 +84,7 @@ fn test_flatten_fromslice_roundtrip() {
         perm_poseidon2_enabled: false,
         num_public_values: 4,
         is_less_than_enabled: false,
+        modular_arithmetic_enabled: false,
     };
     let num_cols = CpuCols::<TEST_WORD_SIZE, usize>::get_width(options);
     let all_cols = (0..num_cols).collect::<Vec<usize>>();

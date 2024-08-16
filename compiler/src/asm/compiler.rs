@@ -285,6 +285,30 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
                 DslIr::MulEFI(dst, lhs, rhs) => {
                     self.mul_ext_felti(dst, lhs, rhs, debug_info);
                 }
+                DslIr::AddM(dst, lhs, rhs) => {
+                    self.push(
+                        AsmInstruction::AddMSecp256k1(dst.ptr_fp(), lhs.ptr_fp(), rhs.ptr_fp()),
+                        debug_info,
+                    );
+                }
+                DslIr::SubM(dst, lhs, rhs) => {
+                    self.push(
+                        AsmInstruction::SubMSecp256k1(dst.ptr_fp(), lhs.ptr_fp(), rhs.ptr_fp()),
+                        debug_info,
+                    );
+                }
+                DslIr::MulM(dst, lhs, rhs) => {
+                    self.push(
+                        AsmInstruction::MulMSecp256k1(dst.ptr_fp(), lhs.ptr_fp(), rhs.ptr_fp()),
+                        debug_info,
+                    );
+                }
+                DslIr::DivM(dst, lhs, rhs) => {
+                    self.push(
+                        AsmInstruction::DivMSecp256k1(dst.ptr_fp(), lhs.ptr_fp(), rhs.ptr_fp()),
+                        debug_info,
+                    );
+                }
                 DslIr::LessThanV(dst, lhs, rhs) => {
                     self.push(
                         AsmInstruction::LessThanF(dst.fp(), lhs.fp(), rhs.fp()),

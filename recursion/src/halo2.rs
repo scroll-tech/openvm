@@ -163,8 +163,8 @@ mod tests {
         let mut value_u32 = 1345237507;
         let value = builder.eval(Bn254Fr::from_canonical_u32(value_u32));
         let result = builder.num2bits_v_circuit(value, 32);
-        for i in 0..result.len() {
-            builder.assert_var_eq(result[i], Bn254Fr::from_canonical_u32(value_u32 & 1));
+        for r in result {
+            builder.assert_var_eq(r, Bn254Fr::from_canonical_u32(value_u32 & 1));
             value_u32 >>= 1;
         }
 

@@ -47,6 +47,7 @@ pub fn execute_program<const WORD_SIZE: usize>(
         VmConfig {
             num_public_values: 4,
             max_segment_len: (1 << 25) - 100,
+            modular_multiplication_enabled: true,
             ..Default::default()
         },
         program,

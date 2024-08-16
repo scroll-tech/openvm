@@ -1,12 +1,16 @@
 use core::panic;
 use std::fmt;
 
+pub use air::CpuAir;
 use enum_utils::FromStr;
 use p3_baby_bear::BabyBear;
 use p3_field::PrimeField32;
 use OpCode::*;
 
-use crate::{field_extension::FieldExtensionArithmeticAir, poseidon2::Poseidon2Chip};
+use crate::{
+    field_extension::FieldExtensionArithmeticAir,
+    modular_multiplication::air::ModularMultiplicationVmAir, poseidon2::Poseidon2Chip,
+};
 
 #[cfg(test)]
 pub mod tests;
@@ -15,8 +19,6 @@ pub mod air;
 pub mod bridge;
 pub mod columns;
 pub mod trace;
-
-pub use air::CpuAir;
 
 pub const INST_WIDTH: usize = 1;
 
@@ -41,11 +43,14 @@ pub const WORD_SIZE: usize = 1;
 pub enum OpCode {
     LOADW = 0,
     STOREW = 1,
-    JAL = 2,
-    BEQ = 3,
-    BNE = 4,
-    TERMINATE = 5,
-    PUBLISH = 6,
+    LOADW2 = 2,
+    STOREW2 = 3,
+    JAL = 4,
+    BEQ = 5,
+    BNE = 6,
+    TERMINATE = 7,
+    PUBLISH = 8,
+
     FADD = 10,
     FSUB = 11,
     FMUL = 12,
@@ -77,8 +82,10 @@ pub enum OpCode {
     /// Phantom instruction to end tracing
     CT_END = 61,
 
-    LOADW2 = 70,
-    STOREW2 = 71,
+    MOD_SECP256K1_ADD = 70,
+    MOD_SECP256K1_SUB = 71,
+    MOD_SECP256K1_MUL = 72,
+    MOD_SECP256K1_DIV = 73,
 
     NOP = 100,
 }
@@ -95,6 +102,12 @@ pub const CORE_INSTRUCTIONS: [OpCode; 15] = [
 ];
 pub const FIELD_ARITHMETIC_INSTRUCTIONS: [OpCode; 4] = [FADD, FSUB, FMUL, FDIV];
 pub const FIELD_EXTENSION_INSTRUCTIONS: [OpCode; 4] = [FE4ADD, FE4SUB, BBE4MUL, BBE4INV];
+pub const MODULAR_ARITHMETIC_INSTRUCTIONS: [OpCode; 4] = [
+    MOD_SECP256K1_ADD,
+    MOD_SECP256K1_SUB,
+    MOD_SECP256K1_MUL,
+    MOD_SECP256K1_DIV,
+];
 
 impl OpCode {
     pub fn all_opcodes() -> Vec<OpCode> {
@@ -128,6 +141,9 @@ fn timestamp_delta(opcode: OpCode) -> usize {
         opcode if FIELD_EXTENSION_INSTRUCTIONS.contains(&opcode) => {
             FieldExtensionArithmeticAir::max_accesses_per_instruction(opcode)
         }
+        opcode if MODULAR_ARITHMETIC_INSTRUCTIONS.contains(&opcode) => {
+            ModularMultiplicationVmAir::max_accesses_per_instruction(opcode)
+        }
         F_LESS_THAN => WRITE_DELTA,
         FAIL => 0,
         PRINTF => 1,
@@ -150,6 +166,7 @@ pub struct CpuOptions {
     pub perm_poseidon2_enabled: bool,
     pub is_less_than_enabled: bool,
     pub num_public_values: usize,
+    pub modular_arithmetic_enabled: bool,
 }
 
 #[derive(Default, Clone, Copy)]
@@ -173,6 +190,9 @@ impl CpuOptions {
         }
         if self.field_arithmetic_enabled {
             result.extend(FIELD_ARITHMETIC_INSTRUCTIONS);
+        }
+        if self.modular_arithmetic_enabled {
+            result.extend(MODULAR_ARITHMETIC_INSTRUCTIONS);
         }
         if self.compress_poseidon2_enabled {
             result.push(COMP_POS2);

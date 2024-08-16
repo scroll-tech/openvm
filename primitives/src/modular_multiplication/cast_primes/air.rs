@@ -2,7 +2,7 @@ use std::{cmp::min, collections::HashSet};
 
 use afs_stark_backend::interaction::InteractionBuilder;
 use itertools::Itertools;
-use num_bigint::BigUint;
+use num_bigint_dig::BigUint;
 use num_traits::{One, ToPrimitive};
 use p3_air::{Air, BaseAir};
 use p3_field::{AbstractField, Field, PrimeField64};
@@ -67,7 +67,7 @@ impl<F: PrimeField64> ModularMultiplicationPrimesAir<F> {
         assert!(small_modulus_bits <= decomp);
         assert!(quotient_bits <= decomp);
         // `total_bits` should be sufficient to represent numbers 0..`modulus`
-        assert!(total_bits >= (modulus.clone() - BigUint::one()).bits() as usize);
+        assert!(total_bits >= (modulus.clone() - BigUint::one()).bits());
         assert!(small_modulus_limit <= (1 << small_modulus_bits));
 
         let mut io_limb_sizes = vec![];

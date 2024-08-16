@@ -1,8 +1,4 @@
-use afs_compiler::{
-    asm::{AsmBuilder, AsmCompiler},
-    ir::Var,
-    util::execute_program_and_generate_traces,
-};
+use afs_compiler::{asm::AsmBuilder, ir::Var, util::execute_program_and_generate_traces};
 use p3_baby_bear::BabyBear;
 use p3_field::{extension::BinomialExtensionField, AbstractField};
 

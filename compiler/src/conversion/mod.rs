@@ -704,6 +704,38 @@ fn convert_instruction<const WORD_SIZE: usize, F: PrimeField32, EF: ExtensionFie
             AS::Memory,
             AS::Memory,
         )],
+        AsmInstruction::AddMSecp256k1(dst, src1, src2) => vec![inst(
+            MOD_SECP256K1_ADD,
+            i32_f(src1),
+            i32_f(src2),
+            i32_f(dst),
+            AS::Memory,
+            AS::Memory,
+        )],
+        AsmInstruction::SubMSecp256k1(dst, src1, src2) => vec![inst(
+            MOD_SECP256K1_SUB,
+            i32_f(src1),
+            i32_f(dst),
+            i32_f(src2),
+            AS::Memory,
+            AS::Memory,
+        )],
+        AsmInstruction::MulMSecp256k1(dst, src1, src2) => vec![inst(
+            MOD_SECP256K1_MUL,
+            i32_f(src1),
+            i32_f(src2),
+            i32_f(dst),
+            AS::Memory,
+            AS::Memory,
+        )],
+        AsmInstruction::DivMSecp256k1(dst, src1, src2) => vec![inst(
+            MOD_SECP256K1_DIV,
+            i32_f(src1),
+            i32_f(dst),
+            i32_f(src2),
+            AS::Memory,
+            AS::Memory,
+        )],
         AsmInstruction::CycleTrackerStart(name) => {
             if options.enable_cycle_tracker {
                 vec![dbg(CT_START, name)]
