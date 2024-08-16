@@ -475,10 +475,32 @@ fn convert_instruction<F: PrimeField32, EF: ExtensionField<F>>(
                 AS::Memory,
             ),
         ],
+        AsmInstruction::BneInc(label, lhs, rhs) => vec![
+            // if mem[lhs] != mem[rhs], pc <- labels[label]
+            inst(
+                BNEINC,
+                i32_f(lhs),
+                i32_f(rhs),
+                labels(label) - pc,
+                AS::Memory,
+                AS::Memory,
+            ),
+        ],
         AsmInstruction::BneI(label, lhs, rhs) => vec![
             // if mem[lhs] != rhs, pc <- labels[label]
             inst(
                 BNE,
+                i32_f(lhs),
+                rhs,
+                labels(label) - pc,
+                AS::Memory,
+                AS::Immediate,
+            ),
+        ],
+        AsmInstruction::BneIInc(label, lhs, rhs) => vec![
+            // if mem[lhs] != mem[rhs], pc <- labels[label]
+            inst(
+                BNEINC,
                 i32_f(lhs),
                 rhs,
                 labels(label) - pc,

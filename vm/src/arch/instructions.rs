@@ -81,6 +81,8 @@ pub enum Opcode {
 
     SECP256K1_EC_ADD_NE = 101,
     SECP256K1_EC_DOUBLE = 102,
+
+    BNEINC = 200,
 }
 
 impl fmt::Display for Opcode {
@@ -89,9 +91,9 @@ impl fmt::Display for Opcode {
     }
 }
 
-pub const CORE_INSTRUCTIONS: [Opcode; 17] = [
+pub const CORE_INSTRUCTIONS: [Opcode; 18] = [
     LOADW, STOREW, JAL, BEQ, BNE, TERMINATE, PRINTF, SHINTW, HINT_INPUT, HINT_BITS, HINT_BYTES,
-    PUBLISH, CT_START, CT_END, NOP, LOADW2, STOREW2,
+    PUBLISH, CT_START, CT_END, NOP, LOADW2, STOREW2, BNEINC,
 ];
 pub const FIELD_ARITHMETIC_INSTRUCTIONS: [Opcode; 4] = [FADD, FSUB, FMUL, FDIV];
 pub const FIELD_EXTENSION_INSTRUCTIONS: [Opcode; 4] = [FE4ADD, FE4SUB, BBE4MUL, BBE4DIV];

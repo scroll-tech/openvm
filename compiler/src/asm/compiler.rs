@@ -917,11 +917,16 @@ impl<'a, F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField>
         // The loop body.
         f(self.loop_var, self.compiler);
 
-        // Increment the loop variable.
-        self.compiler.push(
-            AsmInstruction::AddFI(self.loop_var.fp(), self.loop_var.fp(), self.step_size),
-            debug_info.clone(),
-        );
+        // If the step size is just one, compile to the optimized branch instruction.
+        if self.step_size == F::one() {
+            self.jump_to_loop_body_inc(loop_label, None);
+        } else {
+            // Increment the loop variable.
+            self.compiler.push(
+                AsmInstruction::AddFI(self.loop_var.fp(), self.loop_var.fp(), self.step_size),
+                None,
+            );
+        }
 
         // Add a basic block for the loop condition.
         self.compiler.basic_block();
@@ -984,6 +989,19 @@ impl<'a, F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField>
             }
             RVar::Val(end) => {
                 let instr = AsmInstruction::Bne(loop_label, self.loop_var.fp(), end.fp());
+                self.compiler.push(instr, debug_info.clone());
+            }
+        }
+    }
+
+    fn jump_to_loop_body_inc(&mut self, loop_label: F, debug_info: Option<DebugInfo>) {
+        match self.end {
+            RVar::Const(end) => {
+                let instr = AsmInstruction::BneIInc(loop_label, self.loop_var.fp(), end);
+                self.compiler.push(instr, debug_info.clone());
+            }
+            RVar::Val(end) => {
+                let instr = AsmInstruction::BneInc(loop_label, self.loop_var.fp(), end.fp());
                 self.compiler.push(instr, debug_info.clone());
             }
         }

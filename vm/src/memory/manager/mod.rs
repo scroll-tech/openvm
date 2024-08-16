@@ -531,7 +531,6 @@ impl<F: PrimeField32> MemoryAuxColsFactory<F> {
             self.generate_timestamp_lt_cols(&read.prev_timestamps, read.timestamp),
         )
     }
-
     pub fn make_heap_read_aux_cols<const N: usize>(
         &self,
         read: MemoryHeapReadRecord<F, N>,

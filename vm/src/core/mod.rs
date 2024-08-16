@@ -41,6 +41,7 @@ fn timestamp_delta(opcode: Opcode) -> usize {
         LOADW2 | STOREW2 => 4,
         JAL => 1,
         BEQ | BNE => 2,
+        BNEINC => 3,
         TERMINATE => 0,
         PUBLISH => 2,
         FAIL => 0,

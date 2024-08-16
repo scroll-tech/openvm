@@ -267,6 +267,14 @@ impl<AB: AirBuilderWithPublicValues + InteractionBuilder> Air<AB> for CoreAir {
             .when(AB::Expr::one() - read0_equals_read1)
             .assert_eq(next_pc, pc + c);
 
+        // BNEINC: If d[a] + 1 != e[b], pc <- pc + c; d[a] <- d[a] + 1
+        let bne_inc_flag = operation_flags[&BNEINC];
+        read1_enabled += bne_inc_flag.into();
+        read2_enabled += bne_inc_flag.into();
+        write_enabled += bne_inc_flag.into();
+
+        // TODO: Further constrain BNEINC.
+
         // NOP constraints same pc and timestamp as next row
         let nop_flag = operation_flags[&NOP];
         let mut when_nop = builder.when(nop_flag);

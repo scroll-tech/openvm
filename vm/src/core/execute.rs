@@ -212,6 +212,18 @@ impl<F: PrimeField32> InstructionExecutor<F> for CoreChip<F> {
                 let base_pointer = read!(d, a);
                 write!(e, base_pointer + b, hint);
             }
+            // d[a] <- d[a] + 1
+            // If d[a] != e[b], pc <- pc + c
+            BNEINC => {
+                let left = read!(d, a);
+                let right = read!(e, b);
+
+                write!(d, a, left + F::one());
+
+                if left + F::one() != right {
+                    next_pc = pc + c;
+                }
+            }
             CT_START | CT_END => {
                 // Advance program counter, but don't do anything else
                 // TODO: move handling of these instructions outside CoreChip
