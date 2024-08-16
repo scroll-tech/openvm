@@ -87,6 +87,9 @@ pub enum OpCode {
     MOD_SECP256K1_MUL = 72,
     MOD_SECP256K1_DIV = 73,
 
+    ADD256 = 80,
+    SUB256 = 81,
+
     NOP = 100,
 }
 
