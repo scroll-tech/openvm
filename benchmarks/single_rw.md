@@ -12,6 +12,6 @@
 | RangeCheckerGateAir  | 65_536     | 655_360     | 0     | [2] | [8] |
 | ExecutionAir         | 32_768     | 1_409_024   | 0     | [35] | [8] |
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/1783b35db228d4fcec28e660f01abcf886462c7e
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/8c366d5e4e5d059d0b51303f1a7cdd9ffd8ef832
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10437008999)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10437051377)
