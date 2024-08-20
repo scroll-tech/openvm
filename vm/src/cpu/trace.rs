@@ -18,6 +18,7 @@ use super::{
 };
 use crate::{
     cpu::trace::ExecutionError::{PublicValueIndexOutOfBounds, PublicValueNotEqual},
+    field_arithmetic::columns::FieldArithmeticCols,
     field_extension::{columns::FieldExtensionArithmeticCols, FieldExtensionArithmeticChip},
     memory::{compose, decompose},
     modular_multiplication::ModularMultiplicationChip,
@@ -448,7 +449,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
                 let trace_cells = CpuCols::<WORD_SIZE, F>::get_width(vm.options())
                     + ProgramPreprocessedCols::<F>::get_width()
                     + num_accesses_memory_rows * vm.memory_chip.air.air_width()
-                    + num_field_base_ops * FieldExtensionArithmeticCols::<F>::get_width()
+                    + num_field_base_ops * FieldArithmeticCols::<F>::get_width()
                     + num_field_extension_ops * FieldExtensionArithmeticCols::<F>::get_width()
                     + num_poseidon2_rows
                         * Poseidon2VmCols::<16, F>::get_width(&vm.poseidon2_chip.air);
