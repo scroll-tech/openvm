@@ -21,7 +21,7 @@ pub fn execute_program_with_config<const WORD_SIZE: usize>(
     program: Program<BabyBear>,
     input_stream: Vec<Vec<BabyBear>>,
 ) {
-    let vm = VirtualMachine::<WORD_SIZE, _>::new(config, program, input_stream);
+    let vm = VirtualMachine::<1, WORD_SIZE, _>::new(config, program, input_stream);
     vm.execute().unwrap();
 }
 
@@ -43,7 +43,7 @@ pub fn execute_program<const WORD_SIZE: usize>(
     program: Program<BabyBear>,
     input_stream: Vec<Vec<BabyBear>>,
 ) {
-    let vm = VirtualMachine::<WORD_SIZE, _>::new(
+    let vm = VirtualMachine::<1, WORD_SIZE, _>::new(
         VmConfig {
             num_public_values: 4,
             max_segment_len: (1 << 25) - 100,
@@ -60,7 +60,7 @@ pub fn execute_program_and_generate_traces<const WORD_SIZE: usize>(
     program: Program<BabyBear>,
     input_stream: Vec<Vec<BabyBear>>,
 ) {
-    let vm = VirtualMachine::<WORD_SIZE, _>::new(
+    let vm = VirtualMachine::<1, WORD_SIZE, _>::new(
         VmConfig {
             num_public_values: 4,
             max_segment_len: (1 << 25) - 100,
@@ -77,7 +77,7 @@ pub fn execute_program_with_public_values<const WORD_SIZE: usize>(
     input_stream: Vec<Vec<BabyBear>>,
     public_values: &[(usize, BabyBear)],
 ) {
-    let mut vm = VirtualMachine::<WORD_SIZE, _>::new(
+    let mut vm = VirtualMachine::<1, WORD_SIZE, _>::new(
         VmConfig {
             num_public_values: 4,
             ..Default::default()
@@ -148,7 +148,7 @@ pub fn execute_and_prove_program<const WORD_SIZE: usize>(
     program: Program<BabyBear>,
     input_stream: Vec<Vec<BabyBear>>,
 ) {
-    let vm = VirtualMachine::<WORD_SIZE, _>::new(
+    let vm = VirtualMachine::<1, WORD_SIZE, _>::new(
         VmConfig {
             num_public_values: 4,
             ..Default::default()
@@ -164,7 +164,7 @@ pub fn execute_and_prove_program<const WORD_SIZE: usize>(
         nonempty_pis: pis,
         ..
     } = vm.execute_and_generate_traces().unwrap();
-    let chips = VirtualMachine::<WORD_SIZE, _>::get_chips(&chips);
+    let chips = VirtualMachine::<1, WORD_SIZE, _>::get_chips(&chips);
 
     let perm = random_perm();
     // blowup factor 8 for poseidon2 chip

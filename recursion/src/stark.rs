@@ -899,26 +899,26 @@ pub fn sort_chips<'a>(
     (chips, rec_raps, traces, pvs)
 }
 
-pub fn get_rec_raps<const WORD_SIZE: usize, C: Config>(
-    vm: &ExecutionSegment<WORD_SIZE, C::F>,
-) -> Vec<&dyn DynRapForRecursion<C>>
+pub fn get_rec_raps<const NUM_WORDS: usize, const WORD_SIZE: usize, C: Config>(
+    vm: &ExecutionSegment<NUM_WORDS, WORD_SIZE, C::F>,
+) -> Vec<Box<dyn DynRapForRecursion<C>>>
 where
     C::F: PrimeField32,
 {
-    let mut result: Vec<&dyn DynRapForRecursion<C>> = vec![
-        &vm.cpu_chip.air,
-        &vm.program_chip.air,
-        &vm.memory_chip.air,
-        &vm.range_checker.air,
+    let mut result: Vec<Box<dyn DynRapForRecursion<C>>> = vec![
+        Box::new(vm.cpu_chip.air.clone()),
+        Box::new(vm.program_chip.air.clone()),
+        Box::new(vm.memory_manager.borrow().get_audit_air()),
     ];
     if vm.options().field_arithmetic_enabled {
-        result.push(&vm.field_arithmetic_chip.air);
+        result.push(Box::new(vm.field_arithmetic_chip.air));
     }
     if vm.options().field_extension_enabled {
-        result.push(&vm.field_extension_chip.air);
+        result.push(Box::new(vm.field_extension_chip.air.clone()));
     }
     if vm.options().poseidon2_enabled() {
-        result.push(&vm.poseidon2_chip.air);
+        result.push(Box::new(vm.poseidon2_chip.air.clone()));
     }
+    result.push(Box::new(vm.range_checker.air));
     result
 }

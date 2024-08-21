@@ -8,8 +8,9 @@ use p3_field::PrimeField32;
 use OpCode::*;
 
 use crate::{
-    field_extension::FieldExtensionArithmeticAir,
+    field_extension::FieldExtensionArithmetic, memory::offline_checker::bus::MemoryBus,
     modular_multiplication::air::ModularMultiplicationVmAir, poseidon2::Poseidon2Chip,
+    vm::config::MemoryConfig,
 };
 
 #[cfg(test)]
@@ -23,13 +24,16 @@ pub mod trace;
 pub const INST_WIDTH: usize = 1;
 
 pub const READ_INSTRUCTION_BUS: usize = 0;
-pub const MEMORY_BUS: usize = 1;
+pub const NEW_MEMORY_BUS: MemoryBus = MemoryBus(1);
 pub const ARITHMETIC_BUS: usize = 2;
 pub const FIELD_EXTENSION_BUS: usize = 3;
 pub const RANGE_CHECKER_BUS: usize = 4;
 pub const POSEIDON2_BUS: usize = 5;
 pub const POSEIDON2_DIRECT_BUS: usize = 6;
-pub const IS_LESS_THAN_BUS: usize = 7;
+pub const EXPAND_BUS: usize = 8;
+pub const POSEIDON2_DIRECT_REQUEST_BUS: usize = 9;
+pub const MEMORY_INTERFACE_BUS: usize = 10;
+pub const IS_LESS_THAN_BUS: usize = 11;
 
 pub const CPU_MAX_READS_PER_CYCLE: usize = 3;
 pub const CPU_MAX_WRITES_PER_CYCLE: usize = 1;
@@ -134,29 +138,30 @@ impl OpCode {
 }
 
 fn timestamp_delta(opcode: OpCode) -> usize {
-    // If an instruction performs a writes, it must change timestamp by WRITE_DELTA.
-    const WRITE_DELTA: usize = CPU_MAX_READS_PER_CYCLE + 1;
     match opcode {
-        LOADW | STOREW | LOADW2 | STOREW2 => WRITE_DELTA,
-        // JAL only does WRITE, but it is done as timestamp + 2
-        JAL => WRITE_DELTA,
+        LOADW | STOREW => 3,
+        LOADW2 | STOREW2 => 4,
+        JAL => 1,
         BEQ | BNE => 2,
         TERMINATE => 0,
         PUBLISH => 2,
-        opcode if FIELD_ARITHMETIC_INSTRUCTIONS.contains(&opcode) => WRITE_DELTA,
+        opcode if FIELD_ARITHMETIC_INSTRUCTIONS.contains(&opcode) => 3,
         opcode if FIELD_EXTENSION_INSTRUCTIONS.contains(&opcode) => {
-            FieldExtensionArithmeticAir::max_accesses_per_instruction(opcode)
+            FieldExtensionArithmetic::accesses_per_instruction(opcode)
         }
         opcode if MODULAR_ARITHMETIC_INSTRUCTIONS.contains(&opcode) => {
+            // TODO: note that in this chip's trace generation, we need to make sure
+            // that the timestamp in MemoryManager increases by exactly what this function
+            // returns.
             ModularMultiplicationVmAir::max_accesses_per_instruction(opcode)
         }
-        F_LESS_THAN => WRITE_DELTA,
+        F_LESS_THAN => 3,
         FAIL => 0,
         PRINTF => 1,
         COMP_POS2 | PERM_POS2 => {
-            Poseidon2Chip::<16, BabyBear>::max_accesses_per_instruction(opcode)
+            Poseidon2Chip::<16, 16, 1, BabyBear>::max_accesses_per_instruction(opcode)
         }
-        SHINTW => WRITE_DELTA,
+        SHINTW => 2,
         HINT_INPUT | HINT_BITS => 0,
         CT_START | CT_END => 0,
         NOP => 0,
@@ -229,9 +234,9 @@ pub struct CpuChip<const WORD_SIZE: usize, F: Clone> {
 }
 
 impl<const WORD_SIZE: usize, F: Clone> CpuChip<WORD_SIZE, F> {
-    pub fn new(options: CpuOptions) -> Self {
+    pub fn new(options: CpuOptions, clk_max_bits: usize, decomp: usize) -> Self {
         Self {
-            air: CpuAir::new(options),
+            air: CpuAir::new(options, clk_max_bits, decomp),
             rows: vec![],
             state: ExecutionState::default(),
             start_state: ExecutionState::default(),
@@ -249,8 +254,12 @@ impl<const WORD_SIZE: usize, F: Clone> CpuChip<WORD_SIZE, F> {
     }
 
     /// Sets the current state of the CPU.
-    pub fn from_state(options: CpuOptions, state: ExecutionState) -> Self {
-        let mut chip = Self::new(options);
+    pub fn from_state(
+        options: CpuOptions,
+        state: ExecutionState,
+        mem_config: MemoryConfig,
+    ) -> Self {
+        let mut chip = Self::new(options, mem_config.clk_max_bits, mem_config.decomp);
         chip.state = state;
         chip.start_state = state;
         chip

@@ -1,5 +1,7 @@
 use std::{
+    cell::RefCell,
     collections::{BTreeMap, VecDeque},
+    rc::Rc,
     sync::Arc,
 };
 
@@ -24,22 +26,22 @@ use crate::{
     field_arithmetic::FieldArithmeticChip,
     field_extension::FieldExtensionArithmeticChip,
     is_less_than::IsLessThanChip,
-    memory::offline_checker::MemoryChip,
+    memory::manager::MemoryManager,
     modular_multiplication::ModularMultiplicationChip,
     poseidon2::Poseidon2Chip,
     program::{Program, ProgramChip},
     vm::{cycle_tracker::CycleTracker, metrics::VmMetrics},
 };
 
-pub struct ExecutionSegment<const WORD_SIZE: usize, F: PrimeField32> {
+pub struct ExecutionSegment<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32> {
     pub config: VmConfig,
     pub cpu_chip: CpuChip<WORD_SIZE, F>,
     pub program_chip: ProgramChip<F>,
-    pub memory_chip: MemoryChip<WORD_SIZE, F>,
+    pub memory_manager: Rc<RefCell<MemoryManager<NUM_WORDS, WORD_SIZE, F>>>,
     pub field_arithmetic_chip: FieldArithmeticChip<F>,
-    pub field_extension_chip: FieldExtensionArithmeticChip<WORD_SIZE, F>,
+    pub field_extension_chip: FieldExtensionArithmeticChip<NUM_WORDS, WORD_SIZE, F>,
     pub range_checker: Arc<RangeCheckerGateChip>,
-    pub poseidon2_chip: Poseidon2Chip<16, F>,
+    pub poseidon2_chip: Poseidon2Chip<16, NUM_WORDS, WORD_SIZE, F>,
     pub is_less_than_chip: IsLessThanChip<F>,
     pub modular_multiplication_chip: ModularMultiplicationChip<F>,
     pub input_stream: VecDeque<Vec<F>>,
@@ -53,35 +55,50 @@ pub struct ExecutionSegment<const WORD_SIZE: usize, F: PrimeField32> {
     pub(crate) metrics: VmMetrics,
 }
 
-impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
+impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
+    ExecutionSegment<NUM_WORDS, WORD_SIZE, F>
+{
     /// Creates a new execution segment from a program and initial state, using parent VM config
     pub fn new(config: VmConfig, program: Program<F>, state: VirtualMachineState<F>) -> Self {
-        let decomp = config.decomp;
-        let limb_bits = config.limb_bits;
-
-        let range_checker = Arc::new(RangeCheckerGateChip::new(RANGE_CHECKER_BUS, 1 << decomp));
-
-        let cpu_chip = CpuChip::from_state(config.cpu_options(), state.state);
+        let range_checker = Arc::new(RangeCheckerGateChip::new(
+            RANGE_CHECKER_BUS,
+            (1 << config.memory_config.decomp) as u32,
+        ));
+        let cpu_chip = CpuChip::from_state(config.cpu_options(), state.state, config.memory_config);
+        let memory_manager = Rc::new(RefCell::new(MemoryManager::with_volatile_memory(
+            config.memory_config,
+            range_checker.clone(),
+        )));
         let program_chip = ProgramChip::new(program);
-        let memory_chip = MemoryChip::new(limb_bits, limb_bits, limb_bits, decomp, state.memory);
         let field_arithmetic_chip = FieldArithmeticChip::new();
-        let field_extension_chip = FieldExtensionArithmeticChip::new();
+        let field_extension_chip = FieldExtensionArithmeticChip::new(
+            config.memory_config,
+            memory_manager.clone(),
+            range_checker.clone(),
+        );
         let poseidon2_chip = Poseidon2Chip::from_poseidon2_config(
             Poseidon2Config::<16, F>::new_p3_baby_bear_16(),
+            config.memory_config,
+            memory_manager.clone(),
+            range_checker.clone(),
             POSEIDON2_BUS,
         );
         let modular_multiplication_chip =
             ModularMultiplicationChip::new(ModularMultiplicationBigIntAir::default_for_30_bit());
-        let is_less_than_chip =
-            IsLessThanChip::new(IS_LESS_THAN_BUS, 30, decomp, range_checker.clone());
+        let is_less_than_chip = IsLessThanChip::new(
+            IS_LESS_THAN_BUS,
+            30,
+            config.memory_config.decomp,
+            range_checker.clone(),
+        );
 
         Self {
             config,
             has_execution_happened: false,
             public_values: vec![None; config.num_public_values],
             cpu_chip,
+            memory_manager,
             program_chip,
-            memory_chip,
             field_arithmetic_chip,
             field_extension_chip,
             range_checker,
@@ -105,7 +122,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
     pub fn should_segment(&mut self) -> bool {
         let heights = [
             self.cpu_chip.current_height(),
-            self.memory_chip.current_height(),
+            self.memory_manager.borrow().interface_chip.current_height(),
             self.field_arithmetic_chip.current_height(),
             self.field_extension_chip.current_height(),
             self.poseidon2_chip.current_height(),
@@ -126,12 +143,9 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         let mut result = vec![
             cpu_trace,
             self.program_chip.generate_trace(),
-            if self.memory_chip.accesses.is_empty() {
-                DenseMatrix::default(0, 0)
-            } else {
-                self.memory_chip.generate_trace(self.range_checker.clone())
-            },
-            self.range_checker.generate_trace(),
+            self.memory_manager
+                .borrow()
+                .generate_memory_interface_trace(),
         ];
         if self.config.cpu_options().field_arithmetic_enabled {
             result.push(self.field_arithmetic_chip.generate_trace());
@@ -145,6 +159,9 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         if self.config.cpu_options().is_less_than_enabled {
             result.push(self.is_less_than_chip.generate_trace());
         }
+        // Note: range checker should be last because the chip.generate_trace() calls above
+        // may influence the range checker.
+        result.push(self.range_checker.generate_trace());
 
         result
     }
@@ -158,7 +175,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
     }
 
     pub fn get_num_chips(&self) -> usize {
-        let mut result: usize = 4;
+        let mut result: usize = 4; // cpu, program, memory_interface, range_checker
         if self.config.cpu_options().field_arithmetic_enabled {
             result += 1;
         }
@@ -174,23 +191,26 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         result
     }
 
+    pub fn get_cpu_pis(&self) -> Vec<F> {
+        self.cpu_chip
+            .pis
+            .clone()
+            .into_iter()
+            .chain(self.public_values.iter().map(|x| x.unwrap_or(F::zero())))
+            .collect()
+    }
+
     /// Returns public values for all chips in this segment
     pub fn get_pis(&self) -> Vec<Vec<F>> {
         let len = self.get_num_chips();
         let mut result: Vec<Vec<F>> = vec![vec![]; len];
-        let mut cpu_public_values = self.cpu_chip.pis.clone();
-        cpu_public_values.extend(self.public_values.iter().map(|x| x.unwrap_or(F::zero())));
-        result[0].clone_from(&cpu_public_values);
+        result[0] = self.get_cpu_pis();
         result
     }
 
     pub fn get_types(&self) -> Vec<ChipType> {
-        let mut result: Vec<ChipType> = vec![
-            ChipType::Cpu,
-            ChipType::Program,
-            ChipType::Memory,
-            ChipType::RangeChecker,
-        ];
+        let mut result: Vec<ChipType> =
+            vec![ChipType::Cpu, ChipType::Program, ChipType::MemoryInterface];
         if self.config.cpu_options().field_arithmetic_enabled {
             result.push(ChipType::FieldArithmetic);
         }
@@ -203,6 +223,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         if self.config.cpu_options().is_less_than_enabled {
             result.push(ChipType::IsLessThan);
         }
+        result.push(ChipType::RangeChecker);
         assert!(result.len() == self.get_num_chips());
         result
     }
@@ -215,10 +236,6 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
         let mut metrics = BTreeMap::new();
         metrics.insert("cpu_cycles".to_string(), self.cpu_chip.rows.len());
         metrics.insert("cpu_timestamp".to_string(), self.cpu_chip.state.timestamp);
-        metrics.insert(
-            "memory_chip_accesses".to_string(),
-            self.memory_chip.accesses.len(),
-        );
         metrics.insert(
             "field_arithmetic_ops".to_string(),
             self.field_arithmetic_chip.operations.len(),
@@ -244,8 +261,8 @@ impl<const WORD_SIZE: usize, F: PrimeField32> ExecutionSegment<WORD_SIZE, F> {
 }
 
 /// Global function to get chips from a segment
-pub fn get_chips<const WORD_SIZE: usize, SC: StarkGenericConfig>(
-    segment: ExecutionSegment<WORD_SIZE, Val<SC>>,
+pub fn get_chips<const NUM_WORDS: usize, const WORD_SIZE: usize, SC: StarkGenericConfig>(
+    segment: ExecutionSegment<NUM_WORDS, WORD_SIZE, Val<SC>>,
     inclusion_mask: &[bool],
 ) -> Vec<Box<dyn AnyRap<SC>>>
 where
@@ -255,8 +272,7 @@ where
     let mut result: Vec<Box<dyn AnyRap<SC>>> = vec![
         Box::new(segment.cpu_chip.air),
         Box::new(segment.program_chip.air),
-        Box::new(segment.memory_chip.air),
-        Box::new(segment.range_checker.air),
+        Box::new(segment.memory_manager.borrow().get_audit_air().clone()),
     ];
     if segment.config.cpu_options().field_arithmetic_enabled {
         result.push(Box::new(segment.field_arithmetic_chip.air));
@@ -270,8 +286,9 @@ where
     if segment.config.cpu_options().is_less_than_enabled {
         result.push(Box::new(segment.is_less_than_chip.air));
     }
+    result.push(Box::new(segment.range_checker.air));
 
-    assert!(result.len() == num_chips);
+    assert_eq!(result.len(), num_chips);
 
     inclusion_mask
         .iter()
@@ -283,6 +300,6 @@ where
             result.remove(index);
         });
 
-    assert!(result.len() == inclusion_mask.iter().filter(|&x| *x).count());
+    assert_eq!(result.len(), inclusion_mask.iter().filter(|&x| *x).count());
     result
 }

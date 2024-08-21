@@ -4,14 +4,16 @@ use afs_stark_backend::interaction::InteractionBuilder;
 use p3_field::AbstractField;
 
 use super::{
-    columns::{CpuIoCols, MemoryAccessCols},
-    CpuAir, OpCode, ARITHMETIC_BUS, CPU_MAX_ACCESSES_PER_CYCLE, CPU_MAX_READS_PER_CYCLE,
-    FIELD_ARITHMETIC_INSTRUCTIONS, FIELD_EXTENSION_BUS, FIELD_EXTENSION_INSTRUCTIONS, MEMORY_BUS,
-    POSEIDON2_BUS, READ_INSTRUCTION_BUS,
+    columns::CpuIoCols, CpuAir, OpCode, ARITHMETIC_BUS, CPU_MAX_ACCESSES_PER_CYCLE,
+    CPU_MAX_READS_PER_CYCLE, FIELD_ARITHMETIC_INSTRUCTIONS, FIELD_EXTENSION_BUS,
+    FIELD_EXTENSION_INSTRUCTIONS, POSEIDON2_BUS, READ_INSTRUCTION_BUS,
 };
-use crate::cpu::{
-    OpCode::{COMP_POS2, F_LESS_THAN, PERM_POS2},
-    IS_LESS_THAN_BUS,
+use crate::{
+    cpu::{
+        OpCode::{COMP_POS2, F_LESS_THAN, PERM_POS2},
+        IS_LESS_THAN_BUS,
+    },
+    memory::manager::operation::MemoryOperation,
 };
 
 impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
@@ -19,7 +21,7 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
         &self,
         builder: &mut AB,
         io: CpuIoCols<AB::Var>,
-        accesses: [MemoryAccessCols<WORD_SIZE, AB::Var>; CPU_MAX_ACCESSES_PER_CYCLE],
+        ops: [MemoryOperation<WORD_SIZE, AB::Var>; CPU_MAX_ACCESSES_PER_CYCLE],
         operation_flags: &BTreeMap<OpCode, AB::Var>,
     ) {
         // Interaction with program (bus 0)
@@ -31,28 +33,13 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
             AB::Expr::one() - operation_flags[&OpCode::NOP],
         );
 
-        for (i, access) in accesses.into_iter().enumerate() {
-            let memory_cycle = io.timestamp + AB::F::from_canonical_usize(i);
-            let is_write = i >= CPU_MAX_READS_PER_CYCLE;
-
-            let fields = [
-                memory_cycle,
-                AB::F::from_bool(is_write).into(),
-                access.address_space.into(),
-                access.address.into(),
-            ]
-            .into_iter()
-            .chain(access.data.into_iter().map(Into::into));
-            builder.push_send(MEMORY_BUS, fields, access.enabled - access.is_immediate);
-        }
-
         // Interaction with arithmetic (bus 2)
         if self.options.field_arithmetic_enabled {
             let fields = [
                 io.opcode,
-                accesses[0].data[0],
-                accesses[1].data[0],
-                accesses[CPU_MAX_READS_PER_CYCLE].data[0],
+                ops[0].cell.data[0],
+                ops[1].cell.data[0],
+                ops[CPU_MAX_READS_PER_CYCLE].cell.data[0],
             ];
             let count = FIELD_ARITHMETIC_INSTRUCTIONS
                 .iter()
@@ -64,7 +51,15 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
 
         // Interaction with field extension arithmetic (bus 3)
         if self.options.field_extension_enabled {
-            let fields = [io.opcode, io.op_a, io.op_b, io.op_c, io.d, io.e];
+            let fields = [
+                io.opcode,
+                io.timestamp,
+                io.op_a,
+                io.op_b,
+                io.op_c,
+                io.d,
+                io.e,
+            ];
             let count = FIELD_EXTENSION_INSTRUCTIONS
                 .iter()
                 .fold(AB::Expr::zero(), |acc, opcode| {
@@ -93,9 +88,9 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
 
         if self.options.is_less_than_enabled {
             let fields = [
-                accesses[0].data[0],
-                accesses[1].data[0],
-                accesses[CPU_MAX_READS_PER_CYCLE].data[0],
+                ops[0].cell.data[0],
+                ops[1].cell.data[0],
+                ops[CPU_MAX_READS_PER_CYCLE].cell.data[0],
             ];
             let count = operation_flags[&F_LESS_THAN];
             builder.push_send(IS_LESS_THAN_BUS, fields, count);

@@ -1,4 +1,4 @@
-use std::{array, borrow::Borrow};
+use std::array;
 
 use afs_primitives::{
     sub_chip::AirConfig,
@@ -16,22 +16,27 @@ use crate::{
     field_extension::BETA,
 };
 
-impl AirConfig for FieldExtensionArithmeticAir {
-    type Cols<T> = FieldExtensionArithmeticCols<T>;
+impl<const WORD_SIZE: usize> AirConfig for FieldExtensionArithmeticAir<WORD_SIZE> {
+    type Cols<T> = FieldExtensionArithmeticCols<WORD_SIZE, T>;
 }
 
-impl<F: Field> BaseAir<F> for FieldExtensionArithmeticAir {
+impl<const WORD_SIZE: usize, F: Field> BaseAir<F> for FieldExtensionArithmeticAir<WORD_SIZE> {
     fn width(&self) -> usize {
-        FieldExtensionArithmeticCols::<F>::get_width()
+        FieldExtensionArithmeticCols::<WORD_SIZE, F>::get_width(self)
     }
 }
 
-impl<AB: InteractionBuilder> Air<AB> for FieldExtensionArithmeticAir {
+impl<const WORD_SIZE: usize, AB: InteractionBuilder> Air<AB>
+    for FieldExtensionArithmeticAir<WORD_SIZE>
+{
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
 
         let local = main.row_slice(0);
-        let local_cols: &FieldExtensionArithmeticCols<AB::Var> = (*local).borrow();
+        let local_cols = FieldExtensionArithmeticCols::<WORD_SIZE, AB::Var>::from_iter(
+            &mut local.iter().copied(),
+            &self.mem_oc.timestamp_lt_air,
+        );
 
         let FieldExtensionArithmeticCols { io, aux } = local_cols;
 
@@ -95,6 +100,7 @@ impl<AB: InteractionBuilder> Air<AB> for FieldExtensionArithmeticAir {
             }
         }
 
+        let local_cols = FieldExtensionArithmeticCols { aux, io };
         self.eval_interactions(builder, local_cols);
     }
 }

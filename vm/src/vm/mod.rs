@@ -1,8 +1,4 @@
-use std::{
-    collections::{HashMap, VecDeque},
-    mem::take,
-    ops::Deref,
-};
+use std::{collections::VecDeque, mem::take, ops::Deref};
 
 use afs_stark_backend::rap::AnyRap;
 use afs_test_utils::config::baby_bear_poseidon2::BabyBearPoseidon2Config;
@@ -34,10 +30,10 @@ mod segment;
 ///
 /// Chips, traces, and public values should be retrieved by unpacking the `ExecutionResult` struct.
 /// `VirtualMachine::get_chips()` can be used to convert the boxes of chips to concrete chips.
-pub struct VirtualMachine<const WORD_SIZE: usize, F: PrimeField32> {
+pub struct VirtualMachine<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32> {
     pub config: VmConfig,
     pub program: Program<F>,
-    pub segments: Vec<ExecutionSegment<WORD_SIZE, F>>,
+    pub segments: Vec<ExecutionSegment<NUM_WORDS, WORD_SIZE, F>>,
     pub traces: Vec<DenseMatrix<F>>,
 }
 
@@ -46,7 +42,7 @@ pub struct VirtualMachine<const WORD_SIZE: usize, F: PrimeField32> {
 pub enum ChipType {
     Cpu,
     Program,
-    Memory,
+    MemoryInterface,
     RangeChecker,
     FieldArithmetic,
     FieldExtension,
@@ -83,18 +79,20 @@ pub struct ExecutionAndTraceGenerationResult<const WORD_SIZE: usize> {
 
 /// Struct that holds the current state of the VM. For now, includes memory, input stream, and hint stream.
 /// Hint stream cannot be added to during execution, but must be copied because it is popped from.
+///
+/// TODO[zach]: Capture memory in VM state for continuations.
 pub struct VirtualMachineState<F: PrimeField32> {
     /// Current state of the CPU
     state: ExecutionState,
-    /// Current memory of the CPU
-    memory: HashMap<(F, F), F>,
     /// Input stream of the CPU
     input_stream: VecDeque<Vec<F>>,
     /// Hint stream of the CPU
     hint_stream: VecDeque<F>,
 }
 
-impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
+impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
+    VirtualMachine<NUM_WORDS, WORD_SIZE, F>
+{
     /// Create a new VM with a given config, program, and input stream.
     ///
     /// The VM will start with a single segment, which is created from the initial state of the CPU.
@@ -108,7 +106,6 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
         vm.segment(
             VirtualMachineState {
                 state: ExecutionState::default(),
-                memory: HashMap::new(),
                 input_stream: VecDeque::from(input_stream),
                 hint_stream: VecDeque::new(),
             },
@@ -136,7 +133,6 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
         let last_seg = self.segments.last().unwrap();
         VirtualMachineState {
             state: last_seg.cpu_chip.state,
-            memory: last_seg.memory_chip.memory_clone(),
             input_stream: last_seg.input_stream.clone(),
             hint_stream: last_seg.hint_stream.clone(),
         }
@@ -164,9 +160,12 @@ impl<const WORD_SIZE: usize, F: PrimeField32> VirtualMachine<WORD_SIZE, F> {
     }
 }
 
-impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
-    /// Executes the VM by calling `ExecutionSegment::execute()` until the CPU hits `TERMINATE`
-    /// and `cpu_chip.is_done`. Between every segment, the VM will call `next_segment()`.
+/// Executes the VM by calling `ExecutionSegment::generate_traces()` until the CPU hits `TERMINATE`
+/// and `cpu_chip.is_done`. Between every segment, the VM will call `generate_commitments()` and then
+/// `next_segment()`.
+impl<const NUM_WORDS: usize, const WORD_SIZE: usize>
+    VirtualMachine<NUM_WORDS, WORD_SIZE, BabyBear>
+{
     pub fn execute(mut self) -> Result<ExecutionResult<WORD_SIZE>, ExecutionError> {
         let mut metrics = Vec::new();
 
@@ -233,7 +232,7 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
             debug_infos: vec![],
         };
 
-        let unique_chips = get_chips::<WORD_SIZE, BabyBearPoseidon2Config>(
+        let unique_chips = get_chips::<NUM_WORDS, WORD_SIZE, BabyBearPoseidon2Config>(
             ExecutionSegment::new(self.config, empty_program, self.current_state()),
             &vec![true; num_chips],
         );
@@ -249,7 +248,7 @@ impl<const WORD_SIZE: usize> VirtualMachine<WORD_SIZE, BabyBear> {
 
             let segment_pis = segment.get_pis();
             let segment_types = segment.get_types();
-            chips.extend(get_chips::<WORD_SIZE, BabyBearPoseidon2Config>(
+            chips.extend(get_chips::<NUM_WORDS, WORD_SIZE, BabyBearPoseidon2Config>(
                 segment,
                 &inclusion_mask,
             ));

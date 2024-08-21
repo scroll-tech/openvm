@@ -53,10 +53,10 @@ fn test_fibonacci_program_verify() {
         ..Default::default()
     };
 
-    let dummy_vm = VirtualMachine::<1, _>::new(vm_config, fib_program.clone(), vec![]);
+    let dummy_vm = VirtualMachine::<1, 1, _>::new(vm_config, fib_program.clone(), vec![]);
     let rec_raps = get_rec_raps(&dummy_vm.segments[0]);
 
-    let mut vm = VirtualMachine::<1, _>::new(vm_config, fib_program, vec![]);
+    let mut vm = VirtualMachine::<1, 1, _>::new(vm_config, fib_program, vec![]);
     vm.segments[0].public_values = vec![
         Some(BabyBear::zero()),
         Some(BabyBear::one()),
@@ -71,6 +71,7 @@ fn test_fibonacci_program_verify() {
     } = vm.execute_and_generate_traces().unwrap();
 
     let chips = chips.iter().map(|x| x.deref()).collect();
+    let rec_raps = rec_raps.iter().map(|x| x.deref()).collect();
 
     // blowup factor = 3
     let fri_params = if matches!(std::env::var("AXIOM_FAST_TEST"), Ok(x) if &x == "1") {

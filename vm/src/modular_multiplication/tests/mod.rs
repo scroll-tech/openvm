@@ -10,17 +10,17 @@ use crate::{
     modular_multiplication::{bigint_to_elems, ModularMultiplicationChip},
     program::Program,
     vm::{
-        config::{VmConfig, DEFAULT_MAX_SEGMENT_LEN},
+        config::{MemoryConfig, VmConfig, DEFAULT_MAX_SEGMENT_LEN},
         VirtualMachine,
     },
 };
 
-fn make_vm<const WORD_SIZE: usize>(
+fn make_vm<const NUM_WORDS: usize, const WORD_SIZE: usize>(
     program: Program<BabyBear>,
     field_arithmetic_enabled: bool,
     field_extension_enabled: bool,
-) -> VirtualMachine<WORD_SIZE, BabyBear> {
-    VirtualMachine::<WORD_SIZE, BabyBear>::new(
+) -> VirtualMachine<NUM_WORDS, WORD_SIZE, BabyBear> {
+    VirtualMachine::<NUM_WORDS, WORD_SIZE, BabyBear>::new(
         VmConfig {
             field_arithmetic_enabled,
             field_extension_enabled,
@@ -28,8 +28,12 @@ fn make_vm<const WORD_SIZE: usize>(
             perm_poseidon2_enabled: false,
             modular_multiplication_enabled: true,
             is_less_than_enabled: false,
-            limb_bits: 16,
-            decomp: 16,
+            memory_config: MemoryConfig {
+                addr_space_max_bits: 16,
+                pointer_max_bits: 16,
+                clk_max_bits: 16,
+                decomp: 16,
+            },
             num_public_values: 4,
             max_segment_len: DEFAULT_MAX_SEGMENT_LEN,
             collect_metrics: false,
@@ -41,7 +45,7 @@ fn make_vm<const WORD_SIZE: usize>(
 
 #[test]
 fn test_modular_multiplication_runtime() {
-    let mut vm = make_vm::<1>(
+    let mut vm = make_vm::<1, 1>(
         Program {
             instructions: vec![],
             debug_infos: vec![],
@@ -67,7 +71,6 @@ fn test_modular_multiplication_runtime() {
 
     let address1 = 0;
     let address2 = 100;
-    let mm_timestamp = 300;
     let address3 = 4000;
 
     let repr_bits = segment.modular_multiplication_chip.air.air.repr_bits;
@@ -81,25 +84,22 @@ fn test_modular_multiplication_runtime() {
 
     for (i, &elem) in bigint_to_elems(a, repr_bits, num_elems).iter().enumerate() {
         let address = address1 + i;
-        segment.memory_chip.write_elem(
-            address,
+        segment.memory_manager.borrow_mut().write_word(
             BabyBear::one(),
             BabyBear::from_canonical_usize(address),
-            elem,
+            [elem],
         );
     }
     for (i, &elem) in bigint_to_elems(b, repr_bits, num_elems).iter().enumerate() {
         let address = address2 + i;
-        segment.memory_chip.write_elem(
-            address,
+        segment.memory_manager.borrow_mut().write_word(
             BabyBear::one(),
             BabyBear::from_canonical_usize(address),
-            elem,
+            [elem],
         );
     }
     ModularMultiplicationChip::calculate(
         segment,
-        mm_timestamp,
         Instruction::from_isize(
             MOD_SECP256K1_MUL,
             address1 as isize,
@@ -111,11 +111,10 @@ fn test_modular_multiplication_runtime() {
     );
     for (i, &elem) in bigint_to_elems(r, repr_bits, num_elems).iter().enumerate() {
         let address = address3 + i;
-        segment.memory_chip.write_elem(
-            address,
+        segment.memory_manager.borrow_mut().write_word(
             BabyBear::one(),
             BabyBear::from_canonical_usize(address),
-            elem,
+            [elem],
         );
     }
 }
