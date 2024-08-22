@@ -26,7 +26,7 @@ use crate::{
 ///
 /// ## Usage
 /// [MemoryBridge] must be initialized with the correct number of auxiliary columns to match the
-/// max number of memory operations to be constrained.
+/// exact number of memory operations to be constrained.
 #[derive(Clone, Debug)]
 // TODO: WORD_SIZE should not be here, refactor
 pub struct MemoryBridge<V, const WORD_SIZE: usize> {
@@ -60,10 +60,8 @@ impl<V, const WORD_SIZE: usize> MemoryBridge<V, WORD_SIZE> {
         data: [impl Into<T>; WORD_SIZE],
         timestamp: impl Into<T>,
     ) -> MemoryReadOperation<T, V, WORD_SIZE> {
-        let aux = self
-            .aux
-            .pop_front()
-            .expect("Exceeded max capacity of memory accesses");
+        let aux = self.aux.pop_front().expect("Overflowed memory accesses");
+
         MemoryReadOperation {
             offline_checker: self.offline_checker,
             address: MemoryAddress::from(address),
@@ -82,10 +80,8 @@ impl<V, const WORD_SIZE: usize> MemoryBridge<V, WORD_SIZE> {
         data: [impl Into<T>; WORD_SIZE],
         timestamp: impl Into<T>,
     ) -> MemoryWriteOperation<T, V, WORD_SIZE> {
-        let aux = self
-            .aux
-            .pop_front()
-            .expect("Exceeded max capacity of memory accesses");
+        let aux = self.aux.pop_front().expect("Overflowed memory accesses");
+
         MemoryWriteOperation {
             offline_checker: self.offline_checker,
             address: MemoryAddress::from(address),
@@ -93,6 +89,12 @@ impl<V, const WORD_SIZE: usize> MemoryBridge<V, WORD_SIZE> {
             timestamp: timestamp.into(),
             aux,
         }
+    }
+}
+
+impl<V, const WORD_SIZE: usize> Drop for MemoryBridge<V, WORD_SIZE> {
+    fn drop(&mut self) {
+        assert!(self.aux.is_empty(), "Underflowed memory accesses");
     }
 }
 
