@@ -1,7 +1,7 @@
 ## Benchmark for VM Verifier for Fibonacci Air
 | Total Cells | Total Prove (ms) | Main Trace Gen (ms) | Perm Trace Gen (ms) | Calc Quotient Values (ms) | Rest of Prove (ms) |
 |-----------------------------|-----------------------|--------------------------|--------------------------|-----------------|----------------|
-| 78_409_728 | 15400.00 | 2910.00 | 96.40 | 2260.00 | 10133.60 |
+| 78_409_728 | 15400.00 | 2890.00 | 97.70 | 2250.00 | 10162.30 |
 
 ### AIR metrics
 | Name | Rows | Cells | Prep Cols | Main Cols | Perm Cols |
@@ -22,9 +22,9 @@
 
 | Name | Value |
 |------|-------|
-| cpu_cycles           | 497133     |
+| cpu_cycles           | 497264     |
 | cpu_timestamp        | 0          |
-| field_arithmetic_ops | 164539     |
+| field_arithmetic_ops | 164600     |
 | field_extension_ops  | 9153       |
 | is_less_than_ops     | 0          |
 | poseidon2_chip_rows  | 3309       |
@@ -33,7 +33,7 @@
 #### Opcode metrics
 | Name | Frequency | Trace Cells Contributed |
 |------|-------|-----|
-| FADD                 | 134354     | 15585064   |
+| FADD                 | 134415     | 15592140   |
 | BNE                  | 75347      | 7986782    |
 | STOREW               | 74001      | 7844106    |
 | LOADW                | 49216      | 5216896    |
@@ -41,7 +41,7 @@
 | SHINTW               | 33232      | 3522592    |
 | STOREW2              | 21346      | 2262676    |
 | FMUL                 | 20715      | 2402940    |
-| JAL                  | 12839      | 1360934    |
+| JAL                  | 12909      | 1368354    |
 | FSUB                 | 9467       | 1098172    |
 | BBE4MUL              | 4998       | 1214514    |
 | HINT_INPUT           | 4769       | 505514     |
@@ -69,7 +69,7 @@ How many opcodes each DSL instruction generates:
 | LoadV                | 30112      |
 | LoadE                | 19400      |
 | LoadF                | 17279      |
-| IfEqI                | 14495      |
+| IfEqI                | 14565      |
 | StoreV               | 13846      |
 | ImmV                 | 13022      |
 | StoreF               | 10959      |
@@ -84,7 +84,7 @@ How many opcodes each DSL instruction generates:
 | MulE                 | 3726       |
 | AssertEqV            | 3640       |
 | SubV                 | 3502       |
-| AddFI                | 3309       |
+| AddFI                | 3370       |
 | MulVI                | 3300       |
 | MulV                 | 3224       |
 | IfNe                 | 2817       |
@@ -113,6 +113,6 @@ How many opcodes each DSL instruction generates:
 | MulFI                | 1          |
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/e34b3f25d5551b7d36c95c7627a0af3409b23926
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/913913edf4b02a39e04b62198c1997cf20d0fa23
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10516714523)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10517016320)
