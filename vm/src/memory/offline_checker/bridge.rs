@@ -6,9 +6,10 @@ use afs_primitives::{
         columns::{IsZeroCols, IsZeroIoCols},
         IsZeroAir,
     },
-    utils::{and, implies},
+    utils::implies,
 };
 use afs_stark_backend::interaction::InteractionBuilder;
+use p3_air::AirBuilder;
 use p3_field::AbstractField;
 
 use super::{bus::MemoryBus, columns::MemoryOfflineCheckerAuxCols};
@@ -94,7 +95,13 @@ impl<V, const WORD_SIZE: usize> MemoryBridge<V, WORD_SIZE> {
 
 impl<V, const WORD_SIZE: usize> Drop for MemoryBridge<V, WORD_SIZE> {
     fn drop(&mut self) {
-        assert!(self.aux.is_empty(), "Underflowed memory accesses");
+        // panic messes up rust backtrace
+        if !self.aux.is_empty() {
+            println!(
+                "[WARN] Underflowed memory accesses: {} remaining",
+                self.aux.len()
+            );
+        }
     }
 }
 
@@ -207,13 +214,12 @@ impl MemoryOfflineChecker {
             addr_space_is_zero_cols.inv,
         );
 
-        // // immediate => enabled
-        // builder.assert_one(implies::<AB>(aux.is_immediate.into(), op.enabled.clone()));
+        // immediate => enabled
+        builder.assert_one(implies(aux.is_immediate.into(), op.enabled.clone()));
 
-        // TODO[osama]: make this degree 2
         // is_immediate => read
         builder.assert_one(implies(
-            and(op.enabled.clone(), aux.is_immediate.into()),
+            aux.is_immediate.into(),
             AB::Expr::one() - op.op_type.clone(),
         ));
 
@@ -226,26 +232,18 @@ impl MemoryOfflineChecker {
         self.timestamp_lt_air
             .subair_eval(builder, clk_lt_io_cols, aux.clk_lt_aux);
 
-        // TODO[osama]: this should be reduced to degree 2
-        builder.assert_one(implies(
-            and(
-                op.enabled.clone(),
-                AB::Expr::one() - aux.is_immediate.into(),
-            ),
-            aux.clk_lt.into(),
-        ));
+        builder.assert_one(implies(op.enabled.clone(), aux.clk_lt.into()));
 
         // Ensuring that if op_type is Read, data_read is the same as data_write
         for i in 0..WORD_SIZE {
-            builder.assert_zero(
-                op.enabled.clone()
-                    * (AB::Expr::one() - op.op_type.clone())
-                    * (op.cell.data[i].clone() - aux.old_cell.data[i]),
-            );
+            builder
+                .when(op.enabled.clone())
+                .when(AB::Expr::one() - op.op_type.clone())
+                .assert_eq(op.cell.data[i].clone(), aux.old_cell.data[i]);
         }
 
         // TODO[osama]: resolve is_immediate stuff
-        let count = op.enabled * (AB::Expr::one() - aux.is_immediate.into());
+        let count = op.enabled - aux.is_immediate.into();
         let address = MemoryAddress::new(op.addr_space, op.pointer);
         self.memory_bus
             .read(address.clone(), aux.old_cell.data, aux.old_cell.clk)

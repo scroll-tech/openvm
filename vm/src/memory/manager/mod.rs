@@ -205,15 +205,22 @@ pub struct MemoryAccess<const WORD_SIZE: usize, T> {
 }
 
 impl<const WORD_SIZE: usize, T: Field> MemoryAccess<WORD_SIZE, T> {
+    // TODO[jpw]: we can default to addr_space = 1 after is_immediate checks are moved out of default memory access
     pub fn disabled_read(timestamp: T, addr_space: T) -> MemoryAccess<WORD_SIZE, T> {
         Self::disabled_op(timestamp, addr_space, OpType::Read)
     }
 
+    // TODO[jpw]: we can default to addr_space = 1 after is_immediate checks are moved out of default memory access
     pub fn disabled_write(timestamp: T, addr_space: T) -> MemoryAccess<WORD_SIZE, T> {
         Self::disabled_op(timestamp, addr_space, OpType::Write)
     }
 
     fn disabled_op(timestamp: T, addr_space: T, op_type: OpType) -> MemoryAccess<WORD_SIZE, T> {
+        debug_assert_ne!(
+            addr_space,
+            T::zero(),
+            "Disabled memory operation cannot be immediate"
+        );
         MemoryAccess::<WORD_SIZE, T>::new(
             MemoryOperation {
                 addr_space,

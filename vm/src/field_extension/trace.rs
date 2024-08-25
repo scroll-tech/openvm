@@ -109,8 +109,8 @@ impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
 
         let make_aux_col = |op_type| {
             let access = match op_type {
-                OpType::Read => MemoryAccess::disabled_read(clk, F::zero()),
-                OpType::Write => MemoryAccess::disabled_write(clk, F::zero()),
+                OpType::Read => MemoryAccess::disabled_read(clk, F::one()),
+                OpType::Write => MemoryAccess::disabled_write(clk, F::one()),
             };
             MemoryTraceBuilder::<NUM_WORDS, WORD_SIZE, F>::memory_access_to_checker_aux_cols(
                 &self.air.mem_oc,
@@ -126,8 +126,8 @@ impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
                 op_a: F::zero(),
                 op_b: F::zero(),
                 op_c: F::zero(),
-                d: F::zero(),
-                e: F::zero(),
+                d: F::one(),
+                e: F::one(),
                 x: [F::zero(); EXTENSION_DEGREE],
                 y: [F::zero(); EXTENSION_DEGREE],
                 z: [F::zero(); EXTENSION_DEGREE],

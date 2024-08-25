@@ -7,6 +7,7 @@ use super::{operation::MemoryOperation, MemoryAccess, MemoryManager};
 use crate::memory::{
     compose, decompose,
     offline_checker::{bridge::MemoryOfflineChecker, columns::MemoryOfflineCheckerAuxCols},
+    OpType,
 };
 
 pub struct MemoryTraceBuilder<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32> {
@@ -68,19 +69,24 @@ impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
         self.write_word(addr_space, pointer, decompose(data));
     }
 
+    // TODO[jpw]: we can default to addr_space = 1 after is_immediate checks are moved out of default memory access
     pub fn disabled_read(&mut self, addr_space: F) -> MemoryOperation<WORD_SIZE, F> {
-        let clk = self.memory_manager.borrow().get_clk();
-        let mem_access = MemoryAccess::disabled_read(clk, addr_space);
-
-        self.accesses_buffer
-            .push(self.aux_col_from_access(&mem_access));
-
-        mem_access.op
+        self.disabled_op(addr_space, OpType::Read)
     }
 
+    // TODO[jpw]: we can default to addr_space = 1 after is_immediate checks are moved out of default memory access
     pub fn disabled_write(&mut self, addr_space: F) -> MemoryOperation<WORD_SIZE, F> {
+        self.disabled_op(addr_space, OpType::Write)
+    }
+
+    pub fn disabled_op(&mut self, addr_space: F, op_type: OpType) -> MemoryOperation<WORD_SIZE, F> {
+        debug_assert_ne!(
+            addr_space,
+            F::zero(),
+            "Disabled memory operation cannot be immediate"
+        );
         let clk = self.memory_manager.borrow().get_clk();
-        let mem_access = MemoryAccess::disabled_read(clk, addr_space);
+        let mem_access = MemoryAccess::disabled_op(clk, addr_space, op_type);
 
         self.accesses_buffer
             .push(self.aux_col_from_access(&mem_access));

@@ -262,7 +262,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
                     num_reads += 1;
                     assert!(num_reads <= CPU_MAX_READS_PER_CYCLE);
 
-                    mem_ops[num_reads - 1] = mem_read_trace_builder.disabled_read(F::zero());
+                    mem_ops[num_reads - 1] = mem_read_trace_builder.disabled_read(F::one());
                 }};
             }
 
@@ -291,7 +291,7 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
                     while num_writes < CPU_MAX_WRITES_PER_CYCLE {
                         num_writes += 1;
                         mem_ops[CPU_MAX_READS_PER_CYCLE + num_writes - 1] =
-                            mem_write_trace_builder.disabled_write(F::zero());
+                            mem_write_trace_builder.disabled_write(F::one());
                     }
                 }};
             }
@@ -454,12 +454,12 @@ impl<const WORD_SIZE: usize, F: PrimeField32> CpuChip<WORD_SIZE, F> {
 
             // Finalizing memory accesses
             for mem_op in &mut mem_ops[num_reads..CPU_MAX_READS_PER_CYCLE] {
-                *mem_op = mem_read_trace_builder.disabled_read(F::zero());
+                *mem_op = mem_read_trace_builder.disabled_read(F::one());
             }
             for mem_op in
                 &mut mem_ops[CPU_MAX_READS_PER_CYCLE + num_writes..CPU_MAX_ACCESSES_PER_CYCLE]
             {
-                *mem_op = mem_write_trace_builder.disabled_write(F::zero());
+                *mem_op = mem_write_trace_builder.disabled_write(F::one());
             }
 
             let mem_oc_aux_cols: Vec<_> = mem_read_trace_builder

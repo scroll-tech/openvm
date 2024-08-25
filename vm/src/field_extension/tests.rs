@@ -60,19 +60,19 @@ fn generate_records(n: usize) -> Vec<FieldExtensionArithmeticRecord<1, BabyBear>
             op_a: BabyBear::zero(),
             op_b: BabyBear::zero(),
             op_c: BabyBear::zero(),
-            d: BabyBear::zero(),
-            e: BabyBear::zero(),
+            d: BabyBear::one(),
+            e: BabyBear::one(),
             x,
             y,
             z,
             x_reads: array::from_fn(|_| {
-                MemoryAccess::disabled_read(BabyBear::from_canonical_usize(clk), BabyBear::zero())
+                MemoryAccess::disabled_read(BabyBear::from_canonical_usize(clk), BabyBear::one())
             }),
             y_reads: array::from_fn(|_| {
-                MemoryAccess::disabled_read(BabyBear::from_canonical_usize(clk), BabyBear::zero())
+                MemoryAccess::disabled_read(BabyBear::from_canonical_usize(clk), BabyBear::one())
             }),
             z_writes: array::from_fn(|_| {
-                MemoryAccess::disabled_read(BabyBear::from_canonical_usize(clk), BabyBear::zero())
+                MemoryAccess::disabled_read(BabyBear::from_canonical_usize(clk), BabyBear::one())
             }),
         });
     }
