@@ -4,6 +4,7 @@ use afs_primitives::range_gate::RangeCheckerGateChip;
 use p3_field::PrimeField32;
 
 use self::air::MemoryAuditAir;
+use crate::memory::offline_checker::bus::MemoryBus;
 
 pub mod air;
 pub mod bridge;
@@ -13,7 +14,7 @@ pub mod trace;
 #[cfg(test)]
 mod tests;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct MemoryAuditChip<const WORD_SIZE: usize, F: PrimeField32> {
     pub air: MemoryAuditAir<WORD_SIZE>,
     initial_memory: BTreeMap<(F, F), [F; WORD_SIZE]>,
@@ -22,13 +23,20 @@ pub struct MemoryAuditChip<const WORD_SIZE: usize, F: PrimeField32> {
 
 impl<const WORD_SIZE: usize, F: PrimeField32> MemoryAuditChip<WORD_SIZE, F> {
     pub fn new(
+        memory_bus: MemoryBus,
         addr_space_max_bits: usize,
         pointer_max_bits: usize,
         decomp: usize,
         range_checker: Arc<RangeCheckerGateChip>,
     ) -> Self {
         Self {
-            air: MemoryAuditAir::new(addr_space_max_bits, pointer_max_bits, decomp),
+            air: MemoryAuditAir::new(
+                memory_bus,
+                addr_space_max_bits,
+                pointer_max_bits,
+                decomp,
+                false,
+            ),
             initial_memory: BTreeMap::new(),
             range_checker,
         }

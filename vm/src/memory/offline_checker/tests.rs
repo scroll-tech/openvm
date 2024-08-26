@@ -5,7 +5,7 @@ use afs_stark_backend::interaction::InteractionBuilder;
 use afs_test_utils::{
     config::baby_bear_poseidon2::run_simple_test_no_pis, utils::create_seeded_rng,
 };
-use itertools::izip;
+use itertools::zip_eq;
 use p3_air::{Air, BaseAir};
 use p3_baby_bear::BabyBear;
 use p3_field::{AbstractField, Field};
@@ -16,13 +16,14 @@ use crate::{
     cpu::RANGE_CHECKER_BUS,
     memory::{
         manager::{dimensions::MemoryDimensions, trace_builder::MemoryTraceBuilder, MemoryManager},
-        offline_checker::{bridge::MemoryOfflineChecker, columns::MemoryOfflineCheckerCols},
+        offline_checker::{
+            bridge::MemoryOfflineChecker, bus::MemoryBus, columns::MemoryOfflineCheckerCols,
+        },
     },
     vm::config::MemoryConfig,
 };
 
-const TEST_NUM_WORDS: usize = 1;
-const TEST_WORD_SIZE: usize = 4;
+const TEST_WORD_SIZE: usize = 1;
 
 type Val = BabyBear;
 
@@ -52,6 +53,8 @@ impl<AB: InteractionBuilder> Air<AB> for OfflineCheckerDummyAir {
 fn volatile_memory_offline_checker_test() {
     let mut rng = create_seeded_rng();
 
+    let memory_bus = MemoryBus(1);
+
     const MAX_VAL: u32 = 1 << 20;
 
     let memory_dimensions = MemoryDimensions::new(1, 20, 1);
@@ -61,14 +64,13 @@ fn volatile_memory_offline_checker_test() {
         RANGE_CHECKER_BUS,
         (1 << mem_config.decomp) as u32,
     ));
-    let memory_manager = Rc::new(RefCell::new(MemoryManager::<
-        TEST_NUM_WORDS,
-        TEST_WORD_SIZE,
-        Val,
-    >::with_volatile_memory(
-        mem_config, range_checker.clone()
+    let memory_manager = Rc::new(RefCell::new(MemoryManager::with_volatile_memory(
+        memory_bus,
+        mem_config,
+        range_checker.clone(),
     )));
-    let offline_checker = MemoryOfflineChecker::new(mem_config.clk_max_bits, mem_config.decomp);
+    let offline_checker =
+        MemoryOfflineChecker::new(memory_bus, mem_config.clk_max_bits, mem_config.decomp);
 
     let num_addresses = rng.gen_range(1..=10);
     let mut all_addresses = vec![];
@@ -76,21 +78,14 @@ fn volatile_memory_offline_checker_test() {
         let addr_space = Val::from_canonical_usize(
             memory_dimensions.as_offset + rng.gen_range(0..(1 << memory_dimensions.as_height)),
         );
-        let pointer = Val::from_canonical_u32(
-            rng.gen_range(0..(1 << memory_dimensions.address_height)) as u32
-                / TEST_WORD_SIZE as u32
-                * TEST_WORD_SIZE as u32,
-        );
+        let pointer =
+            Val::from_canonical_u32(rng.gen_range(0..(1u32 << memory_dimensions.address_height)));
 
         all_addresses.push((addr_space, pointer));
     }
 
     let mut mem_ops = vec![];
-    let mut mem_trace_builder = MemoryTraceBuilder::new(
-        memory_manager.clone(),
-        range_checker.clone(),
-        offline_checker,
-    );
+    let mut mem_trace_builder = MemoryTraceBuilder::new(memory_manager.clone());
     // First, write to all addresses
     for (addr_space, pointer) in all_addresses.iter() {
         let word = from_fn(|_| Val::from_canonical_u32(rng.next_u32() % MAX_VAL));
@@ -117,11 +112,9 @@ fn volatile_memory_offline_checker_test() {
         mem_ops.push(mem_trace_builder.disabled_read(Val::one()));
     }
 
+    let accesses_buffer = mem_trace_builder.take_accesses_buffer();
     let mut checker_trace = vec![];
-    for (op, aux_cols) in izip!(
-        mem_ops.into_iter(),
-        mem_trace_builder.take_accesses_buffer().into_iter()
-    ) {
+    for (op, aux_cols) in zip_eq(mem_ops, accesses_buffer) {
         checker_trace.extend(op.flatten());
         checker_trace.extend(aux_cols.flatten());
     }

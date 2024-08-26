@@ -1,14 +1,18 @@
 use std::array;
 
+use afs_stark_backend::rap::AnyRap;
 use itertools::{all, Itertools};
+use p3_air::BaseAir;
+use p3_commit::PolynomialSpace;
 use p3_field::PrimeField32;
 use p3_matrix::dense::RowMajorMatrix;
+use p3_uni_stark::{Domain, StarkGenericConfig};
 
 use super::columns::{
     FieldExtensionArithmeticAuxCols, FieldExtensionArithmeticCols, FieldExtensionArithmeticIoCols,
 };
 use crate::{
-    cpu::OpCode,
+    arch::{chips::MachineChip, instructions::Opcode},
     field_extension::chip::{
         FieldExtensionArithmetic, FieldExtensionArithmeticChip, FieldExtensionArithmeticRecord,
         EXTENSION_DEGREE,
@@ -19,17 +23,15 @@ use crate::{
     },
 };
 
-impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
-    FieldExtensionArithmeticChip<NUM_WORDS, WORD_SIZE, F>
-{
+impl<F: PrimeField32> MachineChip<F> for FieldExtensionArithmeticChip<F> {
     /// Generates trace for field arithmetic chip.
     ///
     /// NOTE: may only be called once on a chip. TODO: make consume self or change behavior.
-    pub fn generate_trace(&mut self) -> RowMajorMatrix<F> {
+    fn generate_trace(&mut self) -> RowMajorMatrix<F> {
         let curr_height = self.records.len();
         let correct_height = curr_height.next_power_of_two();
 
-        let width = FieldExtensionArithmeticCols::<WORD_SIZE, F>::get_width(&self.air);
+        let width = FieldExtensionArithmeticCols::<F>::get_width(&self.air);
         let dummy_rows_flattened = (0..correct_height - curr_height)
             .flat_map(|_| self.make_blank_row().flatten())
             .collect_vec();
@@ -46,36 +48,56 @@ impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
         RowMajorMatrix::new(flattened_trace, width)
     }
 
+    fn air<SC: StarkGenericConfig>(&self) -> Box<dyn AnyRap<SC>>
+    where
+        Domain<SC>: PolynomialSpace<Val = F>,
+    {
+        Box::new(self.air)
+    }
+
+    fn current_trace_height(&self) -> usize {
+        self.records.len()
+    }
+
+    fn trace_width(&self) -> usize {
+        BaseAir::<F>::width(&self.air)
+    }
+}
+
+impl<F: PrimeField32> FieldExtensionArithmeticChip<F> {
     /// Constructs a new set of columns (including auxiliary columns) given inputs.
     fn cols_from_record(
         &self,
-        record: FieldExtensionArithmeticRecord<WORD_SIZE, F>,
-    ) -> FieldExtensionArithmeticCols<WORD_SIZE, F> {
-        let is_add = F::from_bool(record.opcode == OpCode::FE4ADD);
-        let is_sub = F::from_bool(record.opcode == OpCode::FE4SUB);
-        let is_mul = F::from_bool(record.opcode == OpCode::BBE4MUL);
-        let is_inv = F::from_bool(record.opcode == OpCode::BBE4INV);
+        record: FieldExtensionArithmeticRecord<F>,
+    ) -> FieldExtensionArithmeticCols<F> {
+        let is_add = F::from_bool(record.opcode == Opcode::FE4ADD);
+        let is_sub = F::from_bool(record.opcode == Opcode::FE4SUB);
+        let is_mul = F::from_bool(record.opcode == Opcode::BBE4MUL);
+        let is_inv = F::from_bool(record.opcode == Opcode::BBE4INV);
 
         let FieldExtensionArithmeticRecord { x, y, z, .. } = record;
 
         let inv = if all(x, |xi| xi == F::zero()) {
             x
         } else {
-            FieldExtensionArithmetic::solve(OpCode::BBE4INV, x, y).unwrap()
+            FieldExtensionArithmetic::solve(Opcode::BBE4INV, x, y).unwrap()
         };
 
+        let range_checker = self.memory.borrow().range_checker.clone();
+
         let access_to_aux = |access| {
-            MemoryTraceBuilder::<NUM_WORDS, WORD_SIZE, F>::memory_access_to_checker_aux_cols(
+            MemoryTraceBuilder::<F>::memory_access_to_checker_aux_cols(
                 &self.air.mem_oc,
-                self.range_checker.clone(),
+                range_checker.clone(),
                 &access,
             )
         };
 
         FieldExtensionArithmeticCols {
             io: FieldExtensionArithmeticIoCols {
-                clk: F::from_canonical_usize(record.clk),
                 opcode: F::from_canonical_usize(record.opcode as usize),
+                pc: F::from_canonical_usize(record.pc),
+                timestamp: F::from_canonical_usize(record.timestamp),
                 op_a: record.op_a,
                 op_b: record.op_b,
                 op_c: record.op_c,
@@ -104,25 +126,27 @@ impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
         }
     }
 
-    fn make_blank_row(&self) -> FieldExtensionArithmeticCols<WORD_SIZE, F> {
-        let clk = self.memory.borrow().get_clk();
+    fn make_blank_row(&self) -> FieldExtensionArithmeticCols<F> {
+        let timestamp = self.memory.borrow().timestamp();
+        let range_checker = self.memory.borrow().range_checker.clone();
 
         let make_aux_col = |op_type| {
             let access = match op_type {
-                OpType::Read => MemoryAccess::disabled_read(clk, F::one()),
-                OpType::Write => MemoryAccess::disabled_write(clk, F::one()),
+                OpType::Read => MemoryAccess::disabled_read(timestamp, F::one()),
+                OpType::Write => MemoryAccess::disabled_write(timestamp, F::one()),
             };
-            MemoryTraceBuilder::<NUM_WORDS, WORD_SIZE, F>::memory_access_to_checker_aux_cols(
+            MemoryTraceBuilder::<F>::memory_access_to_checker_aux_cols(
                 &self.air.mem_oc,
-                self.range_checker.clone(),
+                range_checker.clone(),
                 &access,
             )
         };
 
         FieldExtensionArithmeticCols {
             io: FieldExtensionArithmeticIoCols {
-                clk,
-                opcode: F::from_canonical_u32(OpCode::FE4ADD as u32),
+                timestamp,
+                opcode: F::from_canonical_u32(Opcode::FE4ADD as u32),
+                pc: F::zero(),
                 op_a: F::zero(),
                 op_b: F::zero(),
                 op_c: F::zero(),

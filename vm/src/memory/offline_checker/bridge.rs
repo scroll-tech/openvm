@@ -14,7 +14,7 @@ use p3_field::AbstractField;
 
 use super::{bus::MemoryBus, columns::MemoryOfflineCheckerAuxCols};
 use crate::{
-    cpu::{MEMORY_BUS, RANGE_CHECKER_BUS},
+    cpu::RANGE_CHECKER_BUS,
     memory::{
         manager::{access_cell::AccessCell, operation::MemoryOperation},
         MemoryAddress,
@@ -75,7 +75,6 @@ impl<V, const WORD_SIZE: usize> MemoryBridge<V, WORD_SIZE> {
     /// Prepare a logical memory write operation.
     #[must_use]
     pub fn write<T>(
-        // , const WORD_SIZE: usize>(
         &mut self,
         address: MemoryAddress<impl Into<T>, impl Into<T>>,
         data: [impl Into<T>; WORD_SIZE],
@@ -183,9 +182,9 @@ pub struct MemoryOfflineChecker {
 }
 
 impl MemoryOfflineChecker {
-    pub fn new(clk_max_bits: usize, decomp: usize) -> Self {
+    pub fn new(memory_bus: MemoryBus, clk_max_bits: usize, decomp: usize) -> Self {
         Self {
-            memory_bus: MEMORY_BUS,
+            memory_bus,
             timestamp_lt_air: IsLessThanAir::new(RANGE_CHECKER_BUS, clk_max_bits, decomp),
             is_zero_air: IsZeroAir,
         }

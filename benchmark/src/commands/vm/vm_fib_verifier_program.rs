@@ -1,19 +1,19 @@
+use std::ops::Deref;
+
 use afs_compiler::{
     asm::AsmBuilder,
     ir::{Felt, Var},
 };
 use afs_recursion::stark::sort_chips;
 use color_eyre::eyre::Result;
+use itertools::Itertools;
 use p3_baby_bear::BabyBear;
 use p3_field::{extension::BinomialExtensionField, AbstractField};
-use stark_vm::vm::{config::VmConfig, ExecutionAndTraceGenerationResult, VirtualMachine};
+use stark_vm::vm::{config::VmConfig, segment::SegmentResult, VirtualMachine};
 
-use super::benchmark_helpers::run_recursive_test_benchmark;
+use crate::commands::vm::benchmark_helpers::run_recursive_test_benchmark;
 
 pub fn benchmark_fib_verifier_program(n: usize) -> Result<()> {
-    const NUM_WORDS: usize = 8;
-    const WORD_SIZE: usize = 1;
-
     println!(
         "Running verifier program of VM STARK benchmark with n = {}",
         n
@@ -39,26 +39,34 @@ pub fn benchmark_fib_verifier_program(n: usize) -> Result<()> {
 
     builder.halt();
 
-    let fib_program = builder.compile_isa::<1>();
+    let fib_program = builder.compile_isa();
 
     let vm_config = VmConfig {
         max_segment_len: 2000000,
         ..Default::default()
     };
 
-    let vm = VirtualMachine::<8, 1, _>::new(vm_config, fib_program.clone(), vec![]);
+    let vm = VirtualMachine::new(vm_config, fib_program.clone(), vec![]);
 
-    let ExecutionAndTraceGenerationResult {
-        max_log_degree: _,
-        nonempty_chips: chips,
-        nonempty_traces: traces,
-        nonempty_pis: pis,
+    let result = vm.execute_and_generate()?;
+
+    assert_eq!(
+        result.segment_results.len(),
+        1,
+        "continuations not yet supported"
+    );
+    let result = result.segment_results.into_iter().next().unwrap();
+
+    let SegmentResult {
+        airs,
+        traces,
+        public_values,
         ..
-    } = vm.execute_and_generate_traces().unwrap();
-    let chips = VirtualMachine::<NUM_WORDS, WORD_SIZE, _>::get_chips(&chips);
+    } = result;
 
-    let pvs = pis;
-    let (chips, traces, pvs) = sort_chips(chips, traces, pvs);
+    let airs = airs.iter().map(Box::deref).collect_vec();
+
+    let (chips, traces, pvs) = sort_chips(airs, traces, public_values);
 
     run_recursive_test_benchmark(chips, traces, pvs, "VM Verifier of VM Fibonacci Program")
 }

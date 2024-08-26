@@ -6,21 +6,22 @@ use p3_field::AbstractField;
 use rand::RngCore;
 
 use crate::{
-    cpu::{trace::Instruction, OpCode::SECP256K1_COORD_MUL},
-    modular_multiplication::{bigint_to_elems, ModularArithmeticChip},
     program::Program,
     vm::{
-        config::{MemoryConfig, VmConfig, DEFAULT_MAX_SEGMENT_LEN},
+        config::{DEFAULT_MAX_SEGMENT_LEN, MemoryConfig, VmConfig},
         VirtualMachine,
     },
 };
+use crate::arch::instructions::Opcode::SECP256K1_COORD_MUL;
+use crate::cpu::trace::Instruction;
+use crate::modular_multiplication::{bigint_to_elems, ModularArithmeticChip};
 
-fn make_vm<const NUM_WORDS: usize, const WORD_SIZE: usize>(
+fn make_vm(
     program: Program<BabyBear>,
     field_arithmetic_enabled: bool,
     field_extension_enabled: bool,
-) -> VirtualMachine<NUM_WORDS, WORD_SIZE, BabyBear> {
-    VirtualMachine::<NUM_WORDS, WORD_SIZE, BabyBear>::new(
+) -> VirtualMachine<BabyBear> {
+    VirtualMachine::<BabyBear>::new(
         VmConfig {
             field_arithmetic_enabled,
             field_extension_enabled,
@@ -45,7 +46,7 @@ fn make_vm<const NUM_WORDS: usize, const WORD_SIZE: usize>(
 
 #[test]
 fn test_modular_multiplication_runtime() {
-    let mut vm = make_vm::<1, 1>(
+    let mut vm = make_vm(
         Program {
             instructions: vec![],
             debug_infos: vec![],

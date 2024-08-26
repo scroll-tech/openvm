@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fs::File, io::Write as _};
+use std::{collections::HashMap, fs::File, io::Write as _, ops::Deref};
 
 use afs_recursion::{
     hints::Hintable,
@@ -23,7 +23,7 @@ use p3_matrix::{dense::RowMajorMatrix, Matrix};
 use p3_util::log2_strict_usize;
 use stark_vm::{
     program::Program,
-    vm::{config::VmConfig, ExecutionAndTraceGenerationResult, VirtualMachine},
+    vm::{config::VmConfig, segment::SegmentResult, VirtualMachine},
 };
 use tracing::info_span;
 
@@ -115,10 +115,10 @@ pub fn run_recursive_test_benchmark(
     let mut witness_stream = Vec::new();
     witness_stream.extend(input.write());
 
-    vm_benchmark_execute_and_prove::<8, 1>(program, witness_stream, benchmark_name)
+    vm_benchmark_execute_and_prove(program, witness_stream, benchmark_name)
 }
 
-pub fn vm_benchmark_execute_and_prove<const NUM_WORDS: usize, const WORD_SIZE: usize>(
+pub fn vm_benchmark_execute_and_prove(
     program: Program<BabyBear>,
     input_stream: Vec<Vec<BabyBear>>,
     benchmark_name: &str,
@@ -130,21 +130,26 @@ pub fn vm_benchmark_execute_and_prove<const NUM_WORDS: usize, const WORD_SIZE: u
         ..Default::default()
     };
 
-    let mut vm = VirtualMachine::<NUM_WORDS, WORD_SIZE, _>::new(vm_config, program, input_stream);
+    let mut vm = VirtualMachine::new(vm_config, program, input_stream);
     vm.enable_metrics_collection();
 
     let vm_execute_span = info_span!("Benchmark vm execute").entered();
-    let ExecutionAndTraceGenerationResult {
-        max_log_degree,
-        nonempty_chips: chips,
-        nonempty_traces: traces,
-        nonempty_pis: public_values,
-        metrics: mut vm_metrics,
-        ..
-    } = vm.execute_and_generate_traces().unwrap();
+    let result = vm.execute_and_generate().unwrap();
     vm_execute_span.exit();
 
-    let chips = VirtualMachine::<NUM_WORDS, WORD_SIZE, _>::get_chips(&chips);
+    assert_eq!(
+        result.segment_results.len(),
+        1,
+        "should not use continuations"
+    );
+    let result = result.segment_results.into_iter().next().unwrap();
+    let max_log_degree = result.max_log_degree();
+    let SegmentResult {
+        airs,
+        traces,
+        public_values,
+        metrics,
+    } = result;
 
     let perm = default_perm();
     // blowup factor 8 for poseidon2 chip
@@ -155,13 +160,14 @@ pub fn vm_benchmark_execute_and_prove<const NUM_WORDS: usize, const WORD_SIZE: u
     };
     let engine = engine_from_perm(perm, max_log_degree, fri_params);
 
-    assert_eq!(chips.len(), traces.len());
+    let airs: Vec<&dyn AnyRap<BabyBearPoseidon2Config>> =
+        airs.iter().map(|air| air.deref()).collect();
 
     let keygen_span = info_span!("Benchmark keygen").entered();
     let mut keygen_builder = engine.keygen_builder();
 
-    for i in 0..chips.len() {
-        keygen_builder.add_air(chips[i], public_values[i].len());
+    for i in 0..airs.len() {
+        keygen_builder.add_air(airs[i], public_values[i].len());
     }
 
     let pk = keygen_builder.generate_pk();
@@ -178,7 +184,7 @@ pub fn vm_benchmark_execute_and_prove<const NUM_WORDS: usize, const WORD_SIZE: u
     trace_builder.commit_current();
     trace_commitment_span.exit();
 
-    let main_trace_data = trace_builder.view(&vk, chips.to_vec());
+    let main_trace_data = trace_builder.view(&vk, airs.to_vec());
 
     let mut challenger = engine.new_challenger();
 
@@ -206,7 +212,6 @@ pub fn vm_benchmark_execute_and_prove<const NUM_WORDS: usize, const WORD_SIZE: u
     let perm_trace_gen_ms = timing_data[BACKEND_TIMING_FILTERS[0]];
     let calc_quotient_values_ms = timing_data[BACKEND_TIMING_FILTERS[2]];
     let total_prove_ms = timing_data["Benchmark prove: benchmark"];
-    let vm_metrics = vm_metrics.pop().unwrap(); // only 1 segment
 
     let metrics = BenchmarkMetrics {
         name: benchmark_name.to_string(),
@@ -215,7 +220,7 @@ pub fn vm_benchmark_execute_and_prove<const NUM_WORDS: usize, const WORD_SIZE: u
         perm_trace_gen_ms,
         calc_quotient_values_ms,
         trace: trace_metrics,
-        custom: vm_metrics,
+        custom: metrics,
     };
 
     write!(File::create(TMP_RESULT_MD.as_str())?, "{}", metrics)?;

@@ -11,43 +11,36 @@ use p3_matrix::Matrix;
 
 use super::{
     columns::{CpuAuxCols, CpuCols, CpuIoCols},
-    timestamp_delta, CpuOptions,
-    OpCode::*,
-    CPU_MAX_ACCESSES_PER_CYCLE, CPU_MAX_READS_PER_CYCLE, FIELD_ARITHMETIC_INSTRUCTIONS, INST_WIDTH,
+    timestamp_delta, CpuOptions, CPU_MAX_ACCESSES_PER_CYCLE, CPU_MAX_READS_PER_CYCLE, INST_WIDTH,
+    WORD_SIZE,
 };
-use crate::memory::{
-    offline_checker::bridge::{MemoryBridge, MemoryOfflineChecker},
-    MemoryAddress,
+use crate::{
+    arch::{bus::ExecutionBus, instructions::Opcode::*},
+    memory::{
+        offline_checker::bridge::{MemoryBridge, MemoryOfflineChecker},
+        MemoryAddress,
+    },
 };
 
-#[derive(Clone)]
-// #[derive(Clone)]
 /// Air for the CPU. Carries no state and does not own execution.
-pub struct CpuAir<const WORD_SIZE: usize> {
+#[derive(Clone, Debug)]
+pub struct CpuAir {
     pub options: CpuOptions,
+    pub execution_bus: ExecutionBus,
     pub memory_offline_checker: MemoryOfflineChecker,
 }
 
-impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
-    pub fn new(options: CpuOptions, clk_max_bits: usize, decomp: usize) -> Self {
-        Self {
-            options,
-            memory_offline_checker: MemoryOfflineChecker::new(clk_max_bits, decomp),
-        }
-    }
-}
-
-impl<const WORD_SIZE: usize, F: Field> BaseAir<F> for CpuAir<WORD_SIZE> {
+impl<F: Field> BaseAir<F> for CpuAir {
     fn width(&self) -> usize {
-        CpuCols::<WORD_SIZE, F>::get_width(self)
+        CpuCols::<F>::get_width(self)
     }
 }
 
-impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
+impl CpuAir {
     fn assert_compose<AB: AirBuilder>(
         &self,
         builder: &mut AB,
-        word: [impl Into<AB::Expr>; WORD_SIZE],
+        word: [impl Into<AB::Expr>; 1],
         field_elem: AB::Expr,
     ) {
         let mut iter = word.into_iter();
@@ -60,9 +53,7 @@ impl<const WORD_SIZE: usize> CpuAir<WORD_SIZE> {
 
 // TODO[osama]: here, there should be some relation enforced between the timestamp for the cpu and the memory timestamp
 // TODO[osama]: also, rename to clk
-impl<const WORD_SIZE: usize, AB: AirBuilderWithPublicValues + InteractionBuilder> Air<AB>
-    for CpuAir<WORD_SIZE>
-{
+impl<AB: AirBuilderWithPublicValues + InteractionBuilder> Air<AB> for CpuAir {
     // TODO: continuation verification checks program counters match up [INT-1732]
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
@@ -75,11 +66,11 @@ impl<const WORD_SIZE: usize, AB: AirBuilderWithPublicValues + InteractionBuilder
 
         let local = main.row_slice(0);
         let local: &[AB::Var] = (*local).borrow();
-        let local_cols = CpuCols::<WORD_SIZE, AB::Var>::from_slice(local, self);
+        let local_cols = CpuCols::from_slice(local, self);
 
         let next = main.row_slice(1);
         let next: &[AB::Var] = (*next).borrow();
-        let next_cols = CpuCols::<WORD_SIZE, AB::Var>::from_slice(next, self);
+        let next_cols = CpuCols::from_slice(next, self);
         let CpuCols { io, aux } = local_cols;
         let CpuCols { io: next_io, .. } = next_cols;
 
@@ -124,14 +115,16 @@ impl<const WORD_SIZE: usize, AB: AirBuilderWithPublicValues + InteractionBuilder
             builder.assert_bool(flag);
         }
 
-        let mut sum_flags = AB::Expr::zero();
+        let mut is_cpu_opcode = AB::Expr::zero();
         let mut match_opcode = AB::Expr::zero();
         for (&opcode, &flag) in operation_flags.iter() {
-            sum_flags = sum_flags + flag;
+            is_cpu_opcode += flag.into();
             match_opcode += flag * AB::F::from_canonical_usize(opcode as usize);
         }
-        builder.assert_one(sum_flags);
-        builder.assert_eq(opcode, match_opcode);
+        builder.assert_bool(is_cpu_opcode.clone());
+        builder
+            .when(is_cpu_opcode.clone())
+            .assert_eq(opcode, match_opcode);
 
         // keep track of when memory accesses should be enabled
         let mut read1_enabled_check = AB::Expr::zero();
@@ -360,32 +353,7 @@ impl<const WORD_SIZE: usize, AB: AirBuilderWithPublicValues + InteractionBuilder
         when_publish.assert_eq(read2.addr_space, e);
         when_publish.assert_eq(read2.pointer, b);
 
-        // arithmetic operations
-        if self.options.field_arithmetic_enabled {
-            let mut arithmetic_flags = AB::Expr::zero();
-            for opcode in FIELD_ARITHMETIC_INSTRUCTIONS {
-                arithmetic_flags += operation_flags[&opcode].into();
-            }
-            read1_enabled_check += arithmetic_flags.clone();
-            read2_enabled_check += arithmetic_flags.clone();
-            write_enabled_check += arithmetic_flags.clone();
-            let mut when_arithmetic = builder.when(arithmetic_flags);
-
-            // read from e[b] and f[c]
-            when_arithmetic.assert_eq(read1.addr_space, e);
-            when_arithmetic.assert_eq(read1.pointer, b);
-
-            when_arithmetic.assert_eq(read2.addr_space, f);
-            when_arithmetic.assert_eq(read2.pointer, c);
-
-            // write to d[a]
-            when_arithmetic.assert_eq(write.addr_space, d);
-            when_arithmetic.assert_eq(write.pointer, a);
-
-            when_arithmetic
-                .when_transition()
-                .assert_eq(next_pc, pc + inst_width);
-        }
+        // FIXME[zach]: Properly constrain op.enabled based on opcode.
 
         let mut op_timestamp: AB::Expr = io.timestamp.into();
         let mut memory_bridge = MemoryBridge::new(self.memory_offline_checker, mem_oc_aux_cols);
@@ -447,6 +415,12 @@ impl<const WORD_SIZE: usize, AB: AirBuilderWithPublicValues + InteractionBuilder
         builder.assert_eq(write.enabled, write_enabled_check);
 
         // Turn on all interactions
-        self.eval_interactions(builder, io, mem_ops, &operation_flags);
+        self.eval_interactions(
+            builder,
+            io,
+            next_io,
+            &operation_flags,
+            AB::Expr::one() - is_cpu_opcode,
+        );
     }
 }

@@ -10,26 +10,30 @@ use crate::memory::{
     OpType,
 };
 
-pub struct MemoryTraceBuilder<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32> {
-    memory_manager: Rc<RefCell<MemoryManager<NUM_WORDS, WORD_SIZE, F>>>,
-    range_checker: Arc<RangeCheckerGateChip>,
+const WORD_SIZE: usize = 1;
+
+// TODO[jpw]: use &'a mut [MemoryOfflineCheckerAuxCols<WORD_SIZE, F>] and allow loading mutable buffers
+/// The [MemoryTraceBuilder] uses a buffer to help fill in the auxiliary trace values for memory accesses.
+/// Since it uses a buffer, it must be created within a trace generation function and is not intended to be
+/// owned by a chip.
+#[derive(Clone, Debug)]
+pub struct MemoryTraceBuilder<F: PrimeField32> {
+    memory_manager: Rc<RefCell<MemoryManager<F>>>,
+    // Derived from memory_manager:
     offline_checker: MemoryOfflineChecker,
+    range_checker: Arc<RangeCheckerGateChip>,
 
     accesses_buffer: Vec<MemoryOfflineCheckerAuxCols<WORD_SIZE, F>>,
 }
 
-impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
-    MemoryTraceBuilder<NUM_WORDS, WORD_SIZE, F>
-{
-    pub fn new(
-        memory_manager: Rc<RefCell<MemoryManager<NUM_WORDS, WORD_SIZE, F>>>,
-        range_checker: Arc<RangeCheckerGateChip>,
-        offline_checker: MemoryOfflineChecker,
-    ) -> Self {
+impl<F: PrimeField32> MemoryTraceBuilder<F> {
+    pub fn new(memory_manager: Rc<RefCell<MemoryManager<F>>>) -> Self {
+        let offline_checker = memory_manager.borrow().make_offline_checker();
+        let range_checker = memory_manager.borrow().range_checker.clone();
         Self {
             memory_manager,
-            range_checker,
             offline_checker,
+            range_checker,
             accesses_buffer: Vec::new(),
         }
     }
@@ -85,7 +89,7 @@ impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
             F::zero(),
             "Disabled memory operation cannot be immediate"
         );
-        let clk = self.memory_manager.borrow().get_clk();
+        let clk = self.memory_manager.borrow().timestamp();
         let mem_access = MemoryAccess::disabled_op(clk, addr_space, op_type);
 
         self.accesses_buffer
@@ -94,8 +98,9 @@ impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
         mem_access.op
     }
 
+    // TODO[jpw]: rename increment_timestamp
     pub fn increment_clk(&mut self) {
-        self.memory_manager.borrow_mut().increment_clk();
+        self.memory_manager.borrow_mut().increment_timestamp();
     }
 
     pub fn take_accesses_buffer(&mut self) -> Vec<MemoryOfflineCheckerAuxCols<WORD_SIZE, F>> {
@@ -106,11 +111,8 @@ impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
         &self,
         access: &MemoryAccess<WORD_SIZE, F>,
     ) -> MemoryOfflineCheckerAuxCols<WORD_SIZE, F> {
-        Self::memory_access_to_checker_aux_cols(
-            &self.offline_checker,
-            self.range_checker.clone(),
-            access,
-        )
+        let range_checker = self.range_checker.clone();
+        Self::memory_access_to_checker_aux_cols(&self.offline_checker, range_checker, access)
     }
 
     pub fn memory_access_to_checker_aux_cols(
@@ -127,10 +129,9 @@ impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
             (timestamp_prev, timestamp, range_checker),
         );
 
-        let addr_space_is_zero_cols = LocalTraceInstructions::generate_trace_row(
-            &offline_checker.is_zero_air,
-            memory_access.op.addr_space,
-        );
+        let addr_space_is_zero_cols = offline_checker
+            .is_zero_air
+            .generate_trace_row(memory_access.op.addr_space);
 
         MemoryOfflineCheckerAuxCols::new(
             memory_access.old_cell,

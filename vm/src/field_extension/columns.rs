@@ -8,20 +8,23 @@ use crate::{
     memory::offline_checker::{bridge::MemoryOfflineChecker, columns::MemoryOfflineCheckerAuxCols},
 };
 
+const WORD_SIZE: usize = 1;
+
 /// Columns for field extension chip.
 ///
 /// IO columns for opcode, x, y, result.
 #[repr(C)]
-pub struct FieldExtensionArithmeticCols<const WORD_SIZE: usize, T> {
+pub struct FieldExtensionArithmeticCols<T> {
     pub io: FieldExtensionArithmeticIoCols<T>,
-    pub aux: FieldExtensionArithmeticAuxCols<WORD_SIZE, T>,
+    pub aux: FieldExtensionArithmeticAuxCols<T>,
 }
 
 #[derive(AlignedBorrow)]
 #[repr(C)]
 pub struct FieldExtensionArithmeticIoCols<T> {
-    pub clk: T,
     pub opcode: T,
+    pub pc: T,
+    pub timestamp: T,
     pub op_a: T,
     pub op_b: T,
     pub op_c: T,
@@ -33,7 +36,7 @@ pub struct FieldExtensionArithmeticIoCols<T> {
 }
 
 #[repr(C)]
-pub struct FieldExtensionArithmeticAuxCols<const WORD_SIZE: usize, T> {
+pub struct FieldExtensionArithmeticAuxCols<T> {
     /// Whether the row corresponds an actual event (vs a dummy row for padding).
     pub is_valid: T,
     // Whether the y read occurs: is_valid * (1 - is_inv)
@@ -56,10 +59,10 @@ pub struct FieldExtensionArithmeticAuxCols<const WORD_SIZE: usize, T> {
     pub write_aux_cols: [MemoryOfflineCheckerAuxCols<WORD_SIZE, T>; EXTENSION_DEGREE],
 }
 
-impl<const WORD_SIZE: usize, T> FieldExtensionArithmeticCols<WORD_SIZE, T> {
-    pub fn get_width(air: &FieldExtensionArithmeticAir<WORD_SIZE>) -> usize {
+impl<T> FieldExtensionArithmeticCols<T> {
+    pub fn get_width(air: &FieldExtensionArithmeticAir) -> usize {
         FieldExtensionArithmeticIoCols::<T>::get_width()
-            + FieldExtensionArithmeticAuxCols::<WORD_SIZE, T>::get_width(&air.mem_oc)
+            + FieldExtensionArithmeticAuxCols::<T>::get_width(&air.mem_oc)
     }
 
     pub(crate) fn from_iter<I: Iterator<Item = T>>(iter: &mut I, lt_air: &IsLessThanAir) -> Self {
@@ -67,8 +70,9 @@ impl<const WORD_SIZE: usize, T> FieldExtensionArithmeticCols<WORD_SIZE, T> {
 
         Self {
             io: FieldExtensionArithmeticIoCols {
-                clk: next(),
                 opcode: next(),
+                pc: next(),
+                timestamp: next(),
                 op_a: next(),
                 op_b: next(),
                 op_c: next(),
@@ -100,7 +104,7 @@ impl<const WORD_SIZE: usize, T> FieldExtensionArithmeticCols<WORD_SIZE, T> {
     }
 }
 
-impl<const WORD_SIZE: usize, T: Clone> FieldExtensionArithmeticCols<WORD_SIZE, T> {
+impl<T: Clone> FieldExtensionArithmeticCols<T> {
     pub(crate) fn flatten(&self) -> Vec<T> {
         self.io
             .flatten()
@@ -112,15 +116,16 @@ impl<const WORD_SIZE: usize, T: Clone> FieldExtensionArithmeticCols<WORD_SIZE, T
 
 impl<T> FieldExtensionArithmeticIoCols<T> {
     pub fn get_width() -> usize {
-        3 * EXTENSION_DEGREE + 2
+        (3 * EXTENSION_DEGREE) + 8
     }
 }
 
 impl<T: Clone> FieldExtensionArithmeticIoCols<T> {
     fn flatten(&self) -> Vec<T> {
         let mut result = vec![
-            self.clk.clone(),
             self.opcode.clone(),
+            self.pc.clone(),
+            self.timestamp.clone(),
             self.op_a.clone(),
             self.op_b.clone(),
             self.op_c.clone(),
@@ -134,13 +139,13 @@ impl<T: Clone> FieldExtensionArithmeticIoCols<T> {
     }
 }
 
-impl<const WORD_SIZE: usize, T> FieldExtensionArithmeticAuxCols<WORD_SIZE, T> {
+impl<T> FieldExtensionArithmeticAuxCols<T> {
     pub fn get_width(oc: &MemoryOfflineChecker) -> usize {
-        EXTENSION_DEGREE + 11 + 12 * MemoryOfflineCheckerAuxCols::<WORD_SIZE, T>::width(oc)
+        EXTENSION_DEGREE + 6 + 12 * MemoryOfflineCheckerAuxCols::<1, T>::width(oc)
     }
 }
 
-impl<const WORD_SIZE: usize, T: Clone> FieldExtensionArithmeticAuxCols<WORD_SIZE, T> {
+impl<T: Clone> FieldExtensionArithmeticAuxCols<T> {
     fn flatten(&self) -> Vec<T> {
         let mut result = vec![
             self.is_valid.clone(),

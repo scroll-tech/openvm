@@ -10,7 +10,10 @@ use p3_matrix::Matrix;
 
 use super::columns::FieldExtensionArithmeticCols;
 use crate::{
-    cpu::OpCode::{BBE4INV, BBE4MUL, FE4ADD, FE4SUB},
+    arch::{
+        bus::ExecutionBus,
+        instructions::Opcode::{BBE4INV, BBE4MUL, FE4ADD, FE4SUB},
+    },
     field_extension::chip::FieldExtensionArithmetic,
     memory::offline_checker::bridge::MemoryOfflineChecker,
 };
@@ -18,29 +21,28 @@ use crate::{
 /// Field extension arithmetic chip.
 ///
 /// Handles arithmetic opcodes over the extension field defined by the irreducible polynomial x^4 - 11.
-#[derive(Clone)]
-pub struct FieldExtensionArithmeticAir<const WORD_SIZE: usize> {
-    pub(crate) mem_oc: MemoryOfflineChecker,
+#[derive(Clone, Copy, Debug, derive_new::new)]
+pub struct FieldExtensionArithmeticAir {
+    pub(super) execution_bus: ExecutionBus,
+    pub(super) mem_oc: MemoryOfflineChecker,
 }
 
-impl<const WORD_SIZE: usize> AirConfig for FieldExtensionArithmeticAir<WORD_SIZE> {
-    type Cols<T> = FieldExtensionArithmeticCols<WORD_SIZE, T>;
+impl AirConfig for FieldExtensionArithmeticAir {
+    type Cols<T> = FieldExtensionArithmeticCols<T>;
 }
 
-impl<const WORD_SIZE: usize, F: Field> BaseAir<F> for FieldExtensionArithmeticAir<WORD_SIZE> {
+impl<F: Field> BaseAir<F> for FieldExtensionArithmeticAir {
     fn width(&self) -> usize {
-        FieldExtensionArithmeticCols::<WORD_SIZE, F>::get_width(self)
+        FieldExtensionArithmeticCols::<F>::get_width(self)
     }
 }
 
-impl<const WORD_SIZE: usize, AB: InteractionBuilder> Air<AB>
-    for FieldExtensionArithmeticAir<WORD_SIZE>
-{
+impl<AB: InteractionBuilder> Air<AB> for FieldExtensionArithmeticAir {
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
 
         let local = main.row_slice(0);
-        let local_cols = FieldExtensionArithmeticCols::<WORD_SIZE, AB::Var>::from_iter(
+        let local_cols = FieldExtensionArithmeticCols::from_iter(
             &mut local.iter().copied(),
             &self.mem_oc.timestamp_lt_air,
         );

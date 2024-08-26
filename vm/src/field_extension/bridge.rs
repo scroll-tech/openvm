@@ -1,16 +1,17 @@
 use afs_stark_backend::interaction::InteractionBuilder;
 use p3_field::AbstractField;
 
-use super::columns::{FieldExtensionArithmeticCols, FieldExtensionArithmeticIoCols};
+use super::{
+    air::FieldExtensionArithmeticAir,
+    chip::EXTENSION_DEGREE,
+    columns::{FieldExtensionArithmeticCols, FieldExtensionArithmeticIoCols},
+};
 use crate::{
-    cpu::FIELD_EXTENSION_BUS,
-    field_extension::{
-        air::FieldExtensionArithmeticAir, chip::EXTENSION_DEGREE,
-        columns::FieldExtensionArithmeticAuxCols,
-    },
+    arch::columns::{ExecutionState, InstructionCols},
+    field_extension::columns::FieldExtensionArithmeticAuxCols,
     memory::{
         offline_checker::{
-            bridge::{emb, MemoryBridge, MemoryOfflineChecker},
+            bridge::{MemoryBridge, MemoryOfflineChecker},
             columns::MemoryOfflineCheckerAuxCols,
         },
         MemoryAddress,
@@ -18,7 +19,7 @@ use crate::{
 };
 
 #[allow(clippy::too_many_arguments)]
-fn eval_rw_interactions<AB: InteractionBuilder, const WORD_SIZE: usize>(
+fn eval_rw_interactions<AB: InteractionBuilder>(
     builder: &mut AB,
     mem_oc: MemoryOfflineChecker,
     clk_offset: &mut AB::Expr,
@@ -28,7 +29,7 @@ fn eval_rw_interactions<AB: InteractionBuilder, const WORD_SIZE: usize>(
     addr_space: AB::Var,
     address: AB::Var,
     ext: [AB::Var; EXTENSION_DEGREE],
-    mem_oc_aux_cols: [MemoryOfflineCheckerAuxCols<WORD_SIZE, AB::Var>; EXTENSION_DEGREE],
+    mem_oc_aux_cols: [MemoryOfflineCheckerAuxCols<1, AB::Var>; EXTENSION_DEGREE],
 ) {
     let mut memory_bridge = MemoryBridge::new(mem_oc, mem_oc_aux_cols);
 
@@ -42,7 +43,7 @@ fn eval_rw_interactions<AB: InteractionBuilder, const WORD_SIZE: usize>(
             memory_bridge
                 .write(
                     MemoryAddress::new(addr_space, pointer),
-                    emb(element.into()),
+                    [element.into()],
                     clk,
                 )
                 .eval(builder, is_enabled.clone());
@@ -50,7 +51,7 @@ fn eval_rw_interactions<AB: InteractionBuilder, const WORD_SIZE: usize>(
             memory_bridge
                 .read(
                     MemoryAddress::new(addr_space, pointer),
-                    emb(element.into()),
+                    [element.into()],
                     clk,
                 )
                 .eval(builder, is_enabled.clone());
@@ -58,18 +59,20 @@ fn eval_rw_interactions<AB: InteractionBuilder, const WORD_SIZE: usize>(
     }
 }
 
-impl<const WORD_SIZE: usize> FieldExtensionArithmeticAir<WORD_SIZE> {
+impl FieldExtensionArithmeticAir {
     pub fn eval_interactions<AB: InteractionBuilder>(
         &self,
         builder: &mut AB,
-        local: FieldExtensionArithmeticCols<WORD_SIZE, AB::Var>,
+        local: FieldExtensionArithmeticCols<AB::Var>,
     ) {
         let mut clk_offset = AB::Expr::zero();
 
         let FieldExtensionArithmeticCols { io, aux } = local;
 
         let FieldExtensionArithmeticIoCols {
-            clk,
+            pc,
+            opcode,
+            timestamp,
             op_a,
             op_b,
             op_c,
@@ -91,13 +94,13 @@ impl<const WORD_SIZE: usize> FieldExtensionArithmeticAir<WORD_SIZE> {
         } = aux;
 
         // Reads for x
-        eval_rw_interactions::<AB, WORD_SIZE>(
+        eval_rw_interactions(
             builder,
             self.mem_oc,
             &mut clk_offset,
             is_valid.into(),
             false,
-            clk,
+            timestamp,
             d,
             op_b,
             x,
@@ -105,13 +108,13 @@ impl<const WORD_SIZE: usize> FieldExtensionArithmeticAir<WORD_SIZE> {
         );
 
         // Reads for y
-        eval_rw_interactions::<AB, WORD_SIZE>(
+        eval_rw_interactions(
             builder,
             self.mem_oc,
             &mut clk_offset,
             valid_y_read.into(),
             false,
-            clk,
+            timestamp,
             e,
             op_c,
             y,
@@ -119,24 +122,28 @@ impl<const WORD_SIZE: usize> FieldExtensionArithmeticAir<WORD_SIZE> {
         );
 
         // Writes for z
-        eval_rw_interactions::<AB, WORD_SIZE>(
+        eval_rw_interactions(
             builder,
             self.mem_oc,
             &mut clk_offset,
             is_valid.into(),
             true,
-            clk,
+            timestamp,
             d,
             op_a,
             z,
             write_aux_cols,
         );
 
-        // Receives all IO columns from another chip on bus 3 (FIELD_EXTENSION_BUS)
-        builder.push_receive(
-            FIELD_EXTENSION_BUS,
-            [io.opcode, io.clk, op_a, op_b, op_c, d, e],
-            is_valid,
+        let timestamp_delta =
+            (AB::Expr::two() + valid_y_read) * AB::Expr::from_canonical_usize(EXTENSION_DEGREE);
+
+        self.execution_bus.execute_increment_pc(
+            builder,
+            aux.is_valid,
+            ExecutionState::new(pc, timestamp),
+            timestamp_delta,
+            InstructionCols::new(opcode, [op_a, op_b, op_c, d, e]),
         );
     }
 }

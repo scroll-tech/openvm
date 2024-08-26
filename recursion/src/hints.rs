@@ -410,7 +410,7 @@ mod test {
         asm::AsmBuilder,
         ir::{Ext, Felt, Var},
         prelude::*,
-        util::execute_program_and_generate_traces,
+        util::execute_program,
     };
     use afs_derive::{DslVariable, Hintable};
     use p3_field::AbstractField;
@@ -444,8 +444,8 @@ mod test {
 
         builder.halt();
 
-        let program = builder.compile_isa::<1>();
-        execute_program_and_generate_traces::<1>(program, stream);
+        let program = builder.compile_isa();
+        execute_program(program, stream);
     }
 
     #[test]
@@ -491,8 +491,8 @@ mod test {
 
         builder.halt();
 
-        let program = builder.compile_isa::<1>();
-        execute_program_and_generate_traces::<1>(program, stream);
+        let program = builder.compile_isa();
+        execute_program(program, stream);
     }
 
     #[derive(Hintable)]

@@ -163,5 +163,5 @@ fn run_recursive_test(
     let mut witness_stream = Vec::new();
     witness_stream.extend(input.write());
 
-    execute_and_prove_program::<1>(program, witness_stream);
+    execute_and_prove_program(program, witness_stream);
 }

@@ -1,14 +1,23 @@
 use std::{collections::HashMap, sync::Arc};
 
 use afs_primitives::range_gate::RangeCheckerGateChip;
+use afs_stark_backend::rap::AnyRap;
 use derive_new::new;
+use p3_commit::PolynomialSpace;
 use p3_field::{Field, PrimeField32};
 use p3_matrix::dense::RowMajorMatrix;
+use p3_uni_stark::{Domain, StarkGenericConfig};
 
 use self::{access_cell::AccessCell, interface::MemoryInterface};
 use super::audit::{air::MemoryAuditAir, MemoryAuditChip};
 use crate::{
-    memory::{decompose, manager::operation::MemoryOperation, OpType},
+    arch::chips::MachineChip,
+    memory::{
+        decompose,
+        manager::operation::MemoryOperation,
+        offline_checker::{bridge::MemoryOfflineChecker, bus::MemoryBus},
+        OpType,
+    },
     vm::config::MemoryConfig,
 };
 
@@ -18,16 +27,21 @@ pub mod interface;
 pub mod operation;
 pub mod trace_builder;
 
-pub struct MemoryManager<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32> {
+const WORD_SIZE: usize = 1;
+const NUM_WORDS: usize = 16;
+
+#[derive(Clone, Debug)]
+pub struct MemoryManager<F: PrimeField32> {
+    pub memory_bus: MemoryBus,
     pub interface_chip: MemoryInterface<NUM_WORDS, WORD_SIZE, F>,
-    clk: F,
+    mem_config: MemoryConfig,
+    pub(crate) range_checker: Arc<RangeCheckerGateChip>,
+    pub timestamp: F,
     /// Maps (addr_space, pointer) to (data, timestamp)
-    memory: HashMap<(F, F), AccessCell<WORD_SIZE, F>>,
+    pub memory: HashMap<(F, F), AccessCell<WORD_SIZE, F>>,
 }
 
-impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
-    MemoryManager<NUM_WORDS, WORD_SIZE, F>
-{
+impl<F: PrimeField32> MemoryManager<F> {
     // pub fn with_persistent_memory(
     //     memory_dimensions: MemoryDimensions,
     //     memory: HashMap<(F, F), AccessCell<WORD_SIZE, F>>,
@@ -42,24 +56,37 @@ impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
     // }
 
     pub fn with_volatile_memory(
+        memory_bus: MemoryBus,
         mem_config: MemoryConfig,
         range_checker: Arc<RangeCheckerGateChip>,
     ) -> Self {
         Self {
+            memory_bus,
+            mem_config,
             interface_chip: MemoryInterface::Volatile(MemoryAuditChip::new(
+                memory_bus,
                 mem_config.addr_space_max_bits,
                 mem_config.pointer_max_bits,
                 mem_config.decomp,
-                range_checker,
+                range_checker.clone(),
             )),
-            clk: F::one(),
+            timestamp: F::one(),
             memory: HashMap::new(),
+            range_checker,
         }
     }
 
+    pub fn make_offline_checker(&self) -> MemoryOfflineChecker {
+        MemoryOfflineChecker::new(
+            self.memory_bus,
+            self.mem_config.clk_max_bits,
+            self.mem_config.decomp,
+        )
+    }
+
     pub fn read_word(&mut self, addr_space: F, pointer: F) -> MemoryAccess<WORD_SIZE, F> {
-        let cur_clk = self.clk;
-        self.clk += F::one();
+        let cur_clk = self.timestamp;
+        self.timestamp += F::one();
 
         if addr_space == F::zero() {
             let data = decompose(pointer);
@@ -74,7 +101,6 @@ impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
                 AccessCell::new(data, F::zero()),
             );
         }
-        debug_assert!((pointer.as_canonical_u32() as usize) % WORD_SIZE == 0);
 
         let cell = self.memory.get_mut(&(addr_space, pointer)).unwrap();
         let (old_clk, old_data) = (cell.clk, cell.data);
@@ -112,10 +138,9 @@ impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
         data: [F; WORD_SIZE],
     ) -> MemoryAccess<WORD_SIZE, F> {
         assert!(addr_space != F::zero());
-        debug_assert!((pointer.as_canonical_u32() as usize) % WORD_SIZE == 0);
 
-        let cur_clk = self.clk;
-        self.clk += F::one();
+        let cur_clk = self.timestamp;
+        self.timestamp += F::one();
 
         let cell = self
             .memory
@@ -148,7 +173,6 @@ impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
 
     pub fn unsafe_write_word(&mut self, addr_space: F, pointer: F, data: [F; WORD_SIZE]) {
         assert!(addr_space != F::zero());
-        debug_assert!((pointer.as_canonical_u32() as usize) % WORD_SIZE == 0);
 
         self.memory
             .entry((addr_space, pointer))
@@ -172,12 +196,30 @@ impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
         self.interface_chip.generate_trace(final_memory)
     }
 
-    pub fn increment_clk(&mut self) {
-        self.clk += F::one();
+    // annoying function, need a proper memory testing implementation so this isn't necessary
+    pub fn generate_memory_interface_trace_with_height(
+        &self,
+        trace_height: usize,
+    ) -> RowMajorMatrix<F> {
+        let all_addresses = self.interface_chip.all_addresses();
+        let mut final_memory = HashMap::new();
+        for (addr_space, pointer) in all_addresses {
+            final_memory.insert(
+                (addr_space, pointer),
+                *self.memory.get(&(addr_space, pointer)).unwrap(),
+            );
+        }
+
+        self.interface_chip
+            .generate_trace_with_height(final_memory, trace_height)
     }
 
-    pub fn get_clk(&self) -> F {
-        self.clk
+    pub fn increment_timestamp(&mut self) {
+        self.timestamp += F::one();
+    }
+
+    pub fn timestamp(&self) -> F {
+        self.timestamp
     }
 
     pub fn get_audit_air(&self) -> MemoryAuditAir<WORD_SIZE> {
@@ -198,7 +240,7 @@ impl<const NUM_WORDS: usize, const WORD_SIZE: usize, F: PrimeField32>
     // }
 }
 
-#[derive(new, Debug, Default)]
+#[derive(new, Clone, Debug, Default)]
 pub struct MemoryAccess<const WORD_SIZE: usize, T> {
     pub op: MemoryOperation<WORD_SIZE, T>,
     pub old_cell: AccessCell<WORD_SIZE, T>,
@@ -231,5 +273,28 @@ impl<const WORD_SIZE: usize, T: Field> MemoryAccess<WORD_SIZE, T> {
             },
             AccessCell::new([T::zero(); WORD_SIZE], T::zero()),
         )
+    }
+}
+
+// TODO[jpw]: MemoryManager is taking the role of MemoryInterface here, which is weird.
+// Necessary right now because MemoryInterface doesn't own the final memory state.
+impl<F: PrimeField32> MachineChip<F> for MemoryManager<F> {
+    fn generate_trace(&mut self) -> RowMajorMatrix<F> {
+        self.generate_memory_interface_trace()
+    }
+
+    fn air<SC: StarkGenericConfig>(&self) -> Box<dyn AnyRap<SC>>
+    where
+        Domain<SC>: PolynomialSpace<Val = F>,
+    {
+        Box::new(self.get_audit_air())
+    }
+
+    fn current_trace_height(&self) -> usize {
+        self.interface_chip.current_height()
+    }
+
+    fn trace_width(&self) -> usize {
+        self.get_audit_air().air_width()
     }
 }

@@ -16,7 +16,9 @@ use rand::Rng;
 
 use crate::{
     cpu::RANGE_CHECKER_BUS,
-    memory::{audit::MemoryAuditChip, manager::access_cell::AccessCell},
+    memory::{
+        audit::MemoryAuditChip, manager::access_cell::AccessCell, offline_checker::bus::MemoryBus,
+    },
 };
 
 type Val = BabyBear;
@@ -31,6 +33,7 @@ fn audit_air_test() {
     const MAX_VAL: usize = 1 << LIMB_BITS;
     const WORD_SIZE: usize = 2;
     const DECOMP: usize = 8;
+    let memory_bus = MemoryBus(1);
 
     let mut random_f = |range: usize| Val::from_canonical_usize(rng.gen_range(0..range));
 
@@ -43,8 +46,13 @@ fn audit_air_test() {
     }
 
     let range_checker = Arc::new(RangeCheckerGateChip::new(RANGE_CHECKER_BUS, 1 << DECOMP));
-    let mut audit_chip =
-        MemoryAuditChip::<WORD_SIZE, Val>::new(2, LIMB_BITS, DECOMP, range_checker.clone());
+    let mut audit_chip = MemoryAuditChip::<WORD_SIZE, Val>::new(
+        memory_bus,
+        2,
+        LIMB_BITS,
+        DECOMP,
+        range_checker.clone(),
+    );
 
     let mut final_memory: BTreeMap<_, _> = BTreeMap::new();
 
