@@ -1,7 +1,7 @@
 use p3_field::PrimeField32;
 
-use super::{operation::MemoryOperation, MemoryAccess, MemoryChipRef};
-use crate::memory::{offline_checker::columns::MemoryOfflineCheckerAuxCols, OpType};
+use super::{MemoryAccess, MemoryChipRef, MemoryReadRecord, MemoryWriteRecord};
+use crate::memory::offline_checker::columns::MemoryOfflineCheckerAuxCols;
 
 const WORD_SIZE: usize = 1;
 
@@ -23,15 +23,15 @@ impl<F: PrimeField32> MemoryTraceBuilder<F> {
         }
     }
 
-    pub fn read_cell(&mut self, addr_space: F, pointer: F) -> MemoryOperation<WORD_SIZE, F> {
+    pub fn read_cell(&mut self, addr_space: F, pointer: F) -> MemoryReadRecord<WORD_SIZE, F> {
         let read = self.memory_chip.borrow_mut().read(addr_space, pointer);
 
-        let mem_access = MemoryAccess::from_read(read);
+        let mem_access = MemoryAccess::from_read(read.clone());
 
         self.accesses_buffer
             .push(self.aux_col_from_access(&mem_access));
 
-        mem_access.op
+        read
     }
 
     pub fn write_cell(
@@ -39,47 +39,35 @@ impl<F: PrimeField32> MemoryTraceBuilder<F> {
         addr_space: F,
         pointer: F,
         data: F,
-    ) -> MemoryOperation<WORD_SIZE, F> {
+    ) -> MemoryWriteRecord<WORD_SIZE, F> {
         let write = self
             .memory_chip
             .borrow_mut()
             .write(addr_space, pointer, data);
 
-        let mem_access = MemoryAccess::from_write(write);
+        let mem_access = MemoryAccess::from_write(write.clone());
 
         self.accesses_buffer
             .push(self.aux_col_from_access(&mem_access));
 
-        mem_access.op
+        write
     }
 
     pub fn read_elem(&mut self, addr_space: F, pointer: F) -> F {
-        self.read_cell(addr_space, pointer).cell.data[0]
+        self.read_cell(addr_space, pointer).data[0]
     }
 
-    // TODO[jpw]: we can default to addr_space = 1 after is_immediate checks are moved out of default memory access
-    pub fn disabled_read(&mut self, addr_space: F) -> MemoryOperation<WORD_SIZE, F> {
-        self.disabled_op(addr_space, OpType::Read)
-    }
-
-    // TODO[jpw]: we can default to addr_space = 1 after is_immediate checks are moved out of default memory access
-    pub fn disabled_write(&mut self, addr_space: F) -> MemoryOperation<WORD_SIZE, F> {
-        self.disabled_op(addr_space, OpType::Write)
-    }
-
-    pub fn disabled_op(&mut self, addr_space: F, op_type: OpType) -> MemoryOperation<WORD_SIZE, F> {
+    pub fn disabled_op(&mut self, addr_space: F) {
         debug_assert_ne!(
             addr_space,
             F::zero(),
             "Disabled memory operation cannot be immediate"
         );
         let clk = self.memory_chip.borrow().timestamp();
-        let mem_access = MemoryAccess::disabled_op(clk, addr_space, op_type);
+        let mem_access = MemoryAccess::disabled_op(clk, addr_space);
 
         self.accesses_buffer
             .push(self.aux_col_from_access(&mem_access));
-
-        mem_access.op
     }
 
     // TODO[jpw]: rename increment_timestamp
