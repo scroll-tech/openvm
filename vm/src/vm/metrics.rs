@@ -1,6 +1,7 @@
 use core::fmt;
 use std::{collections::BTreeMap, fmt::Display};
 
+use afs_stark_backend::prover::metrics::format_number_with_underscores;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
@@ -39,23 +40,39 @@ impl Display for VmMetrics {
         writeln!(f)?;
 
         writeln!(f, "| Name | Value |")?;
-        writeln!(f, "|------|-------|")?;
+        writeln!(f, "|------|------:|")?;
         for (name, value) in self.chip_metrics.iter() {
-            writeln!(f, "| {:<20} | {:<10} |", name, value)?;
+            writeln!(
+                f,
+                "| {:<20} | `{:>15}` |",
+                name,
+                format_number_with_underscores(*value)
+            )?;
         }
 
         writeln!(f)?;
         writeln!(f, "#### Opcode metrics")?;
         writeln!(f, "| Name | Frequency | Trace Cells Contributed |")?;
-        writeln!(f, "|------|-------|-----|")?;
+        writeln!(f, "|------|------:|-----:|")?;
         for (name, value) in opcode_counts.iter() {
             let cell_count = *self.opcode_trace_cells.get(name).unwrap_or(&0);
-            writeln!(f, "| {:<20} | {:<10} | {:<10} |", name, value, cell_count)?;
+            writeln!(
+                f,
+                "| {:<20} | `{:>15}` | `{:>15}` |",
+                name,
+                format_number_with_underscores(*value),
+                format_number_with_underscores(cell_count)
+            )?;
         }
         for (name, value) in self.opcode_trace_cells.iter() {
             if !self.opcode_counts.contains_key(name) {
                 // this should never happen
-                writeln!(f, "| {:<20} | 0 | {:<10} |", name, value)?;
+                writeln!(
+                    f,
+                    "| {:<20} | 0 | `{:>15}` |",
+                    name,
+                    format_number_with_underscores(*value)
+                )?;
             }
         }
 
@@ -63,9 +80,14 @@ impl Display for VmMetrics {
         writeln!(f, "### DSL counts")?;
         writeln!(f, "How many opcodes each DSL instruction generates:")?;
         writeln!(f, "| Name | Count |")?;
-        writeln!(f, "|------|-------|")?;
+        writeln!(f, "|------|------:|")?;
         for (name, value) in dsl_counts.iter() {
-            writeln!(f, "| {:<20} | {:<10} |", name, value)?;
+            writeln!(
+                f,
+                "| {:<20} | `{:>15}` |",
+                name,
+                format_number_with_underscores(*value)
+            )?;
         }
 
         writeln!(f, "</details>")?;
