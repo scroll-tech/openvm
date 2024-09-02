@@ -27,7 +27,7 @@ zkhash = { workspace = true }
 itertools.workspace = true
 tracing.workspace = true
 
-serde = { version = "1.0", default-features = false, features = [
+serde = { workspace = true, default-features = false, features = [
     "derive",
     "alloc",
 ] }

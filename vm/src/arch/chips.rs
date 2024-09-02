@@ -1,6 +1,6 @@
 use std::{cell::RefCell, rc::Rc, sync::Arc};
 
-use afs_primitives::range_gate::RangeCheckerGateChip;
+use afs_primitives::{range_gate::RangeCheckerGateChip, xor::lookup::XorLookupChip};
 use afs_stark_backend::rap::AnyRap;
 use enum_dispatch::enum_dispatch;
 use p3_air::BaseAir;
@@ -15,8 +15,8 @@ use crate::{
     cpu::{trace::Instruction, CpuChip},
     field_arithmetic::FieldArithmeticChip,
     field_extension::chip::FieldExtensionArithmeticChip,
+    hashes::{keccak::hasher::KeccakVmChip, poseidon2::Poseidon2Chip},
     memory::manager::MemoryChipRef,
-    poseidon2::Poseidon2Chip,
     program::ProgramChip,
 };
 
@@ -25,7 +25,7 @@ pub trait InstructionExecutor<F> {
     fn execute(
         &mut self,
         instruction: &Instruction<F>,
-        prev_state: ExecutionState<usize>,
+        from_state: ExecutionState<usize>,
     ) -> ExecutionState<usize>;
 }
 
@@ -89,6 +89,7 @@ pub enum InstructionExecutorVariant<F: PrimeField32> {
     FieldArithmetic(Rc<RefCell<FieldArithmeticChip<F>>>),
     FieldExtension(Rc<RefCell<FieldExtensionArithmeticChip<F>>>),
     Poseidon2(Rc<RefCell<Poseidon2Chip<16, F>>>),
+    Keccak256(Rc<RefCell<KeccakVmChip<F>>>),
 }
 
 #[derive(Debug, IntoStaticStr)]
@@ -101,6 +102,8 @@ pub enum MachineChipVariant<F: PrimeField32> {
     FieldExtension(Rc<RefCell<FieldExtensionArithmeticChip<F>>>),
     Poseidon2(Rc<RefCell<Poseidon2Chip<16, F>>>),
     RangeChecker(Arc<RangeCheckerGateChip>),
+    Keccak256(Rc<RefCell<KeccakVmChip<F>>>),
+    ByteXor(Arc<XorLookupChip<8>>),
 }
 
 impl<F: PrimeField32> MachineChip<F> for Arc<RangeCheckerGateChip> {
@@ -117,6 +120,27 @@ impl<F: PrimeField32> MachineChip<F> for Arc<RangeCheckerGateChip> {
 
     fn current_trace_height(&self) -> usize {
         self.air.range_max as usize
+    }
+
+    fn trace_width(&self) -> usize {
+        BaseAir::<F>::width(&self.air)
+    }
+}
+
+impl<F: PrimeField32, const M: usize> MachineChip<F> for Arc<XorLookupChip<M>> {
+    fn generate_trace(self) -> RowMajorMatrix<F> {
+        XorLookupChip::generate_trace(&self)
+    }
+
+    fn air<SC: StarkGenericConfig>(&self) -> Box<dyn AnyRap<SC>>
+    where
+        Domain<SC>: PolynomialSpace<Val = F>,
+    {
+        Box::new(self.air)
+    }
+
+    fn current_trace_height(&self) -> usize {
+        1 << (2 * M)
     }
 
     fn trace_width(&self) -> usize {

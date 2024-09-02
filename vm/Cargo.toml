@@ -9,6 +9,7 @@ description = "Virtual Machine STARK"
 p3-air = { workspace = true }
 p3-baby-bear = { workspace = true }
 p3-field = { workspace = true }
+p3-keccak-air = { workspace = true }
 p3-commit = { workspace = true }
 p3-matrix = { workspace = true }
 p3-maybe-rayon = { workspace = true }
@@ -31,6 +32,8 @@ rand = "0.8"
 serde = "1.0.203"
 toml = "0.8.14"
 enum-utils = "0.1.1"
+strum = { version = "0.26.3", features = ["derive"] }
+tiny-keccak = { version = "2.0.2", features = ["keccak"] }
 num-bigint-dig = "0.8.4"
 num-traits = "0.2.19"
 enum_dispatch = "0.3.13"

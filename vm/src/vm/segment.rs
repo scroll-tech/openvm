@@ -5,7 +5,7 @@ use std::{
     sync::Arc,
 };
 
-use afs_primitives::range_gate::RangeCheckerGateChip;
+use afs_primitives::{range_gate::RangeCheckerGateChip, xor::lookup::XorLookupChip};
 use afs_stark_backend::rap::AnyRap;
 use p3_commit::PolynomialSpace;
 use p3_field::PrimeField32;
@@ -20,14 +20,14 @@ use crate::{
         chips::{InstructionExecutorVariant, MachineChip, MachineChipVariant},
         instructions::{Opcode, FIELD_ARITHMETIC_INSTRUCTIONS, FIELD_EXTENSION_INSTRUCTIONS},
     },
-    cpu::{trace::ExecutionError, CpuChip, RANGE_CHECKER_BUS},
+    cpu::{trace::ExecutionError, CpuChip, BYTE_XOR_BUS, RANGE_CHECKER_BUS},
     field_arithmetic::FieldArithmeticChip,
     field_extension::chip::FieldExtensionArithmeticChip,
+    hashes::{keccak::hasher::KeccakVmChip, poseidon2::Poseidon2Chip},
     memory::{
         manager::{MemoryChip, MemoryChipRef},
         offline_checker::bus::MemoryBus,
     },
-    poseidon2::Poseidon2Chip,
     program::{Program, ProgramChip},
     vm::cycle_tracker::CycleTracker,
 };
@@ -138,6 +138,17 @@ impl<F: PrimeField32> ExecutionSegment<F> {
                 assign!([Opcode::COMP_POS2], poseidon2_chip);
             }
             chips.push(MachineChipVariant::Poseidon2(poseidon2_chip.clone()));
+        }
+        if config.keccak_enabled {
+            let byte_xor_chip = Arc::new(XorLookupChip::new(BYTE_XOR_BUS));
+            let keccak_chip = Rc::new(RefCell::new(KeccakVmChip::new(
+                execution_bus,
+                memory_chip.clone(),
+                byte_xor_chip.clone(),
+            )));
+            assign!([Opcode::KECCAK256], keccak_chip);
+            chips.push(MachineChipVariant::Keccak256(keccak_chip));
+            chips.push(MachineChipVariant::ByteXor(byte_xor_chip));
         }
         // let airs = vec![
         //     (

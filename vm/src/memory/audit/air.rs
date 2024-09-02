@@ -64,7 +64,7 @@ impl<AB: InteractionBuilder> Air<AB> for MemoryAuditAir {
             // Ensuring all is_extra rows are at the bottom
             builder
                 .when_transition()
-                .assert_one(implies(local.is_extra.into(), next.is_extra.into()));
+                .assert_one(implies(local.is_extra, next.is_extra));
 
             // Ensuring addr_lt is correct
             let lt_cols = IsLessThanTupleCols::new(
@@ -82,7 +82,7 @@ impl<AB: InteractionBuilder> Air<AB> for MemoryAuditAir {
             // Ensuring that all addresses are sorted
             builder
                 .when_transition()
-                .assert_one(or(next.is_extra.into(), next.addr_lt.into()));
+                .assert_one(or(next.is_extra, next.addr_lt));
         }
 
         self.eval_interactions(builder, local);

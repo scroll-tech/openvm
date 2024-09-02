@@ -1,6 +1,6 @@
 use std::{array, cell::RefCell, collections::HashMap, rc::Rc, sync::Arc};
 
-use afs_primitives::{range_gate::RangeCheckerGateChip, sub_chip::LocalTraceInstructions};
+use afs_primitives::range_gate::RangeCheckerGateChip;
 use afs_stark_backend::rap::AnyRap;
 use p3_commit::PolynomialSpace;
 use p3_field::PrimeField32;
@@ -14,7 +14,7 @@ use crate::{
     memory::offline_checker::{
         bridge::MemoryOfflineChecker,
         bus::MemoryBus,
-        columns::{MemoryOfflineCheckerAuxCols, MemoryReadAuxCols, MemoryWriteAuxCols},
+        columns::{MemoryReadAuxCols, MemoryWriteAuxCols},
     },
     vm::config::MemoryConfig,
 };
@@ -84,7 +84,7 @@ pub type MemoryChipRef<F> = Rc<RefCell<MemoryChip<F>>>;
 pub struct MemoryChip<F: PrimeField32> {
     pub memory_bus: MemoryBus,
     pub interface_chip: MemoryInterface<NUM_WORDS, F>,
-    mem_config: MemoryConfig,
+    pub(crate) mem_config: MemoryConfig,
     pub(crate) range_checker: Arc<RangeCheckerGateChip>,
     timestamp: F,
     /// Maps (addr_space, pointer) to (data, timestamp)
@@ -251,7 +251,8 @@ impl<F: PrimeField32> MemoryChip<F> {
         &self,
         read: MemoryReadRecord<N, F>,
     ) -> MemoryReadAuxCols<N, F> {
-        self.make_aux_cols(
+        self.make_offline_checker().make_aux_cols(
+            self.range_checker.clone(),
             read.timestamp,
             read.address_space,
             read.data,
@@ -267,7 +268,8 @@ impl<F: PrimeField32> MemoryChip<F> {
         &self,
         write: MemoryWriteRecord<N, F>,
     ) -> MemoryWriteAuxCols<N, F> {
-        self.make_aux_cols(
+        self.make_offline_checker().make_aux_cols(
+            self.range_checker.clone(),
             write.timestamp,
             write.address_space,
             write.prev_data,
@@ -277,44 +279,6 @@ impl<F: PrimeField32> MemoryChip<F> {
 
     pub fn make_disabled_write_aux_cols<const N: usize>(&self) -> MemoryWriteAuxCols<N, F> {
         MemoryWriteAuxCols::disabled(self.make_offline_checker())
-    }
-
-    fn make_aux_cols<const N: usize>(
-        &self,
-        timestamp: F,
-        address_space: F,
-        prev_data: [F; N],
-        prev_timestamps: [F; N],
-    ) -> MemoryOfflineCheckerAuxCols<N, F> {
-        let timestamp = timestamp.as_canonical_u32();
-        for prev_timestamp in &prev_timestamps {
-            debug_assert!(prev_timestamp.as_canonical_u32() < timestamp);
-        }
-
-        let offline_checker = self.make_offline_checker();
-        let clk_lt_cols = array::from_fn(|i| {
-            LocalTraceInstructions::generate_trace_row(
-                &offline_checker.timestamp_lt_air,
-                (
-                    prev_timestamps[i].as_canonical_u32(),
-                    timestamp,
-                    self.range_checker.clone(),
-                ),
-            )
-        });
-
-        let addr_space_is_zero_cols = offline_checker
-            .is_zero_air
-            .generate_trace_row(address_space);
-
-        MemoryOfflineCheckerAuxCols::new(
-            prev_data,
-            prev_timestamps,
-            addr_space_is_zero_cols.io.is_zero,
-            addr_space_is_zero_cols.inv,
-            clk_lt_cols.clone().map(|x| x.io.less_than),
-            clk_lt_cols.map(|x| x.aux),
-        )
     }
 
     pub fn generate_memory_interface_trace(&self) -> RowMajorMatrix<F> {
@@ -352,8 +316,23 @@ impl<F: PrimeField32> MemoryChip<F> {
         self.timestamp += F::one();
     }
 
+    pub fn increment_timestamp_by(&mut self, change: F) {
+        self.timestamp += change;
+    }
+
     pub fn timestamp(&self) -> F {
         self.timestamp
+    }
+
+    /// Advance the timestamp forward to `to_timestamp`. This should be used when the memory
+    /// timestamp needs to sync up with the execution state because instruction execution
+    /// uses an upper bound on timestamp change.
+    pub fn jump_timestamp(&mut self, to_timestamp: F) {
+        debug_assert!(
+            self.timestamp <= to_timestamp,
+            "Should never jump back in time"
+        );
+        self.timestamp = to_timestamp;
     }
 
     pub fn get_audit_air(&self) -> MemoryAuditAir {

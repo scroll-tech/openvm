@@ -19,6 +19,7 @@ use p3_field::AbstractField;
 use p3_matrix::{dense::RowMajorMatrix, Matrix};
 use p3_uni_stark::StarkGenericConfig;
 use p3_util::log2_strict_usize;
+use stark_vm::vm::config::VmConfig;
 
 use crate::{
     hints::Hintable,
@@ -181,5 +182,5 @@ fn run_recursive_test(stark_for_test: &StarkForTest<BabyBearPoseidon2Config>) {
     let mut witness_stream = Vec::new();
     witness_stream.extend(input.write());
 
-    execute_and_prove_program(program, witness_stream);
+    execute_and_prove_program(program, witness_stream, VmConfig::default());
 }

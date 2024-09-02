@@ -112,15 +112,12 @@ pub fn display_program_with_pc<F: PrimeField32>(program: &[Instruction<F>]) {
     }
 }
 
-pub fn execute_and_prove_program(program: Program<BabyBear>, input_stream: Vec<Vec<BabyBear>>) {
-    let vm = VirtualMachine::new(
-        VmConfig {
-            num_public_values: 4,
-            ..Default::default()
-        },
-        program,
-        input_stream,
-    );
+pub fn execute_and_prove_program(
+    program: Program<BabyBear>,
+    input_stream: Vec<Vec<BabyBear>>,
+    config: VmConfig,
+) {
+    let vm = VirtualMachine::new(config, program, input_stream);
 
     let result = vm.execute_and_generate().unwrap();
     assert_eq!(

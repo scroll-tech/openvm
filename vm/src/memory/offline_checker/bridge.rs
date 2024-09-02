@@ -2,10 +2,7 @@ use std::collections::VecDeque;
 
 use afs_primitives::{
     is_less_than::{columns::IsLessThanIoCols, IsLessThanAir},
-    is_zero::{
-        columns::{IsZeroCols, IsZeroIoCols},
-        IsZeroAir,
-    },
+    is_zero::IsZeroAir,
     utils::{and, implies, not},
 };
 use afs_stark_backend::interaction::InteractionBuilder;
@@ -199,22 +196,24 @@ impl MemoryOfflineChecker {
         aux: MemoryOfflineCheckerAuxCols<N, AB::Var>,
         is_write: bool,
     ) {
-        builder.assert_bool(op.enabled.clone());
+        // FIXME[jpw]: this should not be here because op.enabled could be an
+        // expression of degree > 1 and assert_bool is quadratic
+        // builder.assert_bool(op.enabled.clone());
 
         // TODO[jpw] immediate checks should not be in memory bridge
         // Currently: expected is that enabled = 0, is_immediate = 0, all aux = 0 works
 
         // Ensuring is_immediate is correct
-        let addr_space_is_zero_cols = IsZeroCols::<AB::Expr>::new(
-            IsZeroIoCols::<AB::Expr>::new(op.addr_space.clone(), aux.is_immediate.into()),
-            aux.is_zero_aux.into(),
-        );
+        // let addr_space_is_zero_cols = IsZeroCols::<AB::Expr>::new(
+        //     IsZeroIoCols::<AB::Expr>::new(op.addr_space.clone(), aux.is_immediate.into()),
+        //     aux.is_zero_aux.into(),
+        // );
 
-        self.is_zero_air.subair_eval(
-            &mut builder.when(op.enabled.clone()), // when not enabled, allow aux to be all 0s no matter what
-            addr_space_is_zero_cols.io,
-            addr_space_is_zero_cols.inv,
-        );
+        // self.is_zero_air.subair_eval(
+        //     &mut builder.when(op.enabled.clone()), // when not enabled, allow aux to be all 0s no matter what
+        //     addr_space_is_zero_cols.io,
+        //     addr_space_is_zero_cols.inv,
+        // );
 
         // is_immediate => read
         // if is_write {
@@ -240,8 +239,8 @@ impl MemoryOfflineChecker {
             );
 
             builder.assert_one(implies(
-                and(op.enabled.clone(), not(aux.is_immediate.into())),
-                clk_lt.into(),
+                and::<AB::Expr>(op.enabled.clone(), not(aux.is_immediate)),
+                clk_lt,
             ));
         }
 
@@ -260,7 +259,7 @@ impl MemoryOfflineChecker {
         // TODO[osama]: resolve is_immediate stuff
         // builder.assert_one(implies(aux.is_immediate.into(), op.enabled.clone()));
         // TODO[jpw]: make this degree 1 after removing is_immediate
-        let count = op.enabled * not(aux.is_immediate.into());
+        let count = op.enabled * not(aux.is_immediate);
 
         for i in 0..N {
             let address = MemoryAddress::new(

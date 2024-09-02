@@ -15,6 +15,7 @@ mod builder;
 mod collections;
 mod elliptic_curve;
 mod instructions;
+mod keccak;
 mod modular_arithmetic;
 mod poseidon;
 mod ptr;

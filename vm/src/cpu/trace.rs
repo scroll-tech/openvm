@@ -231,6 +231,7 @@ impl<F: PrimeField32> CpuChip<F> {
 
             let (instruction, debug_info) =
                 vm.program_chip.borrow_mut().get_instruction(pc_usize)?;
+            tracing::trace!("pc: {pc_usize} | time: {timestamp} | {:?}", instruction);
 
             let dsl_instr = match debug_info {
                 Some(debug_info) => debug_info.dsl_instruction,
