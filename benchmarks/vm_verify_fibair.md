@@ -1,7 +1,7 @@
 ## Benchmark for VM Verifier for Fibonacci Air
 | Total Cells | Total Prove (ms) | Main Trace Gen (ms) | Perm Trace Gen (ms) | Calc Quotient Values (ms) | Rest of Prove (ms) |
 |-----------------------------|-----------------------|--------------------------|--------------------------|-----------------|----------------|
-| 76_894_208 | 16800.00 | 2350.00 | 131.00 | 2210.00 | 12109.00 |
+| 76_894_208 | 16200.00 | 2280.00 | 149.00 | 2240.00 | 11531.00 |
 
 ### AIR metrics
 | Name | Rows | Cells | Prep Cols | Main Cols | Perm Cols |
@@ -113,6 +113,6 @@ How many opcodes each DSL instruction generates:
 | MulFI                | `              1` |
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/885148fedbeb55c1f4cf5683eddd66009e0be1c7
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/e53e2077b4ac9dbcd8077b5e6a4c0741b5516052
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10676539363)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10678163661)
