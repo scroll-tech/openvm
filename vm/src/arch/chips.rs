@@ -25,7 +25,7 @@ use crate::{
 pub trait InstructionExecutor<F> {
     fn execute(
         &mut self,
-        instruction: &Instruction<F>,
+        instruction: Instruction<F>,
         from_state: ExecutionState<usize>,
     ) -> ExecutionState<usize>;
 }
@@ -49,7 +49,7 @@ pub trait MachineChip<F> {
 impl<F, C: InstructionExecutor<F>> InstructionExecutor<F> for Rc<RefCell<C>> {
     fn execute(
         &mut self,
-        instruction: &Instruction<F>,
+        instruction: Instruction<F>,
         prev_state: ExecutionState<usize>,
     ) -> ExecutionState<usize> {
         self.borrow_mut().execute(instruction, prev_state)
