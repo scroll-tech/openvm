@@ -16,9 +16,9 @@ impl<C: Config> BigIntVar<C> {
 }
 
 /// Number of bits of each field element used.
-const REPR_BITS: usize = 30;
+pub const REPR_BITS: usize = 30;
 /// Number of field elements used to represent a bigint.
-const NUM_ELEMS: usize = 9;
+pub const NUM_ELEMS: usize = 9;
 
 impl<C: Config> Builder<C>
 where
@@ -33,6 +33,10 @@ where
         }
 
         array
+    }
+
+    pub fn uninit_bigint(&mut self) -> BigIntVar<C> {
+        self.dyn_array(NUM_ELEMS)
     }
 
     fn mod_operation(
@@ -88,11 +92,18 @@ where
         for i in 0..NUM_ELEMS {
             let elem = self.get(bigint, i);
             self.if_ne(elem, C::N::zero()).then(|builder| {
+                // FIXME: early break might improve performance.
                 builder.assign(&result, C::N::zero());
             });
         }
 
         result
+    }
+
+    pub fn secp256k1_coord_set_to_zero(&mut self, bigint: &BigIntVar<C>) {
+        for i in 0..NUM_ELEMS {
+            self.set(bigint, i, C::N::zero());
+        }
     }
 
     pub fn secp256k1_coord_eq(&mut self, left: &BigIntVar<C>, right: &BigIntVar<C>) -> Var<C::N> {
