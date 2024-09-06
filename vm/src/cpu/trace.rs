@@ -29,6 +29,7 @@ use crate::{
         },
     },
     cpu::{columns::CpuMemoryAccessCols, WORD_SIZE},
+    memory::offline_checker::columns::{MemoryReadOrImmediateAuxCols, MemoryWriteAuxCols},
     vm::ExecutionSegment,
 };
 
@@ -430,31 +431,42 @@ impl<F: PrimeField32> CpuChip<F> {
             // and move this logic into generate_trace().
             {
                 let memory_chip = vm.memory_chip.borrow();
+                let offline_checker = memory_chip.make_offline_checker();
+                let range_checker = &memory_chip.range_checker;
 
                 let read_cols = array::from_fn(|i| {
                     read_records
                         .get(i)
-                        .map(|read| CpuMemoryAccessCols::from_read_record(read.clone()))
-                        .unwrap_or_else(CpuMemoryAccessCols::disabled)
+                        .map_or_else(CpuMemoryAccessCols::disabled, |read| {
+                            CpuMemoryAccessCols::from_read_record(read.clone())
+                        })
                 });
                 let reads_aux_cols = array::from_fn(|i| {
-                    read_records
-                        .get(i)
-                        .map(|read| memory_chip.make_read_aux_cols(read.clone()))
-                        .unwrap_or_else(|| memory_chip.make_disabled_read_aux_cols())
+                    read_records.get(i).map_or_else(
+                        || MemoryReadOrImmediateAuxCols::disabled(offline_checker),
+                        |read| {
+                            offline_checker.make_read_or_immediate_aux_cols(
+                                range_checker.clone(),
+                                read.clone(),
+                            )
+                        },
+                    )
                 });
 
                 let write_cols = array::from_fn(|i| {
                     write_records
                         .get(i)
-                        .map(|write| CpuMemoryAccessCols::from_write_record(write.clone()))
-                        .unwrap_or_else(CpuMemoryAccessCols::disabled)
+                        .map_or_else(CpuMemoryAccessCols::disabled, |write| {
+                            CpuMemoryAccessCols::from_write_record(write.clone())
+                        })
                 });
                 let writes_aux_cols = array::from_fn(|i| {
-                    write_records
-                        .get(i)
-                        .map(|write| memory_chip.make_write_aux_cols(write.clone()))
-                        .unwrap_or_else(|| memory_chip.make_disabled_write_aux_cols())
+                    write_records.get(i).map_or_else(
+                        || MemoryWriteAuxCols::disabled(offline_checker),
+                        |read| {
+                            offline_checker.make_write_aux_cols(range_checker.clone(), read.clone())
+                        },
+                    )
                 });
 
                 let mut operation_flags = BTreeMap::new();

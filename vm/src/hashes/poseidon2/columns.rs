@@ -200,17 +200,17 @@ impl<T: Clone> Poseidon2VmAuxCols<T> {
         let ptr_aux_cols = array::from_fn(|_| {
             start = end;
             end += MemoryReadAuxCols::<1, T>::width(&air.mem_oc);
-            MemoryReadAuxCols::from_slice(&slc[start..end], air.mem_oc)
+            MemoryReadAuxCols::from_slice(&slc[start..end], &air.mem_oc)
         });
         let input_aux_cols = array::from_fn(|_| {
             start = end;
             end += MemoryReadAuxCols::<CHUNK, T>::width(&air.mem_oc);
-            MemoryReadAuxCols::from_slice(&slc[start..end], air.mem_oc)
+            MemoryReadAuxCols::from_slice(&slc[start..end], &air.mem_oc)
         });
         let output_aux_cols = array::from_fn(|_| {
             start = end;
             end += MemoryWriteAuxCols::<CHUNK, T>::width(&air.mem_oc);
-            MemoryWriteAuxCols::from_slice(&slc[start..end], air.mem_oc)
+            MemoryWriteAuxCols::from_slice(&slc[start..end], &air.mem_oc)
         });
 
         Self {
@@ -234,7 +234,7 @@ impl<T: Field> Poseidon2VmAuxCols<T> {
             internal: Poseidon2Cols::blank_row(&air.inner),
             ptr_aux_cols: array::from_fn(|_| MemoryReadAuxCols::disabled(air.mem_oc)),
             input_aux_cols: array::from_fn(|_| MemoryReadAuxCols::disabled(air.mem_oc)),
-            output_aux_cols: array::from_fn(|_| MemoryReadAuxCols::disabled(air.mem_oc)),
+            output_aux_cols: array::from_fn(|_| MemoryWriteAuxCols::disabled(air.mem_oc)),
         }
     }
 }
