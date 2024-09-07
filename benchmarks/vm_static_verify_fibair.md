@@ -1,6 +1,6 @@
-[1;32mINFO    [0m prove halo2 verifier circuit [ 392s | 100.00% ]
+[1;32mINFO    [0m prove halo2 verifier circuit [ 394s | 100.00% ]
 [1;32mINFO    [0m ┝━ ｉ [info]: span [VerifierProgram] (1):
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 214729976
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 214729776
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 26137794
 [1;32mINFO    [0m ┝━ ｉ [info]: span [stage-c-build-rounds] (1):
@@ -60,11 +60,11 @@
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 282632
 [1;32mINFO    [0m ┝━ ｉ [info]: span [stage-e-verify-constraints] (1):
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 869909
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 869709
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 177833
 [1;32mINFO    [0m ┝━ ｉ [info]: Babybear:
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 121634674
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 121634474
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 25671636
 [1;32mINFO    [0m ┝━ ｉ [info]: Num2Bits:
@@ -75,9 +75,9 @@
 [1;32mINFO    [0m ┕━ ｉ [info]: Poisoned rows after RangeConfig::configure 9 | log.target: "halo2_base::gates::range" | log.module_path: "halo2_base::gates::range" | log.file: "/.cargo/git/checkouts/halo2-lib-d11b5da38eeddd90/2fe813b/halo2-base/src/gates/range/mod.rs" | log.line: 101
 test test_fibonacci_program_halo2_verify ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1405.65s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1435.78s
 
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/239ef6549226e325c15083f8fd0a487182abc379
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/0d14b1700e732f9d7af9b00a8bcae52a3ec962bf
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10745660560)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10746554173)
