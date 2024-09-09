@@ -6,14 +6,16 @@ use std::{
 };
 
 use afs_primitives::{
-    modular_multiplication::bigint::air::ModularArithmeticBigIntAir, range::bus::RangeCheckBus,
-    range_gate::RangeCheckerGateChip, xor::lookup::XorLookupChip,
+    modular_multiplication::bigint::air::ModularArithmeticBigIntAir,
+    var_range::{bus::VariableRangeCheckerBus, VariableRangeCheckerChip},
+    xor::lookup::XorLookupChip,
 };
 use afs_stark_backend::rap::AnyRap;
 use p3_commit::PolynomialSpace;
 use p3_field::PrimeField32;
 use p3_matrix::{dense::RowMajorMatrix, Matrix};
 use p3_uni_stark::{Domain, StarkGenericConfig, Val};
+use p3_util::log2_strict_usize;
 use poseidon2_air::poseidon2::Poseidon2Config;
 
 use super::{VirtualMachineState, VmConfig, VmCycleTracker, VmMetrics};
@@ -71,6 +73,7 @@ impl<SC: StarkGenericConfig> SegmentResult<SC> {
         self.traces
             .iter()
             .map(RowMajorMatrix::height)
+            .map(log2_strict_usize)
             .max()
             .unwrap()
     }
@@ -81,8 +84,9 @@ impl<F: PrimeField32> ExecutionSegment<F> {
     pub fn new(config: VmConfig, program: Program<F>, state: VirtualMachineState<F>) -> Self {
         let execution_bus = ExecutionBus(0);
         let memory_bus = MemoryBus(1);
-        let range_bus = RangeCheckBus::new(RANGE_CHECKER_BUS, 1 << config.memory_config.decomp);
-        let range_checker = Arc::new(RangeCheckerGateChip::new(range_bus));
+        let range_bus =
+            VariableRangeCheckerBus::new(RANGE_CHECKER_BUS, config.memory_config.decomp);
+        let range_checker = Arc::new(VariableRangeCheckerChip::new(range_bus));
 
         let memory_chip = Rc::new(RefCell::new(MemoryChip::with_volatile_memory(
             memory_bus,
