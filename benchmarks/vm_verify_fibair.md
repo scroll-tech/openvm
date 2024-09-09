@@ -1,18 +1,18 @@
 ## Benchmark for VM Verifier for Fibonacci Air
 | Total Cells | Total Prove (ms) | Main Trace Gen (ms) | Perm Trace Gen (ms) | Calc Quotient Values (ms) | Rest of Prove (ms) |
 |-----------------------------|-----------------------|--------------------------|--------------------------|-----------------|----------------|
-| 70_144_000 | 15800.00 | 2030.00 | 124.00 | 2190.00 | 11456.00 |
+| 64_495_616 | 15100.00 | 1960.00 | 126.00 | 2000.00 | 11014.00 |
 
 ### AIR metrics
 | Name | Rows | Cells | Prep Cols | Main Cols | Perm Cols |
 |------|------|-------|-----------|-----------|-----------|
-| CpuAir               | 524_288    | 47_710_208  | 0     | [71] | [20] |
+| CpuAir               | 524_288    | 43_515_904  | 0     | [67] | [16] |
 | ProgramAir           | 65_536     | 589_824     | 9     | [1] | [8] |
-| FieldArithmeticAir   | 262_144    | 13_107_200  | 0     | [34] | [16] |
-| FieldExtensionArithmeticAir | 8_192      | 1_048_576   | 0     | [80] | [48] |
-| Poseidon2VmAir       | 4_096      | 2_707_456   | 0     | [537] | [124] |
-| MemoryAuditAir       | 131_072    | 4_325_376   | 0     | [21] | [12] |
-| RangeCheckerGateAir  | 65_536     | 655_360     | 0     | [2] | [8] |
+| FieldArithmeticAir   | 262_144    | 12_320_768  | 0     | [31] | [16] |
+| FieldExtensionArithmeticAir | 8_192      | 884_736     | 0     | [68] | [40] |
+| Poseidon2VmAir       | 4_096      | 2_465_792   | 0     | [502] | [100] |
+| MemoryAuditAir       | 131_072    | 3_538_944   | 0     | [19] | [8] |
+| VariableRangeCheckerAir | 131_072    | 1_179_648   | 2     | [1] | [8] |
 <details>
 <summary>
 
@@ -28,34 +28,34 @@
 | Memory               | `        107_120` |
 | Poseidon2            | `          3_309` |
 | Program              | `         54_724` |
-| RangeChecker         | `         65_536` |
+| RangeChecker         | `        131_072` |
 
 #### Opcode metrics
 | Name | Frequency | Trace Cells Contributed |
 |------|------:|-----:|
-| FADD                 | `        134_354` | `     14_180_208` |
-| BNE                  | `         75_347` | `      5_349_637` |
-| STOREW               | `         74_001` | `      6_198_084` |
-| LOADW                | `         49_216` | `      3_576_341` |
-| LOADW2               | `         38_007` | `      2_702_193` |
-| SHINTW               | `         33_232` | `      3_057_344` |
-| STOREW2              | `         21_346` | `      1_824_728` |
-| FMUL                 | `         20_715` | `      2_241_897` |
-| JAL                  | `         12_839` | `        911_590` |
-| FSUB                 | `          9_467` | `      1_062_894` |
-| HINT_INPUT           | `          4_769` | `        338_599` |
-| CT_END               | `          3_921` | `        278_391` |
-| CT_START             | `          3_921` | `        278_391` |
-| BBE4MUL              | `          3_759` | `        570_381` |
-| BEQ                  | `          3_429` | `        243_459` |
-| COMP_POS2            | `          2_678` | `      1_628_224` |
-| FE4ADD               | `          1_678` | `        254_386` |
-| BBE4DIV              | `          1_239` | `        187_173` |
-| FE4SUB               | `          1_238` | `        187_106` |
-| PERM_POS2            | `            631` | `        383_648` |
-| HINT_BITS            | `            104` | `          7_384` |
-| FDIV                 | `              3` | `            315` |
-| TERMINATE            | `              1` | `             71` |
+| FADD                 | `        134_354` | `     13_232_774` |
+| BNE                  | `         75_347` | `      5_048_249` |
+| STOREW               | `         74_001` | `      5_812_174` |
+| LOADW                | `         49_216` | `      3_371_667` |
+| LOADW2               | `         38_007` | `      2_549_813` |
+| SHINTW               | `         33_232` | `      2_857_952` |
+| STOREW2              | `         21_346` | `      1_709_900` |
+| FMUL                 | `         20_715` | `      2_090_528` |
+| JAL                  | `         12_839` | `        860_232` |
+| FSUB                 | `          9_467` | `        990_067` |
+| HINT_INPUT           | `          4_769` | `        319_523` |
+| CT_END               | `          3_921` | `        262_707` |
+| CT_START             | `          3_921` | `        262_707` |
+| BBE4MUL              | `          3_759` | `        509_973` |
+| BEQ                  | `          3_429` | `        229_743` |
+| COMP_POS2            | `          2_678` | `      1_523_782` |
+| FE4ADD               | `          1_678` | `        227_442` |
+| BBE4DIV              | `          1_239` | `        167_341` |
+| FE4SUB               | `          1_238` | `        167_282` |
+| PERM_POS2            | `            631` | `        359_039` |
+| HINT_BITS            | `            104` | `          6_968` |
+| FDIV                 | `              3` | `            294` |
+| TERMINATE            | `              1` | `             67` |
 
 ### DSL counts
 How many opcodes each DSL instruction generates:
@@ -113,6 +113,6 @@ How many opcodes each DSL instruction generates:
 | MulFI                | `              1` |
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/142ceae47d66cdbc32f37f928e5f122866c8bb2c
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/8442c47b2d686b771d7c1c0ccd69ce2deaab1d67
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10763789010)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10770485986)
