@@ -1,6 +1,6 @@
-[1;32mINFO    [0m prove halo2 verifier circuit [ 390s | 100.00% ]
+[1;32mINFO    [0m prove halo2 verifier circuit [ 391s | 100.00% ]
 [1;32mINFO    [0m ┝━ ｉ [info]: span [VerifierProgram] (1):
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 216130365
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 216130368
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 24447682
 [1;32mINFO    [0m ┝━ ｉ [info]: span [stage-c-build-rounds] (1):
@@ -64,7 +64,7 @@
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 165465
 [1;32mINFO    [0m ┝━ ｉ [info]: Babybear:
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 113379128
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 113379131
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 23985148
 [1;32mINFO    [0m ┝━ ｉ [info]: Num2Bits:
@@ -75,9 +75,9 @@
 [1;32mINFO    [0m ┕━ ｉ [info]: Poisoned rows after RangeConfig::configure 9 | log.target: "halo2_base::gates::range" | log.module_path: "halo2_base::gates::range" | log.file: "/.cargo/git/checkouts/halo2-lib-d11b5da38eeddd90/2fe813b/halo2-base/src/gates/range/mod.rs" | log.line: 101
 test test_fibonacci_program_halo2_verify ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1408.66s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1422.83s
 
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/d903e00fa42bfb9eec80e0c9297ec4ab1b061dfa
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/26e2125bc67529354cf7aad1dd840ada1d2ce77f
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10797460858)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10801106945)
