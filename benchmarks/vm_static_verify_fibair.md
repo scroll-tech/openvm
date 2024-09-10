@@ -1,4 +1,4 @@
-[1;32mINFO    [0m prove halo2 verifier circuit [ 391s | 100.00% ]
+[1;32mINFO    [0m prove halo2 verifier circuit [ 392s | 100.00% ]
 [1;32mINFO    [0m ┝━ ｉ [info]: span [VerifierProgram] (1):
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 216130365
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
@@ -75,9 +75,9 @@
 [1;32mINFO    [0m ┕━ ｉ [info]: Poisoned rows after RangeConfig::configure 9 | log.target: "halo2_base::gates::range" | log.module_path: "halo2_base::gates::range" | log.file: "/.cargo/git/checkouts/halo2-lib-d11b5da38eeddd90/2fe813b/halo2-base/src/gates/range/mod.rs" | log.line: 101
 test test_fibonacci_program_halo2_verify ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1412.14s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1447.83s
 
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/e0e4c51e0bd28d3ffdbfb5b1d41fadb7c7117025
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/776ed0763cd6897dcf280d584cc022d8c8ed364b
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10793744605)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10796637561)
