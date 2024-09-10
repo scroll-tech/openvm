@@ -24,13 +24,16 @@ pub mod bridge;
 pub mod columns;
 pub mod trace;
 
+pub const NUM_LIMBS: usize = 32; // This is used in some places where const generics are hard to use.
+                                 // Of course, TODO make it something normal
+
 pub const fn num_limbs<const ARG_SIZE: usize, const LIMB_SIZE: usize>() -> usize {
     (ARG_SIZE + LIMB_SIZE - 1) / LIMB_SIZE
 }
 
 #[derive(Debug)]
 pub enum WriteRecord<T> {
-    Uint(MemoryWriteRecord<32, T>),
+    Uint(MemoryWriteRecord<NUM_LIMBS, T>),
     Short(MemoryWriteRecord<1, T>),
 }
 
@@ -43,8 +46,8 @@ pub struct UintArithmeticRecord<const ARG_SIZE: usize, const LIMB_SIZE: usize, T
     pub y_ptr_read: MemoryReadRecord<1, T>,
     pub z_ptr_read: MemoryReadRecord<1, T>,
 
-    pub x_read: MemoryReadRecord<32, T>, // TODO: 32 -> generic expr or smth
-    pub y_read: MemoryReadRecord<32, T>, // TODO: 32 -> generic expr or smth
+    pub x_read: MemoryReadRecord<NUM_LIMBS, T>,
+    pub y_read: MemoryReadRecord<NUM_LIMBS, T>,
     pub z_write: WriteRecord<T>,
 
     // this may be redundant because we can extract it from z_write,
@@ -120,8 +123,8 @@ impl<const ARG_SIZE: usize, const LIMB_SIZE: usize, T: PrimeField32> Instruction
         let [z_ptr_read, x_ptr_read, y_ptr_read] =
             [a, b, c].map(|ptr_of_ptr| memory_chip.read_cell(d, ptr_of_ptr));
 
-        let x_read = memory_chip.read::<32>(f, x_ptr_read.value()); // TODO: 32 -> generic expr or smth
-        let y_read = memory_chip.read::<32>(g, y_ptr_read.value()); // TODO: 32 -> generic expr or smth
+        let x_read = memory_chip.read::<NUM_LIMBS>(f, x_ptr_read.value());
+        let y_read = memory_chip.read::<NUM_LIMBS>(g, y_ptr_read.value());
 
         let x = x_read.data.map(|x| x.as_canonical_u32());
         let y = y_read.data.map(|x| x.as_canonical_u32());
@@ -135,13 +138,14 @@ impl<const ARG_SIZE: usize, const LIMB_SIZE: usize, T: PrimeField32> Instruction
                     .iter()
                     .map(|x| T::from_canonical_u32(*x))
                     .collect::<Vec<_>>();
-                WriteRecord::Uint(memory_chip.write::<32>(
+                WriteRecord::Uint(memory_chip.write::<NUM_LIMBS>(
                     z_address_space,
                     z_ptr_read.value(),
                     to_write.try_into().unwrap(),
                 ))
             }
             CalculationResult::Short(res) => {
+                println!("writing cell: {:?} {:?}", e, z_ptr_read.value());
                 WriteRecord::Short(memory_chip.write_cell(e, z_ptr_read.value(), T::from_bool(res)))
             }
         };
