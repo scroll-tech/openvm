@@ -28,17 +28,23 @@ pub const fn num_limbs<const ARG_SIZE: usize, const LIMB_SIZE: usize>() -> usize
     (ARG_SIZE + LIMB_SIZE - 1) / LIMB_SIZE
 }
 
+#[derive(Debug)]
 pub enum WriteRecord<T> {
-    Uint(MemoryWriteRecord<16, T>),
+    Uint(MemoryWriteRecord<32, T>),
     Short(MemoryWriteRecord<1, T>),
 }
 
+#[derive(Debug)]
 pub struct UintArithmeticRecord<const ARG_SIZE: usize, const LIMB_SIZE: usize, T> {
     pub from_state: ExecutionState<usize>,
     pub instruction: Instruction<T>,
 
-    pub x_read: MemoryReadRecord<16, T>, // TODO: 16 -> generic expr or smth
-    pub y_read: MemoryReadRecord<16, T>, // TODO: 16 -> generic expr or smth
+    pub x_ptr_read: MemoryReadRecord<1, T>,
+    pub y_ptr_read: MemoryReadRecord<1, T>,
+    pub z_ptr_read: MemoryReadRecord<1, T>,
+
+    pub x_read: MemoryReadRecord<32, T>, // TODO: 32 -> generic expr or smth
+    pub y_read: MemoryReadRecord<32, T>, // TODO: 32 -> generic expr or smth
     pub z_write: WriteRecord<T>,
 
     // this may be redundant because we can extract it from z_write,
@@ -48,6 +54,7 @@ pub struct UintArithmeticRecord<const ARG_SIZE: usize, const LIMB_SIZE: usize, T
     pub buffer: Vec<T>,
 }
 
+#[derive(Debug)]
 pub struct UintArithmeticChip<const ARG_SIZE: usize, const LIMB_SIZE: usize, T: PrimeField32> {
     pub air: UintArithmeticAir<ARG_SIZE, LIMB_SIZE>,
     data: Vec<UintArithmeticRecord<ARG_SIZE, LIMB_SIZE, T>>,
@@ -92,12 +99,13 @@ impl<const ARG_SIZE: usize, const LIMB_SIZE: usize, T: PrimeField32> Instruction
     ) -> ExecutionState<usize> {
         let Instruction {
             opcode,
-            op_a: z_address,
-            op_b: x_address,
-            op_c: y_address,
-            d: z_as,
-            e: x_as,
-            op_f: y_as,
+            op_a: a,
+            op_b: b,
+            op_c: c,
+            d,
+            e,
+            op_f: f,
+            op_g: g,
             ..
         } = instruction.clone();
         assert!(UINT256_ARITHMETIC_INSTRUCTIONS.contains(&opcode));
@@ -109,28 +117,32 @@ impl<const ARG_SIZE: usize, const LIMB_SIZE: usize, T: PrimeField32> Instruction
             memory_chip.timestamp().as_canonical_u32() as usize
         );
 
-        let x_read = memory_chip.read::<16>(x_as, x_address); // TODO: 16 -> generic expr or smth
-        let y_read = memory_chip.read::<16>(y_as, y_address); // TODO: 16 -> generic expr or smth
+        let [z_ptr_read, x_ptr_read, y_ptr_read] =
+            [a, b, c].map(|ptr_of_ptr| memory_chip.read_cell(d, ptr_of_ptr));
+
+        let x_read = memory_chip.read::<32>(f, x_ptr_read.value()); // TODO: 32 -> generic expr or smth
+        let y_read = memory_chip.read::<32>(g, y_ptr_read.value()); // TODO: 32 -> generic expr or smth
 
         let x = x_read.data.map(|x| x.as_canonical_u32());
         let y = y_read.data.map(|x| x.as_canonical_u32());
         let (z, residue) = UintArithmetic::<ARG_SIZE, LIMB_SIZE, T>::solve(opcode, (&x, &y));
         let CalculationResidue { result, buffer } = residue;
 
+        let z_address_space = e;
         let z_write: WriteRecord<T> = match z {
             CalculationResult::Uint(limbs) => {
                 let to_write = limbs
                     .iter()
                     .map(|x| T::from_canonical_u32(*x))
                     .collect::<Vec<_>>();
-                WriteRecord::Uint(memory_chip.write::<16>(
-                    z_as,
-                    z_address,
+                WriteRecord::Uint(memory_chip.write::<32>(
+                    z_address_space,
+                    z_ptr_read.value(),
                     to_write.try_into().unwrap(),
                 ))
             }
             CalculationResult::Short(res) => {
-                WriteRecord::Short(memory_chip.write_cell(z_as, z_address, T::from_bool(res)))
+                WriteRecord::Short(memory_chip.write_cell(e, z_ptr_read.value(), T::from_bool(res)))
             }
         };
 
@@ -141,6 +153,9 @@ impl<const ARG_SIZE: usize, const LIMB_SIZE: usize, T: PrimeField32> Instruction
         self.data.push(UintArithmeticRecord {
             from_state,
             instruction: instruction.clone(),
+            x_ptr_read,
+            y_ptr_read,
+            z_ptr_read,
             x_read,
             y_read,
             z_write,
