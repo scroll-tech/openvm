@@ -1,5 +1,6 @@
 extern crate core;
 
+pub mod assert_less_than;
 pub mod assert_sorted;
 pub mod is_equal;
 pub mod is_equal_vec;
