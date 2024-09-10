@@ -3,7 +3,6 @@ use std::{iter::repeat, sync::Arc};
 use afs_stark_backend::interaction::InteractionBuilder;
 use num_bigint_dig::{BigInt, BigUint};
 use p3_field::PrimeField64;
-use p3_matrix::Matrix;
 
 use crate::{
     bigint::{
@@ -69,6 +68,7 @@ impl<T: Clone> ModularArithmeticCols<T> {
 type Equation3<T, S> = fn(S, S, S) -> OverflowInt<T>;
 type Equation5<T, S> = fn(S, S, S, S, S) -> OverflowInt<T>;
 
+#[derive(Clone, Debug)]
 pub struct ModularArithmeticAir {
     pub check_carry_sub_air: CheckCarryModToZeroSubAir,
     // The modulus p
@@ -135,24 +135,16 @@ impl ModularArithmeticAir {
     pub fn eval<AB: InteractionBuilder>(
         &self,
         builder: &mut AB,
+        cols: ModularArithmeticCols<AB::Var>,
         equation: Equation3<AB::Expr, OverflowInt<AB::Expr>>,
     ) {
-        let main = builder.main();
-        let local = main.row_slice(0);
-        let local = ModularArithmeticCols::<AB::Var>::from_slice(
-            &local,
-            self.num_limbs,
-            self.q_limbs,
-            self.carry_limbs,
-        );
-
         let ModularArithmeticCols {
             x,
             y,
             q,
             r,
             carries,
-        } = local;
+        } = cols;
 
         let x_overflow = OverflowInt::<AB::Expr>::from_var_vec::<AB, AB::Var>(x, self.limb_bits);
         let y_overflow = OverflowInt::<AB::Expr>::from_var_vec::<AB, AB::Var>(y, self.limb_bits);
