@@ -218,6 +218,7 @@ impl<F: PrimeField32> CpuChip<F> {
 
         let mut hint_stream = vm.hint_stream.clone();
         let mut cycle_tracker = std::mem::take(&mut vm.cycle_tracker);
+        #[allow(unused_assignments)]
         let mut is_done = false;
         let mut collect_metrics = vm.config.collect_metrics;
         // The backtrace for the previous instruction, if any.
@@ -552,7 +553,8 @@ impl<F: PrimeField32> CpuChip<F> {
                 break;
             }
             if vm.should_segment() {
-                break;
+                panic!("continuations not supported");
+                // break
             }
         }
         if collect_metrics {
