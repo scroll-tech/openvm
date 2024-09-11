@@ -1,7 +1,10 @@
 use std::sync::Arc;
 
 use afs_primitives::{
-    bigint::{modular_arithmetic::add::ModularAdditionAir, utils::get_arithmetic_air},
+    bigint::{
+        modular_arithmetic::add::ModularAdditionAir,
+        utils::{big_uint_mod_inverse, get_arithmetic_air},
+    },
     var_range::VariableRangeCheckerChip,
 };
 use num_bigint_dig::BigUint;
@@ -32,6 +35,9 @@ mod tests;
 // TODO: maybe use const generic.
 pub const LIMB_SIZE: usize = 8;
 pub const NUM_LIMBS: usize = 32;
+
+// Max bits that can fit into our field element.
+pub const FIELD_ELEMENT_BITS: usize = 30;
 
 #[derive(Clone, Debug)]
 pub struct ModularArithmeticRecord<T: PrimeField32> {
@@ -79,6 +85,7 @@ impl<T: PrimeField32> ModularArithmeticChip<T> {
         let primitive_arithmetic_addsub = get_arithmetic_air(
             modulus.clone(),
             LIMB_SIZE,
+            FIELD_ELEMENT_BITS,
             NUM_LIMBS,
             false,
             range_checker_chip.bus().index,
@@ -153,8 +160,7 @@ impl<T: PrimeField32> InstructionExecutor<T> for ModularArithmeticChip<T> {
                 (x_biguint * y_biguint) % &self.modulus
             }
             Opcode::SECP256K1_COORD_DIV | Opcode::SECP256K1_SCALAR_DIV => {
-                let exp = &self.modulus - BigUint::from_u8(2).unwrap();
-                let y_inv = y_biguint.modpow(&exp, &self.modulus);
+                let y_inv = big_uint_mod_inverse(&y_biguint, &self.modulus);
 
                 (x_biguint * y_inv) % &self.modulus
             }

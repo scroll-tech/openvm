@@ -10,7 +10,7 @@ use p3_matrix::dense::RowMajorMatrix;
 use rand::RngCore;
 
 use super::{
-    super::utils::{get_arithmetic_air, secp256k1_prime},
+    super::utils::{big_uint_mod_inverse, get_arithmetic_air, secp256k1_prime},
     add::*,
     div::*,
     mul::*,
@@ -40,6 +40,8 @@ fn get_air_and_range_checker(
     num_limbs: usize,
     is_mul_div: bool,
 ) -> (ModularArithmeticAir, Arc<VariableRangeCheckerChip>) {
+    let field_element_bits = 30;
+
     let range_bus = 1;
     let range_decomp = 17;
     let range_checker = Arc::new(VariableRangeCheckerChip::new(VariableRangeCheckerBus::new(
@@ -49,6 +51,7 @@ fn get_air_and_range_checker(
     let air = get_arithmetic_air(
         prime,
         limb_bits,
+        field_element_bits,
         num_limbs,
         is_mul_div,
         range_bus,
@@ -161,8 +164,7 @@ fn test_x_mul_y_wrong_trace() {
 fn test_x_div_y() {
     let prime = secp256k1_prime();
     let (x, y) = generate_xy();
-    let exp = prime.clone() - BigUint::from_u8(2).unwrap();
-    let y_inv = y.modpow(&exp, &prime);
+    let y_inv = big_uint_mod_inverse(&y, &prime);
 
     let expected_r = x.clone() * y_inv.clone() % prime.clone();
 
