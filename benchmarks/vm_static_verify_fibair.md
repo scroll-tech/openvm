@@ -1,8 +1,8 @@
 [1;32mINFO    [0m prove halo2 verifier circuit [ 392s | 100.00% ]
 [1;32mINFO    [0m ┝━ ｉ [info]: span [VerifierProgram] (1):
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 216130368
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 216120266
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 24447682
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 24445634
 [1;32mINFO    [0m ┝━ ｉ [info]: span [stage-c-build-rounds] (1):
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 157865
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
@@ -60,13 +60,13 @@
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 293756
 [1;32mINFO    [0m ┝━ ｉ [info]: span [stage-e-verify-constraints] (1):
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 810966
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 800864
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 165465
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 163417
 [1;32mINFO    [0m ┝━ ｉ [info]: Babybear:
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 113379131
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 113369029
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 23985148
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 23983100
 [1;32mINFO    [0m ┝━ ｉ [info]: Num2Bits:
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 11441681
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
@@ -75,9 +75,9 @@
 [1;32mINFO    [0m ┕━ ｉ [info]: Poisoned rows after RangeConfig::configure 9 | log.target: "halo2_base::gates::range" | log.module_path: "halo2_base::gates::range" | log.file: "/.cargo/git/checkouts/halo2-lib-d11b5da38eeddd90/2fe813b/halo2-base/src/gates/range/mod.rs" | log.line: 101
 test test_fibonacci_program_halo2_verify ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1429.63s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1443.01s
 
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/93c6ab640afa3e12773f0c2694c6b24fc576f167
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/90a33202d8563938859f822dd2d08965bf6845e9
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10817138185)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10817709193)
