@@ -156,9 +156,9 @@ impl<T: Field> Poseidon2VmIoCols<T> {
 impl<T: Clone> Poseidon2VmAuxCols<T> {
     pub fn width(air: &Poseidon2VmAir<T>) -> usize {
         3 + Poseidon2Cols::<WIDTH, T>::get_width(&air.inner)
-            + 3 * MemoryReadAuxCols::<1, T>::width(&air.mem_oc)
-            + 2 * MemoryReadAuxCols::<CHUNK, T>::width(&air.mem_oc)
-            + 2 * MemoryWriteAuxCols::<CHUNK, T>::width(&air.mem_oc)
+            + 3 * MemoryReadAuxCols::<1, T>::width()
+            + 2 * MemoryReadAuxCols::<CHUNK, T>::width()
+            + 2 * MemoryWriteAuxCols::<CHUNK, T>::width()
     }
 
     pub fn flatten(&self) -> Vec<T> {
@@ -199,18 +199,18 @@ impl<T: Clone> Poseidon2VmAuxCols<T> {
 
         let ptr_aux_cols = array::from_fn(|_| {
             start = end;
-            end += MemoryReadAuxCols::<1, T>::width(&air.mem_oc);
-            MemoryReadAuxCols::from_slice(&slc[start..end], &air.mem_oc)
+            end += MemoryReadAuxCols::<1, T>::width();
+            MemoryReadAuxCols::from_slice(&slc[start..end])
         });
         let input_aux_cols = array::from_fn(|_| {
             start = end;
-            end += MemoryReadAuxCols::<CHUNK, T>::width(&air.mem_oc);
-            MemoryReadAuxCols::from_slice(&slc[start..end], &air.mem_oc)
+            end += MemoryReadAuxCols::<CHUNK, T>::width();
+            MemoryReadAuxCols::from_slice(&slc[start..end])
         });
         let output_aux_cols = array::from_fn(|_| {
             start = end;
-            end += MemoryWriteAuxCols::<CHUNK, T>::width(&air.mem_oc);
-            MemoryWriteAuxCols::from_slice(&slc[start..end], &air.mem_oc)
+            end += MemoryWriteAuxCols::<CHUNK, T>::width();
+            MemoryWriteAuxCols::from_slice(&slc[start..end])
         });
 
         Self {
@@ -232,9 +232,9 @@ impl<T: Field> Poseidon2VmAuxCols<T> {
             lhs_ptr: T::default(),
             rhs_ptr: T::default(),
             internal: Poseidon2Cols::blank_row(&air.inner),
-            ptr_aux_cols: array::from_fn(|_| MemoryReadAuxCols::disabled(air.mem_oc)),
-            input_aux_cols: array::from_fn(|_| MemoryReadAuxCols::disabled(air.mem_oc)),
-            output_aux_cols: array::from_fn(|_| MemoryWriteAuxCols::disabled(air.mem_oc)),
+            ptr_aux_cols: array::from_fn(|_| MemoryReadAuxCols::disabled()),
+            input_aux_cols: array::from_fn(|_| MemoryReadAuxCols::disabled()),
+            output_aux_cols: array::from_fn(|_| MemoryWriteAuxCols::disabled()),
         }
     }
 }

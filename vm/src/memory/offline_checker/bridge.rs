@@ -1,7 +1,7 @@
 use std::iter::zip;
 
 use afs_primitives::{
-    is_less_than::{columns::IsLessThanIoCols, IsLessThanAir},
+    assert_less_than::{columns::AssertLessThanIoCols, AssertLessThanAir},
     is_zero::{
         columns::{IsZeroCols, IsZeroIoCols},
         IsZeroAir,
@@ -24,6 +24,12 @@ use crate::{
         MemoryAddress,
     },
 };
+
+/// AUX_LEN is the number of auxiliary columns (aka the number of limbs that the input numbers will be decomposed into)
+/// for the `AssertLessThanAir` in the `MemoryOfflineChecker`.
+/// Warning: This requires that (clk_max_bits + decomp - 1) / decomp = AUX_LEN
+///         in MemoryOfflineChecker (or whenever AssertLessThanAir is used)
+pub(super) const AUX_LEN: usize = 2;
 
 /// The [MemoryBridge] is used within AIR evaluation functions to constrain logical memory operations (read/write).
 /// It adds all necessary constraints and interactions.
@@ -109,6 +115,9 @@ pub struct MemoryReadOperation<'a, T, V, const N: usize> {
     aux: &'a MemoryReadAuxCols<N, V>,
 }
 
+/// The max degree of constraints is:
+/// eval_timestamps: deg(enabled) + max(1, deg(self.timestamp))
+/// eval_bulk_access: refer to [MemoryOfflineChecker::eval_bulk_access]
 impl<'a, F: AbstractField, V: Copy + Into<F>, const N: usize> MemoryReadOperation<'a, F, V, N> {
     /// Evaluate constraints and send/receive interactions.
     pub fn eval<AB>(self, builder: &mut AB, enabled: impl Into<AB::Expr>)
@@ -156,6 +165,13 @@ pub struct MemoryReadOrImmediateOperation<'a, T, V> {
     aux: &'a MemoryReadOrImmediateAuxCols<V>,
 }
 
+/// The max degree of constraints is:
+/// IsZeroAir.subair_eval:
+///         deg(enabled) + max(deg(address.address_space) + deg(aux.is_immediate),
+///                           deg(address.address_space) + deg(aux.is_zero_aux))
+/// is_immediate check: deg(aux.is_immediate) + max(deg(data), deg(address.pointer))
+/// eval_timestamps: deg(enabled) + max(1, deg(self.timestamp))
+/// eval_bulk_access: refer to [MemoryOfflineChecker::eval_bulk_access]
 impl<'a, F: AbstractField, V: Copy + Into<F>> MemoryReadOrImmediateOperation<'a, F, V> {
     /// Evaluate constraints and send/receive interactions.
     pub fn eval<AB>(self, builder: &mut AB, enabled: impl Into<AB::Expr>)
@@ -219,6 +235,9 @@ pub struct MemoryWriteOperation<'a, T, V, const N: usize> {
     aux: &'a MemoryWriteAuxCols<N, V>,
 }
 
+/// The max degree of constraints is:
+/// eval_timestamps: deg(enabled) + max(1, deg(self.timestamp))
+/// eval_bulk_access: refer to [MemoryOfflineChecker::eval_bulk_access]
 impl<'a, T: AbstractField, V: Copy + Into<T>, const N: usize> MemoryWriteOperation<'a, T, V, N> {
     /// Evaluate constraints and send/receive interactions. `enabled` must be boolean.
     pub fn eval<AB>(self, builder: &mut AB, enabled: impl Into<AB::Expr>)
@@ -248,7 +267,7 @@ impl<'a, T: AbstractField, V: Copy + Into<T>, const N: usize> MemoryWriteOperati
 #[derive(Clone, Copy, Debug)]
 pub struct MemoryOfflineChecker {
     pub memory_bus: MemoryBus,
-    pub timestamp_lt_air: IsLessThanAir,
+    pub timestamp_lt_air: AssertLessThanAir<AUX_LEN>,
 }
 
 impl MemoryOfflineChecker {
@@ -257,10 +276,13 @@ impl MemoryOfflineChecker {
         let range_bus = VariableRangeCheckerBus::new(RANGE_CHECKER_BUS, decomp);
         Self {
             memory_bus,
-            timestamp_lt_air: IsLessThanAir::new(range_bus, clk_max_bits),
+            timestamp_lt_air: AssertLessThanAir::new(range_bus, clk_max_bits),
         }
     }
 
+    // The max degree of constraints is:
+    // deg(enabled) + max(1, deg(timestamp))
+    // Note: deg(prev_timestamp) = 1 since prev_timestamp is Var
     fn eval_timestamps<AB: InteractionBuilder, const N: usize>(
         &self,
         builder: &mut AB,
@@ -268,9 +290,9 @@ impl MemoryOfflineChecker {
         base: &MemoryBaseAuxCols<AB::Var, N>,
         enabled: AB::Expr,
     ) {
-        for (prev_timestamp, clk_lt_aux) in zip(base.prev_timestamps, base.clk_lt_aux.clone()) {
+        for (prev_timestamp, clk_lt_aux) in zip(base.prev_timestamps, base.clk_lt_aux) {
             let clk_lt_io_cols =
-                IsLessThanIoCols::<AB::Expr>::new(prev_timestamp, timestamp.clone(), AB::F::one());
+                AssertLessThanIoCols::<AB::Expr>::new(prev_timestamp, timestamp.clone());
             self.timestamp_lt_air.conditional_eval(
                 builder,
                 clk_lt_io_cols,
@@ -280,6 +302,10 @@ impl MemoryOfflineChecker {
         }
     }
 
+    // At the core, eval_bulk_access is a bunch of push_sends and push_receives.
+    // The max constraint degree of expressions in sends/recieves is:
+    // max(max_deg(data), max_deg(prev_data), max_deg(timestamp), max_deg(prev_timestamps))
+    // Also, each one of them has count with degree: deg(enabled)
     #[allow(clippy::too_many_arguments)]
     fn eval_bulk_access<AB, const N: usize>(
         &self,
