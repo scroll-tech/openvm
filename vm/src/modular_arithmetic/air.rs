@@ -1,23 +1,20 @@
 use std::borrow::Borrow;
 
-use afs_primitives::{
-    bigint::modular_arithmetic::ModularArithmeticCols as PrimitiveArithmeticCols, sub_chip::SubAir,
-};
+use afs_primitives::bigint::modular_arithmetic::ModularArithmeticCols as PrimitiveArithmeticCols;
 use afs_stark_backend::interaction::InteractionBuilder;
 use p3_air::{Air, BaseAir};
-use p3_field::{AbstractField, Field};
+use p3_field::Field;
 use p3_matrix::Matrix;
 
-use super::{columns::ModularArithmeticCols, ModularArithmeticAir};
-use crate::arch::instructions::Opcode;
+use super::{columns::ModularArithmeticCols, ModularArithmeticAirVariant, ModularArithmeticVmAir};
 
-impl<F: Field> BaseAir<F> for ModularArithmeticAir {
+impl<F: Field> BaseAir<F> for ModularArithmeticVmAir<ModularArithmeticAirVariant> {
     fn width(&self) -> usize {
-        todo!()
+        ModularArithmeticCols::<F>::width(self)
     }
 }
 
-impl<AB: InteractionBuilder> Air<AB> for ModularArithmeticAir {
+impl<AB: InteractionBuilder> Air<AB> for ModularArithmeticVmAir<ModularArithmeticAirVariant> {
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
 
@@ -32,10 +29,10 @@ impl<AB: InteractionBuilder> Air<AB> for ModularArithmeticAir {
             r: io.z.data.clone(),
             q: aux.q.clone(),
             carries: aux.carries.clone(),
+            is_valid: aux.is_valid,
         };
-        SubAir::eval(&self.air, builder, cols, ());
+        self.air.eval(builder, cols, ());
 
-        let expected_opcode = AB::Expr::from_canonical_u8(Opcode::SECP256K1_COORD_ADD as u8);
-        self.eval_interactions(builder, io, aux, expected_opcode);
+        self.eval_interactions(builder, io, aux);
     }
 }

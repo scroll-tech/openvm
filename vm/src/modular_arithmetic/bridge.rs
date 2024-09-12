@@ -3,20 +3,19 @@ use p3_field::AbstractField;
 
 use super::{
     columns::{ModularArithmeticAuxCols, ModularArithmeticIoCols},
-    ModularArithmeticAir,
+    ModularArithmeticAirVariant, ModularArithmeticVmAir,
 };
 use crate::{
     arch::columns::InstructionCols,
     memory::{offline_checker::MemoryBridge, MemoryAddress},
 };
 
-impl ModularArithmeticAir {
+impl ModularArithmeticVmAir<ModularArithmeticAirVariant> {
     pub fn eval_interactions<AB: InteractionBuilder>(
         &self,
         builder: &mut AB,
         io: ModularArithmeticIoCols<AB::Var>,
         aux: ModularArithmeticAuxCols<AB::Var>,
-        expected_opcode: AB::Expr,
     ) {
         let mut timestamp_delta = AB::Expr::zero();
         let memory_bridge = MemoryBridge::new(self.mem_oc);
@@ -97,11 +96,11 @@ impl ModularArithmeticAir {
             io.from_state.map(Into::into),
             timestamp_delta,
             InstructionCols::new(
-                expected_opcode,
+                aux.opcode,
                 [
-                    io.z.address,
-                    io.x.address,
-                    io.y.address,
+                    io.z_address.address,
+                    io.x_address.address,
+                    io.y_address.address,
                     io.x_address.address_space,
                     io.x.address_space,
                 ],

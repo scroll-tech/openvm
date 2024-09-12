@@ -1,4 +1,3 @@
-use afs_primitives::sub_chip::LocalTraceInstructions;
 use p3_field::PrimeField32;
 use p3_matrix::dense::RowMajorMatrix;
 
@@ -6,14 +5,14 @@ use super::{
     columns::{
         MemoryData, ModularArithmeticAuxCols, ModularArithmeticCols, ModularArithmeticIoCols,
     },
-    ModularArithmeticChip, ModularArithmeticRecord,
+    ModularArithmeticAirVariant, ModularArithmeticChip, ModularArithmeticRecord, NUM_LIMBS,
 };
 use crate::{
-    arch::chips::MachineChip,
+    arch::{chips::MachineChip, columns::ExecutionState},
     memory::offline_checker::{MemoryReadAuxCols, MemoryWriteAuxCols},
 };
 
-impl<F: PrimeField32> MachineChip<F> for ModularArithmeticChip<F> {
+impl<F: PrimeField32> MachineChip<F> for ModularArithmeticChip<F, ModularArithmeticAirVariant> {
     fn air<SC: p3_uni_stark::StarkGenericConfig>(
         &self,
     ) -> Box<dyn afs_stark_backend::rap::AnyRap<SC>>
@@ -109,6 +108,7 @@ impl<F: PrimeField32> MachineChip<F> for ModularArithmeticChip<F> {
                     z_address_aux_cols: memory_chip.make_read_aux_cols(z_address_read.clone()),
                     carries: primitive_row.carries,
                     q: primitive_row.q,
+                    opcode: F::from_canonical_u8(record.instruction.opcode as u8),
                 };
                 ModularArithmeticCols { io, aux }.flatten()
             })
@@ -117,8 +117,26 @@ impl<F: PrimeField32> MachineChip<F> for ModularArithmeticChip<F> {
         let height = rows.len();
         let padded_height = height.next_power_of_two();
 
+        let dummy_mem_data = MemoryData {
+            data: vec![F::zero(); NUM_LIMBS],
+            address_space: F::zero(),
+            address: F::zero(),
+        };
+        let dummy_mem_addr = MemoryData {
+            data: vec![F::zero()],
+            address_space: F::zero(),
+            address: F::zero(),
+        };
         let blank_row = ModularArithmeticCols {
-            io: Default::default(),
+            io: ModularArithmeticIoCols {
+                from_state: ExecutionState::default(),
+                x: dummy_mem_data.clone(),
+                y: dummy_mem_data.clone(),
+                z: dummy_mem_data.clone(),
+                x_address: dummy_mem_addr.clone(),
+                y_address: dummy_mem_addr.clone(),
+                z_address: dummy_mem_addr.clone(),
+            },
             aux: ModularArithmeticAuxCols {
                 is_valid: Default::default(),
                 read_x_aux_cols: MemoryReadAuxCols::disabled(),
@@ -129,6 +147,7 @@ impl<F: PrimeField32> MachineChip<F> for ModularArithmeticChip<F> {
                 z_address_aux_cols: MemoryReadAuxCols::disabled(),
                 carries: vec![F::zero(); self.air.carry_limbs],
                 q: vec![F::zero(); self.air.q_limbs],
+                opcode: F::zero(),
             },
         }
         .flatten();
