@@ -1,6 +1,9 @@
 use std::{cell::RefCell, rc::Rc, sync::Arc};
 
-use afs_primitives::{var_range::VariableRangeCheckerChip, xor::lookup::XorLookupChip};
+use afs_primitives::{
+    range_tuple::RangeTupleCheckerChip, var_range::VariableRangeCheckerChip,
+    xor::lookup::XorLookupChip,
+};
 use afs_stark_backend::rap::AnyRap;
 use enum_dispatch::enum_dispatch;
 use p3_air::BaseAir;
@@ -20,6 +23,7 @@ use crate::{
     modular_arithmetic::{ModularArithmeticAirVariant, ModularArithmeticChip},
     program::ProgramChip,
     uint_arithmetic::UintArithmeticChip,
+    uint_multiplication::UintMultiplicationChip,
 };
 
 #[enum_dispatch]
@@ -94,6 +98,7 @@ pub enum InstructionExecutorVariant<F: PrimeField32> {
     Keccak256(Rc<RefCell<KeccakVmChip<F>>>),
     ModularArithmetic(Rc<RefCell<ModularArithmeticChip<F, ModularArithmeticAirVariant>>>),
     U256Arithmetic(Rc<RefCell<UintArithmeticChip<256, 8, F>>>),
+    U256Multiplication(Rc<RefCell<UintMultiplicationChip<F, 32, 8>>>),
 }
 
 #[derive(Debug, IntoStaticStr)]
@@ -106,9 +111,11 @@ pub enum MachineChipVariant<F: PrimeField32> {
     FieldExtension(Rc<RefCell<FieldExtensionArithmeticChip<F>>>),
     Poseidon2(Rc<RefCell<Poseidon2Chip<F>>>),
     RangeChecker(Arc<VariableRangeCheckerChip>),
+    RangeTupleChecker(Arc<RangeTupleCheckerChip>),
     Keccak256(Rc<RefCell<KeccakVmChip<F>>>),
     ByteXor(Arc<XorLookupChip<8>>),
     U256Arithmetic(Rc<RefCell<UintArithmeticChip<256, 8, F>>>),
+    U256Multiplication(Rc<RefCell<UintMultiplicationChip<F, 32, 8>>>),
 }
 
 impl<F: PrimeField32> MachineChip<F> for Arc<VariableRangeCheckerChip> {
@@ -125,6 +132,27 @@ impl<F: PrimeField32> MachineChip<F> for Arc<VariableRangeCheckerChip> {
 
     fn current_trace_height(&self) -> usize {
         1 << (1 + self.air.bus.range_max_bits)
+    }
+
+    fn trace_width(&self) -> usize {
+        BaseAir::<F>::width(&self.air)
+    }
+}
+
+impl<F: PrimeField32> MachineChip<F> for Arc<RangeTupleCheckerChip> {
+    fn generate_trace(self) -> RowMajorMatrix<F> {
+        RangeTupleCheckerChip::generate_trace(&self)
+    }
+
+    fn air<SC: StarkGenericConfig>(&self) -> Box<dyn AnyRap<SC>>
+    where
+        Domain<SC>: PolynomialSpace<Val = F>,
+    {
+        Box::new(self.air.clone())
+    }
+
+    fn current_trace_height(&self) -> usize {
+        self.air.height() as usize
     }
 
     fn trace_width(&self) -> usize {
