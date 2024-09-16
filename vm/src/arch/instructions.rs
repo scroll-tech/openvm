@@ -22,7 +22,8 @@ pub enum Opcode {
     FMUL = 12,
     FDIV = 13,
 
-    F_LESS_THAN = 14,
+    CASTF = 14,
+    F_LESS_THAN = 15,
 
     FAIL = 20,
     PRINTF = 21,
