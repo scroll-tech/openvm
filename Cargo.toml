@@ -17,7 +17,7 @@ members = [
     "stark-backend",
     "sdk",
     "vm",
-    "vm/bin",
+    "vm/bin", "ecc/execution",
 ]
 resolver = "2"
 

@@ -1,0 +1,9 @@
+[package]
+name = "ax-ecc-execution"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+
+[dependencies]
+ff = "0.13.0"
+halo2curves-axiom = "0.7.0"
