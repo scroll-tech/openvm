@@ -4,6 +4,9 @@ use ff::Field;
 
 use crate::ec_point::Xi;
 
+#[cfg(test)]
+pub mod tests;
+
 pub fn fp12_square<Fp12>(x: Fp12) -> Fp12
 where
     Fp12: Field,

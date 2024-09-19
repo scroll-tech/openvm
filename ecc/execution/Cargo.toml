@@ -7,3 +7,7 @@ edition.workspace = true
 [dependencies]
 ff = "0.13.0"
 halo2curves-axiom = "0.7.0"
+
+[dev-dependencies]
+rand.workspace = true
+rng = "0.1.0"

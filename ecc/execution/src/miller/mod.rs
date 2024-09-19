@@ -2,6 +2,9 @@ use halo2curves_axiom::ff::Field;
 
 use crate::ec_point::EcPoint;
 
+#[cfg(test)]
+pub mod tests;
+
 #[allow(non_snake_case)]
 pub fn miller_double_step<Fp2>(S: EcPoint<Fp2>) -> (EcPoint<Fp2>, [Fp2; 2])
 where
