@@ -2,6 +2,8 @@ use std::ops::Mul;
 
 use ff::Field;
 
+use crate::ec_point::Xi;
+
 pub fn fp12_square<Fp12>(x: Fp12) -> Fp12
 where
     Fp12: Field,
@@ -22,11 +24,29 @@ where
 }
 
 /// Multiplies two lines in 013 form and outputs the product in 01234 form
-pub fn mul_013_by_013<Fp2>(line_0: [Fp2; 2], line_1: [Fp2; 2]) -> [Fp2; 5]
+pub fn mul_013_by_013<Fp2>(
+    line_0: [Fp2; 2],
+    line_1: [Fp2; 2],
+    // TODO[yj]: once this function is moved into a chip, we can use the xi property instead of passing in this argument
+    xi: Xi<Fp2>,
+) -> [Fp2; 5]
 where
     Fp2: Field,
 {
-    unimplemented!()
+    let b0 = line_0[0];
+    let c0 = line_0[1];
+    let b1 = line_1[0];
+    let c1 = line_1[1];
+
+    // l0 * l1 = (1 + 9b0b1 + b0b1u) + (a0 + a1)w + (a0a1)w² + (b0 + b1)w³ + (a0b1 + b0a1)w⁴
+    let l0 = Fp2::ONE + xi.constant * b0 * b1 + b0 * b1 * xi.u;
+    let l1 = b0 + b1;
+    let l2 = b0 * b1;
+    let l3 = c0 + c1;
+    let l4 = b0 * c1 + b1 * c0;
+    let l6 = c0 * c1;
+
+    [l0, l1, l2, l3, l4]
 }
 
 pub fn mul_by_013<Fp2, Fp12>(f: Fp12, line: [Fp2; 2]) -> Fp12
