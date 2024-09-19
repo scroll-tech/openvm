@@ -38,13 +38,12 @@ where
     let b1 = line_1[0];
     let c1 = line_1[1];
 
-    // l0 * l1 = (1 + 9b0b1 + b0b1u) + (a0 + a1)w + (a0a1)w² + (b0 + b1)w³ + (a0b1 + b0a1)w⁴
-    let l0 = Fp2::ONE + xi.constant * b0 * b1 + b0 * b1 * xi.u;
+    // l0 * l1 = (1 + c0c1 * xi.constant + c0c1 * xi.u) + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + c0b1)w⁴
+    let l0 = Fp2::ONE + c0 * c1 * xi.constant + c0 * c1 * xi.u;
     let l1 = b0 + b1;
     let l2 = b0 * b1;
     let l3 = c0 + c1;
     let l4 = b0 * c1 + b1 * c0;
-    let l6 = c0 * c1;
 
     [l0, l1, l2, l3, l4]
 }
