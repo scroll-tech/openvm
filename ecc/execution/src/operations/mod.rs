@@ -38,8 +38,8 @@ where
     let b1 = line_1[0];
     let c1 = line_1[1];
 
-    // l0 * l1 = (1 + c0c1 * xi.constant + c0c1 * xi.u) + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + c0b1)w⁴
-    let l0 = Fp2::ONE + c0 * c1 * xi.constant + c0 * c1 * xi.u;
+    // l0 * l1 = (c0c1 * xi.xi_0 + c0c1 * xi.u)1 + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + c0b1)w⁴
+    let l0 = c0 * c1 * xi.u + c0 * c1 * xi.xi_0;
     let l1 = b0 + b1;
     let l2 = b0 * b1;
     let l3 = c0 + c1;
@@ -61,5 +61,5 @@ where
     Fp2: Field,
     Fp12: Field + Mul<Fp2, Output = Fp12>,
 {
-    unimplemented!()
+    f * x[0] + f * x[1] + f * x[2] + f * x[3] + f * x[4]
 }

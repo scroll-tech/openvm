@@ -3,8 +3,8 @@ pub struct EcPoint<F> {
     pub y: F,
 }
 
-/// \xi = constant + u
+/// \xi = u + xi_0
 pub struct Xi<F> {
-    pub constant: F,
     pub u: F,
+    pub xi_0: F,
 }
