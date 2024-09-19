@@ -14,10 +14,11 @@ members = [
     "poseidon2-air",
     "recursion",
     "ecc/lib",
+    "ecc/execution",
     "stark-backend",
     "sdk",
     "vm",
-    "vm/bin", "ecc/execution",
+    "vm/bin",
 ]
 resolver = "2"
 
