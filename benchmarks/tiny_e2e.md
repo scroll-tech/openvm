@@ -1,9 +1,9 @@
 {
   "fibonacci_program_inner": {
     "proof_time_ms": {
-      "value": 494.0,
-      "lower_value": 494.0,
-      "upper_value": 494.0
+      "value": 497.0,
+      "lower_value": 497.0,
+      "upper_value": 497.0
     },
     "total_cells": {
       "value": 131300.0,
@@ -13,33 +13,33 @@
   },
   "verifier_outer": {
     "proof_time_ms": {
-      "value": 245128.0,
-      "lower_value": 245128.0,
-      "upper_value": 245128.0
+      "value": 244103.0,
+      "lower_value": 244103.0,
+      "upper_value": 244103.0
     },
     "total_cells": {
-      "value": 5362094.0,
-      "lower_value": 5362094.0,
-      "upper_value": 5362094.0
+      "value": 5361680.0,
+      "lower_value": 5361680.0,
+      "upper_value": 5361680.0
     }
   },
   "verifier_halo2_static": {
     "proof_time_ms": {
-      "value": 522978.0,
-      "lower_value": 522978.0,
-      "upper_value": 522978.0
+      "value": 520248.0,
+      "lower_value": 520248.0,
+      "upper_value": 520248.0
     },
     "total_cells": {
-      "value": 489381954.0,
-      "lower_value": 489381954.0,
-      "upper_value": 489381954.0
+      "value": 489376360.0,
+      "lower_value": 489376360.0,
+      "upper_value": 489376360.0
     }
   },
   "verifier_halo2_wrapper": {
     "proof_time_ms": {
-      "value": 154402.0,
-      "lower_value": 154402.0,
-      "upper_value": 154402.0
+      "value": 153302.0,
+      "lower_value": 153302.0,
+      "upper_value": 153302.0
     },
     "total_cells": {
       "value": 97393525.0,
@@ -49,6 +49,6 @@
   }
 }
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/4d1e1bc932b173b53aea599521d1c1c265aebc6b
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/28b674f415c2ef12c5053f352988f0aef6c731c6
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10965120249)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10966399931)
