@@ -16,12 +16,12 @@ use crate::{
         columns::ExecutionState,
         // instructions::Opcode,
     },
-    cpu::trace::Instruction,
     memory::{MemoryChipRef, MemoryHeapReadRecord, MemoryHeapWriteRecord},
     modular_arithmetic::{
         biguint_to_limbs, limbs_to_biguint, FIELD_ELEMENT_BITS, LIMB_SIZE, NUM_LIMBS,
         SECP256K1_COORD_PRIME, TWO_NUM_LIMBS,
     },
+    program::{bridge::ProgramBus, ExecutionError, Instruction},
 };
 
 mod air;
@@ -116,13 +116,18 @@ fn make_ec_chip_config<T: PrimeField32>(memory_chip: MemoryChipRef<T>) -> EcChip
 }
 
 impl<T: PrimeField32> EcAddUnequalChip<T> {
-    pub fn new(execution_bus: ExecutionBus, memory_chip: MemoryChipRef<T>) -> Self {
+    pub fn new(
+        execution_bus: ExecutionBus,
+        program_bus: ProgramBus,
+        memory_chip: MemoryChipRef<T>,
+    ) -> Self {
         let memory_bridge = memory_chip.borrow().memory_bridge();
 
         let ec_config = make_ec_config(&memory_chip);
         let air = EcAddUnequalVmAir {
             air: EcAddUnequalAir { config: ec_config },
             execution_bus,
+            program_bus,
             memory_bridge,
         };
         let config = make_ec_chip_config(memory_chip);
@@ -140,7 +145,7 @@ impl<T: PrimeField32> InstructionExecutor<T> for EcAddUnequalChip<T> {
         &mut self,
         instruction: Instruction<T>,
         from_state: ExecutionState<usize>,
-    ) -> ExecutionState<usize> {
+    ) -> Result<ExecutionState<usize>, ExecutionError> {
         let Instruction {
             opcode: _,
             op_a: p3_address_ptr,
@@ -183,10 +188,10 @@ impl<T: PrimeField32> InstructionExecutor<T> for EcAddUnequalChip<T> {
         self.data.push(record);
 
         let memory_chip = self.config.memory_chip.borrow();
-        ExecutionState {
+        Ok(ExecutionState {
             pc: from_state.pc + 1,
             timestamp: memory_chip.timestamp().as_canonical_u32() as usize,
-        }
+        })
     }
 }
 
@@ -208,13 +213,18 @@ pub struct EcDoubleChip<T: PrimeField32> {
 }
 
 impl<T: PrimeField32> EcDoubleChip<T> {
-    pub fn new(execution_bus: ExecutionBus, memory_chip: MemoryChipRef<T>) -> Self {
+    pub fn new(
+        execution_bus: ExecutionBus,
+        program_bus: ProgramBus,
+        memory_chip: MemoryChipRef<T>,
+    ) -> Self {
         let memory_bridge = memory_chip.borrow().memory_bridge();
 
         let ec_config = make_ec_config(&memory_chip);
         let air = EcDoubleVmAir {
             air: EcDoubleAir { config: ec_config },
             execution_bus,
+            program_bus,
             memory_bridge,
         };
         let config = make_ec_chip_config(memory_chip);
@@ -232,7 +242,7 @@ impl<T: PrimeField32> InstructionExecutor<T> for EcDoubleChip<T> {
         &mut self,
         instruction: Instruction<T>,
         from_state: ExecutionState<usize>,
-    ) -> ExecutionState<usize> {
+    ) -> Result<ExecutionState<usize>, ExecutionError> {
         let Instruction {
             opcode: _,
             op_a: p2_address_ptr,
@@ -271,9 +281,9 @@ impl<T: PrimeField32> InstructionExecutor<T> for EcDoubleChip<T> {
         self.data.push(record);
 
         let memory_chip = self.config.memory_chip.borrow();
-        ExecutionState {
+        Ok(ExecutionState {
             pc: from_state.pc + 1,
             timestamp: memory_chip.timestamp().as_canonical_u32() as usize,
-        }
+        })
     }
 }

@@ -21,10 +21,10 @@ use crate::{
         bus::ExecutionBus, chips::InstructionExecutor, columns::ExecutionState,
         instructions::Opcode,
     },
-    cpu::trace::Instruction,
     memory::{
         offline_checker::MemoryBridge, MemoryChipRef, MemoryHeapReadRecord, MemoryHeapWriteRecord,
     },
+    program::{bridge::ProgramBus, ExecutionError, Instruction},
 };
 
 pub mod air;
@@ -134,6 +134,7 @@ pub enum ModularArithmeticOp {
 pub struct ModularArithmeticVmAir<A> {
     pub air: A,
     pub execution_bus: ExecutionBus,
+    pub program_bus: ProgramBus,
     pub memory_bridge: MemoryBridge,
 
     pub carry_limbs: usize,
@@ -154,6 +155,7 @@ pub struct ModularArithmeticChip<T: PrimeField32, A> {
 impl<T: PrimeField32> ModularArithmeticChip<T, ModularArithmeticAirVariant> {
     pub fn new(
         execution_bus: ExecutionBus,
+        program_bus: ProgramBus,
         memory_chip: MemoryChipRef<T>,
         modulus: BigUint,
         op: ModularArithmeticOp,
@@ -196,6 +198,7 @@ impl<T: PrimeField32> ModularArithmeticChip<T, ModularArithmeticAirVariant> {
             air: ModularArithmeticVmAir {
                 air: subair,
                 execution_bus,
+                program_bus,
                 memory_bridge,
                 carry_limbs,
                 q_limbs,
@@ -215,7 +218,7 @@ impl<T: PrimeField32> InstructionExecutor<T>
         &mut self,
         instruction: Instruction<T>,
         from_state: ExecutionState<usize>,
-    ) -> ExecutionState<usize> {
+    ) -> Result<ExecutionState<usize>, ExecutionError> {
         let mut memory_chip = self.memory_chip.borrow_mut();
         debug_assert_eq!(
             from_state.timestamp,
@@ -282,10 +285,10 @@ impl<T: PrimeField32> InstructionExecutor<T>
         };
         self.data.push(record);
 
-        ExecutionState {
+        Ok(ExecutionState {
             pc: from_state.pc + 1,
             timestamp: memory_chip.timestamp().as_canonical_u32() as usize,
-        }
+        })
     }
 }
 
