@@ -17,11 +17,11 @@ where
     Fp: Field,
     Fp2: FieldExtension<BaseField = Fp>,
 {
-    let b = line[0];
-    let c = line[1];
-    let b_prime = b.mul_base(&x_over_y);
-    let c_prime = c.mul_base(&y_inv);
-    [b_prime, c_prime]
+    let b_prime = line[0];
+    let c_prime = line[1];
+    let b = b_prime.mul_base(&x_over_y);
+    let c = c_prime.mul_base(&y_inv);
+    [b, c]
 }
 
 /// Multiplies two lines in 013 form and outputs the product in 01234 form
@@ -29,7 +29,7 @@ pub fn mul_013_by_013<Fp, Fp2>(
     line_0: [Fp2; 2],
     line_1: [Fp2; 2],
     // TODO[yj]: once this function is moved into a chip, we can use the xi property instead of passing in this argument
-    xi: Fp2,
+    xi: Fp,
 ) -> [Fp2; 5]
 where
     Fp: Field,
@@ -41,7 +41,7 @@ where
     let c1 = line_1[1];
 
     // l0 * l1 = (c0c1 * xi.xi_0 + c0c1 * xi.u)1 + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + c0b1)w⁴
-    let l0 = c0 * c1 * xi;
+    let l0 = c0 * c1 * Fp2::lift(&xi);
     let l1 = b0 + b1;
     let l2 = b0 * b1;
     let l3 = c0 + c1;
