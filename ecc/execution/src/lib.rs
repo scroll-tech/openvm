@@ -1,3 +1,4 @@
-pub mod ec_point;
+pub mod common;
+pub mod curves;
 pub mod miller;
 pub mod operations;
