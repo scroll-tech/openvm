@@ -1,7 +1,7 @@
 | group | stark_proof_time_ms | total_cells | total_cells_used | verify_program_compile_ms |
 | --- | --- | --- | --- | --- |
-| bench_program_inner | 1201.0 | 1997968 | 287313 |  |
-| inner_verifier | 112597.0 | 1257701396 | 686272370 | 47407.0 |
+| bench_program_inner | 1206.0 | 1997968 | 287313 |  |
+| inner_verifier | 113036.0 | 1257701396 | 686272370 | 47063.0 |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -250,8 +250,8 @@
 | inner_verifier | stage-d-2-fri-fold | CT_END | 13334472 | 182664 |
 | inner_verifier | stage-d-2-fri-fold | CT_START | 13334545 | 182665 |
 | inner_verifier | stage-d-2-fri-fold | STOREW2 | 14053584 | 191328 |
-| inner_verifier | stage-d-2-fri-fold | FE4ADD | 24009984 | 353088 |
 | inner_verifier | stage-d-2-fri-fold | BBE4DIV | 24010060 | 353088 |
+| inner_verifier | stage-d-2-fri-fold | FE4ADD | 24009984 | 353088 |
 | inner_verifier | stage-d-2-fri-fold | BBE4MUL | 48020044 | 706176 |
 | inner_verifier | stage-d-2-fri-fold | FSUB | 22320839 | 720024 |
 | inner_verifier | stage-d-2-fri-fold | BNE | 55589281 | 761497 |
@@ -283,29 +283,29 @@
 | inner_verifier | verify-batch-reduce-fast | LOADW2 | 14014362 | 191976 |
 | inner_verifier | verify-batch-reduce-fast | BNE | 27324192 | 374304 |
 | inner_verifier | verify-batch-reduce-fast | FADD | 17231822 | 555864 |
-| inner_verifier | verify-batch-reduce-fast-setup | CT_START | 73584 | 1008 |
 | inner_verifier | verify-batch-reduce-fast-setup | LOADW | 73603 | 1008 |
+| inner_verifier | verify-batch-reduce-fast-setup | CT_START | 73584 | 1008 |
 | inner_verifier | verify-batch-reduce-fast-setup | JAL | 73584 | 1008 |
 | inner_verifier | verify-batch-reduce-fast-setup | STOREW2 | 282624 | 3072 |
-| inner_verifier | verify-batch-reduce-fast-setup | LOADW2 | 576465 | 7896 |
 | inner_verifier | verify-batch-reduce-fast-setup | FADD | 244776 | 7896 |
+| inner_verifier | verify-batch-reduce-fast-setup | LOADW2 | 576465 | 7896 |
 | inner_verifier | verify-batch-reduce-fast-setup | BNE | 777888 | 10656 |
+| inner_verifier | poseidon2-hash | LOADW | 43800 | 600 |
 | inner_verifier | poseidon2-hash | BEQ | 43800 | 600 |
 | inner_verifier | poseidon2-hash | FMUL | 18600 | 600 |
-| inner_verifier | poseidon2-hash | LOADW | 43800 | 600 |
 | inner_verifier | poseidon2-hash | JAL | 126144 | 1728 |
 | inner_verifier | poseidon2-hash | PERM_POS2 | 11264880 | 22440 |
 | inner_verifier | poseidon2-hash | STOREW | 3453726 | 44808 |
-| inner_verifier | poseidon2-hash | CT_END | 12975312 | 177744 |
 | inner_verifier | poseidon2-hash | STOREW2 | 12975312 | 177744 |
+| inner_verifier | poseidon2-hash | CT_END | 12975312 | 177744 |
 | inner_verifier | poseidon2-hash | CT_START | 13019112 | 178344 |
 | inner_verifier | poseidon2-hash | LOADW2 | 13140057 | 180000 |
 | inner_verifier | poseidon2-hash | BNE | 26159112 | 358344 |
 | inner_verifier | poseidon2-hash | FADD | 16602379 | 535560 |
-| inner_verifier | poseidon2-hash-setup | FADD | 5510064 | 177744 |
 | inner_verifier | poseidon2-hash-setup | LOADW2 | 12975331 | 177744 |
-| inner_verifier | poseidon2-hash-setup | STOREW2 | 12975312 | 177744 |
 | inner_verifier | poseidon2-hash-setup | CT_START | 12975312 | 177744 |
+| inner_verifier | poseidon2-hash-setup | STOREW2 | 12975312 | 177744 |
+| inner_verifier | poseidon2-hash-setup | FADD | 5510064 | 177744 |
 | inner_verifier | compute-reduced-opening | CT_END | 203232 | 2784 |
 | inner_verifier | compute-reduced-opening | CT_START | 215496 | 2952 |
 | inner_verifier | compute-reduced-opening | STOREW | 462623 | 6336 |
@@ -323,20 +323,20 @@
 | inner_verifier | exp-reverse-bits-len | CT_START | 82344 | 1128 |
 | inner_verifier | exp-reverse-bits-len | STOREW | 247089 | 3384 |
 | inner_verifier | exp-reverse-bits-len | JAL | 518811 | 7107 |
-| inner_verifier | exp-reverse-bits-len | FSUB | 348955 | 11256 |
 | inner_verifier | exp-reverse-bits-len | LOADW2 | 821707 | 11256 |
+| inner_verifier | exp-reverse-bits-len | FSUB | 348955 | 11256 |
 | inner_verifier | exp-reverse-bits-len | FMUL | 697872 | 22512 |
 | inner_verifier | exp-reverse-bits-len | BNE | 1725720 | 23640 |
 | inner_verifier | exp-reverse-bits-len | FADD | 1116820 | 36024 |
-| inner_verifier | sp1-fri-fold | CT_START | 120888 | 1656 |
 | inner_verifier | sp1-fri-fold | JAL | 120888 | 1656 |
+| inner_verifier | sp1-fri-fold | CT_START | 120888 | 1656 |
 | inner_verifier | sp1-fri-fold | STOREW | 120907 | 1656 |
 | inner_verifier | sp1-fri-fold | BBE4DIV | 24010060 | 353088 |
 | inner_verifier | sp1-fri-fold | FADD | 10945728 | 353088 |
 | inner_verifier | sp1-fri-fold | FE4ADD | 24009984 | 353088 |
 | inner_verifier | sp1-fri-fold | BNE | 25896312 | 354744 |
-| inner_verifier | sp1-fri-fold | BBE4MUL | 48020044 | 706176 |
 | inner_verifier | sp1-fri-fold | FSUB | 21891494 | 706176 |
+| inner_verifier | sp1-fri-fold | BBE4MUL | 48020044 | 706176 |
 | inner_verifier | sp1-fri-fold | LOADW2 | 128877215 | 1765440 |
 | inner_verifier | sp1-fri-fold | LOADW | 154652658 | 2118528 |
 | inner_verifier | stage-d-3-verify-challenges | PERM_POS2 | 204816 | 408 |
@@ -357,8 +357,8 @@
 | inner_verifier | stage-d-3-verify-challenges | LOADW2 | 1687176 | 23112 |
 | inner_verifier | stage-d-3-verify-challenges | BNE | 1992097 | 27289 |
 | inner_verifier | stage-d-3-verify-challenges | FADD | 1527463 | 49273 |
-| inner_verifier | verify-query | BBE4DIV | 27744 | 408 |
 | inner_verifier | verify-query | PERM_POS2 | 204816 | 408 |
+| inner_verifier | verify-query | BBE4DIV | 27744 | 408 |
 | inner_verifier | verify-query | FE4ADD | 55488 | 816 |
 | inner_verifier | verify-query | FE4SUB | 83232 | 1224 |
 | inner_verifier | verify-query | CT_END | 119136 | 1632 |
@@ -503,9 +503,9 @@
 | inner_verifier | stage-d-verify-pcs | AddEFFI | 384 |
 | inner_verifier | stage-d-verify-pcs | SubVIN | 408 |
 | inner_verifier | stage-d-verify-pcs | ImmE | 480 |
-| inner_verifier | stage-d-verify-pcs | MulV | 775 |
-| inner_verifier | stage-d-verify-pcs | AssertEqV | 775 |
 | inner_verifier | stage-d-verify-pcs | StoreHintWord | 775 |
+| inner_verifier | stage-d-verify-pcs | AssertEqV | 775 |
+| inner_verifier | stage-d-verify-pcs | MulV | 775 |
 | inner_verifier | stage-d-verify-pcs | IfNeI | 1009 |
 | inner_verifier | stage-d-verify-pcs | SubE | 1224 |
 | inner_verifier | stage-d-verify-pcs | SubVI | 1377 |
@@ -543,9 +543,9 @@
 | inner_verifier | stage-d-1-verify-shape-and-sample-challenges | IfNeI | 1 |
 | inner_verifier | stage-d-1-verify-shape-and-sample-challenges | AssertEqVI | 16 |
 | inner_verifier | stage-d-1-verify-shape-and-sample-challenges | Poseidon2PermuteBabyBear | 19 |
+| inner_verifier | stage-d-1-verify-shape-and-sample-challenges | ImmF | 25 |
 | inner_verifier | stage-d-1-verify-shape-and-sample-challenges | AssertEqF | 25 |
 | inner_verifier | stage-d-1-verify-shape-and-sample-challenges | HintBitsF | 25 |
-| inner_verifier | stage-d-1-verify-shape-and-sample-challenges | ImmF | 25 |
 | inner_verifier | stage-d-1-verify-shape-and-sample-challenges | AddE | 51 |
 | inner_verifier | stage-d-1-verify-shape-and-sample-challenges | StoreE | 68 |
 | inner_verifier | stage-d-1-verify-shape-and-sample-challenges | IfEq | 75 |
@@ -634,8 +634,8 @@
 | inner_verifier | verify-batch-reduce-fast | AddVI | 368112 |
 | inner_verifier | verify-batch-reduce-fast | For | 380496 |
 | inner_verifier | verify-batch-reduce-fast-setup | CycleTrackerStart | 1008 |
-| inner_verifier | verify-batch-reduce-fast-setup | StoreV | 3072 |
 | inner_verifier | verify-batch-reduce-fast-setup | AddVI | 3072 |
+| inner_verifier | verify-batch-reduce-fast-setup | StoreV | 3072 |
 | inner_verifier | verify-batch-reduce-fast-setup | IfEq | 4824 |
 | inner_verifier | verify-batch-reduce-fast-setup | LoadV | 7896 |
 | inner_verifier | verify-batch-reduce-fast-setup | For | 12672 |
@@ -645,30 +645,30 @@
 | inner_verifier | poseidon2-hash | ImmF | 9600 |
 | inner_verifier | poseidon2-hash | Poseidon2PermuteBabyBear | 22440 |
 | inner_verifier | poseidon2-hash | ImmV | 23880 |
-| inner_verifier | poseidon2-hash | CycleTrackerEnd | 177744 |
 | inner_verifier | poseidon2-hash | LoadF | 177744 |
+| inner_verifier | poseidon2-hash | CycleTrackerEnd | 177744 |
 | inner_verifier | poseidon2-hash | IfEqI | 177744 |
 | inner_verifier | poseidon2-hash | CycleTrackerStart | 178344 |
 | inner_verifier | poseidon2-hash | StoreF | 187344 |
 | inner_verifier | poseidon2-hash | AddVI | 356088 |
 | inner_verifier | poseidon2-hash | For | 362928 |
 | inner_verifier | poseidon2-hash-setup | LoadF | 177744 |
-| inner_verifier | poseidon2-hash-setup | AddVI | 177744 |
 | inner_verifier | poseidon2-hash-setup | CycleTrackerStart | 177744 |
 | inner_verifier | poseidon2-hash-setup | StoreF | 177744 |
+| inner_verifier | poseidon2-hash-setup | AddVI | 177744 |
 | inner_verifier | compute-reduced-opening | AddV | 1128 |
 | inner_verifier | compute-reduced-opening | ImmF | 2256 |
 | inner_verifier | compute-reduced-opening | CycleTrackerEnd | 2784 |
 | inner_verifier | compute-reduced-opening | CycleTrackerStart | 2952 |
 | inner_verifier | compute-reduced-opening | StoreE | 9024 |
 | inner_verifier | compute-reduced-opening | AddFI | 12384 |
-| inner_verifier | compute-reduced-opening | AddVI | 13512 |
 | inner_verifier | compute-reduced-opening | SubV | 13512 |
+| inner_verifier | compute-reduced-opening | AddVI | 13512 |
 | inner_verifier | compute-reduced-opening | IfEqI | 17235 |
 | inner_verifier | compute-reduced-opening | LoadV | 23592 |
 | inner_verifier | compute-reduced-opening | MulF | 23640 |
-| inner_verifier | compute-reduced-opening | AddE | 353088 |
 | inner_verifier | compute-reduced-opening | DivE | 353088 |
+| inner_verifier | compute-reduced-opening | AddE | 353088 |
 | inner_verifier | compute-reduced-opening | LoadF | 356472 |
 | inner_verifier | compute-reduced-opening | MulE | 706176 |
 | inner_verifier | compute-reduced-opening | For | 746496 |
@@ -678,28 +678,28 @@
 | inner_verifier | exp-reverse-bits-len | ImmF | 2256 |
 | inner_verifier | exp-reverse-bits-len | LoadV | 11256 |
 | inner_verifier | exp-reverse-bits-len | SubV | 11256 |
-| inner_verifier | exp-reverse-bits-len | AddFI | 12384 |
 | inner_verifier | exp-reverse-bits-len | AddVI | 12384 |
+| inner_verifier | exp-reverse-bits-len | AddFI | 12384 |
 | inner_verifier | exp-reverse-bits-len | IfEqI | 17235 |
 | inner_verifier | exp-reverse-bits-len | MulF | 22512 |
 | inner_verifier | exp-reverse-bits-len | For | 25896 |
 | inner_verifier | sp1-fri-fold | CycleTrackerStart | 1656 |
-| inner_verifier | sp1-fri-fold | AddE | 353088 |
 | inner_verifier | sp1-fri-fold | DivE | 353088 |
+| inner_verifier | sp1-fri-fold | AddE | 353088 |
 | inner_verifier | sp1-fri-fold | LoadF | 353088 |
 | inner_verifier | sp1-fri-fold | MulE | 706176 |
 | inner_verifier | sp1-fri-fold | For | 711144 |
 | inner_verifier | sp1-fri-fold | LoadE | 1412352 |
 | inner_verifier | sp1-fri-fold | SubEF | 2824704 |
-| inner_verifier | stage-d-3-verify-challenges | AddEFFI | 96 |
 | inner_verifier | stage-d-3-verify-challenges | AssertEqE | 96 |
+| inner_verifier | stage-d-3-verify-challenges | AddEFFI | 96 |
 | inner_verifier | stage-d-3-verify-challenges | ImmE | 288 |
-| inner_verifier | stage-d-3-verify-challenges | Poseidon2PermuteBabyBear | 408 |
-| inner_verifier | stage-d-3-verify-challenges | IfNeI | 408 |
-| inner_verifier | stage-d-3-verify-challenges | IfEq | 408 |
 | inner_verifier | stage-d-3-verify-challenges | SubVI | 408 |
-| inner_verifier | stage-d-3-verify-challenges | SubVIN | 408 |
+| inner_verifier | stage-d-3-verify-challenges | Poseidon2PermuteBabyBear | 408 |
 | inner_verifier | stage-d-3-verify-challenges | DivE | 408 |
+| inner_verifier | stage-d-3-verify-challenges | SubVIN | 408 |
+| inner_verifier | stage-d-3-verify-challenges | IfEq | 408 |
+| inner_verifier | stage-d-3-verify-challenges | IfNeI | 408 |
 | inner_verifier | stage-d-3-verify-challenges | AddE | 816 |
 | inner_verifier | stage-d-3-verify-challenges | SubE | 1224 |
 | inner_verifier | stage-d-3-verify-challenges | SubV | 1320 |
@@ -708,14 +708,14 @@
 | inner_verifier | stage-d-3-verify-challenges | CycleTrackerStart | 1657 |
 | inner_verifier | stage-d-3-verify-challenges | MulE | 1824 |
 | inner_verifier | stage-d-3-verify-challenges | StoreV | 2040 |
-| inner_verifier | stage-d-3-verify-challenges | AssertEqF | 3264 |
 | inner_verifier | stage-d-3-verify-challenges | ImmF | 3264 |
+| inner_verifier | stage-d-3-verify-challenges | AssertEqF | 3264 |
 | inner_verifier | stage-d-3-verify-challenges | AddEI | 3744 |
-| inner_verifier | stage-d-3-verify-challenges | IfNe | 4896 |
-| inner_verifier | stage-d-3-verify-challenges | MulVI | 4896 |
 | inner_verifier | stage-d-3-verify-challenges | Poseidon2CompressBabyBear | 4896 |
-| inner_verifier | stage-d-3-verify-challenges | ImmV | 5304 |
+| inner_verifier | stage-d-3-verify-challenges | MulVI | 4896 |
+| inner_verifier | stage-d-3-verify-challenges | IfNe | 4896 |
 | inner_verifier | stage-d-3-verify-challenges | AddV | 5304 |
+| inner_verifier | stage-d-3-verify-challenges | ImmV | 5304 |
 | inner_verifier | stage-d-3-verify-challenges | StoreF | 6528 |
 | inner_verifier | stage-d-3-verify-challenges | StoreE | 8160 |
 | inner_verifier | stage-d-3-verify-challenges | Alloc | 8568 |
@@ -727,28 +727,28 @@
 | inner_verifier | stage-d-3-verify-challenges | For | 30987 |
 | inner_verifier | verify-query | AddEFFI | 96 |
 | inner_verifier | verify-query | ImmE | 288 |
-| inner_verifier | verify-query | DivE | 408 |
-| inner_verifier | verify-query | IfNeI | 408 |
-| inner_verifier | verify-query | SubVIN | 408 |
-| inner_verifier | verify-query | SubVI | 408 |
 | inner_verifier | verify-query | IfEq | 408 |
+| inner_verifier | verify-query | SubVI | 408 |
+| inner_verifier | verify-query | SubVIN | 408 |
+| inner_verifier | verify-query | IfNeI | 408 |
 | inner_verifier | verify-query | Poseidon2PermuteBabyBear | 408 |
+| inner_verifier | verify-query | DivE | 408 |
 | inner_verifier | verify-query | AddE | 816 |
 | inner_verifier | verify-query | SubE | 1224 |
 | inner_verifier | verify-query | SubV | 1320 |
-| inner_verifier | verify-query | MulEF | 1632 |
 | inner_verifier | verify-query | CycleTrackerEnd | 1632 |
+| inner_verifier | verify-query | MulEF | 1632 |
 | inner_verifier | verify-query | CycleTrackerStart | 1656 |
 | inner_verifier | verify-query | MulE | 1824 |
 | inner_verifier | verify-query | StoreV | 2040 |
-| inner_verifier | verify-query | ImmF | 3264 |
 | inner_verifier | verify-query | AssertEqF | 3264 |
+| inner_verifier | verify-query | ImmF | 3264 |
 | inner_verifier | verify-query | AddEI | 3744 |
 | inner_verifier | verify-query | MulVI | 4896 |
-| inner_verifier | verify-query | IfNe | 4896 |
 | inner_verifier | verify-query | Poseidon2CompressBabyBear | 4896 |
-| inner_verifier | verify-query | AddV | 5304 |
+| inner_verifier | verify-query | IfNe | 4896 |
 | inner_verifier | verify-query | ImmV | 5304 |
+| inner_verifier | verify-query | AddV | 5304 |
 | inner_verifier | verify-query | StoreF | 6528 |
 | inner_verifier | verify-query | StoreE | 8160 |
 | inner_verifier | verify-query | Alloc | 8568 |
@@ -765,13 +765,13 @@
 | inner_verifier | verify-batch-ext | CycleTrackerEnd | 1224 |
 | inner_verifier | verify-batch-ext | CycleTrackerStart | 1632 |
 | inner_verifier | verify-batch-ext | StoreE | 3264 |
-| inner_verifier | verify-batch-ext | AssertEqF | 3264 |
 | inner_verifier | verify-batch-ext | LoadE | 3264 |
 | inner_verifier | verify-batch-ext | ImmF | 3264 |
+| inner_verifier | verify-batch-ext | AssertEqF | 3264 |
 | inner_verifier | verify-batch-ext | ImmV | 3672 |
-| inner_verifier | verify-batch-ext | Alloc | 4896 |
-| inner_verifier | verify-batch-ext | Poseidon2CompressBabyBear | 4896 |
 | inner_verifier | verify-batch-ext | IfNe | 4896 |
+| inner_verifier | verify-batch-ext | Poseidon2CompressBabyBear | 4896 |
+| inner_verifier | verify-batch-ext | Alloc | 4896 |
 | inner_verifier | verify-batch-ext | MulVI | 4896 |
 | inner_verifier | verify-batch-ext | StoreF | 6528 |
 | inner_verifier | verify-batch-ext | LoadF | 9792 |
@@ -779,24 +779,24 @@
 | inner_verifier | verify-batch-ext | LoadV | 12240 |
 | inner_verifier | verify-batch-ext | For | 17952 |
 | inner_verifier | verify-batch-ext | AddVI | 23256 |
-| inner_verifier | poseidon2-hash-ext | IfNeI | 408 |
-| inner_verifier | poseidon2-hash-ext | Poseidon2PermuteBabyBear | 408 |
 | inner_verifier | poseidon2-hash-ext | CycleTrackerStart | 408 |
+| inner_verifier | poseidon2-hash-ext | Poseidon2PermuteBabyBear | 408 |
+| inner_verifier | poseidon2-hash-ext | IfNeI | 408 |
 | inner_verifier | poseidon2-hash-ext | LoadV | 816 |
 | inner_verifier | poseidon2-hash-ext | ImmV | 2448 |
-| inner_verifier | poseidon2-hash-ext | StoreE | 3264 |
 | inner_verifier | poseidon2-hash-ext | LoadF | 3264 |
-| inner_verifier | poseidon2-hash-ext | LoadE | 3264 |
 | inner_verifier | poseidon2-hash-ext | IfEqI | 3264 |
+| inner_verifier | poseidon2-hash-ext | LoadE | 3264 |
 | inner_verifier | poseidon2-hash-ext | ImmF | 3264 |
+| inner_verifier | poseidon2-hash-ext | StoreE | 3264 |
 | inner_verifier | poseidon2-hash-ext | Alloc | 3672 |
 | inner_verifier | poseidon2-hash-ext | For | 4896 |
 | inner_verifier | poseidon2-hash-ext | StoreF | 6528 |
 | inner_verifier | poseidon2-hash-ext | AddVI | 6936 |
 | inner_verifier | stage-e-verify-constraints | CycleTrackerStart | 1 |
 | inner_verifier | stage-e-verify-constraints | SubVI | 6 |
-| inner_verifier | stage-e-verify-constraints | AddFI | 9 |
 | inner_verifier | stage-e-verify-constraints | ImmF | 9 |
+| inner_verifier | stage-e-verify-constraints | AddFI | 9 |
 | inner_verifier | stage-e-verify-constraints | ImmV | 10 |
 | inner_verifier | stage-e-verify-constraints | AddVI | 12 |
 | inner_verifier | stage-e-verify-constraints | DivE | 18 |
@@ -828,10 +828,10 @@
 | group | stark | trace_gen_time_ms |
 | --- | --- | --- |
 | bench_program_inner | vm | 2.0 |
-| inner_verifier | vm | 32914.0 |
+| inner_verifier | vm | 32889.0 |
 
 
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/148283182135a0a6c596577008e467a4573339db
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/5fd59fca599e23a09ba49b015e89cba9d6f12d19
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10999810701)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11000471159)
