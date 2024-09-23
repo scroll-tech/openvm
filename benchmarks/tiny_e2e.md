@@ -39,6 +39,6 @@
 
 
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/e313a9c92594ea095d5551b8003e7029cb07e948
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/148283182135a0a6c596577008e467a4573339db
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10988238812)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10999810701)
