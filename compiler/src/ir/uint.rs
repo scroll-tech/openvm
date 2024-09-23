@@ -1,7 +1,6 @@
 use p3_field::PrimeField64;
-use stark_vm::modular_arithmetic::NUM_LIMBS;
 
-use super::{modular_arithmetic::BigUintVar, Var};
+use super::{modular_arithmetic::BigUintVar, Var, NUM_LIMBS};
 use crate::ir::{Builder, Config, DslIr};
 
 impl<C: Config> Builder<C>

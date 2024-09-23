@@ -1,5 +1,6 @@
 use afs_compiler::ir::{
-    Array, BigUintVar, Builder, Config, Ext, Felt, MemVariable, Var, DIGEST_SIZE,
+    Array, BigUintVar, Builder, Config, Ext, Felt, MemVariable, Var, DIGEST_SIZE, LIMB_SIZE,
+    NUM_LIMBS,
 };
 use afs_stark_backend::{
     keygen::types::TraceWidth,
@@ -21,7 +22,7 @@ use p3_fri::{BatchOpening, CommitPhaseProofStep, FriProof, QueryProof, TwoAdicFr
 use p3_merkle_tree::FieldMerkleTreeMmcs;
 use p3_poseidon2::{Poseidon2, Poseidon2ExternalMatrixGeneral};
 use p3_symmetric::{PaddingFreeSponge, TruncatedPermutation};
-use stark_vm::modular_arithmetic::{big_uint_to_num_limbs, LIMB_SIZE, NUM_LIMBS};
+use stark_vm::modular_addsub::big_uint_to_num_limbs;
 
 use crate::types::{
     AdjacentOpenedValuesVariable, CommitmentsVariable, InnerConfig, OpenedValuesVariable,

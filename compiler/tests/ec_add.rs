@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use afs_compiler::{
     asm::AsmBuilder,
     ir::{Array, Builder, Config, Var},
-    util::execute_program_with_config,
+    util::{execute_program_with_config, LIMB_SIZE, NUM_LIMBS},
 };
 use itertools::Itertools;
 use num_bigint_dig::{algorithms::mod_inverse, BigUint};
@@ -11,7 +11,7 @@ use num_traits::{abs, signum, FromPrimitive};
 use p3_baby_bear::BabyBear;
 use p3_field::{extension::BinomialExtensionField, AbstractField};
 use stark_vm::{
-    modular_arithmetic::{big_uint_to_num_limbs, secp256k1_coord_prime, LIMB_SIZE, NUM_LIMBS},
+    modular_addsub::{big_uint_to_num_limbs, secp256k1_coord_prime},
     vm::config::VmConfig,
 };
 
@@ -100,7 +100,8 @@ fn test_secp256k1_add(point_1: Point, point_2: Point, point_3: Point) {
         VmConfig {
             secp256k1_enabled: true,
             u256_arithmetic_enabled: true,
-            modular_multiplication_enabled: true,
+            modular_addsub_enabled: true,
+            modular_multdiv_enabled: true,
             ..Default::default()
         },
         program,

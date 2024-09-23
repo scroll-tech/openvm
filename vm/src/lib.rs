@@ -6,7 +6,8 @@ pub mod field_arithmetic;
 pub mod field_extension;
 pub mod hashes;
 pub mod memory;
-pub mod modular_arithmetic;
+pub mod modular_addsub;
+pub mod modular_multdiv;
 pub mod program;
 /// SDK functions for running and proving programs in the VM.
 #[cfg(feature = "sdk")]

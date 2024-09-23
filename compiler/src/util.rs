@@ -2,6 +2,11 @@ use p3_baby_bear::BabyBear;
 use p3_field::{PrimeField, PrimeField32};
 #[cfg(feature = "sdk")]
 pub use sdk::*;
+
+pub const NUM_LIMBS: usize = 32;
+pub const LIMB_SIZE: usize = 8;
+pub const TWO_NUM_LIMBS: usize = 2 * NUM_LIMBS;
+
 use stark_vm::{
     program::{Instruction, Program},
     vm::{config::VmConfig, VirtualMachine},
@@ -35,7 +40,8 @@ pub fn execute_program(program: Program<BabyBear>, input_stream: Vec<Vec<BabyBea
         VmConfig {
             num_public_values: 4,
             max_segment_len: (1 << 25) - 100,
-            modular_multiplication_enabled: true,
+            modular_addsub_enabled: true,
+            modular_multdiv_enabled: true,
             secp256k1_enabled: true,
             bigint_limb_size: 8,
             ..Default::default()
