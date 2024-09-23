@@ -12,7 +12,7 @@
 
 | stark_proof_time_ms | total_cells | total_cells_used | verify_program_compile_ms |
 | --- | --- | --- | --- |
-| 7877.0 | 69738516 | 32891694 | 51.0 |
+| 7859.0 | 69738516 | 32891694 | 50.0 |
 
 | cycle_tracker_span | num_spans |
 | --- | --- |
@@ -61,10 +61,10 @@
 | VerifierProgram | FADD | 4231056 | 134354 |
 | stage-c-build-rounds | CT_START | 73 | 1 |
 | stage-c-build-rounds | PERM_POS2 | 1004 | 2 |
-| stage-c-build-rounds | JAL | 438 | 6 |
 | stage-c-build-rounds | FE4ADD | 408 | 6 |
-| stage-c-build-rounds | BEQ | 584 | 8 |
+| stage-c-build-rounds | JAL | 438 | 6 |
 | stage-c-build-rounds | BBE4MUL | 1000 | 8 |
+| stage-c-build-rounds | BEQ | 584 | 8 |
 | stage-c-build-rounds | FSUB | 496 | 16 |
 | stage-c-build-rounds | FMUL | 734 | 20 |
 | stage-c-build-rounds | LOADW2 | 3297 | 41 |
@@ -75,8 +75,8 @@
 | stage-c-build-rounds | STOREW | 15843 | 191 |
 | stage-d-verify-pcs | HINT_BITS | 7592 | 104 |
 | stage-d-verify-pcs | PERM_POS2 | 315758 | 629 |
-| stage-d-verify-pcs | BBE4DIV | 84124 | 1236 |
 | stage-d-verify-pcs | FE4SUB | 84048 | 1236 |
+| stage-d-verify-pcs | BBE4DIV | 84124 | 1236 |
 | stage-d-verify-pcs | FE4ADD | 113312 | 1663 |
 | stage-d-verify-pcs | COMP_POS2 | 1344356 | 2678 |
 | stage-d-verify-pcs | SHINTW | 296608 | 3224 |
@@ -98,8 +98,8 @@
 | stage-d-1-verify-shape-and-sample-challenges | FE4ADD | 816 | 12 |
 | stage-d-1-verify-shape-and-sample-challenges | BBE4MUL | 1316 | 16 |
 | stage-d-1-verify-shape-and-sample-challenges | HINT_BITS | 7592 | 104 |
-| stage-d-1-verify-shape-and-sample-challenges | JAL | 8833 | 121 |
 | stage-d-1-verify-shape-and-sample-challenges | BEQ | 8833 | 121 |
+| stage-d-1-verify-shape-and-sample-challenges | JAL | 8833 | 121 |
 | stage-d-1-verify-shape-and-sample-challenges | LOADW2 | 13653 | 161 |
 | stage-d-1-verify-shape-and-sample-challenges | STOREW2 | 196528 | 2688 |
 | stage-d-1-verify-shape-and-sample-challenges | SHINTW | 296608 | 3224 |
@@ -128,11 +128,11 @@
 | stage-d-2-fri-fold | STOREW | 3316327 | 37699 |
 | verify-batch | PERM_POS2 | 103412 | 206 |
 | verify-batch | STOREW2 | 83018 | 1030 |
-| verify-batch | COMP_POS2 | 620472 | 1236 |
 | verify-batch | CT_END | 90228 | 1236 |
+| verify-batch | COMP_POS2 | 620472 | 1236 |
 | verify-batch | JAL | 103368 | 1416 |
-| verify-batch | BEQ | 105266 | 1442 |
 | verify-batch | CT_START | 105266 | 1442 |
+| verify-batch | BEQ | 105266 | 1442 |
 | verify-batch | FMUL | 51088 | 1648 |
 | verify-batch | LOADW | 285988 | 3914 |
 | verify-batch | LOADW2 | 315931 | 4326 |
@@ -152,16 +152,16 @@
 | verify-batch-reduce-fast | FADD | 485374 | 15656 |
 | verify-batch-reduce-fast | STOREW | 1797280 | 22042 |
 | verify-batch-reduce-fast-setup | JAL | 45114 | 618 |
-| verify-batch-reduce-fast-setup | LOADW | 45133 | 618 |
 | verify-batch-reduce-fast-setup | CT_START | 45114 | 618 |
+| verify-batch-reduce-fast-setup | LOADW | 45133 | 618 |
 | verify-batch-reduce-fast-setup | STOREW2 | 113712 | 1236 |
 | verify-batch-reduce-fast-setup | FADD | 57474 | 1854 |
-| verify-batch-reduce-fast-setup | LOADW2 | 135399 | 1854 |
 | verify-batch-reduce-fast-setup | BNE | 135342 | 1854 |
+| verify-batch-reduce-fast-setup | LOADW2 | 135399 | 1854 |
+| poseidon2-hash | FMUL | 6386 | 206 |
 | poseidon2-hash | LOADW | 15038 | 206 |
 | poseidon2-hash | BEQ | 15038 | 206 |
 | poseidon2-hash | PERM_POS2 | 103412 | 206 |
-| poseidon2-hash | FMUL | 6386 | 206 |
 | poseidon2-hash | JAL | 30076 | 412 |
 | poseidon2-hash | CT_END | 45114 | 618 |
 | poseidon2-hash | STOREW2 | 45114 | 618 |
@@ -170,14 +170,14 @@
 | poseidon2-hash | BNE | 135342 | 1854 |
 | poseidon2-hash | FADD | 76651 | 2472 |
 | poseidon2-hash | STOREW | 619372 | 7622 |
-| poseidon2-hash-setup | STOREW2 | 45114 | 618 |
 | poseidon2-hash-setup | LOADW2 | 45133 | 618 |
-| poseidon2-hash-setup | FADD | 19158 | 618 |
 | poseidon2-hash-setup | CT_START | 45114 | 618 |
+| poseidon2-hash-setup | FADD | 19158 | 618 |
+| poseidon2-hash-setup | STOREW2 | 45114 | 618 |
 | compute-reduced-opening | CT_END | 37595 | 515 |
 | compute-reduced-opening | CT_START | 52633 | 721 |
-| compute-reduced-opening | FE4ADD | 56032 | 824 |
 | compute-reduced-opening | BBE4DIV | 56108 | 824 |
+| compute-reduced-opening | FE4ADD | 56032 | 824 |
 | compute-reduced-opening | STOREW | 97842 | 1339 |
 | compute-reduced-opening | JAL | 110887 | 1519 |
 | compute-reduced-opening | STOREW2 | 120304 | 1648 |
@@ -197,14 +197,14 @@
 | exp-reverse-bits-len | BNE | 195494 | 2678 |
 | exp-reverse-bits-len | FADD | 127796 | 4120 |
 | sp1-fri-fold | STOREW | 22576 | 309 |
-| sp1-fri-fold | CT_START | 22557 | 309 |
 | sp1-fri-fold | JAL | 22557 | 309 |
+| sp1-fri-fold | CT_START | 22557 | 309 |
 | sp1-fri-fold | FE4ADD | 56032 | 824 |
 | sp1-fri-fold | BBE4DIV | 56108 | 824 |
 | sp1-fri-fold | FADD | 25544 | 824 |
 | sp1-fri-fold | BNE | 82709 | 1133 |
-| sp1-fri-fold | BBE4MUL | 112140 | 1648 |
 | sp1-fri-fold | FSUB | 51126 | 1648 |
+| sp1-fri-fold | BBE4MUL | 112140 | 1648 |
 | sp1-fri-fold | LOADW2 | 300855 | 4120 |
 | sp1-fri-fold | LOADW | 361026 | 4944 |
 | stage-d-3-verify-challenges | BBE4DIV | 28016 | 412 |
@@ -256,9 +256,9 @@
 | verify-batch-ext | BNE | 962432 | 13184 |
 | verify-batch-ext | STOREW | 1207984 | 14832 |
 | verify-batch-ext | FADD | 549196 | 17716 |
-| poseidon2-hash-ext | PERM_POS2 | 206824 | 412 |
 | poseidon2-hash-ext | CT_START | 30076 | 412 |
 | poseidon2-hash-ext | BEQ | 30076 | 412 |
+| poseidon2-hash-ext | PERM_POS2 | 206824 | 412 |
 | poseidon2-hash-ext | JAL | 60152 | 824 |
 | poseidon2-hash-ext | FMUL | 38316 | 1236 |
 | poseidon2-hash-ext | STOREW2 | 303232 | 3296 |
@@ -268,10 +268,10 @@
 | poseidon2-hash-ext | FADD | 293756 | 9476 |
 | poseidon2-hash-ext | STOREW | 1087680 | 13184 |
 | stage-e-verify-constraints | CT_START | 73 | 1 |
-| stage-e-verify-constraints | FE4SUB | 288 | 2 |
 | stage-e-verify-constraints | JAL | 146 | 2 |
-| stage-e-verify-constraints | BBE4DIV | 204 | 3 |
+| stage-e-verify-constraints | FE4SUB | 288 | 2 |
 | stage-e-verify-constraints | FDIV | 93 | 3 |
+| stage-e-verify-constraints | BBE4DIV | 204 | 3 |
 | stage-e-verify-constraints | FSUB | 212 | 5 |
 | stage-e-verify-constraints | FMUL | 186 | 6 |
 | stage-e-verify-constraints | FE4ADD | 1296 | 9 |
@@ -332,12 +332,12 @@
 | VerifierProgram | AddVI | 39783 |
 | VerifierProgram | StoreHintWord | 58471 |
 | VerifierProgram | For | 117162 |
+| stage-c-build-rounds | MulFI | 1 |
 | stage-c-build-rounds | AssertEqVI | 1 |
 | stage-c-build-rounds | CycleTrackerStart | 1 |
-| stage-c-build-rounds | MulFI | 1 |
 | stage-c-build-rounds | ImmF | 1 |
-| stage-c-build-rounds | Poseidon2PermuteBabyBear | 2 |
 | stage-c-build-rounds | MulF | 2 |
+| stage-c-build-rounds | Poseidon2PermuteBabyBear | 2 |
 | stage-c-build-rounds | MulEF | 4 |
 | stage-c-build-rounds | AddV | 4 |
 | stage-c-build-rounds | AddE | 6 |
@@ -345,8 +345,8 @@
 | stage-c-build-rounds | AddEI | 8 |
 | stage-c-build-rounds | IfNe | 10 |
 | stage-c-build-rounds | StoreE | 12 |
-| stage-c-build-rounds | SubVI | 16 |
 | stage-c-build-rounds | IfEqI | 16 |
+| stage-c-build-rounds | SubVI | 16 |
 | stage-c-build-rounds | LoadV | 27 |
 | stage-c-build-rounds | AddEFFI | 32 |
 | stage-c-build-rounds | StoreV | 38 |
@@ -372,12 +372,12 @@
 | stage-d-verify-pcs | AddE | 1663 |
 | stage-d-verify-pcs | ImmE | 2060 |
 | stage-d-verify-pcs | AddV | 2266 |
-| stage-d-verify-pcs | MulF | 2678 |
 | stage-d-verify-pcs | Poseidon2CompressBabyBear | 2678 |
+| stage-d-verify-pcs | MulF | 2678 |
 | stage-d-verify-pcs | IfNe | 2807 |
 | stage-d-verify-pcs | MulVI | 2884 |
-| stage-d-verify-pcs | MulV | 3224 |
 | stage-d-verify-pcs | AssertEqV | 3224 |
+| stage-d-verify-pcs | MulV | 3224 |
 | stage-d-verify-pcs | StoreHintWord | 3224 |
 | stage-d-verify-pcs | AddFI | 3236 |
 | stage-d-verify-pcs | SubV | 3502 |
@@ -408,8 +408,8 @@
 | stage-d-1-verify-shape-and-sample-challenges | AddEI | 32 |
 | stage-d-1-verify-shape-and-sample-challenges | AddEFFI | 64 |
 | stage-d-1-verify-shape-and-sample-challenges | MulEI | 80 |
-| stage-d-1-verify-shape-and-sample-challenges | ImmF | 104 |
 | stage-d-1-verify-shape-and-sample-challenges | HintBitsF | 104 |
+| stage-d-1-verify-shape-and-sample-challenges | ImmF | 104 |
 | stage-d-1-verify-shape-and-sample-challenges | AssertEqF | 104 |
 | stage-d-1-verify-shape-and-sample-challenges | IfEq | 115 |
 | stage-d-1-verify-shape-and-sample-challenges | IfNe | 125 |
@@ -418,18 +418,18 @@
 | stage-d-1-verify-shape-and-sample-challenges | LoadF | 361 |
 | stage-d-1-verify-shape-and-sample-challenges | AddFI | 1794 |
 | stage-d-1-verify-shape-and-sample-challenges | StoreV | 2812 |
-| stage-d-1-verify-shape-and-sample-challenges | StoreHintWord | 3224 |
-| stage-d-1-verify-shape-and-sample-challenges | MulV | 3224 |
 | stage-d-1-verify-shape-and-sample-challenges | AssertEqV | 3224 |
+| stage-d-1-verify-shape-and-sample-challenges | MulV | 3224 |
+| stage-d-1-verify-shape-and-sample-challenges | StoreHintWord | 3224 |
 | stage-d-1-verify-shape-and-sample-challenges | LoadV | 3232 |
 | stage-d-1-verify-shape-and-sample-challenges | IfEqI | 3257 |
 | stage-d-1-verify-shape-and-sample-challenges | SubVI | 3464 |
 | stage-d-1-verify-shape-and-sample-challenges | AddVI | 3469 |
 | stage-d-1-verify-shape-and-sample-challenges | For | 5634 |
 | stage-d-1-verify-shape-and-sample-challenges | ImmV | 6110 |
-| stage-d-2-fri-fold | IfEq | 206 |
 | stage-d-2-fri-fold | IfNeI | 206 |
 | stage-d-2-fri-fold | Poseidon2PermuteBabyBear | 206 |
+| stage-d-2-fri-fold | IfEq | 206 |
 | stage-d-2-fri-fold | AddV | 412 |
 | stage-d-2-fri-fold | AddE | 824 |
 | stage-d-2-fri-fold | ImmE | 824 |
@@ -437,11 +437,11 @@
 | stage-d-2-fri-fold | StoreV | 1030 |
 | stage-d-2-fri-fold | Poseidon2CompressBabyBear | 1236 |
 | stage-d-2-fri-fold | IfNe | 1236 |
+| stage-d-2-fri-fold | MulVI | 1442 |
 | stage-d-2-fri-fold | AddFI | 1442 |
 | stage-d-2-fri-fold | ImmV | 1442 |
-| stage-d-2-fri-fold | MulVI | 1442 |
-| stage-d-2-fri-fold | MulE | 1648 |
 | stage-d-2-fri-fold | AssertEqF | 1648 |
+| stage-d-2-fri-fold | MulE | 1648 |
 | stage-d-2-fri-fold | SubV | 2060 |
 | stage-d-2-fri-fold | CycleTrackerEnd | 2163 |
 | stage-d-2-fri-fold | CycleTrackerStart | 2164 |
@@ -450,35 +450,35 @@
 | stage-d-2-fri-fold | ImmF | 3708 |
 | stage-d-2-fri-fold | StoreF | 3914 |
 | stage-d-2-fri-fold | IfEqI | 4274 |
-| stage-d-2-fri-fold | LoadF | 6180 |
 | stage-d-2-fri-fold | LoadE | 6180 |
+| stage-d-2-fri-fold | LoadF | 6180 |
 | stage-d-2-fri-fold | SubEF | 6592 |
 | stage-d-2-fri-fold | AddVI | 8240 |
 | stage-d-2-fri-fold | LoadV | 11948 |
 | stage-d-2-fri-fold | For | 17925 |
 | stage-d-2-fri-fold | StoreE | 28016 |
-| verify-batch | IfEq | 206 |
-| verify-batch | Poseidon2PermuteBabyBear | 206 |
 | verify-batch | IfNeI | 206 |
+| verify-batch | Poseidon2PermuteBabyBear | 206 |
+| verify-batch | IfEq | 206 |
 | verify-batch | StoreV | 412 |
-| verify-batch | CycleTrackerEnd | 1236 |
+| verify-batch | Poseidon2CompressBabyBear | 1236 |
 | verify-batch | Alloc | 1236 |
 | verify-batch | IfNe | 1236 |
 | verify-batch | ImmV | 1236 |
+| verify-batch | CycleTrackerEnd | 1236 |
 | verify-batch | MulVI | 1236 |
-| verify-batch | Poseidon2CompressBabyBear | 1236 |
 | verify-batch | CycleTrackerStart | 1442 |
 | verify-batch | AssertEqF | 1648 |
 | verify-batch | IfEqI | 2446 |
 | verify-batch | ImmF | 3296 |
 | verify-batch | LoadV | 3708 |
-| verify-batch | LoadF | 3914 |
 | verify-batch | StoreF | 3914 |
+| verify-batch | LoadF | 3914 |
 | verify-batch | AddVI | 5974 |
 | verify-batch | For | 7004 |
-| verify-batch-reduce-fast | Poseidon2PermuteBabyBear | 618 |
 | verify-batch-reduce-fast | IfEq | 618 |
 | verify-batch-reduce-fast | IfNeI | 618 |
+| verify-batch-reduce-fast | Poseidon2PermuteBabyBear | 618 |
 | verify-batch-reduce-fast | StoreV | 1236 |
 | verify-batch-reduce-fast | CycleTrackerEnd | 1854 |
 | verify-batch-reduce-fast | CycleTrackerStart | 2472 |
@@ -491,10 +491,10 @@
 | verify-batch-reduce-fast | Alloc | 6180 |
 | verify-batch-reduce-fast | ImmF | 6592 |
 | verify-batch-reduce-fast | StoreF | 10506 |
-| verify-batch-reduce-fast | For | 10918 |
 | verify-batch-reduce-fast | AddVI | 10918 |
-| verify-batch-reduce-fast-setup | CycleTrackerStart | 618 |
+| verify-batch-reduce-fast | For | 10918 |
 | verify-batch-reduce-fast-setup | IfEq | 618 |
+| verify-batch-reduce-fast-setup | CycleTrackerStart | 618 |
 | verify-batch-reduce-fast-setup | StoreV | 1236 |
 | verify-batch-reduce-fast-setup | AddVI | 1236 |
 | verify-batch-reduce-fast-setup | LoadV | 1854 |
@@ -502,32 +502,32 @@
 | poseidon2-hash | IfNeI | 206 |
 | poseidon2-hash | Poseidon2PermuteBabyBear | 206 |
 | poseidon2-hash | LoadV | 412 |
-| poseidon2-hash | ImmV | 618 |
-| poseidon2-hash | CycleTrackerEnd | 618 |
 | poseidon2-hash | IfEqI | 618 |
 | poseidon2-hash | LoadF | 618 |
+| poseidon2-hash | ImmV | 618 |
+| poseidon2-hash | CycleTrackerEnd | 618 |
 | poseidon2-hash | Alloc | 618 |
 | poseidon2-hash | CycleTrackerStart | 824 |
 | poseidon2-hash | AddVI | 1442 |
 | poseidon2-hash | For | 2884 |
 | poseidon2-hash | ImmF | 3296 |
 | poseidon2-hash | StoreF | 3914 |
-| poseidon2-hash-setup | CycleTrackerStart | 618 |
-| poseidon2-hash-setup | StoreF | 618 |
-| poseidon2-hash-setup | AddVI | 618 |
 | poseidon2-hash-setup | LoadF | 618 |
+| poseidon2-hash-setup | CycleTrackerStart | 618 |
+| poseidon2-hash-setup | AddVI | 618 |
+| poseidon2-hash-setup | StoreF | 618 |
 | compute-reduced-opening | AddV | 206 |
 | compute-reduced-opening | ImmF | 412 |
 | compute-reduced-opening | CycleTrackerEnd | 515 |
 | compute-reduced-opening | CycleTrackerStart | 721 |
 | compute-reduced-opening | DivE | 824 |
 | compute-reduced-opening | AddE | 824 |
-| compute-reduced-opening | LoadF | 1442 |
 | compute-reduced-opening | AddFI | 1442 |
-| compute-reduced-opening | AddVI | 1648 |
+| compute-reduced-opening | LoadF | 1442 |
 | compute-reduced-opening | StoreE | 1648 |
-| compute-reduced-opening | MulE | 1648 |
 | compute-reduced-opening | SubV | 1648 |
+| compute-reduced-opening | AddVI | 1648 |
+| compute-reduced-opening | MulE | 1648 |
 | compute-reduced-opening | IfEqI | 1828 |
 | compute-reduced-opening | MulF | 2678 |
 | compute-reduced-opening | LoadV | 3502 |
@@ -538,75 +538,75 @@
 | exp-reverse-bits-len | ImmF | 412 |
 | exp-reverse-bits-len | SubV | 1236 |
 | exp-reverse-bits-len | LoadV | 1236 |
-| exp-reverse-bits-len | AddFI | 1442 |
 | exp-reverse-bits-len | AddVI | 1442 |
+| exp-reverse-bits-len | AddFI | 1442 |
 | exp-reverse-bits-len | IfEqI | 1828 |
 | exp-reverse-bits-len | MulF | 2472 |
 | exp-reverse-bits-len | For | 3090 |
 | sp1-fri-fold | CycleTrackerStart | 309 |
-| sp1-fri-fold | LoadF | 824 |
-| sp1-fri-fold | AddE | 824 |
 | sp1-fri-fold | DivE | 824 |
+| sp1-fri-fold | AddE | 824 |
+| sp1-fri-fold | LoadF | 824 |
 | sp1-fri-fold | MulE | 1648 |
 | sp1-fri-fold | For | 2575 |
 | sp1-fri-fold | LoadE | 3296 |
 | sp1-fri-fold | SubEF | 6592 |
-| stage-d-3-verify-challenges | AddEFFI | 412 |
-| stage-d-3-verify-challenges | Poseidon2PermuteBabyBear | 412 |
-| stage-d-3-verify-challenges | IfEq | 412 |
-| stage-d-3-verify-challenges | AssertEqE | 412 |
-| stage-d-3-verify-challenges | SubVIN | 412 |
 | stage-d-3-verify-challenges | IfNeI | 412 |
+| stage-d-3-verify-challenges | Poseidon2PermuteBabyBear | 412 |
+| stage-d-3-verify-challenges | AssertEqE | 412 |
 | stage-d-3-verify-challenges | DivE | 412 |
+| stage-d-3-verify-challenges | IfEq | 412 |
+| stage-d-3-verify-challenges | AddEFFI | 412 |
+| stage-d-3-verify-challenges | SubVIN | 412 |
 | stage-d-3-verify-challenges | SubVI | 412 |
 | stage-d-3-verify-challenges | AddE | 824 |
-| stage-d-3-verify-challenges | ImmE | 1236 |
 | stage-d-3-verify-challenges | SubE | 1236 |
+| stage-d-3-verify-challenges | ImmE | 1236 |
 | stage-d-3-verify-challenges | IfNe | 1442 |
-| stage-d-3-verify-challenges | MulVI | 1442 |
 | stage-d-3-verify-challenges | SubV | 1442 |
+| stage-d-3-verify-challenges | MulVI | 1442 |
 | stage-d-3-verify-challenges | Poseidon2CompressBabyBear | 1442 |
 | stage-d-3-verify-challenges | MulEF | 1648 |
 | stage-d-3-verify-challenges | CycleTrackerEnd | 1751 |
 | stage-d-3-verify-challenges | CycleTrackerStart | 1752 |
 | stage-d-3-verify-challenges | AddV | 1854 |
-| stage-d-3-verify-challenges | StoreV | 2060 |
 | stage-d-3-verify-challenges | MulE | 2060 |
-| stage-d-3-verify-challenges | AssertEqF | 3296 |
+| stage-d-3-verify-challenges | StoreV | 2060 |
 | stage-d-3-verify-challenges | ImmF | 3296 |
+| stage-d-3-verify-challenges | AssertEqF | 3296 |
 | stage-d-3-verify-challenges | AddEI | 4532 |
 | stage-d-3-verify-challenges | ImmV | 5356 |
 | stage-d-3-verify-challenges | StoreF | 6592 |
 | stage-d-3-verify-challenges | IfEqI | 6945 |
 | stage-d-3-verify-challenges | StoreE | 8240 |
-| stage-d-3-verify-challenges | LoadV | 8652 |
 | stage-d-3-verify-challenges | Alloc | 8652 |
+| stage-d-3-verify-challenges | LoadV | 8652 |
 | stage-d-3-verify-challenges | LoadF | 10403 |
 | stage-d-3-verify-challenges | LoadE | 11536 |
 | stage-d-3-verify-challenges | AddVI | 14936 |
 | stage-d-3-verify-challenges | For | 18131 |
-| verify-query | IfNeI | 412 |
-| verify-query | AddEFFI | 412 |
-| verify-query | Poseidon2PermuteBabyBear | 412 |
 | verify-query | DivE | 412 |
-| verify-query | SubVI | 412 |
+| verify-query | Poseidon2PermuteBabyBear | 412 |
 | verify-query | IfEq | 412 |
 | verify-query | SubVIN | 412 |
+| verify-query | SubVI | 412 |
+| verify-query | IfNeI | 412 |
+| verify-query | AddEFFI | 412 |
 | verify-query | AddE | 824 |
 | verify-query | ImmE | 1236 |
 | verify-query | SubE | 1236 |
-| verify-query | IfNe | 1442 |
-| verify-query | Poseidon2CompressBabyBear | 1442 |
 | verify-query | MulVI | 1442 |
+| verify-query | Poseidon2CompressBabyBear | 1442 |
+| verify-query | IfNe | 1442 |
 | verify-query | SubV | 1442 |
-| verify-query | CycleTrackerEnd | 1648 |
 | verify-query | MulEF | 1648 |
+| verify-query | CycleTrackerEnd | 1648 |
 | verify-query | CycleTrackerStart | 1751 |
 | verify-query | AddV | 1854 |
 | verify-query | MulE | 2060 |
 | verify-query | StoreV | 2060 |
-| verify-query | ImmF | 3296 |
 | verify-query | AssertEqF | 3296 |
+| verify-query | ImmF | 3296 |
 | verify-query | AddEI | 4532 |
 | verify-query | ImmV | 5356 |
 | verify-query | StoreF | 6592 |
@@ -628,9 +628,9 @@
 | verify-batch-ext | MulVI | 1442 |
 | verify-batch-ext | CycleTrackerStart | 1648 |
 | verify-batch-ext | LoadE | 3296 |
-| verify-batch-ext | ImmF | 3296 |
-| verify-batch-ext | StoreE | 3296 |
 | verify-batch-ext | AssertEqF | 3296 |
+| verify-batch-ext | StoreE | 3296 |
+| verify-batch-ext | ImmF | 3296 |
 | verify-batch-ext | ImmV | 3708 |
 | verify-batch-ext | Alloc | 4944 |
 | verify-batch-ext | LoadV | 5356 |
@@ -639,34 +639,34 @@
 | verify-batch-ext | LoadF | 9888 |
 | verify-batch-ext | For | 11124 |
 | verify-batch-ext | AddVI | 12978 |
-| poseidon2-hash-ext | Poseidon2PermuteBabyBear | 412 |
 | poseidon2-hash-ext | CycleTrackerStart | 412 |
+| poseidon2-hash-ext | Poseidon2PermuteBabyBear | 412 |
 | poseidon2-hash-ext | IfNeI | 412 |
 | poseidon2-hash-ext | LoadV | 824 |
 | poseidon2-hash-ext | ImmV | 2472 |
-| poseidon2-hash-ext | IfEqI | 3296 |
 | poseidon2-hash-ext | LoadE | 3296 |
-| poseidon2-hash-ext | ImmF | 3296 |
+| poseidon2-hash-ext | IfEqI | 3296 |
 | poseidon2-hash-ext | StoreE | 3296 |
+| poseidon2-hash-ext | ImmF | 3296 |
 | poseidon2-hash-ext | LoadF | 3296 |
 | poseidon2-hash-ext | Alloc | 3708 |
 | poseidon2-hash-ext | For | 4944 |
 | poseidon2-hash-ext | StoreF | 6592 |
 | poseidon2-hash-ext | AddVI | 7004 |
-| stage-e-verify-constraints | AddFI | 1 |
-| stage-e-verify-constraints | AddVI | 1 |
 | stage-e-verify-constraints | CycleTrackerStart | 1 |
+| stage-e-verify-constraints | AddVI | 1 |
 | stage-e-verify-constraints | ImmF | 1 |
-| stage-e-verify-constraints | MulF | 2 |
-| stage-e-verify-constraints | SubE | 2 |
+| stage-e-verify-constraints | AddFI | 1 |
 | stage-e-verify-constraints | DivE | 2 |
+| stage-e-verify-constraints | MulF | 2 |
 | stage-e-verify-constraints | ImmV | 2 |
+| stage-e-verify-constraints | SubE | 2 |
 | stage-e-verify-constraints | DivFIN | 3 |
-| stage-e-verify-constraints | MulEF | 4 |
-| stage-e-verify-constraints | AddV | 4 |
-| stage-e-verify-constraints | AssertEqVI | 4 |
 | stage-e-verify-constraints | ImmE | 4 |
+| stage-e-verify-constraints | MulEF | 4 |
 | stage-e-verify-constraints | AssertEqE | 4 |
+| stage-e-verify-constraints | AssertEqVI | 4 |
+| stage-e-verify-constraints | AddV | 4 |
 | stage-e-verify-constraints | DivEIN | 5 |
 | stage-e-verify-constraints | SubEI | 8 |
 | stage-e-verify-constraints | AddE | 9 |
@@ -770,10 +770,10 @@
 
 | stark | trace_gen_time_ms |
 | --- | --- |
-| vm | 1623.0 |
+| vm | 1627.0 |
 
 
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/e313a9c92594ea095d5551b8003e7029cb07e948
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/148283182135a0a6c596577008e467a4573339db
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10988238812)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10999810701)
