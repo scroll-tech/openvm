@@ -1,6 +1,6 @@
 | group | stark_proof_time_ms | total_cells | total_cells_used |
 | --- | --- | --- | --- |
-| fibonacci_program_inner | 362.0 | 1192540 | 135038 |
+| fibonacci_program_inner | 364.0 | 1192540 | 135038 |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -39,6 +39,6 @@
 
 
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/148283182135a0a6c596577008e467a4573339db
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/5fd59fca599e23a09ba49b015e89cba9d6f12d19
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/10999810701)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11000471159)
