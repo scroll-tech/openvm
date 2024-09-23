@@ -1,11 +1,12 @@
 use halo2curves_axiom::ff::Field;
 
-use crate::common::point::EcPoint;
+use crate::common::{field::FieldExtension, point::EcPoint};
 
 #[allow(non_snake_case)]
-pub fn miller_double_step<Fp2>(S: EcPoint<Fp2>) -> (EcPoint<Fp2>, [Fp2; 2])
+pub fn miller_double_step<Fp, Fp2>(S: EcPoint<Fp2>) -> (EcPoint<Fp2>, [Fp2; 2])
 where
-    Fp2: Field,
+    Fp: Field,
+    Fp2: FieldExtension<BaseField = Fp>,
 {
     let one = Fp2::ONE;
     let two = one + one;
@@ -20,7 +21,7 @@ where
     let x_2S = lambda.square() - two * x;
     // y_2S = λ(x - x_2S) - y
     let y_2S = lambda * (x - x_2S) - y;
-    let res = EcPoint { x: x_2S, y: y_2S };
+    let Q_acc = EcPoint { x: x_2S, y: y_2S };
 
     // Tangent line
     //   1 + b' (x_P / y_P) w + c' (1 / y_P) w^3
@@ -31,7 +32,7 @@ where
     let b = lambda.neg();
     let c = lambda * x - y;
 
-    (res, [b, c])
+    (Q_acc, [b, c])
 }
 
 #[allow(non_snake_case)]

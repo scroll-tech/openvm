@@ -1,8 +1,10 @@
 use ff::Field;
 
-use crate::common::field::FieldExtension;
+use crate::common::{field::FieldExtension, point::EcPoint};
 
-pub fn line_repr_from_point<Fp, Fp2>(x: Fp, y: Fp) -> [Fp2; 2]
+/// Returns a line function for a tangent line at the point P
+#[allow(non_snake_case)]
+pub fn line_function_from_point<Fp, Fp2>(P: EcPoint<Fp>) -> [Fp2; 2]
 where
     Fp: Field,
     Fp2: FieldExtension<BaseField = Fp>,
@@ -10,8 +12,8 @@ where
     let one = Fp2::ONE;
     let two = one + one;
     let three = one + two;
-    let x = Fp2::lift(&x);
-    let y = Fp2::lift(&y);
+    let x = Fp2::lift(&P.x);
+    let y = Fp2::lift(&P.y);
 
     // λ = (3x^2) / (2y)
     // 1 - λ(x/y)w + (λx - y)(1/y)w^3

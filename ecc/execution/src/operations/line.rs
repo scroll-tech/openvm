@@ -29,7 +29,7 @@ pub fn mul_013_by_013<Fp, Fp2>(
     line_0: [Fp2; 2],
     line_1: [Fp2; 2],
     // TODO[yj]: once this function is moved into a chip, we can use the xi property instead of passing in this argument
-    xi: Fp,
+    xi_0: Fp,
 ) -> [Fp2; 5]
 where
     Fp: Field,
@@ -40,8 +40,10 @@ where
     let b1 = line_1[0];
     let c1 = line_1[1];
 
-    // l0 * l1 = (c0c1 * xi.xi_0 + c0c1 * xi.u)1 + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + c0b1)w⁴
-    let l0 = c0 * c1 * Fp2::lift(&xi);
+    // w⁶ = u + xi_0
+    // l0 * l1 = c0c1 + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + c0b1)w⁴ + (c0c1)w⁴
+    //         = (c0c1 * xi.xi_0 + c0c1 * xi.u)1 + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + c0b1)w⁴
+    let l0 = c0 * c1 * Fp2::lift(&xi_0);
     let l1 = b0 + b1;
     let l2 = b0 * b1;
     let l3 = c0 + c1;
