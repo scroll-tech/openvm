@@ -870,8 +870,8 @@ checksum = "0c4b4d0bd25bd0b74681c0ad21497610ce1b7c91b1022cd21c80c6fbdd9476b0"
 name = "ax-ecc-execution"
 version = "0.1.0"
 dependencies = [
- "ff 0.13.0",
  "halo2curves-axiom 0.7.0",
+ "itertools 0.13.0",
  "rand 0.8.5",
  "rng",
 ]

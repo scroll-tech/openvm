@@ -38,55 +38,26 @@ where
                 .map(miller_double_step::<Fp, Fp2>)
                 .unzip::<_, _, Vec<_>, Vec<_>>();
             Q_acc = Q_out;
-            let lines_iter = izip!(lines_2S.iter(), x_over_ys.iter(), y_invs.iter());
 
-            // for (Q, line) in Q_acc.iter_mut().zip(lines.iter_mut()) {
-            //     let (Q_out, line_2S) = miller_double_step::<Fp, Fp2>(Q.clone());
-            //     *Q = Q_out;
-            //     lines.push(line_2S);
-            // }
-            // let mut lines_iter = lines
-            //     .iter()
-            //     .zip(x_over_ys.iter())
-            //     .zip(y_invs.iter())
-            //     .map(|((line, x_over_y), y_inv)| (line, x_over_y, y_inv));
+            let lines_iter = izip!(lines_2S.iter(), x_over_ys.iter(), y_invs.iter());
             for (line_2S, x_over_y, y_inv) in lines_iter {
                 let line = &evaluate_line::<Fp, Fp2>(*line_2S, *x_over_y, *y_inv);
                 lines.push(*line);
             }
         } else {
-            // let mut line_S_plus_Qs = Vec::<[Fp2; 2]>::new();
-            // let mut line_S_plus_Q_plus_Ss = Vec::<[Fp2; 2]>::new();
             let Q_signed = q_signed(&Q_acc[i], pseudo_binary_encoding[i]);
             let (Q_out, lines_S_plus_Q, lines_S_plus_Q_plus_S): (Vec<_>, Vec<_>, Vec<_>) = Q_acc
                 .iter()
                 .map(|Q| miller_double_and_add::<Fp, Fp2>(Q.clone(), Q_signed.clone()))
                 .multiunzip();
             Q_acc = Q_out;
+
             let lines_iter = izip!(
                 lines_S_plus_Q.iter(),
                 lines_S_plus_Q_plus_S.iter(),
                 x_over_ys.iter(),
                 y_invs.iter()
             );
-
-            // for (Q, line) in Q_acc.iter_mut().zip(lines.iter_mut()) {
-            //     let (Q_out, line_S_plus_Q, line_S_plus_Q_plus_S) =
-            //         miller_double_and_add::<Fp, Fp2>(Q.clone(), Q_signed);
-            //     *Q = Q_out;
-            //     line_S_plus_Qs.push(line_S_plus_Q);
-            //     line_S_plus_Q_plus_Ss.push(line_S_plus_Q_plus_S);
-            // }
-            // let mut lines_iter = line_S_plus_Qs
-            //     .iter()
-            //     .zip(line_S_plus_Q_plus_Ss.iter())
-            //     .zip(x_over_ys.iter())
-            //     .zip(y_invs.iter())
-            //     .map(
-            //         |(((line_S_plus_Q, line_S_plus_Q_plus_S), x_over_y), y_inv)| {
-            //             (line_S_plus_Q, line_S_plus_Q_plus_S, x_over_y, y_inv)
-            //         },
-            //     );
             let mut lines0 = Vec::<[Fp2; 2]>::new();
             let mut lines1 = Vec::<[Fp2; 2]>::new();
             for (line_S_plus_Q, line_S_plus_Q_plus_S, x_over_y, y_inv) in lines_iter {
