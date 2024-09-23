@@ -1,6 +1,9 @@
 use halo2curves_axiom::ff::Field;
 
-use crate::common::{field::FieldExtension, point::EcPoint};
+use crate::{
+    common::{field::FieldExtension, point::EcPoint},
+    operations::{evaluate_line, fp12_square, mul_013_by_013, mul_by_01234, mul_by_013},
+};
 
 #[allow(non_snake_case)]
 pub fn miller_double_step<Fp, Fp2>(S: EcPoint<Fp2>) -> (EcPoint<Fp2>, [Fp2; 2])
@@ -36,12 +39,13 @@ where
 }
 
 #[allow(non_snake_case)]
-pub fn miller_double_and_add<Fp2>(
+pub fn miller_double_and_add<Fp, Fp2>(
     S: EcPoint<Fp2>,
     Q: EcPoint<Fp2>,
 ) -> (EcPoint<Fp2>, [Fp2; 2], [Fp2; 2])
 where
-    Fp2: Field,
+    Fp: Field,
+    Fp2: FieldExtension<BaseField = Fp>,
 {
     let one = Fp2::ONE;
     let two = one + one;

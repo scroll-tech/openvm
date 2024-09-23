@@ -5,7 +5,7 @@ use halo2curves_axiom::{
 
 use crate::common::field::FieldExtension;
 
-pub const BN254_XI: Fq = Fq::one();
+pub const BN254_XI: Fq2 = Fq2::one();
 
 impl FieldExtension for Fq2 {
     type BaseField = Fq;

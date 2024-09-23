@@ -1,6 +1,6 @@
-use ff::Field;
 use halo2curves_axiom::{
     bn256::{Fq, Fq12, Fq2, Fq6, G1Affine, G2Affine},
+    ff::Field,
     CurveAffine, CurveAffineExt,
 };
 use rand::thread_rng;

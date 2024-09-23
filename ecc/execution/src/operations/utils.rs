@@ -1,4 +1,4 @@
-use ff::Field;
+use halo2curves_axiom::ff::Field;
 
 use crate::common::{field::FieldExtension, point::EcPoint};
 

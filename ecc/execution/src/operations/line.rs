@@ -1,4 +1,4 @@
-use ff::Field;
+use halo2curves_axiom::ff::Field;
 
 use crate::common::field::FieldExtension;
 
@@ -9,7 +9,7 @@ where
     Fp6: FieldExtension<BaseField = Fp2>,
     Fp12: FieldExtension<BaseField = Fp6>,
 {
-    x * x
+    x.square()
 }
 
 pub fn evaluate_line<Fp, Fp2>(line: [Fp2; 2], x_over_y: Fp, y_inv: Fp) -> [Fp2; 2]
@@ -29,7 +29,7 @@ pub fn mul_013_by_013<Fp, Fp2>(
     line_0: [Fp2; 2],
     line_1: [Fp2; 2],
     // TODO[yj]: once this function is moved into a chip, we can use the xi property instead of passing in this argument
-    xi_0: Fp,
+    xi_0: Fp2,
 ) -> [Fp2; 5]
 where
     Fp: Field,
@@ -43,7 +43,7 @@ where
     // w⁶ = u + xi_0
     // l0 * l1 = c0c1 + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + c0b1)w⁴ + (c0c1)w⁴
     //         = (c0c1 * xi.xi_0 + c0c1 * xi.u)1 + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + c0b1)w⁴
-    let l0 = c0 * c1 * Fp2::lift(&xi_0);
+    let l0 = c0 * c1 * xi_0;
     let l1 = b0 + b1;
     let l2 = b0 * b1;
     let l3 = c0 + c1;

@@ -1,6 +1,7 @@
-mod miller_steps;
+mod algorithm;
+mod step;
+mod utils;
 
-pub use miller_steps::*;
-
-#[cfg(test)]
-pub mod tests;
+pub use algorithm::*;
+pub use step::*;
+pub use utils::*;
