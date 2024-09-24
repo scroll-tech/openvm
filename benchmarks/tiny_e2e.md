@@ -1,6 +1,6 @@
-| group | stark_proof_time_ms | total_cells | total_cells_used |
-| --- | --- | --- | --- |
-| fibonacci_program_inner | 360.0 | 1192540 | 135038 |
+| group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms |
+| --- | --- | --- | --- | --- |
+| fibonacci_program_inner | 359.0 | 1192540 | 135038 | 0.0 |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -33,12 +33,8 @@
 | fibonacci_program_inner | CoreAir | 904 | 117 | 19 | 69 | 44 | 0 | 2 | 8 |
 | fibonacci_program_inner | VmConnectorAir | 20 | 4 | 2 | 2 | 8 | 1 | 2 | 2 |
 
-| group | stark | trace_gen_time_ms |
-| --- | --- | --- |
-| fibonacci_program_inner | vm | 0.0 |
 
 
-
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/98b0d42524a3027dceaa04c7cb5c3055b1141cae
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/c427003af1d66b9d3584e59d25bb466c9888b808
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11003690764)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11005680361)
