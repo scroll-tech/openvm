@@ -1,7 +1,7 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- |
-| bench_program_inner | 1204.0 | 1997968 | 287313 | 2.0 |  |
-| inner_verifier | 112389.0 <span style="color: green">(-0.9%)</span> | 1257701396 | 686177978 <span style="color: green">(-0.0%)</span> | 33908.0 <span style="color: red">(+3.0%)</span> | 47423.0 <span style="color: red">(+0.7%)</span> |
+| bench_program_inner | 1207.0 <span style="color: red">(+0.2%)</span> | 1997968 | 287313 | 2.0 |  |
+| inner_verifier | 112969.0 <span style="color: red">(+0.5%)</span> | 1257701396 | 686272370 <span style="color: red">(+0.0%)</span> | 33629.0 <span style="color: green">(-0.8%)</span> | 47480.0 <span style="color: red">(+0.1%)</span> |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -13,8 +13,8 @@
 | bench_program_inner | Memory | 59 |
 | bench_program_inner | Program | 37 |
 | bench_program_inner | RangeChecker | 131072 |
-| inner_verifier | Core | 6493736 <span style="color: green">(-0.0%)</span> |
-| inner_verifier | FieldArithmetic | 2530798 <span style="color: green">(-0.0%)</span> |
+| inner_verifier | Core | 6495018 <span style="color: red">(+0.0%)</span> |
+| inner_verifier | FieldArithmetic | 2530824 <span style="color: red">(+0.0%)</span> |
 | inner_verifier | FieldExtension | 1494190 |
 | inner_verifier | Memory | 845280 |
 | inner_verifier | Poseidon2 | 31058 |
@@ -35,7 +35,7 @@
 | bench_program_inner | TERMINATE | 69 | 1 |
 | inner_verifier | LOADW | 164693384 | 2239721 |
 | inner_verifier | LOADW2 | 149300484 | 2045146 |
-| inner_verifier | FADD | 55810759 <span style="color: green">(-0.0%)</span> | 1751799 <span style="color: green">(-0.0%)</span> |
+| inner_verifier | FADD | 55811565 <span style="color: red">(+0.0%)</span> | 1751825 <span style="color: red">(+0.0%)</span> |
 | inner_verifier | BNE | 81449531 | 1115747 |
 | inner_verifier | BBE4MUL | 52098316 | 735783 |
 | inner_verifier | FSUB | 22434406 | 723191 |
@@ -47,7 +47,7 @@
 | inner_verifier | CT_START | 13455871 | 184327 |
 | inner_verifier | STOREW | 11264721 | 142278 |
 | inner_verifier | FMUL | 1817042 | 55657 |
-| inner_verifier | JAL | 2192647 <span style="color: green">(-4.1%)</span> | 30036 <span style="color: green">(-4.1%)</span> |
+| inner_verifier | JAL | 2286233 <span style="color: red">(+4.3%)</span> | 31318 <span style="color: red">(+4.3%)</span> |
 | inner_verifier | PERM_POS2 | 11482748 | 22874 |
 | inner_verifier | FE4SUB | 2100816 | 15235 |
 | inner_verifier | HINT_INPUT | 781684 | 10708 |
@@ -80,7 +80,7 @@
 | inner_verifier | AddVI | 438550 |
 | inner_verifier | AddE | 389587 |
 | inner_verifier | DivE | 353514 |
-| inner_verifier | IfEqI | 211168 <span style="color: green">(-0.6%)</span> |
+| inner_verifier | IfEqI | 212450 <span style="color: red">(+0.6%)</span> |
 | inner_verifier | StoreF | 195144 |
 | inner_verifier | CycleTrackerEnd | 184327 |
 | inner_verifier | CycleTrackerStart | 184327 |
@@ -97,7 +97,7 @@
 | inner_verifier | ImmF | 15360 |
 | inner_verifier | SubE | 15235 |
 | inner_verifier | SubV | 15168 |
-| inner_verifier | AddFI | 13700 <span style="color: green">(-0.2%)</span> |
+| inner_verifier | AddFI | 13726 <span style="color: red">(+0.2%)</span> |
 | inner_verifier | HintInputVec | 10708 |
 | inner_verifier | MulVI | 9367 |
 | inner_verifier | Poseidon2CompressBabyBear | 8184 |
@@ -148,7 +148,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11017700381/artifacts/1972668780)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/7c0673730d4cf22e1585d00a69e861980a73a901
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11021371346/artifacts/1973750106)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/846375a352431da063a0c4a1d88c81feea3874a8
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11017700381)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11021371346)
