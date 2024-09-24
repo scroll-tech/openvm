@@ -1,9 +1,10 @@
 | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- |
-| 8379.0 <span style="color: red">(+6.5%)</span> | 69738516 | 32891694 | 1763.0 <span style="color: red">(+6.3%)</span> | 52.0 <span style="color: red">(+2.0%)</span> |
+| 7757.0 <span style="color: green">(-7.4%)</span> | 66134036 <span style="color: green">(-5.2%)</span> | 30396086 <span style="color: green">(-7.6%)</span> | 1668.0 <span style="color: green">(-5.4%)</span> | 50.0 <span style="color: green">(-3.8%)</span> |
 
 | chip_name | rows_used |
 | --- | --- |
+| ByteXor | 65536 |
 | Core | 320143 |
 | FieldArithmetic | 164539 |
 | FieldExtension | 7914 |
@@ -15,28 +16,28 @@
 | opcode | cells_used | frequency |
 | --- | --- | --- |
 | FADD | 4231056 | 134354 |
-| BNE | 5500331 | 75347 |
-| STOREW | 6257100 | 74011 |
-| LOADW | 3666963 | 49216 |
-| LOADW2 | 2777855 | 38007 |
-| SHINTW | 3057344 | 33232 |
-| STOREW2 | 1837976 | 21346 |
+| BNE | 4897555 <span style="color: green">(-11.0%)</span> | 75347 |
+| STOREW | 5665012 <span style="color: green">(-9.5%)</span> | 74011 |
+| LOADW | 3273235 <span style="color: green">(-10.7%)</span> | 49216 |
+| LOADW2 | 2473799 <span style="color: green">(-10.9%)</span> | 38007 |
+| SHINTW | 2791488 <span style="color: green">(-8.7%)</span> | 33232 |
+| STOREW2 | 1667208 <span style="color: green">(-9.3%)</span> | 21346 |
 | FMUL | 702623 | 20715 |
-| JAL | 937266 | 12839 |
+| JAL | 834554 <span style="color: green">(-11.0%)</span> | 12839 |
 | FSUB | 355778 | 9467 |
-| HINT_INPUT | 348137 | 4769 |
-| CT_END | 286233 | 3921 |
-| CT_START | 286233 | 3921 |
+| HINT_INPUT | 309985 <span style="color: green">(-11.0%)</span> | 4769 |
+| CT_END | 254865 <span style="color: green">(-11.0%)</span> | 3921 |
+| CT_START | 254865 <span style="color: green">(-11.0%)</span> | 3921 |
 | BBE4MUL | 258120 | 3759 |
-| BEQ | 250317 | 3429 |
+| BEQ | 222885 <span style="color: green">(-11.0%)</span> | 3429 |
 | COMP_POS2 | 1344356 | 2678 |
 | FE4ADD | 115016 | 1678 |
 | BBE4DIV | 84328 | 1239 |
 | FE4SUB | 84336 | 1238 |
 | PERM_POS2 | 316762 | 631 |
-| HINT_BITS | 7592 | 104 |
+| HINT_BITS | 6760 <span style="color: green">(-11.0%)</span> | 104 |
 | FDIV | 93 | 3 |
-| TERMINATE | 73 | 1 |
+| TERMINATE | 65 <span style="color: green">(-11.0%)</span> | 1 |
 
 | dsl_ir | frequency |
 | --- | --- |
@@ -93,18 +94,19 @@
 
 | air_name | cells | constraints | interactions | main_cols | perm_cols | prep_cols | quotient_deg | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CoreAir | 48758784 | 115 | 19 | 73 | 20 | 0 | 8 | 524288 |
+| CoreAir | 44564480 <span style="color: green">(-8.6%)</span> | 111 <span style="color: green">(-3.5%)</span> | 19 | 65 <span style="color: green">(-11.0%)</span> | 20 | 0 | 8 | 524288 |
 | FieldArithmeticAir | 12320768 | 23 | 15 | 31 | 16 | 0 | 8 | 262144 |
 | MemoryAuditAir | 3538944 | 19 | 6 | 19 | 8 | 0 | 8 | 131072 |
 | VariableRangeCheckerAir | 1179648 | 4 | 1 | 1 | 8 | 2 | 1 | 131072 |
 | ProgramAir | 589824 | 4 | 1 | 1 | 8 | 9 | 1 | 65536 |
+| XorLookupAir | 589824 | 4 | 1 | 1 | 8 | 3 | 1 | 65536 |
 | FieldExtensionArithmeticAir | 884736 | 38 | 51 | 68 | 40 | 0 | 8 | 8192 |
 | Poseidon2VmAir | 2465792 | 419 | 144 | 502 | 100 | 0 | 8 | 4096 |
 | VmConnectorAir | 20 | 4 | 2 | 2 | 8 | 1 | 2 | 2 |
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11021371346/artifacts/1973726563)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/846375a352431da063a0c4a1d88c81feea3874a8
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11021496834/artifacts/1973798469)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/ef3c6fcb833bc2b325a99fd53573124ee4c4ee2c
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11021371346)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11021496834)
