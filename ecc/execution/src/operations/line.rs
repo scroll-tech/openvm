@@ -2,16 +2,6 @@ use halo2curves_axiom::ff::Field;
 
 use crate::common::field::FieldExtension;
 
-pub fn fp12_square<Fp, Fp2, Fp6, Fp12>(x: Fp12) -> Fp12
-where
-    Fp: Field,
-    Fp2: FieldExtension<BaseField = Fp>,
-    Fp6: FieldExtension<BaseField = Fp2>,
-    Fp12: FieldExtension<BaseField = Fp6>,
-{
-    x.square()
-}
-
 pub fn evaluate_line<Fp, Fp2>(line: [Fp2; 2], x_over_y: Fp, y_inv: Fp) -> [Fp2; 2]
 where
     Fp: Field,
