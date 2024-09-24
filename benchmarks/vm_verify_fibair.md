@@ -1,6 +1,6 @@
 | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- |
-| 7757.0 <span style="color: green">(-7.4%)</span> | 66134036 <span style="color: green">(-5.2%)</span> | 30396086 <span style="color: green">(-7.6%)</span> | 1668.0 <span style="color: green">(-5.4%)</span> | 50.0 <span style="color: green">(-3.8%)</span> |
+| 7770.0 <span style="color: red">(+0.2%)</span> | 66134036 | 30396086 | 1678.0 <span style="color: red">(+0.6%)</span> | 51.0 <span style="color: red">(+2.0%)</span> |
 
 | chip_name | rows_used |
 | --- | --- |
@@ -16,28 +16,28 @@
 | opcode | cells_used | frequency |
 | --- | --- | --- |
 | FADD | 4231056 | 134354 |
-| BNE | 4897555 <span style="color: green">(-11.0%)</span> | 75347 |
-| STOREW | 5665012 <span style="color: green">(-9.5%)</span> | 74011 |
-| LOADW | 3273235 <span style="color: green">(-10.7%)</span> | 49216 |
-| LOADW2 | 2473799 <span style="color: green">(-10.9%)</span> | 38007 |
-| SHINTW | 2791488 <span style="color: green">(-8.7%)</span> | 33232 |
-| STOREW2 | 1667208 <span style="color: green">(-9.3%)</span> | 21346 |
+| BNE | 4897555 | 75347 |
+| STOREW | 5665012 | 74011 |
+| LOADW | 3273235 | 49216 |
+| LOADW2 | 2473799 | 38007 |
+| SHINTW | 2791488 | 33232 |
+| STOREW2 | 1667208 | 21346 |
 | FMUL | 702623 | 20715 |
-| JAL | 834554 <span style="color: green">(-11.0%)</span> | 12839 |
+| JAL | 834554 | 12839 |
 | FSUB | 355778 | 9467 |
-| HINT_INPUT | 309985 <span style="color: green">(-11.0%)</span> | 4769 |
-| CT_END | 254865 <span style="color: green">(-11.0%)</span> | 3921 |
-| CT_START | 254865 <span style="color: green">(-11.0%)</span> | 3921 |
+| HINT_INPUT | 309985 | 4769 |
+| CT_END | 254865 | 3921 |
+| CT_START | 254865 | 3921 |
 | BBE4MUL | 258120 | 3759 |
-| BEQ | 222885 <span style="color: green">(-11.0%)</span> | 3429 |
+| BEQ | 222885 | 3429 |
 | COMP_POS2 | 1344356 | 2678 |
 | FE4ADD | 115016 | 1678 |
 | BBE4DIV | 84328 | 1239 |
 | FE4SUB | 84336 | 1238 |
 | PERM_POS2 | 316762 | 631 |
-| HINT_BITS | 6760 <span style="color: green">(-11.0%)</span> | 104 |
+| HINT_BITS | 6760 | 104 |
 | FDIV | 93 | 3 |
-| TERMINATE | 65 <span style="color: green">(-11.0%)</span> | 1 |
+| TERMINATE | 65 | 1 |
 
 | dsl_ir | frequency |
 | --- | --- |
@@ -94,7 +94,7 @@
 
 | air_name | cells | constraints | interactions | main_cols | perm_cols | prep_cols | quotient_deg | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CoreAir | 44564480 <span style="color: green">(-8.6%)</span> | 111 <span style="color: green">(-3.5%)</span> | 19 | 65 <span style="color: green">(-11.0%)</span> | 20 | 0 | 8 | 524288 |
+| CoreAir | 44564480 | 111 | 19 | 65 | 20 | 0 | 8 | 524288 |
 | FieldArithmeticAir | 12320768 | 23 | 15 | 31 | 16 | 0 | 8 | 262144 |
 | MemoryAuditAir | 3538944 | 19 | 6 | 19 | 8 | 0 | 8 | 131072 |
 | VariableRangeCheckerAir | 1179648 | 4 | 1 | 1 | 8 | 2 | 1 | 131072 |
@@ -106,7 +106,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11021496834/artifacts/1973798469)
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11021611641/artifacts/1973853775)
 Commit: https://github.com/axiom-crypto/afs-prototype/commit/ef3c6fcb833bc2b325a99fd53573124ee4c4ee2c
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11021496834)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11021611641)
