@@ -367,12 +367,16 @@ impl<F: PrimeField32> ExecutionSegment<F> {
 
             // runtime only instruction handling
             match opcode {
-                Opcode::CT_START => self
-                    .cycle_tracker
-                    .start(instruction.debug.clone(), self.collected_metrics.clone()),
-                Opcode::CT_END => self
-                    .cycle_tracker
-                    .end(instruction.debug.clone(), self.collected_metrics.clone()),
+                Opcode::CT_START => {
+                    self.update_chip_metrics();
+                    self.cycle_tracker
+                        .start(instruction.debug.clone(), self.collected_metrics.clone())
+                }
+                Opcode::CT_END => {
+                    self.update_chip_metrics();
+                    self.cycle_tracker
+                        .end(instruction.debug.clone(), self.collected_metrics.clone())
+                }
                 _ => {}
             }
 
@@ -512,10 +516,10 @@ impl<F: PrimeField32> ExecutionSegment<F> {
     }
 
     pub(crate) fn update_chip_metrics(&mut self) {
-        self.collected_metrics.chip_metrics = self.chip_metrics();
+        self.collected_metrics.chip_heights = self.chip_heights();
     }
 
-    fn chip_metrics(&self) -> BTreeMap<String, usize> {
+    fn chip_heights(&self) -> BTreeMap<String, usize> {
         let mut metrics = BTreeMap::new();
         for chip in self.chips.iter() {
             let chip_name: &'static str = chip.into();
