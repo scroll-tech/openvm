@@ -1,6 +1,6 @@
 | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- |
-| 7770.0 <span style="color: red">(+0.2%)</span> | 66134036 | 30396086 | 1678.0 <span style="color: red">(+0.6%)</span> | 51.0 <span style="color: red">(+2.0%)</span> |
+| 7873.0 <span style="color: red">(+1.3%)</span> | 66134036 | 30396086 | 1658.0 <span style="color: green">(-1.2%)</span> | 49.0 <span style="color: green">(-3.9%)</span> |
 
 | chip_name | rows_used |
 | --- | --- |
@@ -94,7 +94,7 @@
 
 | air_name | cells | constraints | interactions | main_cols | perm_cols | prep_cols | quotient_deg | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CoreAir | 44564480 | 111 | 19 | 65 | 20 | 0 | 8 | 524288 |
+| CoreAir | 44564480 | 112 <span style="color: red">(+0.9%)</span> | 19 | 65 | 20 | 0 | 8 | 524288 |
 | FieldArithmeticAir | 12320768 | 23 | 15 | 31 | 16 | 0 | 8 | 262144 |
 | MemoryAuditAir | 3538944 | 19 | 6 | 19 | 8 | 0 | 8 | 131072 |
 | VariableRangeCheckerAir | 1179648 | 4 | 1 | 1 | 8 | 2 | 1 | 131072 |
@@ -106,7 +106,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11021611641/artifacts/1973853775)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/ef3c6fcb833bc2b325a99fd53573124ee4c4ee2c
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11022923197/artifacts/1974175558)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/c6f7c537373f2c52bf429e8d6a7d8346e60a0a90
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11021611641)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11022923197)
