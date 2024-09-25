@@ -7,3 +7,6 @@ pub use algorithm::*;
 pub use exponentiation::*;
 pub use step::*;
 pub use utils::*;
+
+#[cfg(test)]
+mod tests;

@@ -1,6 +1,6 @@
 use halo2curves_axiom::ff::Field;
 
-use crate::{common::field::FieldExtension, curves::bn254::conv_fp2_coeffs_to_fq12};
+use crate::common::FieldExtension;
 
 pub fn evaluate_line<Fp, Fp2>(line: [Fp2; 2], x_over_y: Fp, y_inv: Fp) -> [Fp2; 2]
 where

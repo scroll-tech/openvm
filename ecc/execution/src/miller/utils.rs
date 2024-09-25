@@ -1,6 +1,6 @@
 use halo2curves_axiom::ff::Field;
 
-use crate::common::{field::FieldExtension, point::EcPoint};
+use crate::common::{EcPoint, FieldExtension};
 
 #[allow(non_snake_case)]
 pub fn q_signed<Fp, Fp2>(Q: &EcPoint<Fp2>, sigma_i: i32) -> EcPoint<Fp2>

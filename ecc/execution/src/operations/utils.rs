@@ -1,6 +1,6 @@
 use halo2curves_axiom::ff::Field;
 
-use crate::common::{field::FieldExtension, point::EcPoint};
+use crate::common::{EcPoint, FieldExtension};
 
 /// Returns a line function for a tangent line at the point P
 #[allow(non_snake_case)]

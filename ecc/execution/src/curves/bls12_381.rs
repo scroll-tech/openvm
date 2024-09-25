@@ -3,7 +3,7 @@ use halo2curves_axiom::{
     ff::Field,
 };
 
-use crate::common::field::FieldExtension;
+use crate::common::FieldExtension;
 
 /// FieldExtension for Fq2 with Fq as base field
 impl FieldExtension<2> for Fq2 {
@@ -30,7 +30,7 @@ impl FieldExtension<2> for Fq2 {
         }
     }
 
-    fn frobenius_map(&mut self, _power: usize) {
+    fn frobenius_map(&mut self, _power: Option<usize>) {
         Fq2::frobenius_map(self);
     }
 }
@@ -70,7 +70,7 @@ impl FieldExtension<6> for Fq12 {
         }
     }
 
-    fn frobenius_map(&mut self, _power: usize) {
+    fn frobenius_map(&mut self, _power: Option<usize>) {
         Fq12::frobenius_map(self);
     }
 

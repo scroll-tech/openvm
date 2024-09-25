@@ -1,9 +1,6 @@
 use halo2curves_axiom::ff::Field;
 
-use crate::{
-    common::{field::FieldExtension, point::EcPoint},
-    operations::{evaluate_line, fp12_square, mul_013_by_013, mul_by_01234, mul_by_013},
-};
+use crate::common::{EcPoint, FieldExtension};
 
 #[allow(non_snake_case)]
 pub fn miller_double_step<Fp, Fp2>(S: EcPoint<Fp2>) -> (EcPoint<Fp2>, [Fp2; 2])

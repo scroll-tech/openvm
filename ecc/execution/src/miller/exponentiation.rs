@@ -1,6 +1,6 @@
 use halo2curves_axiom::ff::Field;
 
-use crate::common::field::FieldExtension;
+use crate::common::FieldExtension;
 
 pub fn final_exp_hint<Fp, Fp2, Fp6, Fp12>(f: Fp12) -> (Fp12, Fp12)
 where

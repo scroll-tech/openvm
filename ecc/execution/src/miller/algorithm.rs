@@ -3,7 +3,7 @@ use itertools::{izip, Itertools};
 
 use super::{miller_double_and_add, miller_double_step, q_signed};
 use crate::{
-    common::{field::FieldExtension, point::EcPoint},
+    common::{EcPoint, FieldExtension},
     operations::{
         evaluate_line, fp12_multiply, fp12_square, mul_013_by_013, mul_by_01234, mul_by_013,
     },

@@ -1,12 +1,11 @@
 use halo2curves_axiom::{
-    bn256::{Fq, Fq12, Fq2, Fq6, G1Affine, G2Affine},
+    bn256::{Fq, Fq12, Fq2, Fq6, G1Affine},
     ff::Field,
-    CurveAffine, CurveAffineExt,
 };
-use rand::{rngs::StdRng, thread_rng, SeedableRng};
+use rand::{rngs::StdRng, SeedableRng};
 
 use crate::{
-    common::{field::FieldExtension, point::EcPoint},
+    common::point::EcPoint,
     curves::bn254::{conv_013_to_fq12, conv_fp2_coeffs_to_fq12, BN254_XI},
     operations::{
         evaluate_line, fp12_square, mul_013_by_013, mul_by_01234, mul_by_013, point_to_013,
@@ -47,19 +46,14 @@ fn test_mul_013_by_013() {
     let line_0 = point_to_013::<Fq, Fq2>(ec_point_0);
     let line_1 = point_to_013::<Fq, Fq2>(ec_point_1);
 
-    // Multiply the two line functions
+    // Multiply the two line functions & convert to Fq12 to compare
     let mul_013_by_013 = mul_013_by_013::<Fq, Fq2>(line_0, line_1, BN254_XI);
-    println!("mul_013_by_013_fq2;5: {:#?}", mul_013_by_013);
     let mul_013_by_013 = conv_fp2_coeffs_to_fq12(&mul_013_by_013);
 
     // Compare with the result of multiplying two Fp12 elements
     let fp12_0 = conv_013_to_fq12(line_0);
     let fp12_1 = conv_013_to_fq12(line_1);
-    println!("fp12_0: {:#?}", fp12_0);
-    println!("fp12_1: {:#?}", fp12_1);
     let check_mul_fp12 = fp12_0 * fp12_1;
-    println!("mul_013_by_013: {:#?}", mul_013_by_013);
-    println!("check_mul_fp12: {:#?}", check_mul_fp12);
     assert_eq!(mul_013_by_013, check_mul_fp12);
 }
 
@@ -72,14 +66,10 @@ fn test_mul_by_013() {
         x: rnd_pt.x,
         y: rnd_pt.y,
     };
-    println!("ecpt: {:#?}", ec_point);
     let line = point_to_013::<Fq, Fq2>(ec_point);
-    println!("line: {:#?}", line);
     let mul_by_013 = mul_by_013::<Fq, Fq2, Fq6, Fq12>(f, line);
 
     let check_mul_fp12 = conv_013_to_fq12(line) * f;
-    println!("mul_by_013: {:#?}", mul_by_013);
-    println!("check_mul_fp12: {:#?}", check_mul_fp12);
     assert_eq!(mul_by_013, check_mul_fp12);
 }
 
