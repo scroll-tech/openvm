@@ -1,6 +1,6 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms |
 | --- | --- | --- | --- | --- |
-| fibonacci_program_inner | 462.0 <span style="color: green">(-0.4%)</span> | 1782300 | 200526 | 0.0 |
+| fibonacci_program_inner | 476.0 <span style="color: red">(+3.0%)</span> | 1782300 | 200526 | 0.0 |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -27,17 +27,17 @@
 
 | group | air_name | cells | constraints | interactions | main_cols | perm_cols | prep_cols | quotient_deg | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| fibonacci_program_inner | VariableRangeCheckerAir | 1179648 | 4 | 1 | 1 | 8 | 2 | 1 | 131072 |
-| fibonacci_program_inner | XorLookupAir | 589824 | 4 | 1 | 1 | 8 | 3 | 1 | 65536 |
+| fibonacci_program_inner | CoreAir | 840 | 114 | 19 | 61 | 44 | 0 | 2 | 8 |
 | fibonacci_program_inner | ProgramAir | 1152 | 4 | 1 | 1 | 8 | 9 | 1 | 128 |
 | fibonacci_program_inner | FieldArithmeticAir | 8576 | 28 | 15 | 31 | 36 | 0 | 2 | 128 |
+| fibonacci_program_inner | XorLookupAir | 589824 | 4 | 1 | 1 | 8 | 3 | 1 | 65536 |
 | fibonacci_program_inner | MemoryAuditAir | 2240 | 21 | 6 | 19 | 16 | 0 | 2 | 64 |
-| fibonacci_program_inner | CoreAir | 840 | 114 | 19 | 61 | 44 | 0 | 2 | 8 |
+| fibonacci_program_inner | VariableRangeCheckerAir | 1179648 | 4 | 1 | 1 | 8 | 2 | 1 | 131072 |
 | fibonacci_program_inner | VmConnectorAir | 20 | 4 | 2 | 2 | 8 | 1 | 2 | 2 |
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11025411312/artifacts/1974835584)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/35dcb23f98b261efec00fded5b7228dbe0d262b2
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11038257392/artifacts/1978356957)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/83233f45d3d448a2384dccf931e4bd28dae78dcd
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11025411312)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11038257392)
