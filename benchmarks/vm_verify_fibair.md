@@ -1,31 +1,31 @@
 | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- |
-| 7770.0 <span style="color: green">(-1.5%)</span> | 66134036 | 30428399 <span style="color: red">(+0.3%)</span> | 1635.0 <span style="color: green">(-3.9%)</span> | 34.0 <span style="color: green">(-2.9%)</span> |
+| 7900.0 <span style="color: red">(+1.7%)</span> | 66134036 | 30421958 <span style="color: green">(-0.0%)</span> | 1676.0 <span style="color: red">(+2.5%)</span> | 36.0 <span style="color: red">(+5.9%)</span> |
 
 | chip_name | rows_used |
 | --- | --- |
 | ByteXor | 65536 |
-| Core | 320749 <span style="color: red">(+0.3%)</span> |
-| FieldArithmetic | 164714 <span style="color: red">(+0.4%)</span> |
+| Core | 320679 <span style="color: green">(-0.0%)</span> |
+| FieldArithmetic | 164653 <span style="color: green">(-0.0%)</span> |
 | FieldExtension | 7914 |
-| Memory | 107372 <span style="color: red">(+0.2%)</span> |
+| Memory | 107372 |
 | Poseidon2 | 3309 |
-| Program | 37634 <span style="color: red">(+0.1%)</span> |
+| Program | 37634 |
 | RangeChecker | 131072 |
 
 | opcode | cells_used | frequency |
 | --- | --- | --- |
-| FADD | 4234578 <span style="color: red">(+0.4%)</span> | 134524 <span style="color: red">(+0.4%)</span> |
+| FADD | 4232668 <span style="color: green">(-0.0%)</span> | 134463 <span style="color: green">(-0.0%)</span> |
 | BNE | 4897555 | 75347 |
-| STOREW | 5647514 <span style="color: green">(-0.1%)</span> | 73719 <span style="color: green">(-0.1%)</span> |
-| LOADW | 3252190 <span style="color: green">(-0.2%)</span> | 48920 <span style="color: green">(-0.2%)</span> |
-| LOADW2 | 2534006 <span style="color: red">(+2.4%)</span> | 38928 <span style="color: red">(+2.4%)</span> |
-| SHINTW | 2791656 <span style="color: red">(+0.0%)</span> | 33234 <span style="color: red">(+0.0%)</span> |
-| STOREW2 | 1684008 <span style="color: red">(+1.0%)</span> | 21546 <span style="color: red">(+0.9%)</span> |
-| FMUL | 703462 <span style="color: red">(+0.0%)</span> | 20720 <span style="color: red">(+0.0%)</span> |
-| JAL | 839104 <span style="color: red">(+0.5%)</span> | 12909 <span style="color: red">(+0.5%)</span> |
-| FSUB | 356671 <span style="color: red">(+0.0%)</span> | 9467 |
-| HINT_INPUT | 310050 <span style="color: red">(+0.0%)</span> | 4770 <span style="color: red">(+0.0%)</span> |
+| STOREW | 5647552 <span style="color: red">(+0.0%)</span> | 73719 |
+| LOADW | 3252171 <span style="color: green">(-0.0%)</span> | 48920 |
+| LOADW2 | 2534006 | 38928 |
+| SHINTW | 2791656 | 33234 |
+| STOREW2 | 1684008 | 21546 |
+| FMUL | 703462 | 20720 |
+| JAL | 834554 <span style="color: green">(-0.5%)</span> | 12839 <span style="color: green">(-0.5%)</span> |
+| FSUB | 356671 | 9467 |
+| HINT_INPUT | 310050 | 4770 |
 | CT_END | 254865 | 3921 |
 | CT_START | 254865 | 3921 |
 | BBE4MUL | 258348 | 3759 |
@@ -41,23 +41,23 @@
 
 | dsl_ir | frequency |
 | --- | --- |
-| For | 116132 <span style="color: green">(-0.9%)</span> |
-| StoreHintWord | 58474 <span style="color: red">(+0.0%)</span> |
-| AddVI | 40299 <span style="color: red">(+1.8%)</span> |
-| Alloc | 39111 <span style="color: red">(+0.0%)</span> |
+| For | 116132 |
+| StoreHintWord | 58474 |
+| AddVI | 40299 |
+| Alloc | 39111 |
 | StoreE | 37932 |
-| LoadV | 30939 <span style="color: red">(+2.7%)</span> |
+| LoadV | 30939 |
 | LoadE | 19400 |
 | LoadF | 17071 |
-| IfEqI | 15183 <span style="color: red">(+4.7%)</span> |
-| StoreV | 14061 <span style="color: red">(+1.5%)</span> |
-| ImmV | 13133 <span style="color: red">(+0.8%)</span> |
+| IfEqI | 15113 <span style="color: green">(-0.5%)</span> |
+| StoreV | 14061 |
+| ImmV | 13133 |
 | StoreF | 10754 |
 | ImmF | 7243 |
 | SubEF | 6612 |
 | AddEI | 6244 |
 | AssertEqF | 5048 |
-| HintInputVec | 4770 <span style="color: red">(+0.0%)</span> |
+| HintInputVec | 4770 |
 | CycleTrackerEnd | 3921 |
 | CycleTrackerStart | 3921 |
 | SubVI | 3900 |
@@ -66,7 +66,7 @@
 | SubV | 3502 |
 | MulVI | 3300 |
 | MulV | 3224 |
-| AddFI | 3162 <span style="color: red">(+2.0%)</span> |
+| AddFI | 3101 <span style="color: green">(-1.9%)</span> |
 | IfNe | 2817 |
 | MulF | 2682 |
 | Poseidon2CompressBabyBear | 2678 |
@@ -106,7 +106,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11038257392/artifacts/1978345918)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/83233f45d3d448a2384dccf931e4bd28dae78dcd
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11040804853/artifacts/1979116440)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/be24239b55c1c6c7cb4126e2ad796d6edff3297b
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11038257392)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11040804853)
