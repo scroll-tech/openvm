@@ -1,7 +1,7 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- |
-| bench_program_inner | 1224.0 <span style="color: red">(+1.4%)</span> | 1997712 | 287089 | 2.0 |  |
-| inner_verifier | 111690.0 <span style="color: green">(-1.1%)</span> | 1191182356 | 633466621 <span style="color: green">(-0.0%)</span> | 33317.0 <span style="color: green">(-1.0%)</span> | 44270.0 <span style="color: green">(-5.6%)</span> |
+| bench_program_inner | 1221.0 <span style="color: green">(-0.2%)</span> | 1997712 | 287089 | 2.0 |  |
+| inner_verifier | 112293.0 <span style="color: red">(+0.5%)</span> | 1191182356 | 633528283 <span style="color: red">(+0.0%)</span> | 33013.0 <span style="color: green">(-0.9%)</span> | 44850.0 <span style="color: red">(+1.3%)</span> |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -14,12 +14,12 @@
 | bench_program_inner | Program | 37 |
 | bench_program_inner | RangeChecker | 131072 |
 | inner_verifier | ByteXor | 65536 |
-| inner_verifier | Core | 6483670 <span style="color: green">(-0.0%)</span> |
-| inner_verifier | FieldArithmetic | 2528260 <span style="color: red">(+0.0%)</span> |
+| inner_verifier | Core | 6484601 <span style="color: red">(+0.0%)</span> |
+| inner_verifier | FieldArithmetic | 2528297 <span style="color: red">(+0.0%)</span> |
 | inner_verifier | FieldExtension | 1492713 |
-| inner_verifier | Memory | 846806 <span style="color: red">(+0.2%)</span> |
+| inner_verifier | Memory | 846806 |
 | inner_verifier | Poseidon2 | 31034 |
-| inner_verifier | Program | 282537 <span style="color: red">(+0.2%)</span> |
+| inner_verifier | Program | 282537 |
 | inner_verifier | RangeChecker | 131072 |
 
 | group | opcode | cells_used | frequency |
@@ -34,24 +34,24 @@
 | bench_program_inner | FE4ADD | 144 | 1 |
 | bench_program_inner | KECCAK256 | 87752 | 1 |
 | bench_program_inner | TERMINATE | 61 | 1 |
-| inner_verifier | LOADW | 146600931 <span style="color: red">(+0.0%)</span> | 2237016 <span style="color: red">(+0.0%)</span> |
-| inner_verifier | LOADW2 | 132529242 <span style="color: green">(-0.2%)</span> | 2038836 <span style="color: green">(-0.2%)</span> |
-| inner_verifier | FADD | 55757425 <span style="color: red">(+0.0%)</span> | 1750024 <span style="color: red">(+0.0%)</span> |
-| inner_verifier | BNE | 72455435 <span style="color: green">(-0.0%)</span> | 1114699 <span style="color: green">(-0.0%)</span> |
+| inner_verifier | LOADW | 146600931 | 2237016 |
+| inner_verifier | LOADW2 | 132529242 | 2038836 |
+| inner_verifier | FADD | 55758572 <span style="color: red">(+0.0%)</span> | 1750061 <span style="color: red">(+0.0%)</span> |
+| inner_verifier | BNE | 72455435 | 1114699 |
 | inner_verifier | BBE4MUL | 52046108 | 735013 |
-| inner_verifier | FSUB | 22410959 <span style="color: red">(+0.0%)</span> | 722423 |
+| inner_verifier | FSUB | 22410959 | 722423 |
 | inner_verifier | FE4ADD | 29182452 | 389266 |
 | inner_verifier | BBE4DIV | 24024280 | 353201 |
-| inner_verifier | SHINTW | 26291916 <span style="color: red">(+0.0%)</span> | 312999 <span style="color: red">(+0.0%)</span> |
-| inner_verifier | STOREW2 | 14896389 <span style="color: red">(+0.5%)</span> | 220071 <span style="color: red">(+0.4%)</span> |
+| inner_verifier | SHINTW | 26291916 | 312999 |
+| inner_verifier | STOREW2 | 14896389 | 220071 |
 | inner_verifier | CT_END | 11968775 | 184135 |
 | inner_verifier | CT_START | 11968775 | 184135 |
-| inner_verifier | STOREW | 10116547 <span style="color: red">(+0.2%)</span> | 142027 <span style="color: red">(+0.1%)</span> |
-| inner_verifier | FMUL | 1817254 <span style="color: red">(+0.0%)</span> | 55662 <span style="color: red">(+0.0%)</span> |
-| inner_verifier | JAL | 1959314 <span style="color: red">(+0.0%)</span> | 30143 <span style="color: red">(+0.0%)</span> |
+| inner_verifier | STOREW | 10116547 | 142027 |
+| inner_verifier | FMUL | 1817254 | 55662 |
+| inner_verifier | JAL | 2019829 <span style="color: red">(+3.1%)</span> | 31074 <span style="color: red">(+3.1%)</span> |
 | inner_verifier | PERM_POS2 | 11470700 | 22850 |
 | inner_verifier | FE4SUB | 2100528 | 15233 |
-| inner_verifier | HINT_INPUT | 696085 <span style="color: red">(+0.0%)</span> | 10709 <span style="color: red">(+0.0%)</span> |
+| inner_verifier | HINT_INPUT | 696085 | 10709 |
 | inner_verifier | BEQ | 576810 | 8874 |
 | inner_verifier | COMP_POS2 | 4108368 | 8184 |
 | inner_verifier | FDIV | 7493 | 151 |
@@ -73,24 +73,24 @@
 | bench_program_inner | Halt | 1 |
 | bench_program_inner | Keccak256 | 1 |
 | inner_verifier | SubEF | 2821704 |
-| inner_verifier | For | 1819266 <span style="color: green">(-0.2%)</span> |
+| inner_verifier | For | 1819266 |
 | inner_verifier | LoadE | 1498380 |
 | inner_verifier | MulE | 727858 |
-| inner_verifier | StoreHintWord | 614514 <span style="color: red">(+0.0%)</span> |
-| inner_verifier | LoadF | 552045 <span style="color: green">(-0.3%)</span> |
-| inner_verifier | AddVI | 439289 <span style="color: red">(+0.4%)</span> |
+| inner_verifier | StoreHintWord | 614514 |
+| inner_verifier | LoadF | 552045 |
+| inner_verifier | AddVI | 439289 |
 | inner_verifier | AddE | 389266 |
 | inner_verifier | DivE | 353130 |
-| inner_verifier | IfEqI | 212555 <span style="color: red">(+0.7%)</span> |
+| inner_verifier | IfEqI | 213486 <span style="color: red">(+0.4%)</span> |
 | inner_verifier | StoreF | 194536 |
 | inner_verifier | CycleTrackerEnd | 184135 |
 | inner_verifier | CycleTrackerStart | 184135 |
-| inner_verifier | LoadV | 81129 <span style="color: green">(-2.6%)</span> |
+| inner_verifier | LoadV | 81129 |
 | inner_verifier | AddEI | 80896 |
-| inner_verifier | Alloc | 69733 <span style="color: red">(+0.0%)</span> |
+| inner_verifier | Alloc | 69733 |
 | inner_verifier | MulEI | 35775 |
-| inner_verifier | ImmV | 32342 <span style="color: red">(+0.4%)</span> |
-| inner_verifier | StoreV | 28328 <span style="color: red">(+4.4%)</span> |
+| inner_verifier | ImmV | 32342 |
+| inner_verifier | StoreV | 28328 |
 | inner_verifier | StoreE | 25140 |
 | inner_verifier | MulF | 23762 |
 | inner_verifier | Poseidon2PermuteBabyBear | 22850 |
@@ -98,12 +98,12 @@
 | inner_verifier | ImmF | 15360 |
 | inner_verifier | SubE | 15233 |
 | inner_verifier | SubV | 15168 |
-| inner_verifier | AddFI | 13279 <span style="color: green">(-0.0%)</span> |
-| inner_verifier | HintInputVec | 10709 <span style="color: red">(+0.0%)</span> |
+| inner_verifier | AddFI | 13316 <span style="color: red">(+0.3%)</span> |
+| inner_verifier | HintInputVec | 10709 |
 | inner_verifier | MulVI | 9367 |
 | inner_verifier | Poseidon2CompressBabyBear | 8184 |
 | inner_verifier | IfNe | 7886 |
-| inner_verifier | AddV | 6728 <span style="color: red">(+0.1%)</span> |
+| inner_verifier | AddV | 6728 |
 | inner_verifier | IfEq | 6140 |
 | inner_verifier | AssertEqF | 4633 |
 | inner_verifier | MulEFI | 2660 |
@@ -150,7 +150,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11038257392/artifacts/1978359081)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/83233f45d3d448a2384dccf931e4bd28dae78dcd
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11040804853/artifacts/1979142843)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/be24239b55c1c6c7cb4126e2ad796d6edff3297b
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11038257392)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11040804853)
