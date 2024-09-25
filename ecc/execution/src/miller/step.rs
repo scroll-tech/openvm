@@ -9,7 +9,7 @@ use crate::{
 pub fn miller_double_step<Fp, Fp2>(S: EcPoint<Fp2>) -> (EcPoint<Fp2>, [Fp2; 2])
 where
     Fp: Field,
-    Fp2: FieldExtension<BaseField = Fp>,
+    Fp2: FieldExtension<2, BaseField = Fp>,
 {
     let one = Fp2::ONE;
     let two = one + one;
@@ -45,7 +45,7 @@ pub fn miller_double_and_add<Fp, Fp2>(
 ) -> (EcPoint<Fp2>, [Fp2; 2], [Fp2; 2])
 where
     Fp: Field,
-    Fp2: FieldExtension<BaseField = Fp>,
+    Fp2: FieldExtension<2, BaseField = Fp>,
 {
     let one = Fp2::ONE;
     let two = one + one;

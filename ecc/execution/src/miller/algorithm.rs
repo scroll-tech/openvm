@@ -18,9 +18,9 @@ pub fn multi_miller_loop<Fp, Fp2, Fp6, Fp12>(
 ) -> Fp12
 where
     Fp: Field,
-    Fp2: FieldExtension<BaseField = Fp>,
-    Fp6: FieldExtension<BaseField = Fp2>,
-    Fp12: FieldExtension<BaseField = Fp6>,
+    Fp2: FieldExtension<2, BaseField = Fp>,
+    Fp6: FieldExtension<3, BaseField = Fp2>,
+    Fp12: FieldExtension<2, BaseField = Fp6>,
 {
     multi_miller_loop_embedded_exp(P, Q, None, pseudo_binary_encoding, xi_0)
 }
@@ -35,9 +35,9 @@ pub fn multi_miller_loop_embedded_exp<Fp, Fp2, Fp6, Fp12>(
 ) -> Fp12
 where
     Fp: Field,
-    Fp2: FieldExtension<BaseField = Fp>,
-    Fp6: FieldExtension<BaseField = Fp2>,
-    Fp12: FieldExtension<BaseField = Fp6>,
+    Fp2: FieldExtension<2, BaseField = Fp>,
+    Fp6: FieldExtension<3, BaseField = Fp2>,
+    Fp12: FieldExtension<2, BaseField = Fp6>,
 {
     let x_over_ys = P
         .iter()

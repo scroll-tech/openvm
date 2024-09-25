@@ -4,15 +4,21 @@ use halo2curves_axiom::{
 };
 
 use crate::common::field::FieldExtension;
-const UNUSED_POWER_ARG: usize = 0;
 
 /// FieldExtension for Fq2 with Fq as base field
-impl FieldExtension for Fq2 {
+impl FieldExtension<2> for Fq2 {
     type BaseField = Fq;
 
-    fn lift(base: &Self::BaseField) -> Self {
+    fn from_coeffs(coeffs: [Self::BaseField; 2]) -> Self {
         Fq2 {
-            c0: *base,
+            c0: coeffs[0],
+            c1: coeffs[1],
+        }
+    }
+
+    fn embed(base_elem: &Self::BaseField) -> Self {
+        Fq2 {
+            c0: *base_elem,
             c1: Fq::ZERO,
         }
     }
@@ -34,12 +40,27 @@ impl FieldExtension for Fq2 {
 ///
 
 /// FieldExtension for Fq12 with Fq2 as base field since halo2curves does not implement `Field` for Fq6.
-impl FieldExtension for Fq12 {
+impl FieldExtension<6> for Fq12 {
     type BaseField = Fq2;
 
-    fn lift(base: &Self::BaseField) -> Self {
+    fn from_coeffs(coeffs: [Self::BaseField; 6]) -> Self {
+        Fq12 {
+            c0: Fq6 {
+                c0: coeffs[0],
+                c1: coeffs[2],
+                c2: coeffs[4],
+            },
+            c1: Fq6 {
+                c0: coeffs[1],
+                c1: coeffs[3],
+                c2: coeffs[5],
+            },
+        }
+    }
+
+    fn embed(base_elem: &Self::BaseField) -> Self {
         let fq6_pt = Fq6 {
-            c0: *base,
+            c0: *base_elem,
             c1: Fq2::zero(),
             c2: Fq2::zero(),
         };
