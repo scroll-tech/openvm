@@ -32,8 +32,8 @@ where
 
     // where w⁶ = xi
     // l0 * l1 = 1 + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + b1c0)w⁴ + (c0c1)w⁶
-    //         = (c0c1 * xi) + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + b1c0)w⁴
-    let l0 = c0 * c1;
+    //         = (1 + c0c1 * xi) + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + b1c0)w⁴
+    let l0 = Fp2::ONE + c0 * c1 * xi;
     let l1 = b0 + b1;
     let l2 = b0 * b1;
     let l3 = c0 + c1;
@@ -49,7 +49,7 @@ where
     Fp6: FieldExtension<3, BaseField = Fp2>,
     Fp12: FieldExtension<2, BaseField = Fp6>,
 {
-    mul_by_01234(f, [Fp2::ZERO, line[0], Fp2::ZERO, line[1], Fp2::ZERO])
+    mul_by_01234(f, [Fp2::ONE, line[0], Fp2::ZERO, line[1], Fp2::ZERO])
 }
 
 pub fn mul_by_01234<Fp, Fp2, Fp6, Fp12>(f: Fp12, x: [Fp2; 5]) -> Fp12
@@ -59,10 +59,8 @@ where
     Fp6: FieldExtension<3, BaseField = Fp2>,
     Fp12: FieldExtension<2, BaseField = Fp6>,
 {
-    let mut x = x.to_vec();
-    x.resize(6, Fp2::ZERO);
     let x_fp6_c0 = Fp6::from_coeffs([x[0], x[2], x[4]]);
-    let x_fp6_c1 = Fp6::from_coeffs([x[1], x[3], x[5]]);
+    let x_fp6_c1 = Fp6::from_coeffs([x[1], x[3], Fp2::ZERO]);
     let x_fp12 = Fp12::from_coeffs([x_fp6_c0, x_fp6_c1]);
     f * x_fp12
 }

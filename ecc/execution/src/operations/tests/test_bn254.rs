@@ -76,13 +76,6 @@ fn test_mul_by_013() {
     let line = point_to_013::<Fq, Fq2>(ec_point);
     println!("line: {:#?}", line);
     let mul_by_013 = mul_by_013::<Fq, Fq2, Fq6, Fq12>(f, line);
-    // WIP: validate result
-
-    // let y_inv = rnd_pt.y.invert().unwrap();
-    // let x_over_y = rnd_pt.x * y_inv;
-
-    // let evaluated_line = evaluate_line::<Fq, Fq2>(line, x_over_y, y_inv);
-    // let evalulated_f_cmp = mul_by_013::<Fq, Fq2, Fq6, Fq12>(f, evaluated_line);
 
     let check_mul_fp12 = conv_013_to_fq12(line) * f;
     println!("mul_by_013: {:#?}", mul_by_013);

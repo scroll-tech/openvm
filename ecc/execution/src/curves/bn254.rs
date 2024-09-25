@@ -5,7 +5,15 @@ use halo2curves_axiom::{
 
 use crate::common::field::FieldExtension;
 
-pub const BN254_XI: Fq2 = Fq2::one();
+pub const BN254_XI: Fq2 = Fq2 {
+    c0: Fq::from_raw([
+        0x0000000000000009,
+        0x0000000000000000,
+        0x0000000000000000,
+        0x0000000000000000,
+    ]),
+    c1: Fq::ONE,
+};
 
 /// FieldExtension for Fq2 with Fq as base field
 impl FieldExtension<2> for Fq2 {
