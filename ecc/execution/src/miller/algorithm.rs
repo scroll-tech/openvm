@@ -53,7 +53,7 @@ where
     let mut Q_acc = Q.to_vec();
 
     for i in pseudo_binary_encoding.len() - 2..=0 {
-        f = fp12_square::<Fp, Fp2, Fp6, Fp12>(f);
+        f = fp12_square::<Fp12>(f);
         let mut lines = Vec::<[Fp2; 2]>::new();
         if pseudo_binary_encoding[i] == 0 {
             // Run miller double step if \sigma_i == 0

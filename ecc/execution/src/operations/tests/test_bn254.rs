@@ -3,22 +3,22 @@ use halo2curves_axiom::{
     ff::Field,
     CurveAffine, CurveAffineExt,
 };
-use rand::thread_rng;
+use rand::{rngs::StdRng, thread_rng, SeedableRng};
 
 use crate::{
     common::{field::FieldExtension, point::EcPoint},
-    curves::bn254::BN254_XI,
+    curves::bn254::{conv_013_to_fq12, conv_fp2_coeffs_to_fq12, BN254_XI},
     operations::{
-        evaluate_line, fp12_square, line_function_from_point, mul_013_by_013, mul_by_01234,
-        mul_by_013,
+        evaluate_line, fp12_square, mul_013_by_013, mul_by_01234, mul_by_013,
+        point_to_line_function,
     },
 };
 
 #[test]
 fn test_fp12_square() {
-    let mut rng = thread_rng();
+    let mut rng = StdRng::seed_from_u64(8);
     let rnd = Fq12::random(&mut rng);
-    let sq = fp12_square::<Fq, Fq2, Fq6, Fq12>(rnd);
+    let sq = fp12_square::<Fq12>(rnd);
     let sq_native = rnd.square();
     assert_eq!(sq, sq_native);
 }
@@ -32,7 +32,7 @@ fn test_evaluate_line() {
 #[test]
 fn test_mul_013_by_013() {
     // Generate random curve points
-    let mut rng = thread_rng();
+    let mut rng = StdRng::seed_from_u64(8);
     let rnd_pt_0 = G1Affine::random(&mut rng);
     let rnd_pt_1 = G1Affine::random(&mut rng);
     let ec_point_0 = EcPoint::<Fq> {
@@ -44,25 +44,32 @@ fn test_mul_013_by_013() {
         y: rnd_pt_1.y,
     };
     // Get line evaludated at rnd_pt_0 and rnd_pt_1
-    let line_0 = line_function_from_point::<Fq, Fq2>(ec_point_0);
-    let line_1 = line_function_from_point::<Fq, Fq2>(ec_point_1);
-    let evaluated_line = mul_013_by_013::<Fq, Fq2>(line_0, line_1, BN254_XI);
-    // WIP: validate result
-    let evaluated_point = mul_by_01234::<Fq, Fq2, Fq6, Fq12>(Fq12::ONE, evaluated_line);
-    // let mult = rnd_pt_0 * rnd_pt_1;
-    // assert_eq!(evaluated_line, evaluated_line_2);
+    let line_0 = point_to_line_function::<Fq, Fq2>(ec_point_0);
+    let line_1 = point_to_line_function::<Fq, Fq2>(ec_point_1);
+
+    // Multiply the two line functions
+    let mul_013_by_013 = mul_013_by_013::<Fq, Fq2>(line_0, line_1, BN254_XI);
+    let mul_013_by_013 = conv_fp2_coeffs_to_fq12(&mul_013_by_013);
+
+    // Compare with the result of multiplying two Fp12 elements
+    let fp12_0 = conv_013_to_fq12(line_0);
+    let fp12_1 = conv_013_to_fq12(line_1);
+    let mul_fp12 = fp12_0 * fp12_1;
+    println!("mul_013_by_013: {:#?}", mul_013_by_013);
+    println!("mul_fp12: {:#?}", mul_fp12);
+    assert_eq!(mul_013_by_013, mul_fp12);
 }
 
 #[test]
 fn test_mul_by_013() {
-    let mut rng = thread_rng();
+    let mut rng = StdRng::seed_from_u64(8);
     let f = Fq12::random(&mut rng);
     let rnd_pt = G1Affine::random(&mut rng);
     let ec_point = EcPoint::<Fq> {
         x: rnd_pt.x,
         y: rnd_pt.y,
     };
-    let line = line_function_from_point::<Fq, Fq2>(ec_point);
+    let line = point_to_line_function::<Fq, Fq2>(ec_point);
     let evaluated_f = mul_by_013::<Fq, Fq2, Fq6, Fq12>(f, line);
     // WIP: validate result
 
@@ -76,7 +83,7 @@ fn test_mul_by_013() {
 
 #[test]
 fn test_mul_by_01234() {
-    let mut rng = thread_rng();
+    let mut rng = StdRng::seed_from_u64(8);
     let f = Fq12::random(&mut rng);
     let x = [
         Fq2::random(&mut rng),

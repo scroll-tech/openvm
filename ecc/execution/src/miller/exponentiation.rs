@@ -9,6 +9,7 @@ where
     Fp6: FieldExtension<BaseField = Fp2>,
     Fp12: FieldExtension<BaseField = Fp6>,
 {
+    // f = c^λ * u
     unimplemented!("final_exp_hint is not implemented");
 }
 
