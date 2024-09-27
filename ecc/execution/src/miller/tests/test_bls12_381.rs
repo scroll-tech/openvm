@@ -30,7 +30,6 @@ fn test_multi_miller_loop_bls12_381() {
 
     // Compare against halo2curves implementation
     let g2_prepared = G2Prepared::from(rnd_g2_affine);
-    println!("start comparison h2c multi_miller_loop");
     let compare_miller =
         halo2curves_axiom::bls12_381::multi_miller_loop(&[(&rnd_g1_affine, &g2_prepared)]);
     let compare_final = compare_miller.final_exponentiation();

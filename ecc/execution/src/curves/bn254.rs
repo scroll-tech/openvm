@@ -37,6 +37,10 @@ impl FieldExtension<2> for Fq2 {
         }
     }
 
+    fn conjugate(&mut self) {
+        self.conjugate();
+    }
+
     fn frobenius_map(&mut self, power: Option<usize>) {
         self.frobenius_map(power.unwrap());
     }
@@ -111,6 +115,10 @@ impl FieldExtension<6> for Fq12 {
             c0: fq6_pt,
             c1: Fq6::zero(),
         }
+    }
+
+    fn conjugate(&mut self) {
+        self.conjugate();
     }
 
     fn frobenius_map(&mut self, power: Option<usize>) {

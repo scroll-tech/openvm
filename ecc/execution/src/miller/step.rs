@@ -36,6 +36,34 @@ where
 }
 
 #[allow(non_snake_case)]
+pub fn miller_add_step<Fp, Fp2>(S: EcPoint<Fp2>, Q: EcPoint<Fp2>) -> (EcPoint<Fp2>, [Fp2; 2])
+where
+    Fp: Field,
+    Fp2: FieldExtension<2, BaseField = Fp>,
+{
+    let x_s = S.x;
+    let y_s = S.y;
+    let x_q = Q.x;
+    let y_q = Q.y;
+
+    // λ1 = (y_q - y_s) / (x_q - x_s)
+    let lambda = (y_q - y_s) * (x_q - x_s).invert().unwrap();
+    let x_s_plus_q = lambda.square() - x_s - x_q;
+    let y_s_plus_q = lambda * (x_q - x_s_plus_q) - y_q;
+
+    let res = EcPoint {
+        x: x_s_plus_q,
+        y: y_s_plus_q,
+    };
+
+    // l_{\Psi(S),\Psi(Q)}(P) = 1 - λ_1 (x_P / y_P) w + (λ_1 * x_S - y_S) (1 / y_P) w^3
+    let b = -lambda;
+    let c = lambda * x_s - y_s;
+
+    (res, [b, c])
+}
+
+#[allow(non_snake_case)]
 pub fn miller_double_and_add<Fp, Fp2>(
     S: EcPoint<Fp2>,
     Q: EcPoint<Fp2>,
@@ -53,8 +81,11 @@ where
     let y_q = Q.y;
 
     println!("x_q, x_s,: {:?}, {:?}", x_q, x_s);
+    // λ1 = (y_q - y_s) / (x_q - x_s)
     let lambda1 = (y_q - y_s) * (x_q - x_s).invert().unwrap();
     let x_s_plus_q = lambda1.square() - x_s - x_q;
+
+    // λ2 = -λ1 - 2y_s / (x_{s+q} - x_s)
     let lambda2 = lambda1.neg() - two * y_s * (x_s_plus_q - x_s).invert().unwrap();
     let x_s_plus_q_plus_s = lambda2.square() - x_s - x_s_plus_q;
     let y_s_plus_q_plus_s = lambda2 * (x_s - x_s_plus_q_plus_s) - y_s;

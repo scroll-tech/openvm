@@ -4,6 +4,7 @@ use itertools::{izip, Itertools};
 use super::{miller_double_and_add, miller_double_step, q_signed};
 use crate::{
     common::{EcPoint, FieldExtension},
+    miller::miller_add_step,
     operations::{
         evaluate_line, fp12_multiply, fp12_square, mul_013_by_013, mul_by_01234, mul_by_013,
     },
@@ -57,64 +58,116 @@ where
     let mut total_double_add = 0;
 
     for i in (0..pseudo_binary_encoding.len() - 1).rev() {
-        println!("miller i: {} = {}", i, pseudo_binary_encoding[i]);
-        f = fp12_square::<Fp12>(f);
+        println!(
+            "miller i: {} = {}; Q_acc.x: {:?}",
+            i, pseudo_binary_encoding[i], Q_acc[0].x
+        );
         let mut lines = Vec::<[Fp2; 2]>::new();
-        if pseudo_binary_encoding[i] == 0 {
-            // Run miller double step if \sigma_i == 0
-            let (Q_out, lines_2S) = Q_acc
+
+        // First iteration is at pseudo_binary_encoding[len-2]
+        if i == pseudo_binary_encoding.len() - 2 {
+            println!("miller special case");
+            // special case first step of pseudo-binary encoding as 1
+            // this means that the first step is a double and add, but we need to separate the two steps since the optimized
+            // `miller_double_and_add_step` will fail (since Q_acc is equal to Q_signed)
+            let (Q_out_double, lines_2S) = Q_acc
                 .into_iter()
                 .map(miller_double_step::<Fp, Fp2>)
                 .unzip::<_, _, Vec<_>, Vec<_>>();
-            Q_acc = Q_out;
+            Q_acc = Q_out_double;
 
-            let lines_iter = izip!(lines_2S.iter(), x_over_ys.iter(), y_invs.iter());
-            for (line_2S, x_over_y, y_inv) in lines_iter {
-                let line = &evaluate_line::<Fp, Fp2>(*line_2S, *x_over_y, *y_inv);
-                lines.push(*line);
-            }
-            total_double += 1;
-        } else {
-            // use embedded exponent technique if c is provided
-            f = if let Some(c) = c {
-                match pseudo_binary_encoding[i] {
-                    1 => fp12_multiply(f, c),
-                    -1 => fp12_multiply(f, c_inv),
-                    _ => panic!("Invalid sigma_i"),
-                }
-            } else {
-                f
-            };
-
-            // Run miller double and add if \sigma_i != 0
-            let Q_signed = q_signed(Q, pseudo_binary_encoding[i]);
-            let (Q_out, lines_S_plus_Q, lines_S_plus_Q_plus_S): (Vec<_>, Vec<_>, Vec<_>) = Q_acc
+            let (Q_out_add, lines_S_plus_Q) = Q_acc
                 .iter()
-                .zip(Q_signed.iter())
-                .map(|(Q_acc, Q_signed)| {
-                    miller_double_and_add::<Fp, Fp2>(Q_acc.clone(), Q_signed.clone())
-                })
-                .multiunzip();
-            Q_acc = Q_out;
+                .zip(Q.iter())
+                .map(|(Q_acc, Q)| miller_add_step::<Fp, Fp2>(Q_acc.clone(), Q.clone()))
+                .unzip::<_, _, Vec<_>, Vec<_>>();
+            Q_acc = Q_out_add;
 
             let lines_iter = izip!(
+                lines_2S.iter(),
                 lines_S_plus_Q.iter(),
-                lines_S_plus_Q_plus_S.iter(),
                 x_over_ys.iter(),
                 y_invs.iter()
             );
             let mut lines0 = Vec::<[Fp2; 2]>::new();
             let mut lines1 = Vec::<[Fp2; 2]>::new();
-            for (line_S_plus_Q, line_S_plus_Q_plus_S, x_over_y, y_inv) in lines_iter {
-                let line0 = &evaluate_line::<Fp, Fp2>(*line_S_plus_Q, *x_over_y, *y_inv);
-                let line1 = &evaluate_line::<Fp, Fp2>(*line_S_plus_Q_plus_S, *x_over_y, *y_inv);
+            for (line0, line1, x_over_y, y_inv) in lines_iter {
+                let line0 = &evaluate_line::<Fp, Fp2>(*line0, *x_over_y, *y_inv);
+                let line1 = &evaluate_line::<Fp, Fp2>(*line1, *x_over_y, *y_inv);
                 lines0.push(*line0);
                 lines1.push(*line1);
             }
             let lines_concat = [lines0, lines1].concat();
             lines.extend(lines_concat);
+
+            // Debug counter
             total_double_add += 1;
-        };
+        } else {
+            f = fp12_square::<Fp12>(f);
+
+            if pseudo_binary_encoding[i] == 0 {
+                // Run miller double step if \sigma_i == 0
+                let (Q_out, lines_2S) = Q_acc
+                    .into_iter()
+                    .map(miller_double_step::<Fp, Fp2>)
+                    .unzip::<_, _, Vec<_>, Vec<_>>();
+                Q_acc = Q_out;
+
+                let lines_iter = izip!(lines_2S.iter(), x_over_ys.iter(), y_invs.iter());
+                for (line_2S, x_over_y, y_inv) in lines_iter {
+                    let line = &evaluate_line::<Fp, Fp2>(*line_2S, *x_over_y, *y_inv);
+                    lines.push(*line);
+                }
+
+                // Debug counter
+                total_double += 1;
+            } else {
+                // use embedded exponent technique if c is provided
+                f = if let Some(c) = c {
+                    match pseudo_binary_encoding[i] {
+                        1 => fp12_multiply(f, c),
+                        -1 => fp12_multiply(f, c_inv),
+                        _ => panic!("Invalid sigma_i"),
+                    }
+                } else {
+                    f
+                };
+
+                // Run miller double and add if \sigma_i != 0
+                let Q_signed = q_signed(Q, pseudo_binary_encoding[i]);
+                let (Q_out, lines_S_plus_Q, lines_S_plus_Q_plus_S): (Vec<_>, Vec<_>, Vec<_>) =
+                    Q_acc
+                        .iter()
+                        .zip(Q_signed.iter())
+                        .map(|(Q_acc, Q_signed)| {
+                            miller_double_and_add::<Fp, Fp2>(Q_acc.clone(), Q_signed.clone())
+                        })
+                        .multiunzip();
+                Q_acc = Q_out;
+
+                let lines_iter = izip!(
+                    lines_S_plus_Q.iter(),
+                    lines_S_plus_Q_plus_S.iter(),
+                    x_over_ys.iter(),
+                    y_invs.iter()
+                );
+                // let mut lines0 = Vec::<[Fp2; 2]>::new();
+                // let mut lines1 = Vec::<[Fp2; 2]>::new();
+                for (line_S_plus_Q, line_S_plus_Q_plus_S, x_over_y, y_inv) in lines_iter {
+                    let line0 = &evaluate_line::<Fp, Fp2>(*line_S_plus_Q, *x_over_y, *y_inv);
+                    let line1 = &evaluate_line::<Fp, Fp2>(*line_S_plus_Q_plus_S, *x_over_y, *y_inv);
+                    // lines0.push(*line0);
+                    // lines1.push(*line1);
+                    lines.push(*line0);
+                    lines.push(*line1);
+                }
+                // let lines_concat = [lines0, lines1].concat();
+                // lines.extend(lines_concat);
+
+                // Debug counter
+                total_double_add += 1;
+            };
+        }
 
         if lines.len() % 2 == 1 {
             f = mul_by_013::<Fp, Fp2, Fp12>(f, lines.pop().unwrap());
@@ -128,6 +181,10 @@ where
             }
         }
     }
-    println!("total double: {total_double}, total double & add: {total_double_add}");
+    println!("miller: total double: {total_double}, total double&add: {total_double_add}");
+
+    // NOTE: match gnark implementation
+    f.conjugate();
+
     f
 }

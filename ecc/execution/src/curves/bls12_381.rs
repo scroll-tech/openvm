@@ -34,15 +34,19 @@ impl FieldExtension<2> for Fq2 {
         }
     }
 
+    fn conjugate(&mut self) {
+        Fq2::conjugate(self);
+    }
+
+    fn frobenius_map(&mut self, _power: Option<usize>) {
+        Fq2::frobenius_map(self);
+    }
+
     fn mul_base(self, rhs: &Self::BaseField) -> Self {
         Fq2 {
             c0: self.c0 * rhs,
             c1: self.c1 * rhs,
         }
-    }
-
-    fn frobenius_map(&mut self, _power: Option<usize>) {
-        Fq2::frobenius_map(self);
     }
 }
 
@@ -79,6 +83,10 @@ impl FieldExtension<6> for Fq12 {
             c0: fq6_pt,
             c1: Fq6::zero(),
         }
+    }
+
+    fn conjugate(&mut self) {
+        Fq12::conjugate(self);
     }
 
     fn frobenius_map(&mut self, _power: Option<usize>) {
