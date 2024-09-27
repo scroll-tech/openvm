@@ -96,12 +96,24 @@ where
                 let line1 = &evaluate_line::<Fp, Fp2>(*line1, *x_over_y, *y_inv);
                 lines0.push(*line0);
                 lines1.push(*line1);
+                // lines.push(*line0);
+                // lines.push(*line1);
             }
             let lines_concat = [lines0, lines1].concat();
             lines.extend(lines_concat);
 
             // Debug counter
             total_double_add += 1;
+
+            // // Gnark implementation
+            // for chunk in lines.chunks(2) {
+            //     if let [line0, line1] = chunk {
+            //         let prod = mul_013_by_013(*line0, *line1, xi);
+            //         f = mul_by_01234(f, prod);
+            //     } else {
+            //         panic!("lines.len() % 2 should be 0 at this point");
+            //     }
+            // }
         } else {
             f = fp12_square::<Fp12>(f);
 
@@ -121,6 +133,11 @@ where
 
                 // Debug counter
                 total_double += 1;
+
+                // Gnark implementation
+                for line in lines.iter() {
+                    f = mul_by_013::<Fp, Fp2, Fp12>(f, *line);
+                }
             } else {
                 // use embedded exponent technique if c is provided
                 f = if let Some(c) = c {
@@ -151,21 +168,31 @@ where
                     x_over_ys.iter(),
                     y_invs.iter()
                 );
-                // let mut lines0 = Vec::<[Fp2; 2]>::new();
-                // let mut lines1 = Vec::<[Fp2; 2]>::new();
+                let mut lines0 = Vec::<[Fp2; 2]>::new();
+                let mut lines1 = Vec::<[Fp2; 2]>::new();
                 for (line_S_plus_Q, line_S_plus_Q_plus_S, x_over_y, y_inv) in lines_iter {
                     let line0 = &evaluate_line::<Fp, Fp2>(*line_S_plus_Q, *x_over_y, *y_inv);
                     let line1 = &evaluate_line::<Fp, Fp2>(*line_S_plus_Q_plus_S, *x_over_y, *y_inv);
-                    // lines0.push(*line0);
-                    // lines1.push(*line1);
-                    lines.push(*line0);
-                    lines.push(*line1);
+                    lines0.push(*line0);
+                    lines1.push(*line1);
+                    // lines.push(*line0);
+                    // lines.push(*line1);
                 }
-                // let lines_concat = [lines0, lines1].concat();
-                // lines.extend(lines_concat);
+                let lines_concat = [lines0, lines1].concat();
+                lines.extend(lines_concat);
 
                 // Debug counter
                 total_double_add += 1;
+
+                // // Gnark implementation
+                // for chunk in lines.chunks(2) {
+                //     if let [line0, line1] = chunk {
+                //         let prod = mul_013_by_013(*line0, *line1, xi);
+                //         f = mul_by_01234(f, prod);
+                //     } else {
+                //         panic!("lines.len() % 2 should be 0 at this point");
+                //     }
+                // }
             };
         }
 
@@ -184,7 +211,7 @@ where
     println!("miller: total double: {total_double}, total double&add: {total_double_add}");
 
     // NOTE: match gnark implementation
-    f.conjugate();
+    // f.conjugate();
 
     f
 }
