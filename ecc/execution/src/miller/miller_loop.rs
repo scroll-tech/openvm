@@ -66,10 +66,10 @@ where
 
         // First iteration is at pseudo_binary_encoding[len-2]
         if i == pseudo_binary_encoding.len() - 2 {
-            println!("miller special case");
+            println!("miller first iter special case");
             // special case first step of pseudo-binary encoding as 1
             // this means that the first step is a double and add, but we need to separate the two steps since the optimized
-            // `miller_double_and_add_step` will fail (since Q_acc is equal to Q_signed)
+            // `miller_double_and_add_step` will fail because Q_acc is equal to Q_signed on the first iteration
             let (Q_out_double, lines_2S) = Q_acc
                 .into_iter()
                 .map(miller_double_step::<Fp, Fp2>)
