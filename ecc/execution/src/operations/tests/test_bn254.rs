@@ -1,15 +1,13 @@
 use halo2curves_axiom::{
-    bn256::{Fq, Fq12, Fq2, Fq6, G1Affine},
+    bn256::{Fq, Fq12, Fq2, G1Affine},
     ff::Field,
 };
 use rand::{rngs::StdRng, SeedableRng};
 
 use crate::{
-    common::point::EcPoint,
-    curves::bn254::{conv_013_to_fq12, conv_fp2_coeffs_to_fq12, BN254_XI},
-    operations::{
-        evaluate_line, fp12_square, mul_013_by_013, mul_by_01234, mul_by_013, point_to_013,
-    },
+    common::EcPoint,
+    curves::{conv_013_to_fq12, conv_fp2_coeffs_to_fq12, BN254_XI},
+    operations::{fp12_square, mul_013_by_013, mul_by_01234, mul_by_013, point_to_013},
 };
 
 #[test]
@@ -67,7 +65,8 @@ fn test_mul_by_013() {
         y: rnd_pt.y,
     };
     let line = point_to_013::<Fq, Fq2>(ec_point);
-    let mul_by_013 = mul_by_013::<Fq, Fq2, Fq6, Fq12>(f, line);
+    let mul_by_013 = mul_by_013::<Fq, Fq2, Fq12>(f, line);
+    println!("{:#?}", mul_by_013);
 
     let check_mul_fp12 = conv_013_to_fq12(line) * f;
     assert_eq!(mul_by_013, check_mul_fp12);
@@ -84,7 +83,7 @@ fn test_mul_by_01234() {
         Fq2::random(&mut rng),
         Fq2::random(&mut rng),
     ];
-    let mul_by_01234 = mul_by_01234::<Fq, Fq2, Fq6, Fq12>(f, x);
+    let mul_by_01234 = mul_by_01234::<Fq, Fq2, Fq12>(f, x);
 
     let x_f12 = conv_fp2_coeffs_to_fq12(&x);
     assert_eq!(mul_by_01234, f * x_f12);

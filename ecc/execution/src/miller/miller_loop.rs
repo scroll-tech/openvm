@@ -10,35 +10,36 @@ use crate::{
 };
 
 #[allow(non_snake_case)]
-pub fn multi_miller_loop<Fp, Fp2, Fp6, Fp12>(
+pub fn multi_miller_loop<Fp, Fp2, Fp12>(
     P: &[EcPoint<Fp>],
     Q: &[EcPoint<Fp2>],
     pseudo_binary_encoding: &[i32],
-    xi_0: Fp2,
+    xi: Fp2,
 ) -> Fp12
 where
     Fp: Field,
     Fp2: FieldExtension<2, BaseField = Fp>,
-    Fp6: FieldExtension<3, BaseField = Fp2>,
-    Fp12: FieldExtension<2, BaseField = Fp6>,
+    Fp12: FieldExtension<6, BaseField = Fp2>,
 {
-    multi_miller_loop_embedded_exp(P, Q, None, pseudo_binary_encoding, xi_0)
+    multi_miller_loop_embedded_exp::<Fp, Fp2, Fp12>(P, Q, None, pseudo_binary_encoding, xi)
 }
 
 #[allow(non_snake_case)]
-pub fn multi_miller_loop_embedded_exp<Fp, Fp2, Fp6, Fp12>(
+pub fn multi_miller_loop_embedded_exp<Fp, Fp2, Fp12>(
     P: &[EcPoint<Fp>],
     Q: &[EcPoint<Fp2>],
     c: Option<Fp12>,
     pseudo_binary_encoding: &[i32],
-    xi_0: Fp2,
+    xi: Fp2,
 ) -> Fp12
 where
     Fp: Field,
     Fp2: FieldExtension<2, BaseField = Fp>,
-    Fp6: FieldExtension<3, BaseField = Fp2>,
-    Fp12: FieldExtension<2, BaseField = Fp6>,
+    Fp12: FieldExtension<6, BaseField = Fp2>,
 {
+    assert!(P.len() > 0);
+    assert_eq!(P.len(), Q.len());
+
     let x_over_ys = P
         .iter()
         .map(|P| P.x * P.y.invert().unwrap())
@@ -52,7 +53,11 @@ where
     let mut f = Fp12::ONE;
     let mut Q_acc = Q.to_vec();
 
-    for i in pseudo_binary_encoding.len() - 2..=0 {
+    let mut total_double = 0;
+    let mut total_double_add = 0;
+
+    for i in (0..pseudo_binary_encoding.len() - 1).rev() {
+        println!("miller i: {} = {}", i, pseudo_binary_encoding[i]);
         f = fp12_square::<Fp12>(f);
         let mut lines = Vec::<[Fp2; 2]>::new();
         if pseudo_binary_encoding[i] == 0 {
@@ -68,6 +73,7 @@ where
                 let line = &evaluate_line::<Fp, Fp2>(*line_2S, *x_over_y, *y_inv);
                 lines.push(*line);
             }
+            total_double += 1;
         } else {
             // use embedded exponent technique if c is provided
             f = if let Some(c) = c {
@@ -81,10 +87,13 @@ where
             };
 
             // Run miller double and add if \sigma_i != 0
-            let Q_signed = q_signed(&Q_acc[i], pseudo_binary_encoding[i]);
+            let Q_signed = q_signed(Q, pseudo_binary_encoding[i]);
             let (Q_out, lines_S_plus_Q, lines_S_plus_Q_plus_S): (Vec<_>, Vec<_>, Vec<_>) = Q_acc
                 .iter()
-                .map(|Q| miller_double_and_add::<Fp, Fp2>(Q.clone(), Q_signed.clone()))
+                .zip(Q_signed.iter())
+                .map(|(Q_acc, Q_signed)| {
+                    miller_double_and_add::<Fp, Fp2>(Q_acc.clone(), Q_signed.clone())
+                })
                 .multiunzip();
             Q_acc = Q_out;
 
@@ -104,19 +113,21 @@ where
             }
             let lines_concat = [lines0, lines1].concat();
             lines.extend(lines_concat);
+            total_double_add += 1;
         };
 
         if lines.len() % 2 == 1 {
-            f = mul_by_013::<Fp, Fp2, Fp6, Fp12>(f, lines.pop().unwrap());
+            f = mul_by_013::<Fp, Fp2, Fp12>(f, lines.pop().unwrap());
         }
         for chunk in lines.chunks(2) {
             if let [line0, line1] = chunk {
-                let prod = mul_013_by_013(*line0, *line1, xi_0);
+                let prod = mul_013_by_013(*line0, *line1, xi);
                 f = mul_by_01234(f, prod);
             } else {
                 panic!("lines.len() % 2 should be 0 at this point");
             }
         }
     }
+    println!("total double: {total_double}, total double & add: {total_double_add}");
     f
 }

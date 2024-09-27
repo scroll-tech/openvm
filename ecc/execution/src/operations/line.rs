@@ -42,25 +42,23 @@ where
     [l0, l1, l2, l3, l4]
 }
 
-pub fn mul_by_013<Fp, Fp2, Fp6, Fp12>(f: Fp12, line: [Fp2; 2]) -> Fp12
+pub fn mul_by_013<Fp, Fp2, Fp12>(f: Fp12, line: [Fp2; 2]) -> Fp12
 where
     Fp: Field,
     Fp2: FieldExtension<2, BaseField = Fp>,
-    Fp6: FieldExtension<3, BaseField = Fp2>,
-    Fp12: FieldExtension<2, BaseField = Fp6>,
+    Fp12: FieldExtension<6, BaseField = Fp2>,
 {
     mul_by_01234(f, [Fp2::ONE, line[0], Fp2::ZERO, line[1], Fp2::ZERO])
 }
 
-pub fn mul_by_01234<Fp, Fp2, Fp6, Fp12>(f: Fp12, x: [Fp2; 5]) -> Fp12
+pub fn mul_by_01234<Fp, Fp2, Fp12>(f: Fp12, x: [Fp2; 5]) -> Fp12
 where
     Fp: Field,
     Fp2: FieldExtension<2, BaseField = Fp>,
-    Fp6: FieldExtension<3, BaseField = Fp2>,
-    Fp12: FieldExtension<2, BaseField = Fp6>,
+    Fp12: FieldExtension<6, BaseField = Fp2>,
 {
-    let x_fp6_c0 = Fp6::from_coeffs([x[0], x[2], x[4]]);
-    let x_fp6_c1 = Fp6::from_coeffs([x[1], x[3], Fp2::ZERO]);
-    let x_fp12 = Fp12::from_coeffs([x_fp6_c0, x_fp6_c1]);
+    let mut x_extend: [Fp2; 6] = [Fp2::default(); 6];
+    x_extend[..5].clone_from_slice(&x);
+    let x_fp12 = Fp12::from_coeffs(x_extend);
     f * x_fp12
 }

@@ -52,7 +52,8 @@ where
     let x_q = Q.x;
     let y_q = Q.y;
 
-    let lambda1 = (y_s - y_q) * (x_s - x_q).invert().unwrap();
+    println!("x_q, x_s,: {:?}, {:?}", x_q, x_s);
+    let lambda1 = (y_q - y_s) * (x_q - x_s).invert().unwrap();
     let x_s_plus_q = lambda1.square() - x_s - x_q;
     let lambda2 = lambda1.neg() - two * y_s * (x_s_plus_q - x_s).invert().unwrap();
     let x_s_plus_q_plus_s = lambda2.square() - x_s - x_s_plus_q;

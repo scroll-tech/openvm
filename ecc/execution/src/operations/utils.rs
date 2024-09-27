@@ -33,12 +33,11 @@ where
     [b, c]
 }
 
-pub fn frobenius<Fp, Fp2, Fp6, Fp12>(x: Fp12) -> Fp12
+pub fn frobenius<Fp, Fp2, Fp12>(x: Fp12) -> Fp12
 where
     Fp: Field,
     Fp2: FieldExtension<2, BaseField = Fp>,
-    Fp6: FieldExtension<3, BaseField = Fp2>,
-    Fp12: FieldExtension<2, BaseField = Fp6>,
+    Fp12: FieldExtension<6, BaseField = Fp2>,
 {
     unimplemented!("frobenius is not implemented");
 }

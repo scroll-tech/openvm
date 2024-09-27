@@ -6,14 +6,18 @@ use halo2curves_axiom::{
 use crate::common::FieldExtension;
 
 pub const BN254_XI: Fq2 = Fq2 {
-    c0: Fq::from_raw([
-        0x0000000000000009,
-        0x0000000000000000,
-        0x0000000000000000,
-        0x0000000000000000,
-    ]),
+    c0: Fq::from_raw([9, 0, 0, 0]),
     c1: Fq::ONE,
 };
+
+// from gnark implementation: https://github.com/Consensys/gnark/blob/42dcb0c3673b2394bf1fd82f5128f7a121d7d48e/std/algebra/emulated/sw_bn254/pairing.go#L356
+// loopCounter = 6x₀+2 = 29793968203157093288
+// in 2-NAF
+pub const GNARK_BN254_PBE_NAF: [i32; 66] = [
+    0, 0, 0, 1, 0, 1, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1, 0, -1, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0,
+    -1, 0, 0, 1, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 1, 0, -1, 0, 0, 0, -1, 0, -1, 0,
+    0, 0, 1, 0, -1, 0, 1,
+];
 
 /// FieldExtension for Fq2 with Fq as base field
 impl FieldExtension<2> for Fq2 {
@@ -45,54 +49,67 @@ impl FieldExtension<2> for Fq2 {
     }
 }
 
-/// FieldExtension for Fq6 with Fq2 as base field
-impl FieldExtension<3> for Fq6 {
-    type BaseField = Fq2;
+// /// FieldExtension for Fq6 with Fq2 as base field
+// impl FieldExtension<3> for Fq6 {
+//     type BaseField = Fq2;
 
-    fn from_coeffs(coeffs: [Self::BaseField; 3]) -> Self {
-        Fq6 {
-            c0: coeffs[0],
-            c1: coeffs[1],
-            c2: coeffs[2],
-        }
-    }
+//     fn from_coeffs(coeffs: [Self::BaseField; 3]) -> Self {
+//         Fq6 {
+//             c0: coeffs[0],
+//             c1: coeffs[1],
+//             c2: coeffs[2],
+//         }
+//     }
 
-    fn embed(base_elem: &Self::BaseField) -> Self {
-        Fq6 {
-            c0: *base_elem,
-            c1: Fq2::ZERO,
-            c2: Fq2::ZERO,
-        }
-    }
+//     fn embed(base_elem: &Self::BaseField) -> Self {
+//         Fq6 {
+//             c0: *base_elem,
+//             c1: Fq2::ZERO,
+//             c2: Fq2::ZERO,
+//         }
+//     }
 
-    fn frobenius_map(&mut self, power: Option<usize>) {
-        self.frobenius_map(power.unwrap());
-    }
+//     fn frobenius_map(&mut self, power: Option<usize>) {
+//         self.frobenius_map(power.unwrap());
+//     }
 
-    fn mul_base(self, rhs: &Self::BaseField) -> Self {
-        Fq6 {
-            c0: self.c0 * rhs,
-            c1: self.c1 * rhs,
-            c2: self.c2 * rhs,
-        }
-    }
-}
+//     fn mul_base(self, rhs: &Self::BaseField) -> Self {
+//         Fq6 {
+//             c0: self.c0 * rhs,
+//             c1: self.c1 * rhs,
+//             c2: self.c2 * rhs,
+//         }
+//     }
+// }
 
 /// FieldExtension for Fq12 with Fq6 as base field since halo2curves does not implement `Field` for Fq6.
-impl FieldExtension<2> for Fq12 {
-    type BaseField = Fq6;
+impl FieldExtension<6> for Fq12 {
+    type BaseField = Fq2;
 
-    fn from_coeffs(coeffs: [Self::BaseField; 2]) -> Self {
+    fn from_coeffs(coeffs: [Self::BaseField; 6]) -> Self {
         Fq12 {
-            c0: coeffs[0],
-            c1: coeffs[1],
+            c0: Fq6 {
+                c0: coeffs[0],
+                c1: coeffs[2],
+                c2: coeffs[4],
+            },
+            c1: Fq6 {
+                c0: coeffs[1],
+                c1: coeffs[3],
+                c2: coeffs[5],
+            },
         }
     }
 
     fn embed(base_elem: &Self::BaseField) -> Self {
-        Fq12 {
+        let fq6_pt = Fq6 {
             c0: *base_elem,
-            c1: Fq6::ZERO,
+            c1: Fq2::zero(),
+            c2: Fq2::zero(),
+        };
+        Fq12 {
+            c0: fq6_pt,
+            c1: Fq6::zero(),
         }
     }
 
@@ -101,9 +118,14 @@ impl FieldExtension<2> for Fq12 {
     }
 
     fn mul_base(self, rhs: &Self::BaseField) -> Self {
+        let fq6_pt = Fq6 {
+            c0: *rhs,
+            c1: Fq2::zero(),
+            c2: Fq2::zero(),
+        };
         Fq12 {
-            c0: self.c0 * rhs,
-            c1: self.c1 * rhs,
+            c0: self.c0 * fq6_pt,
+            c1: self.c1 * fq6_pt,
         }
     }
 }

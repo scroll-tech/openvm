@@ -5,6 +5,17 @@ use halo2curves_axiom::{
 
 use crate::common::FieldExtension;
 
+pub const BLS12_381_XI: Fq2 = Fq2 {
+    c0: Fq::ONE,
+    c1: Fq::ONE,
+};
+
+// from gnark implementation: https://github.com/Consensys/gnark/blob/42dcb0c3673b2394bf1fd82f5128f7a121d7d48e/std/algebra/emulated/sw_bls12381/pairing.go#L322
+pub const GNARK_BLS12_381_PBE: [i32; 64] = [
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1,
+];
+
 /// FieldExtension for Fq2 with Fq as base field
 impl FieldExtension<2> for Fq2 {
     type BaseField = Fq;

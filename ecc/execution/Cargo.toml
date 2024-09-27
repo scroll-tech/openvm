@@ -5,7 +5,7 @@ authors.workspace = true
 edition.workspace = true
 
 [dependencies]
-halo2curves-axiom = "0.7.0"
+halo2curves-axiom = { path = "../../../halo2curves" }
 itertools.workspace = true
 rand_core = "0.6.4"
 

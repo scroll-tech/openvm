@@ -2716,8 +2716,6 @@ dependencies = [
 [[package]]
 name = "halo2curves-axiom"
 version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd8309e4638b4f1bcf6613d72265a84074d26034c35edc5d605b5688e580b8b8"
 dependencies = [
  "blake2b_simd",
  "digest 0.10.7",

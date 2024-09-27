@@ -1,12 +1,16 @@
 use halo2curves_axiom::ff::Field;
 
-pub trait FieldExtension<const N: usize>: Field {
+pub trait FieldExtension<const DEG: usize>: Field {
     type BaseField: Field;
 
-    fn from_coeffs(coeffs: [Self::BaseField; N]) -> Self;
+    /// Generate an extension field element from its base field coefficients.
+    fn from_coeffs(coeffs: [Self::BaseField; DEG]) -> Self;
 
-    /// Lift a base field element into an extension field element.
+    /// Embed a base field element into an extension field element.
     fn embed(base_elem: &Self::BaseField) -> Self;
+
+    /// Conjuagte an extension field element.
+    // fn conjugate(&mut self);
 
     /// Frobenius map
     fn frobenius_map(&mut self, power: Option<usize>);

@@ -1,10 +1,10 @@
-mod algorithm;
-pub mod exponentiation;
+mod final_exp;
+mod miller_loop;
 mod step;
 mod utils;
 
-pub use algorithm::*;
-pub use exponentiation::*;
+pub use final_exp::*;
+pub use miller_loop::*;
 pub use step::*;
 pub use utils::*;
 
