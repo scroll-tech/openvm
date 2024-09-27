@@ -1,12 +1,12 @@
 | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- |
-| 7,803.0 <span style="color: green">(-97.0 [-1.2%])</span> | 66,134,036 | 30,421,958 | 1,663.0 <span style="color: green">(-4.0 [-0.2%])</span> | 35.0 <span style="color: red">(+1.0 [+2.9%])</span> |
+| 7,899.0 <span style="color: red">(+96.0 [+1.2%])</span> | 66,134,036 | 30,435,318 <span style="color: red">(+13,360 [+0.0%])</span> | 1,686.0 <span style="color: red">(+23.0 [+1.4%])</span> | 34.0 <span style="color: green">(-1.0 [-2.9%])</span> |
 
 | chip_name | rows_used |
 | --- | --- |
 | ByteXor | 65,536 |
-| Core | 320,679 |
-| FieldArithmetic | 164,653 |
+| Core | 320,844 <span style="color: red">(+165 [+0.1%])</span> |
+| FieldArithmetic | 164,738 <span style="color: red">(+85 [+0.1%])</span> |
 | FieldExtension | 7,914 |
 | Memory | 107,372 |
 | Poseidon2 | 3,309 |
@@ -15,7 +15,7 @@
 
 | opcode | cells_used | frequency |
 | --- | --- | --- |
-| FADD | 4,232,668 | 134,463 |
+| FADD | 4,235,303 <span style="color: red">(+2,635 [+0.1%])</span> | 134,548 <span style="color: red">(+85 [+0.1%])</span> |
 | BNE | 4,897,555 | 75,347 |
 | STOREW | 5,647,552 | 73,719 |
 | LOADW | 3,252,171 | 48,920 |
@@ -23,7 +23,7 @@
 | SHINTW | 2,791,656 | 33,234 |
 | STOREW2 | 1,684,008 | 21,546 |
 | FMUL | 703,462 | 20,720 |
-| JAL | 834,554 | 12,839 |
+| JAL | 845,279 <span style="color: red">(+10,725 [+1.3%])</span> | 13,004 <span style="color: red">(+165 [+1.3%])</span> |
 | FSUB | 356,671 | 9,467 |
 | HINT_INPUT | 310,050 | 4,770 |
 | CT_END | 254,865 | 3,921 |
@@ -49,7 +49,7 @@
 | LoadV | 2,074,020 | 30,939 |
 | LoadE | 1,261,646 | 19,400 |
 | LoadF | 1,116,208 | 17,071 |
-| IfEqI | 982,345 | 15,113 |
+| IfEqI | 993,070 <span style="color: red">(+10,725 [+1.1%])</span> | 15,278 <span style="color: red">(+165 [+1.1%])</span> |
 | StoreV | 1,131,610 | 14,061 |
 | ImmV | 920,468 | 13,133 |
 | StoreF | 889,618 | 10,754 |
@@ -66,7 +66,7 @@
 | SubV | 108,619 | 3,502 |
 | MulVI | 102,376 | 3,300 |
 | MulV | 160,896 | 3,224 |
-| AddFI | 96,777 | 3,101 |
+| AddFI | 99,412 <span style="color: red">(+2,635 [+2.7%])</span> | 3,186 <span style="color: red">(+85 [+2.7%])</span> |
 | IfNe | 183,105 | 2,817 |
 | MulF | 83,161 | 2,682 |
 | Poseidon2CompressBabyBear | 1,344,356 | 2,678 |
@@ -106,7 +106,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11076434657/artifacts/1989068392)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/011ce669b8ae59ba6ab0915afe24f61dfd318ce9
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11079080508/artifacts/1989738545)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/aed298cad4699b20b8e9f9df901511de92bbbc17
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11076434657)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11079080508)
