@@ -6,7 +6,7 @@ use rand::{rngs::StdRng, SeedableRng};
 use crate::{
     common::EcPoint,
     curves::{BLS12_381_XI, GNARK_BLS12_381_PBE},
-    miller::multi_miller_loop,
+    miller::{multi_miller_loop, multi_miller_loop_separate_double_plus_add},
 };
 
 #[test]
@@ -35,7 +35,8 @@ fn test_multi_miller_loop_bls12_381() {
     let compare_final = compare_miller.final_exponentiation();
 
     // Run the multi-miller loop
-    let f = multi_miller_loop::<Fq, Fq2, Fq12>(
+    // let f = multi_miller_loop::<Fq, Fq2, Fq12>(
+    let f = multi_miller_loop_separate_double_plus_add::<Fq, Fq2, Fq12>(
         &[P],
         &[Q],
         GNARK_BLS12_381_PBE.as_slice(),
