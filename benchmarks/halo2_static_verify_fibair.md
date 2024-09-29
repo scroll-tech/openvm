@@ -1,8 +1,8 @@
-[1;32mINFO    [0m prove halo2 verifier circuit [ 417s | 100.00% ] step: "static_verifier_prove"
+[1;32mINFO    [0m prove halo2 verifier circuit [ 416s | 100.00% ] step: "static_verifier_prove"
 [1;32mINFO    [0m ┝━ ｉ [info]: span [VerifierProgram] (1):
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 242001140
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 242017203
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 27450287
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 27453413
 [1;32mINFO    [0m ┝━ ｉ [info]: span [stage-c-build-rounds] (1):
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 212647
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
@@ -60,13 +60,13 @@
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 327540
 [1;32mINFO    [0m ┝━ ｉ [info]: span [stage-e-verify-constraints] (1):
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 849591
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 865654
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 172445
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 175571
 [1;32mINFO    [0m ┝━ ｉ [info]: Babybear:
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 127105440
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 127121503
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
-[1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 26930971
+[1;32mINFO    [0m ┝━ ｉ [info]:   - total_lookup_cell: 26934097
 [1;32mINFO    [0m ┝━ ｉ [info]: Num2Bits:
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_gate_cell: 12524593
 [1;32mINFO    [0m ┝━ ｉ [info]:   - total_fixed: 0
@@ -75,9 +75,9 @@
 [1;32mINFO    [0m ┕━ ｉ [info]: Poisoned rows after RangeConfig::configure 9 | log.target: "halo2_base::gates::range" | log.module_path: "halo2_base::gates::range" | log.file: "/.cargo/git/checkouts/halo2-lib-d11b5da38eeddd90/2fe813b/halo2-base/src/gates/range/mod.rs" | log.line: 101
 test test_fibonacci_program_halo2_verify ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1242.40s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1252.09s
 
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/0e2b70d31953aeb9f72c67e05739e6a7fc4959e3
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/f6c0cb6dfa1bae8902066df12f45332591100a60
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11082129140)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11089750892)
