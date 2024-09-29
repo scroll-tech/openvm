@@ -1,6 +1,6 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms |
 | --- | --- | --- | --- | --- |
-| fibonacci_program_inner | 473.0 <span style="color: green">(-1.0 [-0.2%])</span> | 1,782,300 | 200,526 | 0.0 |
+| fibonacci_program_inner | 464.0 <span style="color: green">(-9.0 [-1.9%])</span> | 1,782,300 | 200,526 | 0.0 |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -8,6 +8,12 @@
 | fibonacci_program_inner | Core | 6 |
 | fibonacci_program_inner | FieldArithmetic | 90 |
 | fibonacci_program_inner | Memory | 35 |
+| fibonacci_program_inner | Memory 2 | 0 |
+| fibonacci_program_inner | Memory 3 | 0 |
+| fibonacci_program_inner | Memory 4 | 0 |
+| fibonacci_program_inner | Memory 5 | 0 |
+| fibonacci_program_inner | Memory 6 | 0 |
+| fibonacci_program_inner | Memory 7 | 0 |
 | fibonacci_program_inner | Program | 97 |
 | fibonacci_program_inner | RangeChecker | 131,072 |
 
@@ -37,7 +43,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11082129140/artifacts/1990387239)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/0e2b70d31953aeb9f72c67e05739e6a7fc4959e3
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11089750892/artifacts/1991787186)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/f6c0cb6dfa1bae8902066df12f45332591100a60
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11082129140)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11089750892)
