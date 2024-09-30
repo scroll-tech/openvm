@@ -1,70 +1,17 @@
-use std::{cell::RefCell, rc::Rc, sync::Arc};
+use std::{cell::RefCell, rc::Rc};
 
-use afs_primitives::{
-    bigint::{check_carry_mod_to_zero::CheckCarryModToZeroSubAir, utils::*},
-    ecc::SampleEcPoints,
-    sub_chip::LocalTraceInstructions,
-    var_range::{bus::VariableRangeCheckerBus, VariableRangeCheckerChip},
-};
-use ax_sdk::{
-    any_rap_vec, config::baby_bear_blake3::BabyBearBlake3Engine, engine::StarkFriEngine,
-    utils::create_seeded_rng,
-};
+use afs_primitives::{bigint::utils::*, ecc::SampleEcPoints, sub_chip::LocalTraceInstructions};
+use ax_sdk::{any_rap_vec, config::baby_bear_blake3::BabyBearBlake3Engine, engine::StarkFriEngine};
 use num_bigint_dig::BigUint;
 use p3_air::BaseAir;
 use p3_baby_bear::BabyBear;
 use p3_matrix::dense::RowMajorMatrix;
-use rand::RngCore;
 
-use super::{super::utils::*, ExprBuilder, FieldExprChip, FieldVariableConfig, SymbolicExpr};
+use super::{super::utils::*, ExprBuilder, FieldExprChip, SymbolicExpr};
 
 const LIMB_BITS: usize = 8;
 
-pub fn generate_random_biguint(prime: &BigUint) -> BigUint {
-    let mut rng = create_seeded_rng();
-    let len = 32;
-    let x = (0..len).map(|_| rng.next_u32()).collect();
-    let x = BigUint::new(x);
-    x % prime
-}
-
-fn get_sub_air(prime: &BigUint) -> (CheckCarryModToZeroSubAir, Arc<VariableRangeCheckerChip>) {
-    let field_element_bits = 30;
-    let range_bus = 1;
-    let range_decomp = 17; // double needs 17, rests need 16.
-    let range_checker = Arc::new(VariableRangeCheckerChip::new(VariableRangeCheckerBus::new(
-        range_bus,
-        range_decomp,
-    )));
-    let subair = CheckCarryModToZeroSubAir::new(
-        prime.clone(),
-        LIMB_BITS,
-        range_bus,
-        range_decomp,
-        field_element_bits,
-    );
-    (subair, range_checker)
-}
-
-#[derive(Clone)]
-pub struct TestConfig;
-impl FieldVariableConfig for TestConfig {
-    fn canonical_limb_bits() -> usize {
-        LIMB_BITS
-    }
-
-    fn max_limb_bits() -> usize {
-        29
-    }
-
-    fn num_limbs_per_field_element() -> usize {
-        32
-    }
-
-    fn range_checker_bits() -> usize {
-        17
-    }
-}
+use super::super::test_utils::*;
 
 #[test]
 fn test_add() {
