@@ -1,7 +1,7 @@
 use halo2curves_axiom::ff::Field;
 use itertools::{izip, Itertools};
 
-use super::{miller_double_and_add, miller_double_step, q_signed};
+use super::{miller_double_and_add_step, miller_double_step, q_signed};
 use crate::{
     common::{EcPoint, FieldExtension},
     miller::miller_add_step,
@@ -52,9 +52,11 @@ where
     } else {
         Fp12::ONE
     };
+
     let mut f = Fp12::ONE;
     let mut Q_acc = Q.to_vec();
 
+    // Debug counters
     let mut total_double = 0;
     let mut total_double_add = 0;
 
@@ -65,7 +67,7 @@ where
         );
         let mut lines = Vec::<[Fp2; 2]>::new();
 
-        // First iteration is at pseudo_binary_encoding[len-2]
+        // First iteration is a special case at pseudo_binary_encoding[len-2]
         if i == pseudo_binary_encoding.len() - 2 {
             println!("miller first iter special case");
             // special case first step of pseudo-binary encoding as 1
@@ -77,6 +79,15 @@ where
                 .unzip::<_, _, Vec<_>, Vec<_>>();
             Q_acc = Q_out_double;
 
+            let lines_iter = izip!(lines_2S.iter(), x_over_ys.iter(), y_invs.iter());
+            for (line_2S, x_over_y, y_inv) in lines_iter {
+                let line = evaluate_line::<Fp, Fp2>(*line_2S, *x_over_y, *y_inv);
+                lines.push(line.clone());
+
+                // Match gnark implementation (why is there an additional write to f here??)
+                f = mul_by_013::<Fp, Fp2, Fp12>(f, line);
+            }
+
             let (Q_out_add, lines_S_plus_Q) = Q_acc
                 .iter()
                 .zip(Q.iter())
@@ -84,38 +95,16 @@ where
                 .unzip::<_, _, Vec<_>, Vec<_>>();
             Q_acc = Q_out_add;
 
-            let lines_iter = izip!(
-                lines_2S.iter(),
-                lines_S_plus_Q.iter(),
-                x_over_ys.iter(),
-                y_invs.iter()
-            );
-            let mut lines0 = Vec::<[Fp2; 2]>::new();
-            let mut lines1 = Vec::<[Fp2; 2]>::new();
-            for (line0, line1, x_over_y, y_inv) in lines_iter {
-                let line0 = &evaluate_line::<Fp, Fp2>(*line0, *x_over_y, *y_inv);
-                let line1 = &evaluate_line::<Fp, Fp2>(*line1, *x_over_y, *y_inv);
-                lines0.push(*line0);
-                lines1.push(*line1);
-                // lines.push(*line0);
-                // lines.push(*line1);
+            let lines_iter = izip!(lines_S_plus_Q.iter(), x_over_ys.iter(), y_invs.iter());
+            for (lines_S_plus_Q, x_over_y, y_inv) in lines_iter {
+                let line = evaluate_line::<Fp, Fp2>(*lines_S_plus_Q, *x_over_y, *y_inv);
+                lines.push(line);
             }
-            let lines_concat = [lines0, lines1].concat();
-            lines.extend(lines_concat);
 
             // Debug counter
             total_double_add += 1;
-
-            // // Gnark implementation
-            // for chunk in lines.chunks(2) {
-            //     if let [line0, line1] = chunk {
-            //         let prod = mul_013_by_013(*line0, *line1, xi);
-            //         f = mul_by_01234(f, prod);
-            //     } else {
-            //         panic!("lines.len() % 2 should be 0 at this point");
-            //     }
-            // }
         } else {
+            // Regular Miller loop iteration
             f = fp12_square::<Fp12>(f);
 
             if pseudo_binary_encoding[i] == 0 {
@@ -128,8 +117,8 @@ where
 
                 let lines_iter = izip!(lines_2S.iter(), x_over_ys.iter(), y_invs.iter());
                 for (line_2S, x_over_y, y_inv) in lines_iter {
-                    let line = &evaluate_line::<Fp, Fp2>(*line_2S, *x_over_y, *y_inv);
-                    lines.push(*line);
+                    let line = evaluate_line::<Fp, Fp2>(*line_2S, *x_over_y, *y_inv);
+                    lines.push(line);
                 }
 
                 // Debug counter
@@ -158,7 +147,7 @@ where
                         .iter()
                         .zip(Q_signed.iter())
                         .map(|(Q_acc, Q_signed)| {
-                            miller_double_and_add::<Fp, Fp2>(Q_acc.clone(), Q_signed.clone())
+                            miller_double_and_add_step::<Fp, Fp2>(Q_acc.clone(), Q_signed.clone())
                         })
                         .multiunzip();
                 Q_acc = Q_out;
@@ -169,18 +158,18 @@ where
                     x_over_ys.iter(),
                     y_invs.iter()
                 );
-                let mut lines0 = Vec::<[Fp2; 2]>::new();
-                let mut lines1 = Vec::<[Fp2; 2]>::new();
+                // let mut lines0 = Vec::<[Fp2; 2]>::new();
+                // let mut lines1 = Vec::<[Fp2; 2]>::new();
                 for (line_S_plus_Q, line_S_plus_Q_plus_S, x_over_y, y_inv) in lines_iter {
-                    let line0 = &evaluate_line::<Fp, Fp2>(*line_S_plus_Q, *x_over_y, *y_inv);
-                    let line1 = &evaluate_line::<Fp, Fp2>(*line_S_plus_Q_plus_S, *x_over_y, *y_inv);
-                    lines0.push(*line0);
-                    lines1.push(*line1);
-                    // lines.push(*line0);
-                    // lines.push(*line1);
+                    let line0 = evaluate_line::<Fp, Fp2>(*line_S_plus_Q, *x_over_y, *y_inv);
+                    let line1 = evaluate_line::<Fp, Fp2>(*line_S_plus_Q_plus_S, *x_over_y, *y_inv);
+                    // lines0.push(line0);
+                    // lines1.push(line1);
+                    lines.push(line0);
+                    lines.push(line1);
                 }
-                let lines_concat = [lines0, lines1].concat();
-                lines.extend(lines_concat);
+                // let lines_concat = [lines0, lines1].concat();
+                // lines.extend(lines_concat);
 
                 // Debug counter
                 total_double_add += 1;
@@ -212,7 +201,7 @@ where
     println!("miller: total double: {total_double}, total double&add: {total_double_add}");
 
     // NOTE: match gnark implementation
-    // f.conjugate();
+    f.conjugate();
 
     f
 }

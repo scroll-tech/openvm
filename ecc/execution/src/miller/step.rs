@@ -16,7 +16,8 @@ where
     let x = S.x;
     let y = S.y;
     // λ = (3x^2) / (2y)
-    let lambda = (three * x.square()) * (two * y).invert().unwrap();
+    let two_y_inv = (two * y).invert().unwrap();
+    let lambda = (three * x.square()) * two_y_inv;
     // x_2S = λ^2 - 2x
     let x_2S = lambda.square() - two * x;
     // y_2S = λ(x - x_2S) - y
@@ -46,8 +47,9 @@ where
     let x_q = Q.x;
     let y_q = Q.y;
 
-    // λ1 = (y_q - y_s) / (x_q - x_s)
-    let lambda = (y_q - y_s) * (x_q - x_s).invert().unwrap();
+    // λ1 = (y_s - y_q) / (x_s - x_q)
+    let x_s_minus_x_q_inv = (x_s - x_q).invert().unwrap();
+    let lambda = (y_s - y_q) * x_s_minus_x_q_inv;
     let x_s_plus_q = lambda.square() - x_s - x_q;
     let y_s_plus_q = lambda * (x_q - x_s_plus_q) - y_q;
 
@@ -64,7 +66,7 @@ where
 }
 
 #[allow(non_snake_case)]
-pub fn miller_double_and_add<Fp, Fp2>(
+pub fn miller_double_and_add_step<Fp, Fp2>(
     S: EcPoint<Fp2>,
     Q: EcPoint<Fp2>,
 ) -> (EcPoint<Fp2>, [Fp2; 2], [Fp2; 2])
@@ -81,8 +83,8 @@ where
     let y_q = Q.y;
 
     println!("x_q, x_s,: {:?}, {:?}", x_q, x_s);
-    // λ1 = (y_q - y_s) / (x_q - x_s)
-    let lambda1 = (y_q - y_s) * (x_q - x_s).invert().unwrap();
+    // λ1 = (y_s - y_q) / (x_s - x_q)
+    let lambda1 = (y_s - y_q) * (x_s - x_q).invert().unwrap();
     let x_s_plus_q = lambda1.square() - x_s - x_q;
 
     // λ2 = -λ1 - 2y_s / (x_{s+q} - x_s)
@@ -99,7 +101,7 @@ where
     let b_1 = -lambda1;
     let c_1 = lambda1 * x_s - y_s;
 
-    // l_{\Psi(S+Q),\Psi(Q)}(P) = 1 - λ_2 (x_P / y_P) w + (λ_2 * x_S - y_S) (1 / y_P) w^3
+    // l_{\Psi(S+Q),\Psi(S)}(P) = 1 - λ_2 (x_P / y_P) w + (λ_2 * x_S - y_S) (1 / y_P) w^3
     let b_2 = -lambda2;
     let c_2 = lambda2 * x_s - y_s;
 
