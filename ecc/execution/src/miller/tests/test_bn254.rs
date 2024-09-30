@@ -3,7 +3,7 @@ use rand::{rngs::StdRng, SeedableRng};
 
 use crate::{
     common::EcPoint,
-    curves::{BN254_XI, GNARK_BN254_PBE_NAF},
+    curves::bn254::{BN254_XI, GNARK_BN254_PBE_NAF},
     miller::multi_miller_loop,
 };
 

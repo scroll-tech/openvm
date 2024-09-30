@@ -18,3 +18,11 @@ pub trait FieldExtension<const DEG: usize>: Field {
     /// Multiply an extension field element by an element in the base field
     fn mul_base(self, rhs: &Self::BaseField) -> Self;
 }
+
+pub trait Fp2Constructor<Fp: Field> {
+    fn new(c0: Fp, c1: Fp) -> Self;
+}
+
+pub trait Fp12Constructor<Fp2: FieldExtension<2>> {
+    fn new(c00: Fp2, c01: Fp2, c02: Fp2, c10: Fp2, c11: Fp2, c12: Fp2) -> Self;
+}

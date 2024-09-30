@@ -1,5 +1,5 @@
-mod bls12_381;
-mod bn254;
+pub mod bls12_381;
+pub mod bn254;
+mod utils;
 
-pub use bls12_381::*;
-pub use bn254::*;
+pub use utils::*;

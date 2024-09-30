@@ -6,7 +6,7 @@ use rand::{rngs::StdRng, SeedableRng};
 
 use crate::{
     common::EcPoint,
-    curves::{conv_013_to_fq12, conv_fp2_coeffs_to_fq12, BN254_XI},
+    curves::{bn254::BN254_XI, conv_013_to_fp12, conv_fp2_coeffs_to_fp12},
     operations::{fp12_square, mul_013_by_013, mul_by_01234, mul_by_013, point_to_013},
 };
 
@@ -46,11 +46,11 @@ fn test_mul_013_by_013() {
 
     // Multiply the two line functions & convert to Fq12 to compare
     let mul_013_by_013 = mul_013_by_013::<Fq, Fq2>(line_0, line_1, BN254_XI);
-    let mul_013_by_013 = conv_fp2_coeffs_to_fq12(&mul_013_by_013);
+    let mul_013_by_013 = conv_fp2_coeffs_to_fp12::<Fq, Fq2, Fq12>(&mul_013_by_013);
 
     // Compare with the result of multiplying two Fp12 elements
-    let fp12_0 = conv_013_to_fq12(line_0);
-    let fp12_1 = conv_013_to_fq12(line_1);
+    let fp12_0 = conv_013_to_fp12::<Fq, Fq2, Fq12>(line_0);
+    let fp12_1 = conv_013_to_fp12::<Fq, Fq2, Fq12>(line_1);
     let check_mul_fp12 = fp12_0 * fp12_1;
     assert_eq!(mul_013_by_013, check_mul_fp12);
 }
@@ -68,7 +68,7 @@ fn test_mul_by_013() {
     let mul_by_013 = mul_by_013::<Fq, Fq2, Fq12>(f, line);
     println!("{:#?}", mul_by_013);
 
-    let check_mul_fp12 = conv_013_to_fq12(line) * f;
+    let check_mul_fp12 = conv_013_to_fp12::<Fq, Fq2, Fq12>(line) * f;
     assert_eq!(mul_by_013, check_mul_fp12);
 }
 
@@ -85,6 +85,6 @@ fn test_mul_by_01234() {
     ];
     let mul_by_01234 = mul_by_01234::<Fq, Fq2, Fq12>(f, x);
 
-    let x_f12 = conv_fp2_coeffs_to_fq12(&x);
+    let x_f12 = conv_fp2_coeffs_to_fp12::<Fq, Fq2, Fq12>(&x);
     assert_eq!(mul_by_01234, f * x_f12);
 }

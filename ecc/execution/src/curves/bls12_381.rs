@@ -3,7 +3,7 @@ use halo2curves_axiom::{
     ff::Field,
 };
 
-use crate::common::FieldExtension;
+use crate::common::{FieldExtension, Fp12Constructor, Fp2Constructor};
 
 pub const BLS12_381_XI: Fq2 = Fq2 {
     c0: Fq::ONE,
@@ -15,6 +15,29 @@ pub const GNARK_BLS12_381_PBE: [i32; 64] = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1,
 ];
+
+impl Fp2Constructor<Fq> for Fq2 {
+    fn new(c0: Fq, c1: Fq) -> Self {
+        Fq2 { c0, c1 }
+    }
+}
+
+impl Fp12Constructor<Fq2> for Fq12 {
+    fn new(c00: Fq2, c01: Fq2, c02: Fq2, c10: Fq2, c11: Fq2, c12: Fq2) -> Self {
+        Fq12 {
+            c0: Fq6 {
+                c0: c00,
+                c1: c01,
+                c2: c02,
+            },
+            c1: Fq6 {
+                c0: c10,
+                c1: c11,
+                c2: c12,
+            },
+        }
+    }
+}
 
 /// FieldExtension for Fq2 with Fq as base field
 impl FieldExtension<2> for Fq2 {
