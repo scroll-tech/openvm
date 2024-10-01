@@ -1,16 +1,16 @@
 | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- |
-| 8,168.0 <span style="color: green">(-43.0 [-0.5%])</span> | 67,641,364 | 27,527,369 <span style="color: green">(-2,144 [-0.0%])</span> | 1,726.0 <span style="color: green">(-2.0 [-0.1%])</span> | 33.0 |
+| 8,218.0 <span style="color: red">(+50.0 [+0.6%])</span> | 67,641,364 | 27,538,761 <span style="color: red">(+11,392 [+0.0%])</span> | 1,719.0 <span style="color: green">(-7.0 [-0.4%])</span> | 34.0 <span style="color: red">(+1.0 [+3.0%])</span> |
 
 | chip_name | rows_used |
 | --- | --- |
 | ByteXor | 65,536 |
-| Core | 290,797 <span style="color: green">(-23 [-0.0%])</span> |
-| FieldArithmetic | 140,489 <span style="color: green">(-39 [-0.0%])</span> |
+| Core | 290,938 <span style="color: red">(+141 [+0.0%])</span> |
+| FieldArithmetic | 140,536 <span style="color: red">(+47 [+0.0%])</span> |
 | FieldExtension | 7,486 |
 | Memory | 97,965 |
-| Memory 2 | 40,635 <span style="color: red">(+32 [+0.1%])</span> |
-| Memory 3 | 20,319 <span style="color: red">(+16 [+0.1%])</span> |
+| Memory 2 | 40,679 <span style="color: red">(+44 [+0.1%])</span> |
+| Memory 3 | 20,341 <span style="color: red">(+22 [+0.1%])</span> |
 | Memory 4 | 3,851 |
 | Memory 5 | 0 |
 | Memory 6 | 0 |
@@ -21,7 +21,7 @@
 
 | opcode | cells_used | frequency |
 | --- | --- | --- |
-| FADD | 3,607,252 <span style="color: green">(-929 [-0.0%])</span> | 113,072 <span style="color: green">(-39 [-0.0%])</span> |
+| FADD | 3,609,094 <span style="color: red">(+1,842 [+0.1%])</span> | 113,119 <span style="color: red">(+47 [+0.0%])</span> |
 | STOREW | 5,470,066 | 71,082 |
 | BNE | 4,232,825 | 65,066 |
 | LOADW | 3,146,152 | 45,729 |
@@ -29,12 +29,12 @@
 | SHINTW | 2,257,164 | 26,871 |
 | STOREW2 | 1,554,571 | 19,809 |
 | FMUL | 647,825 | 18,520 |
-| JAL | 745,364 <span style="color: green">(-1,495 [-0.2%])</span> | 11,465 <span style="color: green">(-23 [-0.2%])</span> |
+| JAL | 754,529 <span style="color: red">(+9,165 [+1.2%])</span> | 11,606 <span style="color: red">(+141 [+1.2%])</span> |
 | FSUB | 375,784 | 8,894 |
 | HINT_INPUT | 262,080 | 4,032 |
 | CT_END | 247,455 | 3,807 |
 | CT_START | 247,455 | 3,807 |
-| BBE4MUL | 200,390 <span style="color: red">(+280 [+0.1%])</span> | 3,451 |
+| BBE4MUL | 200,775 <span style="color: red">(+385 [+0.2%])</span> | 3,451 |
 | BEQ | 177,450 | 2,730 |
 | COMP_POS2 | 1,010,000 | 2,000 |
 | FE4ADD | 107,859 | 1,630 |
@@ -55,23 +55,23 @@
 | LoadV | 1,878,982 | 27,958 |
 | LoadE | 1,298,465 | 18,836 |
 | LoadF | 1,142,617 | 16,585 |
-| IfEqI | 869,245 <span style="color: green">(-1,495 [-0.2%])</span> | 13,373 <span style="color: green">(-23 [-0.2%])</span> |
+| IfEqI | 878,410 <span style="color: red">(+9,165 [+1.1%])</span> | 13,514 <span style="color: red">(+141 [+1.1%])</span> |
 | ImmV | 900,014 | 12,842 |
 | StoreV | 1,003,675 | 12,540 |
 | StoreF | 864,732 | 10,448 |
 | ImmF | 461,083 | 7,036 |
 | SubEF | 419,063 | 6,420 |
-| AddEI | 215,404 <span style="color: red">(+280 [+0.1%])</span> | 5,664 |
+| AddEI | 215,789 <span style="color: red">(+385 [+0.2%])</span> | 5,664 |
 | AssertEqF | 318,565 | 4,901 |
 | HintInputVec | 262,080 | 4,032 |
 | CycleTrackerEnd | 247,455 | 3,807 |
 | CycleTrackerStart | 247,455 | 3,807 |
 | SubVI | 178,943 | 3,789 |
 | AssertEqV | 229,775 | 3,535 |
-| MulE | 194,431 <span style="color: red">(+280 [+0.1%])</span> | 3,418 |
+| MulE | 194,816 <span style="color: red">(+385 [+0.2%])</span> | 3,418 |
 | MulV | 156,493 | 3,131 |
 | SubV | 96,157 | 3,100 |
-| AddFI | 88,357 <span style="color: green">(-1,209 [-1.3%])</span> | 2,830 <span style="color: green">(-39 [-1.4%])</span> |
+| AddFI | 89,814 <span style="color: red">(+1,457 [+1.6%])</span> | 2,877 <span style="color: red">(+47 [+1.7%])</span> |
 | MulVI | 80,800 | 2,604 |
 | MulF | 68,343 | 2,204 |
 | IfNe | 138,840 | 2,136 |
@@ -115,7 +115,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11131861767/artifacts/2002590048)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/b973ca95093f8de9284699573136f75f826f622d
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11132461367/artifacts/2002766028)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/06db959bcce8a6ac428afff69c15d06ddbbeb5a2
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11131861767)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11132461367)
