@@ -79,6 +79,10 @@ impl<F: Field> MachineChip<F> for ExecutionTester<F> {
         Box::new(ExecutionDummyAir::new(self.bus))
     }
 
+    fn air_name(&self) -> String {
+        "ExecutionDummyAir".to_string()
+    }
+
     fn current_trace_height(&self) -> usize {
         self.records.len()
     }
