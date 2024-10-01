@@ -26,22 +26,11 @@ fn test_multi_miller_loop_bls12_381() {
     // let P = G1Affine::conditional_select(&P, &G1Affine::generator(), either_identity);
     // let Q = G2Affine::conditional_select(&Q, &G2Affine::generator(), either_identity);
 
-    // Manual pair:
-    // P = (0, 1)
-    // Q = (0 + 1u, 2 + 3u)
+    let P = G1Affine::generator();
+    let Q = G2Affine::generator();
 
-    let mut P = G1Affine::default();
-    P.x = Fq::from_raw_unchecked([0, 0, 0, 0, 0, 0]);
-    P.y = Fq::from_raw_unchecked([1, 0, 0, 0, 0, 0]);
-    let mut Q: G2Affine = G2Affine::default();
-    Q.x = Fq2 {
-        c0: Fq::from_raw_unchecked([0, 0, 0, 0, 0, 0]),
-        c1: Fq::from_raw_unchecked([1, 0, 0, 0, 0, 0]),
-    };
-    Q.y = Fq2 {
-        c0: Fq::from_raw_unchecked([2, 0, 0, 0, 0, 0]),
-        c1: Fq::from_raw_unchecked([3, 0, 0, 0, 0, 0]),
-    };
+    println!("P.x: {:x?}", P.x.0);
+    println!("Q.c0.x: {:x?}", Q.x.c0.0);
 
     let P_is_on_curve: bool = P.is_on_curve().into();
     let Q_is_on_curve: bool = Q.is_on_curve().into();
@@ -68,6 +57,20 @@ fn test_multi_miller_loop_bls12_381() {
     println!("{:#?}", f);
     let wrapped_f = MillerLoopResult(f);
     let final_f = wrapped_f.final_exponentiation();
+
+    let cf = compare_final.0;
+    println!("cf.c0.c0.c0: {:?}", cf.c0.c0.c0.0);
+    println!("cf.c0.c0.c1: {:?}", cf.c0.c0.c1.0);
+    println!("cf.c0.c1.c0: {:?}", cf.c0.c1.c0.0);
+    println!("cf.c0.c1.c1: {:?}", cf.c0.c1.c1.0);
+    println!("cf.c0.c2.c0: {:?}", cf.c0.c2.c0.0);
+    println!("cf.c0.c2.c1: {:?}", cf.c0.c2.c1.0);
+    println!("cf.c1.c0.c0: {:?}", cf.c1.c0.c0.0);
+    println!("cf.c1.c0.c1: {:?}", cf.c1.c0.c1.0);
+    println!("cf.c1.c1.c0: {:?}", cf.c1.c1.c0.0);
+    println!("cf.c1.c1.c1: {:?}", cf.c1.c1.c1.0);
+    println!("cf.c1.c2.c0: {:?}", cf.c1.c2.c0.0);
+    println!("cf.c1.c2.c1: {:?}", cf.c1.c2.c1.0);
 
     // Run halo2curves final exponentiation on our multi_miller_loop output
     assert_eq!(final_f, compare_final);
@@ -105,17 +108,20 @@ fn test_f_mul() {
     // let P = G1Affine::conditional_select(&P, &G1Affine::generator(), either_identity);
     // let Q = G2Affine::conditional_select(&Q, &G2Affine::generator(), either_identity);
 
-    let two = Fq::one() + Fq::one();
-    let three = Fq::one() + Fq::one() + Fq::one();
-    let mut P = G1Affine::default();
-    P.x = Fq::zero();
-    P.y = Fq::one();
-    let mut Q: G2Affine = G2Affine::default();
-    Q.x = Fq2 {
-        c0: Fq::zero(),
-        c1: Fq::one(),
-    };
-    Q.y = Fq2 { c0: two, c1: three };
+    // let two = Fq::one() + Fq::one();
+    // let three = Fq::one() + Fq::one() + Fq::one();
+    // let mut P = G1Affine::default();
+    // P.x = Fq::zero();
+    // P.y = Fq::one();
+    // let mut Q: G2Affine = G2Affine::default();
+    // Q.x = Fq2 {
+    //     c0: Fq::zero(),
+    //     c1: Fq::one(),
+    // };
+    // Q.y = Fq2 { c0: two, c1: three };
+
+    let P = G1Affine::generator();
+    let Q = G2Affine::generator();
 
     let P_ecpoint = EcPoint { x: P.x, y: P.y };
     let Q_ecpoint = EcPoint { x: Q.x, y: Q.y };
@@ -134,6 +140,8 @@ fn test_f_mul() {
     f = mul_by_013::<Fq, Fq2, Fq12>(f, l_init);
     Q_acc = Q_acc_init;
 
+    // Now f is in a state where we can do a left vs right side test of double-and-add vs double then add:
+
     // Left side test: Double and add
     let (Q_acc_daa, l_S_plus_Q, l_S_plus_Q_plus_S) =
         miller_double_and_add_step::<Fq, Fq2>(Q_acc.clone(), Q_ecpoint.clone());
@@ -143,6 +151,7 @@ fn test_f_mul() {
     // let l_prod0 = mul_013_by_013(l_S_plus_Q, l_S_plus_Q_plus_S, BLS12_381_XI);
     // let f_mul = mul_by_01234::<Fq, Fq2, Fq12>(f.clone(), l_prod0);
     let f_mul = mul_by_013::<Fq, Fq2, Fq12>(f.clone(), l_S_plus_Q_plus_S);
+    // let f_mul = f_mul.conjugate();
 
     // Right side test: Double, then add
     let (Q_acc_d, l_2S) = miller_double_step::<Fq, Fq2>(Q_acc.clone());
@@ -153,8 +162,8 @@ fn test_f_mul() {
     let f_prod_mul = mul_by_01234::<Fq, Fq2, Fq12>(f.clone(), l_prod1);
 
     // assert_eq!(f_mul, f_prod_mul);
-    // assert_eq!(Q_acc_daa.x, Q_acc_a.x);
-    // assert_eq!(Q_acc_daa.y, Q_acc_a.y);
+    assert_eq!(Q_acc_daa.x, Q_acc_a.x);
+    assert_eq!(Q_acc_daa.y, Q_acc_a.y);
 
     let wrapped_f_mul = MillerLoopResult(f_mul);
     let final_f_mul = wrapped_f_mul.final_exponentiation();
