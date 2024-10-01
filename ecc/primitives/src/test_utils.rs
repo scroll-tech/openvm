@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{str::FromStr, sync::Arc};
 
 use afs_primitives::{
     bigint::check_carry_mod_to_zero::CheckCarryModToZeroSubAir,
@@ -6,6 +6,9 @@ use afs_primitives::{
 };
 use ax_sdk::utils::create_seeded_rng;
 use num_bigint_dig::BigUint;
+use num_traits::{FromPrimitive, Zero};
+use p3_baby_bear::BabyBear;
+use p3_field::PrimeField64;
 use rand::RngCore;
 
 use super::field_expression::FieldVariableConfig;
@@ -56,4 +59,20 @@ impl FieldVariableConfig for TestConfig {
     fn range_checker_bits() -> usize {
         17
     }
+}
+
+pub fn evaluate_biguint(limbs: &[BabyBear], limb_bits: usize) -> BigUint {
+    let mut res = BigUint::zero();
+    let base = BigUint::from_u64(1 << limb_bits).unwrap();
+    for limb in limbs.iter().rev() {
+        res = res * base.clone() + BigUint::from_u64(limb.as_canonical_u64()).unwrap();
+    }
+    res
+}
+
+pub fn bn254_prime() -> BigUint {
+    BigUint::from_str(
+        "21888242871839275222246405745257275088696311157297823662689037894645226208583",
+    )
+    .unwrap()
 }

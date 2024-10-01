@@ -939,6 +939,7 @@ dependencies = [
  "ax-sdk",
  "elliptic-curve",
  "ff 0.13.0",
+ "halo2curves-axiom 0.7.0",
  "hex-literal",
  "itertools 0.13.0",
  "k256",
@@ -5901,6 +5902,16 @@ name = "unicode-width"
 version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7dd6e30e90baa6f72411720665d41d89b9a3d039dc45b8faea1ddd07f617f6af"
+
+[[package]]
+name = "unroll"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5ad948c1cb799b1a70f836077721a92a35ac177d4daddf4c20a633786d4cf618"
+dependencies = [
+ "quote",
+ "syn 1.0.109",
+]
 
 [[package]]
 name = "unroll"

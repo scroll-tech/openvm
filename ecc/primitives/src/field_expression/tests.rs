@@ -7,11 +7,9 @@ use p3_air::BaseAir;
 use p3_baby_bear::BabyBear;
 use p3_matrix::dense::RowMajorMatrix;
 
-use super::{super::utils::*, ExprBuilder, FieldExprChip, SymbolicExpr};
+use super::{super::test_utils::*, ExprBuilder, FieldExprChip, SymbolicExpr};
 
 const LIMB_BITS: usize = 8;
-
-use super::super::test_utils::*;
 
 #[test]
 fn test_add() {
