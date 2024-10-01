@@ -29,9 +29,6 @@ fn test_multi_miller_loop_bls12_381() {
     let P = G1Affine::generator();
     let Q = G2Affine::generator();
 
-    println!("P.x: {:x?}", P.x.0);
-    println!("Q.c0.x: {:x?}", Q.x.c0.0);
-
     let P_is_on_curve: bool = P.is_on_curve().into();
     let Q_is_on_curve: bool = Q.is_on_curve().into();
     assert!(P_is_on_curve);
@@ -47,18 +44,33 @@ fn test_multi_miller_loop_bls12_381() {
     // let compare_final = halo2curves_axiom::bls12_381::pairing(&P, &Q);
 
     // Run the multi-miller loop
-    let f = multi_miller_loop::<Fq, Fq2, Fq12>(
-        // let f = multi_miller_loop_separate_double_plus_add::<Fq, Fq2, Fq12>(
+    // let f = multi_miller_loop::<Fq, Fq2, Fq12>(
+    let f = multi_miller_loop_separate_double_plus_add::<Fq, Fq2, Fq12>(
         &[P_ecpoint],
         &[Q_ecpoint],
         GNARK_BLS12_381_PBE.as_slice(),
         BLS12_381_XI,
     );
-    println!("{:#?}", f);
+
+    // let f = multi_miller_loop_gnark::<Fq, Fq2, Fq12>(
+    //     &[P_ecpoint],
+    //     &[Q_ecpoint],
+    //     GNARK_BLS12_381_PBE.as_slice(),
+    //     BLS12_381_XI,
+    //     |label, ecpt: EcPoint<Fq2>| {
+    //         println!("{}", label);
+    //         println!("ecpt.x.c0.0: {:?}", ecpt.x.c0.0);
+    //         println!("ecpt.x.c0.1: {:?}", ecpt.x.c1.0);
+    //         println!("ecpt.y.c0.0: {:?}", ecpt.y.c0.0);
+    //         println!("ecpt.y.c0.1: {:?}", ecpt.y.c1.0);
+    //     },
+    // );
+
     let wrapped_f = MillerLoopResult(f);
     let final_f = wrapped_f.final_exponentiation();
+    println!("final_f: {:#?}", final_f);
 
-    let cf = compare_final.0;
+    let cf = final_f.0;
     println!("cf.c0.c0.c0: {:?}", cf.c0.c0.c0.0);
     println!("cf.c0.c0.c1: {:?}", cf.c0.c0.c1.0);
     println!("cf.c0.c1.c0: {:?}", cf.c0.c1.c0.0);
@@ -138,28 +150,44 @@ fn test_f_mul() {
     let (Q_acc_init, l_init) = miller_double_step::<Fq, Fq2>(Q_ecpoint.clone());
     let l_init = evaluate_line::<Fq, Fq2>(l_init, x_over_y.clone(), y_inv.clone());
     f = mul_by_013::<Fq, Fq2, Fq12>(f, l_init);
+
+    // Test Q_acc_init == Q + Q
+    let Q2 = Q + Q;
+    let Q2 = G2Affine::from(Q2);
+    assert_eq!(Q2.x, Q_acc_init.x);
+    assert_eq!(Q2.y, Q_acc_init.y);
+
     Q_acc = Q_acc_init;
 
-    // Now f is in a state where we can do a left vs right side test of double-and-add vs double then add:
+    // Now Q_acc is in a state where we can do a left vs right side test of double-and-add vs double then add:
 
     // Left side test: Double and add
     let (Q_acc_daa, l_S_plus_Q, l_S_plus_Q_plus_S) =
         miller_double_and_add_step::<Fq, Fq2>(Q_acc.clone(), Q_ecpoint.clone());
+    let l_S_plus_Q = evaluate_line::<Fq, Fq2>(l_S_plus_Q, x_over_y.clone(), y_inv.clone());
     let l_S_plus_Q_plus_S =
         evaluate_line::<Fq, Fq2>(l_S_plus_Q_plus_S, x_over_y.clone(), y_inv.clone());
-    // let l_S_plus_Q = evaluate_line::<Fq, Fq2>(l_S_plus_Q, x_over_y.clone(), y_inv.clone());
-    // let l_prod0 = mul_013_by_013(l_S_plus_Q, l_S_plus_Q_plus_S, BLS12_381_XI);
-    // let f_mul = mul_by_01234::<Fq, Fq2, Fq12>(f.clone(), l_prod0);
-    let f_mul = mul_by_013::<Fq, Fq2, Fq12>(f.clone(), l_S_plus_Q_plus_S);
-    // let f_mul = f_mul.conjugate();
+    let l_prod0 = mul_013_by_013(l_S_plus_Q, l_S_plus_Q_plus_S, BLS12_381_XI);
+    let f_mul = mul_by_01234::<Fq, Fq2, Fq12>(f.clone(), l_prod0);
+
+    // Test Q_acc_da == 2(2Q) + Q
+    let Q4 = Q2 + Q2;
+    let Q4_Q = Q4 + Q;
+    let Q4_Q = G2Affine::from(Q4_Q);
+    assert_eq!(Q4_Q.x, Q_acc_daa.x);
+    assert_eq!(Q4_Q.y, Q_acc_daa.y);
 
     // Right side test: Double, then add
     let (Q_acc_d, l_2S) = miller_double_step::<Fq, Fq2>(Q_acc.clone());
-    let (Q_acc_a, l_S_plus_Q) = miller_add_step::<Fq, Fq2>(Q_acc_d, Q_ecpoint.clone());
+    let (Q_acc_a, l_2S_plus_Q) = miller_add_step::<Fq, Fq2>(Q_acc_d, Q_ecpoint.clone());
     let l_2S = evaluate_line::<Fq, Fq2>(l_2S, x_over_y.clone(), y_inv.clone());
-    let l_S_plus_Q = evaluate_line::<Fq, Fq2>(l_S_plus_Q, x_over_y.clone(), y_inv.clone());
-    let l_prod1 = mul_013_by_013(l_2S, l_S_plus_Q, BLS12_381_XI);
+    let l_2S_plus_Q = evaluate_line::<Fq, Fq2>(l_2S_plus_Q, x_over_y.clone(), y_inv.clone());
+    let l_prod1 = mul_013_by_013(l_2S, l_2S_plus_Q, BLS12_381_XI);
     let f_prod_mul = mul_by_01234::<Fq, Fq2, Fq12>(f.clone(), l_prod1);
+
+    // Test Q_acc_a == 2(2Q) + Q
+    assert_eq!(Q4_Q.x, Q_acc_a.x);
+    assert_eq!(Q4_Q.y, Q_acc_a.y);
 
     // assert_eq!(f_mul, f_prod_mul);
     assert_eq!(Q_acc_daa.x, Q_acc_a.x);
@@ -173,3 +201,27 @@ fn test_f_mul() {
 
     assert_eq!(final_f_mul, final_f_prod_mul);
 }
+
+// #[test]
+// fn test_double_and_add_step() {
+//     let P = G1Affine::generator();
+//     let Q = G2Affine::generator();
+
+//     let res = P.;
+
+//     let P_ecpoint = EcPoint { x: P.x, y: P.y };
+//     let Q_ecpoint = EcPoint { x: Q.x, y: Q.y };
+
+//     // Setup constants
+//     let y_inv = P_ecpoint.y.invert().unwrap();
+//     let x_over_y = P_ecpoint.x * y_inv;
+
+//     // We want to check that Fp12 * (l_(S+Q+S) is equal to Fp12 * (l_(2S) * l_(S+Q))
+//     let mut f = Fq12::one();
+//     let mut Q_acc = Q_ecpoint.clone();
+
+//     // Initial step: double
+//     let (Q_acc_init, l_init) = miller_double_and_add_step::(Q_acc.clone(), Q_ecpoint.clone());
+//     let l_init = evaluate_line::<Fq, Fq2>(l_init, x_over_y.clone(), y_inv.clone());
+//     f = mul_by_013::<Fq, Fq2, Fq12>(f, l
+// }

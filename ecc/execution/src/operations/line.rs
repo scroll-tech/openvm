@@ -57,7 +57,7 @@ where
     Fp2: FieldExtension<2, BaseField = Fp>,
     Fp12: FieldExtension<6, BaseField = Fp2>,
 {
-    let mut x_extend: [Fp2; 6] = [Fp2::default(); 6];
+    let mut x_extend: [Fp2; 6] = [Fp2::ZERO; 6];
     x_extend[..5].clone_from_slice(&x);
     let x_fp12 = Fp12::from_coeffs(x_extend);
     f * x_fp12

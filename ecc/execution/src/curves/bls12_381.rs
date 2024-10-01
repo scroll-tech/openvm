@@ -1,9 +1,12 @@
 use halo2curves_axiom::{
-    bls12_381::{Fq, Fq12, Fq2, Fq6},
+    bls12_381::{Fq, Fq12, Fq2, Fq6, G1Affine, G2Affine, G2},
     ff::Field,
 };
 
-use crate::common::{FieldExtension, Fp12Constructor, Fp2Constructor};
+use crate::{
+    common::{EcPoint, FieldExtension, Fp12Constructor, Fp2Constructor},
+    miller::miller_double_step,
+};
 
 pub const BLS12_381_XI: Fq2 = Fq2 {
     c0: Fq::ONE,
@@ -127,4 +130,20 @@ impl FieldExtension<6> for Fq12 {
             c1: self.c1 * fq6_pt,
         }
     }
+}
+
+pub fn print_fq12_raw(label: &str, f: Fq12) {
+    println!("{}", label);
+    println!("f.c0.c0.c0: {:?}", f.c0.c0.c0.0);
+    println!("f.c0.c0.c1: {:?}", f.c0.c0.c1.0);
+    println!("f.c0.c1.c0: {:?}", f.c0.c1.c0.0);
+    println!("f.c0.c1.c1: {:?}", f.c0.c1.c1.0);
+    println!("f.c0.c2.c0: {:?}", f.c0.c2.c0.0);
+    println!("f.c0.c2.c1: {:?}", f.c0.c2.c1.0);
+    println!("f.c1.c0.c0: {:?}", f.c1.c0.c0.0);
+    println!("f.c1.c0.c1: {:?}", f.c1.c0.c1.0);
+    println!("f.c1.c1.c0: {:?}", f.c1.c1.c0.0);
+    println!("f.c1.c1.c1: {:?}", f.c1.c1.c1.0);
+    println!("f.c1.c2.c0: {:?}", f.c1.c2.c0.0);
+    println!("f.c1.c2.c1: {:?}", f.c1.c2.c1.0);
 }
