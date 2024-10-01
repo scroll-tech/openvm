@@ -185,6 +185,15 @@ fn test_f_mul() {
     let l_prod1 = mul_013_by_013(l_2S, l_2S_plus_Q, BLS12_381_XI);
     let f_prod_mul = mul_by_01234::<Fq, Fq2, Fq12>(f.clone(), l_prod1);
 
+    // Test line functions match
+    let f_line_daa = mul_by_01234::<Fq, Fq2, Fq12>(Fq12::one(), l_prod0);
+    let f_line_daa_final = MillerLoopResult(f_line_daa);
+    let f_line_daa_final = f_line_daa_final.final_exponentiation();
+    let f_line_da = mul_by_01234::<Fq, Fq2, Fq12>(Fq12::one(), l_prod1);
+    let f_line_da_final = MillerLoopResult(f_line_da);
+    let f_line_da_final = f_line_da_final.final_exponentiation();
+    assert_eq!(f_line_daa_final, f_line_da_final);
+
     // Test Q_acc_a == 2(2Q) + Q
     assert_eq!(Q4_Q.x, Q_acc_a.x);
     assert_eq!(Q4_Q.y, Q_acc_a.y);

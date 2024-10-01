@@ -6,8 +6,10 @@ use rand::{rngs::StdRng, SeedableRng};
 
 use crate::{
     common::EcPoint,
-    curves::{bn254::BN254_XI, conv_013_to_fp12, conv_fp2_coeffs_to_fp12},
-    operations::{fp12_square, mul_013_by_013, mul_by_01234, mul_by_013, point_to_013},
+    curves::{
+        bn254::{mul_013_by_013, mul_by_01234, mul_by_013, BN254_XI},
+        conv_013_to_fp12, conv_fp2_coeffs_to_fp12, fp12_square, point_to_013,
+    },
 };
 
 #[test]

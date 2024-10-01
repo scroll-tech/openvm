@@ -1,12 +1,9 @@
 use halo2curves_axiom::{
-    bls12_381::{Fq, Fq12, Fq2, Fq6, G1Affine, G2Affine, G2},
+    bls12_381::{Fq, Fq12, Fq2, Fq6},
     ff::Field,
 };
 
-use crate::{
-    common::{EcPoint, FieldExtension, Fp12Constructor, Fp2Constructor},
-    miller::miller_double_step,
-};
+use crate::common::{FieldExtension, Fp12Constructor, Fp2Constructor};
 
 pub const BLS12_381_XI: Fq2 = Fq2 {
     c0: Fq::ONE,

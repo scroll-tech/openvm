@@ -6,8 +6,10 @@ use rand::{rngs::StdRng, SeedableRng};
 
 use crate::{
     common::EcPoint,
-    curves::{bls12_381::BLS12_381_XI, conv_013_to_fp12, conv_fp2_coeffs_to_fp12},
-    operations::{fp12_square, mul_013_by_013, mul_by_01234, mul_by_013, point_to_013},
+    curves::{
+        bls12_381::{mul_013_by_013, mul_by_01234, mul_by_013, BLS12_381_XI},
+        conv_013_to_fp12, conv_fp2_coeffs_to_fp12, fp12_square, point_to_013,
+    },
 };
 
 // TODO[yj]: Probably should refactor these tests so that they don't repeat the ones in BN254

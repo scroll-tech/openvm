@@ -21,10 +21,8 @@ where
     // func FinalExponentiation(z *GT, _z ...*GT) GT {
     // 	var result GT
     // 	result.Set(z)
-    let mut f = f;
 
     // 	var t [3]GT
-    let mut t = [f; 3];
 
     // Easy part
     // (p⁶-1)(p²+1)
