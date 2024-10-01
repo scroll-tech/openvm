@@ -1,7 +1,7 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- |
-| bench_program_inner | 1,476.0 <span style="color: green">(-16.0 [-1.1%])</span> | 4,189,204 | 697,883 | 40.0 <span style="color: red">(+7.0 [+21.2%])</span> |  |
-| inner_verifier | 29,712.0 <span style="color: red">(+59.0 [+0.2%])</span> | 320,012,308 | 161,147,792 <span style="color: red">(+101,093 [+0.1%])</span> | 14,747.0 <span style="color: red">(+5,059.0 [+52.2%])</span> | 385.0 <span style="color: green">(-9.0 [-2.3%])</span> |
+| bench_program_inner | 1,494.0 <span style="color: red">(+18.0 [+1.2%])</span> | 4,189,204 | 697,883 | 40.0 |  |
+| inner_verifier | 29,833.0 <span style="color: red">(+121.0 [+0.4%])</span> | 320,012,308 | 161,097,886 <span style="color: green">(-49,906 [-0.0%])</span> | 14,589.0 <span style="color: green">(-158.0 [-1.1%])</span> | 387.0 <span style="color: red">(+2.0 [+0.5%])</span> |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -9,32 +9,29 @@
 | bench_program_inner | ByteXor | 65,536 |
 | bench_program_inner | Core | 1,296 |
 | bench_program_inner | FieldArithmetic | 1,256 |
-| bench_program_inner | FieldExtension |
 | bench_program_inner | Memory | 9,607 |
 | bench_program_inner | Memory 2 | 4,672 |
 | bench_program_inner | Memory 3 | 2,336 |
 | bench_program_inner | Memory 4 | 1,168 |
 | bench_program_inner | Memory 5 | 584 |
 | bench_program_inner | Memory 6 | 292 |
-| bench_program_inner | Memory 7 |
-| bench_program_inner | Poseidon2 |
 | bench_program_inner | Program | 370 |
 | bench_program_inner | RangeChecker | 131,072 |
 | bench_program_inner | Shift256 | 96 |
 | inner_verifier | ByteXor | 65,536 |
-| inner_verifier | Core | 1,587,071 <span style="color: red">(+1,518 [+0.1%])</span> |
-| inner_verifier | FieldArithmetic | 769,278 <span style="color: red">(+33 [+0.0%])</span> |
+| inner_verifier | Core | 1,586,308 <span style="color: green">(-763 [-0.0%])</span> |
+| inner_verifier | FieldArithmetic | 769,277 <span style="color: green">(-1 [-0.0%])</span> |
 | inner_verifier | FieldExtension | 267,400 |
 | inner_verifier | Memory | 329,224 |
-| inner_verifier | Memory 2 | 651,855 <span style="color: red">(+80 [+0.0%])</span> |
-| inner_verifier | Memory 3 | 326,077 <span style="color: red">(+40 [+0.0%])</span> |
+| inner_verifier | Memory 2 | 651,839 <span style="color: green">(-16 [-0.0%])</span> |
+| inner_verifier | Memory 3 | 326,069 <span style="color: green">(-8 [-0.0%])</span> |
 | inner_verifier | Memory 4 | 16,235 |
-| inner_verifier | Memory 5 |
-| inner_verifier | Memory 6 |
-| inner_verifier | Memory 7 |
 | inner_verifier | Poseidon2 | 11,829 |
 | inner_verifier | Program | 95,372 |
 | inner_verifier | RangeChecker | 131,072 |
+
+<details>
+<summary>Click to expand</summary>
 
 | group | dsl_ir | opcode | frequency |
 | --- | --- | --- | --- |
@@ -71,7 +68,7 @@
 | inner_verifier | AddEFFI | STOREW | 393 |
 | inner_verifier | AddEFI | FADD | 152 |
 | inner_verifier | AddEI | FADD | 26,332 |
-| inner_verifier | AddFI | FADD | 19,961 |
+| inner_verifier | AddFI | FADD | 19,960 <span style="color: green">(-1 [-0.0%])</span> |
 | inner_verifier | AddV | FADD | 6,308 |
 | inner_verifier | AddVI | FADD | 145,244 |
 | inner_verifier | Alloc | FADD | 24,624 |
@@ -98,7 +95,7 @@
 | inner_verifier | HintInputVec | HINT_INPUT | 9,736 |
 | inner_verifier | IfEq | BNE | 7,860 |
 | inner_verifier | IfEqI | BNE | 61,056 |
-| inner_verifier | IfEqI | JAL | 13,570 |
+| inner_verifier | IfEqI | JAL | 12,807 <span style="color: green">(-763 [-5.6%])</span> |
 | inner_verifier | IfNe | BEQ | 6,956 |
 | inner_verifier | IfNe | JAL | 20 |
 | inner_verifier | IfNeI | BEQ | 1,072 |
@@ -139,6 +136,11 @@
 | inner_verifier | SubV | FSUB | 21,672 |
 | inner_verifier | SubVI | FSUB | 1,281 |
 | inner_verifier | SubVIN | FSUB | 357 |
+
+</details>
+
+<details>
+<summary>Click to expand</summary>
 
 | group | air_name | dsl_ir | opcode | cells_used |
 | --- | --- | --- | --- | --- |
@@ -246,12 +248,12 @@
 | inner_verifier | AccessAdapter<4> | AddEFI | FADD | 195 |
 | inner_verifier | Audit | AddEFI | FADD | 2,888 |
 | inner_verifier | FieldArithmeticAir | AddEFI | FADD | 4,712 |
-| inner_verifier | AccessAdapter<2> | AddEI | FADD | 140,184 |
-| inner_verifier | AccessAdapter<4> | AddEI | FADD | 82,836 |
+| inner_verifier | AccessAdapter<2> | AddEI | FADD | 140,096 <span style="color: green">(-88 [-0.1%])</span> |
+| inner_verifier | AccessAdapter<4> | AddEI | FADD | 82,784 <span style="color: green">(-52 [-0.1%])</span> |
 | inner_verifier | Audit | AddEI | FADD | 408,500 |
 | inner_verifier | FieldArithmeticAir | AddEI | FADD | 816,292 |
 | inner_verifier | Audit | AddFI | FADD | 3,097 |
-| inner_verifier | FieldArithmeticAir | AddFI | FADD | 618,791 |
+| inner_verifier | FieldArithmeticAir | AddFI | FADD | 618,760 <span style="color: green">(-31 [-0.0%])</span> |
 | inner_verifier | Audit | AddV | FADD | 19 |
 | inner_verifier | FieldArithmeticAir | AddV | FADD | 195,548 |
 | inner_verifier | Audit | AddVI | FADD | 17,233 |
@@ -300,7 +302,7 @@
 | inner_verifier | CoreAir | HintInputVec | HINT_INPUT | 632,840 |
 | inner_verifier | CoreAir | IfEq | BNE | 510,900 |
 | inner_verifier | CoreAir | IfEqI | BNE | 3,968,640 |
-| inner_verifier | CoreAir | IfEqI | JAL | 882,050 |
+| inner_verifier | CoreAir | IfEqI | JAL | 832,455 <span style="color: green">(-49,595 [-5.6%])</span> |
 | inner_verifier | CoreAir | IfNe | BEQ | 452,140 |
 | inner_verifier | CoreAir | IfNe | JAL | 1,300 |
 | inner_verifier | CoreAir | IfNeI | BEQ | 69,680 |
@@ -333,8 +335,8 @@
 | inner_verifier | CoreAir | LoadV | LOADW | 823,810 |
 | inner_verifier | Audit | LoadV | LOADW2 | 3,382 |
 | inner_verifier | CoreAir | LoadV | LOADW2 | 4,875,325 |
-| inner_verifier | AccessAdapter<2> | MulE | BBE4MUL | 476,828 |
-| inner_verifier | AccessAdapter<4> | MulE | BBE4MUL | 281,762 |
+| inner_verifier | AccessAdapter<2> | MulE | BBE4MUL | 476,740 <span style="color: green">(-88 [-0.0%])</span> |
+| inner_verifier | AccessAdapter<4> | MulE | BBE4MUL | 281,710 <span style="color: green">(-52 [-0.0%])</span> |
 | inner_verifier | Audit | MulE | BBE4MUL | 1,061,720 |
 | inner_verifier | FieldExtensionArithmeticAir | MulE | BBE4MUL | 5,484,652 |
 | inner_verifier | AccessAdapter<2> | MulEF | FMUL | 7,876 |
@@ -420,38 +422,40 @@
 | inner_verifier | FieldArithmeticAir | SubVI | FSUB | 39,711 |
 | inner_verifier | FieldArithmeticAir | SubVIN | FSUB | 11,067 |
 
+</details>
+
 | group | air_name | cells | constraints | interactions | main_cols | perm_cols | prep_cols | quotient_deg | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| bench_program_inner | CoreAir | 215,040 | 114 | 19 | 61 | 44 | 2 | 2,048 |
+| bench_program_inner | CoreAir | 215,040 | 114 | 19 | 61 | 44 |  | 2 | 2,048 |
 | bench_program_inner | ProgramAir<BabyBear> | 4,608 | 4 | 1 | 1 | 8 | 9 | 1 | 512 |
-| bench_program_inner | FieldArithmeticAir | 137,216 | 28 | 15 | 31 | 36 | 2 | 2,048 |
-| bench_program_inner | ArithmeticLogicAir<32, 8> | 223,232 | 187 | 65 | 172 | 264 | 2 | 512 |
-| bench_program_inner | ShiftAir<32, 8> | 54,784 | 3,193 | 93 | 236 | 192 | 2 | 128 |
+| bench_program_inner | FieldArithmeticAir | 137,216 | 28 | 15 | 31 | 36 |  | 2 | 2,048 |
+| bench_program_inner | ArithmeticLogicAir<32, 8> | 223,232 | 187 | 65 | 172 | 264 |  | 2 | 512 |
+| bench_program_inner | ShiftAir<32, 8> | 54,784 | 3,193 | 93 | 236 | 192 |  | 2 | 128 |
 | bench_program_inner | XorLookupAir<8> | 589,824 | 4 | 1 | 1 | 8 | 3 | 1 | 65,536 |
-| bench_program_inner | MemoryAuditAir | 573,440 | 21 | 6 | 19 | 16 | 2 | 16,384 |
-| bench_program_inner | AccessAdapterAir<2> | 573,440 | 14 | 5 | 11 | 24 | 2 | 16,384 |
-| bench_program_inner | AccessAdapterAir<4> | 303,104 | 14 | 5 | 13 | 24 | 2 | 8,192 |
-| bench_program_inner | AccessAdapterAir<8> | 167,936 | 14 | 5 | 17 | 24 | 2 | 4,096 |
-| bench_program_inner | AccessAdapterAir<16> | 100,352 | 14 | 5 | 25 | 24 | 2 | 2,048 |
-| bench_program_inner | AccessAdapterAir<32> | 66,560 | 14 | 5 | 41 | 24 | 2 | 1,024 |
+| bench_program_inner | MemoryAuditAir | 573,440 | 21 | 6 | 19 | 16 |  | 2 | 16,384 |
+| bench_program_inner | AccessAdapterAir<2> | 573,440 | 14 | 5 | 11 | 24 |  | 2 | 16,384 |
+| bench_program_inner | AccessAdapterAir<4> | 303,104 | 14 | 5 | 13 | 24 |  | 2 | 8,192 |
+| bench_program_inner | AccessAdapterAir<8> | 167,936 | 14 | 5 | 17 | 24 |  | 2 | 4,096 |
+| bench_program_inner | AccessAdapterAir<16> | 100,352 | 14 | 5 | 25 | 24 |  | 2 | 2,048 |
+| bench_program_inner | AccessAdapterAir<32> | 66,560 | 14 | 5 | 41 | 24 |  | 2 | 1,024 |
 | bench_program_inner | VariableRangeCheckerAir | 1,179,648 | 4 | 1 | 1 | 8 | 2 | 1 | 131,072 |
 | bench_program_inner | VmConnectorAir | 20 | 4 | 2 | 2 | 8 | 1 | 2 | 2 |
-| inner_verifier | CoreAir | 178,257,920 | 112 | 19 | 65 | 20 | 8 | 2,097,152 |
+| inner_verifier | CoreAir | 178,257,920 | 112 | 19 | 65 | 20 |  | 8 | 2,097,152 |
 | inner_verifier | ProgramAir<BabyBear> | 1,179,648 | 4 | 1 | 1 | 8 | 9 | 1 | 131,072 |
-| inner_verifier | FieldArithmeticAir | 49,283,072 | 23 | 15 | 31 | 16 | 8 | 1,048,576 |
-| inner_verifier | FieldExtensionArithmeticAir | 29,884,416 | 23 | 15 | 41 | 16 | 8 | 524,288 |
-| inner_verifier | Poseidon2VmAir<BabyBear> | 7,307,264 | 373 | 32 | 418 | 28 | 8 | 16,384 |
+| inner_verifier | FieldArithmeticAir | 49,283,072 | 23 | 15 | 31 | 16 |  | 8 | 1,048,576 |
+| inner_verifier | FieldExtensionArithmeticAir | 29,884,416 | 23 | 15 | 41 | 16 |  | 8 | 524,288 |
+| inner_verifier | Poseidon2VmAir<BabyBear> | 7,307,264 | 373 | 32 | 418 | 28 |  | 8 | 16,384 |
 | inner_verifier | XorLookupAir<8> | 589,824 | 4 | 1 | 1 | 8 | 3 | 1 | 65,536 |
-| inner_verifier | MemoryAuditAir | 14,155,776 | 19 | 6 | 19 | 8 | 8 | 524,288 |
-| inner_verifier | AccessAdapterAir<2> | 24,117,248 | 11 | 5 | 11 | 12 | 4 | 1,048,576 |
-| inner_verifier | AccessAdapterAir<4> | 13,107,200 | 11 | 5 | 13 | 12 | 4 | 524,288 |
-| inner_verifier | AccessAdapterAir<8> | 950,272 | 11 | 5 | 17 | 12 | 4 | 32,768 |
+| inner_verifier | MemoryAuditAir | 14,155,776 | 19 | 6 | 19 | 8 |  | 8 | 524,288 |
+| inner_verifier | AccessAdapterAir<2> | 24,117,248 | 11 | 5 | 11 | 12 |  | 4 | 1,048,576 |
+| inner_verifier | AccessAdapterAir<4> | 13,107,200 | 11 | 5 | 13 | 12 |  | 4 | 524,288 |
+| inner_verifier | AccessAdapterAir<8> | 950,272 | 11 | 5 | 17 | 12 |  | 4 | 32,768 |
 | inner_verifier | VariableRangeCheckerAir | 1,179,648 | 4 | 1 | 1 | 8 | 2 | 1 | 131,072 |
 | inner_verifier | VmConnectorAir | 20 | 4 | 2 | 2 | 8 | 1 | 2 | 2 |
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11132556260/artifacts/2002832714)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/f4eff3a994cc1540c12c7480d746228eb377b803
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11134191396/artifacts/2003318437)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/77deaf85818021199c93277d2f32f72915bf6402
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11132556260)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11134191396)
