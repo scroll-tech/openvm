@@ -1,23 +1,23 @@
 | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- |
-| 8,166.0 <span style="color: green">(-52.0 [-0.6%])</span> | 67,641,364 | 27,532,987 <span style="color: green">(-5,774 [-0.0%])</span> | 2,642.0 <span style="color: red">(+923.0 [+53.7%])</span> | 33.0 <span style="color: green">(-1.0 [-2.9%])</span> |
+| 8,142.0 <span style="color: green">(-24.0 [-0.3%])</span> | 67,641,364 | 27,526,820 <span style="color: green">(-6,167 [-0.0%])</span> | 2,574.0 <span style="color: green">(-68.0 [-2.6%])</span> | 33.0 |
 
 | chip_name | rows_used |
 | --- | --- |
 | ByteXor | 65,536 |
-| Core | 290,854 <span style="color: green">(-84 [-0.0%])</span> |
-| FieldArithmetic | 140,562 <span style="color: red">(+26 [+0.0%])</span> |
+| Core | 290,793 <span style="color: green">(-61 [-0.0%])</span> |
+| FieldArithmetic | 140,500 <span style="color: green">(-62 [-0.0%])</span> |
 | FieldExtension | 7,486 |
 | Memory | 97,965 |
-| Memory 2 | 40,615 <span style="color: green">(-64 [-0.2%])</span> |
-| Memory 3 | 20,309 <span style="color: green">(-32 [-0.2%])</span> |
+| Memory 2 | 40,599 <span style="color: green">(-16 [-0.0%])</span> |
+| Memory 3 | 20,301 <span style="color: green">(-8 [-0.0%])</span> |
 | Memory 4 | 3,851 |
-| Memory 5 |
-| Memory 6 |
-| Memory 7 |
 | Poseidon2 | 2,613 |
 | Program | 36,703 |
 | RangeChecker | 131,072 |
+
+<details>
+<summary>Click to expand</summary>
 
 | dsl_ir | opcode | frequency |
 | --- | --- | --- |
@@ -27,7 +27,7 @@
 | AddEFFI | LOADW | 128 |
 | AddEFFI | STOREW | 384 |
 | AddEI | FADD | 5,664 |
-| AddFI | FADD | 2,903 |
+| AddFI | FADD | 2,841 <span style="color: green">(-62 [-2.1%])</span> |
 | AddV | FADD | 1,808 |
 | AddVI | FADD | 35,232 |
 | Alloc | FADD | 13,004 |
@@ -54,7 +54,7 @@
 | HintInputVec | HINT_INPUT | 4,032 |
 | IfEq | BNE | 722 |
 | IfEqI | BNE | 11,283 |
-| IfEqI | JAL | 2,147 |
+| IfEqI | JAL | 2,086 <span style="color: green">(-61 [-2.8%])</span> |
 | IfNe | BEQ | 2,129 |
 | IfNe | JAL | 7 |
 | IfNeI | BEQ | 601 |
@@ -93,6 +93,11 @@
 | SubVI | FSUB | 3,789 |
 | SubVIN | FSUB | 400 |
 
+</details>
+
+<details>
+<summary>Click to expand</summary>
+
 | air_name | dsl_ir | opcode | cells_used |
 | --- | --- | --- | --- |
 | Audit |  | JAL | 19 |
@@ -110,12 +115,12 @@
 | AccessAdapter<2> | AddEFFI | STOREW | 132 |
 | Audit | AddEFFI | STOREW | 912 |
 | CoreAir | AddEFFI | STOREW | 24,960 |
-| AccessAdapter<2> | AddEI | FADD | 24,442 |
-| AccessAdapter<4> | AddEI | FADD | 14,443 |
+| AccessAdapter<2> | AddEI | FADD | 24,354 <span style="color: green">(-88 [-0.4%])</span> |
+| AccessAdapter<4> | AddEI | FADD | 14,391 <span style="color: green">(-52 [-0.4%])</span> |
 | Audit | AddEI | FADD | 760 |
 | FieldArithmeticAir | AddEI | FADD | 175,584 |
 | Audit | AddFI | FADD | 627 |
-| FieldArithmeticAir | AddFI | FADD | 89,993 |
+| FieldArithmeticAir | AddFI | FADD | 88,071 <span style="color: green">(-1,922 [-2.1%])</span> |
 | Audit | AddV | FADD | 19 |
 | FieldArithmeticAir | AddV | FADD | 56,048 |
 | Audit | AddVI | FADD | 61,484 |
@@ -158,7 +163,7 @@
 | CoreAir | HintInputVec | HINT_INPUT | 262,080 |
 | CoreAir | IfEq | BNE | 46,930 |
 | CoreAir | IfEqI | BNE | 733,395 |
-| CoreAir | IfEqI | JAL | 139,555 |
+| CoreAir | IfEqI | JAL | 135,590 <span style="color: green">(-3,965 [-2.8%])</span> |
 | CoreAir | IfNe | BEQ | 138,385 |
 | CoreAir | IfNe | JAL | 455 |
 | CoreAir | IfNeI | BEQ | 39,065 |
@@ -191,8 +196,8 @@
 | CoreAir | LoadV | LOADW | 568,490 |
 | Audit | LoadV | LOADW2 | 893 |
 | CoreAir | LoadV | LOADW2 | 1,248,780 |
-| AccessAdapter<2> | MulE | BBE4MUL | 33,396 |
-| AccessAdapter<4> | MulE | BBE4MUL | 19,734 |
+| AccessAdapter<2> | MulE | BBE4MUL | 33,308 <span style="color: green">(-88 [-0.3%])</span> |
+| AccessAdapter<4> | MulE | BBE4MUL | 19,682 <span style="color: green">(-52 [-0.3%])</span> |
 | Audit | MulE | BBE4MUL | 988 |
 | FieldExtensionArithmeticAir | MulE | BBE4MUL | 140,138 |
 | AccessAdapter<2> | MulEF | FMUL | 8,822 |
@@ -265,24 +270,26 @@
 | FieldArithmeticAir | SubVI | FSUB | 117,459 |
 | FieldArithmeticAir | SubVIN | FSUB | 12,400 |
 
+</details>
+
 | air_name | cells | constraints | interactions | main_cols | perm_cols | prep_cols | quotient_deg | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CoreAir | 44,564,480 | 112 | 19 | 65 | 20 | 8 | 524,288 |
+| CoreAir | 44,564,480 | 112 | 19 | 65 | 20 |  | 8 | 524,288 |
 | ProgramAir<BabyBear> | 589,824 | 4 | 1 | 1 | 8 | 9 | 1 | 65,536 |
-| FieldArithmeticAir | 12,320,768 | 23 | 15 | 31 | 16 | 8 | 262,144 |
-| FieldExtensionArithmeticAir | 466,944 | 23 | 15 | 41 | 16 | 8 | 8,192 |
-| Poseidon2VmAir<BabyBear> | 1,826,816 | 373 | 32 | 418 | 28 | 8 | 4,096 |
+| FieldArithmeticAir | 12,320,768 | 23 | 15 | 31 | 16 |  | 8 | 262,144 |
+| FieldExtensionArithmeticAir | 466,944 | 23 | 15 | 41 | 16 |  | 8 | 8,192 |
+| Poseidon2VmAir<BabyBear> | 1,826,816 | 373 | 32 | 418 | 28 |  | 8 | 4,096 |
 | XorLookupAir<8> | 589,824 | 4 | 1 | 1 | 8 | 3 | 1 | 65,536 |
-| MemoryAuditAir | 3,538,944 | 19 | 6 | 19 | 8 | 8 | 131,072 |
-| AccessAdapterAir<2> | 1,507,328 | 11 | 5 | 11 | 12 | 4 | 65,536 |
-| AccessAdapterAir<4> | 819,200 | 11 | 5 | 13 | 12 | 4 | 32,768 |
-| AccessAdapterAir<8> | 237,568 | 11 | 5 | 17 | 12 | 4 | 8,192 |
+| MemoryAuditAir | 3,538,944 | 19 | 6 | 19 | 8 |  | 8 | 131,072 |
+| AccessAdapterAir<2> | 1,507,328 | 11 | 5 | 11 | 12 |  | 4 | 65,536 |
+| AccessAdapterAir<4> | 819,200 | 11 | 5 | 13 | 12 |  | 4 | 32,768 |
+| AccessAdapterAir<8> | 237,568 | 11 | 5 | 17 | 12 |  | 4 | 8,192 |
 | VariableRangeCheckerAir | 1,179,648 | 4 | 1 | 1 | 8 | 2 | 1 | 131,072 |
 | VmConnectorAir | 20 | 4 | 2 | 2 | 8 | 1 | 2 | 2 |
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11132556260/artifacts/2002817258)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/f4eff3a994cc1540c12c7480d746228eb377b803
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11134191396/artifacts/2003308260)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/77deaf85818021199c93277d2f32f72915bf6402
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11132556260)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11134191396)
