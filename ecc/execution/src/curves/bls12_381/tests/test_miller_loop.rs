@@ -6,12 +6,11 @@ use subtle::{Choice, ConditionallySelectable};
 
 use crate::{
     common::EcPoint,
-    curves::bls12_381::{BLS12_381_XI, GNARK_BLS12_381_PBE},
-    miller::{
-        miller_add_step, miller_double_and_add_step, miller_double_step, multi_miller_loop,
-        multi_miller_loop_separate_double_plus_add,
+    curves::bls12_381::{
+        line::{evaluate_line, mul_013_by_013, mul_by_01234, mul_by_013},
+        miller_add_step, miller_double_and_add_step, miller_double_step,
+        multi_miller_loop_separate_double_plus_add, BLS12_381_XI, GNARK_BLS12_381_PBE,
     },
-    operations::{evaluate_line, mul_013_by_013, mul_by_01234, mul_by_013},
 };
 
 #[test]

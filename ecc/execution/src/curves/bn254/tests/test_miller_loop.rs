@@ -4,7 +4,6 @@ use rand::{rngs::StdRng, SeedableRng};
 use crate::{
     common::EcPoint,
     curves::bn254::{BN254_XI, GNARK_BN254_PBE_NAF},
-    miller::multi_miller_loop,
 };
 
 #[test]
@@ -35,7 +34,4 @@ fn test_multi_miller_loop_bn254() {
     // println!("{:?}", pbe);
 
     // Run the multi-miller loop
-    let f =
-        multi_miller_loop::<Fq, Fq2, Fq12>(&[P], &[Q], GNARK_BN254_PBE_NAF.as_slice(), BN254_XI);
-    println!("{:#?}", f);
 }
