@@ -1,7 +1,7 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- |
-| bench_program_inner | 1,201.0 <span style="color: green">(-18.0 [-1.5%])</span> | 1,915,681 | 277,324 | 2.0 |  |
-| inner_verifier | 67,144.0 <span style="color: green">(-478.0 [-0.7%])</span> | 712,704,020 | 384,664,798 | 22,276.0 <span style="color: green">(-151.0 [-0.7%])</span> | 46,434.0 <span style="color: red">(+2,251.0 [+5.1%])</span> |
+| bench_program_inner | 1,203.0 <span style="color: red">(+2.0 [+0.2%])</span> | 1,915,681 | 277,324 | 2.0 |  |
+| inner_verifier | 67,704.0 <span style="color: red">(+560.0 [+0.8%])</span> | 712,704,020 | 384,664,798 | 22,245.0 <span style="color: green">(-31.0 [-0.1%])</span> | 46,398.0 <span style="color: green">(-36.0 [-0.1%])</span> |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -168,7 +168,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11129010592/artifacts/2001691147)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/d1c099fd4ced92fd45e492c18dcdc8f031c7b24d
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11131861767/artifacts/2002618970)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/b973ca95093f8de9284699573136f75f826f622d
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11129010592)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11131861767)
