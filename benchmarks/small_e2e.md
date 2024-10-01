@@ -1,7 +1,7 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- |
-| bench_program_inner | 1,203.0 <span style="color: green">(-2.0 [-0.2%])</span> | 1,915,681 | 277,324 | 2.0 |  |
-| inner_verifier | 67,867.0 <span style="color: green">(-388.0 [-0.6%])</span> | 712,704,020 | 384,664,798 | 34,710.0 <span style="color: red">(+12,540.0 [+56.6%])</span> | 45,958.0 <span style="color: green">(-219.0 [-0.5%])</span> |
+| bench_program_inner | 1,207.0 <span style="color: red">(+4.0 [+0.3%])</span> | 1,915,681 | 277,324 | 2.0 |  |
+| inner_verifier | 67,999.0 <span style="color: red">(+132.0 [+0.2%])</span> | 712,704,020 | 384,664,798 | 34,622.0 <span style="color: green">(-88.0 [-0.3%])</span> | 46,252.0 <span style="color: red">(+294.0 [+0.6%])</span> |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -14,9 +14,6 @@
 | bench_program_inner | Memory 2 | 26 |
 | bench_program_inner | Memory 3 | 13 |
 | bench_program_inner | Memory 4 | 5 |
-| bench_program_inner | Memory 5 |
-| bench_program_inner | Memory 6 |
-| bench_program_inner | Memory 7 |
 | bench_program_inner | Program | 37 |
 | bench_program_inner | RangeChecker | 131,072 |
 | inner_verifier | ByteXor | 65,536 |
@@ -27,12 +24,12 @@
 | inner_verifier | Memory 2 | 1,941,507 |
 | inner_verifier | Memory 3 | 970,798 |
 | inner_verifier | Memory 4 | 33,096 |
-| inner_verifier | Memory 5 |
-| inner_verifier | Memory 6 |
-| inner_verifier | Memory 7 |
 | inner_verifier | Poseidon2 | 20,103 |
 | inner_verifier | Program | 203,951 |
 | inner_verifier | RangeChecker | 131,072 |
+
+<details>
+<summary>Click to expand</summary>
 
 | group | dsl_ir | opcode | frequency |
 | --- | --- | --- | --- |
@@ -130,6 +127,11 @@
 | inner_verifier | SubV | FSUB | 14,028 |
 | inner_verifier | SubVI | FSUB | 1,277 |
 | inner_verifier | SubVIN | FSUB | 357 |
+
+</details>
+
+<details>
+<summary>Click to expand</summary>
 
 | group | air_name | dsl_ir | opcode | cells_used |
 | --- | --- | --- | --- | --- |
@@ -362,36 +364,38 @@
 | inner_verifier | FieldArithmeticAir | SubVI | FSUB | 39,587 |
 | inner_verifier | FieldArithmeticAir | SubVIN | FSUB | 11,067 |
 
+</details>
+
 | group | air_name | cells | constraints | interactions | main_cols | perm_cols | prep_cols | quotient_deg | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| bench_program_inner | CoreAir | 3,360 | 114 | 19 | 61 | 44 | 2 | 32 |
+| bench_program_inner | CoreAir | 3,360 | 114 | 19 | 61 | 44 |  | 2 | 32 |
 | bench_program_inner | ProgramAir<BabyBear> | 576 | 4 | 1 | 1 | 8 | 9 | 1 | 64 |
-| bench_program_inner | FieldArithmeticAir | 1,072 | 28 | 15 | 31 | 36 | 2 | 16 |
-| bench_program_inner | FieldExtensionArithmeticAir | 77 | 28 | 15 | 41 | 36 | 2 | 1 |
-| bench_program_inner | KeccakVmAir | 132,544 | 2,251 | 235 | 3,198 | 944 | 2 | 32 |
+| bench_program_inner | FieldArithmeticAir | 1,072 | 28 | 15 | 31 | 36 |  | 2 | 16 |
+| bench_program_inner | FieldExtensionArithmeticAir | 77 | 28 | 15 | 41 | 36 |  | 2 | 1 |
+| bench_program_inner | KeccakVmAir | 132,544 | 2,251 | 235 | 3,198 | 944 |  | 2 | 32 |
 | bench_program_inner | XorLookupAir<8> | 589,824 | 4 | 1 | 1 | 8 | 3 | 1 | 65,536 |
-| bench_program_inner | MemoryAuditAir | 4,480 | 21 | 6 | 19 | 16 | 2 | 128 |
-| bench_program_inner | AccessAdapterAir<2> | 2,240 | 14 | 5 | 11 | 24 | 2 | 64 |
-| bench_program_inner | AccessAdapterAir<4> | 1,184 | 14 | 5 | 13 | 24 | 2 | 32 |
-| bench_program_inner | AccessAdapterAir<8> | 656 | 14 | 5 | 17 | 24 | 2 | 16 |
+| bench_program_inner | MemoryAuditAir | 4,480 | 21 | 6 | 19 | 16 |  | 2 | 128 |
+| bench_program_inner | AccessAdapterAir<2> | 2,240 | 14 | 5 | 11 | 24 |  | 2 | 64 |
+| bench_program_inner | AccessAdapterAir<4> | 1,184 | 14 | 5 | 13 | 24 |  | 2 | 32 |
+| bench_program_inner | AccessAdapterAir<8> | 656 | 14 | 5 | 17 | 24 |  | 2 | 16 |
 | bench_program_inner | VariableRangeCheckerAir | 1,179,648 | 4 | 1 | 1 | 8 | 2 | 1 | 131,072 |
 | bench_program_inner | VmConnectorAir | 20 | 4 | 2 | 2 | 8 | 1 | 2 | 2 |
-| inner_verifier | CoreAir | 356,515,840 | 112 | 19 | 65 | 20 | 8 | 4,194,304 |
+| inner_verifier | CoreAir | 356,515,840 | 112 | 19 | 65 | 20 |  | 8 | 4,194,304 |
 | inner_verifier | ProgramAir<BabyBear> | 2,359,296 | 4 | 1 | 1 | 8 | 9 | 1 | 262,144 |
-| inner_verifier | FieldArithmeticAir | 98,566,144 | 23 | 15 | 31 | 16 | 8 | 2,097,152 |
-| inner_verifier | FieldExtensionArithmeticAir | 59,768,832 | 23 | 15 | 41 | 16 | 8 | 1,048,576 |
-| inner_verifier | Poseidon2VmAir<BabyBear> | 14,614,528 | 373 | 32 | 418 | 28 | 8 | 32,768 |
+| inner_verifier | FieldArithmeticAir | 98,566,144 | 23 | 15 | 31 | 16 |  | 8 | 2,097,152 |
+| inner_verifier | FieldExtensionArithmeticAir | 59,768,832 | 23 | 15 | 41 | 16 |  | 8 | 1,048,576 |
+| inner_verifier | Poseidon2VmAir<BabyBear> | 14,614,528 | 373 | 32 | 418 | 28 |  | 8 | 32,768 |
 | inner_verifier | XorLookupAir<8> | 589,824 | 4 | 1 | 1 | 8 | 3 | 1 | 65,536 |
-| inner_verifier | MemoryAuditAir | 28,311,552 | 19 | 6 | 19 | 8 | 8 | 1,048,576 |
-| inner_verifier | AccessAdapterAir<2> | 96,468,992 | 11 | 5 | 11 | 12 | 4 | 4,194,304 |
-| inner_verifier | AccessAdapterAir<4> | 52,428,800 | 11 | 5 | 13 | 12 | 4 | 2,097,152 |
-| inner_verifier | AccessAdapterAir<8> | 1,900,544 | 11 | 5 | 17 | 12 | 4 | 65,536 |
+| inner_verifier | MemoryAuditAir | 28,311,552 | 19 | 6 | 19 | 8 |  | 8 | 1,048,576 |
+| inner_verifier | AccessAdapterAir<2> | 96,468,992 | 11 | 5 | 11 | 12 |  | 4 | 4,194,304 |
+| inner_verifier | AccessAdapterAir<4> | 52,428,800 | 11 | 5 | 13 | 12 |  | 4 | 2,097,152 |
+| inner_verifier | AccessAdapterAir<8> | 1,900,544 | 11 | 5 | 17 | 12 |  | 4 | 65,536 |
 | inner_verifier | VariableRangeCheckerAir | 1,179,648 | 4 | 1 | 1 | 8 | 2 | 1 | 131,072 |
 | inner_verifier | VmConnectorAir | 20 | 4 | 2 | 2 | 8 | 1 | 2 | 2 |
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11132556260/artifacts/2002862653)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/f4eff3a994cc1540c12c7480d746228eb377b803
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11134191396/artifacts/2003332726)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/77deaf85818021199c93277d2f32f72915bf6402
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11132556260)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11134191396)
