@@ -33,13 +33,16 @@ fn test_multi_miller_loop_bls12_381() {
 
     // Compare against halo2curves implementation
     let g2_prepared = G2Prepared::from(Q);
+    println!("test1");
     let compare_miller = halo2curves_axiom::bls12_381::multi_miller_loop(&[(&P, &g2_prepared)]);
+    println!("test2");
     let compare_final = compare_miller.final_exponentiation();
+    println!("compare_final: {:?}", compare_final.0.c0.c0);
     // let compare_final = halo2curves_axiom::bls12_381::pairing(&P, &Q);
 
     // Run the multi-miller loop
     // let f = multi_miller_loop::<Fq, Fq2, Fq12>(
-    let f = multi_miller_loop_separate_double_plus_add::<Fq, Fq2, Fq12>(
+    let f = multi_miller_loop_separate_double_plus_add(
         &[P_ecpoint],
         &[Q_ecpoint],
         GNARK_BLS12_381_PBE.as_slice(),

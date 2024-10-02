@@ -293,17 +293,18 @@ where
     f
 }
 
+use halo2curves_axiom::bls12_381::{Fq as Fp, Fq12 as Fp12, Fq2 as Fp2};
 #[allow(non_snake_case)]
-pub fn multi_miller_loop_separate_double_plus_add<Fp, Fp2, Fp12>(
+pub fn multi_miller_loop_separate_double_plus_add(
     P: &[EcPoint<Fp>],
     Q: &[EcPoint<Fp2>],
     _pseudo_binary_encoding: &[i32],
     xi: Fp2,
 ) -> Fp12
-where
-    Fp: Field,
-    Fp2: FieldExtension<2, BaseField = Fp>,
-    Fp12: FieldExtension<6, BaseField = Fp2>,
+// where
+//     Fp: Field,
+//     Fp2: FieldExtension<2, BaseField = Fp>,
+//     Fp12: FieldExtension<6, BaseField = Fp2>,
 {
     pub const BLS_X: u64 = 0xd201_0000_0001_0000;
     assert!(P.len() > 0);
@@ -324,13 +325,23 @@ where
     let mut total_double_add = 0;
 
     let mut found_one = false;
+    let mut counter = 0;
     for i in (0..64).rev().map(|b| (((BLS_X >> 1) >> b) & 1) == 1) {
         if !found_one {
             found_one = i;
+            println!("going to continue! found_one: {}", found_one);
             continue;
         }
         let i_binary = i as u8;
-        println!("miller i: {} = {}; Q_acc.x: {:?}", i, i_binary, Q_acc[0].x);
+        // println!("miller i: {} = {}; Q_acc.x: {:?}", i, i_binary, Q_acc[0].x);
+        counter += 1;
+
+        let tmp = halo2curves_axiom::bls12_381::MillerLoopResult(f);
+        println!(
+            "counter: {} final expo: {:?}",
+            counter,
+            tmp.final_exponentiation().0.c1.c0
+        );
 
         // Do double step
         let (Q_out, lines_2S) = Q_acc
@@ -341,8 +352,9 @@ where
 
         let lines_iter = izip!(lines_2S.iter(), x_over_ys.iter(), y_invs.iter());
         for (line_2S, x_over_y, y_inv) in lines_iter {
-            let line = &evaluate_line::<Fp, Fp2>(*line_2S, *x_over_y, *y_inv);
-            lines.push(*line);
+            let line = evaluate_line::<Fp, Fp2>(*line_2S, *x_over_y, *y_inv);
+            f = evaluate_lines::<Fp, Fp2, Fp12>(f, vec![line], xi);
+            lines.push(line);
         }
 
         if i {
@@ -361,8 +373,9 @@ where
                 y_invs.iter()
             );
             for (lines_S_plus_Q, x_over_y, y_inv) in lines_iter {
-                let line = &evaluate_line::<Fp, Fp2>(*lines_S_plus_Q, *x_over_y, *y_inv);
-                lines.push(*line);
+                let line = evaluate_line::<Fp, Fp2>(*lines_S_plus_Q, *x_over_y, *y_inv);
+                f = evaluate_lines::<Fp, Fp2, Fp12>(f, vec![line], xi);
+                lines.push(line);
             }
 
             // Debug counter
@@ -371,7 +384,6 @@ where
             // Debug counter
             total_double += 1;
         }
-
         f = fp12_square::<Fp12>(f);
     }
 
@@ -384,8 +396,9 @@ where
 
     let lines_iter = izip!(lines_2S.iter(), x_over_ys.iter(), y_invs.iter());
     for (line_2S, x_over_y, y_inv) in lines_iter {
-        let line = &evaluate_line::<Fp, Fp2>(*line_2S, *x_over_y, *y_inv);
-        lines.push(*line);
+        let line = evaluate_line::<Fp, Fp2>(*line_2S, *x_over_y, *y_inv);
+        f = evaluate_lines::<Fp, Fp2, Fp12>(f, vec![line], xi);
+        lines.push(line);
     }
 
     // Debug counter
@@ -393,9 +406,18 @@ where
 
     println!("miller: total double: {total_double}, total double&add: {total_double_add}");
 
-    f = evaluate_lines::<Fp, Fp2, Fp12>(f, lines, xi);
+    println!("lines: {:?}", lines.len());
+    // f = evaluate_lines::<Fp, Fp2, Fp12>(f, lines, xi);
+    let tmp = halo2curves_axiom::bls12_381::MillerLoopResult(f);
+    println!(
+        "before conjugate final expo: {:?}",
+        tmp.final_exponentiation().0.c1.c0
+    );
 
-    f.conjugate();
+    f = f.conjugate();
+
+    let tmp = halo2curves_axiom::bls12_381::MillerLoopResult(f);
+    println!("final final expo: {:?}", tmp.final_exponentiation().0.c1.c0);
 
     f
 }
