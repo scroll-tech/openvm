@@ -3,9 +3,8 @@ use itertools::{izip, Itertools};
 
 use crate::{
     common::{EcPoint, FieldExtension},
-    curves::{
-        bls12_381::{evaluate_line, mul_013_by_013, mul_by_01234, mul_by_013},
-        fp12_square, q_signed,
+    curves::bls12_381::{
+        evaluate_line, fp12_square, mul_023_by_023, mul_by_012345, mul_by_023, q_signed,
     },
 };
 
@@ -226,7 +225,7 @@ where
 
             // // Gnark implementation
             // for line in lines.iter() {
-            //     f = mul_by_013::<Fp, Fp2, Fp12>(f, *line);
+            //     f = mul_by_023::<Fp, Fp2, Fp12>(f, *line);
             // }
         } else {
             // use embedded exponent technique if c is provided
@@ -276,8 +275,8 @@ where
             // // Gnark implementation
             // for chunk in lines.chunks(2) {
             //     if let [line0, line1] = chunk {
-            //         let prod = mul_013_by_013(*line0, *line1, xi);
-            //         f = mul_by_01234(f, prod);
+            //         let prod = mul_023_by_023(*line0, *line1, xi);
+            //         f = mul_by_012345(f, prod);
             //     } else {
             //         panic!("lines.len() % 2 should be 0 at this point");
             //     }
@@ -287,12 +286,12 @@ where
     println!("miller: total double: {total_double}, total double&add: {total_double_add}");
 
     if lines.len() % 2 == 1 {
-        f = mul_by_013::<Fp, Fp2, Fp12>(f, lines.pop().unwrap());
+        f = mul_by_023::<Fp, Fp2, Fp12>(f, lines.pop().unwrap());
     }
     for chunk in lines.chunks(2) {
         if let [line0, line1] = chunk {
-            let prod = mul_013_by_013(*line0, *line1, xi);
-            f = mul_by_01234(f, prod);
+            let prod = mul_023_by_023(*line0, *line1, xi);
+            f = mul_by_012345(f, prod);
         } else {
             panic!("lines.len() % 2 should be 0 at this point");
         }
@@ -358,7 +357,7 @@ where
 
         // Gnark implementation
         // for line in lines.iter() {
-        //     f = mul_by_013::<Fp, Fp2, Fp12>(f, *line);
+        //     f = mul_by_023::<Fp, Fp2, Fp12>(f, *line);
         // }
         // lines = Vec::new();
 
@@ -396,8 +395,8 @@ where
             // // Gnark implementation
             // for chunk in lines.chunks(2) {
             //     if let [line0, line1] = chunk {
-            //         let prod = mul_013_by_013(*line0, *line1, xi);
-            //         f = mul_by_01234(f, prod);
+            //         let prod = mul_023_by_023(*line0, *line1, xi);
+            //         f = mul_by_012345(f, prod);
             //     } else {
             //         panic!("lines.len() % 2 should be 0 at this point");
             //     }
@@ -408,12 +407,12 @@ where
         }
 
         if lines.len() % 2 == 1 {
-            f = mul_by_013::<Fp, Fp2, Fp12>(f, lines.pop().unwrap());
+            f = mul_by_023::<Fp, Fp2, Fp12>(f, lines.pop().unwrap());
         }
         for chunk in lines.chunks(2) {
             if let [line0, line1] = chunk {
-                let prod = mul_013_by_013(*line0, *line1, xi);
-                f = mul_by_01234(f, prod);
+                let prod = mul_023_by_023(*line0, *line1, xi);
+                f = mul_by_012345(f, prod);
             } else {
                 panic!("lines.len() % 2 should be 0 at this point");
             }
@@ -438,7 +437,7 @@ where
 
     // Gnark implementation
     for line in lines.iter() {
-        f = mul_by_013::<Fp, Fp2, Fp12>(f, *line);
+        f = mul_by_023::<Fp, Fp2, Fp12>(f, *line);
     }
 
     // Debug counter

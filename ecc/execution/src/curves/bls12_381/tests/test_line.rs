@@ -6,9 +6,9 @@ use rand::{rngs::StdRng, SeedableRng};
 
 use crate::{
     common::EcPoint,
-    curves::{
-        bls12_381::{mul_013_by_013, mul_by_01234, mul_by_013, BLS12_381_XI},
-        conv_013_to_fp12, conv_fp2_coeffs_to_fp12, fp12_square, point_to_013,
+    curves::bls12_381::{
+        conv_023_to_fp12, conv_fp2_coeffs_to_fp12, fp12_square, mul_023_by_023, mul_by_012345,
+        mul_by_023, point_to_023, BLS12_381_XI,
     },
 };
 
@@ -29,7 +29,7 @@ fn test_evaluate_line() {
 }
 
 #[test]
-fn test_mul_013_by_013() {
+fn test_mul_023_by_023() {
     // Generate random curve points
     let mut rng = StdRng::seed_from_u64(8);
     let rnd_pt_0 = G1Affine::random(&mut rng);
@@ -44,22 +44,22 @@ fn test_mul_013_by_013() {
     };
 
     // Get lines evaluated at rnd_pt_0 and rnd_pt_1
-    let line_0 = point_to_013::<Fq, Fq2>(ec_point_0);
-    let line_1 = point_to_013::<Fq, Fq2>(ec_point_1);
+    let line_0 = point_to_023::<Fq, Fq2>(ec_point_0);
+    let line_1 = point_to_023::<Fq, Fq2>(ec_point_1);
 
     // Multiply the two line functions & convert to Fq12 to compare
-    let mul_013_by_013 = mul_013_by_013::<Fq, Fq2>(line_0, line_1, BLS12_381_XI);
-    let mul_013_by_013 = conv_fp2_coeffs_to_fp12::<Fq, Fq2, Fq12>(&mul_013_by_013);
+    let mul_023_by_023 = mul_023_by_023::<Fq, Fq2>(line_0, line_1, BLS12_381_XI);
+    let mul_023_by_023 = conv_fp2_coeffs_to_fp12::<Fq, Fq2, Fq12>(&mul_023_by_023);
 
     // Compare with the result of multiplying two Fp12 elements
-    let fp12_0 = conv_013_to_fp12::<Fq, Fq2, Fq12>(line_0);
-    let fp12_1 = conv_013_to_fp12::<Fq, Fq2, Fq12>(line_1);
+    let fp12_0 = conv_023_to_fp12::<Fq, Fq2, Fq12>(line_0);
+    let fp12_1 = conv_023_to_fp12::<Fq, Fq2, Fq12>(line_1);
     let check_mul_fp12 = fp12_0 * fp12_1;
-    assert_eq!(mul_013_by_013, check_mul_fp12);
+    assert_eq!(mul_023_by_023, check_mul_fp12);
 }
 
 #[test]
-fn test_mul_by_013() {
+fn test_mul_by_023() {
     let mut rng = StdRng::seed_from_u64(8);
     let f = Fq12::random(&mut rng);
     let rnd_pt = G1Affine::random(&mut rng);
@@ -67,16 +67,16 @@ fn test_mul_by_013() {
         x: rnd_pt.x,
         y: rnd_pt.y,
     };
-    let line = point_to_013::<Fq, Fq2>(ec_point);
-    let mul_by_013 = mul_by_013::<Fq, Fq2, Fq12>(f, line);
-    println!("{:#?}", mul_by_013);
+    let line = point_to_023::<Fq, Fq2>(ec_point);
+    let mul_by_023 = mul_by_023::<Fq, Fq2, Fq12>(f, line);
+    println!("{:#?}", mul_by_023);
 
-    let check_mul_fp12 = conv_013_to_fp12::<Fq, Fq2, Fq12>(line) * f;
-    assert_eq!(mul_by_013, check_mul_fp12);
+    let check_mul_fp12 = conv_023_to_fp12::<Fq, Fq2, Fq12>(line) * f;
+    assert_eq!(mul_by_023, check_mul_fp12);
 }
 
 #[test]
-fn test_mul_by_01234() {
+fn test_mul_by_012345() {
     let mut rng = StdRng::seed_from_u64(8);
     let f = Fq12::random(&mut rng);
     let x = [
@@ -85,9 +85,10 @@ fn test_mul_by_01234() {
         Fq2::random(&mut rng),
         Fq2::random(&mut rng),
         Fq2::random(&mut rng),
+        Fq2::random(&mut rng),
     ];
-    let mul_by_01234 = mul_by_01234::<Fq, Fq2, Fq12>(f, x);
+    let mul_by_012345 = mul_by_012345::<Fq, Fq2, Fq12>(f, x);
 
     let x_f12 = conv_fp2_coeffs_to_fp12::<Fq, Fq2, Fq12>(&x);
-    assert_eq!(mul_by_01234, f * x_f12);
+    assert_eq!(mul_by_012345, f * x_f12);
 }

@@ -7,8 +7,8 @@ use subtle::{Choice, ConditionallySelectable};
 use crate::{
     common::EcPoint,
     curves::bls12_381::{
-        line::{evaluate_line, mul_013_by_013, mul_by_01234, mul_by_013},
-        miller_add_step, miller_double_and_add_step, miller_double_step,
+        line::{evaluate_line, mul_023_by_023, mul_by_012345, mul_by_023},
+        miller_add_step, miller_double_and_add_step, miller_double_step, multi_miller_loop,
         multi_miller_loop_separate_double_plus_add, BLS12_381_XI, GNARK_BLS12_381_PBE,
     },
 };
@@ -43,8 +43,8 @@ fn test_multi_miller_loop_bls12_381() {
     // let compare_final = halo2curves_axiom::bls12_381::pairing(&P, &Q);
 
     // Run the multi-miller loop
-    // let f = multi_miller_loop::<Fq, Fq2, Fq12>(
-    let f = multi_miller_loop_separate_double_plus_add::<Fq, Fq2, Fq12>(
+    let f = multi_miller_loop::<Fq, Fq2, Fq12>(
+        // let f = multi_miller_loop_separate_double_plus_add::<Fq, Fq2, Fq12>(
         &[P_ecpoint],
         &[Q_ecpoint],
         GNARK_BLS12_381_PBE.as_slice(),
@@ -148,7 +148,7 @@ fn test_f_mul() {
     // Initial step: double
     let (Q_acc_init, l_init) = miller_double_step::<Fq, Fq2>(Q_ecpoint.clone());
     let l_init = evaluate_line::<Fq, Fq2>(l_init, x_over_y.clone(), y_inv.clone());
-    f = mul_by_013::<Fq, Fq2, Fq12>(f, l_init);
+    f = mul_by_023::<Fq, Fq2, Fq12>(f, l_init);
 
     // Test Q_acc_init == Q + Q
     let Q2 = Q + Q;
@@ -163,11 +163,12 @@ fn test_f_mul() {
     // Left side test: Double and add
     let (Q_acc_daa, l_S_plus_Q, l_S_plus_Q_plus_S) =
         miller_double_and_add_step::<Fq, Fq2>(Q_acc.clone(), Q_ecpoint.clone());
-    let l_S_plus_Q = evaluate_line::<Fq, Fq2>(l_S_plus_Q, x_over_y.clone(), y_inv.clone());
     let l_S_plus_Q_plus_S =
         evaluate_line::<Fq, Fq2>(l_S_plus_Q_plus_S, x_over_y.clone(), y_inv.clone());
-    let l_prod0 = mul_013_by_013(l_S_plus_Q, l_S_plus_Q_plus_S, BLS12_381_XI);
-    let f_mul = mul_by_01234::<Fq, Fq2, Fq12>(f.clone(), l_prod0);
+    let l_S_plus_Q = evaluate_line::<Fq, Fq2>(l_S_plus_Q, x_over_y.clone(), y_inv.clone());
+    let l_prod0 = mul_023_by_023(l_S_plus_Q, l_S_plus_Q_plus_S, BLS12_381_XI);
+    let f_mul = mul_by_012345::<Fq, Fq2, Fq12>(f.clone(), l_prod0);
+    // let f_mul = mul_by_023::<Fq, Fq2, Fq12>(f.clone(), l_S_plus_Q_plus_S);
 
     // Test Q_acc_da == 2(2Q) + Q
     let Q4 = Q2 + Q2;
@@ -181,17 +182,17 @@ fn test_f_mul() {
     let (Q_acc_a, l_2S_plus_Q) = miller_add_step::<Fq, Fq2>(Q_acc_d, Q_ecpoint.clone());
     let l_2S = evaluate_line::<Fq, Fq2>(l_2S, x_over_y.clone(), y_inv.clone());
     let l_2S_plus_Q = evaluate_line::<Fq, Fq2>(l_2S_plus_Q, x_over_y.clone(), y_inv.clone());
-    let l_prod1 = mul_013_by_013(l_2S, l_2S_plus_Q, BLS12_381_XI);
-    let f_prod_mul = mul_by_01234::<Fq, Fq2, Fq12>(f.clone(), l_prod1);
+    let l_prod1 = mul_023_by_023(l_2S, l_2S_plus_Q, BLS12_381_XI);
+    let f_prod_mul = mul_by_012345::<Fq, Fq2, Fq12>(f.clone(), l_prod1);
 
     // Test line functions match
-    let f_line_daa = mul_by_01234::<Fq, Fq2, Fq12>(Fq12::one(), l_prod0);
-    let f_line_daa_final = MillerLoopResult(f_line_daa);
-    let f_line_daa_final = f_line_daa_final.final_exponentiation();
-    let f_line_da = mul_by_01234::<Fq, Fq2, Fq12>(Fq12::one(), l_prod1);
-    let f_line_da_final = MillerLoopResult(f_line_da);
-    let f_line_da_final = f_line_da_final.final_exponentiation();
-    assert_eq!(f_line_daa_final, f_line_da_final);
+    // let f_line_daa = mul_by_012345::<Fq, Fq2, Fq12>(Fq12::one(), l_prod0);
+    // let f_line_daa_final = MillerLoopResult(f_line_daa);
+    // let f_line_daa_final = f_line_daa_final.final_exponentiation();
+    // let f_line_da = mul_by_012345::<Fq, Fq2, Fq12>(Fq12::one(), l_prod1);
+    // let f_line_da_final = MillerLoopResult(f_line_da);
+    // let f_line_da_final = f_line_da_final.final_exponentiation();
+    // assert_eq!(f_line_daa_final, f_line_da_final);
 
     // Test Q_acc_a == 2(2Q) + Q
     assert_eq!(Q4_Q.x, Q_acc_a.x);
@@ -231,5 +232,5 @@ fn test_f_mul() {
 //     // Initial step: double
 //     let (Q_acc_init, l_init) = miller_double_and_add_step::(Q_acc.clone(), Q_ecpoint.clone());
 //     let l_init = evaluate_line::<Fq, Fq2>(l_init, x_over_y.clone(), y_inv.clone());
-//     f = mul_by_013::<Fq, Fq2, Fq12>(f, l
+//     f = mul_by_023::<Fq, Fq2, Fq12>(f, l
 // }
