@@ -7,8 +7,8 @@ use rand::{rngs::StdRng, SeedableRng};
 use crate::{
     common::EcPoint,
     curves::bls12_381::{
-        conv_023_to_fp12, conv_fp2_coeffs_to_fp12, fp12_square, mul_023_by_023, mul_by_012345,
-        mul_by_023, point_to_023, BLS12_381_XI,
+        conv_023_to_fp12, conv_fp2_coeffs_to_fp12, fp12_square, mul_023_by_023, mul_by_023,
+        mul_by_02345, point_to_023, BLS12_381_XI,
     },
 };
 
@@ -76,7 +76,7 @@ fn test_mul_by_023() {
 }
 
 #[test]
-fn test_mul_by_012345() {
+fn test_mul_by_02345() {
     let mut rng = StdRng::seed_from_u64(8);
     let f = Fq12::random(&mut rng);
     let x = [
@@ -87,8 +87,8 @@ fn test_mul_by_012345() {
         Fq2::random(&mut rng),
         Fq2::random(&mut rng),
     ];
-    let mul_by_012345 = mul_by_012345::<Fq, Fq2, Fq12>(f, x);
+    let mul_by_02345 = mul_by_02345::<Fq, Fq2, Fq12>(f, x);
 
     let x_f12 = conv_fp2_coeffs_to_fp12::<Fq, Fq2, Fq12>(&x);
-    assert_eq!(mul_by_012345, f * x_f12);
+    assert_eq!(mul_by_02345, f * x_f12);
 }

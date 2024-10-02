@@ -50,13 +50,13 @@ where
     Fp2: FieldExtension<2, BaseField = Fp>,
     Fp12: FieldExtension<6, BaseField = Fp2>,
 {
-    mul_by_012345(
+    mul_by_02345(
         f,
         [line[0], Fp2::ZERO, line[1], Fp2::ONE, Fp2::ZERO, Fp2::ZERO],
     )
 }
 
-pub fn mul_by_012345<Fp, Fp2, Fp12>(f: Fp12, x: [Fp2; 6]) -> Fp12
+pub fn mul_by_02345<Fp, Fp2, Fp12>(f: Fp12, x: [Fp2; 6]) -> Fp12
 where
     Fp: Field,
     Fp2: FieldExtension<2, BaseField = Fp>,

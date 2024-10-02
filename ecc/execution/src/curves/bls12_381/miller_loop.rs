@@ -4,7 +4,7 @@ use itertools::{izip, Itertools};
 use crate::{
     common::{EcPoint, FieldExtension},
     curves::bls12_381::{
-        evaluate_line, fp12_square, mul_023_by_023, mul_by_012345, mul_by_023, q_signed,
+        evaluate_line, fp12_square, mul_023_by_023, mul_by_023, mul_by_02345, q_signed,
     },
 };
 
@@ -223,11 +223,6 @@ where
 
             // Debug counter
             total_double += 1;
-
-            // // Gnark implementation
-            // for line in lines.iter() {
-            //     f = mul_by_023::<Fp, Fp2, Fp12>(f, *line);
-            // }
         } else {
             // use embedded exponent technique if c is provided
             // f = if let Some(c) = c {
@@ -257,50 +252,44 @@ where
                 x_over_ys.iter(),
                 y_invs.iter()
             );
-            // let mut lines0 = Vec::<[Fp2; 2]>::new();
-            // let mut lines1 = Vec::<[Fp2; 2]>::new();
             for (line_S_plus_Q, line_S_plus_Q_plus_S, x_over_y, y_inv) in lines_iter {
                 let line0 = evaluate_line::<Fp, Fp2>(*line_S_plus_Q, *x_over_y, *y_inv);
                 let line1 = evaluate_line::<Fp, Fp2>(*line_S_plus_Q_plus_S, *x_over_y, *y_inv);
-                // lines0.push(line0);
-                // lines1.push(line1);
                 lines.push(line0);
                 lines.push(line1);
             }
-            // let lines_concat = [lines0, lines1].concat();
-            // lines.extend(lines_concat);
 
             // Debug counter
             total_double_add += 1;
-
-            // // Gnark implementation
-            // for chunk in lines.chunks(2) {
-            //     if let [line0, line1] = chunk {
-            //         let prod = mul_023_by_023(*line0, *line1, xi);
-            //         f = mul_by_012345(f, prod);
-            //     } else {
-            //         panic!("lines.len() % 2 should be 0 at this point");
-            //     }
-            // }
         };
     }
     println!("miller: total double: {total_double}, total double&add: {total_double_add}");
 
+    f = evaluate_lines::<Fp, Fp2, Fp12>(f, lines, xi);
+
+    // We conjugate here f since the x value of BLS12-381 is *negative* 0xd201000000010000
+    f.conjugate();
+
+    f
+}
+
+pub fn evaluate_lines<Fp, Fp2, Fp12>(mut f: Fp12, mut lines: Vec<[Fp2; 2]>, xi: Fp2) -> Fp12
+where
+    Fp: Field,
+    Fp2: FieldExtension<2, BaseField = Fp>,
+    Fp12: FieldExtension<6, BaseField = Fp2>,
+{
     if lines.len() % 2 == 1 {
         f = mul_by_023::<Fp, Fp2, Fp12>(f, lines.pop().unwrap());
     }
     for chunk in lines.chunks(2) {
         if let [line0, line1] = chunk {
             let prod = mul_023_by_023(*line0, *line1, xi);
-            f = mul_by_012345(f, prod);
+            f = mul_by_02345(f, prod);
         } else {
             panic!("lines.len() % 2 should be 0 at this point");
         }
     }
-
-    // NOTE: match gnark implementation
-    // f.conjugate();
-
     f
 }
 
@@ -329,6 +318,7 @@ where
 
     let mut f = Fp12::ONE;
     let mut Q_acc = Q.to_vec();
+    let mut lines = Vec::<[Fp2; 2]>::new();
 
     let mut total_double = 0;
     let mut total_double_add = 0;
@@ -341,7 +331,6 @@ where
         }
         let i_binary = i as u8;
         println!("miller i: {} = {}; Q_acc.x: {:?}", i, i_binary, Q_acc[0].x);
-        let mut lines = Vec::<[Fp2; 2]>::new();
 
         // Do double step
         let (Q_out, lines_2S) = Q_acc
@@ -356,12 +345,6 @@ where
             lines.push(*line);
         }
 
-        // Gnark implementation
-        // for line in lines.iter() {
-        //     f = mul_by_023::<Fp, Fp2, Fp12>(f, *line);
-        // }
-        // lines = Vec::new();
-
         if i {
             // Do add step
             let (Q_out_add, lines_S_plus_Q) = Q_acc
@@ -372,56 +355,25 @@ where
             Q_acc = Q_out_add;
 
             let lines_iter = izip!(
-                lines_2S.iter(),
+                // lines_2S.iter(),
                 lines_S_plus_Q.iter(),
                 x_over_ys.iter(),
                 y_invs.iter()
             );
-            let mut lines0 = Vec::<[Fp2; 2]>::new();
-            let mut lines1 = Vec::<[Fp2; 2]>::new();
-            for (line0, line1, x_over_y, y_inv) in lines_iter {
-                let line0 = &evaluate_line::<Fp, Fp2>(*line0, *x_over_y, *y_inv);
-                let line1 = &evaluate_line::<Fp, Fp2>(*line1, *x_over_y, *y_inv);
-                lines0.push(*line0);
-                lines1.push(*line1);
-                // lines.push(*line0);
-                // lines.push(*line1);
+            for (lines_S_plus_Q, x_over_y, y_inv) in lines_iter {
+                let line = &evaluate_line::<Fp, Fp2>(*lines_S_plus_Q, *x_over_y, *y_inv);
+                lines.push(*line);
             }
-            let lines_concat = [lines0, lines1].concat();
-            lines.extend(lines_concat);
 
             // Debug counter
             total_double_add += 1;
-
-            // // Gnark implementation
-            // for chunk in lines.chunks(2) {
-            //     if let [line0, line1] = chunk {
-            //         let prod = mul_023_by_023(*line0, *line1, xi);
-            //         f = mul_by_012345(f, prod);
-            //     } else {
-            //         panic!("lines.len() % 2 should be 0 at this point");
-            //     }
-            // }
         } else {
             // Debug counter
             total_double += 1;
         }
 
-        if lines.len() % 2 == 1 {
-            f = mul_by_023::<Fp, Fp2, Fp12>(f, lines.pop().unwrap());
-        }
-        for chunk in lines.chunks(2) {
-            if let [line0, line1] = chunk {
-                let prod = mul_023_by_023(*line0, *line1, xi);
-                f = mul_by_012345(f, prod);
-            } else {
-                panic!("lines.len() % 2 should be 0 at this point");
-            }
-        }
-
         f = fp12_square::<Fp12>(f);
     }
-    let mut lines = Vec::<[Fp2; 2]>::new();
 
     // Do double step
     let (Q_out, lines_2S) = Q_acc
@@ -436,15 +388,12 @@ where
         lines.push(*line);
     }
 
-    // Gnark implementation
-    for line in lines.iter() {
-        f = mul_by_023::<Fp, Fp2, Fp12>(f, *line);
-    }
-
     // Debug counter
     total_double += 1;
 
     println!("miller: total double: {total_double}, total double&add: {total_double_add}");
+
+    f = evaluate_lines::<Fp, Fp2, Fp12>(f, lines, xi);
 
     f.conjugate();
 
