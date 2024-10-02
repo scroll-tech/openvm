@@ -31,15 +31,15 @@ where
     let Q_acc = EcPoint { x: x_2S, y: y_2S };
 
     // Tangent line
-    //   1 + b' (x_P / y_P) w + c' (1 / y_P) w^3
+    //   1 + b' (x_P / y_P) w^-1 + c' (1 / y_P) w^-3
     // where
-    //   l_{\Psi(S),\Psi(S)}(P) = 1 - λ (x_P / y_P) w + (λ * x_S - y_S) (1 / y_P) w^3
-    // b = - λ
-    // c = λ * x_S - y_S
-    let b = lambda.neg();
-    let c = lambda * x - y;
+    //   l_{\Psi(S),\Psi(S)}(P) = (λ * x_S - y_S) (1 / y_P)  - λ (x_P / y_P) w^2 + w^3
+    // x0 = λ * x_S - y_S
+    // x2 = - λ
+    let x0 = lambda * x - y;
+    let x2 = lambda.neg();
 
-    (Q_acc, [b, c])
+    (Q_acc, [x0, x2])
 }
 
 #[allow(non_snake_case)]
@@ -64,11 +64,11 @@ where
         y: y_s_plus_q,
     };
 
-    // l_{\Psi(S),\Psi(Q)}(P) = 1 - λ_1 (x_P / y_P) w + (λ_1 * x_S - y_S) (1 / y_P) w^3
-    let b = -lambda;
-    let c = lambda * x_s - y_s;
+    // l_{\Psi(S),\Psi(Q)}(P) = (λ_1 * x_S - y_S) (1 / y_P) - λ_1 (x_P / y_P) w^2 + w^3
+    let x0 = lambda * x_s - y_s;
+    let x2 = -lambda;
 
-    (res, [b, c])
+    (res, [x0, x2])
 }
 
 #[allow(non_snake_case)]
@@ -103,15 +103,16 @@ where
         y: y_s_plus_q_plus_s,
     };
 
-    // l_{\Psi(S),\Psi(Q)}(P) = 1 - λ_1 (x_P / y_P) w + (λ_1 * x_S - y_S) (1 / y_P) w^3
-    let b_1 = -lambda1;
-    let c_1 = lambda1 * x_s - y_s;
+    // l_{\Psi(S),\Psi(Q)}(P) = (λ_1 * x_S - y_S) (1 / y_P) - λ_1 (x_P / y_P) w^2 + w^3
+    let x0_0 = lambda1 * x_s - y_s;
+    let x2_0 = -lambda1;
 
-    // l_{\Psi(S+Q),\Psi(S)}(P) = 1 - λ_2 (x_P / y_P) w + (λ_2 * x_S - y_S) (1 / y_P) w^3
-    let b_2 = -lambda2;
-    let c_2 = lambda2 * x_s - y_s;
+    // l_{\Psi(S+Q),\Psi(S)}(P) = (λ_2 * x_S - y_S) (1 / y_P) - λ_2 (x_P / y_P) w^2 + w^3
 
-    (res, [b_1, c_1], [b_2, c_2])
+    let x0_1 = lambda2 * x_s - y_s;
+    let x2_1 = -lambda2;
+
+    (res, [x0_0, x2_0], [x0_1, x2_1])
 }
 
 #[allow(non_snake_case)]
