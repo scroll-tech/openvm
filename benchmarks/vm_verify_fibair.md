@@ -1,16 +1,16 @@
 | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- |
-| 8,142.0 <span style="color: green">(-24.0 [-0.3%])</span> | 67,641,364 | 27,526,820 <span style="color: green">(-6,167 [-0.0%])</span> | 2,574.0 <span style="color: green">(-68.0 [-2.6%])</span> | 33.0 |
+| 8,181.0 <span style="color: red">(+39.0 [+0.5%])</span> | 67,641,364 | 27,526,820 | 2,594.0 <span style="color: red">(+20.0 [+0.8%])</span> | 33.0 |
 
 | chip_name | rows_used |
 | --- | --- |
 | ByteXor | 65,536 |
-| Core | 290,793 <span style="color: green">(-61 [-0.0%])</span> |
-| FieldArithmetic | 140,500 <span style="color: green">(-62 [-0.0%])</span> |
+| Core | 290,793 |
+| FieldArithmetic | 140,500 |
 | FieldExtension | 7,486 |
 | Memory | 97,965 |
-| Memory 2 | 40,599 <span style="color: green">(-16 [-0.0%])</span> |
-| Memory 3 | 20,301 <span style="color: green">(-8 [-0.0%])</span> |
+| Memory 2 | 40,599 |
+| Memory 3 | 20,301 |
 | Memory 4 | 3,851 |
 | Poseidon2 | 2,613 |
 | Program | 36,703 |
@@ -27,7 +27,7 @@
 | AddEFFI | LOADW | 128 |
 | AddEFFI | STOREW | 384 |
 | AddEI | FADD | 5,664 |
-| AddFI | FADD | 2,841 <span style="color: green">(-62 [-2.1%])</span> |
+| AddFI | FADD | 2,841 |
 | AddV | FADD | 1,808 |
 | AddVI | FADD | 35,232 |
 | Alloc | FADD | 13,004 |
@@ -54,7 +54,7 @@
 | HintInputVec | HINT_INPUT | 4,032 |
 | IfEq | BNE | 722 |
 | IfEqI | BNE | 11,283 |
-| IfEqI | JAL | 2,086 <span style="color: green">(-61 [-2.8%])</span> |
+| IfEqI | JAL | 2,086 |
 | IfNe | BEQ | 2,129 |
 | IfNe | JAL | 7 |
 | IfNeI | BEQ | 601 |
@@ -115,12 +115,12 @@
 | AccessAdapter<2> | AddEFFI | STOREW | 132 |
 | Audit | AddEFFI | STOREW | 912 |
 | CoreAir | AddEFFI | STOREW | 24,960 |
-| AccessAdapter<2> | AddEI | FADD | 24,354 <span style="color: green">(-88 [-0.4%])</span> |
-| AccessAdapter<4> | AddEI | FADD | 14,391 <span style="color: green">(-52 [-0.4%])</span> |
+| AccessAdapter<2> | AddEI | FADD | 24,354 |
+| AccessAdapter<4> | AddEI | FADD | 14,391 |
 | Audit | AddEI | FADD | 760 |
 | FieldArithmeticAir | AddEI | FADD | 175,584 |
 | Audit | AddFI | FADD | 627 |
-| FieldArithmeticAir | AddFI | FADD | 88,071 <span style="color: green">(-1,922 [-2.1%])</span> |
+| FieldArithmeticAir | AddFI | FADD | 88,071 |
 | Audit | AddV | FADD | 19 |
 | FieldArithmeticAir | AddV | FADD | 56,048 |
 | Audit | AddVI | FADD | 61,484 |
@@ -163,7 +163,7 @@
 | CoreAir | HintInputVec | HINT_INPUT | 262,080 |
 | CoreAir | IfEq | BNE | 46,930 |
 | CoreAir | IfEqI | BNE | 733,395 |
-| CoreAir | IfEqI | JAL | 135,590 <span style="color: green">(-3,965 [-2.8%])</span> |
+| CoreAir | IfEqI | JAL | 135,590 |
 | CoreAir | IfNe | BEQ | 138,385 |
 | CoreAir | IfNe | JAL | 455 |
 | CoreAir | IfNeI | BEQ | 39,065 |
@@ -196,8 +196,8 @@
 | CoreAir | LoadV | LOADW | 568,490 |
 | Audit | LoadV | LOADW2 | 893 |
 | CoreAir | LoadV | LOADW2 | 1,248,780 |
-| AccessAdapter<2> | MulE | BBE4MUL | 33,308 <span style="color: green">(-88 [-0.3%])</span> |
-| AccessAdapter<4> | MulE | BBE4MUL | 19,682 <span style="color: green">(-52 [-0.3%])</span> |
+| AccessAdapter<2> | MulE | BBE4MUL | 33,308 |
+| AccessAdapter<4> | MulE | BBE4MUL | 19,682 |
 | Audit | MulE | BBE4MUL | 988 |
 | FieldExtensionArithmeticAir | MulE | BBE4MUL | 140,138 |
 | AccessAdapter<2> | MulEF | FMUL | 8,822 |
@@ -289,7 +289,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11134191396/artifacts/2003308260)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/77deaf85818021199c93277d2f32f72915bf6402
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11135985909/artifacts/2003782561)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/4c42855ff168448ab90b7ca74fe99f7a90ccd879
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11134191396)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11135985909)
