@@ -1,5 +1,5 @@
 use halo2curves_axiom::bls12_381::{
-    Fq, Fq12, Fq2, G1Affine, G2Affine, G2Prepared, MillerLoopResult, G2,
+    Fq, Fq12, Fq2, G1Affine, G2Affine, G2Prepared, MillerLoopResult,
 };
 use rand::{rngs::StdRng, SeedableRng};
 use subtle::{Choice, ConditionallySelectable};
@@ -9,8 +9,7 @@ use crate::{
     curves::bls12_381::{
         line::{evaluate_line, mul_023_by_023, mul_by_023, mul_by_02345},
         miller_add_step, miller_double_and_add_step, miller_double_step, multi_miller_loop,
-        multi_miller_loop_separate_double_plus_add,
-        multi_miller_loop_separate_double_plus_add_custom_debug, BLS12_381_XI, GNARK_BLS12_381_PBE,
+        multi_miller_loop_separate_double_plus_add, BLS12_381_XI, GNARK_BLS12_381_PBE,
     },
 };
 
@@ -33,35 +32,18 @@ fn test_multi_miller_loop_bls12_381() {
     let Q_ecpoint = EcPoint { x: Q.x, y: Q.y };
 
     // Compare against halo2curves implementation
-    // let g2_prepared = G2Prepared::from(Q);
-    // let compare_miller = halo2curves_axiom::bls12_381::multi_miller_loop(&[(&P, &g2_prepared)]);
-    // let compare_final = compare_miller.final_exponentiation();
-    let compare_final = halo2curves_axiom::bls12_381::pairing(&P, &Q);
+    let g2_prepared = G2Prepared::from(Q);
+    let compare_miller = halo2curves_axiom::bls12_381::multi_miller_loop(&[(&P, &g2_prepared)]);
+    let compare_final = compare_miller.final_exponentiation();
+    // let compare_final = halo2curves_axiom::bls12_381::pairing(&P, &Q);
 
     // Run the multi-miller loop
     // let f = multi_miller_loop::<Fq, Fq2, Fq12>(
-    // let f = multi_miller_loop_separate_double_plus_add::<Fq, Fq2, Fq12>(
-    //     &[P_ecpoint],
-    //     &[Q_ecpoint],
-    //     GNARK_BLS12_381_PBE.as_slice(),
-    //     BLS12_381_XI,
-    // );
-
-    let f = multi_miller_loop_separate_double_plus_add_custom_debug::<Fq, Fq2, Fq12>(
+    let f = multi_miller_loop_separate_double_plus_add::<Fq, Fq2, Fq12>(
         &[P_ecpoint],
         &[Q_ecpoint],
         GNARK_BLS12_381_PBE.as_slice(),
         BLS12_381_XI,
-        |label, idx, elem: EcPoint<Fq2>| {
-            let mut Q_acc_aff = G2Affine::generator();
-            Q_acc_aff.x = elem.x;
-            Q_acc_aff.y = elem.y;
-            let Q_acc_proj = G2::from(Q_acc_aff);
-            println!("{}, {}: {:?}", idx, label, Q_acc_proj.x.c0.0);
-        },
-        |label, idx, elem: Fq12| {
-            println!("{}, {}: {:?}", idx, label, elem.c0.c0.c0.0);
-        },
     );
 
     // let f = multi_miller_loop_gnark::<Fq, Fq2, Fq12>(

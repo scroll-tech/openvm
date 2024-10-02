@@ -1,4 +1,4 @@
-use halo2curves_axiom::{bls12_381::G2, ff::Field};
+use halo2curves_axiom::ff::Field;
 use itertools::{izip, Itertools};
 
 use crate::{
@@ -28,7 +28,7 @@ where
     let x_2S = lambda.square() - two * x;
     // y_2S = λ(x - x_2S) - y
     let y_2S = lambda * (x - x_2S) - y;
-    let res = EcPoint { x: x_2S, y: y_2S };
+    let Q_acc = EcPoint { x: x_2S, y: y_2S };
 
     // Tangent line
     //   1 + b' (x_P / y_P) w^-1 + c' (1 / y_P) w^-3
@@ -37,9 +37,9 @@ where
     // x0 = λ * x_S - y_S
     // x2 = - λ
     let x0 = lambda * x - y;
-    let x2 = -lambda;
+    let x2 = lambda.neg();
 
-    (res, [x0, x2])
+    (Q_acc, [x0, x2])
 }
 
 #[allow(non_snake_case)]
@@ -113,45 +113,6 @@ where
     let x2_1 = -lambda2;
 
     (res, [x0_0, x2_0], [x0_1, x2_1])
-}
-
-pub fn evaluate_lines<Fp, Fp2, Fp12>(mut f: Fp12, mut lines: Vec<[Fp2; 2]>, xi: Fp2) -> Fp12
-where
-    Fp: Field,
-    Fp2: FieldExtension<2, BaseField = Fp>,
-    Fp12: FieldExtension<6, BaseField = Fp2>,
-{
-    if lines.len() % 2 == 1 {
-        f = mul_by_023::<Fp, Fp2, Fp12>(f, lines.pop().unwrap());
-    }
-    for chunk in lines.chunks(2) {
-        if let [line0, line1] = chunk {
-            let prod = mul_023_by_023(*line0, *line1, xi);
-            f = mul_by_02345(f, prod);
-        } else {
-            panic!("lines.len() % 2 should be 0 at this point");
-        }
-    }
-    f
-}
-
-pub fn evaluate_lines_debug<Fp, Fp2, Fp12>(
-    mut f: Fp12,
-    mut lines: Vec<[Fp2; 2]>,
-    xi: Fp2,
-    debug_fn: fn(&str, usize, Fp12),
-) -> Fp12
-where
-    Fp: Field,
-    Fp2: FieldExtension<2, BaseField = Fp>,
-    Fp12: FieldExtension<6, BaseField = Fp2>,
-{
-    lines.reverse();
-    for (i, &line) in lines.iter().enumerate() {
-        debug_fn("f", i, f);
-        f = mul_by_023::<Fp, Fp2, Fp12>(f, line);
-    }
-    f
 }
 
 #[allow(non_snake_case)]
@@ -312,6 +273,26 @@ where
     f
 }
 
+pub fn evaluate_lines<Fp, Fp2, Fp12>(mut f: Fp12, mut lines: Vec<[Fp2; 2]>, xi: Fp2) -> Fp12
+where
+    Fp: Field,
+    Fp2: FieldExtension<2, BaseField = Fp>,
+    Fp12: FieldExtension<6, BaseField = Fp2>,
+{
+    if lines.len() % 2 == 1 {
+        f = mul_by_023::<Fp, Fp2, Fp12>(f, lines.pop().unwrap());
+    }
+    for chunk in lines.chunks(2) {
+        if let [line0, line1] = chunk {
+            let prod = mul_023_by_023(*line0, *line1, xi);
+            f = mul_by_02345(f, prod);
+        } else {
+            panic!("lines.len() % 2 should be 0 at this point");
+        }
+    }
+    f
+}
+
 #[allow(non_snake_case)]
 pub fn multi_miller_loop_separate_double_plus_add<Fp, Fp2, Fp12>(
     P: &[EcPoint<Fp>],
@@ -349,7 +330,7 @@ where
             continue;
         }
         let i_binary = i as u8;
-        println!("miller i: {} = {};\tQ_acc.x: {:?}", i, i_binary, Q_acc[0].x);
+        println!("miller i: {} = {}; Q_acc.x: {:?}", i, i_binary, Q_acc[0].x);
 
         // Do double step
         let (Q_out, lines_2S) = Q_acc
@@ -360,8 +341,8 @@ where
 
         let lines_iter = izip!(lines_2S.iter(), x_over_ys.iter(), y_invs.iter());
         for (line_2S, x_over_y, y_inv) in lines_iter {
-            let line = evaluate_line::<Fp, Fp2>(*line_2S, *x_over_y, *y_inv);
-            lines.push(line);
+            let line = &evaluate_line::<Fp, Fp2>(*line_2S, *x_over_y, *y_inv);
+            lines.push(*line);
         }
 
         if i {
@@ -380,8 +361,8 @@ where
                 y_invs.iter()
             );
             for (lines_S_plus_Q, x_over_y, y_inv) in lines_iter {
-                let line = evaluate_line::<Fp, Fp2>(*lines_S_plus_Q, *x_over_y, *y_inv);
-                lines.push(line);
+                let line = &evaluate_line::<Fp, Fp2>(*lines_S_plus_Q, *x_over_y, *y_inv);
+                lines.push(*line);
             }
 
             // Debug counter
@@ -413,145 +394,6 @@ where
     println!("miller: total double: {total_double}, total double&add: {total_double_add}");
 
     f = evaluate_lines::<Fp, Fp2, Fp12>(f, lines, xi);
-
-    f.conjugate();
-
-    f
-}
-
-#[allow(non_snake_case)]
-pub fn multi_miller_loop_separate_double_plus_add_custom_debug<Fp, Fp2, Fp12>(
-    P: &[EcPoint<Fp>],
-    Q: &[EcPoint<Fp2>],
-    pseudo_binary_encoding: &[i32],
-    xi: Fp2,
-    debug_loop: fn(&str, usize, EcPoint<Fp2>),
-    debug_fn: fn(&str, usize, Fp12),
-) -> Fp12
-where
-    Fp: Field,
-    Fp2: FieldExtension<2, BaseField = Fp>,
-    Fp12: FieldExtension<6, BaseField = Fp2>,
-{
-    pub const BLS_X: u64 = 0xd201_0000_0001_0000;
-    assert!(P.len() > 0);
-    assert_eq!(P.len(), Q.len());
-
-    let y_invs = P.iter().map(|P| P.y.invert().unwrap()).collect::<Vec<Fp>>();
-    let x_over_ys = P
-        .iter()
-        .zip(y_invs.iter())
-        .map(|(P, y_inv)| P.x * y_inv)
-        .collect::<Vec<Fp>>();
-
-    let mut f = Fp12::ONE;
-    let mut Q_acc = Q.to_vec();
-    let mut lines = Vec::<[Fp2; 2]>::new();
-
-    let mut total_double = 0;
-    let mut total_double_add = 0;
-
-    debug_loop("Q_acc", 62, Q_acc[0].clone());
-
-    println!("miller first iter special case");
-    let (Q_out_double, lines_2S) = Q_acc
-        .into_iter()
-        .map(miller_double_step::<Fp, Fp2>)
-        .unzip::<_, _, Vec<_>, Vec<_>>();
-    Q_acc = Q_out_double;
-
-    let lines_iter = izip!(lines_2S.iter(), x_over_ys.iter(), y_invs.iter());
-    for (line_2S, x_over_y, y_inv) in lines_iter {
-        let line = evaluate_line::<Fp, Fp2>(*line_2S, *x_over_y, *y_inv);
-        lines.push(line);
-    }
-
-    debug_loop("Q_acc", 62, Q_acc[0].clone());
-
-    let (Q_out_add, lines_S_plus_Q) = Q_acc
-        .iter()
-        .zip(Q.iter())
-        .map(|(Q_acc, Q)| miller_add_step::<Fp, Fp2>(Q_acc.clone(), Q.clone()))
-        .unzip::<_, _, Vec<_>, Vec<_>>();
-    Q_acc = Q_out_add;
-
-    let lines_iter = izip!(lines_S_plus_Q.iter(), x_over_ys.iter(), y_invs.iter());
-    for (lines_S_plus_Q, x_over_y, y_inv) in lines_iter {
-        let line = evaluate_line::<Fp, Fp2>(*lines_S_plus_Q, *x_over_y, *y_inv);
-        lines.push(line);
-    }
-
-    // Debug counter
-    total_double_add += 1;
-
-    for i in (0..pseudo_binary_encoding.len() - 2).rev() {
-        debug_loop("Q_acc", i, Q_acc[0].clone());
-
-        // Regular Miller loop iteration
-        f = fp12_square::<Fp12>(f);
-        // println!("miller i: {} = {};\tQ_acc.x: {:?}", i, i_binary, Q_acc[0].x);
-
-        // Do double step
-        let (Q_out, lines_2S) = Q_acc
-            .into_iter()
-            .map(miller_double_step::<Fp, Fp2>)
-            .unzip::<_, _, Vec<_>, Vec<_>>();
-        Q_acc = Q_out;
-
-        let lines_iter = izip!(lines_2S.iter(), x_over_ys.iter(), y_invs.iter());
-        for (line_2S, x_over_y, y_inv) in lines_iter {
-            let line = evaluate_line::<Fp, Fp2>(*line_2S, *x_over_y, *y_inv);
-            lines.push(line);
-        }
-
-        if pseudo_binary_encoding[i] != 0 {
-            debug_loop("Q_acc", i, Q_acc[0].clone());
-            // Do add step
-            let (Q_out_add, lines_S_plus_Q) = Q_acc
-                .iter()
-                .zip(Q.iter())
-                .map(|(Q_acc, Q)| miller_add_step::<Fp, Fp2>(Q_acc.clone(), Q.clone()))
-                .unzip::<_, _, Vec<_>, Vec<_>>();
-            Q_acc = Q_out_add;
-
-            let lines_iter = izip!(
-                // lines_2S.iter(),
-                lines_S_plus_Q.iter(),
-                x_over_ys.iter(),
-                y_invs.iter()
-            );
-            for (lines_S_plus_Q, x_over_y, y_inv) in lines_iter {
-                let line = evaluate_line::<Fp, Fp2>(*lines_S_plus_Q, *x_over_y, *y_inv);
-                lines.push(line);
-            }
-
-            // Debug counter
-            total_double_add += 1;
-        } else {
-            // Debug counter
-            total_double += 1;
-        }
-    }
-
-    // // Do double step
-    // let (Q_out, lines_2S) = Q_acc
-    //     .into_iter()
-    //     .map(miller_double_step::<Fp, Fp2>)
-    //     .unzip::<_, _, Vec<_>, Vec<_>>();
-    // Q_acc = Q_out;
-
-    // let lines_iter = izip!(lines_2S.iter(), x_over_ys.iter(), y_invs.iter());
-    // for (line_2S, x_over_y, y_inv) in lines_iter {
-    //     let line = &evaluate_line::<Fp, Fp2>(*line_2S, *x_over_y, *y_inv);
-    //     lines.push(*line);
-    // }
-
-    // Debug counter
-    // total_double += 1;
-
-    println!("miller: total double: {total_double}, total double&add: {total_double_add}");
-
-    f = evaluate_lines_debug::<Fp, Fp2, Fp12>(f, lines, xi, debug_fn);
 
     f.conjugate();
 
