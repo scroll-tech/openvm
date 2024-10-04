@@ -1,16 +1,16 @@
 | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- |
-| 8,144.0 <span style="color: red">(+9.0 [+0.1%])</span> | 68,165,652 <span style="color: red">(+524,288 [+0.8%])</span> | 27,824,078 <span style="color: red">(+293,473 [+1.1%])</span> | 2,578.0 <span style="color: green">(-37.0 [-1.4%])</span> | 34.0 |
+| 8,195.0 <span style="color: red">(+51.0 [+0.6%])</span> | 68,165,652 | 27,818,166 <span style="color: green">(-5,912 [-0.0%])</span> | 2,593.0 <span style="color: red">(+15.0 [+0.6%])</span> | 33.0 <span style="color: green">(-1.0 [-2.9%])</span> |
 
 | chip_name | rows_used |
 | --- | --- |
 | ByteXor | 65,536 |
-| Core | 290,886 <span style="color: red">(+46 [+0.0%])</span> |
-| FieldArithmetic | 140,497 <span style="color: green">(-13 [-0.0%])</span> |
+| Core | 290,797 <span style="color: green">(-89 [-0.0%])</span> |
+| FieldArithmetic | 140,489 <span style="color: green">(-8 [-0.0%])</span> |
 | FieldExtension | 7,486 |
 | Memory | 97,965 |
-| Memory 2 | 40,623 |
-| Memory 3 | 20,313 |
+| Memory 2 | 40,635 <span style="color: red">(+12 [+0.0%])</span> |
+| Memory 3 | 20,319 <span style="color: red">(+6 [+0.0%])</span> |
 | Memory 4 | 3,851 |
 | Poseidon2 | 2,613 |
 | Program | 36,703 |
@@ -27,7 +27,7 @@
 | AddEFFI | 1 | 128 |
 | AddEFFI | 2 | 384 |
 | AddEI | 256 | 5,664 |
-| AddFI | 256 | 2,838 |
+| AddFI | 256 | 2,830 <span style="color: green">(-8 [-0.3%])</span> |
 | AddV | 256 | 1,808 |
 | AddVI | 256 | 35,232 |
 | Alloc | 1 | 13,004 |
@@ -53,7 +53,7 @@
 | HintBitsF | 14 | 101 |
 | HintInputVec | 13 | 4,032 |
 | IfEq | 7 | 722 |
-| IfEqI | 5 | 2,179 |
+| IfEqI | 5 | 2,090 <span style="color: green">(-89 [-4.1%])</span> |
 | IfEqI | 7 | 11,283 |
 | IfNe | 5 | 7 |
 | IfNe | 6 | 2,129 |
@@ -115,12 +115,12 @@
 | AccessAdapter<2> | AddEFFI | 2 | 132 |
 | Audit | AddEFFI | 2 | 912 |
 | CoreAir | AddEFFI | 2 | 25,344 |
-| AccessAdapter<2> | AddEI | 256 | 24,486 |
-| AccessAdapter<4> | AddEI | 256 | 14,469 |
+| AccessAdapter<2> | AddEI | 256 | 24,552 <span style="color: red">(+66 [+0.3%])</span> |
+| AccessAdapter<4> | AddEI | 256 | 14,508 <span style="color: red">(+39 [+0.3%])</span> |
 | Audit | AddEI | 256 | 760 |
 | FieldArithmeticAir | AddEI | 256 | 175,584 |
 | Audit | AddFI | 256 | 627 |
-| FieldArithmeticAir | AddFI | 256 | 87,978 |
+| FieldArithmeticAir | AddFI | 256 | 87,730 <span style="color: green">(-248 [-0.3%])</span> |
 | Audit | AddV | 256 | 19 |
 | FieldArithmeticAir | AddV | 256 | 56,048 |
 | Audit | AddVI | 256 | 61,484 |
@@ -162,7 +162,7 @@
 | CoreAir | HintBitsF | 14 | 6,666 |
 | CoreAir | HintInputVec | 13 | 266,112 |
 | CoreAir | IfEq | 7 | 47,652 |
-| CoreAir | IfEqI | 5 | 143,814 |
+| CoreAir | IfEqI | 5 | 137,940 <span style="color: green">(-5,874 [-4.1%])</span> |
 | CoreAir | IfEqI | 7 | 744,678 |
 | CoreAir | IfNe | 5 | 462 |
 | CoreAir | IfNe | 6 | 140,514 |
@@ -196,8 +196,8 @@
 | CoreAir | LoadV | 1 | 577,236 |
 | Audit | LoadV | 3 | 893 |
 | CoreAir | LoadV | 3 | 1,267,992 |
-| AccessAdapter<2> | MulE | 274 | 33,440 |
-| AccessAdapter<4> | MulE | 274 | 19,760 |
+| AccessAdapter<2> | MulE | 274 | 33,506 <span style="color: red">(+66 [+0.2%])</span> |
+| AccessAdapter<4> | MulE | 274 | 19,799 <span style="color: red">(+39 [+0.2%])</span> |
 | Audit | MulE | 274 | 988 |
 | FieldExtensionArithmeticAir | MulE | 274 | 140,138 |
 | AccessAdapter<2> | MulEF | 258 | 8,822 |
@@ -275,7 +275,7 @@
 | air_name | cells | constraints | interactions | main_cols | perm_cols | prep_cols | quotient_deg | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | ProgramAir<BabyBear> | 589,824 | 4 | 1 | 1 | 8 | 9 | 1 | 65,536 |
-| CoreAir | 45,088,768 <span style="color: red">(+524,288 [+1.2%])</span> | 113 <span style="color: red">(+1 [+0.9%])</span> | 19 | 66 <span style="color: red">(+1 [+1.5%])</span> | 20 |  | 8 | 524,288 |
+| CoreAir | 45,088,768 | 113 | 19 | 66 | 20 |  | 8 | 524,288 |
 | FieldArithmeticAir | 12,320,768 | 23 | 15 | 31 | 16 |  | 8 | 262,144 |
 | FieldExtensionArithmeticAir | 466,944 | 23 | 15 | 41 | 16 |  | 8 | 8,192 |
 | Poseidon2VmAir<BabyBear> | 1,826,816 | 373 | 32 | 418 | 28 |  | 8 | 4,096 |
@@ -289,7 +289,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11183509101/artifacts/2016769596)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/b071c8a1a74a1114f39cd11633595a7534115b18
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11187080286/artifacts/2017797811)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/8aa767bdac6d333767d578a04b528e3e877ab4e0
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11183509101)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11187080286)
