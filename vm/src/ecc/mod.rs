@@ -91,6 +91,8 @@ pub struct EcAddUnequalChip<T: PrimeField32> {
     pub air: EcAddUnequalVmAir,
     pub data: Vec<EcAddUnequalRecord<T>>,
     pub config: EcChipConfig<T>,
+
+    _offset: usize,
 }
 
 fn make_ec_config<T: PrimeField32>(memory_chip: &MemoryChipRef<T>) -> EcAirConfig {
@@ -121,6 +123,7 @@ impl<T: PrimeField32> EcAddUnequalChip<T> {
         execution_bus: ExecutionBus,
         program_bus: ProgramBus,
         memory_chip: MemoryChipRef<T>,
+        offset: usize,
     ) -> Self {
         let memory_bridge = memory_chip.borrow().memory_bridge();
 
@@ -129,6 +132,7 @@ impl<T: PrimeField32> EcAddUnequalChip<T> {
             air: EcAddUnequalAir { config: ec_config },
             execution_bridge: ExecutionBridge::new(execution_bus, program_bus),
             memory_bridge,
+            offset,
         };
         let config = make_ec_chip_config(memory_chip);
 
@@ -136,6 +140,7 @@ impl<T: PrimeField32> EcAddUnequalChip<T> {
             air,
             config,
             data: vec![],
+            _offset: offset,
         }
     }
 }
@@ -210,6 +215,8 @@ pub struct EcDoubleChip<T: PrimeField32> {
     pub air: EcDoubleVmAir,
     pub data: Vec<EcDoubleRecord<T>>,
     pub config: EcChipConfig<T>,
+
+    _offset: usize,
 }
 
 impl<T: PrimeField32> EcDoubleChip<T> {
@@ -217,6 +224,7 @@ impl<T: PrimeField32> EcDoubleChip<T> {
         execution_bus: ExecutionBus,
         program_bus: ProgramBus,
         memory_chip: MemoryChipRef<T>,
+        offset: usize,
     ) -> Self {
         let memory_bridge = memory_chip.borrow().memory_bridge();
 
@@ -225,6 +233,7 @@ impl<T: PrimeField32> EcDoubleChip<T> {
             air: EcDoubleAir { config: ec_config },
             execution_bridge: ExecutionBridge::new(execution_bus, program_bus),
             memory_bridge,
+            offset,
         };
         let config = make_ec_chip_config(memory_chip);
 
@@ -232,6 +241,7 @@ impl<T: PrimeField32> EcDoubleChip<T> {
             air,
             config,
             data: vec![],
+            _offset: offset,
         }
     }
 }

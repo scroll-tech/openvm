@@ -12,6 +12,8 @@ use p3_commit::PolynomialSpace;
 use p3_field::PrimeField32;
 use p3_matrix::dense::RowMajorMatrix;
 use p3_uni_stark::{Domain, StarkGenericConfig};
+use serde::{Deserialize, Serialize};
+use strum::EnumDiscriminants;
 use strum_macros::IntoStaticStr;
 
 use crate::{
@@ -158,7 +160,9 @@ impl<F, C: MachineChip<F>> MachineChip<F> for Rc<RefCell<C>> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, EnumDiscriminants)]
+#[strum_discriminants(derive(Serialize, Deserialize))]
+#[strum_discriminants(name(ExecutorName))]
 #[enum_dispatch(InstructionExecutor<F>)]
 pub enum InstructionExecutorVariant<F: PrimeField32> {
     Core(Rc<RefCell<CoreChip<F>>>),
@@ -177,7 +181,7 @@ pub enum InstructionExecutorVariant<F: PrimeField32> {
     Secp256k1Double(Rc<RefCell<EcDoubleChip<F>>>),
 }
 
-#[derive(Debug, IntoStaticStr)]
+#[derive(Debug, Clone, IntoStaticStr)]
 #[enum_dispatch(MachineChip<F>)]
 pub enum MachineChipVariant<F: PrimeField32> {
     Core(Rc<RefCell<CoreChip<F>>>),

@@ -1,7 +1,13 @@
+use std::ops::Range;
+
 use derive_new::new;
 use serde::{Deserialize, Serialize};
+use strum::EnumCount;
 
-use crate::core::CoreOptions;
+use crate::{
+    arch::{instructions::*, ExecutorName},
+    core::CoreOptions,
+};
 
 pub const DEFAULT_MAX_SEGMENT_LEN: usize = (1 << 25) - 100;
 pub const DEFAULT_POSEIDON2_MAX_CONSTRAINT_DEGREE: usize = 7; // the sbox degree used for Poseidon2
@@ -20,24 +26,85 @@ impl Default for MemoryConfig {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+fn default_executor_range(executor: ExecutorName) -> (Range<usize>, usize) {
+    let (start, len, offset) = match executor {
+        ExecutorName::Core => (
+            CoreOpcode::default_offset(),
+            CoreOpcode::COUNT,
+            CoreOpcode::default_offset(),
+        ),
+        ExecutorName::FieldArithmetic => (
+            FieldArithmeticOpcode::default_offset(),
+            FieldArithmeticOpcode::COUNT,
+            FieldArithmeticOpcode::default_offset(),
+        ),
+        ExecutorName::FieldExtension => (
+            FieldExtensionOpcode::default_offset(),
+            FieldExtensionOpcode::COUNT,
+            FieldExtensionOpcode::default_offset(),
+        ),
+        ExecutorName::Poseidon2 => (
+            Poseidon2Opcode::default_offset(),
+            Poseidon2Opcode::COUNT,
+            Poseidon2Opcode::default_offset(),
+        ),
+        ExecutorName::Keccak256 => (
+            Keccak256Opcode::default_offset(),
+            Keccak256Opcode::COUNT,
+            Keccak256Opcode::default_offset(),
+        ),
+        ExecutorName::ModularAddSub => (
+            ModularArithmeticOpcode::default_offset(),
+            2,
+            ModularArithmeticOpcode::default_offset(),
+        ),
+        ExecutorName::ModularMultDiv => (
+            ModularArithmeticOpcode::default_offset() + 2,
+            2,
+            ModularArithmeticOpcode::default_offset(),
+        ),
+        ExecutorName::ArithmeticLogicUnit256 => (
+            U256Opcode::default_offset(),
+            8,
+            U256Opcode::default_offset(),
+        ),
+        ExecutorName::U256Multiplication => (
+            U256Opcode::default_offset() + 11,
+            1,
+            U256Opcode::default_offset(),
+        ),
+        ExecutorName::Shift256 => (
+            U256Opcode::default_offset() + 8,
+            3,
+            U256Opcode::default_offset(),
+        ),
+        ExecutorName::Ui => (
+            U32Opcode::default_offset(),
+            U32Opcode::COUNT,
+            U32Opcode::default_offset(),
+        ),
+        ExecutorName::CastF => (
+            CastfOpcode::default_offset(),
+            CastfOpcode::COUNT,
+            CastfOpcode::default_offset(),
+        ),
+        ExecutorName::Secp256k1AddUnequal => {
+            (EccOpcode::default_offset(), 1, EccOpcode::default_offset())
+        }
+        ExecutorName::Secp256k1Double => (
+            EccOpcode::default_offset() + 1,
+            1,
+            EccOpcode::default_offset(),
+        ),
+    };
+    (start..(start + len), offset)
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VmConfig {
-    // TODO: VmConfig should just contain CoreOptions to reduce redundancy
-    pub field_arithmetic_enabled: bool,
-    pub field_extension_enabled: bool,
-    pub compress_poseidon2_enabled: bool,
-    pub perm_poseidon2_enabled: bool,
+    pub executors: Vec<(Range<usize>, ExecutorName, usize)>, // (range of opcodes, who executes, offset)
+
     pub poseidon2_max_constraint_degree: Option<usize>,
-    pub keccak_enabled: bool,
-    pub modular_addsub_enabled: bool,
-    pub modular_multdiv_enabled: bool,
-    pub is_less_than_enabled: bool,
-    pub u256_arithmetic_enabled: bool,
-    pub u256_multiplication_enabled: bool,
-    pub shift_256_enabled: bool,
-    pub ui_32_enabled: bool,
-    pub castf_enabled: bool,
-    pub secp256k1_enabled: bool,
     pub memory_config: MemoryConfig,
     pub num_public_values: usize,
     pub max_segment_len: usize,
@@ -47,30 +114,56 @@ pub struct VmConfig {
     pub bigint_limb_size: usize,
 }
 
+impl VmConfig {
+    pub fn from_parameters(
+        poseidon2_max_constraint_degree: Option<usize>,
+        memory_config: MemoryConfig,
+        num_public_values: usize,
+        max_segment_len: usize,
+        collect_metrics: bool,
+        bigint_limb_size: usize,
+    ) -> Self {
+        VmConfig {
+            executors: Vec::new(),
+            poseidon2_max_constraint_degree,
+            memory_config,
+            num_public_values,
+            max_segment_len,
+            collect_metrics,
+            bigint_limb_size,
+        }
+    }
+
+    pub fn add_executor(
+        mut self,
+        range: Range<usize>,
+        executor: ExecutorName,
+        offset: usize,
+    ) -> Self {
+        self.executors.push((range, executor, offset));
+        self
+    }
+
+    pub fn add_default_executor(self, executor: ExecutorName) -> Self {
+        let (range, offset) = default_executor_range(executor);
+        self.add_executor(range, executor, offset)
+    }
+}
+
 impl Default for VmConfig {
     fn default() -> Self {
-        VmConfig {
-            field_arithmetic_enabled: true,
-            field_extension_enabled: true,
-            compress_poseidon2_enabled: true,
-            perm_poseidon2_enabled: true,
-            poseidon2_max_constraint_degree: Some(DEFAULT_POSEIDON2_MAX_CONSTRAINT_DEGREE),
-            keccak_enabled: false,
-            modular_addsub_enabled: false,
-            modular_multdiv_enabled: false,
-            is_less_than_enabled: false,
-            u256_arithmetic_enabled: false,
-            u256_multiplication_enabled: false,
-            shift_256_enabled: false,
-            ui_32_enabled: false,
-            castf_enabled: false,
-            secp256k1_enabled: false,
-            memory_config: Default::default(),
-            num_public_values: 0,
-            max_segment_len: DEFAULT_MAX_SEGMENT_LEN,
-            collect_metrics: false,
-            bigint_limb_size: 8,
-        }
+        Self::from_parameters(
+            Some(DEFAULT_POSEIDON2_MAX_CONSTRAINT_DEGREE),
+            Default::default(),
+            0,
+            DEFAULT_MAX_SEGMENT_LEN,
+            false,
+            8,
+        )
+        .add_default_executor(ExecutorName::Core)
+        .add_default_executor(ExecutorName::FieldArithmetic)
+        .add_default_executor(ExecutorName::FieldExtension)
+        .add_default_executor(ExecutorName::Poseidon2)
     }
 }
 
@@ -82,15 +175,15 @@ impl VmConfig {
     }
 
     pub fn core() -> Self {
-        VmConfig {
-            field_arithmetic_enabled: false,
-            field_extension_enabled: false,
-            compress_poseidon2_enabled: false,
-            poseidon2_max_constraint_degree: None,
-            perm_poseidon2_enabled: false,
-            keccak_enabled: false,
-            ..Default::default()
-        }
+        Self::from_parameters(
+            None,
+            Default::default(),
+            0,
+            DEFAULT_MAX_SEGMENT_LEN,
+            false,
+            8,
+        )
+        .add_default_executor(ExecutorName::Core)
     }
 
     pub fn aggregation(poseidon2_max_constraint_degree: usize) -> Self {

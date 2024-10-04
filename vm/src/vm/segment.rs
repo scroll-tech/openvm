@@ -20,6 +20,7 @@ use p3_matrix::{dense::RowMajorMatrix, Matrix};
 use p3_uni_stark::{Domain, StarkGenericConfig, Val};
 use p3_util::log2_strict_usize;
 use poseidon2_air::poseidon2::Poseidon2Config;
+use strum::EnumCount;
 
 use super::{
     connector::VmConnectorChip, cycle_tracker::CycleTracker, VirtualMachineState, VmConfig,
@@ -28,12 +29,8 @@ use super::{
 use crate::{
     alu::ArithmeticLogicChip,
     arch::{
-        instructions::{
-            Opcode, ALU_256_INSTRUCTIONS, CORE_INSTRUCTIONS, FIELD_ARITHMETIC_INSTRUCTIONS,
-            FIELD_EXTENSION_INSTRUCTIONS, SHIFT_256_INSTRUCTIONS, UI_32_INSTRUCTIONS,
-        },
-        ExecutionBus, ExecutionState, InstructionExecutor, InstructionExecutorVariant, MachineChip,
-        MachineChipVariant,
+        instructions::*, ExecutionBus, ExecutionState, ExecutorName, InstructionExecutor,
+        InstructionExecutorVariant, MachineChip, MachineChipVariant,
     },
     castf::CastFChip,
     core::{
@@ -57,7 +54,7 @@ use crate::{
 pub struct ExecutionSegment<F: PrimeField32> {
     pub config: VmConfig,
 
-    pub executors: BTreeMap<Opcode, InstructionExecutorVariant<F>>,
+    pub executors: BTreeMap<usize, InstructionExecutorVariant<F>>,
     pub chips: Vec<MachineChipVariant<F>>,
     pub core_chip: Rc<RefCell<CoreChip<F>>>,
     pub program_chip: Rc<RefCell<ProgramChip<F>>>,
@@ -108,199 +105,262 @@ impl<F: PrimeField32> ExecutionSegment<F> {
             config.memory_config,
             range_checker.clone(),
         )));
-        let core_chip = Rc::new(RefCell::new(CoreChip::from_state(
-            config.core_options(),
-            execution_bus,
-            program_bus,
-            memory_chip.clone(),
-            state.state,
-        )));
         let program_chip = Rc::new(RefCell::new(ProgramChip::new(program)));
 
-        let mut executors: BTreeMap<Opcode, InstructionExecutorVariant<F>> = BTreeMap::new();
-        macro_rules! assign {
-            ($opcodes: expr, $executor: expr) => {
-                for opcode in $opcodes {
-                    executors.insert(opcode, $executor.clone().into());
-                }
-            };
-        }
+        let mut executors: BTreeMap<usize, InstructionExecutorVariant<F>> = BTreeMap::new();
 
         // NOTE: The order of entries in `chips` must be a linear extension of the dependency DAG.
         // That is, if chip A holds a strong reference to chip B, then A must precede B in `chips`.
 
-        let mut chips = vec![
-            MachineChipVariant::Core(core_chip.clone()),
-            MachineChipVariant::Program(program_chip.clone()),
-        ];
+        let mut chips = vec![MachineChipVariant::Program(program_chip.clone())];
 
-        for opcode in CORE_INSTRUCTIONS {
-            executors.insert(opcode, core_chip.clone().into());
+        let mut modular_muldiv_chips = vec![];
+        let mut modular_addsub_chips = vec![];
+        let mut core_chip = if config
+            .executors
+            .iter()
+            .any(|(_, executor, _)| matches!(executor, ExecutorName::Core))
+        {
+            None
+        } else {
+            let offset = 0; // Core offset should be 0 by default; maybe it makes sense to make this always the case?
+            let chip = Rc::new(RefCell::new(CoreChip::from_state(
+                config.core_options(),
+                execution_bus,
+                program_bus,
+                memory_chip.clone(),
+                state.state,
+                offset,
+            )));
+            let range = 0..CoreOpcode::COUNT;
+            for opcode in range {
+                executors.insert(offset + opcode, chip.clone().into());
+            }
+            chips.push(MachineChipVariant::Core(chip.clone()));
+            Some(chip)
+        };
+
+        for (range, executor, offset) in config.clone().executors {
+            for opcode in range.clone() {
+                if let Some(old_executor) = executors.get(&opcode) {
+                    panic!(
+                        "Attempting to override an executor for opcode {} ({:?} -> {:?})",
+                        opcode, old_executor, executor
+                    );
+                }
+            }
+            match executor {
+                ExecutorName::Core => {
+                    assert!(core_chip.is_none(), "Core chip already initialized");
+                    core_chip = Some(Rc::new(RefCell::new(CoreChip::from_state(
+                        config.core_options(),
+                        execution_bus,
+                        program_bus,
+                        memory_chip.clone(),
+                        state.state,
+                        offset,
+                    ))));
+                    for opcode in range {
+                        executors.insert(opcode, core_chip.clone().unwrap().into());
+                    }
+                    chips.push(MachineChipVariant::Core(core_chip.clone().unwrap()));
+                }
+                ExecutorName::FieldArithmetic => {
+                    let chip = Rc::new(RefCell::new(FieldArithmeticChip::new(
+                        execution_bus,
+                        program_bus,
+                        memory_chip.clone(),
+                        offset,
+                    )));
+                    for opcode in range {
+                        executors.insert(opcode, chip.clone().into());
+                    }
+                    chips.push(MachineChipVariant::FieldArithmetic(chip));
+                }
+                ExecutorName::FieldExtension => {
+                    let chip = Rc::new(RefCell::new(FieldExtensionArithmeticChip::new(
+                        execution_bus,
+                        program_bus,
+                        memory_chip.clone(),
+                        offset,
+                    )));
+                    for opcode in range {
+                        executors.insert(opcode, chip.clone().into());
+                    }
+                    chips.push(MachineChipVariant::FieldExtension(chip));
+                }
+                ExecutorName::Poseidon2 => {
+                    let chip = Rc::new(RefCell::new(Poseidon2Chip::from_poseidon2_config(
+                        Poseidon2Config::<16, F>::new_p3_baby_bear_16(),
+                        config
+                            .poseidon2_max_constraint_degree
+                            .expect("Poseidon2 is enabled but no max_constraint_degree provided"),
+                        execution_bus,
+                        program_bus,
+                        memory_chip.clone(),
+                        offset,
+                    )));
+                    for opcode in range {
+                        executors.insert(opcode, chip.clone().into());
+                    }
+                    chips.push(MachineChipVariant::Poseidon2(chip));
+                }
+                ExecutorName::Keccak256 => {
+                    let chip = Rc::new(RefCell::new(KeccakVmChip::new(
+                        execution_bus,
+                        program_bus,
+                        memory_chip.clone(),
+                        byte_xor_chip.clone(),
+                        offset,
+                    )));
+                    for opcode in range {
+                        executors.insert(opcode, chip.clone().into());
+                    }
+                    chips.push(MachineChipVariant::Keccak256(chip));
+                }
+                ExecutorName::ModularAddSub => {
+                    let new_chip = if modular_addsub_chips.is_empty() {
+                        Rc::new(RefCell::new(ModularAddSubChip::new(
+                            execution_bus,
+                            program_bus,
+                            memory_chip.clone(),
+                            SECP256K1_COORD_PRIME.clone(),
+                            offset,
+                        )))
+                    } else {
+                        Rc::new(RefCell::new(ModularAddSubChip::new(
+                            execution_bus,
+                            program_bus,
+                            memory_chip.clone(),
+                            SECP256K1_SCALAR_PRIME.clone(),
+                            offset,
+                        )))
+                    };
+                    modular_addsub_chips.push(new_chip.clone());
+                    for opcode in range {
+                        executors.insert(opcode, new_chip.clone().into());
+                    }
+                }
+                ExecutorName::ModularMultDiv => {
+                    let new_chip = if modular_muldiv_chips.is_empty() {
+                        Rc::new(RefCell::new(ModularMultDivChip::new(
+                            execution_bus,
+                            program_bus,
+                            memory_chip.clone(),
+                            SECP256K1_COORD_PRIME.clone(),
+                            offset,
+                        )))
+                    } else {
+                        Rc::new(RefCell::new(ModularMultDivChip::new(
+                            execution_bus,
+                            program_bus,
+                            memory_chip.clone(),
+                            SECP256K1_SCALAR_PRIME.clone(),
+                            offset,
+                        )))
+                    };
+                    modular_muldiv_chips.push(new_chip.clone());
+                    for opcode in range {
+                        executors.insert(opcode, new_chip.clone().into());
+                    }
+                }
+                ExecutorName::ArithmeticLogicUnit256 => {
+                    // We probably must include this chip if we include any modular arithmetic,
+                    // not sure if we need to enforce this here.
+                    let chip = Rc::new(RefCell::new(ArithmeticLogicChip::new(
+                        execution_bus,
+                        program_bus,
+                        memory_chip.clone(),
+                        byte_xor_chip.clone(),
+                        offset,
+                    )));
+                    for opcode in range {
+                        executors.insert(opcode, chip.clone().into());
+                    }
+                    chips.push(MachineChipVariant::ArithmeticLogicUnit256(chip));
+                }
+                ExecutorName::U256Multiplication => {
+                    let range_tuple_bus = RangeTupleCheckerBus::new(
+                        RANGE_TUPLE_CHECKER_BUS,
+                        vec![(1 << 8), 32 * (1 << 8)],
+                    );
+                    let range_tuple_checker = Arc::new(RangeTupleCheckerChip::new(range_tuple_bus));
+                    let chip = Rc::new(RefCell::new(UintMultiplicationChip::new(
+                        execution_bus,
+                        program_bus,
+                        memory_chip.clone(),
+                        range_tuple_checker.clone(),
+                        offset,
+                    )));
+                    for opcode in range {
+                        executors.insert(opcode, chip.clone().into());
+                    }
+                    chips.push(MachineChipVariant::U256Multiplication(chip));
+                }
+                ExecutorName::Shift256 => {
+                    let chip = Rc::new(RefCell::new(ShiftChip::new(
+                        execution_bus,
+                        program_bus,
+                        memory_chip.clone(),
+                        byte_xor_chip.clone(),
+                        offset,
+                    )));
+                    for opcode in range {
+                        executors.insert(opcode, chip.clone().into());
+                    }
+                    chips.push(MachineChipVariant::Shift256(chip));
+                }
+                ExecutorName::Ui => {
+                    let chip = Rc::new(RefCell::new(UiChip::new(
+                        execution_bus,
+                        program_bus,
+                        memory_chip.clone(),
+                        offset,
+                    )));
+                    for opcode in range {
+                        executors.insert(opcode, chip.clone().into());
+                    }
+                    chips.push(MachineChipVariant::Ui(chip));
+                }
+                ExecutorName::CastF => {
+                    let chip = Rc::new(RefCell::new(CastFChip::new(
+                        execution_bus,
+                        program_bus,
+                        memory_chip.clone(),
+                        offset,
+                    )));
+                    for opcode in range {
+                        executors.insert(opcode, chip.clone().into());
+                    }
+                    chips.push(MachineChipVariant::CastF(chip));
+                }
+                ExecutorName::Secp256k1AddUnequal => {
+                    let chip = Rc::new(RefCell::new(EcAddUnequalChip::new(
+                        execution_bus,
+                        program_bus,
+                        memory_chip.clone(),
+                        offset,
+                    )));
+                    for opcode in range {
+                        executors.insert(opcode, chip.clone().into());
+                    }
+                    chips.push(MachineChipVariant::Secp256k1AddUnequal(chip));
+                }
+                ExecutorName::Secp256k1Double => {
+                    let chip = Rc::new(RefCell::new(EcDoubleChip::new(
+                        execution_bus,
+                        program_bus,
+                        memory_chip.clone(),
+                        offset,
+                    )));
+                    for opcode in range {
+                        executors.insert(opcode, chip.clone().into());
+                    }
+                    chips.push(MachineChipVariant::Secp256k1Double(chip));
+                }
+            }
         }
 
-        if config.field_arithmetic_enabled {
-            let field_arithmetic_chip = Rc::new(RefCell::new(FieldArithmeticChip::new(
-                execution_bus,
-                program_bus,
-                memory_chip.clone(),
-            )));
-            assign!(FIELD_ARITHMETIC_INSTRUCTIONS, field_arithmetic_chip);
-            chips.push(MachineChipVariant::FieldArithmetic(field_arithmetic_chip));
-        }
-        if config.field_extension_enabled {
-            let field_extension_chip = Rc::new(RefCell::new(FieldExtensionArithmeticChip::new(
-                execution_bus,
-                program_bus,
-                memory_chip.clone(),
-            )));
-            assign!(FIELD_EXTENSION_INSTRUCTIONS, field_extension_chip);
-            chips.push(MachineChipVariant::FieldExtension(field_extension_chip))
-        }
-        if config.perm_poseidon2_enabled || config.compress_poseidon2_enabled {
-            let poseidon2_chip = Rc::new(RefCell::new(Poseidon2Chip::from_poseidon2_config(
-                Poseidon2Config::<16, F>::new_p3_baby_bear_16(),
-                config
-                    .poseidon2_max_constraint_degree
-                    .expect("Poseidon2 is enabled but no max_constraint_degree provided"),
-                execution_bus,
-                program_bus,
-                memory_chip.clone(),
-            )));
-            if config.perm_poseidon2_enabled {
-                assign!([Opcode::PERM_POS2], poseidon2_chip);
-            }
-            if config.compress_poseidon2_enabled {
-                assign!([Opcode::COMP_POS2], poseidon2_chip);
-            }
-            chips.push(MachineChipVariant::Poseidon2(poseidon2_chip.clone()));
-        }
-        if config.keccak_enabled {
-            let keccak_chip = Rc::new(RefCell::new(KeccakVmChip::new(
-                execution_bus,
-                program_bus,
-                memory_chip.clone(),
-                byte_xor_chip.clone(),
-            )));
-            assign!([Opcode::KECCAK256], keccak_chip);
-            chips.push(MachineChipVariant::Keccak256(keccak_chip));
-        }
-        if config.modular_addsub_enabled {
-            let mod_addsub_coord: ModularAddSubChip<F, 32, 8> = ModularAddSubChip::new(
-                execution_bus,
-                program_bus,
-                memory_chip.clone(),
-                SECP256K1_COORD_PRIME.clone(),
-            );
-            let mod_addsub_scalar: ModularAddSubChip<F, 32, 8> = ModularAddSubChip::new(
-                execution_bus,
-                program_bus,
-                memory_chip.clone(),
-                SECP256K1_SCALAR_PRIME.clone(),
-            );
-            assign!(
-                [Opcode::SECP256K1_COORD_ADD, Opcode::SECP256K1_COORD_SUB],
-                Rc::new(RefCell::new(mod_addsub_coord.clone()))
-            );
-            assign!(
-                [Opcode::SECP256K1_SCALAR_ADD, Opcode::SECP256K1_SCALAR_SUB],
-                Rc::new(RefCell::new(mod_addsub_scalar.clone()))
-            );
-        }
-        if config.modular_multdiv_enabled {
-            let mod_multdiv_coord: ModularMultDivChip<F, 63, 32, 8> = ModularMultDivChip::new(
-                execution_bus,
-                program_bus,
-                memory_chip.clone(),
-                SECP256K1_COORD_PRIME.clone(),
-            );
-            let mod_multdiv_scalar: ModularMultDivChip<F, 63, 32, 8> = ModularMultDivChip::new(
-                execution_bus,
-                program_bus,
-                memory_chip.clone(),
-                SECP256K1_SCALAR_PRIME.clone(),
-            );
-            assign!(
-                [Opcode::SECP256K1_COORD_MUL, Opcode::SECP256K1_COORD_DIV],
-                Rc::new(RefCell::new(mod_multdiv_coord.clone()))
-            );
-            assign!(
-                [Opcode::SECP256K1_SCALAR_MUL, Opcode::SECP256K1_SCALAR_DIV],
-                Rc::new(RefCell::new(mod_multdiv_scalar.clone()))
-            );
-        }
-        // Modular multiplication also depends on U256 arithmetic.
-        if config.modular_multdiv_enabled || config.u256_arithmetic_enabled {
-            let u256_chip = Rc::new(RefCell::new(ArithmeticLogicChip::new(
-                execution_bus,
-                program_bus,
-                memory_chip.clone(),
-                byte_xor_chip.clone(),
-            )));
-            chips.push(MachineChipVariant::ArithmeticLogicUnit256(
-                u256_chip.clone(),
-            ));
-            assign!(ALU_256_INSTRUCTIONS, u256_chip);
-        }
-        if config.u256_multiplication_enabled {
-            let range_tuple_bus =
-                RangeTupleCheckerBus::new(RANGE_TUPLE_CHECKER_BUS, vec![(1 << 8), 32 * (1 << 8)]);
-            let range_tuple_checker = Arc::new(RangeTupleCheckerChip::new(range_tuple_bus));
-            let u256_mult_chip = Rc::new(RefCell::new(UintMultiplicationChip::new(
-                execution_bus,
-                program_bus,
-                memory_chip.clone(),
-                range_tuple_checker.clone(),
-            )));
-            assign!([Opcode::MUL256], u256_mult_chip);
-            chips.push(MachineChipVariant::U256Multiplication(u256_mult_chip));
-            chips.push(MachineChipVariant::RangeTupleChecker(range_tuple_checker));
-        }
-        if config.shift_256_enabled {
-            let shift_chip = Rc::new(RefCell::new(ShiftChip::new(
-                execution_bus,
-                program_bus,
-                memory_chip.clone(),
-                byte_xor_chip.clone(),
-            )));
-            assign!(SHIFT_256_INSTRUCTIONS, shift_chip);
-            chips.push(MachineChipVariant::Shift256(shift_chip));
-        }
-        if config.ui_32_enabled {
-            let ui_chip = Rc::new(RefCell::new(UiChip::new(
-                execution_bus,
-                program_bus,
-                memory_chip.clone(),
-            )));
-            assign!(UI_32_INSTRUCTIONS, ui_chip);
-            chips.push(MachineChipVariant::Ui(ui_chip));
-        }
-        if config.castf_enabled {
-            let castf_chip = Rc::new(RefCell::new(CastFChip::new(
-                execution_bus,
-                program_bus,
-                memory_chip.clone(),
-            )));
-            assign!([Opcode::CASTF], castf_chip);
-            chips.push(MachineChipVariant::CastF(castf_chip));
-        }
-        if config.secp256k1_enabled {
-            let secp256k1_add_unequal_chip = Rc::new(RefCell::new(EcAddUnequalChip::new(
-                execution_bus,
-                program_bus,
-                memory_chip.clone(),
-            )));
-            let secp256k1_double_chip = Rc::new(RefCell::new(EcDoubleChip::new(
-                execution_bus,
-                program_bus,
-                memory_chip.clone(),
-            )));
-            assign!([Opcode::SECP256K1_EC_ADD_NE], secp256k1_add_unequal_chip);
-            assign!([Opcode::SECP256K1_EC_DOUBLE], secp256k1_double_chip);
-            chips.push(MachineChipVariant::Secp256k1AddUnequal(
-                secp256k1_add_unequal_chip,
-            ));
-            chips.push(MachineChipVariant::Secp256k1Double(secp256k1_double_chip));
-        }
         chips.push(MachineChipVariant::ByteXor(byte_xor_chip));
         // Most chips have a reference to the memory chip, and the memory chip has a reference to
         // the range checker chip.
@@ -313,7 +373,7 @@ impl<F: PrimeField32> ExecutionSegment<F> {
             config,
             executors,
             chips,
-            core_chip,
+            core_chip: core_chip.unwrap(),
             program_chip,
             memory_chip,
             connector_chip,
@@ -360,27 +420,25 @@ impl<F: PrimeField32> ExecutionSegment<F> {
             let prev_trace_cells = self.current_trace_cells();
 
             // runtime only instruction handling
-            match opcode {
-                Opcode::FAIL => {
-                    if let Some(mut backtrace) = prev_backtrace {
-                        backtrace.resolve();
-                        eprintln!("eDSL program failure; backtrace:\n{:?}", backtrace);
-                    } else {
-                        eprintln!("eDSL program failure; no backtrace");
-                    }
-                    return Err(ExecutionError::Fail(pc_usize));
+            // FIXME: assumes CoreOpcode has offset 0:
+            if opcode == CoreOpcode::FAIL as usize {
+                if let Some(mut backtrace) = prev_backtrace {
+                    backtrace.resolve();
+                    eprintln!("eDSL program failure; backtrace:\n{:?}", backtrace);
+                } else {
+                    eprintln!("eDSL program failure; no backtrace");
                 }
-                Opcode::CT_START => {
-                    self.update_chip_metrics();
-                    self.cycle_tracker
-                        .start(instruction.debug.clone(), self.collected_metrics.clone())
-                }
-                Opcode::CT_END => {
-                    self.update_chip_metrics();
-                    self.cycle_tracker
-                        .end(instruction.debug.clone(), self.collected_metrics.clone())
-                }
-                _ => {}
+                return Err(ExecutionError::Fail(pc_usize));
+            }
+            if opcode == CoreOpcode::CT_START as usize {
+                self.update_chip_metrics();
+                self.cycle_tracker
+                    .start(instruction.debug.clone(), self.collected_metrics.clone())
+            }
+            if opcode == CoreOpcode::CT_END as usize {
+                self.update_chip_metrics();
+                self.cycle_tracker
+                    .end(instruction.debug.clone(), self.collected_metrics.clone())
             }
             prev_backtrace = trace;
 
@@ -415,7 +473,7 @@ impl<F: PrimeField32> ExecutionSegment<F> {
                             now_value - prev_value;
                     }
                 }
-                if opcode == Opcode::TERMINATE {
+                if opcode == CoreOpcode::TERMINATE as usize {
                     self.update_chip_metrics();
                     // Due to row padding, the padded rows will all have opcode TERMINATE, so stop metric collection after the first one
                     collect_metrics = false;
@@ -424,7 +482,7 @@ impl<F: PrimeField32> ExecutionSegment<F> {
                         .absolute(now_trace_cells.into_values().sum::<usize>() as u64);
                 }
             }
-            if opcode == Opcode::TERMINATE {
+            if opcode == CoreOpcode::TERMINATE as usize {
                 break;
             }
             if self.should_segment() {
