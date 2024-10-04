@@ -1,6 +1,6 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms |
 | --- | --- | --- | --- | --- |
-| fibonacci_program_inner | 708.0 | 1,782,308 <span style="color: red">(+8 [+0.0%])</span> | 200,532 <span style="color: red">(+6 [+0.0%])</span> | 1.0 |
+| fibonacci_program_inner | 704.0 <span style="color: green">(-4.0 [-0.6%])</span> | 1,782,308 | 200,532 | 1.0 |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -46,7 +46,7 @@
 | group | air_name | cells | constraints | interactions | main_cols | perm_cols | prep_cols | quotient_deg | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | fibonacci_program_inner | ProgramAir<BabyBear> | 1,152 | 4 | 1 | 1 | 8 | 9 | 1 | 128 |
-| fibonacci_program_inner | CoreAir | 848 <span style="color: red">(+8 [+1.0%])</span> | 115 <span style="color: red">(+1 [+0.9%])</span> | 19 | 62 <span style="color: red">(+1 [+1.6%])</span> | 44 |  | 2 | 8 |
+| fibonacci_program_inner | CoreAir | 848 | 115 | 19 | 62 | 44 |  | 2 | 8 |
 | fibonacci_program_inner | FieldArithmeticAir | 8,576 | 28 | 15 | 31 | 36 |  | 2 | 128 |
 | fibonacci_program_inner | XorLookupAir<8> | 589,824 | 4 | 1 | 1 | 8 | 3 | 1 | 65,536 |
 | fibonacci_program_inner | MemoryAuditAir | 2,240 | 21 | 6 | 19 | 16 |  | 2 | 64 |
@@ -55,7 +55,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11183509101/artifacts/2016802270)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/b071c8a1a74a1114f39cd11633595a7534115b18
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11187080286/artifacts/2017809242)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/8aa767bdac6d333767d578a04b528e3e877ab4e0
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11183509101)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11187080286)
