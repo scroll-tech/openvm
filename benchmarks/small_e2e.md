@@ -1,7 +1,7 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- |
-| bench_program_inner | 1,209.0 <span style="color: green">(-4.0 [-0.3%])</span> | 1,915,681 | 277,324 | 2.0 |  |
-| inner_verifier | 67,707.0 <span style="color: red">(+20.0 [+0.0%])</span> | 712,704,020 | 384,674,329 <span style="color: red">(+9,531 [+0.0%])</span> | 34,426.0 <span style="color: green">(-406.0 [-1.2%])</span> | 45,606.0 <span style="color: green">(-630.0 [-1.4%])</span> |
+| bench_program_inner | 1,211.0 <span style="color: red">(+2.0 [+0.2%])</span> | 1,915,713 <span style="color: red">(+32 [+0.0%])</span> | 277,352 <span style="color: red">(+28 [+0.0%])</span> | 2.0 |  |
+| inner_verifier | 67,110.0 <span style="color: green">(-597.0 [-0.9%])</span> | 716,898,324 <span style="color: red">(+4,194,304 [+0.6%])</span> | 388,606,487 <span style="color: red">(+3,932,158 [+1.0%])</span> | 35,055.0 <span style="color: red">(+629.0 [+1.8%])</span> | 46,886.0 <span style="color: red">(+1,280.0 [+2.8%])</span> |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -17,15 +17,15 @@
 | bench_program_inner | Program | 37 |
 | bench_program_inner | RangeChecker | 131,072 |
 | inner_verifier | ByteXor | 65,536 |
-| inner_verifier | Core | 3,795,327 <span style="color: red">(+147 [+0.0%])</span> |
-| inner_verifier | FieldArithmetic | 1,556,022 <span style="color: red">(+6 [+0.0%])</span> |
-| inner_verifier | FieldExtension | 843,140 |
-| inner_verifier | Memory | 622,614 |
-| inner_verifier | Memory 2 | 1,941,495 <span style="color: green">(-12 [-0.0%])</span> |
-| inner_verifier | Memory 3 | 970,792 <span style="color: green">(-6 [-0.0%])</span> |
-| inner_verifier | Memory 4 | 33,096 |
-| inner_verifier | Poseidon2 | 20,103 |
-| inner_verifier | Program | 203,951 |
+| inner_verifier | Core | 3,796,884 <span style="color: red">(+1,557 [+0.0%])</span> |
+| inner_verifier | FieldArithmetic | 1,556,271 <span style="color: red">(+249 [+0.0%])</span> |
+| inner_verifier | FieldExtension | 843,315 <span style="color: red">(+175 [+0.0%])</span> |
+| inner_verifier | Memory | 622,695 <span style="color: red">(+81 [+0.0%])</span> |
+| inner_verifier | Memory 2 | 1,941,943 <span style="color: red">(+448 [+0.0%])</span> |
+| inner_verifier | Memory 3 | 971,037 <span style="color: red">(+245 [+0.0%])</span> |
+| inner_verifier | Memory 4 | 33,138 <span style="color: red">(+42 [+0.1%])</span> |
+| inner_verifier | Poseidon2 | 20,124 <span style="color: red">(+21 [+0.1%])</span> |
+| inner_verifier | Program | 203,982 <span style="color: red">(+31 [+0.0%])</span> |
 | inner_verifier | RangeChecker | 131,072 |
 
 <details>
@@ -33,100 +33,100 @@
 
 | group | dsl_ir | opcode | frequency |
 | --- | --- | --- | --- |
-| bench_program_inner |  | JAL | 1 |
-| bench_program_inner |  | STOREW | 2 |
-| bench_program_inner | AddE | FE4ADD | 1 |
-| bench_program_inner | AddF | FADD | 1 |
-| bench_program_inner | AddVI | FADD | 6 |
-| bench_program_inner | Alloc | FADD | 2 |
-| bench_program_inner | Alloc | FMUL | 2 |
-| bench_program_inner | Alloc | LOADW | 2 |
-| bench_program_inner | For | BNE | 3 |
-| bench_program_inner | For | FADD | 2 |
-| bench_program_inner | For | JAL | 1 |
-| bench_program_inner | For | STOREW | 1 |
-| bench_program_inner | Halt | TERMINATE | 1 |
-| bench_program_inner | IfEqI | BNE | 2 |
-| bench_program_inner | ImmE | STOREW | 8 |
-| bench_program_inner | ImmF | STOREW | 2 |
-| bench_program_inner | ImmV | STOREW | 3 |
-| bench_program_inner | Keccak256 | KECCAK256 | 1 |
-| bench_program_inner | StoreV | STOREW2 | 2 |
-| inner_verifier |  | JAL | 1 |
-| inner_verifier |  | STOREW | 2 |
-| inner_verifier | AddE | FE4ADD | 223,739 |
-| inner_verifier | AddEFFI | LOADW | 127 |
-| inner_verifier | AddEFFI | STOREW | 381 |
-| inner_verifier | AddEFI | FADD | 164 |
-| inner_verifier | AddEI | FADD | 66,780 |
-| inner_verifier | AddFI | FADD | 12,457 <span style="color: red">(+6 [+0.0%])</span> |
-| inner_verifier | AddV | FADD | 5,980 |
-| inner_verifier | AddVI | FADD | 271,372 |
-| inner_verifier | Alloc | FADD | 23,824 |
-| inner_verifier | Alloc | FMUL | 14,353 |
-| inner_verifier | Alloc | LOADW | 23,824 |
-| inner_verifier | AssertEqE | BNE | 132 |
-| inner_verifier | AssertEqEI | BNE | 4 |
-| inner_verifier | AssertEqF | BNE | 4,054 |
-| inner_verifier | AssertEqV | BNE | 1,129 |
-| inner_verifier | AssertEqVI | BNE | 188 |
-| inner_verifier | CycleTrackerEnd | CT_END | 104,335 |
-| inner_verifier | CycleTrackerStart | CT_START | 104,335 |
-| inner_verifier | DivE | BBE4DIV | 194,967 |
-| inner_verifier | DivEIN | BBE4DIV | 30 |
-| inner_verifier | DivEIN | STOREW | 120 |
-| inner_verifier | DivFIN | FDIV | 72 |
-| inner_verifier | For | BNE | 546,377 |
-| inner_verifier | For | FADD | 527,869 |
-| inner_verifier | For | JAL | 18,508 |
-| inner_verifier | For | LOADW | 966 |
-| inner_verifier | For | STOREW | 17,542 |
-| inner_verifier | Halt | TERMINATE | 1 |
-| inner_verifier | HintBitsF | HINT_BITS | 22 |
-| inner_verifier | HintInputVec | HINT_INPUT | 9,471 |
-| inner_verifier | IfEq | BNE | 6,158 |
-| inner_verifier | IfEqI | BNE | 121,234 |
-| inner_verifier | IfEqI | JAL | 8,979 <span style="color: red">(+147 [+1.7%])</span> |
-| inner_verifier | IfNe | BEQ | 6,893 |
-| inner_verifier | IfNe | JAL | 21 |
-| inner_verifier | IfNeI | BEQ | 946 |
-| inner_verifier | ImmE | STOREW | 12,344 |
-| inner_verifier | ImmF | STOREW | 14,565 |
-| inner_verifier | ImmV | STOREW | 21,584 |
-| inner_verifier | LoadE | LOADW | 41,448 |
-| inner_verifier | LoadE | LOADW2 | 800,184 |
-| inner_verifier | LoadF | LOADW | 14,498 |
-| inner_verifier | LoadF | LOADW2 | 298,670 |
-| inner_verifier | LoadV | LOADW | 12,257 |
-| inner_verifier | LoadV | LOADW2 | 61,816 |
-| inner_verifier | MulE | BBE4MUL | 408,006 |
-| inner_verifier | MulEF | FMUL | 1,668 |
-| inner_verifier | MulEFI | FMUL | 1,444 |
-| inner_verifier | MulEI | BBE4MUL | 2,562 |
-| inner_verifier | MulEI | STOREW | 10,248 |
-| inner_verifier | MulF | FMUL | 22,173 |
-| inner_verifier | MulFI | FMUL | 12 |
-| inner_verifier | MulV | FMUL | 682 |
-| inner_verifier | MulVI | FMUL | 8,259 |
-| inner_verifier | NegE | FMUL | 184 |
-| inner_verifier | Poseidon2CompressBabyBear | COMP_POS2 | 7,224 |
-| inner_verifier | Poseidon2PermuteBabyBear | PERM_POS2 | 12,879 |
-| inner_verifier | StoreE | STOREW | 11,236 |
-| inner_verifier | StoreE | STOREW2 | 11,156 |
-| inner_verifier | StoreF | STOREW | 12,624 |
-| inner_verifier | StoreF | STOREW2 | 101,565 |
-| inner_verifier | StoreHintWord | FADD | 192,347 |
-| inner_verifier | StoreHintWord | SHINTW | 202,500 |
-| inner_verifier | StoreV | STOREW | 1,833 |
-| inner_verifier | StoreV | STOREW2 | 23,461 |
-| inner_verifier | SubE | FE4SUB | 13,836 |
-| inner_verifier | SubEF | FSUB | 389,196 |
-| inner_verifier | SubEF | LOADW | 1,167,588 |
-| inner_verifier | SubEFI | FADD | 1,284 |
-| inner_verifier | SubEI | FADD | 240 |
-| inner_verifier | SubV | FSUB | 14,028 |
-| inner_verifier | SubVI | FSUB | 1,277 |
-| inner_verifier | SubVIN | FSUB | 357 |
+| bench_program_inner |  | 2 | 2 |
+| bench_program_inner |  | 5 | 1 |
+| bench_program_inner | AddE | 272 | 1 |
+| bench_program_inner | AddF | 256 | 1 |
+| bench_program_inner | AddVI | 256 | 6 |
+| bench_program_inner | Alloc | 1 | 2 |
+| bench_program_inner | Alloc | 256 | 2 |
+| bench_program_inner | Alloc | 258 | 2 |
+| bench_program_inner | For | 2 | 1 |
+| bench_program_inner | For | 256 | 2 |
+| bench_program_inner | For | 5 | 1 |
+| bench_program_inner | For | 7 | 3 |
+| bench_program_inner | Halt | 8 | 1 |
+| bench_program_inner | IfEqI | 7 | 2 |
+| bench_program_inner | ImmE | 2 | 8 |
+| bench_program_inner | ImmF | 2 | 2 |
+| bench_program_inner | ImmV | 2 | 3 |
+| bench_program_inner | Keccak256 | 304 | 1 |
+| bench_program_inner | StoreV | 4 | 2 |
+| inner_verifier |  | 2 | 2 |
+| inner_verifier |  | 5 | 1 |
+| inner_verifier | AddE | 272 | 223,787 |
+| inner_verifier | AddEFFI | 1 | 127 |
+| inner_verifier | AddEFFI | 2 | 381 |
+| inner_verifier | AddEFI | 256 | 168 |
+| inner_verifier | AddEI | 256 | 66,784 |
+| inner_verifier | AddFI | 256 | 12,459 |
+| inner_verifier | AddV | 256 | 5,980 |
+| inner_verifier | AddVI | 256 | 271,414 |
+| inner_verifier | Alloc | 1 | 23,824 |
+| inner_verifier | Alloc | 256 | 23,824 |
+| inner_verifier | Alloc | 258 | 14,353 |
+| inner_verifier | AssertEqE | 7 | 132 |
+| inner_verifier | AssertEqEI | 7 | 4 |
+| inner_verifier | AssertEqF | 7 | 4,054 |
+| inner_verifier | AssertEqV | 7 | 1,129 |
+| inner_verifier | AssertEqVI | 7 | 188 |
+| inner_verifier | CycleTrackerEnd | 17 | 104,356 |
+| inner_verifier | CycleTrackerStart | 16 | 104,356 |
+| inner_verifier | DivE | 275 | 195,009 |
+| inner_verifier | DivEIN | 2 | 120 |
+| inner_verifier | DivEIN | 275 | 30 |
+| inner_verifier | DivFIN | 259 | 72 |
+| inner_verifier | For | 1 | 966 |
+| inner_verifier | For | 2 | 17,542 |
+| inner_verifier | For | 256 | 527,961 |
+| inner_verifier | For | 5 | 18,508 |
+| inner_verifier | For | 7 | 546,469 |
+| inner_verifier | Halt | 8 | 1 |
+| inner_verifier | HintBitsF | 14 | 22 |
+| inner_verifier | HintInputVec | 13 | 9,471 |
+| inner_verifier | IfEq | 7 | 6,158 |
+| inner_verifier | IfEqI | 5 | 9,824 |
+| inner_verifier | IfEqI | 7 | 121,255 |
+| inner_verifier | IfNe | 5 | 21 |
+| inner_verifier | IfNe | 6 | 6,893 |
+| inner_verifier | IfNeI | 6 | 946 |
+| inner_verifier | ImmE | 2 | 12,360 |
+| inner_verifier | ImmF | 2 | 14,565 |
+| inner_verifier | ImmV | 2 | 21,584 |
+| inner_verifier | LoadE | 1 | 41,456 |
+| inner_verifier | LoadE | 3 | 800,352 |
+| inner_verifier | LoadF | 1 | 14,498 |
+| inner_verifier | LoadF | 3 | 298,733 |
+| inner_verifier | LoadV | 1 | 12,257 |
+| inner_verifier | LoadV | 3 | 61,816 |
+| inner_verifier | MulE | 274 | 408,091 |
+| inner_verifier | MulEF | 258 | 1,668 |
+| inner_verifier | MulEFI | 258 | 1,432 |
+| inner_verifier | MulEI | 2 | 10,248 |
+| inner_verifier | MulEI | 274 | 2,562 |
+| inner_verifier | MulF | 258 | 22,173 |
+| inner_verifier | MulFI | 258 | 12 |
+| inner_verifier | MulV | 258 | 682 |
+| inner_verifier | MulVI | 258 | 8,259 |
+| inner_verifier | NegE | 258 | 184 |
+| inner_verifier | Poseidon2CompressBabyBear | 289 | 7,224 |
+| inner_verifier | Poseidon2PermuteBabyBear | 288 | 12,900 |
+| inner_verifier | StoreE | 2 | 11,236 |
+| inner_verifier | StoreE | 4 | 11,156 |
+| inner_verifier | StoreF | 2 | 12,624 |
+| inner_verifier | StoreF | 4 | 101,586 |
+| inner_verifier | StoreHintWord | 12 | 202,529 |
+| inner_verifier | StoreHintWord | 256 | 192,376 |
+| inner_verifier | StoreV | 2 | 1,833 |
+| inner_verifier | StoreV | 4 | 23,461 |
+| inner_verifier | SubE | 273 | 13,836 |
+| inner_verifier | SubEF | 1 | 1,167,840 |
+| inner_verifier | SubEF | 257 | 389,280 |
+| inner_verifier | SubEFI | 256 | 1,288 |
+| inner_verifier | SubEI | 256 | 240 |
+| inner_verifier | SubV | 257 | 14,028 |
+| inner_verifier | SubVI | 257 | 1,277 |
+| inner_verifier | SubVIN | 257 | 357 |
 
 </details>
 
@@ -135,244 +135,244 @@
 
 | group | air_name | dsl_ir | opcode | cells_used |
 | --- | --- | --- | --- | --- |
-| bench_program_inner | Audit |  | JAL | 19 |
-| bench_program_inner | CoreAir |  | JAL | 61 |
-| bench_program_inner | Audit |  | STOREW | 38 |
-| bench_program_inner | CoreAir |  | STOREW | 122 |
-| bench_program_inner | AccessAdapter<2> | AddE | FE4ADD | 66 |
-| bench_program_inner | AccessAdapter<4> | AddE | FE4ADD | 39 |
-| bench_program_inner | Audit | AddE | FE4ADD | 76 |
-| bench_program_inner | FieldExtensionArithmeticAir | AddE | FE4ADD | 41 |
-| bench_program_inner | Audit | AddF | FADD | 19 |
-| bench_program_inner | FieldArithmeticAir | AddF | FADD | 31 |
-| bench_program_inner | Audit | AddVI | FADD | 38 |
-| bench_program_inner | FieldArithmeticAir | AddVI | FADD | 186 |
-| bench_program_inner | FieldArithmeticAir | Alloc | FADD | 62 |
-| bench_program_inner | FieldArithmeticAir | Alloc | FMUL | 62 |
-| bench_program_inner | Audit | Alloc | LOADW | 38 |
-| bench_program_inner | CoreAir | Alloc | LOADW | 122 |
-| bench_program_inner | CoreAir | For | BNE | 183 |
-| bench_program_inner | FieldArithmeticAir | For | FADD | 62 |
-| bench_program_inner | CoreAir | For | JAL | 61 |
-| bench_program_inner | Audit | For | STOREW | 19 |
-| bench_program_inner | CoreAir | For | STOREW | 61 |
-| bench_program_inner | CoreAir | Halt | TERMINATE | 61 |
-| bench_program_inner | CoreAir | IfEqI | BNE | 122 |
-| bench_program_inner | Audit | ImmE | STOREW | 152 |
-| bench_program_inner | CoreAir | ImmE | STOREW | 488 |
-| bench_program_inner | Audit | ImmF | STOREW | 38 |
-| bench_program_inner | CoreAir | ImmF | STOREW | 122 |
-| bench_program_inner | Audit | ImmV | STOREW | 38 |
-| bench_program_inner | CoreAir | ImmV | STOREW | 183 |
-| bench_program_inner | AccessAdapter<2> | Keccak256 | KECCAK256 | 220 |
-| bench_program_inner | AccessAdapter<4> | Keccak256 | KECCAK256 | 130 |
-| bench_program_inner | AccessAdapter<8> | Keccak256 | KECCAK256 | 85 |
-| bench_program_inner | Audit | Keccak256 | KECCAK256 | 722 |
-| bench_program_inner | KeccakVmAir | Keccak256 | KECCAK256 | 76,752 |
-| bench_program_inner | Audit | StoreV | STOREW2 | 38 |
-| bench_program_inner | CoreAir | StoreV | STOREW2 | 122 |
-| inner_verifier | Audit |  | JAL | 19 |
-| inner_verifier | CoreAir |  | JAL | 65 |
-| inner_verifier | Audit |  | STOREW | 38 |
-| inner_verifier | CoreAir |  | STOREW | 130 |
-| inner_verifier | AccessAdapter<2> | AddE | FE4ADD | 1,123,078 |
-| inner_verifier | AccessAdapter<4> | AddE | FE4ADD | 663,637 |
-| inner_verifier | Audit | AddE | FE4ADD | 2,156,728 |
-| inner_verifier | FieldExtensionArithmeticAir | AddE | FE4ADD | 9,173,299 |
-| inner_verifier | AccessAdapter<2> | AddEFFI | LOADW | 704 |
-| inner_verifier | AccessAdapter<4> | AddEFFI | LOADW | 832 |
-| inner_verifier | Audit | AddEFFI | LOADW | 798 |
-| inner_verifier | CoreAir | AddEFFI | LOADW | 8,255 |
-| inner_verifier | AccessAdapter<2> | AddEFFI | STOREW | 704 |
-| inner_verifier | Audit | AddEFFI | STOREW | 2,394 |
-| inner_verifier | CoreAir | AddEFFI | STOREW | 24,765 |
-| inner_verifier | AccessAdapter<2> | AddEFI | FADD | 286 |
-| inner_verifier | AccessAdapter<4> | AddEFI | FADD | 169 |
-| inner_verifier | Audit | AddEFI | FADD | 3,116 |
-| inner_verifier | FieldArithmeticAir | AddEFI | FADD | 5,084 |
-| inner_verifier | AccessAdapter<2> | AddEI | FADD | 361,548 <span style="color: green">(-66 [-0.0%])</span> |
-| inner_verifier | AccessAdapter<4> | AddEI | FADD | 213,642 <span style="color: green">(-39 [-0.0%])</span> |
-| inner_verifier | Audit | AddEI | FADD | 1,177,012 |
-| inner_verifier | FieldArithmeticAir | AddEI | FADD | 2,070,180 |
-| inner_verifier | Audit | AddFI | FADD | 3,021 |
-| inner_verifier | FieldArithmeticAir | AddFI | FADD | 386,167 <span style="color: red">(+186 [+0.0%])</span> |
-| inner_verifier | Audit | AddV | FADD | 19 |
-| inner_verifier | FieldArithmeticAir | AddV | FADD | 185,380 |
-| inner_verifier | Audit | AddVI | FADD | 17,005 |
-| inner_verifier | FieldArithmeticAir | AddVI | FADD | 8,412,532 |
-| inner_verifier | FieldArithmeticAir | Alloc | FADD | 738,544 |
-| inner_verifier | AccessAdapter<2> | Alloc | FMUL | 33 |
-| inner_verifier | AccessAdapter<4> | Alloc | FMUL | 39 |
-| inner_verifier | FieldArithmeticAir | Alloc | FMUL | 444,943 |
-| inner_verifier | Audit | Alloc | LOADW | 3,420 |
-| inner_verifier | CoreAir | Alloc | LOADW | 1,548,560 |
-| inner_verifier | AccessAdapter<2> | AssertEqE | BNE | 726 |
-| inner_verifier | AccessAdapter<4> | AssertEqE | BNE | 429 |
-| inner_verifier | CoreAir | AssertEqE | BNE | 8,580 |
-| inner_verifier | AccessAdapter<2> | AssertEqEI | BNE | 22 |
-| inner_verifier | AccessAdapter<4> | AssertEqEI | BNE | 13 |
-| inner_verifier | CoreAir | AssertEqEI | BNE | 260 |
-| inner_verifier | CoreAir | AssertEqF | BNE | 263,510 |
-| inner_verifier | CoreAir | AssertEqV | BNE | 73,385 |
-| inner_verifier | CoreAir | AssertEqVI | BNE | 12,220 |
-| inner_verifier | CoreAir | CycleTrackerEnd | CT_END | 6,781,775 |
-| inner_verifier | CoreAir | CycleTrackerStart | CT_START | 6,781,775 |
-| inner_verifier | AccessAdapter<2> | DivE | BBE4DIV | 8,563,104 |
-| inner_verifier | AccessAdapter<4> | DivE | BBE4DIV | 5,060,016 |
-| inner_verifier | Audit | DivE | BBE4DIV | 1,672 |
-| inner_verifier | FieldExtensionArithmeticAir | DivE | BBE4DIV | 7,993,647 |
-| inner_verifier | AccessAdapter<2> | DivEIN | BBE4DIV | 1,694 |
-| inner_verifier | AccessAdapter<4> | DivEIN | BBE4DIV | 1,001 |
-| inner_verifier | Audit | DivEIN | BBE4DIV | 2,204 |
-| inner_verifier | FieldExtensionArithmeticAir | DivEIN | BBE4DIV | 1,230 |
-| inner_verifier | AccessAdapter<2> | DivEIN | STOREW | 429 |
-| inner_verifier | AccessAdapter<4> | DivEIN | STOREW | 117 |
-| inner_verifier | CoreAir | DivEIN | STOREW | 7,800 |
-| inner_verifier | Audit | DivFIN | FDIV | 1,311 |
-| inner_verifier | FieldArithmeticAir | DivFIN | FDIV | 2,232 |
-| inner_verifier | CoreAir | For | BNE | 35,514,505 |
-| inner_verifier | FieldArithmeticAir | For | FADD | 16,363,939 |
-| inner_verifier | AccessAdapter<2> | For | JAL | 418 |
-| inner_verifier | AccessAdapter<4> | For | JAL | 494 |
-| inner_verifier | CoreAir | For | JAL | 1,203,020 |
-| inner_verifier | Audit | For | LOADW | 399 |
-| inner_verifier | CoreAir | For | LOADW | 62,790 |
-| inner_verifier | Audit | For | STOREW | 2,356 |
-| inner_verifier | CoreAir | For | STOREW | 1,140,230 |
-| inner_verifier | CoreAir | Halt | TERMINATE | 65 |
-| inner_verifier | CoreAir | HintBitsF | HINT_BITS | 1,430 |
-| inner_verifier | CoreAir | HintInputVec | HINT_INPUT | 615,615 |
-| inner_verifier | CoreAir | IfEq | BNE | 400,270 |
-| inner_verifier | CoreAir | IfEqI | BNE | 7,880,210 |
-| inner_verifier | CoreAir | IfEqI | JAL | 583,635 <span style="color: red">(+9,555 [+1.7%])</span> |
-| inner_verifier | CoreAir | IfNe | BEQ | 448,045 |
-| inner_verifier | CoreAir | IfNe | JAL | 1,365 |
-| inner_verifier | CoreAir | IfNeI | BEQ | 61,490 |
-| inner_verifier | AccessAdapter<2> | ImmE | STOREW | 462 |
-| inner_verifier | AccessAdapter<4> | ImmE | STOREW | 273 |
-| inner_verifier | Audit | ImmE | STOREW | 226,480 |
-| inner_verifier | CoreAir | ImmE | STOREW | 802,360 |
-| inner_verifier | Audit | ImmF | STOREW | 3,876 |
-| inner_verifier | CoreAir | ImmF | STOREW | 946,725 |
-| inner_verifier | Audit | ImmV | STOREW | 18,506 |
-| inner_verifier | CoreAir | ImmV | STOREW | 1,402,960 |
-| inner_verifier | AccessAdapter<2> | LoadE | LOADW | 16,126 |
-| inner_verifier | AccessAdapter<4> | LoadE | LOADW | 9,529 |
-| inner_verifier | Audit | LoadE | LOADW | 704,672 |
-| inner_verifier | CoreAir | LoadE | LOADW | 2,694,120 |
-| inner_verifier | AccessAdapter<2> | LoadE | LOADW2 | 24,090 |
-| inner_verifier | AccessAdapter<4> | LoadE | LOADW2 | 14,235 |
-| inner_verifier | CoreAir | LoadE | LOADW2 | 52,011,960 |
-| inner_verifier | AccessAdapter<2> | LoadF | LOADW | 22,176 |
-| inner_verifier | AccessAdapter<4> | LoadF | LOADW | 13,104 |
-| inner_verifier | AccessAdapter<8> | LoadF | LOADW | 8,568 |
-| inner_verifier | Audit | LoadF | LOADW | 63,536 |
-| inner_verifier | CoreAir | LoadF | LOADW | 942,370 |
-| inner_verifier | AccessAdapter<2> | LoadF | LOADW2 | 605 |
-| inner_verifier | AccessAdapter<4> | LoadF | LOADW2 | 364 |
-| inner_verifier | AccessAdapter<8> | LoadF | LOADW2 | 391 |
-| inner_verifier | Audit | LoadF | LOADW2 | 1,767 |
-| inner_verifier | CoreAir | LoadF | LOADW2 | 19,413,550 |
-| inner_verifier | Audit | LoadV | LOADW | 28,158 |
-| inner_verifier | CoreAir | LoadV | LOADW | 796,705 |
-| inner_verifier | Audit | LoadV | LOADW2 | 3,040 |
-| inner_verifier | CoreAir | LoadV | LOADW2 | 4,018,040 |
-| inner_verifier | AccessAdapter<2> | MulE | BBE4MUL | 510,158 <span style="color: green">(-66 [-0.0%])</span> |
-| inner_verifier | AccessAdapter<4> | MulE | BBE4MUL | 301,457 <span style="color: green">(-39 [-0.0%])</span> |
-| inner_verifier | Audit | MulE | BBE4MUL | 1,293,140 |
-| inner_verifier | FieldExtensionArithmeticAir | MulE | BBE4MUL | 16,728,246 |
-| inner_verifier | AccessAdapter<2> | MulEF | FMUL | 7,876 |
-| inner_verifier | AccessAdapter<4> | MulEF | FMUL | 4,654 |
-| inner_verifier | Audit | MulEF | FMUL | 4,484 |
-| inner_verifier | FieldArithmeticAir | MulEF | FMUL | 51,708 |
-| inner_verifier | AccessAdapter<2> | MulEFI | FMUL | 1,122 |
-| inner_verifier | AccessAdapter<4> | MulEFI | FMUL | 663 |
-| inner_verifier | Audit | MulEFI | FMUL | 27,436 |
-| inner_verifier | FieldArithmeticAir | MulEFI | FMUL | 44,764 |
-| inner_verifier | AccessAdapter<2> | MulEI | BBE4MUL | 165,594 |
-| inner_verifier | AccessAdapter<4> | MulEI | BBE4MUL | 97,851 |
-| inner_verifier | Audit | MulEI | BBE4MUL | 189,848 |
-| inner_verifier | FieldExtensionArithmeticAir | MulEI | BBE4MUL | 105,042 |
-| inner_verifier | AccessAdapter<2> | MulEI | STOREW | 56,122 |
-| inner_verifier | AccessAdapter<4> | MulEI | STOREW | 33,033 |
-| inner_verifier | Audit | MulEI | STOREW | 57 |
-| inner_verifier | CoreAir | MulEI | STOREW | 666,120 |
-| inner_verifier | Audit | MulF | FMUL | 760 |
-| inner_verifier | FieldArithmeticAir | MulF | FMUL | 687,363 |
-| inner_verifier | Audit | MulFI | FMUL | 228 |
-| inner_verifier | FieldArithmeticAir | MulFI | FMUL | 372 |
-| inner_verifier | Audit | MulV | FMUL | 12,901 |
-| inner_verifier | FieldArithmeticAir | MulV | FMUL | 21,142 |
-| inner_verifier | Audit | MulVI | FMUL | 114 |
-| inner_verifier | FieldArithmeticAir | MulVI | FMUL | 256,029 |
-| inner_verifier | AccessAdapter<2> | NegE | FMUL | 902 |
-| inner_verifier | AccessAdapter<4> | NegE | FMUL | 533 |
-| inner_verifier | Audit | NegE | FMUL | 3,496 |
-| inner_verifier | FieldArithmeticAir | NegE | FMUL | 5,704 |
-| inner_verifier | AccessAdapter<2> | Poseidon2CompressBabyBear | COMP_POS2 | 298,452 |
-| inner_verifier | AccessAdapter<4> | Poseidon2CompressBabyBear | COMP_POS2 | 176,358 |
-| inner_verifier | AccessAdapter<8> | Poseidon2CompressBabyBear | COMP_POS2 | 115,311 |
-| inner_verifier | Poseidon2VmAir<BabyBear> | Poseidon2CompressBabyBear | COMP_POS2 | 3,019,632 |
-| inner_verifier | AccessAdapter<2> | Poseidon2PermuteBabyBear | PERM_POS2 | 604,780 |
-| inner_verifier | AccessAdapter<4> | Poseidon2PermuteBabyBear | PERM_POS2 | 357,656 |
-| inner_verifier | AccessAdapter<8> | Poseidon2PermuteBabyBear | PERM_POS2 | 235,450 |
-| inner_verifier | Poseidon2VmAir<BabyBear> | Poseidon2PermuteBabyBear | PERM_POS2 | 5,383,422 |
-| inner_verifier | AccessAdapter<2> | StoreE | STOREW | 7,854 |
-| inner_verifier | AccessAdapter<4> | StoreE | STOREW | 4,641 |
-| inner_verifier | Audit | StoreE | STOREW | 213,484 |
-| inner_verifier | CoreAir | StoreE | STOREW | 730,340 |
-| inner_verifier | AccessAdapter<2> | StoreE | STOREW2 | 45,276 |
-| inner_verifier | AccessAdapter<4> | StoreE | STOREW2 | 26,754 |
-| inner_verifier | Audit | StoreE | STOREW2 | 28,424 |
-| inner_verifier | CoreAir | StoreE | STOREW2 | 725,140 |
-| inner_verifier | Audit | StoreF | STOREW | 239,856 |
-| inner_verifier | CoreAir | StoreF | STOREW | 820,560 |
-| inner_verifier | AccessAdapter<2> | StoreF | STOREW2 | 520,960 |
-| inner_verifier | AccessAdapter<4> | StoreF | STOREW2 | 308,126 |
-| inner_verifier | AccessAdapter<8> | StoreF | STOREW2 | 202,912 |
-| inner_verifier | Audit | StoreF | STOREW2 | 55,176 |
-| inner_verifier | CoreAir | StoreF | STOREW2 | 6,601,725 |
-| inner_verifier | FieldArithmeticAir | StoreHintWord | FADD | 5,962,757 |
-| inner_verifier | Audit | StoreHintWord | SHINTW | 3,847,500 |
-| inner_verifier | CoreAir | StoreHintWord | SHINTW | 13,162,500 |
-| inner_verifier | Audit | StoreV | STOREW | 34,827 |
-| inner_verifier | CoreAir | StoreV | STOREW | 119,145 |
-| inner_verifier | Audit | StoreV | STOREW2 | 441,484 |
-| inner_verifier | CoreAir | StoreV | STOREW2 | 1,524,965 |
-| inner_verifier | AccessAdapter<2> | SubE | FE4SUB | 458,172 |
-| inner_verifier | AccessAdapter<4> | SubE | FE4SUB | 270,738 |
-| inner_verifier | Audit | SubE | FE4SUB | 970,368 |
-| inner_verifier | FieldExtensionArithmeticAir | SubE | FE4SUB | 567,276 |
-| inner_verifier | AccessAdapter<2> | SubEF | FSUB | 4,280,914 |
-| inner_verifier | AccessAdapter<4> | SubEF | FSUB | 5,059,262 |
-| inner_verifier | Audit | SubEF | FSUB | 418 |
-| inner_verifier | FieldArithmeticAir | SubEF | FSUB | 12,065,076 |
-| inner_verifier | AccessAdapter<2> | SubEF | LOADW | 4,280,914 |
-| inner_verifier | Audit | SubEF | LOADW | 1,254 |
-| inner_verifier | CoreAir | SubEF | LOADW | 75,893,220 |
-| inner_verifier | AccessAdapter<2> | SubEFI | FADD | 176 |
-| inner_verifier | AccessAdapter<4> | SubEFI | FADD | 104 |
-| inner_verifier | Audit | SubEFI | FADD | 24,396 |
-| inner_verifier | FieldArithmeticAir | SubEFI | FADD | 39,804 |
-| inner_verifier | AccessAdapter<2> | SubEI | FADD | 968 |
-| inner_verifier | AccessAdapter<4> | SubEI | FADD | 572 |
-| inner_verifier | Audit | SubEI | FADD | 4,408 |
-| inner_verifier | FieldArithmeticAir | SubEI | FADD | 7,440 |
-| inner_verifier | Audit | SubV | FSUB | 57 |
-| inner_verifier | FieldArithmeticAir | SubV | FSUB | 434,868 |
-| inner_verifier | Audit | SubVI | FSUB | 14,003 |
-| inner_verifier | FieldArithmeticAir | SubVI | FSUB | 39,587 |
-| inner_verifier | FieldArithmeticAir | SubVIN | FSUB | 11,067 |
+| bench_program_inner | Audit |  | 2 | 38 |
+| bench_program_inner | CoreAir |  | 2 | 124 |
+| bench_program_inner | Audit |  | 5 | 19 |
+| bench_program_inner | CoreAir |  | 5 | 62 |
+| bench_program_inner | AccessAdapter<2> | AddE | 272 | 66 |
+| bench_program_inner | AccessAdapter<4> | AddE | 272 | 39 |
+| bench_program_inner | Audit | AddE | 272 | 76 |
+| bench_program_inner | FieldExtensionArithmeticAir | AddE | 272 | 41 |
+| bench_program_inner | Audit | AddF | 256 | 19 |
+| bench_program_inner | FieldArithmeticAir | AddF | 256 | 31 |
+| bench_program_inner | Audit | AddVI | 256 | 38 |
+| bench_program_inner | FieldArithmeticAir | AddVI | 256 | 186 |
+| bench_program_inner | Audit | Alloc | 1 | 38 |
+| bench_program_inner | CoreAir | Alloc | 1 | 124 |
+| bench_program_inner | FieldArithmeticAir | Alloc | 256 | 62 |
+| bench_program_inner | FieldArithmeticAir | Alloc | 258 | 62 |
+| bench_program_inner | Audit | For | 2 | 19 |
+| bench_program_inner | CoreAir | For | 2 | 62 |
+| bench_program_inner | FieldArithmeticAir | For | 256 | 62 |
+| bench_program_inner | CoreAir | For | 5 | 62 |
+| bench_program_inner | CoreAir | For | 7 | 186 |
+| bench_program_inner | CoreAir | Halt | 8 | 62 |
+| bench_program_inner | CoreAir | IfEqI | 7 | 124 |
+| bench_program_inner | Audit | ImmE | 2 | 152 |
+| bench_program_inner | CoreAir | ImmE | 2 | 496 |
+| bench_program_inner | Audit | ImmF | 2 | 38 |
+| bench_program_inner | CoreAir | ImmF | 2 | 124 |
+| bench_program_inner | Audit | ImmV | 2 | 38 |
+| bench_program_inner | CoreAir | ImmV | 2 | 186 |
+| bench_program_inner | AccessAdapter<2> | Keccak256 | 304 | 220 |
+| bench_program_inner | AccessAdapter<4> | Keccak256 | 304 | 130 |
+| bench_program_inner | AccessAdapter<8> | Keccak256 | 304 | 85 |
+| bench_program_inner | Audit | Keccak256 | 304 | 722 |
+| bench_program_inner | KeccakVmAir | Keccak256 | 304 | 76,752 |
+| bench_program_inner | Audit | StoreV | 4 | 38 |
+| bench_program_inner | CoreAir | StoreV | 4 | 124 |
+| inner_verifier | Audit |  | 2 | 38 |
+| inner_verifier | CoreAir |  | 2 | 132 |
+| inner_verifier | Audit |  | 5 | 19 |
+| inner_verifier | CoreAir |  | 5 | 66 |
+| inner_verifier | AccessAdapter<2> | AddE | 272 | 1,123,254 |
+| inner_verifier | AccessAdapter<4> | AddE | 272 | 663,741 |
+| inner_verifier | Audit | AddE | 272 | 2,157,184 |
+| inner_verifier | FieldExtensionArithmeticAir | AddE | 272 | 9,175,267 |
+| inner_verifier | AccessAdapter<2> | AddEFFI | 1 | 704 |
+| inner_verifier | AccessAdapter<4> | AddEFFI | 1 | 832 |
+| inner_verifier | Audit | AddEFFI | 1 | 798 |
+| inner_verifier | CoreAir | AddEFFI | 1 | 8,382 |
+| inner_verifier | AccessAdapter<2> | AddEFFI | 2 | 704 |
+| inner_verifier | Audit | AddEFFI | 2 | 2,394 |
+| inner_verifier | CoreAir | AddEFFI | 2 | 25,146 |
+| inner_verifier | AccessAdapter<2> | AddEFI | 256 | 286 |
+| inner_verifier | AccessAdapter<4> | AddEFI | 256 | 169 |
+| inner_verifier | Audit | AddEFI | 256 | 3,192 |
+| inner_verifier | FieldArithmeticAir | AddEFI | 256 | 5,208 |
+| inner_verifier | AccessAdapter<2> | AddEI | 256 | 361,834 |
+| inner_verifier | AccessAdapter<4> | AddEI | 256 | 213,811 |
+| inner_verifier | Audit | AddEI | 256 | 1,177,088 |
+| inner_verifier | FieldArithmeticAir | AddEI | 256 | 2,070,304 |
+| inner_verifier | Audit | AddFI | 256 | 3,021 |
+| inner_verifier | FieldArithmeticAir | AddFI | 256 | 386,229 |
+| inner_verifier | Audit | AddV | 256 | 19 |
+| inner_verifier | FieldArithmeticAir | AddV | 256 | 185,380 |
+| inner_verifier | Audit | AddVI | 256 | 17,005 |
+| inner_verifier | FieldArithmeticAir | AddVI | 256 | 8,413,834 |
+| inner_verifier | Audit | Alloc | 1 | 3,420 |
+| inner_verifier | CoreAir | Alloc | 1 | 1,572,384 |
+| inner_verifier | FieldArithmeticAir | Alloc | 256 | 738,544 |
+| inner_verifier | AccessAdapter<2> | Alloc | 258 | 33 |
+| inner_verifier | AccessAdapter<4> | Alloc | 258 | 39 |
+| inner_verifier | FieldArithmeticAir | Alloc | 258 | 444,943 |
+| inner_verifier | AccessAdapter<2> | AssertEqE | 7 | 726 |
+| inner_verifier | AccessAdapter<4> | AssertEqE | 7 | 429 |
+| inner_verifier | CoreAir | AssertEqE | 7 | 8,712 |
+| inner_verifier | AccessAdapter<2> | AssertEqEI | 7 | 22 |
+| inner_verifier | AccessAdapter<4> | AssertEqEI | 7 | 13 |
+| inner_verifier | CoreAir | AssertEqEI | 7 | 264 |
+| inner_verifier | CoreAir | AssertEqF | 7 | 267,564 |
+| inner_verifier | CoreAir | AssertEqV | 7 | 74,514 |
+| inner_verifier | CoreAir | AssertEqVI | 7 | 12,408 |
+| inner_verifier | CoreAir | CycleTrackerEnd | 17 | 6,887,496 |
+| inner_verifier | CoreAir | CycleTrackerStart | 16 | 6,887,496 |
+| inner_verifier | AccessAdapter<2> | DivE | 275 | 8,564,952 |
+| inner_verifier | AccessAdapter<4> | DivE | 275 | 5,061,108 |
+| inner_verifier | Audit | DivE | 275 | 1,672 |
+| inner_verifier | FieldExtensionArithmeticAir | DivE | 275 | 7,995,369 |
+| inner_verifier | AccessAdapter<2> | DivEIN | 2 | 429 |
+| inner_verifier | AccessAdapter<4> | DivEIN | 2 | 117 |
+| inner_verifier | CoreAir | DivEIN | 2 | 7,920 |
+| inner_verifier | AccessAdapter<2> | DivEIN | 275 | 1,694 |
+| inner_verifier | AccessAdapter<4> | DivEIN | 275 | 1,001 |
+| inner_verifier | Audit | DivEIN | 275 | 2,204 |
+| inner_verifier | FieldExtensionArithmeticAir | DivEIN | 275 | 1,230 |
+| inner_verifier | Audit | DivFIN | 259 | 1,311 |
+| inner_verifier | FieldArithmeticAir | DivFIN | 259 | 2,232 |
+| inner_verifier | Audit | For | 1 | 399 |
+| inner_verifier | CoreAir | For | 1 | 63,756 |
+| inner_verifier | Audit | For | 2 | 2,356 |
+| inner_verifier | CoreAir | For | 2 | 1,157,772 |
+| inner_verifier | FieldArithmeticAir | For | 256 | 16,366,791 |
+| inner_verifier | AccessAdapter<2> | For | 5 | 418 |
+| inner_verifier | AccessAdapter<4> | For | 5 | 494 |
+| inner_verifier | CoreAir | For | 5 | 1,221,528 |
+| inner_verifier | CoreAir | For | 7 | 36,066,954 |
+| inner_verifier | CoreAir | Halt | 8 | 66 |
+| inner_verifier | CoreAir | HintBitsF | 14 | 1,452 |
+| inner_verifier | CoreAir | HintInputVec | 13 | 625,086 |
+| inner_verifier | CoreAir | IfEq | 7 | 406,428 |
+| inner_verifier | CoreAir | IfEqI | 5 | 648,384 |
+| inner_verifier | CoreAir | IfEqI | 7 | 8,002,830 |
+| inner_verifier | CoreAir | IfNe | 5 | 1,386 |
+| inner_verifier | CoreAir | IfNe | 6 | 454,938 |
+| inner_verifier | CoreAir | IfNeI | 6 | 62,436 |
+| inner_verifier | AccessAdapter<2> | ImmE | 2 | 462 |
+| inner_verifier | AccessAdapter<4> | ImmE | 2 | 273 |
+| inner_verifier | Audit | ImmE | 2 | 226,784 |
+| inner_verifier | CoreAir | ImmE | 2 | 815,760 |
+| inner_verifier | Audit | ImmF | 2 | 3,876 |
+| inner_verifier | CoreAir | ImmF | 2 | 961,290 |
+| inner_verifier | Audit | ImmV | 2 | 18,506 |
+| inner_verifier | CoreAir | ImmV | 2 | 1,424,544 |
+| inner_verifier | AccessAdapter<2> | LoadE | 1 | 16,126 |
+| inner_verifier | AccessAdapter<4> | LoadE | 1 | 9,529 |
+| inner_verifier | Audit | LoadE | 1 | 704,824 |
+| inner_verifier | CoreAir | LoadE | 1 | 2,736,096 |
+| inner_verifier | AccessAdapter<2> | LoadE | 3 | 24,090 |
+| inner_verifier | AccessAdapter<4> | LoadE | 3 | 14,235 |
+| inner_verifier | CoreAir | LoadE | 3 | 52,823,232 |
+| inner_verifier | AccessAdapter<2> | LoadF | 1 | 22,176 |
+| inner_verifier | AccessAdapter<4> | LoadF | 1 | 13,104 |
+| inner_verifier | AccessAdapter<8> | LoadF | 1 | 8,568 |
+| inner_verifier | Audit | LoadF | 1 | 63,517 |
+| inner_verifier | CoreAir | LoadF | 1 | 956,868 |
+| inner_verifier | AccessAdapter<2> | LoadF | 3 | 605 |
+| inner_verifier | AccessAdapter<4> | LoadF | 3 | 364 |
+| inner_verifier | AccessAdapter<8> | LoadF | 3 | 391 |
+| inner_verifier | Audit | LoadF | 3 | 1,767 |
+| inner_verifier | CoreAir | LoadF | 3 | 19,716,378 |
+| inner_verifier | Audit | LoadV | 1 | 28,158 |
+| inner_verifier | CoreAir | LoadV | 1 | 808,962 |
+| inner_verifier | Audit | LoadV | 3 | 3,040 |
+| inner_verifier | CoreAir | LoadV | 3 | 4,079,856 |
+| inner_verifier | AccessAdapter<2> | MulE | 274 | 510,488 |
+| inner_verifier | AccessAdapter<4> | MulE | 274 | 301,652 |
+| inner_verifier | Audit | MulE | 274 | 1,293,216 |
+| inner_verifier | FieldExtensionArithmeticAir | MulE | 274 | 16,731,731 |
+| inner_verifier | AccessAdapter<2> | MulEF | 258 | 7,876 |
+| inner_verifier | AccessAdapter<4> | MulEF | 258 | 4,654 |
+| inner_verifier | Audit | MulEF | 258 | 4,484 |
+| inner_verifier | FieldArithmeticAir | MulEF | 258 | 51,708 |
+| inner_verifier | AccessAdapter<2> | MulEFI | 258 | 1,100 |
+| inner_verifier | AccessAdapter<4> | MulEFI | 258 | 650 |
+| inner_verifier | Audit | MulEFI | 258 | 27,208 |
+| inner_verifier | FieldArithmeticAir | MulEFI | 258 | 44,392 |
+| inner_verifier | AccessAdapter<2> | MulEI | 2 | 56,122 |
+| inner_verifier | AccessAdapter<4> | MulEI | 2 | 33,033 |
+| inner_verifier | Audit | MulEI | 2 | 57 |
+| inner_verifier | CoreAir | MulEI | 2 | 676,368 |
+| inner_verifier | AccessAdapter<2> | MulEI | 274 | 165,594 |
+| inner_verifier | AccessAdapter<4> | MulEI | 274 | 97,851 |
+| inner_verifier | Audit | MulEI | 274 | 189,848 |
+| inner_verifier | FieldExtensionArithmeticAir | MulEI | 274 | 105,042 |
+| inner_verifier | Audit | MulF | 258 | 779 |
+| inner_verifier | FieldArithmeticAir | MulF | 258 | 687,363 |
+| inner_verifier | Audit | MulFI | 258 | 228 |
+| inner_verifier | FieldArithmeticAir | MulFI | 258 | 372 |
+| inner_verifier | Audit | MulV | 258 | 12,901 |
+| inner_verifier | FieldArithmeticAir | MulV | 258 | 21,142 |
+| inner_verifier | Audit | MulVI | 258 | 114 |
+| inner_verifier | FieldArithmeticAir | MulVI | 258 | 256,029 |
+| inner_verifier | AccessAdapter<2> | NegE | 258 | 902 |
+| inner_verifier | AccessAdapter<4> | NegE | 258 | 533 |
+| inner_verifier | Audit | NegE | 258 | 3,496 |
+| inner_verifier | FieldArithmeticAir | NegE | 258 | 5,704 |
+| inner_verifier | AccessAdapter<2> | Poseidon2CompressBabyBear | 289 | 298,452 |
+| inner_verifier | AccessAdapter<4> | Poseidon2CompressBabyBear | 289 | 176,358 |
+| inner_verifier | AccessAdapter<8> | Poseidon2CompressBabyBear | 289 | 115,311 |
+| inner_verifier | Poseidon2VmAir<BabyBear> | Poseidon2CompressBabyBear | 289 | 3,019,632 |
+| inner_verifier | AccessAdapter<2> | Poseidon2PermuteBabyBear | 288 | 605,011 |
+| inner_verifier | AccessAdapter<4> | Poseidon2PermuteBabyBear | 288 | 357,929 |
+| inner_verifier | AccessAdapter<8> | Poseidon2PermuteBabyBear | 288 | 235,807 |
+| inner_verifier | Poseidon2VmAir<BabyBear> | Poseidon2PermuteBabyBear | 288 | 5,392,200 |
+| inner_verifier | AccessAdapter<2> | StoreE | 2 | 7,854 |
+| inner_verifier | AccessAdapter<4> | StoreE | 2 | 4,641 |
+| inner_verifier | Audit | StoreE | 2 | 213,484 |
+| inner_verifier | CoreAir | StoreE | 2 | 741,576 |
+| inner_verifier | AccessAdapter<2> | StoreE | 4 | 45,276 |
+| inner_verifier | AccessAdapter<4> | StoreE | 4 | 26,754 |
+| inner_verifier | Audit | StoreE | 4 | 28,424 |
+| inner_verifier | CoreAir | StoreE | 4 | 736,296 |
+| inner_verifier | Audit | StoreF | 2 | 239,856 |
+| inner_verifier | CoreAir | StoreF | 2 | 833,184 |
+| inner_verifier | AccessAdapter<2> | StoreF | 4 | 521,191 |
+| inner_verifier | AccessAdapter<4> | StoreF | 4 | 308,399 |
+| inner_verifier | AccessAdapter<8> | StoreF | 4 | 203,269 |
+| inner_verifier | Audit | StoreF | 4 | 55,176 |
+| inner_verifier | CoreAir | StoreF | 4 | 6,704,676 |
+| inner_verifier | Audit | StoreHintWord | 12 | 3,848,051 |
+| inner_verifier | CoreAir | StoreHintWord | 12 | 13,366,914 |
+| inner_verifier | FieldArithmeticAir | StoreHintWord | 256 | 5,963,656 |
+| inner_verifier | Audit | StoreV | 2 | 34,827 |
+| inner_verifier | CoreAir | StoreV | 2 | 120,978 |
+| inner_verifier | Audit | StoreV | 4 | 441,484 |
+| inner_verifier | CoreAir | StoreV | 4 | 1,548,426 |
+| inner_verifier | AccessAdapter<2> | SubE | 273 | 458,172 |
+| inner_verifier | AccessAdapter<4> | SubE | 273 | 270,738 |
+| inner_verifier | Audit | SubE | 273 | 970,368 |
+| inner_verifier | FieldExtensionArithmeticAir | SubE | 273 | 567,276 |
+| inner_verifier | AccessAdapter<2> | SubEF | 1 | 4,281,838 |
+| inner_verifier | Audit | SubEF | 1 | 1,254 |
+| inner_verifier | CoreAir | SubEF | 1 | 77,077,440 |
+| inner_verifier | AccessAdapter<2> | SubEF | 257 | 4,281,838 |
+| inner_verifier | AccessAdapter<4> | SubEF | 257 | 5,060,354 |
+| inner_verifier | Audit | SubEF | 257 | 418 |
+| inner_verifier | FieldArithmeticAir | SubEF | 257 | 12,067,680 |
+| inner_verifier | AccessAdapter<2> | SubEFI | 256 | 176 |
+| inner_verifier | AccessAdapter<4> | SubEFI | 256 | 104 |
+| inner_verifier | Audit | SubEFI | 256 | 24,472 |
+| inner_verifier | FieldArithmeticAir | SubEFI | 256 | 39,928 |
+| inner_verifier | AccessAdapter<2> | SubEI | 256 | 968 |
+| inner_verifier | AccessAdapter<4> | SubEI | 256 | 572 |
+| inner_verifier | Audit | SubEI | 256 | 4,408 |
+| inner_verifier | FieldArithmeticAir | SubEI | 256 | 7,440 |
+| inner_verifier | Audit | SubV | 257 | 57 |
+| inner_verifier | FieldArithmeticAir | SubV | 257 | 434,868 |
+| inner_verifier | Audit | SubVI | 257 | 14,003 |
+| inner_verifier | FieldArithmeticAir | SubVI | 257 | 39,587 |
+| inner_verifier | FieldArithmeticAir | SubVIN | 257 | 11,067 |
 
 </details>
 
 | group | air_name | cells | constraints | interactions | main_cols | perm_cols | prep_cols | quotient_deg | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| bench_program_inner | CoreAir | 3,360 | 114 | 19 | 61 | 44 |  | 2 | 32 |
 | bench_program_inner | ProgramAir<BabyBear> | 576 | 4 | 1 | 1 | 8 | 9 | 1 | 64 |
+| bench_program_inner | CoreAir | 3,392 <span style="color: red">(+32 [+1.0%])</span> | 115 <span style="color: red">(+1 [+0.9%])</span> | 19 | 62 <span style="color: red">(+1 [+1.6%])</span> | 44 |  | 2 | 32 |
+| bench_program_inner | KeccakVmAir | 132,544 | 2,251 | 235 | 3,198 | 944 |  | 2 | 32 |
 | bench_program_inner | FieldArithmeticAir | 1,072 | 28 | 15 | 31 | 36 |  | 2 | 16 |
 | bench_program_inner | FieldExtensionArithmeticAir | 77 | 28 | 15 | 41 | 36 |  | 2 | 1 |
-| bench_program_inner | KeccakVmAir | 132,544 | 2,251 | 235 | 3,198 | 944 |  | 2 | 32 |
 | bench_program_inner | XorLookupAir<8> | 589,824 | 4 | 1 | 1 | 8 | 3 | 1 | 65,536 |
 | bench_program_inner | MemoryAuditAir | 4,480 | 21 | 6 | 19 | 16 |  | 2 | 128 |
 | bench_program_inner | AccessAdapterAir<2> | 2,240 | 14 | 5 | 11 | 24 |  | 2 | 64 |
@@ -380,8 +380,8 @@
 | bench_program_inner | AccessAdapterAir<8> | 656 | 14 | 5 | 17 | 24 |  | 2 | 16 |
 | bench_program_inner | VariableRangeCheckerAir | 1,179,648 | 4 | 1 | 1 | 8 | 2 | 1 | 131,072 |
 | bench_program_inner | VmConnectorAir | 20 | 4 | 2 | 2 | 8 | 1 | 2 | 2 |
-| inner_verifier | CoreAir | 356,515,840 | 112 | 19 | 65 | 20 |  | 8 | 4,194,304 |
 | inner_verifier | ProgramAir<BabyBear> | 2,359,296 | 4 | 1 | 1 | 8 | 9 | 1 | 262,144 |
+| inner_verifier | CoreAir | 360,710,144 <span style="color: red">(+4,194,304 [+1.2%])</span> | 113 <span style="color: red">(+1 [+0.9%])</span> | 19 | 66 <span style="color: red">(+1 [+1.5%])</span> | 20 |  | 8 | 4,194,304 |
 | inner_verifier | FieldArithmeticAir | 98,566,144 | 23 | 15 | 31 | 16 |  | 8 | 2,097,152 |
 | inner_verifier | FieldExtensionArithmeticAir | 59,768,832 | 23 | 15 | 41 | 16 |  | 8 | 1,048,576 |
 | inner_verifier | Poseidon2VmAir<BabyBear> | 14,614,528 | 373 | 32 | 418 | 28 |  | 8 | 32,768 |
@@ -395,7 +395,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11173017385/artifacts/2013962306)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/6e1d8560a71b388c15bd6e374c38b4c625c1fa4a
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11183509101/artifacts/2016808250)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/b071c8a1a74a1114f39cd11633595a7534115b18
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11173017385)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11183509101)
