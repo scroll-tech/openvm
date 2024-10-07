@@ -101,6 +101,8 @@ pub trait MachineIntegration<F: PrimeField32, A: MachineAdapter<F>> {
         reads: <A::Interface<F> as MachineAdapterInterface<F>>::Reads,
     ) -> Result<(InstructionOutput<F, A::Interface<F>>, Self::Record)>;
 
+    fn get_opcode_name(&self, opcode: usize) -> String;
+
     // Should mutate `row_slice` to populate with values corresponding to `record`.
     fn generate_trace_row(&self, row_slice: &mut Self::Cols<F>, record: Self::Record);
 
@@ -195,6 +197,10 @@ where
                 .postprocess(&mut memory, &instruction, from_state, output)?;
         self.records.push((read_record, write_record, inner_record));
         Ok(to_state)
+    }
+
+    fn get_opcode_name(&self, opcode: usize) -> String {
+        self.inner.get_opcode_name(opcode)
     }
 }
 
