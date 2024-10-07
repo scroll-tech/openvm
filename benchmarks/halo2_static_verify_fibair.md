@@ -3,9 +3,9 @@
 [1;32mINFO    [0m ┕━ ｉ [info]: Poisoned rows after RangeConfig::configure 9 | log.target: "halo2_base::gates::range" | log.module_path: "halo2_base::gates::range" | log.file: "/.cargo/git/checkouts/halo2-lib-d11b5da38eeddd90/2fe813b/halo2-base/src/gates/range/mod.rs" | log.line: 101
 test test_fibonacci_program_halo2_verify ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 369.84s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 371.34s
 
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/2a52e3a73357e8998bded2b27e63e5bfbe5dc155
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/4967e7b5c72385716872e9a6425b2dbf356ddc7e
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11224220966)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11224692790)
