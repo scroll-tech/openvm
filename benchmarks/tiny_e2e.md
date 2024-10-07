@@ -55,7 +55,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11218826184/artifacts/2024764382)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/c4e949033cab523d5e59699ec3889d84d6d66ce3
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11224220966/artifacts/2026356426)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/2a52e3a73357e8998bded2b27e63e5bfbe5dc155
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11218826184)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11224220966)
