@@ -1,7 +1,7 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- |
-| bench_program_inner | 1,211.0 | 1,915,713 | 277,352 | 2.0 |  |
-| inner_verifier | 67,445.0 <span style="color: green">(-56.0 [-0.1%])</span> | 716,898,324 | 388,624,399 | 33,034.0 <span style="color: red">(+184.0 [+0.6%])</span> | 47,335.0 <span style="color: red">(+374.0 [+0.8%])</span> |
+| bench_program_inner | 1,214.0 <span style="color: red">(+3.0 [+0.2%])</span> | 1,915,713 | 277,352 | 2.0 |  |
+| inner_verifier | 67,536.0 <span style="color: red">(+91.0 [+0.1%])</span> | 716,898,324 | 388,606,487 <span style="color: green">(-17,912 [-0.0%])</span> | 33,209.0 <span style="color: red">(+175.0 [+0.5%])</span> | 47,470.0 <span style="color: red">(+135.0 [+0.3%])</span> |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -17,12 +17,12 @@
 | bench_program_inner | Program | 37 |
 | bench_program_inner | RangeChecker | 131,072 |
 | inner_verifier | ByteXor | 65,536 |
-| inner_verifier | Core | 3,797,140 |
-| inner_verifier | FieldArithmetic | 1,556,297 |
+| inner_verifier | Core | 3,796,884 <span style="color: green">(-256 [-0.0%])</span> |
+| inner_verifier | FieldArithmetic | 1,556,271 <span style="color: green">(-26 [-0.0%])</span> |
 | inner_verifier | FieldExtension | 843,315 |
 | inner_verifier | Memory | 622,695 |
-| inner_verifier | Memory 2 | 1,941,955 |
-| inner_verifier | Memory 3 | 971,043 |
+| inner_verifier | Memory 2 | 1,941,943 <span style="color: green">(-12 [-0.0%])</span> |
+| inner_verifier | Memory 3 | 971,037 <span style="color: green">(-6 [-0.0%])</span> |
 | inner_verifier | Memory 4 | 33,138 |
 | inner_verifier | Poseidon2 | 20,124 |
 | inner_verifier | Program | 203,982 |
@@ -59,7 +59,7 @@
 | inner_verifier | AddEFFI | STOREW | 381 |
 | inner_verifier | AddEFI | ADD | 168 |
 | inner_verifier | AddEI | ADD | 66,784 |
-| inner_verifier | AddFI | ADD | 12,485 |
+| inner_verifier | AddFI | ADD | 12,459 <span style="color: green">(-26 [-0.2%])</span> |
 | inner_verifier | AddV | ADD | 5,980 |
 | inner_verifier | AddVI | ADD | 271,414 |
 | inner_verifier | Alloc | ADD | 23,824 |
@@ -86,7 +86,7 @@
 | inner_verifier | HintInputVec | HINT_INPUT | 9,471 |
 | inner_verifier | IfEq | BNE | 6,158 |
 | inner_verifier | IfEqI | BNE | 121,255 |
-| inner_verifier | IfEqI | JAL | 10,080 |
+| inner_verifier | IfEqI | JAL | 9,824 <span style="color: green">(-256 [-2.5%])</span> |
 | inner_verifier | IfNe | BEQ | 6,893 |
 | inner_verifier | IfNe | JAL | 21 |
 | inner_verifier | IfNeI | BEQ | 946 |
@@ -190,12 +190,12 @@
 | inner_verifier | AccessAdapter<4> | AddEFI | ADD | 169 |
 | inner_verifier | Audit | AddEFI | ADD | 3,192 |
 | inner_verifier | FieldArithmeticAir | AddEFI | ADD | 5,208 |
-| inner_verifier | AccessAdapter<2> | AddEI | ADD | 361,900 |
-| inner_verifier | AccessAdapter<4> | AddEI | ADD | 213,850 |
+| inner_verifier | AccessAdapter<2> | AddEI | ADD | 361,834 <span style="color: green">(-66 [-0.0%])</span> |
+| inner_verifier | AccessAdapter<4> | AddEI | ADD | 213,811 <span style="color: green">(-39 [-0.0%])</span> |
 | inner_verifier | Audit | AddEI | ADD | 1,177,088 |
 | inner_verifier | FieldArithmeticAir | AddEI | ADD | 2,070,304 |
 | inner_verifier | Audit | AddFI | ADD | 3,021 |
-| inner_verifier | FieldArithmeticAir | AddFI | ADD | 387,035 |
+| inner_verifier | FieldArithmeticAir | AddFI | ADD | 386,229 <span style="color: green">(-806 [-0.2%])</span> |
 | inner_verifier | Audit | AddV | ADD | 19 |
 | inner_verifier | FieldArithmeticAir | AddV | ADD | 185,380 |
 | inner_verifier | Audit | AddVI | ADD | 17,005 |
@@ -244,7 +244,7 @@
 | inner_verifier | CoreAir | HintInputVec | HINT_INPUT | 625,086 |
 | inner_verifier | CoreAir | IfEq | BNE | 406,428 |
 | inner_verifier | CoreAir | IfEqI | BNE | 8,002,830 |
-| inner_verifier | CoreAir | IfEqI | JAL | 665,280 |
+| inner_verifier | CoreAir | IfEqI | JAL | 648,384 <span style="color: green">(-16,896 [-2.5%])</span> |
 | inner_verifier | CoreAir | IfNe | BEQ | 454,938 |
 | inner_verifier | CoreAir | IfNe | JAL | 1,386 |
 | inner_verifier | CoreAir | IfNeI | BEQ | 62,436 |
@@ -277,8 +277,8 @@
 | inner_verifier | CoreAir | LoadV | LOADW | 808,962 |
 | inner_verifier | Audit | LoadV | LOADW2 | 3,040 |
 | inner_verifier | CoreAir | LoadV | LOADW2 | 4,079,856 |
-| inner_verifier | AccessAdapter<2> | MulE | BBE4MUL | 510,554 |
-| inner_verifier | AccessAdapter<4> | MulE | BBE4MUL | 301,691 |
+| inner_verifier | AccessAdapter<2> | MulE | BBE4MUL | 510,488 <span style="color: green">(-66 [-0.0%])</span> |
+| inner_verifier | AccessAdapter<4> | MulE | BBE4MUL | 301,652 <span style="color: green">(-39 [-0.0%])</span> |
 | inner_verifier | Audit | MulE | BBE4MUL | 1,293,216 |
 | inner_verifier | FieldExtensionArithmeticAir | MulE | BBE4MUL | 16,731,731 |
 | inner_verifier | AccessAdapter<2> | MulEF | MUL | 7,876 |
@@ -395,7 +395,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11218826184/artifacts/2024764326)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/c4e949033cab523d5e59699ec3889d84d6d66ce3
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11224220966/artifacts/2026366120)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/2a52e3a73357e8998bded2b27e63e5bfbe5dc155
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11218826184)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11224220966)
