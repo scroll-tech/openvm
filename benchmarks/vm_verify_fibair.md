@@ -1,16 +1,16 @@
 | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- |
-| 8,217.0 <span style="color: red">(+22.0 [+0.3%])</span> | 68,165,652 | 27,824,153 <span style="color: red">(+5,987 [+0.0%])</span> | 2,584.0 <span style="color: green">(-9.0 [-0.3%])</span> | 34.0 <span style="color: red">(+1.0 [+3.0%])</span> |
+| 8,173.0 <span style="color: green">(-44.0 [-0.5%])</span> | 68,165,652 | 27,826,688 <span style="color: red">(+2,535 [+0.0%])</span> | 2,551.0 <span style="color: green">(-33.0 [-1.3%])</span> | 33.0 <span style="color: green">(-1.0 [-2.9%])</span> |
 
 | chip_name | rows_used |
 | --- | --- |
 | ByteXor | 65,536 |
-| Core | 290,865 <span style="color: red">(+68 [+0.0%])</span> |
-| FieldArithmetic | 140,508 <span style="color: red">(+19 [+0.0%])</span> |
+| Core | 290,883 <span style="color: red">(+18 [+0.0%])</span> |
+| FieldArithmetic | 140,565 <span style="color: red">(+57 [+0.0%])</span> |
 | FieldExtension | 7,486 |
 | Memory | 97,965 |
-| Memory 2 | 40,687 <span style="color: red">(+52 [+0.1%])</span> |
-| Memory 3 | 20,345 <span style="color: red">(+26 [+0.1%])</span> |
+| Memory 2 | 40,663 <span style="color: green">(-24 [-0.1%])</span> |
+| Memory 3 | 20,333 <span style="color: green">(-12 [-0.1%])</span> |
 | Memory 4 | 3,851 |
 | Poseidon2 | 2,613 |
 | Program | 36,703 |
@@ -21,77 +21,77 @@
 
 | dsl_ir | opcode | frequency |
 | --- | --- | --- |
-|  | 2 | 2 |
-|  | 5 | 1 |
-| AddE | 272 | 1,630 |
-| AddEFFI | 1 | 128 |
-| AddEFFI | 2 | 384 |
-| AddEI | 256 | 5,664 |
-| AddFI | 256 | 2,849 <span style="color: red">(+19 [+0.7%])</span> |
-| AddV | 256 | 1,808 |
-| AddVI | 256 | 35,232 |
-| Alloc | 1 | 13,004 |
-| Alloc | 256 | 13,004 |
-| Alloc | 258 | 8,972 |
-| AssertEqE | 7 | 404 |
-| AssertEqEI | 7 | 4 |
-| AssertEqF | 7 | 4,901 |
-| AssertEqV | 7 | 3,535 |
-| AssertEqVI | 7 | 32 |
-| CycleTrackerEnd | 17 | 3,807 |
-| CycleTrackerStart | 16 | 3,807 |
-| DivE | 275 | 1,202 |
-| DivEIN | 2 | 4 |
-| DivEIN | 275 | 1 |
-| DivFIN | 259 | 3 |
-| For | 1 | 700 |
-| For | 2 | 8,667 |
-| For | 256 | 34,818 |
-| For | 5 | 9,367 |
-| For | 7 | 44,185 |
-| Halt | 8 | 1 |
-| HintBitsF | 14 | 101 |
-| HintInputVec | 13 | 4,032 |
-| IfEq | 7 | 722 |
-| IfEqI | 5 | 2,158 <span style="color: red">(+68 [+3.3%])</span> |
-| IfEqI | 7 | 11,283 |
-| IfNe | 5 | 7 |
-| IfNe | 6 | 2,129 |
-| IfNeI | 6 | 601 |
-| ImmE | 2 | 2,008 |
-| ImmF | 2 | 7,036 |
-| ImmV | 2 | 12,842 |
-| LoadE | 1 | 4,836 |
-| LoadE | 3 | 14,000 |
-| LoadF | 1 | 13,500 |
-| LoadF | 3 | 3,085 |
-| LoadV | 1 | 8,746 |
-| LoadV | 3 | 19,212 |
-| MulE | 274 | 3,418 |
-| MulEF | 258 | 1,608 |
-| MulEI | 2 | 132 |
-| MulEI | 274 | 33 |
-| MulF | 258 | 2,204 |
-| MulFI | 258 | 1 |
-| MulV | 258 | 3,131 |
-| MulVI | 258 | 2,604 |
-| Poseidon2CompressBabyBear | 289 | 2,000 |
-| Poseidon2PermuteBabyBear | 288 | 613 |
-| StoreE | 2 | 32,012 |
-| StoreE | 4 | 4,816 |
-| StoreF | 2 | 6,496 |
-| StoreF | 4 | 3,952 |
-| StoreHintWord | 12 | 26,871 |
-| StoreHintWord | 256 | 19,708 |
-| StoreV | 2 | 1,499 |
-| StoreV | 4 | 11,041 |
-| SubE | 273 | 1,202 |
-| SubEF | 1 | 4,815 |
-| SubEF | 257 | 1,605 |
-| SubEI | 256 | 8 |
-| SubV | 257 | 3,100 |
-| SubVI | 257 | 3,789 |
-| SubVIN | 257 | 400 |
+|  | JAL | 1 |
+|  | STOREW | 2 |
+| AddE | FE4ADD | 1,630 |
+| AddEFFI | LOADW | 128 |
+| AddEFFI | STOREW | 384 |
+| AddEI | ADD | 5,664 |
+| AddFI | ADD | 2,906 |
+| AddV | ADD | 1,808 |
+| AddVI | ADD | 35,232 |
+| Alloc | ADD | 13,004 |
+| Alloc | LOADW | 13,004 |
+| Alloc | MUL | 8,972 |
+| AssertEqE | BNE | 404 |
+| AssertEqEI | BNE | 4 |
+| AssertEqF | BNE | 4,901 |
+| AssertEqV | BNE | 3,535 |
+| AssertEqVI | BNE | 32 |
+| CycleTrackerEnd | CT_END | 3,807 |
+| CycleTrackerStart | CT_START | 3,807 |
+| DivE | BBE4DIV | 1,202 |
+| DivEIN | BBE4DIV | 1 |
+| DivEIN | STOREW | 4 |
+| DivFIN | DIV | 3 |
+| For | ADD | 34,818 |
+| For | BNE | 44,185 |
+| For | JAL | 9,367 |
+| For | LOADW | 700 |
+| For | STOREW | 8,667 |
+| Halt | TERMINATE | 1 |
+| HintBitsF | HINT_BITS | 101 |
+| HintInputVec | HINT_INPUT | 4,032 |
+| IfEq | BNE | 722 |
+| IfEqI | BNE | 11,283 |
+| IfEqI | JAL | 2,176 |
+| IfNe | BEQ | 2,129 |
+| IfNe | JAL | 7 |
+| IfNeI | BEQ | 601 |
+| ImmE | STOREW | 2,008 |
+| ImmF | STOREW | 7,036 |
+| ImmV | STOREW | 12,842 |
+| LoadE | LOADW | 4,836 |
+| LoadE | LOADW2 | 14,000 |
+| LoadF | LOADW | 13,500 |
+| LoadF | LOADW2 | 3,085 |
+| LoadV | LOADW | 8,746 |
+| LoadV | LOADW2 | 19,212 |
+| MulE | BBE4MUL | 3,418 |
+| MulEF | MUL | 1,608 |
+| MulEI | BBE4MUL | 33 |
+| MulEI | STOREW | 132 |
+| MulF | MUL | 2,204 |
+| MulFI | MUL | 1 |
+| MulV | MUL | 3,131 |
+| MulVI | MUL | 2,604 |
+| Poseidon2CompressBabyBear | COMP_POS2 | 2,000 |
+| Poseidon2PermuteBabyBear | PERM_POS2 | 613 |
+| StoreE | STOREW | 32,012 |
+| StoreE | STOREW2 | 4,816 |
+| StoreF | STOREW | 6,496 |
+| StoreF | STOREW2 | 3,952 |
+| StoreHintWord | ADD | 19,708 |
+| StoreHintWord | SHINTW | 26,871 |
+| StoreV | STOREW | 1,499 |
+| StoreV | STOREW2 | 11,041 |
+| SubE | FE4SUB | 1,202 |
+| SubEF | LOADW | 4,815 |
+| SubEF | SUB | 1,605 |
+| SubEI | ADD | 8 |
+| SubV | SUB | 3,100 |
+| SubVI | SUB | 3,789 |
+| SubVIN | SUB | 400 |
 
 </details>
 
@@ -100,175 +100,175 @@
 
 | air_name | dsl_ir | opcode | cells_used |
 | --- | --- | --- | --- |
-| Audit |  | 2 | 38 |
-| CoreAir |  | 2 | 132 |
-| Audit |  | 5 | 19 |
-| CoreAir |  | 5 | 66 |
-| AccessAdapter<2> | AddE | 272 | 24,882 |
-| AccessAdapter<4> | AddE | 272 | 14,703 |
-| Audit | AddE | 272 | 1,444 |
-| FieldExtensionArithmeticAir | AddE | 272 | 66,830 |
-| AccessAdapter<2> | AddEFFI | 1 | 132 |
-| AccessAdapter<4> | AddEFFI | 1 | 156 |
-| Audit | AddEFFI | 1 | 304 |
-| CoreAir | AddEFFI | 1 | 8,448 |
-| AccessAdapter<2> | AddEFFI | 2 | 132 |
-| Audit | AddEFFI | 2 | 912 |
-| CoreAir | AddEFFI | 2 | 25,344 |
-| AccessAdapter<2> | AddEI | 256 | 24,838 <span style="color: red">(+286 [+1.2%])</span> |
-| AccessAdapter<4> | AddEI | 256 | 14,677 <span style="color: red">(+169 [+1.2%])</span> |
-| Audit | AddEI | 256 | 760 |
-| FieldArithmeticAir | AddEI | 256 | 175,584 |
-| Audit | AddFI | 256 | 627 |
-| FieldArithmeticAir | AddFI | 256 | 88,319 <span style="color: red">(+589 [+0.7%])</span> |
-| Audit | AddV | 256 | 19 |
-| FieldArithmeticAir | AddV | 256 | 56,048 |
-| Audit | AddVI | 256 | 61,484 |
-| FieldArithmeticAir | AddVI | 256 | 1,092,192 |
-| Audit | Alloc | 1 | 3,230 |
-| CoreAir | Alloc | 1 | 858,264 |
-| FieldArithmeticAir | Alloc | 256 | 403,124 |
-| AccessAdapter<2> | Alloc | 258 | 22 |
-| AccessAdapter<4> | Alloc | 258 | 26 |
-| FieldArithmeticAir | Alloc | 258 | 278,132 |
-| AccessAdapter<2> | AssertEqE | 7 | 2,222 |
-| AccessAdapter<4> | AssertEqE | 7 | 1,313 |
-| CoreAir | AssertEqE | 7 | 26,664 |
-| CoreAir | AssertEqEI | 7 | 264 |
-| CoreAir | AssertEqF | 7 | 323,466 |
-| CoreAir | AssertEqV | 7 | 233,310 |
-| CoreAir | AssertEqVI | 7 | 2,112 |
-| CoreAir | CycleTrackerEnd | 17 | 251,262 |
-| CoreAir | CycleTrackerStart | 16 | 251,262 |
-| AccessAdapter<2> | DivE | 275 | 35,310 |
-| AccessAdapter<4> | DivE | 275 | 20,865 |
-| FieldExtensionArithmeticAir | DivE | 275 | 49,282 |
-| AccessAdapter<2> | DivEIN | 2 | 11 |
-| CoreAir | DivEIN | 2 | 264 |
-| AccessAdapter<2> | DivEIN | 275 | 22 |
-| AccessAdapter<4> | DivEIN | 275 | 13 |
-| FieldExtensionArithmeticAir | DivEIN | 275 | 41 |
-| FieldArithmeticAir | DivFIN | 259 | 93 |
-| Audit | For | 1 | 1,900 |
-| CoreAir | For | 1 | 46,200 |
-| Audit | For | 2 | 874 |
-| CoreAir | For | 2 | 572,022 |
-| FieldArithmeticAir | For | 256 | 1,079,358 |
-| AccessAdapter<2> | For | 5 | 55 |
-| AccessAdapter<4> | For | 5 | 65 |
-| CoreAir | For | 5 | 618,222 |
-| CoreAir | For | 7 | 2,916,210 |
-| CoreAir | Halt | 8 | 66 |
-| CoreAir | HintBitsF | 14 | 6,666 |
-| CoreAir | HintInputVec | 13 | 266,112 |
-| CoreAir | IfEq | 7 | 47,652 |
-| CoreAir | IfEqI | 5 | 142,428 <span style="color: red">(+4,488 [+3.3%])</span> |
-| CoreAir | IfEqI | 7 | 744,678 |
-| CoreAir | IfNe | 5 | 462 |
-| CoreAir | IfNe | 6 | 140,514 |
-| CoreAir | IfNeI | 6 | 39,666 |
-| AccessAdapter<2> | ImmE | 2 | 2,200 |
-| AccessAdapter<4> | ImmE | 2 | 1,300 |
-| Audit | ImmE | 2 | 76 |
-| CoreAir | ImmE | 2 | 132,528 |
-| Audit | ImmF | 2 | 3,743 |
-| CoreAir | ImmF | 2 | 464,376 |
-| Audit | ImmV | 2 | 65,284 |
-| CoreAir | ImmV | 2 | 847,572 |
-| AccessAdapter<2> | LoadE | 1 | 17,688 |
-| AccessAdapter<4> | LoadE | 1 | 10,452 |
-| Audit | LoadE | 1 | 380 |
-| CoreAir | LoadE | 1 | 319,176 |
-| AccessAdapter<2> | LoadE | 3 | 28,666 |
-| AccessAdapter<4> | LoadE | 3 | 16,939 |
-| CoreAir | LoadE | 3 | 924,000 |
-| AccessAdapter<2> | LoadF | 1 | 26,400 |
-| AccessAdapter<4> | LoadF | 1 | 15,600 |
-| AccessAdapter<8> | LoadF | 1 | 10,200 |
-| Audit | LoadF | 1 | 8,702 |
-| CoreAir | LoadF | 1 | 891,000 |
-| AccessAdapter<2> | LoadF | 3 | 715 |
-| AccessAdapter<4> | LoadF | 3 | 429 |
-| AccessAdapter<8> | LoadF | 3 | 323 |
-| Audit | LoadF | 3 | 2,223 |
-| CoreAir | LoadF | 3 | 203,610 |
-| Audit | LoadV | 1 | 60,819 |
-| CoreAir | LoadV | 1 | 577,236 |
-| Audit | LoadV | 3 | 893 |
-| CoreAir | LoadV | 3 | 1,267,992 |
-| AccessAdapter<2> | MulE | 274 | 33,792 <span style="color: red">(+286 [+0.9%])</span> |
-| AccessAdapter<4> | MulE | 274 | 19,968 <span style="color: red">(+169 [+0.9%])</span> |
-| Audit | MulE | 274 | 988 |
-| FieldExtensionArithmeticAir | MulE | 274 | 140,138 |
-| AccessAdapter<2> | MulEF | 258 | 8,822 |
-| AccessAdapter<4> | MulEF | 258 | 5,213 |
-| Audit | MulEF | 258 | 76 |
-| FieldArithmeticAir | MulEF | 258 | 49,848 |
-| AccessAdapter<2> | MulEI | 2 | 638 |
-| AccessAdapter<4> | MulEI | 2 | 338 |
-| Audit | MulEI | 2 | 57 |
-| CoreAir | MulEI | 2 | 8,712 |
-| AccessAdapter<2> | MulEI | 274 | 1,892 |
-| AccessAdapter<4> | MulEI | 274 | 1,118 |
-| Audit | MulEI | 274 | 1,596 |
-| FieldExtensionArithmeticAir | MulEI | 274 | 1,353 |
-| Audit | MulF | 258 | 19 |
-| FieldArithmeticAir | MulF | 258 | 68,324 |
-| Audit | MulFI | 258 | 19 |
-| FieldArithmeticAir | MulFI | 258 | 31 |
-| Audit | MulV | 258 | 59,432 |
-| FieldArithmeticAir | MulV | 258 | 97,061 |
-| Audit | MulVI | 258 | 76 |
-| FieldArithmeticAir | MulVI | 258 | 80,724 |
-| AccessAdapter<2> | Poseidon2CompressBabyBear | 289 | 88,000 |
-| AccessAdapter<4> | Poseidon2CompressBabyBear | 289 | 52,000 |
-| AccessAdapter<8> | Poseidon2CompressBabyBear | 289 | 34,000 |
-| Poseidon2VmAir<BabyBear> | Poseidon2CompressBabyBear | 289 | 836,000 |
-| AccessAdapter<2> | Poseidon2PermuteBabyBear | 288 | 53,801 |
-| AccessAdapter<4> | Poseidon2PermuteBabyBear | 288 | 31,798 |
-| AccessAdapter<8> | Poseidon2PermuteBabyBear | 288 | 20,842 |
-| Poseidon2VmAir<BabyBear> | Poseidon2PermuteBabyBear | 288 | 256,234 |
-| AccessAdapter<2> | StoreE | 2 | 8,800 |
-| AccessAdapter<4> | StoreE | 2 | 5,200 |
-| Audit | StoreE | 2 | 608,228 |
-| CoreAir | StoreE | 2 | 2,112,792 |
-| AccessAdapter<2> | StoreE | 4 | 8,800 |
-| AccessAdapter<4> | StoreE | 4 | 5,200 |
-| Audit | StoreE | 4 | 30,704 |
-| CoreAir | StoreE | 4 | 317,856 |
-| Audit | StoreF | 2 | 123,424 |
-| CoreAir | StoreF | 2 | 428,736 |
-| AccessAdapter<2> | StoreF | 4 | 231 |
-| AccessAdapter<4> | StoreF | 4 | 143 |
-| AccessAdapter<8> | StoreF | 4 | 102 |
-| Audit | StoreF | 4 | 61,712 |
-| CoreAir | StoreF | 4 | 260,832 |
-| Audit | StoreHintWord | 12 | 510,549 |
-| CoreAir | StoreHintWord | 12 | 1,773,486 |
-| FieldArithmeticAir | StoreHintWord | 256 | 610,948 |
-| Audit | StoreV | 2 | 28,481 |
-| CoreAir | StoreV | 2 | 98,934 |
-| Audit | StoreV | 4 | 160,094 |
-| CoreAir | StoreV | 4 | 728,706 |
-| AccessAdapter<2> | SubE | 273 | 44,176 |
-| AccessAdapter<4> | SubE | 273 | 26,104 |
-| Audit | SubE | 273 | 380 |
-| FieldExtensionArithmeticAir | SubE | 273 | 49,282 |
-| AccessAdapter<2> | SubEF | 1 | 17,633 |
-| Audit | SubEF | 1 | 171 |
-| CoreAir | SubEF | 1 | 317,790 |
-| AccessAdapter<2> | SubEF | 257 | 17,633 |
-| AccessAdapter<4> | SubEF | 257 | 20,839 |
-| Audit | SubEF | 257 | 57 |
-| FieldArithmeticAir | SubEF | 257 | 49,755 |
-| AccessAdapter<2> | SubEI | 256 | 44 |
-| AccessAdapter<4> | SubEI | 256 | 26 |
-| FieldArithmeticAir | SubEI | 256 | 248 |
-| Audit | SubV | 257 | 57 |
-| FieldArithmeticAir | SubV | 257 | 96,100 |
-| Audit | SubVI | 257 | 61,484 |
-| FieldArithmeticAir | SubVI | 257 | 117,459 |
-| FieldArithmeticAir | SubVIN | 257 | 12,400 |
+| Audit |  | JAL | 19 |
+| CoreAir |  | JAL | 66 |
+| Audit |  | STOREW | 38 |
+| CoreAir |  | STOREW | 132 |
+| AccessAdapter<2> | AddE | FE4ADD | 24,882 |
+| AccessAdapter<4> | AddE | FE4ADD | 14,703 |
+| Audit | AddE | FE4ADD | 1,444 |
+| FieldExtensionArithmeticAir | AddE | FE4ADD | 66,830 |
+| AccessAdapter<2> | AddEFFI | LOADW | 132 |
+| AccessAdapter<4> | AddEFFI | LOADW | 156 |
+| Audit | AddEFFI | LOADW | 304 |
+| CoreAir | AddEFFI | LOADW | 8,448 |
+| AccessAdapter<2> | AddEFFI | STOREW | 132 |
+| Audit | AddEFFI | STOREW | 912 |
+| CoreAir | AddEFFI | STOREW | 25,344 |
+| AccessAdapter<2> | AddEI | ADD | 24,706 |
+| AccessAdapter<4> | AddEI | ADD | 14,599 |
+| Audit | AddEI | ADD | 760 |
+| FieldArithmeticAir | AddEI | ADD | 175,584 |
+| Audit | AddFI | ADD | 627 |
+| FieldArithmeticAir | AddFI | ADD | 90,086 |
+| Audit | AddV | ADD | 19 |
+| FieldArithmeticAir | AddV | ADD | 56,048 |
+| Audit | AddVI | ADD | 61,484 |
+| FieldArithmeticAir | AddVI | ADD | 1,092,192 |
+| FieldArithmeticAir | Alloc | ADD | 403,124 |
+| Audit | Alloc | LOADW | 3,230 |
+| CoreAir | Alloc | LOADW | 858,264 |
+| AccessAdapter<2> | Alloc | MUL | 22 |
+| AccessAdapter<4> | Alloc | MUL | 26 |
+| FieldArithmeticAir | Alloc | MUL | 278,132 |
+| AccessAdapter<2> | AssertEqE | BNE | 2,222 |
+| AccessAdapter<4> | AssertEqE | BNE | 1,313 |
+| CoreAir | AssertEqE | BNE | 26,664 |
+| CoreAir | AssertEqEI | BNE | 264 |
+| CoreAir | AssertEqF | BNE | 323,466 |
+| CoreAir | AssertEqV | BNE | 233,310 |
+| CoreAir | AssertEqVI | BNE | 2,112 |
+| CoreAir | CycleTrackerEnd | CT_END | 251,262 |
+| CoreAir | CycleTrackerStart | CT_START | 251,262 |
+| AccessAdapter<2> | DivE | BBE4DIV | 35,310 |
+| AccessAdapter<4> | DivE | BBE4DIV | 20,865 |
+| FieldExtensionArithmeticAir | DivE | BBE4DIV | 49,282 |
+| AccessAdapter<2> | DivEIN | BBE4DIV | 22 |
+| AccessAdapter<4> | DivEIN | BBE4DIV | 13 |
+| FieldExtensionArithmeticAir | DivEIN | BBE4DIV | 41 |
+| AccessAdapter<2> | DivEIN | STOREW | 11 |
+| CoreAir | DivEIN | STOREW | 264 |
+| FieldArithmeticAir | DivFIN | DIV | 93 |
+| FieldArithmeticAir | For | ADD | 1,079,358 |
+| CoreAir | For | BNE | 2,916,210 |
+| AccessAdapter<2> | For | JAL | 55 |
+| AccessAdapter<4> | For | JAL | 65 |
+| CoreAir | For | JAL | 618,222 |
+| Audit | For | LOADW | 1,900 |
+| CoreAir | For | LOADW | 46,200 |
+| Audit | For | STOREW | 874 |
+| CoreAir | For | STOREW | 572,022 |
+| CoreAir | Halt | TERMINATE | 66 |
+| CoreAir | HintBitsF | HINT_BITS | 6,666 |
+| CoreAir | HintInputVec | HINT_INPUT | 266,112 |
+| CoreAir | IfEq | BNE | 47,652 |
+| CoreAir | IfEqI | BNE | 744,678 |
+| CoreAir | IfEqI | JAL | 143,616 |
+| CoreAir | IfNe | BEQ | 140,514 |
+| CoreAir | IfNe | JAL | 462 |
+| CoreAir | IfNeI | BEQ | 39,666 |
+| AccessAdapter<2> | ImmE | STOREW | 2,200 |
+| AccessAdapter<4> | ImmE | STOREW | 1,300 |
+| Audit | ImmE | STOREW | 76 |
+| CoreAir | ImmE | STOREW | 132,528 |
+| Audit | ImmF | STOREW | 3,743 |
+| CoreAir | ImmF | STOREW | 464,376 |
+| Audit | ImmV | STOREW | 65,284 |
+| CoreAir | ImmV | STOREW | 847,572 |
+| AccessAdapter<2> | LoadE | LOADW | 17,688 |
+| AccessAdapter<4> | LoadE | LOADW | 10,452 |
+| Audit | LoadE | LOADW | 380 |
+| CoreAir | LoadE | LOADW | 319,176 |
+| AccessAdapter<2> | LoadE | LOADW2 | 28,666 |
+| AccessAdapter<4> | LoadE | LOADW2 | 16,939 |
+| CoreAir | LoadE | LOADW2 | 924,000 |
+| AccessAdapter<2> | LoadF | LOADW | 26,400 |
+| AccessAdapter<4> | LoadF | LOADW | 15,600 |
+| AccessAdapter<8> | LoadF | LOADW | 10,200 |
+| Audit | LoadF | LOADW | 8,702 |
+| CoreAir | LoadF | LOADW | 891,000 |
+| AccessAdapter<2> | LoadF | LOADW2 | 715 |
+| AccessAdapter<4> | LoadF | LOADW2 | 429 |
+| AccessAdapter<8> | LoadF | LOADW2 | 323 |
+| Audit | LoadF | LOADW2 | 2,223 |
+| CoreAir | LoadF | LOADW2 | 203,610 |
+| Audit | LoadV | LOADW | 60,819 |
+| CoreAir | LoadV | LOADW | 577,236 |
+| Audit | LoadV | LOADW2 | 893 |
+| CoreAir | LoadV | LOADW2 | 1,267,992 |
+| AccessAdapter<2> | MulE | BBE4MUL | 33,660 |
+| AccessAdapter<4> | MulE | BBE4MUL | 19,890 |
+| Audit | MulE | BBE4MUL | 988 |
+| FieldExtensionArithmeticAir | MulE | BBE4MUL | 140,138 |
+| AccessAdapter<2> | MulEF | MUL | 8,822 |
+| AccessAdapter<4> | MulEF | MUL | 5,213 |
+| Audit | MulEF | MUL | 76 |
+| FieldArithmeticAir | MulEF | MUL | 49,848 |
+| AccessAdapter<2> | MulEI | BBE4MUL | 1,892 |
+| AccessAdapter<4> | MulEI | BBE4MUL | 1,118 |
+| Audit | MulEI | BBE4MUL | 1,596 |
+| FieldExtensionArithmeticAir | MulEI | BBE4MUL | 1,353 |
+| AccessAdapter<2> | MulEI | STOREW | 638 |
+| AccessAdapter<4> | MulEI | STOREW | 338 |
+| Audit | MulEI | STOREW | 57 |
+| CoreAir | MulEI | STOREW | 8,712 |
+| Audit | MulF | MUL | 19 |
+| FieldArithmeticAir | MulF | MUL | 68,324 |
+| Audit | MulFI | MUL | 19 |
+| FieldArithmeticAir | MulFI | MUL | 31 |
+| Audit | MulV | MUL | 59,432 |
+| FieldArithmeticAir | MulV | MUL | 97,061 |
+| Audit | MulVI | MUL | 76 |
+| FieldArithmeticAir | MulVI | MUL | 80,724 |
+| AccessAdapter<2> | Poseidon2CompressBabyBear | COMP_POS2 | 88,000 |
+| AccessAdapter<4> | Poseidon2CompressBabyBear | COMP_POS2 | 52,000 |
+| AccessAdapter<8> | Poseidon2CompressBabyBear | COMP_POS2 | 34,000 |
+| Poseidon2VmAir<BabyBear> | Poseidon2CompressBabyBear | COMP_POS2 | 836,000 |
+| AccessAdapter<2> | Poseidon2PermuteBabyBear | PERM_POS2 | 53,801 |
+| AccessAdapter<4> | Poseidon2PermuteBabyBear | PERM_POS2 | 31,798 |
+| AccessAdapter<8> | Poseidon2PermuteBabyBear | PERM_POS2 | 20,842 |
+| Poseidon2VmAir<BabyBear> | Poseidon2PermuteBabyBear | PERM_POS2 | 256,234 |
+| AccessAdapter<2> | StoreE | STOREW | 8,800 |
+| AccessAdapter<4> | StoreE | STOREW | 5,200 |
+| Audit | StoreE | STOREW | 608,228 |
+| CoreAir | StoreE | STOREW | 2,112,792 |
+| AccessAdapter<2> | StoreE | STOREW2 | 8,800 |
+| AccessAdapter<4> | StoreE | STOREW2 | 5,200 |
+| Audit | StoreE | STOREW2 | 30,704 |
+| CoreAir | StoreE | STOREW2 | 317,856 |
+| Audit | StoreF | STOREW | 123,424 |
+| CoreAir | StoreF | STOREW | 428,736 |
+| AccessAdapter<2> | StoreF | STOREW2 | 231 |
+| AccessAdapter<4> | StoreF | STOREW2 | 143 |
+| AccessAdapter<8> | StoreF | STOREW2 | 102 |
+| Audit | StoreF | STOREW2 | 61,712 |
+| CoreAir | StoreF | STOREW2 | 260,832 |
+| FieldArithmeticAir | StoreHintWord | ADD | 610,948 |
+| Audit | StoreHintWord | SHINTW | 510,549 |
+| CoreAir | StoreHintWord | SHINTW | 1,773,486 |
+| Audit | StoreV | STOREW | 28,481 |
+| CoreAir | StoreV | STOREW | 98,934 |
+| Audit | StoreV | STOREW2 | 160,094 |
+| CoreAir | StoreV | STOREW2 | 728,706 |
+| AccessAdapter<2> | SubE | FE4SUB | 44,176 |
+| AccessAdapter<4> | SubE | FE4SUB | 26,104 |
+| Audit | SubE | FE4SUB | 380 |
+| FieldExtensionArithmeticAir | SubE | FE4SUB | 49,282 |
+| AccessAdapter<2> | SubEF | LOADW | 17,633 |
+| Audit | SubEF | LOADW | 171 |
+| CoreAir | SubEF | LOADW | 317,790 |
+| AccessAdapter<2> | SubEF | SUB | 17,633 |
+| AccessAdapter<4> | SubEF | SUB | 20,839 |
+| Audit | SubEF | SUB | 57 |
+| FieldArithmeticAir | SubEF | SUB | 49,755 |
+| AccessAdapter<2> | SubEI | ADD | 44 |
+| AccessAdapter<4> | SubEI | ADD | 26 |
+| FieldArithmeticAir | SubEI | ADD | 248 |
+| Audit | SubV | SUB | 57 |
+| FieldArithmeticAir | SubV | SUB | 96,100 |
+| Audit | SubVI | SUB | 61,484 |
+| FieldArithmeticAir | SubVI | SUB | 117,459 |
+| FieldArithmeticAir | SubVIN | SUB | 12,400 |
 
 </details>
 
@@ -289,7 +289,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11206713161/artifacts/2021611485)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/cf1119e0fc3d7de4ce04e32a2f4de414f2b83c2d
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11210001762/artifacts/2022337450)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/9e43903f7d272b6a21b5338ac9eda06405c9507f
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11206713161)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11210001762)
