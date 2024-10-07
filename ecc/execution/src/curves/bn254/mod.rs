@@ -1,12 +1,12 @@
+mod curve;
 mod field;
 mod final_exp;
 mod line;
-mod utils;
+mod miller_loop;
 
-pub use field::*;
+pub use curve::*;
 pub use final_exp::*;
 pub use line::*;
-pub use utils::*;
 
 #[cfg(test)]
 mod tests;

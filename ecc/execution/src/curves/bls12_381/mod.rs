@@ -1,8 +1,10 @@
+mod curve;
 mod field;
 mod final_exp;
 mod line;
+mod miller_loop;
 
-pub use field::*;
+pub use curve::*;
 pub use final_exp::*;
 pub use line::*;
 
