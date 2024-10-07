@@ -1,16 +1,16 @@
 | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- |
-| 8,236.0 <span style="color: red">(+89.0 [+1.1%])</span> | 68,165,652 | 27,822,717 <span style="color: red">(+2,384 [+0.0%])</span> | 2,593.0 <span style="color: red">(+1.0 [+0.0%])</span> | 34.0 |
+| 8,132.0 <span style="color: green">(-104.0 [-1.3%])</span> | 68,165,652 | 27,811,492 <span style="color: green">(-11,225 [-0.0%])</span> | 2,563.0 <span style="color: green">(-30.0 [-1.2%])</span> | 33.0 <span style="color: green">(-1.0 [-2.9%])</span> |
 
 | chip_name | rows_used |
 | --- | --- |
 | ByteXor | 65,536 |
-| Core | 290,875 <span style="color: red">(+55 [+0.0%])</span> |
-| FieldArithmetic | 140,472 <span style="color: green">(-56 [-0.0%])</span> |
+| Core | 290,721 <span style="color: green">(-154 [-0.1%])</span> |
+| FieldArithmetic | 140,501 <span style="color: red">(+29 [+0.0%])</span> |
 | FieldExtension | 7,486 |
 | Memory | 97,965 |
-| Memory 2 | 40,631 <span style="color: red">(+28 [+0.1%])</span> |
-| Memory 3 | 20,317 <span style="color: red">(+14 [+0.1%])</span> |
+| Memory 2 | 40,519 <span style="color: green">(-112 [-0.3%])</span> |
+| Memory 3 | 20,261 <span style="color: green">(-56 [-0.3%])</span> |
 | Memory 4 | 3,851 |
 | Poseidon2 | 2,613 |
 | Program | 36,703 |
@@ -27,7 +27,7 @@
 | AddEFFI | LOADW | 128 |
 | AddEFFI | STOREW | 384 |
 | AddEI | ADD | 5,664 |
-| AddFI | ADD | 2,813 <span style="color: green">(-56 [-2.0%])</span> |
+| AddFI | ADD | 2,842 <span style="color: red">(+29 [+1.0%])</span> |
 | AddV | ADD | 1,808 |
 | AddVI | ADD | 35,232 |
 | Alloc | ADD | 13,004 |
@@ -54,7 +54,7 @@
 | HintInputVec | HINT_INPUT | 4,032 |
 | IfEq | BNE | 722 |
 | IfEqI | BNE | 11,283 |
-| IfEqI | JAL | 2,168 <span style="color: red">(+55 [+2.6%])</span> |
+| IfEqI | JAL | 2,014 <span style="color: green">(-154 [-7.1%])</span> |
 | IfNe | BEQ | 2,129 |
 | IfNe | JAL | 7 |
 | IfNeI | BEQ | 601 |
@@ -115,12 +115,12 @@
 | AccessAdapter<2> | AddEFFI | STOREW | 132 |
 | Audit | AddEFFI | STOREW | 912 |
 | CoreAir | AddEFFI | STOREW | 25,344 |
-| AccessAdapter<2> | AddEI | ADD | 24,530 <span style="color: red">(+154 [+0.6%])</span> |
-| AccessAdapter<4> | AddEI | ADD | 14,495 <span style="color: red">(+91 [+0.6%])</span> |
+| AccessAdapter<2> | AddEI | ADD | 23,914 <span style="color: green">(-616 [-2.5%])</span> |
+| AccessAdapter<4> | AddEI | ADD | 14,131 <span style="color: green">(-364 [-2.5%])</span> |
 | Audit | AddEI | ADD | 760 |
 | FieldArithmeticAir | AddEI | ADD | 175,584 |
 | Audit | AddFI | ADD | 627 |
-| FieldArithmeticAir | AddFI | ADD | 87,203 <span style="color: green">(-1,736 [-2.0%])</span> |
+| FieldArithmeticAir | AddFI | ADD | 88,102 <span style="color: red">(+899 [+1.0%])</span> |
 | Audit | AddV | ADD | 19 |
 | FieldArithmeticAir | AddV | ADD | 56,048 |
 | Audit | AddVI | ADD | 61,484 |
@@ -163,7 +163,7 @@
 | CoreAir | HintInputVec | HINT_INPUT | 266,112 |
 | CoreAir | IfEq | BNE | 47,652 |
 | CoreAir | IfEqI | BNE | 744,678 |
-| CoreAir | IfEqI | JAL | 143,088 <span style="color: red">(+3,630 [+2.6%])</span> |
+| CoreAir | IfEqI | JAL | 132,924 <span style="color: green">(-10,164 [-7.1%])</span> |
 | CoreAir | IfNe | BEQ | 140,514 |
 | CoreAir | IfNe | JAL | 462 |
 | CoreAir | IfNeI | BEQ | 39,666 |
@@ -196,8 +196,8 @@
 | CoreAir | LoadV | LOADW | 577,236 |
 | Audit | LoadV | LOADW2 | 893 |
 | CoreAir | LoadV | LOADW2 | 1,267,992 |
-| AccessAdapter<2> | MulE | BBE4MUL | 33,484 <span style="color: red">(+154 [+0.5%])</span> |
-| AccessAdapter<4> | MulE | BBE4MUL | 19,786 <span style="color: red">(+91 [+0.5%])</span> |
+| AccessAdapter<2> | MulE | BBE4MUL | 32,868 <span style="color: green">(-616 [-1.8%])</span> |
+| AccessAdapter<4> | MulE | BBE4MUL | 19,422 <span style="color: green">(-364 [-1.8%])</span> |
 | Audit | MulE | BBE4MUL | 988 |
 | FieldExtensionArithmeticAir | MulE | BBE4MUL | 140,138 |
 | AccessAdapter<2> | MulEF | MUL | 8,822 |
@@ -289,7 +289,10 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11224220966/artifacts/2026340432)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/2a52e3a73357e8998bded2b27e63e5bfbe5dc155
+[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4967e7b5c72385716872e9a6425b2dbf356ddc7e/verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4967e7b5c72385716872e9a6425b2dbf356ddc7e/verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4967e7b5c72385716872e9a6425b2dbf356ddc7e/verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4967e7b5c72385716872e9a6425b2dbf356ddc7e/verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4967e7b5c72385716872e9a6425b2dbf356ddc7e/verify_fibair.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4967e7b5c72385716872e9a6425b2dbf356ddc7e/verify_fibair.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4967e7b5c72385716872e9a6425b2dbf356ddc7e/verify_fibair.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4967e7b5c72385716872e9a6425b2dbf356ddc7e/verify_fibair.dsl_ir.opcode.frequency.svg)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/4967e7b5c72385716872e9a6425b2dbf356ddc7e
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11224220966)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11224692790)
