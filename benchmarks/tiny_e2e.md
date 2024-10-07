@@ -1,6 +1,6 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms |
 | --- | --- | --- | --- | --- |
-| fibonacci_program_inner | 706.0 <span style="color: red">(+2.0 [+0.3%])</span> | 1,782,308 | 200,532 | 1.0 |
+| fibonacci_program_inner | 707.0 <span style="color: red">(+1.0 [+0.1%])</span> | 1,782,308 | 200,532 | 1.0 |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -16,12 +16,12 @@
 
 | group | dsl_ir | opcode | frequency |
 | --- | --- | --- | --- |
-| fibonacci_program_inner |  | 2 | 2 |
-| fibonacci_program_inner |  | 5 | 1 |
-| fibonacci_program_inner | AddF | 256 | 30 |
-| fibonacci_program_inner | AddFI | 256 | 60 |
-| fibonacci_program_inner | Halt | 8 | 1 |
-| fibonacci_program_inner | ImmF | 2 | 2 |
+| fibonacci_program_inner |  | JAL | 1 |
+| fibonacci_program_inner |  | STOREW | 2 |
+| fibonacci_program_inner | AddF | ADD | 30 |
+| fibonacci_program_inner | AddFI | ADD | 60 |
+| fibonacci_program_inner | Halt | TERMINATE | 1 |
+| fibonacci_program_inner | ImmF | STOREW | 2 |
 
 </details>
 
@@ -30,16 +30,16 @@
 
 | group | air_name | dsl_ir | opcode | cells_used |
 | --- | --- | --- | --- | --- |
-| fibonacci_program_inner | Audit |  | 2 | 38 |
-| fibonacci_program_inner | CoreAir |  | 2 | 124 |
-| fibonacci_program_inner | Audit |  | 5 | 19 |
-| fibonacci_program_inner | CoreAir |  | 5 | 62 |
-| fibonacci_program_inner | FieldArithmeticAir | AddF | 256 | 930 |
-| fibonacci_program_inner | Audit | AddFI | 256 | 570 |
-| fibonacci_program_inner | FieldArithmeticAir | AddFI | 256 | 1,860 |
-| fibonacci_program_inner | CoreAir | Halt | 8 | 62 |
-| fibonacci_program_inner | Audit | ImmF | 2 | 38 |
-| fibonacci_program_inner | CoreAir | ImmF | 2 | 124 |
+| fibonacci_program_inner | Audit |  | JAL | 19 |
+| fibonacci_program_inner | CoreAir |  | JAL | 62 |
+| fibonacci_program_inner | Audit |  | STOREW | 38 |
+| fibonacci_program_inner | CoreAir |  | STOREW | 124 |
+| fibonacci_program_inner | FieldArithmeticAir | AddF | ADD | 930 |
+| fibonacci_program_inner | Audit | AddFI | ADD | 570 |
+| fibonacci_program_inner | FieldArithmeticAir | AddFI | ADD | 1,860 |
+| fibonacci_program_inner | CoreAir | Halt | TERMINATE | 62 |
+| fibonacci_program_inner | Audit | ImmF | STOREW | 38 |
+| fibonacci_program_inner | CoreAir | ImmF | STOREW | 124 |
 
 </details>
 
@@ -55,7 +55,7 @@
 
 
 
-Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11206713161/artifacts/2021622382)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/cf1119e0fc3d7de4ce04e32a2f4de414f2b83c2d
+Flamegraphs: [link](https://github.com/axiom-crypto/afs-prototype/actions/runs/11210001762/artifacts/2022346726)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/9e43903f7d272b6a21b5338ac9eda06405c9507f
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11206713161)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11210001762)
