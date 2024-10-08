@@ -1,16 +1,16 @@
 | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- |
-| 8,182.0 <span style="color: red">(+50.0 [+0.6%])</span> | 68,165,652 | 27,821,445 <span style="color: red">(+9,953 [+0.0%])</span> | 2,593.0 <span style="color: red">(+30.0 [+1.2%])</span> | 35.0 <span style="color: red">(+2.0 [+6.1%])</span> |
+| 8,100.0 <span style="color: green">(-82.0 [-1.0%])</span> | 68,165,652 | 27,822,417 <span style="color: red">(+972 [+0.0%])</span> | 2,590.0 <span style="color: green">(-3.0 [-0.1%])</span> | 35.0 |
 
 | chip_name | rows_used |
 | --- | --- |
 | ByteXor | 65,536 |
-| Core | 290,840 <span style="color: red">(+119 [+0.0%])</span> |
-| FieldArithmetic | 140,510 <span style="color: red">(+9 [+0.0%])</span> |
+| Core | 290,854 <span style="color: red">(+14 [+0.0%])</span> |
+| FieldArithmetic | 140,498 <span style="color: green">(-12 [-0.0%])</span> |
 | FieldExtension | 7,486 |
 | Memory | 97,965 |
-| Memory 2 | 40,623 <span style="color: red">(+104 [+0.3%])</span> |
-| Memory 3 | 20,313 <span style="color: red">(+52 [+0.3%])</span> |
+| Memory 2 | 40,647 <span style="color: red">(+24 [+0.1%])</span> |
+| Memory 3 | 20,325 <span style="color: red">(+12 [+0.1%])</span> |
 | Memory 4 | 3,851 |
 | Poseidon2 | 2,613 |
 | Program | 36,703 |
@@ -27,7 +27,7 @@
 | AddEFFI | LOADW | 128 |
 | AddEFFI | STOREW | 384 |
 | AddEI | ADD | 5,664 |
-| AddFI | ADD | 2,851 <span style="color: red">(+9 [+0.3%])</span> |
+| AddFI | ADD | 2,839 <span style="color: green">(-12 [-0.4%])</span> |
 | AddV | ADD | 1,808 |
 | AddVI | ADD | 35,232 |
 | Alloc | ADD | 13,004 |
@@ -54,7 +54,7 @@
 | HintInputVec | HINT_INPUT | 4,032 |
 | IfEq | BNE | 722 |
 | IfEqI | BNE | 11,283 |
-| IfEqI | JAL | 2,133 <span style="color: red">(+119 [+5.9%])</span> |
+| IfEqI | JAL | 2,147 <span style="color: red">(+14 [+0.7%])</span> |
 | IfNe | BEQ | 2,129 |
 | IfNe | JAL | 7 |
 | IfNeI | BEQ | 601 |
@@ -115,12 +115,12 @@
 | AccessAdapter<2> | AddEFFI | STOREW | 132 |
 | Audit | AddEFFI | STOREW | 912 |
 | CoreAir | AddEFFI | STOREW | 25,344 |
-| AccessAdapter<2> | AddEI | ADD | 24,486 <span style="color: red">(+572 [+2.4%])</span> |
-| AccessAdapter<4> | AddEI | ADD | 14,469 <span style="color: red">(+338 [+2.4%])</span> |
+| AccessAdapter<2> | AddEI | ADD | 24,618 <span style="color: red">(+132 [+0.5%])</span> |
+| AccessAdapter<4> | AddEI | ADD | 14,547 <span style="color: red">(+78 [+0.5%])</span> |
 | Audit | AddEI | ADD | 760 |
 | FieldArithmeticAir | AddEI | ADD | 175,584 |
 | Audit | AddFI | ADD | 627 |
-| FieldArithmeticAir | AddFI | ADD | 88,381 <span style="color: red">(+279 [+0.3%])</span> |
+| FieldArithmeticAir | AddFI | ADD | 88,009 <span style="color: green">(-372 [-0.4%])</span> |
 | Audit | AddV | ADD | 19 |
 | FieldArithmeticAir | AddV | ADD | 56,048 |
 | Audit | AddVI | ADD | 61,484 |
@@ -163,7 +163,7 @@
 | CoreAir | HintInputVec | HINT_INPUT | 266,112 |
 | CoreAir | IfEq | BNE | 47,652 |
 | CoreAir | IfEqI | BNE | 744,678 |
-| CoreAir | IfEqI | JAL | 140,778 <span style="color: red">(+7,854 [+5.9%])</span> |
+| CoreAir | IfEqI | JAL | 141,702 <span style="color: red">(+924 [+0.7%])</span> |
 | CoreAir | IfNe | BEQ | 140,514 |
 | CoreAir | IfNe | JAL | 462 |
 | CoreAir | IfNeI | BEQ | 39,666 |
@@ -196,8 +196,8 @@
 | CoreAir | LoadV | LOADW | 577,236 |
 | Audit | LoadV | LOADW2 | 893 |
 | CoreAir | LoadV | LOADW2 | 1,267,992 |
-| AccessAdapter<2> | MulE | BBE4MUL | 33,440 <span style="color: red">(+572 [+1.7%])</span> |
-| AccessAdapter<4> | MulE | BBE4MUL | 19,760 <span style="color: red">(+338 [+1.7%])</span> |
+| AccessAdapter<2> | MulE | BBE4MUL | 33,572 <span style="color: red">(+132 [+0.4%])</span> |
+| AccessAdapter<4> | MulE | BBE4MUL | 19,838 <span style="color: red">(+78 [+0.4%])</span> |
 | Audit | MulE | BBE4MUL | 988 |
 | FieldExtensionArithmeticAir | MulE | BBE4MUL | 140,138 |
 | AccessAdapter<2> | MulEF | MUL | 8,822 |
@@ -295,4 +295,4 @@
 [![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4949e78ae967fc392ed20b44e36614802570f6fe/verify_fibair.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4949e78ae967fc392ed20b44e36614802570f6fe/verify_fibair.dsl_ir.opcode.frequency.svg)
 Commit: https://github.com/axiom-crypto/afs-prototype/commit/4949e78ae967fc392ed20b44e36614802570f6fe
 AWS Instance Type: [r7g.8xlarge](https://instances.vantage.sh/aws/ec2/r7g.8xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11228136357)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11228149898)
