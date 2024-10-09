@@ -215,3 +215,17 @@ pub enum LessThanOpcode {
     SLT,
     SLTU,
 }
+
+#[derive(
+    Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, EnumCount, EnumIter, FromRepr, UsizeOpcode,
+)]
+#[opcode_offset = 0x320]
+#[repr(usize)]
+#[allow(non_camel_case_types)]
+pub enum Rv32LoadStoreOpcode {
+    LOADW,
+    STOREW,
+    STOREH,
+    STOREB,
+}
+// TODO[arayi]: add opcodes lb, lbu, lh, lhu, LOADB_NOEXTEND, LOADH_NOEXTEND
