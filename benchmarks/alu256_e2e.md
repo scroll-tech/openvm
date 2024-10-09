@@ -1,7 +1,7 @@
-| group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
-| --- | --- | --- | --- | --- | --- |
-| bench_program_inner | 896.0 <span style="color: green">(-8.0 [-0.9%])</span> | 3,601,428 | 633,643 | 40.0 |  |
-| inner_verifier | 29,842.0 <span style="color: green">(-137.0 [-0.5%])</span> | 321,519,636 | 159,704,941 <span style="color: red">(+14,437 [+0.0%])</span> | 14,026.0 <span style="color: red">(+18.0 [+0.1%])</span> | 376.0 <span style="color: green">(-17.0 [-4.3%])</span> |
+| group | stark_prove_excluding_trace_time_ms | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
+| --- | --- | --- | --- | --- |
+| bench_program_inner | 1,040.0 <span style="color: red">(+144.0 [+16.1%])</span> | 633,643 | 40.0 |  |
+| inner_verifier | 38,116.0 <span style="color: red">(+8,274.0 [+27.7%])</span> | 158,594,621 <span style="color: green">(-1,110,320 [-0.7%])</span> | 14,049.0 <span style="color: red">(+23.0 [+0.2%])</span> | 380.0 <span style="color: red">(+4.0 [+1.1%])</span> |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -19,15 +19,15 @@
 | bench_program_inner | RangeChecker | 65,536 |
 | bench_program_inner | Shift256 | 96 |
 | inner_verifier | ByteXor | 65,536 |
-| inner_verifier | Core | 1,558,208 <span style="color: red">(+233 [+0.0%])</span> |
-| inner_verifier | FieldArithmetic | 750,451 <span style="color: green">(-1 [-0.0%])</span> |
+| inner_verifier | Core | 1,558,832 <span style="color: red">(+624 [+0.0%])</span> |
+| inner_verifier | FieldArithmetic | 751,369 <span style="color: red">(+918 [+0.1%])</span> |
 | inner_verifier | FieldExtension | 267,359 |
-| inner_verifier | Memory | 321,662 |
-| inner_verifier | Memory 2 | 648,679 <span style="color: green">(-52 [-0.0%])</span> |
-| inner_verifier | Memory 3 | 324,489 <span style="color: green">(-26 [-0.0%])</span> |
+| inner_verifier | Memory | 266,779 <span style="color: green">(-54,883 [-17.1%])</span> |
+| inner_verifier | Memory 2 | 641,163 <span style="color: green">(-7,516 [-1.2%])</span> |
+| inner_verifier | Memory 3 | 320,731 <span style="color: green">(-3,758 [-1.2%])</span> |
 | inner_verifier | Memory 4 | 15,580 |
 | inner_verifier | Poseidon2 | 11,198 |
-| inner_verifier | Program | 95,413 |
+| inner_verifier | Program | 89,758 <span style="color: green">(-5,655 [-5.9%])</span> |
 | inner_verifier | RangeChecker | 65,536 |
 
 <details>
@@ -67,47 +67,47 @@
 | inner_verifier | AddEFFI | LOADW | 127 |
 | inner_verifier | AddEFFI | STOREW | 381 |
 | inner_verifier | AddEFI | ADD | 156 |
-| inner_verifier | AddEI | ADD | 26,076 |
-| inner_verifier | AddFI | ADD | 19,852 <span style="color: green">(-1 [-0.0%])</span> |
-| inner_verifier | AddV | ADD | 5,865 |
-| inner_verifier | AddVI | ADD | 141,319 |
-| inner_verifier | Alloc | ADD | 23,194 |
-| inner_verifier | Alloc | LOADW | 23,194 |
-| inner_verifier | Alloc | MUL | 14,026 |
+| inner_verifier | AddEI | ADD | 26,084 <span style="color: red">(+8 [+0.0%])</span> |
+| inner_verifier | AddFI | ADD | 19,816 <span style="color: green">(-36 [-0.2%])</span> |
+| inner_verifier | AddV | ADD | 5,946 <span style="color: red">(+81 [+1.4%])</span> |
+| inner_verifier | AddVI | ADD | 141,696 <span style="color: red">(+377 [+0.3%])</span> |
+| inner_verifier | Alloc | ADD | 23,328 <span style="color: red">(+134 [+0.6%])</span> |
+| inner_verifier | Alloc | LOADW | 23,328 <span style="color: red">(+134 [+0.6%])</span> |
+| inner_verifier | Alloc | MUL | 14,134 <span style="color: red">(+108 [+0.8%])</span> |
 | inner_verifier | AssertEqE | BNE | 140 |
 | inner_verifier | AssertEqEI | BNE | 4 |
 | inner_verifier | AssertEqF | BNE | 3,886 |
-| inner_verifier | AssertEqV | BNE | 1,122 |
-| inner_verifier | AssertEqVI | BNE | 214 |
+| inner_verifier | AssertEqV | BNE | 1,181 <span style="color: red">(+59 [+5.3%])</span> |
+| inner_verifier | AssertEqVI | BNE | 140 <span style="color: green">(-74 [-34.6%])</span> |
 | inner_verifier | CycleTrackerEnd | CT_END | 37,156 |
 | inner_verifier | CycleTrackerStart | CT_START | 37,156 |
 | inner_verifier | DivE | BBE4DIV | 59,206 |
 | inner_verifier | DivEIN | BBE4DIV | 36 |
 | inner_verifier | DivEIN | STOREW | 144 |
 | inner_verifier | DivFIN | DIV | 86 |
-| inner_verifier | For | ADD | 235,225 |
-| inner_verifier | For | BNE | 254,205 |
-| inner_verifier | For | JAL | 18,980 |
+| inner_verifier | For | ADD | 235,455 <span style="color: red">(+230 [+0.1%])</span> |
+| inner_verifier | For | BNE | 254,571 <span style="color: red">(+366 [+0.1%])</span> |
+| inner_verifier | For | JAL | 19,116 <span style="color: red">(+136 [+0.7%])</span> |
 | inner_verifier | For | LOADW | 1,008 |
-| inner_verifier | For | STOREW | 17,972 |
+| inner_verifier | For | STOREW | 18,108 <span style="color: red">(+136 [+0.8%])</span> |
 | inner_verifier | Halt | TERMINATE | 1 |
 | inner_verifier | HintBitsF | HINT_BITS | 22 |
-| inner_verifier | HintInputVec | HINT_INPUT | 9,168 |
+| inner_verifier | HintInputVec | HINT_INPUT | 9,194 <span style="color: red">(+26 [+0.3%])</span> |
 | inner_verifier | IfEq | BNE | 6,723 |
-| inner_verifier | IfEqI | BNE | 60,271 |
-| inner_verifier | IfEqI | JAL | 12,382 <span style="color: red">(+233 [+1.9%])</span> |
+| inner_verifier | IfEqI | BNE | 60,346 <span style="color: red">(+75 [+0.1%])</span> |
+| inner_verifier | IfEqI | JAL | 13,382 <span style="color: red">(+1,000 [+8.1%])</span> |
 | inner_verifier | IfNe | BEQ | 6,448 |
 | inner_verifier | IfNe | JAL | 19 |
-| inner_verifier | IfNeI | BEQ | 988 |
-| inner_verifier | ImmE | STOREW | 7,192 |
-| inner_verifier | ImmF | STOREW | 15,745 |
-| inner_verifier | ImmV | STOREW | 13,202 |
-| inner_verifier | LoadE | LOADW | 15,356 |
-| inner_verifier | LoadE | LOADW2 | 259,140 |
-| inner_verifier | LoadF | LOADW | 14,469 |
-| inner_verifier | LoadF | LOADW2 | 96,074 |
-| inner_verifier | LoadV | LOADW | 12,064 |
-| inner_verifier | LoadV | LOADW2 | 72,546 |
+| inner_verifier | IfNeI | BEQ | 1,016 <span style="color: red">(+28 [+2.8%])</span> |
+| inner_verifier | ImmE | STOREW | 7,200 <span style="color: red">(+8 [+0.1%])</span> |
+| inner_verifier | ImmF | STOREW | 15,713 <span style="color: green">(-32 [-0.2%])</span> |
+| inner_verifier | ImmV | STOREW | 13,363 <span style="color: red">(+161 [+1.2%])</span> |
+| inner_verifier | LoadE | LOADW | 15,364 <span style="color: red">(+8 [+0.1%])</span> |
+| inner_verifier | LoadE | LOADW2 | 259,196 <span style="color: red">(+56 [+0.0%])</span> |
+| inner_verifier | LoadF | LOADW | 10,939 <span style="color: green">(-3,530 [-24.4%])</span> |
+| inner_verifier | LoadF | LOADW2 | 96,246 <span style="color: red">(+172 [+0.2%])</span> |
+| inner_verifier | LoadV | LOADW | 11,289 <span style="color: green">(-775 [-6.4%])</span> |
+| inner_verifier | LoadV | LOADW2 | 74,962 <span style="color: red">(+2,416 [+3.3%])</span> |
 | inner_verifier | MulE | BBE4MUL | 133,772 |
 | inner_verifier | MulEF | MUL | 1,632 |
 | inner_verifier | MulEFI | MUL | 536 |
@@ -120,21 +120,21 @@
 | inner_verifier | NegE | MUL | 136 |
 | inner_verifier | Poseidon2CompressBabyBear | COMP_POS2 | 6,846 |
 | inner_verifier | Poseidon2PermuteBabyBear | PERM_POS2 | 4,352 |
-| inner_verifier | StoreE | STOREW | 10,924 |
+| inner_verifier | StoreE | STOREW | 10,932 <span style="color: red">(+8 [+0.1%])</span> |
 | inner_verifier | StoreE | STOREW2 | 12,328 |
-| inner_verifier | StoreF | STOREW | 13,500 |
-| inner_verifier | StoreF | STOREW2 | 33,693 |
-| inner_verifier | StoreHintWord | ADD | 95,155 |
-| inner_verifier | StoreHintWord | SHINTW | 105,005 |
-| inner_verifier | StoreV | STOREW | 1,872 |
-| inner_verifier | StoreV | STOREW2 | 23,736 |
+| inner_verifier | StoreF | STOREW | 13,228 <span style="color: green">(-272 [-2.0%])</span> |
+| inner_verifier | StoreF | STOREW2 | 33,905 <span style="color: red">(+212 [+0.6%])</span> |
+| inner_verifier | StoreHintWord | ADD | 95,168 <span style="color: red">(+13 [+0.0%])</span> |
+| inner_verifier | StoreHintWord | SHINTW | 105,044 <span style="color: red">(+39 [+0.0%])</span> |
+| inner_verifier | StoreV | STOREW | 1,363 <span style="color: green">(-509 [-27.2%])</span> |
+| inner_verifier | StoreV | STOREW2 | 24,512 <span style="color: red">(+776 [+3.3%])</span> |
 | inner_verifier | SubE | FE4SUB | 3,919 |
 | inner_verifier | SubEF | LOADW | 353,136 |
 | inner_verifier | SubEF | SUB | 117,712 |
 | inner_verifier | SubEFI | ADD | 596 |
 | inner_verifier | SubEI | ADD | 288 |
-| inner_verifier | SubV | SUB | 21,525 |
-| inner_verifier | SubVI | SUB | 1,252 |
+| inner_verifier | SubV | SUB | 21,539 <span style="color: red">(+14 [+0.1%])</span> |
+| inner_verifier | SubVI | SUB | 1,241 <span style="color: green">(-11 [-0.9%])</span> |
 | inner_verifier | SubVIN | SUB | 336 |
 
 </details>
@@ -233,37 +233,37 @@
 | inner_verifier | CoreAir |  | JAL | 66 |
 | inner_verifier | Audit |  | STOREW | 38 |
 | inner_verifier | CoreAir |  | STOREW | 132 |
-| inner_verifier | AccessAdapter<2> | AddE | FE4ADD | 277,178 |
-| inner_verifier | AccessAdapter<4> | AddE | FE4ADD | 163,787 |
-| inner_verifier | Audit | AddE | FE4ADD | 701,024 |
+| inner_verifier | AccessAdapter<2> | AddE | FE4ADD | 209,572 <span style="color: green">(-67,606 [-24.4%])</span> |
+| inner_verifier | AccessAdapter<4> | AddE | FE4ADD | 123,838 <span style="color: green">(-39,949 [-24.4%])</span> |
+| inner_verifier | Audit | AddE | FE4ADD | 412,984 <span style="color: green">(-288,040 [-41.1%])</span> |
 | inner_verifier | FieldExtensionArithmeticAir | AddE | FE4ADD | 2,820,718 |
-| inner_verifier | AccessAdapter<2> | AddEFFI | LOADW | 660 |
-| inner_verifier | AccessAdapter<4> | AddEFFI | LOADW | 780 |
-| inner_verifier | Audit | AddEFFI | LOADW | 874 |
+| inner_verifier | AccessAdapter<2> | AddEFFI | LOADW | 891 <span style="color: red">(+231 [+35.0%])</span> |
+| inner_verifier | AccessAdapter<4> | AddEFFI | LOADW | 1,053 <span style="color: red">(+273 [+35.0%])</span> |
+| inner_verifier | Audit | AddEFFI | LOADW | 418 <span style="color: green">(-456 [-52.2%])</span> |
 | inner_verifier | CoreAir | AddEFFI | LOADW | 8,382 |
-| inner_verifier | AccessAdapter<2> | AddEFFI | STOREW | 660 |
-| inner_verifier | Audit | AddEFFI | STOREW | 2,622 |
+| inner_verifier | AccessAdapter<2> | AddEFFI | STOREW | 891 <span style="color: red">(+231 [+35.0%])</span> |
+| inner_verifier | Audit | AddEFFI | STOREW | 1,254 <span style="color: green">(-1,368 [-52.2%])</span> |
 | inner_verifier | CoreAir | AddEFFI | STOREW | 25,146 |
-| inner_verifier | AccessAdapter<2> | AddEFI | ADD | 330 |
-| inner_verifier | AccessAdapter<4> | AddEFI | ADD | 195 |
-| inner_verifier | Audit | AddEFI | ADD | 2,964 |
+| inner_verifier | AccessAdapter<2> | AddEFI | ADD | 506 <span style="color: red">(+176 [+53.3%])</span> |
+| inner_verifier | AccessAdapter<4> | AddEFI | ADD | 299 <span style="color: red">(+104 [+53.3%])</span> |
+| inner_verifier | Audit | AddEFI | ADD | 2,280 <span style="color: green">(-684 [-23.1%])</span> |
 | inner_verifier | FieldArithmeticAir | AddEFI | ADD | 4,836 |
-| inner_verifier | AccessAdapter<2> | AddEI | ADD | 138,534 <span style="color: green">(-286 [-0.2%])</span> |
-| inner_verifier | AccessAdapter<4> | AddEI | ADD | 81,861 <span style="color: green">(-169 [-0.2%])</span> |
-| inner_verifier | Audit | AddEI | ADD | 408,576 |
-| inner_verifier | FieldArithmeticAir | AddEI | ADD | 808,356 |
-| inner_verifier | Audit | AddFI | ADD | 3,097 |
-| inner_verifier | FieldArithmeticAir | AddFI | ADD | 615,412 <span style="color: green">(-31 [-0.0%])</span> |
-| inner_verifier | Audit | AddV | ADD | 19 |
-| inner_verifier | FieldArithmeticAir | AddV | ADD | 181,815 |
-| inner_verifier | Audit | AddVI | ADD | 17,233 |
-| inner_verifier | FieldArithmeticAir | AddVI | ADD | 4,380,889 |
-| inner_verifier | FieldArithmeticAir | Alloc | ADD | 719,014 |
-| inner_verifier | Audit | Alloc | LOADW | 3,686 |
-| inner_verifier | CoreAir | Alloc | LOADW | 1,530,804 |
-| inner_verifier | AccessAdapter<2> | Alloc | MUL | 33 |
-| inner_verifier | AccessAdapter<4> | Alloc | MUL | 39 |
-| inner_verifier | FieldArithmeticAir | Alloc | MUL | 434,806 |
+| inner_verifier | AccessAdapter<2> | AddEI | ADD | 153,076 <span style="color: red">(+14,542 [+10.5%])</span> |
+| inner_verifier | AccessAdapter<4> | AddEI | ADD | 90,454 <span style="color: red">(+8,593 [+10.5%])</span> |
+| inner_verifier | Audit | AddEI | ADD | 350,208 <span style="color: green">(-58,368 [-14.3%])</span> |
+| inner_verifier | FieldArithmeticAir | AddEI | ADD | 808,604 <span style="color: red">(+248 [+0.0%])</span> |
+| inner_verifier | Audit | AddFI | ADD | 456 <span style="color: green">(-2,641 [-85.3%])</span> |
+| inner_verifier | FieldArithmeticAir | AddFI | ADD | 614,296 <span style="color: green">(-1,116 [-0.2%])</span> |
+| inner_verifier | Audit | AddV | ADD | 57 <span style="color: red">(+38 [+200.0%])</span> |
+| inner_verifier | FieldArithmeticAir | AddV | ADD | 184,326 <span style="color: red">(+2,511 [+1.4%])</span> |
+| inner_verifier | Audit | AddVI | ADD | 15,029 <span style="color: green">(-2,204 [-12.8%])</span> |
+| inner_verifier | FieldArithmeticAir | AddVI | ADD | 4,392,576 <span style="color: red">(+11,687 [+0.3%])</span> |
+| inner_verifier | FieldArithmeticAir | Alloc | ADD | 723,168 <span style="color: red">(+4,154 [+0.6%])</span> |
+| inner_verifier | Audit | Alloc | LOADW | 1,634 <span style="color: green">(-2,052 [-55.7%])</span> |
+| inner_verifier | CoreAir | Alloc | LOADW | 1,539,648 <span style="color: red">(+8,844 [+0.6%])</span> |
+| inner_verifier | AccessAdapter<2> | Alloc | MUL | 22 <span style="color: green">(-11 [-33.3%])</span> |
+| inner_verifier | AccessAdapter<4> | Alloc | MUL | 26 <span style="color: green">(-13 [-33.3%])</span> |
+| inner_verifier | FieldArithmeticAir | Alloc | MUL | 438,154 <span style="color: red">(+3,348 [+0.8%])</span> |
 | inner_verifier | AccessAdapter<2> | AssertEqE | BNE | 770 |
 | inner_verifier | AccessAdapter<4> | AssertEqE | BNE | 455 |
 | inner_verifier | CoreAir | AssertEqE | BNE | 9,240 |
@@ -271,101 +271,100 @@
 | inner_verifier | AccessAdapter<4> | AssertEqEI | BNE | 13 |
 | inner_verifier | CoreAir | AssertEqEI | BNE | 264 |
 | inner_verifier | CoreAir | AssertEqF | BNE | 256,476 |
-| inner_verifier | CoreAir | AssertEqV | BNE | 74,052 |
-| inner_verifier | CoreAir | AssertEqVI | BNE | 14,124 |
+| inner_verifier | CoreAir | AssertEqV | BNE | 77,946 <span style="color: red">(+3,894 [+5.3%])</span> |
+| inner_verifier | CoreAir | AssertEqVI | BNE | 9,240 <span style="color: green">(-4,884 [-34.6%])</span> |
 | inner_verifier | CoreAir | CycleTrackerEnd | CT_END | 2,452,296 |
 | inner_verifier | CoreAir | CycleTrackerStart | CT_START | 2,452,296 |
-| inner_verifier | AccessAdapter<2> | DivE | BBE4DIV | 2,590,588 |
-| inner_verifier | AccessAdapter<4> | DivE | BBE4DIV | 1,530,802 |
-| inner_verifier | Audit | DivE | BBE4DIV | 1,976 |
+| inner_verifier | AccessAdapter<2> | DivE | BBE4DIV | 2,589,994 <span style="color: green">(-594 [-0.0%])</span> |
+| inner_verifier | AccessAdapter<4> | DivE | BBE4DIV | 1,530,451 <span style="color: green">(-351 [-0.0%])</span> |
 | inner_verifier | FieldExtensionArithmeticAir | DivE | BBE4DIV | 2,427,446 |
-| inner_verifier | AccessAdapter<2> | DivEIN | BBE4DIV | 2,046 |
-| inner_verifier | AccessAdapter<4> | DivEIN | BBE4DIV | 1,209 |
-| inner_verifier | Audit | DivEIN | BBE4DIV | 2,660 |
+| inner_verifier | AccessAdapter<2> | DivEIN | BBE4DIV | 1,474 <span style="color: green">(-572 [-28.0%])</span> |
+| inner_verifier | AccessAdapter<4> | DivEIN | BBE4DIV | 871 <span style="color: green">(-338 [-28.0%])</span> |
+| inner_verifier | Audit | DivEIN | BBE4DIV | 456 <span style="color: green">(-2,204 [-82.9%])</span> |
 | inner_verifier | FieldExtensionArithmeticAir | DivEIN | BBE4DIV | 1,476 |
 | inner_verifier | AccessAdapter<2> | DivEIN | STOREW | 517 |
 | inner_verifier | AccessAdapter<4> | DivEIN | STOREW | 143 |
 | inner_verifier | CoreAir | DivEIN | STOREW | 9,504 |
-| inner_verifier | Audit | DivFIN | DIV | 1,577 |
 | inner_verifier | FieldArithmeticAir | DivFIN | DIV | 2,666 |
-| inner_verifier | FieldArithmeticAir | For | ADD | 7,291,975 |
-| inner_verifier | CoreAir | For | BNE | 16,777,530 |
-| inner_verifier | AccessAdapter<2> | For | JAL | 451 |
-| inner_verifier | AccessAdapter<4> | For | JAL | 533 |
-| inner_verifier | CoreAir | For | JAL | 1,252,680 |
+| inner_verifier | FieldArithmeticAir | For | ADD | 7,299,105 <span style="color: red">(+7,130 [+0.1%])</span> |
+| inner_verifier | CoreAir | For | BNE | 16,801,686 <span style="color: red">(+24,156 [+0.1%])</span> |
+| inner_verifier | AccessAdapter<2> | For | JAL | 462 <span style="color: red">(+11 [+2.4%])</span> |
+| inner_verifier | AccessAdapter<4> | For | JAL | 546 <span style="color: red">(+13 [+2.4%])</span> |
+| inner_verifier | CoreAir | For | JAL | 1,261,656 <span style="color: red">(+8,976 [+0.7%])</span> |
 | inner_verifier | Audit | For | LOADW | 399 |
 | inner_verifier | CoreAir | For | LOADW | 66,528 |
-| inner_verifier | Audit | For | STOREW | 2,660 |
-| inner_verifier | CoreAir | For | STOREW | 1,186,152 |
+| inner_verifier | Audit | For | STOREW | 988 <span style="color: green">(-1,672 [-62.9%])</span> |
+| inner_verifier | CoreAir | For | STOREW | 1,195,128 <span style="color: red">(+8,976 [+0.8%])</span> |
 | inner_verifier | CoreAir | Halt | TERMINATE | 66 |
 | inner_verifier | CoreAir | HintBitsF | HINT_BITS | 1,452 |
-| inner_verifier | CoreAir | HintInputVec | HINT_INPUT | 605,088 |
+| inner_verifier | CoreAir | HintInputVec | HINT_INPUT | 606,804 <span style="color: red">(+1,716 [+0.3%])</span> |
 | inner_verifier | CoreAir | IfEq | BNE | 443,718 |
-| inner_verifier | CoreAir | IfEqI | BNE | 3,977,886 |
-| inner_verifier | CoreAir | IfEqI | JAL | 817,212 <span style="color: red">(+15,378 [+1.9%])</span> |
+| inner_verifier | CoreAir | IfEqI | BNE | 3,982,836 <span style="color: red">(+4,950 [+0.1%])</span> |
+| inner_verifier | CoreAir | IfEqI | JAL | 883,212 <span style="color: red">(+66,000 [+8.1%])</span> |
 | inner_verifier | CoreAir | IfNe | BEQ | 425,568 |
 | inner_verifier | CoreAir | IfNe | JAL | 1,254 |
-| inner_verifier | CoreAir | IfNeI | BEQ | 65,208 |
-| inner_verifier | AccessAdapter<2> | ImmE | STOREW | 462 |
-| inner_verifier | AccessAdapter<4> | ImmE | STOREW | 273 |
-| inner_verifier | Audit | ImmE | STOREW | 128,592 |
-| inner_verifier | CoreAir | ImmE | STOREW | 474,672 |
-| inner_verifier | Audit | ImmF | STOREW | 3,952 |
-| inner_verifier | CoreAir | ImmF | STOREW | 1,039,170 |
-| inner_verifier | Audit | ImmV | STOREW | 18,943 |
-| inner_verifier | CoreAir | ImmV | STOREW | 871,332 |
-| inner_verifier | AccessAdapter<2> | LoadE | LOADW | 15,246 |
-| inner_verifier | AccessAdapter<4> | LoadE | LOADW | 9,009 |
-| inner_verifier | Audit | LoadE | LOADW | 213,560 |
-| inner_verifier | CoreAir | LoadE | LOADW | 1,013,496 |
+| inner_verifier | CoreAir | IfNeI | BEQ | 67,056 <span style="color: red">(+1,848 [+2.8%])</span> |
+| inner_verifier | AccessAdapter<2> | ImmE | STOREW | 3,300 <span style="color: red">(+2,838 [+614.3%])</span> |
+| inner_verifier | AccessAdapter<4> | ImmE | STOREW | 1,950 <span style="color: red">(+1,677 [+614.3%])</span> |
+| inner_verifier | Audit | ImmE | STOREW | 116,280 <span style="color: green">(-12,312 [-9.6%])</span> |
+| inner_verifier | CoreAir | ImmE | STOREW | 475,200 <span style="color: red">(+528 [+0.1%])</span> |
+| inner_verifier | Audit | ImmF | STOREW | 2,337 <span style="color: green">(-1,615 [-40.9%])</span> |
+| inner_verifier | CoreAir | ImmF | STOREW | 1,037,058 <span style="color: green">(-2,112 [-0.2%])</span> |
+| inner_verifier | Audit | ImmV | STOREW | 15,048 <span style="color: green">(-3,895 [-20.6%])</span> |
+| inner_verifier | CoreAir | ImmV | STOREW | 881,958 <span style="color: red">(+10,626 [+1.2%])</span> |
+| inner_verifier | AccessAdapter<2> | LoadE | LOADW | 61,182 <span style="color: red">(+45,936 [+301.3%])</span> |
+| inner_verifier | AccessAdapter<4> | LoadE | LOADW | 36,153 <span style="color: red">(+27,144 [+301.3%])</span> |
+| inner_verifier | Audit | LoadE | LOADW | 8,816 <span style="color: green">(-204,744 [-95.9%])</span> |
+| inner_verifier | CoreAir | LoadE | LOADW | 1,014,024 <span style="color: red">(+528 [+0.1%])</span> |
 | inner_verifier | AccessAdapter<2> | LoadE | LOADW2 | 22,704 |
 | inner_verifier | AccessAdapter<4> | LoadE | LOADW2 | 13,416 |
-| inner_verifier | CoreAir | LoadE | LOADW2 | 17,103,240 |
+| inner_verifier | Audit | LoadE | LOADW2 | 76 |
+| inner_verifier | CoreAir | LoadE | LOADW2 | 17,106,936 <span style="color: red">(+3,696 [+0.0%])</span> |
 | inner_verifier | AccessAdapter<2> | LoadF | LOADW | 21,252 |
 | inner_verifier | AccessAdapter<4> | LoadF | LOADW | 12,558 |
 | inner_verifier | AccessAdapter<8> | LoadF | LOADW | 8,211 |
-| inner_verifier | Audit | LoadF | LOADW | 73,815 |
-| inner_verifier | CoreAir | LoadF | LOADW | 954,954 |
+| inner_verifier | Audit | LoadF | LOADW | 494 <span style="color: green">(-73,321 [-99.3%])</span> |
+| inner_verifier | CoreAir | LoadF | LOADW | 721,974 <span style="color: green">(-232,980 [-24.4%])</span> |
 | inner_verifier | AccessAdapter<2> | LoadF | LOADW2 | 583 |
 | inner_verifier | AccessAdapter<4> | LoadF | LOADW2 | 351 |
 | inner_verifier | AccessAdapter<8> | LoadF | LOADW2 | 374 |
-| inner_verifier | Audit | LoadF | LOADW2 | 1,919 |
-| inner_verifier | CoreAir | LoadF | LOADW2 | 6,340,884 |
-| inner_verifier | Audit | LoadV | LOADW | 30,590 |
-| inner_verifier | CoreAir | LoadV | LOADW | 796,224 |
-| inner_verifier | Audit | LoadV | LOADW2 | 3,382 |
-| inner_verifier | CoreAir | LoadV | LOADW2 | 4,788,036 |
-| inner_verifier | AccessAdapter<2> | MulE | BBE4MUL | 475,288 <span style="color: green">(-286 [-0.1%])</span> |
-| inner_verifier | AccessAdapter<4> | MulE | BBE4MUL | 280,852 <span style="color: green">(-169 [-0.1%])</span> |
-| inner_verifier | Audit | MulE | BBE4MUL | 1,061,796 |
+| inner_verifier | Audit | LoadF | LOADW2 | 513 <span style="color: green">(-1,406 [-73.3%])</span> |
+| inner_verifier | CoreAir | LoadF | LOADW2 | 6,352,236 <span style="color: red">(+11,352 [+0.2%])</span> |
+| inner_verifier | Audit | LoadV | LOADW | 13,737 <span style="color: green">(-16,853 [-55.1%])</span> |
+| inner_verifier | CoreAir | LoadV | LOADW | 745,074 <span style="color: green">(-51,150 [-6.4%])</span> |
+| inner_verifier | Audit | LoadV | LOADW2 | 1,615 <span style="color: green">(-1,767 [-52.2%])</span> |
+| inner_verifier | CoreAir | LoadV | LOADW2 | 4,947,492 <span style="color: red">(+159,456 [+3.3%])</span> |
+| inner_verifier | AccessAdapter<2> | MulE | BBE4MUL | 419,804 <span style="color: green">(-55,484 [-11.7%])</span> |
+| inner_verifier | AccessAdapter<4> | MulE | BBE4MUL | 248,066 <span style="color: green">(-32,786 [-11.7%])</span> |
+| inner_verifier | Audit | MulE | BBE4MUL | 824,752 <span style="color: green">(-237,044 [-22.3%])</span> |
 | inner_verifier | FieldExtensionArithmeticAir | MulE | BBE4MUL | 5,484,652 |
-| inner_verifier | AccessAdapter<2> | MulEF | MUL | 7,414 |
-| inner_verifier | AccessAdapter<4> | MulEF | MUL | 4,381 |
-| inner_verifier | Audit | MulEF | MUL | 5,396 |
+| inner_verifier | AccessAdapter<2> | MulEF | MUL | 8,030 <span style="color: red">(+616 [+8.3%])</span> |
+| inner_verifier | AccessAdapter<4> | MulEF | MUL | 4,745 <span style="color: red">(+364 [+8.3%])</span> |
+| inner_verifier | Audit | MulEF | MUL | 912 <span style="color: green">(-4,484 [-83.1%])</span> |
 | inner_verifier | FieldArithmeticAir | MulEF | MUL | 50,592 |
-| inner_verifier | AccessAdapter<2> | MulEFI | MUL | 1,496 |
-| inner_verifier | AccessAdapter<4> | MulEFI | MUL | 884 |
-| inner_verifier | Audit | MulEFI | MUL | 10,184 |
+| inner_verifier | AccessAdapter<2> | MulEFI | MUL | 2,068 <span style="color: red">(+572 [+38.2%])</span> |
+| inner_verifier | AccessAdapter<4> | MulEFI | MUL | 1,222 <span style="color: red">(+338 [+38.2%])</span> |
+| inner_verifier | Audit | MulEFI | MUL | 7,676 <span style="color: green">(-2,508 [-24.6%])</span> |
 | inner_verifier | FieldArithmeticAir | MulEFI | MUL | 16,616 |
-| inner_verifier | AccessAdapter<2> | MulEI | BBE4MUL | 103,532 |
-| inner_verifier | AccessAdapter<4> | MulEI | BBE4MUL | 61,178 |
-| inner_verifier | Audit | MulEI | BBE4MUL | 119,168 |
+| inner_verifier | AccessAdapter<2> | MulEI | BBE4MUL | 80,432 <span style="color: green">(-23,100 [-22.3%])</span> |
+| inner_verifier | AccessAdapter<4> | MulEI | BBE4MUL | 47,528 <span style="color: green">(-13,650 [-22.3%])</span> |
+| inner_verifier | Audit | MulEI | BBE4MUL | 18,088 <span style="color: green">(-101,080 [-84.8%])</span> |
 | inner_verifier | FieldExtensionArithmeticAir | MulEI | BBE4MUL | 66,748 |
 | inner_verifier | AccessAdapter<2> | MulEI | STOREW | 35,585 |
 | inner_verifier | AccessAdapter<4> | MulEI | STOREW | 20,904 |
 | inner_verifier | Audit | MulEI | STOREW | 57 |
 | inner_verifier | CoreAir | MulEI | STOREW | 429,792 |
-| inner_verifier | Audit | MulF | MUL | 931 |
+| inner_verifier | Audit | MulF | MUL | 19 <span style="color: green">(-912 [-98.0%])</span> |
 | inner_verifier | FieldArithmeticAir | MulF | MUL | 1,141,079 |
-| inner_verifier | Audit | MulFI | MUL | 266 |
+| inner_verifier | Audit | MulFI | MUL | 19 <span style="color: green">(-247 [-92.9%])</span> |
 | inner_verifier | FieldArithmeticAir | MulFI | MUL | 434 |
 | inner_verifier | Audit | MulV | MUL | 12,901 |
 | inner_verifier | FieldArithmeticAir | MulV | MUL | 21,142 |
-| inner_verifier | Audit | MulVI | MUL | 114 |
+| inner_verifier | Audit | MulVI | MUL | 133 <span style="color: red">(+19 [+16.7%])</span> |
 | inner_verifier | FieldArithmeticAir | MulVI | MUL | 247,349 |
-| inner_verifier | AccessAdapter<2> | NegE | MUL | 638 |
-| inner_verifier | AccessAdapter<4> | NegE | MUL | 377 |
-| inner_verifier | Audit | NegE | MUL | 2,584 |
+| inner_verifier | AccessAdapter<2> | NegE | MUL | 814 <span style="color: red">(+176 [+27.6%])</span> |
+| inner_verifier | AccessAdapter<4> | NegE | MUL | 481 <span style="color: red">(+104 [+27.6%])</span> |
+| inner_verifier | Audit | NegE | MUL | 1,596 <span style="color: green">(-988 [-38.2%])</span> |
 | inner_verifier | FieldArithmeticAir | NegE | MUL | 4,216 |
 | inner_verifier | AccessAdapter<2> | Poseidon2CompressBabyBear | COMP_POS2 | 279,048 |
 | inner_verifier | AccessAdapter<4> | Poseidon2CompressBabyBear | COMP_POS2 | 164,892 |
@@ -375,90 +374,88 @@
 | inner_verifier | AccessAdapter<4> | Poseidon2PermuteBabyBear | PERM_POS2 | 137,878 |
 | inner_verifier | AccessAdapter<8> | Poseidon2PermuteBabyBear | PERM_POS2 | 91,205 |
 | inner_verifier | Poseidon2VmAir<BabyBear> | Poseidon2PermuteBabyBear | PERM_POS2 | 1,819,136 |
-| inner_verifier | AccessAdapter<2> | StoreE | STOREW | 7,392 |
-| inner_verifier | AccessAdapter<4> | StoreE | STOREW | 4,368 |
-| inner_verifier | Audit | StoreE | STOREW | 207,556 |
-| inner_verifier | CoreAir | StoreE | STOREW | 720,984 |
+| inner_verifier | AccessAdapter<2> | StoreE | STOREW | 7,436 <span style="color: red">(+44 [+0.6%])</span> |
+| inner_verifier | AccessAdapter<4> | StoreE | STOREW | 4,394 <span style="color: red">(+26 [+0.6%])</span> |
+| inner_verifier | Audit | StoreE | STOREW | 207,708 <span style="color: red">(+152 [+0.1%])</span> |
+| inner_verifier | CoreAir | StoreE | STOREW | 721,512 <span style="color: red">(+528 [+0.1%])</span> |
 | inner_verifier | AccessAdapter<2> | StoreE | STOREW2 | 52,668 |
 | inner_verifier | AccessAdapter<4> | StoreE | STOREW2 | 31,122 |
 | inner_verifier | Audit | StoreE | STOREW2 | 26,752 |
 | inner_verifier | CoreAir | StoreE | STOREW2 | 813,648 |
-| inner_verifier | Audit | StoreF | STOREW | 256,500 |
-| inner_verifier | CoreAir | StoreF | STOREW | 891,000 |
+| inner_verifier | Audit | StoreF | STOREW | 251,332 <span style="color: green">(-5,168 [-2.0%])</span> |
+| inner_verifier | CoreAir | StoreF | STOREW | 873,048 <span style="color: green">(-17,952 [-2.0%])</span> |
 | inner_verifier | AccessAdapter<2> | StoreF | STOREW2 | 144,199 |
 | inner_verifier | AccessAdapter<4> | StoreF | STOREW2 | 86,177 |
 | inner_verifier | AccessAdapter<8> | StoreF | STOREW2 | 57,256 |
-| inner_verifier | Audit | StoreF | STOREW2 | 51,984 |
-| inner_verifier | CoreAir | StoreF | STOREW2 | 2,223,738 |
-| inner_verifier | FieldArithmeticAir | StoreHintWord | ADD | 2,949,805 |
-| inner_verifier | Audit | StoreHintWord | SHINTW | 1,995,095 |
-| inner_verifier | CoreAir | StoreHintWord | SHINTW | 6,930,330 |
-| inner_verifier | Audit | StoreV | STOREW | 35,568 |
-| inner_verifier | CoreAir | StoreV | STOREW | 123,552 |
-| inner_verifier | Audit | StoreV | STOREW2 | 446,310 |
-| inner_verifier | CoreAir | StoreV | STOREW2 | 1,566,576 |
-| inner_verifier | AccessAdapter<2> | SubE | FE4SUB | 133,936 |
-| inner_verifier | AccessAdapter<4> | SubE | FE4SUB | 79,144 |
-| inner_verifier | Audit | SubE | FE4SUB | 221,464 |
+| inner_verifier | Audit | StoreF | STOREW2 | 56,012 <span style="color: red">(+4,028 [+7.7%])</span> |
+| inner_verifier | CoreAir | StoreF | STOREW2 | 2,237,730 <span style="color: red">(+13,992 [+0.6%])</span> |
+| inner_verifier | FieldArithmeticAir | StoreHintWord | ADD | 2,950,208 <span style="color: red">(+403 [+0.0%])</span> |
+| inner_verifier | Audit | StoreHintWord | SHINTW | 1,995,836 <span style="color: red">(+741 [+0.0%])</span> |
+| inner_verifier | CoreAir | StoreHintWord | SHINTW | 6,932,904 <span style="color: red">(+2,574 [+0.0%])</span> |
+| inner_verifier | Audit | StoreV | STOREW | 25,897 <span style="color: green">(-9,671 [-27.2%])</span> |
+| inner_verifier | CoreAir | StoreV | STOREW | 89,958 <span style="color: green">(-33,594 [-27.2%])</span> |
+| inner_verifier | Audit | StoreV | STOREW2 | 461,054 <span style="color: red">(+14,744 [+3.3%])</span> |
+| inner_verifier | CoreAir | StoreV | STOREW2 | 1,617,792 <span style="color: red">(+51,216 [+3.3%])</span> |
+| inner_verifier | AccessAdapter<2> | SubE | FE4SUB | 131,120 <span style="color: green">(-2,816 [-2.1%])</span> |
+| inner_verifier | AccessAdapter<4> | SubE | FE4SUB | 77,480 <span style="color: green">(-1,664 [-2.1%])</span> |
+| inner_verifier | Audit | SubE | FE4SUB | 209,000 <span style="color: green">(-12,464 [-5.6%])</span> |
 | inner_verifier | FieldExtensionArithmeticAir | SubE | FE4SUB | 160,679 |
-| inner_verifier | AccessAdapter<2> | SubEF | LOADW | 1,294,546 |
-| inner_verifier | Audit | SubEF | LOADW | 1,482 |
+| inner_verifier | AccessAdapter<2> | SubEF | LOADW | 1,294,832 <span style="color: red">(+286 [+0.0%])</span> |
 | inner_verifier | CoreAir | SubEF | LOADW | 23,306,976 |
-| inner_verifier | AccessAdapter<2> | SubEF | SUB | 1,294,546 |
-| inner_verifier | AccessAdapter<4> | SubEF | SUB | 1,529,918 |
-| inner_verifier | Audit | SubEF | SUB | 494 |
+| inner_verifier | AccessAdapter<2> | SubEF | SUB | 1,294,832 <span style="color: red">(+286 [+0.0%])</span> |
+| inner_verifier | AccessAdapter<4> | SubEF | SUB | 1,530,256 <span style="color: red">(+338 [+0.0%])</span> |
 | inner_verifier | FieldArithmeticAir | SubEF | SUB | 3,649,072 |
-| inner_verifier | AccessAdapter<2> | SubEFI | ADD | 154 |
-| inner_verifier | AccessAdapter<4> | SubEFI | ADD | 91 |
-| inner_verifier | Audit | SubEFI | ADD | 11,324 |
+| inner_verifier | AccessAdapter<2> | SubEFI | ADD | 572 <span style="color: red">(+418 [+271.4%])</span> |
+| inner_verifier | AccessAdapter<4> | SubEFI | ADD | 338 <span style="color: red">(+247 [+271.4%])</span> |
+| inner_verifier | Audit | SubEFI | ADD | 9,576 <span style="color: green">(-1,748 [-15.4%])</span> |
 | inner_verifier | FieldArithmeticAir | SubEFI | ADD | 18,476 |
-| inner_verifier | AccessAdapter<2> | SubEI | ADD | 1,298 |
-| inner_verifier | AccessAdapter<4> | SubEI | ADD | 767 |
-| inner_verifier | Audit | SubEI | ADD | 5,320 |
+| inner_verifier | AccessAdapter<2> | SubEI | ADD | 2,442 <span style="color: red">(+1,144 [+88.1%])</span> |
+| inner_verifier | AccessAdapter<4> | SubEI | ADD | 1,443 <span style="color: red">(+676 [+88.1%])</span> |
+| inner_verifier | Audit | SubEI | ADD | 912 <span style="color: green">(-4,408 [-82.9%])</span> |
 | inner_verifier | FieldArithmeticAir | SubEI | ADD | 8,928 |
-| inner_verifier | Audit | SubV | SUB | 57 |
-| inner_verifier | FieldArithmeticAir | SubV | SUB | 667,275 |
-| inner_verifier | Audit | SubVI | SUB | 14,098 |
-| inner_verifier | FieldArithmeticAir | SubVI | SUB | 38,812 |
+| inner_verifier | Audit | SubV | SUB | 76 <span style="color: red">(+19 [+33.3%])</span> |
+| inner_verifier | FieldArithmeticAir | SubV | SUB | 667,709 <span style="color: red">(+434 [+0.1%])</span> |
+| inner_verifier | Audit | SubVI | SUB | 13,357 <span style="color: green">(-741 [-5.3%])</span> |
+| inner_verifier | FieldArithmeticAir | SubVI | SUB | 38,471 <span style="color: green">(-341 [-0.9%])</span> |
 | inner_verifier | FieldArithmeticAir | SubVIN | SUB | 10,416 |
 
 </details>
 
-| group | air_name | cells | constraints | interactions | main_cols | perm_cols | prep_cols | quotient_deg | rows |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| bench_program_inner | ProgramAir<BabyBear> | 4,608 | 4 | 1 | 1 | 8 | 9 | 1 | 512 |
-| bench_program_inner | CoreAir | 217,088 | 115 | 19 | 62 | 44 |  | 2 | 2,048 |
-| bench_program_inner | FieldArithmeticAir | 137,216 | 28 | 15 | 31 | 36 |  | 2 | 2,048 |
-| bench_program_inner | ArithmeticLogicAir<32, 8> | 223,232 | 187 | 65 | 172 | 264 |  | 2 | 512 |
-| bench_program_inner | ShiftAir<32, 8> | 54,784 | 3,193 | 93 | 236 | 192 |  | 2 | 128 |
-| bench_program_inner | XorLookupAir<8> | 589,824 | 4 | 1 | 1 | 8 | 3 | 1 | 65,536 |
-| bench_program_inner | MemoryAuditAir | 573,440 | 21 | 6 | 19 | 16 |  | 2 | 16,384 |
-| bench_program_inner | AccessAdapterAir<2> | 573,440 | 14 | 5 | 11 | 24 |  | 2 | 16,384 |
-| bench_program_inner | AccessAdapterAir<4> | 303,104 | 14 | 5 | 13 | 24 |  | 2 | 8,192 |
-| bench_program_inner | AccessAdapterAir<8> | 167,936 | 14 | 5 | 17 | 24 |  | 2 | 4,096 |
-| bench_program_inner | AccessAdapterAir<16> | 100,352 | 14 | 5 | 25 | 24 |  | 2 | 2,048 |
-| bench_program_inner | AccessAdapterAir<32> | 66,560 | 14 | 5 | 41 | 24 |  | 2 | 1,024 |
-| bench_program_inner | VariableRangeCheckerAir | 589,824 | 4 | 1 | 1 | 8 | 2 | 1 | 65,536 |
-| bench_program_inner | VmConnectorAir | 20 | 4 | 2 | 2 | 8 | 1 | 2 | 2 |
-| inner_verifier | ProgramAir<BabyBear> | 1,179,648 | 4 | 1 | 1 | 8 | 9 | 1 | 131,072 |
-| inner_verifier | CoreAir | 180,355,072 | 113 | 19 | 66 | 20 |  | 8 | 2,097,152 |
-| inner_verifier | FieldArithmeticAir | 49,283,072 | 23 | 15 | 31 | 16 |  | 8 | 1,048,576 |
-| inner_verifier | FieldExtensionArithmeticAir | 29,884,416 | 23 | 15 | 41 | 16 |  | 8 | 524,288 |
-| inner_verifier | Poseidon2VmAir<BabyBear> | 7,307,264 | 373 | 32 | 418 | 28 |  | 8 | 16,384 |
-| inner_verifier | XorLookupAir<8> | 589,824 | 4 | 1 | 1 | 8 | 3 | 1 | 65,536 |
-| inner_verifier | MemoryAuditAir | 14,155,776 | 19 | 6 | 19 | 8 |  | 8 | 524,288 |
-| inner_verifier | AccessAdapterAir<2> | 24,117,248 | 11 | 5 | 11 | 12 |  | 4 | 1,048,576 |
-| inner_verifier | AccessAdapterAir<4> | 13,107,200 | 11 | 5 | 13 | 12 |  | 4 | 524,288 |
-| inner_verifier | AccessAdapterAir<8> | 950,272 | 11 | 5 | 17 | 12 |  | 4 | 32,768 |
-| inner_verifier | VariableRangeCheckerAir | 589,824 | 4 | 1 | 1 | 8 | 2 | 1 | 65,536 |
-| inner_verifier | VmConnectorAir | 20 | 4 | 2 | 2 | 8 | 1 | 2 | 2 |
+| group | air_name | constraints | interactions | quotient_deg |
+| --- | --- | --- | --- | --- |
+| bench_program_inner | ProgramAir<BabyBear> | 4 | 1 | 1 |
+| bench_program_inner | CoreAir | 115 | 19 | 2 |
+| bench_program_inner | FieldArithmeticAir | 28 | 15 | 2 |
+| bench_program_inner | ArithmeticLogicAir<32, 8> | 187 | 65 | 2 |
+| bench_program_inner | ShiftAir<32, 8> | 3,193 | 93 | 2 |
+| bench_program_inner | XorLookupAir<8> | 4 | 1 | 1 |
+| bench_program_inner | MemoryAuditAir | 21 | 6 | 2 |
+| bench_program_inner | AccessAdapterAir<2> | 14 | 5 | 2 |
+| bench_program_inner | AccessAdapterAir<4> | 14 | 5 | 2 |
+| bench_program_inner | AccessAdapterAir<8> | 14 | 5 | 2 |
+| bench_program_inner | AccessAdapterAir<16> | 14 | 5 | 2 |
+| bench_program_inner | AccessAdapterAir<32> | 14 | 5 | 2 |
+| bench_program_inner | VariableRangeCheckerAir | 4 | 1 | 1 |
+| bench_program_inner | VmConnectorAir | 4 | 2 | 2 |
+| inner_verifier | ProgramAir<BabyBear> | 4 | 1 | 1 |
+| inner_verifier | CoreAir | 113 | 19 | 8 |
+| inner_verifier | FieldArithmeticAir | 23 | 15 | 8 |
+| inner_verifier | FieldExtensionArithmeticAir | 23 | 15 | 8 |
+| inner_verifier | Poseidon2VmAir<BabyBear> | 373 | 32 | 8 |
+| inner_verifier | XorLookupAir<8> | 4 | 1 | 1 |
+| inner_verifier | MemoryAuditAir | 19 | 6 | 8 |
+| inner_verifier | AccessAdapterAir<2> | 11 | 5 | 4 |
+| inner_verifier | AccessAdapterAir<4> | 11 | 5 | 4 |
+| inner_verifier | AccessAdapterAir<8> | 11 | 5 | 4 |
+| inner_verifier | VariableRangeCheckerAir | 4 | 1 | 1 |
+| inner_verifier | VmConnectorAir | 4 | 2 | 2 |
 
 
 
-[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e93b23ccf9fe439209e99cdfc68dbbc2c6ae444c/alu256_e2e.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e93b23ccf9fe439209e99cdfc68dbbc2c6ae444c/alu256_e2e.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e93b23ccf9fe439209e99cdfc68dbbc2c6ae444c/alu256_e2e.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e93b23ccf9fe439209e99cdfc68dbbc2c6ae444c/alu256_e2e.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e93b23ccf9fe439209e99cdfc68dbbc2c6ae444c/alu256_e2e.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e93b23ccf9fe439209e99cdfc68dbbc2c6ae444c/alu256_e2e.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e93b23ccf9fe439209e99cdfc68dbbc2c6ae444c/alu256_e2e.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e93b23ccf9fe439209e99cdfc68dbbc2c6ae444c/alu256_e2e.dsl_ir.opcode.frequency.svg)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/e93b23ccf9fe439209e99cdfc68dbbc2c6ae444c
+[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4eed1f12706feffb24938fd07f62479f90a42597/alu256_e2e.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4eed1f12706feffb24938fd07f62479f90a42597/alu256_e2e.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4eed1f12706feffb24938fd07f62479f90a42597/alu256_e2e.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4eed1f12706feffb24938fd07f62479f90a42597/alu256_e2e.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4eed1f12706feffb24938fd07f62479f90a42597/alu256_e2e.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4eed1f12706feffb24938fd07f62479f90a42597/alu256_e2e.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4eed1f12706feffb24938fd07f62479f90a42597/alu256_e2e.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4eed1f12706feffb24938fd07f62479f90a42597/alu256_e2e.dsl_ir.opcode.frequency.svg)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/4eed1f12706feffb24938fd07f62479f90a42597
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11261087582)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11263954450)
