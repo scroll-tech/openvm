@@ -1,11 +1,6 @@
----
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-layout: default
----
-
-# Main
+# Benchmarks
 
 - [VM Verify Fibonacci AIR](benchmarks/vm_verify_fibair.md)
-- [Single Page Filter Scan (<)](benchmarks/single_filter.md)
-- [Single Page Read/Write](benchmarks/single_rw.md)
+- [tiny_e2e](benchmarks/tiny_e2e.md)
+- [small_e2e](benchmarks/small_e2e.md)
+- [alu256_e2e](benchmarks/alu256_e2e.md)
