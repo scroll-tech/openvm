@@ -1,6 +1,6 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells_used | trace_gen_time_ms |
 | --- | --- | --- | --- |
-| fibonacci_program_inner | 425.0 <span style="color: red">(+1.0 [+0.2%])</span> | 134,996 | 0.0 |
+| fibonacci_program_inner | 420.0 <span style="color: green">(-5.0 [-1.2%])</span> | 134,996 | 0.0 |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
