@@ -1,16 +1,16 @@
 | stark_prove_excluding_trace_time_ms | total_cells_used | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- |
-| 10,448.0 <span style="color: red">(+59.0 [+0.6%])</span> | 27,739,271 <span style="color: red">(+4,789 [+0.0%])</span> | 2,555.0 <span style="color: green">(-7.0 [-0.3%])</span> | 36.0 <span style="color: red">(+1.0 [+2.9%])</span> |
+| 10,209.0 <span style="color: green">(-239.0 [-2.3%])</span> | 27,740,966 <span style="color: red">(+1,695 [+0.0%])</span> | 2,551.0 <span style="color: green">(-4.0 [-0.2%])</span> | 36.0 |
 
 | chip_name | rows_used |
 | --- | --- |
 | ByteXor | 65,536 |
-| Core | 290,644 <span style="color: red">(+61 [+0.0%])</span> |
-| FieldArithmetic | 140,656 <span style="color: green">(-7 [-0.0%])</span> |
+| Core | 290,665 <span style="color: red">(+21 [+0.0%])</span> |
+| FieldArithmetic | 140,675 <span style="color: red">(+19 [+0.0%])</span> |
 | FieldExtension | 7,486 |
 | Memory | 97,480 |
-| Memory 2 | 40,635 <span style="color: red">(+56 [+0.1%])</span> |
-| Memory 3 | 20,319 <span style="color: red">(+28 [+0.1%])</span> |
+| Memory 2 | 40,619 <span style="color: green">(-16 [-0.0%])</span> |
+| Memory 3 | 20,311 <span style="color: green">(-8 [-0.0%])</span> |
 | Memory 4 | 3,851 |
 | Poseidon2 | 2,613 |
 | Program | 37,480 |
@@ -27,7 +27,7 @@
 | AddEFFI | LOADW | 128 |
 | AddEFFI | STOREW | 384 |
 | AddEI | ADD | 5,664 |
-| AddFI | ADD | 2,830 <span style="color: green">(-7 [-0.2%])</span> |
+| AddFI | ADD | 2,849 <span style="color: red">(+19 [+0.7%])</span> |
 | AddV | ADD | 1,815 |
 | AddVI | ADD | 35,364 |
 | Alloc | ADD | 13,011 |
@@ -54,7 +54,7 @@
 | HintInputVec | HINT_INPUT | 4,032 |
 | IfEq | BNE | 722 |
 | IfEqI | BNE | 11,289 |
-| IfEqI | JAL | 1,890 <span style="color: red">(+61 [+3.3%])</span> |
+| IfEqI | JAL | 1,911 <span style="color: red">(+21 [+1.1%])</span> |
 | IfNe | BEQ | 2,129 |
 | IfNe | JAL | 7 |
 | IfNeI | BEQ | 603 |
@@ -115,12 +115,12 @@
 | AccessAdapter<2> | AddEFFI | STOREW | 132 |
 | Audit | AddEFFI | STOREW | 912 |
 | CoreAir | AddEFFI | STOREW | 25,344 |
-| AccessAdapter<2> | AddEI | ADD | 24,552 <span style="color: red">(+308 [+1.3%])</span> |
-| AccessAdapter<4> | AddEI | ADD | 14,508 <span style="color: red">(+182 [+1.3%])</span> |
+| AccessAdapter<2> | AddEI | ADD | 24,464 <span style="color: green">(-88 [-0.4%])</span> |
+| AccessAdapter<4> | AddEI | ADD | 14,456 <span style="color: green">(-52 [-0.4%])</span> |
 | Audit | AddEI | ADD | 760 |
 | FieldArithmeticAir | AddEI | ADD | 175,584 |
 | Audit | AddFI | ADD | 418 |
-| FieldArithmeticAir | AddFI | ADD | 87,730 <span style="color: green">(-217 [-0.2%])</span> |
+| FieldArithmeticAir | AddFI | ADD | 88,319 <span style="color: red">(+589 [+0.7%])</span> |
 | Audit | AddV | ADD | 57 |
 | FieldArithmeticAir | AddV | ADD | 56,265 |
 | Audit | AddVI | ADD | 61,294 |
@@ -163,7 +163,7 @@
 | CoreAir | HintInputVec | HINT_INPUT | 266,112 |
 | CoreAir | IfEq | BNE | 47,652 |
 | CoreAir | IfEqI | BNE | 745,074 |
-| CoreAir | IfEqI | JAL | 124,740 <span style="color: red">(+4,026 [+3.3%])</span> |
+| CoreAir | IfEqI | JAL | 126,126 <span style="color: red">(+1,386 [+1.1%])</span> |
 | CoreAir | IfNe | BEQ | 140,514 |
 | CoreAir | IfNe | JAL | 462 |
 | CoreAir | IfNeI | BEQ | 39,798 |
@@ -196,8 +196,8 @@
 | CoreAir | LoadV | LOADW | 580,800 |
 | Audit | LoadV | LOADW2 | 1,615 |
 | CoreAir | LoadV | LOADW2 | 1,283,766 |
-| AccessAdapter<2> | MulE | BBE4MUL | 33,506 <span style="color: red">(+308 [+0.9%])</span> |
-| AccessAdapter<4> | MulE | BBE4MUL | 19,799 <span style="color: red">(+182 [+0.9%])</span> |
+| AccessAdapter<2> | MulE | BBE4MUL | 33,418 <span style="color: green">(-88 [-0.3%])</span> |
+| AccessAdapter<4> | MulE | BBE4MUL | 19,747 <span style="color: green">(-52 [-0.3%])</span> |
 | Audit | MulE | BBE4MUL | 988 |
 | FieldExtensionArithmeticAir | MulE | BBE4MUL | 140,138 |
 | AccessAdapter<2> | MulEF | MUL | 8,822 |
