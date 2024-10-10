@@ -1,7 +1,7 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells_used | total_proof_time_ms | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- |
-| bench_program_inner | 710.0 <span style="color: green">(-4.0 [-0.6%])</span> | 211,816 | 712.0 <span style="color: green">(-4.0 [-0.6%])</span> | 2.0 |  |
-| inner_verifier | 84,880.0 <span style="color: red">(+190.0 [+0.2%])</span> | 384,984,986 <span style="color: green">(-22,487 [-0.0%])</span> | 117,734.0 <span style="color: red">(+48.0 [+0.0%])</span> | 32,854.0 <span style="color: green">(-142.0 [-0.4%])</span> | 45,888.0 <span style="color: red">(+260.0 [+0.6%])</span> |
+| bench_program_inner | 709.0 <span style="color: green">(-1.0 [-0.1%])</span> | 211,816 | 711.0 <span style="color: green">(-1.0 [-0.1%])</span> | 2.0 |  |
+| inner_verifier | 85,302.0 <span style="color: red">(+422.0 [+0.5%])</span> | 384,977,353 <span style="color: green">(-7,633 [-0.0%])</span> | 118,315.0 <span style="color: red">(+581.0 [+0.5%])</span> | 33,013.0 <span style="color: red">(+159.0 [+0.5%])</span> | 46,143.0 <span style="color: red">(+255.0 [+0.6%])</span> |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -17,12 +17,12 @@
 | bench_program_inner | Program | 37 |
 | bench_program_inner | RangeChecker | 65,536 |
 | inner_verifier | ByteXor | 65,536 |
-| inner_verifier | Core | 3,767,330 <span style="color: green">(-330 [-0.0%])</span> |
-| inner_verifier | FieldArithmetic | 1,538,151 <span style="color: green">(-7 [-0.0%])</span> |
+| inner_verifier | Core | 3,767,224 <span style="color: green">(-106 [-0.0%])</span> |
+| inner_verifier | FieldArithmetic | 1,538,144 <span style="color: green">(-7 [-0.0%])</span> |
 | inner_verifier | FieldExtension | 843,097 |
 | inner_verifier | Memory | 584,699 |
-| inner_verifier | Memory 2 | 1,940,053 <span style="color: green">(-28 [-0.0%])</span> |
-| inner_verifier | Memory 3 | 970,092 <span style="color: green">(-14 [-0.0%])</span> |
+| inner_verifier | Memory 2 | 1,940,029 <span style="color: green">(-24 [-0.0%])</span> |
+| inner_verifier | Memory 3 | 970,080 <span style="color: green">(-12 [-0.0%])</span> |
 | inner_verifier | Memory 4 | 32,483 |
 | inner_verifier | Poseidon2 | 19,493 |
 | inner_verifier | Program | 199,131 |
@@ -59,7 +59,7 @@
 | inner_verifier | AddEFFI | STOREW | 369 |
 | inner_verifier | AddEFI | ADD | 168 |
 | inner_verifier | AddEI | ADD | 66,532 |
-| inner_verifier | AddFI | ADD | 12,320 <span style="color: green">(-7 [-0.1%])</span> |
+| inner_verifier | AddFI | ADD | 12,313 <span style="color: green">(-7 [-0.1%])</span> |
 | inner_verifier | AddV | ADD | 5,606 |
 | inner_verifier | AddVI | ADD | 267,774 |
 | inner_verifier | Alloc | ADD | 22,508 |
@@ -86,7 +86,7 @@
 | inner_verifier | HintInputVec | HINT_INPUT | 8,925 |
 | inner_verifier | IfEq | BNE | 5,189 |
 | inner_verifier | IfEqI | BNE | 120,514 |
-| inner_verifier | IfEqI | JAL | 8,481 <span style="color: green">(-330 [-3.7%])</span> |
+| inner_verifier | IfEqI | JAL | 8,375 <span style="color: green">(-106 [-1.2%])</span> |
 | inner_verifier | IfNe | BEQ | 6,385 |
 | inner_verifier | IfNe | JAL | 20 |
 | inner_verifier | IfNeI | BEQ | 886 |
@@ -190,12 +190,12 @@
 | inner_verifier | AccessAdapter<4> | AddEFI | ADD | 338 |
 | inner_verifier | Audit | AddEFI | ADD | 2,052 |
 | inner_verifier | FieldArithmeticAir | AddEFI | ADD | 5,208 |
-| inner_verifier | AccessAdapter<2> | AddEI | ADD | 370,392 <span style="color: green">(-154 [-0.0%])</span> |
-| inner_verifier | AccessAdapter<4> | AddEI | ADD | 218,868 <span style="color: green">(-91 [-0.0%])</span> |
+| inner_verifier | AccessAdapter<2> | AddEI | ADD | 370,260 <span style="color: green">(-132 [-0.0%])</span> |
+| inner_verifier | AccessAdapter<4> | AddEI | ADD | 218,790 <span style="color: green">(-78 [-0.0%])</span> |
 | inner_verifier | Audit | AddEI | ADD | 1,132,096 |
 | inner_verifier | FieldArithmeticAir | AddEI | ADD | 2,062,492 |
 | inner_verifier | Audit | AddFI | ADD | 437 |
-| inner_verifier | FieldArithmeticAir | AddFI | ADD | 381,920 <span style="color: green">(-217 [-0.1%])</span> |
+| inner_verifier | FieldArithmeticAir | AddFI | ADD | 381,703 <span style="color: green">(-217 [-0.1%])</span> |
 | inner_verifier | Audit | AddV | ADD | 57 |
 | inner_verifier | FieldArithmeticAir | AddV | ADD | 173,786 |
 | inner_verifier | Audit | AddVI | ADD | 14,991 |
@@ -242,7 +242,7 @@
 | inner_verifier | CoreAir | HintInputVec | HINT_INPUT | 589,050 |
 | inner_verifier | CoreAir | IfEq | BNE | 342,474 |
 | inner_verifier | CoreAir | IfEqI | BNE | 7,953,924 |
-| inner_verifier | CoreAir | IfEqI | JAL | 559,746 <span style="color: green">(-21,780 [-3.7%])</span> |
+| inner_verifier | CoreAir | IfEqI | JAL | 552,750 <span style="color: green">(-6,996 [-1.2%])</span> |
 | inner_verifier | CoreAir | IfNe | BEQ | 421,410 |
 | inner_verifier | CoreAir | IfNe | JAL | 1,320 |
 | inner_verifier | CoreAir | IfNeI | BEQ | 58,476 |
@@ -276,8 +276,8 @@
 | inner_verifier | CoreAir | LoadV | LOADW | 724,548 |
 | inner_verifier | Audit | LoadV | LOADW2 | 1,615 |
 | inner_verifier | CoreAir | LoadV | LOADW2 | 4,065,666 |
-| inner_verifier | AccessAdapter<2> | MulE | BBE4MUL | 492,888 <span style="color: green">(-154 [-0.0%])</span> |
-| inner_verifier | AccessAdapter<4> | MulE | BBE4MUL | 291,252 <span style="color: green">(-91 [-0.0%])</span> |
+| inner_verifier | AccessAdapter<2> | MulE | BBE4MUL | 492,756 <span style="color: green">(-132 [-0.0%])</span> |
+| inner_verifier | AccessAdapter<4> | MulE | BBE4MUL | 291,174 <span style="color: green">(-78 [-0.0%])</span> |
 | inner_verifier | Audit | MulE | BBE4MUL | 1,215,620 |
 | inner_verifier | FieldExtensionArithmeticAir | MulE | BBE4MUL | 16,728,246 |
 | inner_verifier | AccessAdapter<2> | MulEF | MUL | 7,898 |
