@@ -31,7 +31,7 @@ where
         &FibonacciAir
     }
 
-    fn generate_air_proof_input(&self) -> AirProofInput<'_, SC> {
+    fn generate_air_proof_input(&self) -> AirProofInput<SC> {
         AirProofInput {
             air: self.air(),
             cached_mains: vec![],

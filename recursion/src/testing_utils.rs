@@ -68,16 +68,10 @@ pub mod inner {
         stark_for_test: StarkForTest<BabyBearPoseidon2Config>,
         fri_params: FriParameters,
     ) {
-        let StarkForTest {
-            any_raps,
-            traces,
-            pvs,
-        } = stark_for_test;
-        let any_raps: Vec<_> = any_raps.iter().map(|x| x.as_ref()).collect();
-
+        let StarkForTest { air_infos } = stark_for_test;
         let vparams =
-            <BabyBearPoseidon2Engine as StarkFriEngine<BabyBearPoseidon2Config>>::run_simple_test(
-                &any_raps, traces, &pvs,
+            <BabyBearPoseidon2Engine as StarkFriEngine<BabyBearPoseidon2Config>>::run_test_fast(
+                air_infos,
             )
             .unwrap();
 

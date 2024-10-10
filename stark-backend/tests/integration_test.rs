@@ -2,7 +2,7 @@
 #![allow(incomplete_features)]
 
 /// Test utils
-use ax_sdk::{any_rap_vec, config, utils};
+use ax_sdk::{any_rap_box_vec, config, utils};
 use ax_sdk::{
     config::{baby_bear_poseidon2::BabyBearPoseidon2Engine, setup_tracing, FriParameters},
     engine::StarkFriEngine,
@@ -40,7 +40,7 @@ fn test_single_fib_stark() {
 
     let trace = generate_trace_rows::<Val>(a, b, n);
 
-    BabyBearPoseidon2Engine::run_simple_test(&any_rap_vec![&air], vec![trace], &[pis])
+    BabyBearPoseidon2Engine::run_simple_test_fast(any_rap_box_vec![air], vec![trace], vec![pis])
         .expect("Verification failed");
 }
 
@@ -64,7 +64,7 @@ fn test_single_fib_triples_stark() {
 
     let trace = generate_trace_rows::<Val>(a, b, n);
 
-    BabyBearPoseidon2Engine::run_simple_test(&any_rap_vec![&air], vec![trace], &[pis])
+    BabyBearPoseidon2Engine::run_simple_test_fast(any_rap_box_vec![air], vec![trace], vec![pis])
         .expect("Verification failed");
 }
 
@@ -89,7 +89,7 @@ fn test_single_fib_selector_stark() {
 
     let trace = generate_trace_rows::<Val>(a, b, air.sels());
 
-    BabyBearPoseidon2Engine::run_simple_test(&any_rap_vec![&air], vec![trace], &[pis])
+    BabyBearPoseidon2Engine::run_simple_test_fast(any_rap_box_vec![air], vec![trace], vec![pis])
         .expect("Verification failed");
 }
 
@@ -122,10 +122,10 @@ fn test_double_fib_starks() {
     let trace1 = fib_air::trace::generate_trace_rows::<Val>(a, b, n1);
     let trace2 = fib_selector_air::trace::generate_trace_rows::<Val>(a, b, air2.sels());
 
-    BabyBearPoseidon2Engine::run_simple_test(
-        &any_rap_vec![&air1, &air2],
+    BabyBearPoseidon2Engine::run_simple_test_fast(
+        any_rap_box_vec![air1, air2],
         vec![trace1, trace2],
-        &[pis1, pis2],
+        vec![pis1, pis2],
     )
     .expect("Verification failed");
 }

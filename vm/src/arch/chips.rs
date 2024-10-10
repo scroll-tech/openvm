@@ -35,7 +35,7 @@ use crate::{
     new_mul::Rv32MultiplicationChip,
     new_mulh::Rv32MulHChip,
     new_shift::Rv32ShiftChip,
-    program::{ExecutionError, Instruction, ProgramChip},
+    program::{ExecutionError, Instruction},
     shift::ShiftChip,
     ui::UiChip,
     uint_multiplication::UintMultiplicationChip,
@@ -209,7 +209,6 @@ pub enum InstructionExecutorVariant<F: PrimeField32> {
 #[enum_dispatch(MachineChip<F>)]
 pub enum MachineChipVariant<F: PrimeField32> {
     Core(Rc<RefCell<CoreChip<F>>>),
-    Program(Rc<RefCell<ProgramChip<F>>>),
     Memory(MemoryChipRef<F>),
     FieldArithmetic(Rc<RefCell<FieldArithmeticChip<F>>>),
     FieldExtension(Rc<RefCell<FieldExtensionArithmeticChip<F>>>),

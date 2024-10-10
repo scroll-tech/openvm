@@ -31,6 +31,7 @@ impl DummyInteractionCols {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct DummyInteractionAir {
     field_width: usize,
     /// Send if true. Receive if false.
@@ -235,7 +236,7 @@ impl<'a, SC: StarkGenericConfig> Chip<SC> for DummyInteractionChip<'a, SC> {
         if self.trace_committer.is_some() {
             let (common_main, cached_main) = self.generate_traces_with_partition(data);
             AirProofInput {
-                air: &self.air,
+                air: self.air(),
                 cached_mains: vec![cached_main],
                 common_main: Some(common_main),
                 public_values: vec![],
@@ -243,7 +244,7 @@ impl<'a, SC: StarkGenericConfig> Chip<SC> for DummyInteractionChip<'a, SC> {
         } else {
             let common_main = self.generate_traces_without_partition(data);
             AirProofInput {
-                air: &self.air,
+                air: self.air(),
                 cached_mains: vec![],
                 common_main: Some(common_main),
                 public_values: vec![],
