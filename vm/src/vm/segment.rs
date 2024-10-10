@@ -32,7 +32,8 @@ use crate::{
     arch::{
         instructions::*, ExecutionBus, ExecutionState, ExecutorName, InstructionExecutor,
         InstructionExecutorVariant, MachineChip, MachineChipVariant, Rv32AluAdapter,
-        Rv32BranchAdapter, Rv32LoadStoreAdapter, Rv32MultAdapter, Rv32RdWriteAdapter,
+        Rv32BranchAdapter, Rv32JalrAdapter, Rv32LoadStoreAdapter, Rv32MultAdapter,
+        Rv32RdWriteAdapter,
     },
     branch_eq::{BranchEqualIntegration, Rv32BranchEqualChip},
     branch_lt::{BranchLessThanIntegration, Rv32BranchLessThanChip},
@@ -56,7 +57,9 @@ use crate::{
     new_mulh::{MulHIntegration, Rv32MulHChip},
     new_shift::{Rv32ShiftChip, ShiftIntegration},
     program::{bridge::ProgramBus, DebugInfo, ExecutionError, Program, ProgramChip},
+    rv32_auipc::{Rv32AuipcChip, Rv32AuipcIntegration},
     rv32_jal_lui::{Rv32JalLuiChip, Rv32JalLuiIntegration},
+    rv32_jalr::{Rv32JalrChip, Rv32JalrIntegration},
     shift::ShiftChip,
     ui::UiChip,
     uint_multiplication::UintMultiplicationChip,
@@ -392,6 +395,28 @@ impl<F: PrimeField32> ExecutionSegment<F> {
                         executors.insert(opcode, chip.clone().into());
                     }
                     chips.push(MachineChipVariant::JalLuiRv32(chip));
+                }
+                ExecutorName::JalrRv32 => {
+                    let chip = Rc::new(RefCell::new(Rv32JalrChip::new(
+                        Rv32JalrAdapter::new(),
+                        Rv32JalrIntegration::new(offset),
+                        memory_chip.clone(),
+                    )));
+                    for opcode in range {
+                        executors.insert(opcode, chip.clone().into());
+                    }
+                    chips.push(MachineChipVariant::JalrRv32(chip));
+                }
+                ExecutorName::AuipcRv32 => {
+                    let chip = Rc::new(RefCell::new(Rv32AuipcChip::new(
+                        Rv32RdWriteAdapter::new(),
+                        Rv32AuipcIntegration::new(offset),
+                        memory_chip.clone(),
+                    )));
+                    for opcode in range {
+                        executors.insert(opcode, chip.clone().into());
+                    }
+                    chips.push(MachineChipVariant::AuipcRv32(chip));
                 }
                 ExecutorName::Ui => {
                     let chip = Rc::new(RefCell::new(UiChip::new(
