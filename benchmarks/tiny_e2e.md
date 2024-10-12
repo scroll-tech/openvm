@@ -1,6 +1,6 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_proof_time_ms | trace_gen_time_ms |
 | --- | --- | --- | --- | --- | --- |
-| fibonacci_program_inner | <span style="color: green">(-15.0 [-0.2%])</span> <div style='text-align: right'>9,491.0</div>  | <div style='text-align: right'>20,068,004</div>  | <div style='text-align: right'>2,232,051</div>  | <span style="color: green">(-15.0 [-0.2%])</span> <div style='text-align: right'>9,558.0</div>  | <div style='text-align: right'>67.0</div>  |
+| fibonacci_program_inner | <span style="color: red">(+25.0 [+0.3%])</span> <div style='text-align: right'>9,516.0</div>  | <div style='text-align: right'>20,068,004</div>  | <div style='text-align: right'>2,232,051</div>  | <span style="color: red">(+26.0 [+0.3%])</span> <div style='text-align: right'>9,584.0</div>  | <span style="color: red">(+1.0 [+1.5%])</span> <div style='text-align: right'>68.0</div>  |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
@@ -57,10 +57,10 @@
 
 
 
-[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/293a2e56d58e18fee4e1c5d80250c51c22ec1e23/tiny_e2e.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/293a2e56d58e18fee4e1c5d80250c51c22ec1e23/tiny_e2e.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/293a2e56d58e18fee4e1c5d80250c51c22ec1e23/tiny_e2e.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/293a2e56d58e18fee4e1c5d80250c51c22ec1e23/tiny_e2e.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/293a2e56d58e18fee4e1c5d80250c51c22ec1e23/tiny_e2e.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/293a2e56d58e18fee4e1c5d80250c51c22ec1e23/tiny_e2e.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/293a2e56d58e18fee4e1c5d80250c51c22ec1e23/tiny_e2e.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/293a2e56d58e18fee4e1c5d80250c51c22ec1e23/tiny_e2e.dsl_ir.opcode.frequency.svg)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/293a2e56d58e18fee4e1c5d80250c51c22ec1e23
+[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/9cbae88710cb3e7ccb9e8243e57d1b91aec8e8ac/tiny_e2e.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/9cbae88710cb3e7ccb9e8243e57d1b91aec8e8ac/tiny_e2e.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/9cbae88710cb3e7ccb9e8243e57d1b91aec8e8ac/tiny_e2e.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/9cbae88710cb3e7ccb9e8243e57d1b91aec8e8ac/tiny_e2e.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/9cbae88710cb3e7ccb9e8243e57d1b91aec8e8ac/tiny_e2e.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/9cbae88710cb3e7ccb9e8243e57d1b91aec8e8ac/tiny_e2e.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/9cbae88710cb3e7ccb9e8243e57d1b91aec8e8ac/tiny_e2e.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/9cbae88710cb3e7ccb9e8243e57d1b91aec8e8ac/tiny_e2e.dsl_ir.opcode.frequency.svg)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/9cbae88710cb3e7ccb9e8243e57d1b91aec8e8ac
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11295227107)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11302435735)
