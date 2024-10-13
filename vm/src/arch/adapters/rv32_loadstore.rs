@@ -3,7 +3,7 @@ use std::{marker::PhantomData, sync::Arc};
 use afs_derive::AlignedBorrow;
 use afs_primitives::var_range::VariableRangeCheckerChip;
 use afs_stark_backend::interaction::InteractionBuilder;
-use p3_air::{AirBuilderWithPublicValues, BaseAir, PairBuilder};
+use p3_air::BaseAir;
 use p3_field::{AbstractField, Field, PrimeField32};
 
 use super::compose;
@@ -13,7 +13,7 @@ use crate::{
             Rv32LoadStoreOpcode::{self, *},
             UsizeOpcode,
         },
-        ExecutionState, InstructionOutput, IntegrationInterface, MachineAdapter,
+        ExecutionState, InstructionOutput, IntegrationInterface, MachineAdapter, MachineAdapterAir,
         MachineAdapterInterface, Result, RV32_REGISTER_NUM_LANES, RV_IS_TYPE_IMM_BITS,
     },
     memory::{
@@ -40,12 +40,27 @@ pub struct Rv32LoadStoreAdapterCols<T, const NUM_CELLS: usize> {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct Rv32LoadStoreAdapterAir<F: Field> {
+pub struct Rv32LoadStoreAdapterAir<F: Field, const NUM_CELLS: usize> {
     marker: PhantomData<F>,
 }
 
-impl<F: Field> BaseAir<F> for Rv32LoadStoreAdapterAir<F> {
+impl<F: Field, const NUM_CELLS: usize> BaseAir<F> for Rv32LoadStoreAdapterAir<F, NUM_CELLS> {
     fn width(&self) -> usize {
+        todo!()
+    }
+}
+
+impl<AB: InteractionBuilder, const NUM_CELLS: usize> MachineAdapterAir<AB>
+    for Rv32LoadStoreAdapterAir<AB::F, NUM_CELLS>
+{
+    type Interface = Rv32LoadStoreAdapterInterface<AB::Expr, NUM_CELLS>;
+
+    fn eval(
+        &self,
+        _builder: &mut AB,
+        _local: &[AB::Var],
+        _ctx: IntegrationInterface<AB::Expr, Self::Interface>,
+    ) {
         todo!()
     }
 }
@@ -80,7 +95,7 @@ impl<T, const NUM_CELLS: usize> MachineAdapterInterface<T>
 
 #[derive(Debug, Clone)]
 pub struct Rv32LoadStoreAdapter<F: Field, const NUM_CELLS: usize> {
-    pub air: Rv32LoadStoreAdapterAir<F>,
+    pub air: Rv32LoadStoreAdapterAir<F, NUM_CELLS>,
     pub offset: usize,
     pub range_checker_chip: Arc<VariableRangeCheckerChip>,
 }
@@ -88,7 +103,7 @@ pub struct Rv32LoadStoreAdapter<F: Field, const NUM_CELLS: usize> {
 impl<F: Field, const NUM_CELLS: usize> Rv32LoadStoreAdapter<F, NUM_CELLS> {
     pub fn new(range_checker_chip: Arc<VariableRangeCheckerChip>, offset: usize) -> Self {
         Self {
-            air: Rv32LoadStoreAdapterAir::<F> {
+            air: Rv32LoadStoreAdapterAir::<F, NUM_CELLS> {
                 marker: PhantomData,
             },
             offset,
@@ -102,8 +117,7 @@ impl<F: PrimeField32, const NUM_CELLS: usize> MachineAdapter<F>
 {
     type ReadRecord = Rv32LoadStoreAdapterReadRecord<F, NUM_CELLS>;
     type WriteRecord = Rv32LoadStoreAdapterWriteRecord<F, NUM_CELLS>;
-    type Air = Rv32LoadStoreAdapterAir<F>;
-    type Cols<T> = Rv32LoadStoreAdapterCols<T, NUM_CELLS>;
+    type Air = Rv32LoadStoreAdapterAir<F, NUM_CELLS>;
 
     type Interface<T: AbstractField> = Rv32LoadStoreAdapterInterface<T, NUM_CELLS>;
 
@@ -239,25 +253,14 @@ impl<F: PrimeField32, const NUM_CELLS: usize> MachineAdapter<F>
 
     fn generate_trace_row(
         &self,
-        _row_slice: &mut Self::Cols<F>,
+        _row_slice: &mut [F],
         _read_record: Self::ReadRecord,
         _write_record: Self::WriteRecord,
     ) {
         todo!()
     }
 
-    fn eval_adapter_constraints<
-        AB: InteractionBuilder<F = F> + PairBuilder + AirBuilderWithPublicValues,
-    >(
-        _air: &Self::Air,
-        _builder: &mut AB,
-        _local: &Self::Cols<AB::Var>,
-        _interface: IntegrationInterface<AB::Expr, Self::Interface<AB::Expr>>,
-    ) -> AB::Expr {
-        todo!()
-    }
-
-    fn air(&self) -> Self::Air {
-        todo!()
+    fn air(&self) -> &Self::Air {
+        &self.air
     }
 }

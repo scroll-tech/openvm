@@ -1,13 +1,13 @@
 use std::{marker::PhantomData, mem::size_of};
 
 use afs_stark_backend::interaction::InteractionBuilder;
-use p3_air::{Air, AirBuilderWithPublicValues, BaseAir, PairBuilder};
+use p3_air::{Air, BaseAir};
 use p3_field::{AbstractField, Field, PrimeField32};
 
 use super::RV32_REGISTER_NUM_LANES;
 use crate::{
     arch::{
-        ExecutionState, InstructionOutput, IntegrationInterface, MachineAdapter,
+        ExecutionState, InstructionOutput, IntegrationInterface, MachineAdapter, MachineAdapterAir,
         MachineAdapterInterface, Result,
     },
     memory::{MemoryChip, MemoryWriteRecord},
@@ -74,11 +74,23 @@ impl<AB: InteractionBuilder> Air<AB> for Rv32RdWriteAdapterAir {
     }
 }
 
+impl<AB: InteractionBuilder> MachineAdapterAir<AB> for Rv32RdWriteAdapterAir {
+    type Interface = Rv32RdWriteAdapterInterface<AB::Expr>;
+
+    fn eval(
+        &self,
+        _builder: &mut AB,
+        _local: &[AB::Var],
+        _ctx: IntegrationInterface<AB::Expr, Self::Interface>,
+    ) {
+        todo!()
+    }
+}
+
 impl<F: PrimeField32> MachineAdapter<F> for Rv32RdWriteAdapter<F> {
     type ReadRecord = ();
     type WriteRecord = Rv32RdWriteWriteRecord<F>;
     type Air = Rv32RdWriteAdapterAir;
-    type Cols<T> = Rv32RdWriteAdapterCols<T>;
     type Interface<T: AbstractField> = Rv32RdWriteAdapterInterface<T>;
 
     fn preprocess(
@@ -120,25 +132,14 @@ impl<F: PrimeField32> MachineAdapter<F> for Rv32RdWriteAdapter<F> {
 
     fn generate_trace_row(
         &self,
-        _row_slice: &mut Self::Cols<F>,
+        _row_slice: &mut [F],
         _read_record: Self::ReadRecord,
         _write_record: Self::WriteRecord,
     ) {
         todo!();
     }
 
-    fn eval_adapter_constraints<
-        AB: InteractionBuilder<F = F> + PairBuilder + AirBuilderWithPublicValues,
-    >(
-        _air: &Self::Air,
-        _builder: &mut AB,
-        _local: &Self::Cols<AB::Var>,
-        _interface: IntegrationInterface<AB::Expr, Self::Interface<AB::Expr>>,
-    ) -> AB::Expr {
-        todo!();
-    }
-
-    fn air(&self) -> Self::Air {
-        self.air
+    fn air(&self) -> &Self::Air {
+        &self.air
     }
 }

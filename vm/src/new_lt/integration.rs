@@ -2,15 +2,15 @@ use std::sync::Arc;
 
 use afs_derive::AlignedBorrow;
 use afs_primitives::xor::{bus::XorBus, lookup::XorLookupChip};
-use afs_stark_backend::interaction::InteractionBuilder;
-use p3_air::{Air, AirBuilderWithPublicValues, BaseAir, PairBuilder};
+use afs_stark_backend::{interaction::InteractionBuilder, rap::BaseAirWithPublicValues};
+use p3_air::{Air, BaseAir};
 use p3_field::{Field, PrimeField32};
 
 use crate::{
     arch::{
         instructions::{LessThanOpcode, UsizeOpcode},
         InstructionOutput, IntegrationInterface, MachineAdapter, MachineAdapterInterface,
-        MachineIntegration, Reads, Result, Writes,
+        MachineIntegration, MachineIntegrationAir, Reads, Result, Writes,
     },
     program::Instruction,
 };
@@ -55,6 +55,27 @@ impl<AB: InteractionBuilder, const NUM_LIMBS: usize, const LIMB_BITS: usize> Air
     }
 }
 
+impl<F: Field, const NUM_LIMBS: usize, const LIMB_BITS: usize> BaseAirWithPublicValues<F>
+    for LessThanAir<NUM_LIMBS, LIMB_BITS>
+{
+}
+
+impl<AB, I, const NUM_LIMBS: usize, const LIMB_BITS: usize> MachineIntegrationAir<AB, I>
+    for LessThanAir<NUM_LIMBS, LIMB_BITS>
+where
+    AB: InteractionBuilder,
+    I: MachineAdapterInterface<AB::Expr>,
+{
+    fn eval(
+        &self,
+        _builder: &mut AB,
+        _local: &[AB::Var],
+        _local_adapter: &[AB::Var],
+    ) -> IntegrationInterface<AB::Expr, I> {
+        todo!()
+    }
+}
+
 #[derive(Debug)]
 pub struct LessThanIntegration<const NUM_LIMBS: usize, const LIMB_BITS: usize> {
     pub air: LessThanAir<NUM_LIMBS, LIMB_BITS>,
@@ -78,11 +99,10 @@ impl<F: PrimeField32, A: MachineAdapter<F>, const NUM_LIMBS: usize, const LIMB_B
     MachineIntegration<F, A> for LessThanIntegration<NUM_LIMBS, LIMB_BITS>
 where
     Reads<F, A::Interface<F>>: Into<[[F; NUM_LIMBS]; 2]>,
-    Writes<F, A::Interface<F>>: From<[F; NUM_LIMBS]>,
+    Writes<F, A::Interface<F>>: From<[[F; NUM_LIMBS]; 1]>,
 {
     // TODO: update for trace generation
     type Record = u32;
-    type Cols<T> = LessThanCols<T, NUM_LIMBS, LIMB_BITS>;
     type Air = LessThanAir<NUM_LIMBS, LIMB_BITS>;
 
     #[allow(clippy::type_complexity)]
@@ -107,7 +127,7 @@ where
         // Integration doesn't modify PC directly, so we let Adapter handle the increment
         let output: InstructionOutput<F, A::Interface<F>> = InstructionOutput {
             to_pc: None,
-            writes: writes.map(F::from_canonical_u32).into(),
+            writes: [writes.map(F::from_canonical_u32)].into(),
         };
 
         // TODO: send XorLookupChip requests
@@ -120,22 +140,12 @@ where
         todo!()
     }
 
-    fn generate_trace_row(&self, _row_slice: &mut Self::Cols<F>, _record: Self::Record) {
+    fn generate_trace_row(&self, _row_slice: &mut [F], _record: Self::Record) {
         todo!()
     }
 
-    /// Returns `(to_pc, interface)`.
-    fn eval_primitive<AB: InteractionBuilder<F = F> + PairBuilder + AirBuilderWithPublicValues>(
-        _air: &Self::Air,
-        _builder: &mut AB,
-        _local: &Self::Cols<AB::Var>,
-        _local_adapter: &A::Cols<AB::Var>,
-    ) -> IntegrationInterface<AB::Expr, A::Interface<AB::Expr>> {
-        todo!()
-    }
-
-    fn air(&self) -> Self::Air {
-        self.air
+    fn air(&self) -> &Self::Air {
+        &self.air
     }
 }
 

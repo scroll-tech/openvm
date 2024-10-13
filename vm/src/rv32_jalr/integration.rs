@@ -1,7 +1,7 @@
 use std::{array, marker::PhantomData, mem::size_of};
 
-use afs_stark_backend::interaction::InteractionBuilder;
-use p3_air::{AirBuilderWithPublicValues, BaseAir, PairBuilder};
+use afs_stark_backend::{interaction::InteractionBuilder, rap::BaseAirWithPublicValues};
+use p3_air::BaseAir;
 use p3_field::{Field, PrimeField32};
 
 use crate::{
@@ -9,8 +9,8 @@ use crate::{
         compose,
         instructions::{Rv32JalrOpcode, UsizeOpcode},
         InstructionOutput, IntegrationInterface, MachineAdapter, MachineAdapterInterface,
-        MachineIntegration, Reads, Result, Writes, PC_BITS, RV32_REGISTER_NUM_LANES,
-        RV_IS_TYPE_IMM_BITS,
+        MachineIntegration, MachineIntegrationAir, Reads, Result, Writes, PC_BITS,
+        RV32_REGISTER_NUM_LANES, RV_IS_TYPE_IMM_BITS,
     },
     program::Instruction,
 };
@@ -38,6 +38,22 @@ impl<F: Field> BaseAir<F> for Rv32JalrAir<F> {
     }
 }
 
+impl<F: Field> BaseAirWithPublicValues<F> for Rv32JalrAir<F> {}
+
+impl<AB: InteractionBuilder, I> MachineIntegrationAir<AB, I> for Rv32JalrAir<AB::F>
+where
+    I: MachineAdapterInterface<AB::Expr>,
+{
+    fn eval(
+        &self,
+        _builder: &mut AB,
+        _local: &[AB::Var],
+        _local_adapter: &[AB::Var],
+    ) -> IntegrationInterface<AB::Expr, I> {
+        todo!()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Rv32JalrIntegration<F: Field> {
     pub air: Rv32JalrAir<F>,
@@ -61,7 +77,6 @@ where
 {
     type Record = ();
     type Air = Rv32JalrAir<F>;
-    type Cols<T> = Rv32JalrCols<T>;
 
     #[allow(clippy::type_complexity)]
     fn execute_instruction(
@@ -96,21 +111,12 @@ where
         format!("{:?}", Rv32JalrOpcode::from_usize(opcode - self.air.offset))
     }
 
-    fn generate_trace_row(&self, _row_slice: &mut Self::Cols<F>, _record: Self::Record) {
+    fn generate_trace_row(&self, _row_slice: &mut [F], _record: Self::Record) {
         todo!()
     }
 
-    fn eval_primitive<AB: InteractionBuilder<F = F> + PairBuilder + AirBuilderWithPublicValues>(
-        _air: &Self::Air,
-        _builder: &mut AB,
-        _local: &Self::Cols<AB::Var>,
-        _local_adapter: &A::Cols<AB::Var>,
-    ) -> IntegrationInterface<AB::Expr, A::Interface<AB::Expr>> {
-        todo!()
-    }
-
-    fn air(&self) -> Self::Air {
-        todo!()
+    fn air(&self) -> &Self::Air {
+        &self.air
     }
 }
 

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use derivative::Derivative;
 use itertools::Itertools;
 use p3_matrix::dense::RowMajorMatrix;
@@ -59,13 +61,13 @@ pub struct AirProofData<SC: StarkGenericConfig> {
 }
 
 /// Proof input
-pub struct ProofInput<'a, SC: StarkGenericConfig> {
+pub struct ProofInput<SC: StarkGenericConfig> {
     /// (AIR id, AIR input)
-    pub per_air: Vec<(usize, AirProofInput<'a, SC>)>,
+    pub per_air: Vec<(usize, AirProofInput<SC>)>,
 }
 
-impl<'a, SC: StarkGenericConfig> ProofInput<'a, SC> {
-    pub fn new(per_air: Vec<(usize, AirProofInput<'a, SC>)>) -> Self {
+impl<SC: StarkGenericConfig> ProofInput<SC> {
+    pub fn new(per_air: Vec<(usize, AirProofInput<SC>)>) -> Self {
         Self { per_air }
     }
 }
@@ -80,23 +82,14 @@ pub struct CommittedTraceData<SC: StarkGenericConfig> {
 /// Necessary input for proving a single AIR.
 #[derive(Derivative)]
 #[derivative(Clone(bound = "Com<SC>: Clone"))]
-pub struct AirProofInput<'a, SC: StarkGenericConfig> {
-    pub air: &'a dyn AnyRap<SC>,
+pub struct AirProofInput<SC: StarkGenericConfig> {
+    pub air: Arc<dyn AnyRap<SC>>,
     /// Cached main trace matrices
     pub cached_mains: Vec<CommittedTraceData<SC>>,
     /// Common main trace matrix
     pub common_main: Option<RowMajorMatrix<Val<SC>>>,
     /// Public values
     pub public_values: Vec<Val<SC>>,
-}
-
-pub trait Chip<SC: StarkGenericConfig> {
-    fn air(&self) -> &dyn AnyRap<SC>;
-    /// Generate all necessary input for proving a single AIR.
-    fn generate_air_proof_input(&self) -> AirProofInput<SC>;
-    fn generate_air_proof_input_with_id(&self, air_id: usize) -> (usize, AirProofInput<SC>) {
-        (air_id, self.generate_air_proof_input())
-    }
 }
 
 impl<SC: StarkGenericConfig> Proof<SC> {
@@ -111,7 +104,7 @@ impl<SC: StarkGenericConfig> Proof<SC> {
     }
 }
 
-impl<'a, SC: StarkGenericConfig> ProofInput<'a, SC> {
+impl<SC: StarkGenericConfig> ProofInput<SC> {
     pub fn sort(&mut self) {
         self.per_air.sort_by_key(|p| p.0);
     }

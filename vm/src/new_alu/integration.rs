@@ -2,15 +2,15 @@ use std::{array, sync::Arc};
 
 use afs_derive::AlignedBorrow;
 use afs_primitives::xor::{bus::XorBus, lookup::XorLookupChip};
-use afs_stark_backend::interaction::InteractionBuilder;
-use p3_air::{Air, AirBuilderWithPublicValues, BaseAir, PairBuilder};
+use afs_stark_backend::{interaction::InteractionBuilder, rap::BaseAirWithPublicValues};
+use p3_air::BaseAir;
 use p3_field::{Field, PrimeField32};
 
 use crate::{
     arch::{
         instructions::{AluOpcode, UsizeOpcode},
         InstructionOutput, IntegrationInterface, MachineAdapter, MachineAdapterInterface,
-        MachineIntegration, Reads, Result, Writes,
+        MachineIntegration, MachineIntegrationAir, MinimalInstruction, Reads, Result, Writes,
     },
     program::Instruction,
 };
@@ -34,6 +34,7 @@ pub struct ArithmeticLogicCols<T, const NUM_LIMBS: usize, const LIMB_BITS: usize
 #[derive(Copy, Clone, Debug)]
 pub struct ArithmeticLogicAir<const NUM_LIMBS: usize, const LIMB_BITS: usize> {
     pub bus: XorBus,
+    offset: usize,
 }
 
 impl<F: Field, const NUM_LIMBS: usize, const LIMB_BITS: usize> BaseAir<F>
@@ -43,20 +44,42 @@ impl<F: Field, const NUM_LIMBS: usize, const LIMB_BITS: usize> BaseAir<F>
         ArithmeticLogicCols::<F, NUM_LIMBS, LIMB_BITS>::width()
     }
 }
-
-impl<AB: InteractionBuilder, const NUM_LIMBS: usize, const LIMB_BITS: usize> Air<AB>
+impl<F: Field, const NUM_LIMBS: usize, const LIMB_BITS: usize> BaseAirWithPublicValues<F>
     for ArithmeticLogicAir<NUM_LIMBS, LIMB_BITS>
 {
-    fn eval(&self, _builder: &mut AB) {
-        todo!();
+}
+
+impl<AB, I, const NUM_LIMBS: usize, const LIMB_BITS: usize> MachineIntegrationAir<AB, I>
+    for ArithmeticLogicAir<NUM_LIMBS, LIMB_BITS>
+where
+    AB: InteractionBuilder,
+    I: MachineAdapterInterface<AB::Expr>,
+    I::Reads: From<[[AB::Expr; NUM_LIMBS]; 2]>,
+    I::Writes: From<[[AB::Expr; NUM_LIMBS]; 1]>,
+    I::ProcessedInstruction: From<MinimalInstruction<AB::Expr>>,
+{
+    fn eval(
+        &self,
+        _builder: &mut AB,
+        _local: &[AB::Var],
+        _local_adapter: &[AB::Var],
+    ) -> IntegrationInterface<AB::Expr, I> {
+        todo!()
     }
+}
+
+#[derive(Debug)]
+pub struct ArithmeticLogicRecord<T, const NUM_LIMBS: usize, const LIMB_BITS: usize> {
+    pub opcode: AluOpcode,
+    pub a: [T; NUM_LIMBS],
+    pub b: [T; NUM_LIMBS],
+    pub c: [T; NUM_LIMBS],
 }
 
 #[derive(Debug)]
 pub struct ArithmeticLogicIntegration<const NUM_LIMBS: usize, const LIMB_BITS: usize> {
     pub air: ArithmeticLogicAir<NUM_LIMBS, LIMB_BITS>,
     pub xor_lookup_chip: Arc<XorLookupChip<LIMB_BITS>>,
-    offset: usize,
 }
 
 impl<const NUM_LIMBS: usize, const LIMB_BITS: usize>
@@ -66,22 +89,22 @@ impl<const NUM_LIMBS: usize, const LIMB_BITS: usize>
         Self {
             air: ArithmeticLogicAir {
                 bus: xor_lookup_chip.bus(),
+                offset,
             },
             xor_lookup_chip,
-            offset,
         }
     }
 }
 
-impl<F: PrimeField32, A: MachineAdapter<F>, const NUM_LIMBS: usize, const LIMB_BITS: usize>
-    MachineIntegration<F, A> for ArithmeticLogicIntegration<NUM_LIMBS, LIMB_BITS>
+impl<F, A, const NUM_LIMBS: usize, const LIMB_BITS: usize> MachineIntegration<F, A>
+    for ArithmeticLogicIntegration<NUM_LIMBS, LIMB_BITS>
 where
+    F: PrimeField32,
+    A: MachineAdapter<F>,
     Reads<F, A::Interface<F>>: Into<[[F; NUM_LIMBS]; 2]>,
-    Writes<F, A::Interface<F>>: From<[F; NUM_LIMBS]>,
+    Writes<F, A::Interface<F>>: From<[[F; NUM_LIMBS]; 1]>,
 {
-    // TODO: update for trace generation
-    type Record = u32;
-    type Cols<T> = ArithmeticLogicCols<T, NUM_LIMBS, LIMB_BITS>;
+    type Record = ArithmeticLogicRecord<F, NUM_LIMBS, LIMB_BITS>;
     type Air = ArithmeticLogicAir<NUM_LIMBS, LIMB_BITS>;
 
     #[allow(clippy::type_complexity)]
@@ -92,45 +115,49 @@ where
         reads: <A::Interface<F> as MachineAdapterInterface<F>>::Reads,
     ) -> Result<(InstructionOutput<F, A::Interface<F>>, Self::Record)> {
         let Instruction { opcode, .. } = instruction;
-        let opcode = AluOpcode::from_usize(opcode - self.offset);
+        let opcode = AluOpcode::from_usize(opcode - self.air.offset);
 
         let data: [[F; NUM_LIMBS]; 2] = reads.into();
-        let x = data[0].map(|x| x.as_canonical_u32());
-        let y = data[1].map(|y| y.as_canonical_u32());
-        let z = solve_alu::<NUM_LIMBS, LIMB_BITS>(opcode, &x, &y);
+        let b = data[0].map(|x| x.as_canonical_u32());
+        let c = data[1].map(|y| y.as_canonical_u32());
+        let a = solve_alu::<NUM_LIMBS, LIMB_BITS>(opcode, &b, &c);
 
         // Integration doesn't modify PC directly, so we let Adapter handle the increment
         let output: InstructionOutput<F, A::Interface<F>> = InstructionOutput {
             to_pc: None,
-            writes: z.map(F::from_canonical_u32).into(),
+            writes: [a.map(F::from_canonical_u32)].into(),
         };
 
-        // TODO: send XorLookupChip requests
-        // TODO: create Record and return
+        if opcode == AluOpcode::ADD || opcode == AluOpcode::SUB {
+            for a_val in a {
+                self.xor_lookup_chip.request(a_val, a_val);
+            }
+        } else {
+            for (b_val, c_val) in b.iter().zip(c.iter()) {
+                self.xor_lookup_chip.request(*b_val, *c_val);
+            }
+        }
 
-        Ok((output, 0))
+        let record = Self::Record {
+            opcode,
+            a: a.map(F::from_canonical_u32),
+            b: data[0],
+            c: data[1],
+        };
+
+        Ok((output, record))
     }
 
     fn get_opcode_name(&self, _opcode: usize) -> String {
         todo!()
     }
 
-    fn generate_trace_row(&self, _row_slice: &mut Self::Cols<F>, _record: Self::Record) {
+    fn generate_trace_row(&self, _row_slice: &mut [F], _record: Self::Record) {
         todo!()
     }
 
-    /// Returns `(to_pc, interface)`.
-    fn eval_primitive<AB: InteractionBuilder<F = F> + PairBuilder + AirBuilderWithPublicValues>(
-        _air: &Self::Air,
-        _builder: &mut AB,
-        _local: &Self::Cols<AB::Var>,
-        _local_adapter: &A::Cols<AB::Var>,
-    ) -> IntegrationInterface<AB::Expr, A::Interface<AB::Expr>> {
-        todo!()
-    }
-
-    fn air(&self) -> Self::Air {
-        self.air
+    fn air(&self) -> &Self::Air {
+        &self.air
     }
 }
 

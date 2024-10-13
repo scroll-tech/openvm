@@ -1,7 +1,7 @@
 use std::{marker::PhantomData, mem::size_of};
 
-use afs_stark_backend::interaction::InteractionBuilder;
-use p3_air::{AirBuilderWithPublicValues, BaseAir, PairBuilder};
+use afs_stark_backend::{interaction::InteractionBuilder, rap::BaseAirWithPublicValues};
+use p3_air::BaseAir;
 use p3_field::{Field, PrimeField32};
 
 use crate::{
@@ -11,7 +11,7 @@ use crate::{
             UsizeOpcode,
         },
         InstructionOutput, IntegrationInterface, MachineAdapter, MachineAdapterInterface,
-        MachineIntegration, Reads, Result, Writes,
+        MachineIntegration, MachineIntegrationAir, Reads, Result, Writes,
     },
     program::Instruction,
 };
@@ -39,6 +39,23 @@ impl<F: Field, const NUM_CELLS: usize> BaseAir<F> for LoadStoreAir<F, NUM_CELLS>
     }
 }
 
+impl<F: Field, const NUM_CELLS: usize> BaseAirWithPublicValues<F> for LoadStoreAir<F, NUM_CELLS> {}
+
+impl<AB, I, const NUM_CELLS: usize> MachineIntegrationAir<AB, I> for LoadStoreAir<AB::F, NUM_CELLS>
+where
+    AB: InteractionBuilder,
+    I: MachineAdapterInterface<AB::Expr>,
+{
+    fn eval(
+        &self,
+        _builder: &mut AB,
+        _local: &[AB::Var],
+        _local_adapter: &[AB::Var],
+    ) -> IntegrationInterface<AB::Expr, I> {
+        todo!()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct LoadStoreIntegration<F: Field, const NUM_CELLS: usize> {
     pub air: LoadStoreAir<F, NUM_CELLS>,
@@ -63,7 +80,6 @@ where
 {
     type Record = ();
     type Air = LoadStoreAir<F, NUM_CELLS>;
-    type Cols<T> = LoadStoreCols<T, NUM_CELLS>;
 
     #[allow(clippy::type_complexity)]
     fn execute_instruction(
@@ -91,21 +107,12 @@ where
         )
     }
 
-    fn generate_trace_row(&self, _row_slice: &mut Self::Cols<F>, _record: Self::Record) {
+    fn generate_trace_row(&self, _row_slice: &mut [F], _record: Self::Record) {
         todo!()
     }
 
-    fn eval_primitive<AB: InteractionBuilder<F = F> + PairBuilder + AirBuilderWithPublicValues>(
-        _air: &Self::Air,
-        _builder: &mut AB,
-        _local: &Self::Cols<AB::Var>,
-        _local_adapter: &A::Cols<AB::Var>,
-    ) -> IntegrationInterface<AB::Expr, A::Interface<AB::Expr>> {
-        todo!()
-    }
-
-    fn air(&self) -> Self::Air {
-        todo!()
+    fn air(&self) -> &Self::Air {
+        &self.air
     }
 }
 

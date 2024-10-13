@@ -12,13 +12,16 @@ use afs_primitives::{
     var_range::{bus::VariableRangeCheckerBus, VariableRangeCheckerChip},
     xor::lookup::XorLookupChip,
 };
-use afs_stark_backend::utils::AirInfo;
+use afs_stark_backend::{
+    config::{Domain, StarkGenericConfig},
+    p3_commit::PolynomialSpace,
+    utils::AirInfo,
+    Chip,
+};
 use backtrace::Backtrace;
 use itertools::{izip, zip_eq};
-use p3_commit::PolynomialSpace;
 use p3_field::PrimeField32;
 use p3_matrix::Matrix;
-use p3_uni_stark::{Domain, StarkGenericConfig};
 use p3_util::log2_strict_usize;
 use poseidon2_air::poseidon2::Poseidon2Config;
 use strum::EnumCount;
@@ -61,7 +64,6 @@ use crate::{
     rv32_jal_lui::{Rv32JalLuiChip, Rv32JalLuiIntegration},
     rv32_jalr::{Rv32JalrChip, Rv32JalrIntegration},
     shift::ShiftChip,
-    ui::UiChip,
     uint_multiplication::UintMultiplicationChip,
     vm::config::PersistenceType,
 };
@@ -418,18 +420,6 @@ impl<F: PrimeField32> ExecutionSegment<F> {
                     }
                     chips.push(MachineChipVariant::AuipcRv32(chip));
                 }
-                ExecutorName::Ui => {
-                    let chip = Rc::new(RefCell::new(UiChip::new(
-                        execution_bus,
-                        program_bus,
-                        memory_chip.clone(),
-                        offset,
-                    )));
-                    for opcode in range {
-                        executors.insert(opcode, chip.clone().into());
-                    }
-                    chips.push(MachineChipVariant::Ui(chip));
-                }
                 ExecutorName::CastF => {
                     let chip = Rc::new(RefCell::new(CastFChip::new(
                         execution_bus,
@@ -442,6 +432,7 @@ impl<F: PrimeField32> ExecutionSegment<F> {
                     }
                     chips.push(MachineChipVariant::CastF(chip));
                 }
+                // TODO: make these customizable opcode classes
                 ExecutorName::Secp256k1AddUnequal => {
                     let chip = Rc::new(RefCell::new(EcAddUnequalChip::new(
                         execution_bus,
@@ -736,7 +727,7 @@ impl<F: PrimeField32> ExecutionSegment<F> {
 
         let trace = self.connector_chip.generate_trace();
         result.air_infos.push(AirInfo::simple_no_pis(
-            Box::new(self.connector_chip.air),
+            Arc::new(self.connector_chip.air),
             trace,
         ));
 

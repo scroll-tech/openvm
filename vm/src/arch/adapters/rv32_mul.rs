@@ -2,14 +2,14 @@ use std::{marker::PhantomData, mem::size_of};
 
 use afs_derive::AlignedBorrow;
 use afs_stark_backend::interaction::InteractionBuilder;
-use p3_air::{Air, AirBuilderWithPublicValues, BaseAir, PairBuilder};
+use p3_air::{Air, BaseAir};
 use p3_field::{AbstractField, Field, PrimeField32};
 
 use super::RV32_REGISTER_NUM_LANES;
 use crate::{
     arch::{
         ExecutionBridge, ExecutionBus, ExecutionState, InstructionOutput, IntegrationInterface,
-        MachineAdapter, MachineAdapterInterface, Result,
+        MachineAdapter, MachineAdapterAir, MachineAdapterInterface, Result,
     },
     memory::{
         offline_checker::{MemoryBridge, MemoryReadAuxCols, MemoryWriteAuxCols},
@@ -101,11 +101,23 @@ impl<AB: InteractionBuilder> Air<AB> for Rv32MultAdapterAir {
     }
 }
 
+impl<AB: InteractionBuilder> MachineAdapterAir<AB> for Rv32MultAdapterAir {
+    type Interface = Rv32MultAdapterInterface<AB::Expr>;
+
+    fn eval(
+        &self,
+        _builder: &mut AB,
+        _local: &[AB::Var],
+        _ctx: IntegrationInterface<AB::Expr, Self::Interface>,
+    ) {
+        todo!()
+    }
+}
+
 impl<F: PrimeField32> MachineAdapter<F> for Rv32MultAdapter<F> {
     type ReadRecord = Rv32MultReadRecord<F>;
     type WriteRecord = Rv32MultWriteRecord<F>;
     type Air = Rv32MultAdapterAir;
-    type Cols<T> = Rv32MultAdapterCols<T>;
     type Interface<T: AbstractField> = Rv32MultAdapterInterface<T>;
 
     fn preprocess(
@@ -155,25 +167,14 @@ impl<F: PrimeField32> MachineAdapter<F> for Rv32MultAdapter<F> {
 
     fn generate_trace_row(
         &self,
-        _row_slice: &mut Self::Cols<F>,
+        _row_slice: &mut [F],
         _read_record: Self::ReadRecord,
         _write_record: Self::WriteRecord,
     ) {
         todo!();
     }
 
-    fn eval_adapter_constraints<
-        AB: InteractionBuilder<F = F> + PairBuilder + AirBuilderWithPublicValues,
-    >(
-        _air: &Self::Air,
-        _builder: &mut AB,
-        _local: &Self::Cols<AB::Var>,
-        _interface: IntegrationInterface<AB::Expr, Self::Interface<AB::Expr>>,
-    ) -> AB::Expr {
-        todo!();
-    }
-
-    fn air(&self) -> Self::Air {
-        self.air
+    fn air(&self) -> &Self::Air {
+        &self.air
     }
 }

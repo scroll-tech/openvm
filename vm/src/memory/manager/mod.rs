@@ -10,14 +10,16 @@ use afs_primitives::{
     sub_chip::LocalTraceInstructions,
     var_range::{bus::VariableRangeCheckerBus, VariableRangeCheckerChip},
 };
-use afs_stark_backend::rap::AnyRap;
+use afs_stark_backend::{
+    config::{Domain, StarkGenericConfig},
+    p3_commit::PolynomialSpace,
+    rap::AnyRap,
+};
 use itertools::zip_eq;
 pub use memory::{AddressSpace, MemoryReadRecord, MemoryWriteRecord};
 use p3_air::BaseAir;
-use p3_commit::PolynomialSpace;
-use p3_field::PrimeField32;
+use p3_field::{Field, PrimeField32};
 use p3_matrix::dense::RowMajorMatrix;
-use p3_uni_stark::{Domain, StarkGenericConfig};
 
 use self::interface::MemoryInterface;
 use super::{
@@ -150,7 +152,7 @@ impl<T: Clone, const N: usize> From<MemoryHeapWriteRecord<T, N>> for MemoryHeapD
 pub type MemoryChipRef<F> = Rc<RefCell<MemoryChip<F>>>;
 
 #[derive(Clone, Debug)]
-pub struct MemoryChip<F: PrimeField32> {
+pub struct MemoryChip<F: Field> {
     pub memory_bus: MemoryBus,
     pub interface_chip: MemoryInterface<NUM_WORDS, F>,
     pub(crate) mem_config: MemoryConfig,
@@ -408,18 +410,18 @@ impl<F: PrimeField32> MemoryChip<F> {
         ]
     }
 
-    pub fn airs<SC: StarkGenericConfig>(&self) -> Vec<Box<dyn AnyRap<SC>>>
+    pub fn airs<SC: StarkGenericConfig>(&self) -> Vec<Arc<dyn AnyRap<SC>>>
     where
         Domain<SC>: PolynomialSpace<Val = F>,
     {
         vec![
-            Box::new(self.get_audit_air()),
-            Box::new(self.access_adapter_air::<2>()),
-            Box::new(self.access_adapter_air::<4>()),
-            Box::new(self.access_adapter_air::<8>()),
-            Box::new(self.access_adapter_air::<16>()),
-            Box::new(self.access_adapter_air::<32>()),
-            Box::new(self.access_adapter_air::<64>()),
+            Arc::new(self.get_audit_air()),
+            Arc::new(self.access_adapter_air::<2>()),
+            Arc::new(self.access_adapter_air::<4>()),
+            Arc::new(self.access_adapter_air::<8>()),
+            Arc::new(self.access_adapter_air::<16>()),
+            Arc::new(self.access_adapter_air::<32>()),
+            Arc::new(self.access_adapter_air::<64>()),
         ]
     }
 
@@ -482,6 +484,7 @@ impl<F: PrimeField32> MemoryChip<F> {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct MemoryAuxColsFactory<T> {
     range_checker: Arc<VariableRangeCheckerChip>,
     timestamp_lt_air: AssertLessThanAir<AUX_LEN>,
