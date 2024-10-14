@@ -20,6 +20,7 @@ use crate::{
     types::ECPoint,
 };
 
+mod ec_msm;
 mod ecdsa;
 
 const SECP256K1_COORD_BITS: usize = 256;
