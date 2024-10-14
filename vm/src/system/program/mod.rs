@@ -1,4 +1,4 @@
-use std::{error::Error, fmt::Display, sync::Arc};
+use std::{collections::HashMap, error::Error, fmt::Display, sync::Arc};
 
 use afs_stark_backend::{
     config::{StarkGenericConfig, Val},
@@ -213,17 +213,82 @@ impl DebugInfo {
 
 #[derive(Clone, Debug)]
 pub struct Program<F> {
-    pub instructions: Vec<Instruction<F>>,
-    pub debug_infos: Vec<Option<DebugInfo>>,
+    /// A map from program counter to instruction.
+    /// Sometimes the instructions are enumerated as 0, 4, 8, etc.
+    /// Maybe at some point we will replace this with a struct that would have a `Vec` under the hood and divide the incoming `pc` by whatever given.
+    pub instructions_and_debug_infos: HashMap<usize, (Instruction<F>, Option<DebugInfo>)>,
+    pub step: usize,
 }
 
 impl<F> Program<F> {
+    pub fn from_instructions_and_step(instructions: &[Instruction<F>], step: usize) -> Self
+    where
+        F: Clone,
+    {
+        Self {
+            instructions_and_debug_infos: instructions
+                .iter()
+                .enumerate()
+                .map(|(index, instruction)| (index * step, ((*instruction).clone(), None)))
+                .collect(),
+            step,
+        }
+    }
+
+    pub fn from_instructions_and_debug_infos(
+        instructions: &[Instruction<F>],
+        debug_infos: &[Option<DebugInfo>],
+    ) -> Self
+    where
+        F: Clone,
+    {
+        Self {
+            instructions_and_debug_infos: instructions
+                .iter()
+                .zip(debug_infos.iter())
+                .enumerate()
+                .map(|(index, (instruction, debug_info))| {
+                    (index, ((*instruction).clone(), (*debug_info).clone()))
+                })
+                .collect(),
+            step: 1,
+        }
+    }
+
+    pub fn from_instructions(instructions: &[Instruction<F>]) -> Self
+    where
+        F: Clone,
+    {
+        Self::from_instructions_and_step(instructions, 1)
+    }
+
     pub fn len(&self) -> usize {
-        self.instructions.len()
+        self.instructions_and_debug_infos.len()
     }
 
     pub fn is_empty(&self) -> bool {
-        self.instructions.is_empty()
+        self.instructions_and_debug_infos.is_empty()
+    }
+
+    pub fn instructions(&self) -> Vec<Instruction<F>>
+    where
+        F: Clone,
+    {
+        self.instructions_and_debug_infos
+            .iter()
+            .sorted_by_key(|(pc, _)| *pc)
+            .map(|(_, (instruction, _))| instruction)
+            .cloned()
+            .collect()
+    }
+
+    pub fn debug_infos(&self) -> Vec<Option<DebugInfo>> {
+        self.instructions_and_debug_infos
+            .iter()
+            .sorted_by_key(|(pc, _)| *pc)
+            .map(|(_, (_, debug_info))| debug_info)
+            .cloned()
+            .collect()
     }
 }
 
@@ -244,10 +309,10 @@ impl<F: PrimeField64> ProgramChip<F> {
     pub fn new(mut program: Program<F>) -> Self {
         let true_program_length = program.len();
         while !program.len().is_power_of_two() {
-            program
-                .instructions
-                .push(Instruction::from_isize(FAIL as usize, 0, 0, 0, 0, 0));
-            program.debug_infos.push(None);
+            program.instructions_and_debug_infos.insert(
+                program.len() * program.step,
+                (Instruction::from_isize(FAIL as usize, 0, 0, 0, 0, 0), None),
+            );
         }
         Self {
             execution_frequencies: vec![0; program.len()],
@@ -267,10 +332,7 @@ impl<F: PrimeField64> ProgramChip<F> {
             return Err(ExecutionError::PcOutOfBounds(pc, self.true_program_length));
         }
         self.execution_frequencies[pc] += 1;
-        Ok((
-            self.air.program.instructions[pc].clone(),
-            self.air.program.debug_infos[pc].clone(),
-        ))
+        Ok(self.air.program.instructions_and_debug_infos[&pc].clone())
     }
 }
 
