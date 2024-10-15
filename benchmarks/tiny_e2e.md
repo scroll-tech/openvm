@@ -1,13 +1,13 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_proof_time_ms | trace_gen_time_ms |
 | --- | --- | --- | --- | --- | --- |
-| fibonacci_program_inner | <span style="color: green">(-9.0 [-0.1%])</span> <div style='text-align: right'>9,489.0</div>  | <div style='text-align: right'>20,068,004</div>  | <div style='text-align: right'>2,166,515</div>  | <span style="color: green">(-9.0 [-0.1%])</span> <div style='text-align: right'>9,556.0</div>  | <div style='text-align: right'>67.0</div>  |
+| fibonacci_program_inner | <span style="color: red">(+37.0 [+0.4%])</span> <div style='text-align: right'>9,526.0</div>  | <div style='text-align: right'>20,068,004</div>  | <div style='text-align: right'>2,166,515</div>  | <span style="color: red">(+37.0 [+0.4%])</span> <div style='text-align: right'>9,593.0</div>  | <div style='text-align: right'>67.0</div>  |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
 | fibonacci_program_inner | ByteXor | <div style='text-align: right'>65,536</div>  |
 | fibonacci_program_inner | Core | <div style='text-align: right'>6</div>  |
 | fibonacci_program_inner | FieldArithmetic | <div style='text-align: right'>90</div>  |
-| fibonacci_program_inner | MemoryChip Audit | <div style='text-align: right'>35</div>  |
+| fibonacci_program_inner | MemoryChip MemoryBoundary | <div style='text-align: right'>35</div>  |
 | fibonacci_program_inner | ProgramChip | <div style='text-align: right'>97</div>  |
 | fibonacci_program_inner | RangeTupleChecker | <div style='text-align: right'>2,097,152</div>  |
 
@@ -30,16 +30,16 @@
 
 | group | air_name | dsl_ir | opcode | cells_used |
 | --- | --- | --- | --- | --- |
-| fibonacci_program_inner | Audit |  | JAL | <div style='text-align: right'>19</div>  |
 | fibonacci_program_inner | CoreAir |  | JAL | <div style='text-align: right'>62</div>  |
-| fibonacci_program_inner | Audit |  | STOREW | <div style='text-align: right'>38</div>  |
+| fibonacci_program_inner | MemoryBoundary |  | JAL | <div style='text-align: right'>19</div>  |
 | fibonacci_program_inner | CoreAir |  | STOREW | <div style='text-align: right'>124</div>  |
+| fibonacci_program_inner | MemoryBoundary |  | STOREW | <div style='text-align: right'>38</div>  |
 | fibonacci_program_inner | FieldArithmeticAir | AddF | ADD | <div style='text-align: right'>930</div>  |
-| fibonacci_program_inner | Audit | AddFI | ADD | <div style='text-align: right'>570</div>  |
 | fibonacci_program_inner | FieldArithmeticAir | AddFI | ADD | <div style='text-align: right'>1,860</div>  |
+| fibonacci_program_inner | MemoryBoundary | AddFI | ADD | <div style='text-align: right'>570</div>  |
 | fibonacci_program_inner | CoreAir | Halt | TERMINATE | <div style='text-align: right'>62</div>  |
-| fibonacci_program_inner | Audit | ImmF | STOREW | <div style='text-align: right'>38</div>  |
 | fibonacci_program_inner | CoreAir | ImmF | STOREW | <div style='text-align: right'>124</div>  |
+| fibonacci_program_inner | MemoryBoundary | ImmF | STOREW | <div style='text-align: right'>38</div>  |
 
 </details>
 
@@ -50,16 +50,16 @@
 | fibonacci_program_inner | FieldArithmeticAir | <div style='text-align: right'>8,576</div>  | <div style='text-align: right'>28</div>  | <div style='text-align: right'>15</div>  | <div style='text-align: right'>31</div>  | <div style='text-align: right'>36</div>  |  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>128</div>  |
 | fibonacci_program_inner | XorLookupAir<8> | <div style='text-align: right'>589,824</div>  | <div style='text-align: right'>4</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>8</div>  | <div style='text-align: right'>3</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>65,536</div>  |
 | fibonacci_program_inner | RangeTupleCheckerAir<2> | <div style='text-align: right'>18,874,368</div>  | <div style='text-align: right'>4</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>8</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>2,097,152</div>  |
-| fibonacci_program_inner | MemoryAuditAir | <div style='text-align: right'>2,240</div>  | <div style='text-align: right'>21</div>  | <div style='text-align: right'>6</div>  | <div style='text-align: right'>19</div>  | <div style='text-align: right'>16</div>  |  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>64</div>  |
+| fibonacci_program_inner | VolatileBoundaryAir | <div style='text-align: right'>2,240</div>  | <div style='text-align: right'>21</div>  | <div style='text-align: right'>6</div>  | <div style='text-align: right'>19</div>  | <div style='text-align: right'>16</div>  |  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>64</div>  |
 | fibonacci_program_inner | VariableRangeCheckerAir | <div style='text-align: right'>589,824</div>  | <div style='text-align: right'>4</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>8</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>65,536</div>  |
 | fibonacci_program_inner | VmConnectorAir | <div style='text-align: right'>20</div>  | <div style='text-align: right'>4</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>8</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>2</div>  |
 
 
 
-[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0cff86269ef0ec9d1345f651338f2de22d3160eb/tiny_e2e.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0cff86269ef0ec9d1345f651338f2de22d3160eb/tiny_e2e.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0cff86269ef0ec9d1345f651338f2de22d3160eb/tiny_e2e.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0cff86269ef0ec9d1345f651338f2de22d3160eb/tiny_e2e.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0cff86269ef0ec9d1345f651338f2de22d3160eb/tiny_e2e.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0cff86269ef0ec9d1345f651338f2de22d3160eb/tiny_e2e.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0cff86269ef0ec9d1345f651338f2de22d3160eb/tiny_e2e.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0cff86269ef0ec9d1345f651338f2de22d3160eb/tiny_e2e.dsl_ir.opcode.frequency.svg)
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/0cff86269ef0ec9d1345f651338f2de22d3160eb
+[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b0a3e24dd4f19bf5ac4a6685945076f966717139/tiny_e2e.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b0a3e24dd4f19bf5ac4a6685945076f966717139/tiny_e2e.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b0a3e24dd4f19bf5ac4a6685945076f966717139/tiny_e2e.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b0a3e24dd4f19bf5ac4a6685945076f966717139/tiny_e2e.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b0a3e24dd4f19bf5ac4a6685945076f966717139/tiny_e2e.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b0a3e24dd4f19bf5ac4a6685945076f966717139/tiny_e2e.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b0a3e24dd4f19bf5ac4a6685945076f966717139/tiny_e2e.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b0a3e24dd4f19bf5ac4a6685945076f966717139/tiny_e2e.dsl_ir.opcode.frequency.svg)
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/b0a3e24dd4f19bf5ac4a6685945076f966717139
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11336981213)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11344570300)
