@@ -20,15 +20,15 @@ use crate::{
         castf::CastFChip,
         ecc::{EcAddUnequalChip, EcDoubleChip},
         hashes::{keccak::hasher::KeccakVmChip, poseidon2::Poseidon2Chip},
-        modular_addsub::ModularAddSubChip,
-        modular_multdiv::ModularMultDivChip,
-        uint_multiplication::UintMultiplicationChip,
     },
     kernels::{
-        core::CoreChip, new_field_arithmetic::NewFieldArithmeticChip,
-        new_field_extension::NewFieldExtensionChip,
+        core::CoreChip, field_arithmetic::FieldArithmeticChip, field_extension::FieldExtensionChip,
     },
-    old::{alu::ArithmeticLogicChip, shift::ShiftChip},
+    old::{
+        alu::ArithmeticLogicChip, modular_addsub::ModularAddSubChip,
+        modular_multdiv::ModularMultDivChip, shift::ShiftChip,
+        uint_multiplication::UintMultiplicationChip,
+    },
     rv32im::{
         base_alu::Rv32BaseAluChip, branch_eq::Rv32BranchEqualChip,
         branch_lt::Rv32BranchLessThanChip, loadstore::Rv32LoadStoreChip,
@@ -120,8 +120,8 @@ impl<F, C: VmChip<F>> VmChip<F> for Rc<RefCell<C>> {
 #[enum_dispatch(InstructionExecutor<F>)]
 pub enum AxVmInstructionExecutor<F: PrimeField32> {
     Core(Rc<RefCell<CoreChip<F>>>),
-    FieldArithmetic(Rc<RefCell<NewFieldArithmeticChip<F>>>),
-    FieldExtension(Rc<RefCell<NewFieldExtensionChip<F>>>),
+    FieldArithmetic(Rc<RefCell<FieldArithmeticChip<F>>>),
+    FieldExtension(Rc<RefCell<FieldExtensionChip<F>>>),
     Poseidon2(Rc<RefCell<Poseidon2Chip<F>>>),
     Keccak256(Rc<RefCell<KeccakVmChip<F>>>),
     ArithmeticLogicUnitRv32(Rc<RefCell<Rv32BaseAluChip<F>>>),
@@ -151,8 +151,8 @@ pub enum AxVmInstructionExecutor<F: PrimeField32> {
 #[enum_dispatch(VmChip<F>)]
 pub enum AxVmChip<F: PrimeField32> {
     Core(Rc<RefCell<CoreChip<F>>>),
-    FieldArithmetic(Rc<RefCell<NewFieldArithmeticChip<F>>>),
-    FieldExtension(Rc<RefCell<NewFieldExtensionChip<F>>>),
+    FieldArithmetic(Rc<RefCell<FieldArithmeticChip<F>>>),
+    FieldExtension(Rc<RefCell<FieldExtensionChip<F>>>),
     Poseidon2(Rc<RefCell<Poseidon2Chip<F>>>),
     RangeChecker(Arc<VariableRangeCheckerChip>),
     RangeTupleChecker(Arc<RangeTupleCheckerChip<2>>),
