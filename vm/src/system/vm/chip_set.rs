@@ -392,7 +392,7 @@ impl VmConfig {
                             program_bus,
                             memory_controller.clone(),
                         ),
-                        Rv32AuipcCoreChip::new(offset),
+                        Rv32AuipcCoreChip::new(byte_xor_chip.clone(), offset),
                         memory_controller.clone(),
                     )));
                     for opcode in range {
