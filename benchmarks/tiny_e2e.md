@@ -1,6 +1,6 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_proof_time_ms | trace_gen_time_ms |
 | --- | --- | --- | --- | --- | --- |
-| fibonacci_program_inner | <span style="color: red">(+31.0 [+0.3%])</span> <div style='text-align: right'>9,508.0</div>  | <div style='text-align: right'>20,067,876</div>  | <div style='text-align: right'>2,166,425</div>  | <span style="color: red">(+32.0 [+0.3%])</span> <div style='text-align: right'>9,577.0</div>  | <span style="color: red">(+1.0 [+1.5%])</span> <div style='text-align: right'>69.0</div>  |
+| fibonacci_program_inner | <span style="color: green">(-13.0 [-0.1%])</span> <div style='text-align: right'>9,495.0</div>  | <div style='text-align: right'>20,067,876</div>  | <div style='text-align: right'>2,166,425</div>  | <span style="color: green">(-14.0 [-0.1%])</span> <div style='text-align: right'>9,563.0</div>  | <span style="color: green">(-1.0 [-1.4%])</span> <div style='text-align: right'>68.0</div>  |
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
