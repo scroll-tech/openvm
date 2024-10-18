@@ -1,7 +1,7 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_proof_time_ms | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| bench_program_inner | <span style="color: green">(-1.0 [-0.1%])</span> <div style='text-align: right'>697.0</div>  | <div style='text-align: right'>1,326,448</div>  | <div style='text-align: right'>146,229</div>  | <span style="color: green">(-1.0 [-0.1%])</span> <div style='text-align: right'>765.0</div>  | <div style='text-align: right'>68.0</div>  |  |
-| inner_verifier | <span style="color: red">(+250.0 [+0.3%])</span> <div style='text-align: right'>86,329.0</div>  | <div style='text-align: right'>714,932,244</div>  | <span style="color: red">(+16,078 [+0.0%])</span> <div style='text-align: right'>382,229,275</div>  | <span style="color: red">(+574.0 [+0.5%])</span> <div style='text-align: right'>114,674.0</div>  | <span style="color: red">(+324.0 [+1.2%])</span> <div style='text-align: right'>28,345.0</div>  | <span style="color: red">(+763.0 [+1.7%])</span> <div style='text-align: right'>46,257.0</div>  |
+| bench_program_inner | <span style="color: red">(+8.0 [+1.1%])</span> <div style='text-align: right'>705.0</div>  | <div style='text-align: right'>1,326,448</div>  | <div style='text-align: right'>146,229</div>  | <span style="color: red">(+8.0 [+1.0%])</span> <div style='text-align: right'>773.0</div>  | <div style='text-align: right'>68.0</div>  |  |
+| inner_verifier | <span style="color: green">(-219.0 [-0.3%])</span> <div style='text-align: right'>86,110.0</div>  | <div style='text-align: right'>714,932,244</div>  | <span style="color: green">(-25,794 [-0.0%])</span> <div style='text-align: right'>382,203,481</div>  | <span style="color: green">(-317.0 [-0.3%])</span> <div style='text-align: right'>114,357.0</div>  | <span style="color: green">(-98.0 [-0.3%])</span> <div style='text-align: right'>28,247.0</div>  | <span style="color: green">(-279.0 [-0.6%])</span> <div style='text-align: right'>45,978.0</div>  |
 
 | group | air_name | cells | constraints | interactions | main_cols | perm_cols | prep_cols | quotient_deg | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -37,4 +37,4 @@
 [![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/66b11cdbbb452154ffae20602ef4a0a4c93d593c/small_e2e.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/66b11cdbbb452154ffae20602ef4a0a4c93d593c/small_e2e.dsl_ir.opcode.frequency.svg)
 Commit: https://github.com/axiom-crypto/afs-prototype/commit/66b11cdbbb452154ffae20602ef4a0a4c93d593c
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11410942000)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11410946590)
