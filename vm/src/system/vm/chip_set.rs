@@ -54,7 +54,7 @@ use crate::{
     rv32im::{
         adapters::{
             Rv32BaseAluAdapterChip, Rv32BranchAdapterChip, Rv32CondRdWriteAdapterChip,
-            Rv32JalrAdapter, Rv32LoadStoreAdapter, Rv32MultAdapter, Rv32RdWriteAdapterChip,
+            Rv32JalrAdapterChip, Rv32LoadStoreAdapter, Rv32MultAdapter, Rv32RdWriteAdapterChip,
         },
         base_alu::{BaseAluCoreChip, Rv32BaseAluChip},
         branch_eq::{BranchEqualCoreChip, Rv32BranchEqualChip},
@@ -447,8 +447,12 @@ impl VmConfig {
                 }
                 ExecutorName::JalrRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32JalrChip::new(
-                        Rv32JalrAdapter::new(),
-                        Rv32JalrCoreChip::new(offset),
+                        Rv32JalrAdapterChip::new(
+                            execution_bus,
+                            program_bus,
+                            memory_controller.clone(),
+                        ),
+                        Rv32JalrCoreChip::new(byte_xor_chip.clone(), range_checker.clone(), offset),
                         memory_controller.clone(),
                     )));
                     for opcode in range {

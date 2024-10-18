@@ -9,7 +9,7 @@ use afs_stark_backend::interaction::InteractionBuilder;
 use p3_air::{AirBuilder, BaseAir};
 use p3_field::{AbstractField, Field, PrimeField32};
 
-use super::RV32_REGISTER_NUM_LANES;
+use super::{JumpUiProcessedInstruction, RV32_REGISTER_NUM_LANES};
 use crate::{
     arch::{
         AdapterAirContext, AdapterRuntimeContext, BasicAdapterInterface, ExecutionBridge,
@@ -25,15 +25,8 @@ use crate::{
     },
 };
 
-#[repr(C)]
-#[derive(AlignedBorrow)]
-pub struct JumpUiProcessedInstruction<T> {
-    pub is_valid: T,
-    /// Absolute opcode number
-    pub opcode: T,
-    pub immediate: T,
-}
-
+type Rv32RdWriteAdapterInterface<T> =
+    BasicAdapterInterface<T, JumpUiProcessedInstruction<T>, 0, 1, 0, RV32_REGISTER_NUM_LANES>;
 /// This adapter doesn't read anything, and writes to [a:4]_d, where d == 1
 #[derive(Debug, Clone)]
 pub struct Rv32RdWriteAdapterChip<F: Field> {
@@ -85,9 +78,6 @@ pub struct Rv32RdWriteWriteRecord<F: Field> {
     pub from_state: ExecutionState<u32>,
     pub rd: Option<MemoryWriteRecord<F, RV32_REGISTER_NUM_LANES>>,
 }
-
-type Rv32RdWriteAdapterInterface<T> =
-    BasicAdapterInterface<T, JumpUiProcessedInstruction<T>, 0, 1, 0, RV32_REGISTER_NUM_LANES>;
 
 #[repr(C)]
 #[derive(Debug, Clone, AlignedBorrow)]

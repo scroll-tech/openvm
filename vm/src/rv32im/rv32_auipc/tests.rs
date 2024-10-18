@@ -11,14 +11,14 @@ use p3_field::{AbstractField, PrimeField32};
 use p3_matrix::{dense::RowMajorMatrix, Matrix};
 use rand::{rngs::StdRng, Rng};
 
-use super::{Rv32AuipcChip, Rv32AuipcCols, Rv32AuipcCoreChip};
+use super::{Rv32AuipcChip, Rv32AuipcCoreChip, Rv32AuipcCoreCols};
 use crate::{
     arch::{
         instructions::{
             Rv32AuipcOpcode::{self, *},
             UsizeOpcode,
         },
-        testing::{memory::gen_pointer, VmChipTestBuilder},
+        testing::VmChipTestBuilder,
         VmAdapterChip,
     },
     kernels::core::BYTE_XOR_BUS,
@@ -42,7 +42,7 @@ fn set_and_execute(
     initial_pc: Option<u32>,
 ) {
     let imm = imm.unwrap_or(rng.gen_range(0..(1 << IMM_BITS))) as usize;
-    let a = gen_pointer(rng, 32);
+    let a = rng.gen_range(0..32) << 2;
 
     tester.execute_with_pc(
         chip,
@@ -136,7 +136,7 @@ fn run_negative_auipc_test(
 
         let (_, core_row) = trace_row.split_at_mut(adapter_width);
 
-        let core_cols: &mut Rv32AuipcCols<F> = core_row.borrow_mut();
+        let core_cols: &mut Rv32AuipcCoreCols<F> = core_row.borrow_mut();
 
         if let Some(data) = rd_data {
             core_cols.rd_data = data.map(F::from_canonical_u32);

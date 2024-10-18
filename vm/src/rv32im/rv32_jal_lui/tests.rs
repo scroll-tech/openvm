@@ -25,7 +25,7 @@ use crate::{
             Rv32CondRdWriteAdapterChip, Rv32CondRdWriteAdapterCols, PC_BITS, RV32_CELL_BITS,
             RV32_REGISTER_NUM_LANES, RV_IS_TYPE_IMM_BITS,
         },
-        rv32_jal_lui::Rv32JalLuiCols,
+        rv32_jal_lui::Rv32JalLuiCoreCols,
     },
     system::program::Instruction,
 };
@@ -48,7 +48,7 @@ fn set_and_execute(
         LUI => imm,
     };
 
-    let a = rng.gen_range(1..32) << 2;
+    let a = rng.gen_range((opcode == LUI) as usize..32) << 2;
     let needs_write = a != 0 || opcode == LUI;
 
     tester.execute_with_pc(
@@ -156,7 +156,7 @@ fn run_negative_jal_lui_test(
         let (adapter_row, core_row) = trace_row.split_at_mut(adapter_width);
 
         let adapter_cols: &mut Rv32CondRdWriteAdapterCols<F> = adapter_row.borrow_mut();
-        let core_cols: &mut Rv32JalLuiCols<F> = core_row.borrow_mut();
+        let core_cols: &mut Rv32JalLuiCoreCols<F> = core_row.borrow_mut();
 
         if let Some(data) = rd_data {
             core_cols.rd_data = data.map(F::from_canonical_u32);
