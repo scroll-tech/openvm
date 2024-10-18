@@ -1,6 +1,6 @@
 | group | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_proof_time_ms | trace_gen_time_ms |
 | --- | --- | --- | --- | --- | --- |
-| fibonacci_program_inner | <span style="color: green">(-3.0 [-0.9%])</span> <div style='text-align: right'>319.0</div>  | <div style='text-align: right'>603,684</div>  | <div style='text-align: right'>3,737</div>  | <span style="color: green">(-3.0 [-0.8%])</span> <div style='text-align: right'>386.0</div>  | <div style='text-align: right'>67.0</div>  |
+| fibonacci_program_inner | <span style="color: red">(+3.0 [+0.9%])</span> <div style='text-align: right'>322.0</div>  | <div style='text-align: right'>603,684</div>  | <div style='text-align: right'>3,737</div>  | <span style="color: red">(+3.0 [+0.8%])</span> <div style='text-align: right'>389.0</div>  | <div style='text-align: right'>67.0</div>  |
 
 | group | air_name | cells | constraints | interactions | main_cols | perm_cols | prep_cols | quotient_deg | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -19,4 +19,4 @@
 [![](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/66b11cdbbb452154ffae20602ef4a0a4c93d593c/tiny_e2e.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-staging-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/66b11cdbbb452154ffae20602ef4a0a4c93d593c/tiny_e2e.dsl_ir.opcode.frequency.svg)
 Commit: https://github.com/axiom-crypto/afs-prototype/commit/66b11cdbbb452154ffae20602ef4a0a4c93d593c
 AWS Instance Type: [r7g.16xlarge](https://instances.vantage.sh/aws/ec2/r7g.16xlarge)
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11410942000)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11410946590)
