@@ -1,7 +1,6 @@
 use std::{
     borrow::{Borrow, BorrowMut},
     cell::RefCell,
-    marker::PhantomData,
 };
 
 use afs_derive::AlignedBorrow;
@@ -12,8 +11,8 @@ use p3_field::{AbstractField, Field, PrimeField32};
 use super::{JumpUiProcessedInstruction, RV32_REGISTER_NUM_LANES};
 use crate::{
     arch::{
-        AdapterAirContext, AdapterRuntimeContext, ExecutionBridge, ExecutionBus, ExecutionState,
-        Result, VmAdapterAir, VmAdapterChip, VmAdapterInterface,
+        AdapterAirContext, AdapterRuntimeContext, BasicAdapterInterface, ExecutionBridge,
+        ExecutionBus, ExecutionState, Result, VmAdapterAir, VmAdapterChip, VmAdapterInterface,
     },
     system::{
         memory::{
@@ -65,14 +64,6 @@ pub struct Rv32BranchWriteRecord {
     pub from_state: ExecutionState<u32>,
 }
 
-pub struct Rv32BranchAdapterInterface<T>(PhantomData<T>);
-
-impl<T> VmAdapterInterface<T> for Rv32BranchAdapterInterface<T> {
-    type Reads = [[T; RV32_REGISTER_NUM_LANES]; 2];
-    type Writes = ();
-    type ProcessedInstruction = JumpUiProcessedInstruction<T>;
-}
-
 #[repr(C)]
 #[derive(AlignedBorrow)]
 pub struct Rv32BranchAdapterCols<T> {
@@ -95,7 +86,14 @@ impl<F: Field> BaseAir<F> for Rv32BranchAdapterAir {
 }
 
 impl<AB: InteractionBuilder> VmAdapterAir<AB> for Rv32BranchAdapterAir {
-    type Interface = Rv32BranchAdapterInterface<AB::Expr>;
+    type Interface = BasicAdapterInterface<
+        AB::Expr,
+        JumpUiProcessedInstruction<AB::Expr>,
+        2,
+        0,
+        RV32_REGISTER_NUM_LANES,
+        0,
+    >;
 
     fn eval(
         &self,
@@ -156,7 +154,8 @@ impl<F: PrimeField32> VmAdapterChip<F> for Rv32BranchAdapterChip<F> {
     type ReadRecord = Rv32BranchReadRecord<F>;
     type WriteRecord = Rv32BranchWriteRecord;
     type Air = Rv32BranchAdapterAir;
-    type Interface = Rv32BranchAdapterInterface<F>;
+    type Interface =
+        BasicAdapterInterface<F, JumpUiProcessedInstruction<F>, 2, 0, RV32_REGISTER_NUM_LANES, 0>;
 
     fn preprocess(
         &mut self,
