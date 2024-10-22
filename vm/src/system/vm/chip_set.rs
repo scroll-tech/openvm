@@ -56,8 +56,8 @@ use crate::{
     rv32im::{
         adapters::{
             Rv32BaseAluAdapterChip, Rv32BranchAdapterChip, Rv32CondRdWriteAdapterChip,
-            Rv32JalrAdapterChip, Rv32LoadStoreAdapterChip, Rv32MultAdapter, Rv32RdWriteAdapterChip,
-            Rv32VecHeapAdapterChip,
+            Rv32JalrAdapterChip, Rv32LoadStoreAdapterChip, Rv32MultAdapterChip,
+            Rv32RdWriteAdapterChip, Rv32VecHeapAdapterChip,
         },
         base_alu::{BaseAluCoreChip, Rv32BaseAluChip},
         branch_eq::{BranchEqualCoreChip, Rv32BranchEqualChip},
@@ -159,9 +159,6 @@ impl VmConfig {
         let range_bus = VariableRangeCheckerBus::new(RANGE_CHECKER_BUS, self.memory_config.decomp);
         let range_checker = Arc::new(VariableRangeCheckerChip::new(range_bus));
         let byte_xor_chip = Arc::new(XorLookupChip::new(BYTE_XOR_BUS));
-        let range_tuple_bus =
-            RangeTupleCheckerBus::new(RANGE_TUPLE_CHECKER_BUS, [(1 << 8), 32 * (1 << 8)]);
-        let range_tuple_checker = Arc::new(RangeTupleCheckerChip::new(range_tuple_bus));
 
         let memory_controller = match self.memory_config.persistence_type {
             PersistenceType::Volatile => {
@@ -190,6 +187,13 @@ impl VmConfig {
         // That is, if chip A holds a strong reference to chip B, then A must precede B in `required_executors`.
         let mut required_executors: BTreeSet<_> = self.executors.clone().into_iter().collect();
         let mut chips = vec![];
+
+        let mul_u256_enabled = required_executors.contains(&ExecutorName::U256Multiplication);
+        let range_tuple_bus = RangeTupleCheckerBus::new(
+            RANGE_TUPLE_CHECKER_BUS,
+            [(1 << 8), if mul_u256_enabled { 32 } else { 8 } * (1 << 8)],
+        );
+        let range_tuple_checker = Arc::new(RangeTupleCheckerChip::new(range_tuple_bus));
 
         // CoreChip is always required even if it's not explicitly specified.
         required_executors.insert(ExecutorName::Core);
@@ -314,7 +318,11 @@ impl VmConfig {
                 }
                 ExecutorName::MultiplicationRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32MultiplicationChip::new(
-                        Rv32MultAdapter::new(execution_bus, program_bus, memory_controller.clone()),
+                        Rv32MultAdapterChip::new(
+                            execution_bus,
+                            program_bus,
+                            memory_controller.clone(),
+                        ),
                         MultiplicationCoreChip::new(range_tuple_checker.clone(), offset),
                         memory_controller.clone(),
                     )));
@@ -325,8 +333,16 @@ impl VmConfig {
                 }
                 ExecutorName::MultiplicationHighRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32MulHChip::new(
-                        Rv32MultAdapter::new(execution_bus, program_bus, memory_controller.clone()),
-                        MulHCoreChip::new(range_tuple_checker.clone(), offset),
+                        Rv32MultAdapterChip::new(
+                            execution_bus,
+                            program_bus,
+                            memory_controller.clone(),
+                        ),
+                        MulHCoreChip::new(
+                            byte_xor_chip.clone(),
+                            range_tuple_checker.clone(),
+                            offset,
+                        ),
                         memory_controller.clone(),
                     )));
                     for opcode in range {
@@ -349,7 +365,11 @@ impl VmConfig {
                 }
                 ExecutorName::DivRemRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32DivRemChip::new(
-                        Rv32MultAdapter::new(execution_bus, program_bus, memory_controller.clone()),
+                        Rv32MultAdapterChip::new(
+                            execution_bus,
+                            program_bus,
+                            memory_controller.clone(),
+                        ),
                         DivRemCoreChip::new(range_tuple_checker.clone(), offset),
                         memory_controller.clone(),
                     )));
