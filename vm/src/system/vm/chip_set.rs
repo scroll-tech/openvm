@@ -760,7 +760,7 @@ impl VmConfig {
             chips.push(AxVmChip::RangeTupleChecker(range_tuple_checker));
         }
 
-        let connector_chip = VmConnectorChip::new(execution_bus);
+        let connector_chip = VmConnectorChip::new(execution_bus, program_bus);
 
         VmChipSet {
             executors,

@@ -80,7 +80,7 @@ impl<F: PrimeField32> VirtualMachine<F> {
 
         loop {
             pc = segment.execute_from_pc(pc)?;
-            if segment.did_terminate() {
+            if segment.did_terminate {
                 break;
             }
 
@@ -88,7 +88,7 @@ impl<F: PrimeField32> VirtualMachine<F> {
                 pc,
                 segment.chip_set.connector_chip.boundary_states[1]
                     .unwrap()
-                    .pc
+                    .pc as u32
             );
 
             let config = mem::take(&mut segment.config);
