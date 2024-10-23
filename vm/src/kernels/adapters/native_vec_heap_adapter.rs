@@ -330,7 +330,6 @@ impl<
     ) -> Result<(ExecutionState<u32>, Self::WriteRecord)> {
         let e = instruction.e;
         let mut i = 0;
-        println!("rd_val: {} WRITE_SIZE: {}", read_record.rd_val, WRITE_SIZE);
         let writes = output.writes.map(|write| {
             let record = memory.write(
                 e,
