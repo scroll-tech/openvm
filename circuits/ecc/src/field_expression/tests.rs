@@ -13,11 +13,10 @@ use ax_sdk::{
 use num_bigint_dig::BigUint;
 use p3_air::BaseAir;
 use p3_baby_bear::BabyBear;
-use p3_field::Field;
 use p3_matrix::dense::RowMajorMatrix;
 use rand::RngCore;
 
-use super::{super::test_utils::*, ExprBuilder, FieldExpr, FieldVariableConfig, SymbolicExpr};
+use super::{super::test_utils::*, ExprBuilder, FieldExpr, SymbolicExpr};
 use crate::field_expression::{FieldExprCols, FieldVariable};
 
 const LIMB_BITS: usize = 8;
@@ -51,30 +50,8 @@ fn setup(
         range_decomp,
         field_element_bits,
     );
-    let builder = ExprBuilder::new(
-        prime.clone(),
-        LIMB_BITS,
-        32,
-        range_checker.range_max_bits(),
-        BabyBear::bits() - 2,
-    );
+    let builder = ExprBuilder::new(prime.clone(), LIMB_BITS, 32, range_checker.range_max_bits());
     (subair, range_checker, Rc::new(RefCell::new(builder)))
-}
-
-#[derive(Clone)]
-pub struct TestConfig;
-impl FieldVariableConfig for TestConfig {
-    fn canonical_limb_bits() -> usize {
-        LIMB_BITS
-    }
-
-    fn max_limb_bits() -> usize {
-        29
-    }
-
-    fn num_limbs_per_field_element() -> usize {
-        32
-    }
 }
 
 #[test]

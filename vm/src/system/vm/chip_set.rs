@@ -623,7 +623,6 @@ impl VmConfig {
                             secp256k1_coord_prime(),
                             32,
                             8,
-                            F::bits() - 2,
                             memory_controller.borrow().range_checker.clone(),
                             offset,
                         ),
@@ -645,7 +644,6 @@ impl VmConfig {
                             secp256k1_coord_prime(),
                             32,
                             8,
-                            F::bits() - 2,
                             memory_controller.borrow().range_checker.clone(),
                             offset,
                         ),
@@ -702,7 +700,6 @@ impl VmConfig {
                             8,
                             memory_controller.borrow().range_checker.clone(),
                             class_offset,
-                            F::bits() - 2,
                         ),
                         memory_controller.clone(),
                     )));
@@ -724,7 +721,6 @@ impl VmConfig {
                             8,
                             memory_controller.borrow().range_checker.clone(),
                             class_offset,
-                            F::bits() - 2,
                         ),
                         memory_controller.clone(),
                     )));
@@ -746,7 +742,6 @@ impl VmConfig {
                             8,
                             memory_controller.borrow().range_checker.clone(),
                             class_offset,
-                            F::bits() - 2,
                         ),
                         memory_controller.clone(),
                     )));
@@ -768,7 +763,6 @@ impl VmConfig {
                             8,
                             memory_controller.borrow().range_checker.clone(),
                             class_offset,
-                            F::bits() - 2,
                         ),
                         memory_controller.clone(),
                     )));
@@ -790,7 +784,6 @@ impl VmConfig {
                             8,
                             memory_controller.borrow().range_checker.clone(),
                             class_offset,
-                            F::bits() - 2,
                         ),
                         memory_controller.clone(),
                     )));
@@ -812,7 +805,6 @@ impl VmConfig {
                             8,
                             memory_controller.borrow().range_checker.clone(),
                             class_offset,
-                            F::bits() - 2,
                         ),
                         memory_controller.clone(),
                     )));
