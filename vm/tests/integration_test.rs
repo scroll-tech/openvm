@@ -38,6 +38,7 @@ use stark_vm::{
         },
     },
 };
+use test_log::test;
 
 const LIMB_BITS: usize = 29;
 

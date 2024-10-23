@@ -10,8 +10,8 @@ use std::{
 use afs_primitives::{
     bigint::utils::secp256k1_coord_prime,
     range_tuple::{RangeTupleCheckerBus, RangeTupleCheckerChip},
-    var_range::{bus::VariableRangeCheckerBus, VariableRangeCheckerChip},
-    xor::lookup::XorLookupChip,
+    var_range::{VariableRangeCheckerBus, VariableRangeCheckerChip},
+    xor::XorLookupChip,
 };
 use afs_stark_backend::{
     config::{Domain, StarkGenericConfig},
@@ -611,7 +611,6 @@ impl VmConfig {
                     chips.push(AxVmChip::CastF(chip));
                 }
                 // TODO: make these customizable opcode classes
-                // use new ones
                 ExecutorName::Secp256k1AddUnequal => {
                     let chip = Rc::new(RefCell::new(KernelEcAddNeChip::new(
                         NativeVecHeapAdapterChip::<F, 2, 2, 2, 32, 32>::new(
