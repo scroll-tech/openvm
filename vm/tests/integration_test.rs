@@ -7,7 +7,8 @@ use afs_stark_backend::{
 use ax_sdk::{
     config::{
         baby_bear_poseidon2::BabyBearPoseidon2Engine,
-        fri_params::standard_fri_params_with_100_bits_conjectured_security, FriParameters,
+        fri_params::standard_fri_params_with_100_bits_conjectured_security, setup_tracing,
+        FriParameters,
     },
     engine::{StarkEngine, StarkFriEngine},
     utils::create_seeded_rng,
@@ -20,8 +21,8 @@ use stark_vm::{
     arch::{
         instructions::{
             BranchEqualOpcode::*, CoreOpcode::*, FieldArithmeticOpcode::*, FieldExtensionOpcode::*,
-            Keccak256Opcode::*, NativeBranchEqualOpcode, NativeJalOpcode::*, Poseidon2Opcode::*,
-            TerminateOpcode::*, UsizeOpcode,
+            Keccak256Opcode::*, NativeBranchEqualOpcode, NativeJalOpcode::*,
+            NativeLoadStoreOpcode::*, Poseidon2Opcode::*, TerminateOpcode::*, UsizeOpcode,
         },
         ExecutorName,
     },
@@ -52,6 +53,7 @@ where
 
 fn vm_config_with_field_arithmetic() -> VmConfig {
     VmConfig::core()
+        .add_executor(ExecutorName::LoadStore)
         .add_executor(ExecutorName::FieldArithmetic)
         .add_executor(ExecutorName::BranchEqual)
         .add_executor(ExecutorName::Jal)
@@ -82,6 +84,7 @@ fn air_test_with_compress_poseidon2(
         },
         ..VmConfig::core()
     }
+    .add_executor(ExecutorName::LoadStore)
     .add_executor(ExecutorName::Poseidon2);
     let pk = vm_config.generate_pk(engine.keygen_builder());
 
@@ -97,6 +100,7 @@ fn air_test_with_compress_poseidon2(
 
 #[test]
 fn test_vm_1() {
+    setup_tracing();
     let n = 6;
     /*
     Instruction 0 assigns word[0]_1 to n.
@@ -247,11 +251,11 @@ fn test_vm_1_persistent() {
     let config = VmConfig {
         poseidon2_max_constraint_degree: 3,
         memory_config: MemoryConfig::new(1, 16, 10, 6, PersistenceType::Persistent),
-        ..VmConfig::core()
+        ..VmConfig::default_with_no_executors()
     }
+    .add_executor(ExecutorName::LoadStore)
     .add_executor(ExecutorName::FieldArithmetic)
-    .add_executor(ExecutorName::BranchEqual)
-    .add_executor(ExecutorName::Jal);
+    .add_executor(ExecutorName::BranchEqual);
     let pk = config.generate_pk(engine.keygen_builder());
 
     let n = 6;
@@ -497,6 +501,7 @@ fn test_vm_without_field_arithmetic() {
     air_test(
         VirtualMachine::new(
             VmConfig::core()
+                .add_executor(ExecutorName::LoadStore)
                 .add_executor(ExecutorName::BranchEqual)
                 .add_executor(ExecutorName::Jal),
         ),
@@ -602,6 +607,7 @@ fn test_vm_field_extension_arithmetic() {
 
     let vm = VirtualMachine::new(
         VmConfig::core()
+            .add_executor(ExecutorName::LoadStore)
             .add_executor(ExecutorName::FieldArithmetic)
             .add_executor(ExecutorName::FieldExtension),
     );
@@ -635,6 +641,7 @@ fn test_vm_field_extension_arithmetic_persistent() {
             memory_config: MemoryConfig::new(1, 16, 10, 6, PersistenceType::Persistent),
             ..VmConfig::core()
         }
+        .add_executor(ExecutorName::LoadStore)
         .add_executor(ExecutorName::FieldArithmetic)
         .add_executor(ExecutorName::FieldExtension),
     );
@@ -893,6 +900,7 @@ fn test_vm_keccak() {
     air_test(
         VirtualMachine::new(
             VmConfig::core()
+                .add_executor(ExecutorName::LoadStore)
                 .add_executor(ExecutorName::Keccak256)
                 .add_executor(ExecutorName::BranchEqual)
                 .add_executor(ExecutorName::Jal),
@@ -923,6 +931,7 @@ fn test_vm_keccak_non_full_round() {
     air_test(
         VirtualMachine::new(
             VmConfig::core()
+                .add_executor(ExecutorName::LoadStore)
                 .add_executor(ExecutorName::Keccak256)
                 .add_executor(ExecutorName::BranchEqual)
                 .add_executor(ExecutorName::Jal),
