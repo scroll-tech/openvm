@@ -15,6 +15,7 @@ use crate::{
         testing::VmChipTestBuilder,
         VmChipWrapper,
     },
+    intrinsics::test_utils::write_ptr_reg,
     rv32im::adapters::{Rv32VecHeapAdapterChip, RV32_REGISTER_NUM_LIMBS},
     utils::biguint_to_limbs,
 };
@@ -106,17 +107,9 @@ fn test_addsub(opcode_offset: usize, modulus: BigUint) {
         let address2 = 128u32;
         let address3 = 256u32;
 
-        let mut write_reg = |reg_addr, value: u32| {
-            tester.write(
-                ptr_as,
-                reg_addr,
-                value.to_le_bytes().map(BabyBear::from_canonical_u8),
-            );
-        };
-
-        write_reg(addr_ptr1, address1);
-        write_reg(addr_ptr2, address2);
-        write_reg(addr_ptr3, address3);
+        write_ptr_reg(&mut tester, ptr_as, addr_ptr1, address1);
+        write_ptr_reg(&mut tester, ptr_as, addr_ptr2, address2);
+        write_ptr_reg(&mut tester, ptr_as, addr_ptr3, address3);
 
         let a_limbs: [BabyBear; NUM_LIMBS] =
             biguint_to_limbs(a.clone(), LIMB_BITS).map(BabyBear::from_canonical_u32);
@@ -231,17 +224,9 @@ fn test_muldiv(opcode_offset: usize, modulus: BigUint) {
         let address2 = 128;
         let address3 = 256;
 
-        let mut write_reg = |reg_addr, value: u32| {
-            tester.write(
-                ptr_as,
-                reg_addr,
-                value.to_le_bytes().map(BabyBear::from_canonical_u8),
-            );
-        };
-
-        write_reg(addr_ptr1, address1);
-        write_reg(addr_ptr2, address2);
-        write_reg(addr_ptr3, address3);
+        write_ptr_reg(&mut tester, ptr_as, addr_ptr1, address1);
+        write_ptr_reg(&mut tester, ptr_as, addr_ptr2, address2);
+        write_ptr_reg(&mut tester, ptr_as, addr_ptr3, address3);
 
         let a_limbs: [BabyBear; NUM_LIMBS] =
             biguint_to_limbs(a.clone(), LIMB_BITS).map(BabyBear::from_canonical_u32);
