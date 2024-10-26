@@ -2,9 +2,10 @@ use std::{array::from_fn, mem::size_of};
 
 use afs_derive::AlignedBorrow;
 use afs_stark_backend::interaction::InteractionBuilder;
+use axvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP};
 use p3_field::{AbstractField, Field};
 
-use crate::program::{bridge::ProgramBus, ExecutionError, Instruction};
+use crate::system::program::{ExecutionError, ProgramBus};
 
 pub type Result<T> = std::result::Result<T, ExecutionError>;
 
@@ -41,6 +42,11 @@ pub struct ExecutionBridgeInteractor<AB: InteractionBuilder> {
     operands: Vec<AB::Expr>,
     from_state: ExecutionState<AB::Expr>,
     to_state: ExecutionState<AB::Expr>,
+}
+
+pub enum PcIncOrSet<T> {
+    Inc(T),
+    Set(T),
 }
 
 impl<T> ExecutionState<T> {
@@ -104,18 +110,18 @@ impl<F: Field> InstructionCols<F> {
     pub fn from_instruction(instruction: &Instruction<F>) -> Self {
         let Instruction {
             opcode,
-            op_a,
-            op_b,
-            op_c,
+            a,
+            b,
+            c,
             d,
             e,
-            op_f,
-            op_g,
+            f,
+            g,
             ..
         } = instruction;
         Self {
             opcode: F::from_canonical_usize(*opcode),
-            operands: [op_a, op_b, op_c, d, e, op_f, op_g].map(|&f| f),
+            operands: [a, b, c, d, e, f, g].map(|&f| f),
         }
     }
 }
@@ -163,6 +169,25 @@ impl ExecutionBridge {
         }
     }
 
+    /// If `to_pc` is `Some`, then `pc_inc` is ignored and the `to_state` uses `to_pc`. Otherwise `to_pc = from_pc + pc_inc`.
+    pub fn execute_and_increment_or_set_pc<AB: InteractionBuilder>(
+        &self,
+        opcode: impl Into<AB::Expr>,
+        operands: impl IntoIterator<Item = impl Into<AB::Expr>>,
+        from_state: ExecutionState<impl Into<AB::Expr> + Clone>,
+        timestamp_change: impl Into<AB::Expr>,
+        pc_kind: impl Into<PcIncOrSet<AB::Expr>>,
+    ) -> ExecutionBridgeInteractor<AB> {
+        let to_state = ExecutionState {
+            pc: match pc_kind.into() {
+                PcIncOrSet::Set(to_pc) => to_pc,
+                PcIncOrSet::Inc(pc_inc) => from_state.pc.clone().into() + pc_inc,
+            },
+            timestamp: from_state.timestamp.clone().into() + timestamp_change.into(),
+        };
+        self.execute(opcode, operands, from_state, to_state)
+    }
+
     pub fn execute_and_increment_pc<AB: InteractionBuilder>(
         &self,
         opcode: impl Into<AB::Expr>,
@@ -171,7 +196,7 @@ impl ExecutionBridge {
         timestamp_change: impl Into<AB::Expr>,
     ) -> ExecutionBridgeInteractor<AB> {
         let to_state = ExecutionState {
-            pc: from_state.pc.clone().into() + AB::Expr::one(),
+            pc: from_state.pc.clone().into() + AB::Expr::from_canonical_u32(DEFAULT_PC_STEP),
             timestamp: from_state.timestamp.clone().into() + timestamp_change.into(),
         };
         self.execute(opcode, operands, from_state, to_state)
@@ -210,5 +235,14 @@ impl<AB: InteractionBuilder> ExecutionBridgeInteractor<AB> {
 
         self.execution_bus
             .execute(builder, multiplicity, self.from_state, self.to_state);
+    }
+}
+
+impl<T: AbstractField> From<(u32, Option<T>)> for PcIncOrSet<T> {
+    fn from((pc_inc, to_pc): (u32, Option<T>)) -> Self {
+        match to_pc {
+            None => PcIncOrSet::Inc(T::from_canonical_u32(pc_inc)),
+            Some(to_pc) => PcIncOrSet::Set(to_pc),
+        }
     }
 }

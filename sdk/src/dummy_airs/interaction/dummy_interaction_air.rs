@@ -9,9 +9,9 @@ use std::{iter, sync::Arc};
 use afs_stark_backend::{
     air_builders::PartitionedAirBuilder,
     interaction::{InteractionBuilder, InteractionType},
-    prover::types::{AirProofInput, CommittedTraceData, TraceCommitter},
+    prover::types::{AirProofInput, AirProofRawInput, CommittedTraceData, TraceCommitter},
     rap::{AnyRap, BaseAirWithPublicValues, PartitionedBaseAir},
-    Chip,
+    Chip, ChipUsageGetter,
 };
 use itertools::izip;
 use p3_air::{Air, BaseAir};
@@ -120,7 +120,17 @@ pub struct DummyInteractionChip<'a, SC: StarkGenericConfig> {
     trace_committer: Option<TraceCommitter<'a, SC>>,
     // common_main: Option<RowMajorMatrix<Val<SC>>>,
     data: Option<DummyInteractionData>,
-    air: DummyInteractionAir,
+    pub air: DummyInteractionAir,
+}
+
+impl<'pcs, SC: StarkGenericConfig> Clone for DummyInteractionChip<'pcs, SC> {
+    fn clone(&self) -> Self {
+        Self {
+            trace_committer: self.trace_committer.clone(),
+            data: self.data.clone(),
+            air: self.air,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -197,7 +207,7 @@ where
         (
             RowMajorMatrix::new(common_main_val, 1),
             CommittedTraceData {
-                raw_data: cached_trace,
+                raw_data: Arc::new(cached_trace),
                 prover_data,
             },
         )
@@ -228,25 +238,48 @@ impl<'a, SC: StarkGenericConfig> Chip<SC> for DummyInteractionChip<'a, SC> {
         Arc::new(self.air)
     }
 
-    fn generate_air_proof_input(&self) -> AirProofInput<SC> {
+    fn generate_air_proof_input(self) -> AirProofInput<SC> {
         assert!(self.data.is_some());
         let data = self.data.clone().unwrap();
         if self.trace_committer.is_some() {
             let (common_main, cached_main) = self.generate_traces_with_partition(data);
             AirProofInput {
                 air: self.air(),
-                cached_mains: vec![cached_main],
-                common_main: Some(common_main),
-                public_values: vec![],
+                cached_mains_pdata: vec![cached_main.prover_data],
+                raw: AirProofRawInput {
+                    cached_mains: vec![cached_main.raw_data],
+                    common_main: Some(common_main),
+                    public_values: vec![],
+                },
             }
         } else {
             let common_main = self.generate_traces_without_partition(data);
             AirProofInput {
                 air: self.air(),
-                cached_mains: vec![],
-                common_main: Some(common_main),
-                public_values: vec![],
+                cached_mains_pdata: vec![],
+                raw: AirProofRawInput {
+                    cached_mains: vec![],
+                    common_main: Some(common_main),
+                    public_values: vec![],
+                },
             }
         }
+    }
+}
+
+impl<'a, SC: StarkGenericConfig> ChipUsageGetter for DummyInteractionChip<'a, SC> {
+    fn air_name(&self) -> String {
+        "DummyInteractionAir".to_string()
+    }
+    fn current_trace_height(&self) -> usize {
+        if let Some(data) = &self.data {
+            data.count.len()
+        } else {
+            0
+        }
+    }
+
+    fn trace_width(&self) -> usize {
+        self.air.field_width + 1
     }
 }

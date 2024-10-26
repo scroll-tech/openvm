@@ -2,7 +2,8 @@ use std::sync::Arc;
 
 use derivative::Derivative;
 use itertools::Itertools;
-use p3_matrix::dense::RowMajorMatrix;
+use p3_field::Field;
+use p3_matrix::{dense::RowMajorMatrix, Matrix};
 use p3_uni_stark::{StarkGenericConfig, Val};
 use serde::{Deserialize, Serialize};
 
@@ -70,12 +71,15 @@ impl<SC: StarkGenericConfig> ProofInput<SC> {
     pub fn new(per_air: Vec<(usize, AirProofInput<SC>)>) -> Self {
         Self { per_air }
     }
+    pub fn into_air_proof_input_vec(self) -> Vec<AirProofInput<SC>> {
+        self.per_air.into_iter().map(|(_, x)| x).collect()
+    }
 }
 
 #[derive(Derivative)]
 #[derivative(Clone(bound = "Com<SC>: Clone"))]
 pub struct CommittedTraceData<SC: StarkGenericConfig> {
-    pub raw_data: RowMajorMatrix<Val<SC>>,
+    pub raw_data: Arc<RowMajorMatrix<Val<SC>>>,
     pub prover_data: ProverTraceData<SC>,
 }
 
@@ -84,12 +88,20 @@ pub struct CommittedTraceData<SC: StarkGenericConfig> {
 #[derivative(Clone(bound = "Com<SC>: Clone"))]
 pub struct AirProofInput<SC: StarkGenericConfig> {
     pub air: Arc<dyn AnyRap<SC>>,
+    /// Prover data for cached main traces
+    pub cached_mains_pdata: Vec<ProverTraceData<SC>>,
+    pub raw: AirProofRawInput<Val<SC>>,
+}
+
+/// Raw input for proving a single AIR.
+#[derive(Clone, Debug)]
+pub struct AirProofRawInput<F: Field> {
     /// Cached main trace matrices
-    pub cached_mains: Vec<CommittedTraceData<SC>>,
+    pub cached_mains: Vec<Arc<RowMajorMatrix<F>>>,
     /// Common main trace matrix
-    pub common_main: Option<RowMajorMatrix<Val<SC>>>,
+    pub common_main: Option<RowMajorMatrix<F>>,
     /// Public values
-    pub public_values: Vec<Val<SC>>,
+    pub public_values: Vec<F>,
 }
 
 impl<SC: StarkGenericConfig> Proof<SC> {
@@ -134,5 +146,27 @@ impl<SC: StarkGenericConfig> MultiStarkVerifyingKey<SC> {
 impl<SC: StarkGenericConfig> MultiStarkProvingKey<SC> {
     pub fn validate(&self, proof_input: &ProofInput<SC>) -> bool {
         self.get_vk().validate(proof_input)
+    }
+}
+
+impl<F: Field> AirProofRawInput<F> {
+    pub fn height(&self) -> usize {
+        let mut height = None;
+        for m in self.cached_mains.iter() {
+            if let Some(h) = height {
+                assert_eq!(h, m.height());
+            } else {
+                height = Some(m.height());
+            }
+        }
+        let common_h = self.common_main.as_ref().map(|trace| trace.height());
+        if let Some(h) = height {
+            if let Some(common_h) = common_h {
+                assert_eq!(h, common_h);
+            }
+            h
+        } else {
+            common_h.unwrap_or(0)
+        }
     }
 }

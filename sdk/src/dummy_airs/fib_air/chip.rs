@@ -1,11 +1,18 @@
 use std::sync::Arc;
 
-use afs_stark_backend::{prover::types::AirProofInput, rap::AnyRap, Chip};
-use p3_field::{AbstractField, PrimeField32};
+use afs_stark_backend::{
+    prover::types::{AirProofInput, AirProofRawInput},
+    rap::AnyRap,
+    Chip, ChipUsageGetter,
+};
+use p3_field::PrimeField32;
+use p3_matrix::Matrix;
 use p3_uni_stark::{StarkGenericConfig, Val};
 
 use super::{air::FibonacciAir, trace::generate_trace_rows};
+use crate::dummy_airs::fib_air::columns::NUM_FIBONACCI_COLS;
 
+#[derive(Clone, Debug)]
 pub struct FibonacciChip {
     /// The 0th number in the fibonacci sequence.
     pub a: u32,
@@ -30,26 +37,31 @@ where
         Arc::new(FibonacciAir)
     }
 
-    fn generate_air_proof_input(&self) -> AirProofInput<SC> {
+    fn generate_air_proof_input(self) -> AirProofInput<SC> {
+        let common_main = generate_trace_rows::<Val<SC>>(self.a, self.b, self.n);
+        let a = common_main.get(0, 0);
+        let b = common_main.get(0, 1);
+        let last_val = common_main.get(self.n - 1, 1);
         AirProofInput {
             air: self.air(),
-            cached_mains: vec![],
-            common_main: Some(generate_trace_rows::<Val<SC>>(self.a, self.b, self.n)),
-            public_values: [self.a, self.b, get_fib_number(self.n)]
-                .into_iter()
-                .map(Val::<SC>::from_canonical_u32)
-                .collect(),
+            cached_mains_pdata: vec![],
+            raw: AirProofRawInput {
+                cached_mains: vec![],
+                common_main: Some(generate_trace_rows::<Val<SC>>(self.a, self.b, self.n)),
+                public_values: vec![a, b, last_val],
+            },
         }
     }
 }
 
-fn get_fib_number(n: usize) -> u32 {
-    let mut a = 0;
-    let mut b = 1;
-    for _ in 0..n - 1 {
-        let c = a + b;
-        a = b;
-        b = c;
+impl ChipUsageGetter for FibonacciChip {
+    fn air_name(&self) -> String {
+        "FibonacciAir".to_string()
     }
-    b
+    fn current_trace_height(&self) -> usize {
+        self.n
+    }
+    fn trace_width(&self) -> usize {
+        NUM_FIBONACCI_COLS
+    }
 }

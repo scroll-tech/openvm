@@ -1,33 +1,19 @@
-pub mod alu;
+/// Traits and constructs for the axVM architecture.
 pub mod arch;
-pub mod branch_eq;
-pub mod branch_lt;
-pub mod castf;
-pub mod core;
-pub mod ecc;
-pub mod field_arithmetic;
-pub mod field_extension;
-pub mod hashes;
-pub mod loadstore;
-pub mod memory;
-pub mod modular_addsub;
-pub mod modular_multdiv;
-pub mod modular_v2;
-pub mod new_alu;
-pub mod new_divrem;
-pub mod new_lt;
-pub mod new_mul;
-pub mod new_mulh;
-pub mod new_shift;
-pub mod program;
-pub mod rv32_auipc;
-pub mod rv32_jal_lui;
-pub mod rv32_jalr;
-/// SDK functions for running and proving programs in the VM.
+/// Common chips that are not specific to a particular context.
+pub mod common;
+/// Chips to support axVM intrinsic instructions.
+pub mod intrinsics;
+/// Chips to support axVM kernel instructions.
+pub mod kernels;
+/// Chips to support RV32IM instructions.
+pub mod rv32im;
+/// System chips that are always required by the architecture.
+pub mod system;
+
 #[cfg(feature = "sdk")]
 pub mod sdk;
-pub mod shift;
-pub mod uint_multiplication;
-pub mod vm;
-
 mod utils;
+
+// To be deleted:
+pub mod old;

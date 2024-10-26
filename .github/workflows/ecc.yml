@@ -7,10 +7,12 @@ on:
     branches: ["main"]
     paths:
       - "stark-backend/**"
-      - "primitives/**"
+      - "circuits/primitives/**"
       - "vm/**"
-      - "compiler/**"
-      - "ecc/**"
+      - "toolchain/compiler/**"
+      - "circuits/ecc/**"
+      - "lib/ecc/**"
+      - "lib/ecc-execution/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
@@ -22,7 +24,9 @@ env:
 
 jobs:
   tests:
-    runs-on: ubuntu-arm64-16core-64ram
+    runs-on:
+      - runs-on=${{ github.run_id }}
+      - runner=32cpu-linux-arm64
 
     steps:
       - uses: actions/checkout@v4
@@ -33,6 +37,16 @@ jobs:
       - uses: taiki-e/install-action@nextest
 
       - name: Run ecc-lib crate tests
-        working-directory: ecc/lib
+        working-directory: lib/ecc
         run: |
           cargo nextest run --cargo-profile=fast --features parallel
+
+      - name: Run ecc-execution crate tests
+        working-directory: lib/ecc-execution
+        run: |
+          cargo nextest run --cargo-profile=fast
+
+      - name: Run ecc-circuits crate tests
+        working-directory: circuits/ecc
+        run: |
+          RUST_MIN_STACK=8388608 cargo nextest run --cargo-profile=fast --features parallel

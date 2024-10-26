@@ -3,20 +3,18 @@ use std::{array::from_fn, borrow::BorrowMut as _, cell::RefCell, mem::size_of, s
 use afs_stark_backend::{
     config::{StarkGenericConfig, Val},
     interaction::InteractionType,
+    prover::types::AirProofInput,
     rap::AnyRap,
-    Chip,
+    Chip, ChipUsageGetter,
 };
 use air::{DummyMemoryInteractionCols, MemoryDummyAir};
-use p3_field::PrimeField32;
+use p3_field::{AbstractField, PrimeField32};
 use p3_matrix::dense::RowMajorMatrix;
 use rand::{seq::SliceRandom, Rng};
 
-use crate::{
-    arch::chips::VmChip,
-    memory::{
-        offline_checker::{MemoryBus, MemoryBusInteraction},
-        MemoryAddress, MemoryChipRef,
-    },
+use crate::system::memory::{
+    offline_checker::{MemoryBus, MemoryBusInteraction},
+    MemoryAddress, MemoryControllerRef,
 };
 
 pub mod air;
@@ -30,47 +28,54 @@ const WORD_SIZE: usize = 1;
 #[derive(Clone, Debug)]
 pub struct MemoryTester<F: PrimeField32> {
     pub bus: MemoryBus,
-    pub chip: MemoryChipRef<F>,
+    pub controller: MemoryControllerRef<F>,
     /// Log of raw bus messages
     pub records: Vec<MemoryBusInteraction<F>>,
 }
 
 impl<F: PrimeField32> MemoryTester<F> {
-    pub fn new(chip: MemoryChipRef<F>) -> Self {
-        let bus = chip.borrow().memory_bus;
+    pub fn new(controller: MemoryControllerRef<F>) -> Self {
+        let bus = controller.borrow().memory_bus;
         Self {
             bus,
-            chip,
+            controller,
             records: Vec::new(),
         }
     }
 
-    /// Returns the cell value at the current timestamp according to [MemoryChip].
+    /// Returns the cell value at the current timestamp according to [MemoryController].
     pub fn read_cell(&mut self, address_space: usize, pointer: usize) -> F {
         let [addr_space, pointer] = [address_space, pointer].map(F::from_canonical_usize);
         // core::BorrowMut confuses compiler
-        let read = RefCell::borrow_mut(&self.chip).read_cell(addr_space, pointer);
+        let read = RefCell::borrow_mut(&self.controller).read_cell(addr_space, pointer);
         let address = MemoryAddress::new(addr_space, pointer);
-        self.records.push(
-            self.bus
-                .receive(address, read.data.to_vec(), read.prev_timestamp),
-        );
-        self.records
-            .push(self.bus.send(address, read.data.to_vec(), read.timestamp));
+        self.records.push(self.bus.receive(
+            address,
+            read.data.to_vec(),
+            F::from_canonical_u32(read.prev_timestamp),
+        ));
+        self.records.push(self.bus.send(
+            address,
+            read.data.to_vec(),
+            F::from_canonical_u32(read.timestamp),
+        ));
         read.value()
     }
 
     pub fn write_cell(&mut self, address_space: usize, pointer: usize, value: F) {
         let [addr_space, pointer] = [address_space, pointer].map(F::from_canonical_usize);
-        let write = RefCell::borrow_mut(&self.chip).write_cell(addr_space, pointer, value);
+        let write = RefCell::borrow_mut(&self.controller).write_cell(addr_space, pointer, value);
         let address = MemoryAddress::new(addr_space, pointer);
         self.records.push(self.bus.receive(
             address,
             write.prev_data.to_vec(),
-            write.prev_timestamp,
+            F::from_canonical_u32(write.prev_timestamp),
         ));
-        self.records
-            .push(self.bus.send(address, write.data.to_vec(), write.timestamp));
+        self.records.push(self.bus.send(
+            address,
+            write.data.to_vec(),
+            F::from_canonical_u32(write.timestamp),
+        ));
     }
 
     pub fn read<const N: usize>(&mut self, address_space: usize, pointer: usize) -> [F; N] {
@@ -90,45 +95,45 @@ impl<F: PrimeField32> MemoryTester<F> {
     }
 }
 
-impl<F: PrimeField32> VmChip<F> for MemoryTester<F> {
-    fn generate_trace(self) -> RowMajorMatrix<F> {
-        let height = self.records.len().next_power_of_two();
-        let width = self.trace_width();
-        let mut values = vec![F::zero(); height * width];
-        // This zip only goes through records. The padding rows between records.len()..height
-        // are filled with zeros - in particular count = 0 so nothing is added to bus.
-        for (row, record) in values.chunks_mut(width).zip(self.records) {
-            let row: &mut DummyMemoryInteractionCols<F, WORD_SIZE> = row.borrow_mut();
-            row.address = record.address;
-            row.data = record.data.try_into().unwrap();
-            row.timestamp = record.timestamp;
-            row.count = match record.interaction_type {
-                InteractionType::Send => F::one(),
-                InteractionType::Receive => -F::one(),
-            };
-        }
-        RowMajorMatrix::new(values, width)
-    }
-
-    fn air_name(&self) -> String {
-        "MemoryDummyAir".to_string()
-    }
-
-    fn current_trace_height(&self) -> usize {
-        self.records.len() / self.trace_width()
-    }
-
-    fn trace_width(&self) -> usize {
-        size_of::<DummyMemoryInteractionCols<u8, WORD_SIZE>>()
-    }
-}
-
 impl<SC: StarkGenericConfig> Chip<SC> for MemoryTester<Val<SC>>
 where
     Val<SC>: PrimeField32,
 {
     fn air(&self) -> Arc<dyn AnyRap<SC>> {
         Arc::new(MemoryDummyAir::<WORD_SIZE>::new(self.bus))
+    }
+
+    fn generate_air_proof_input(self) -> AirProofInput<SC> {
+        let air = self.air();
+        let height = self.records.len().next_power_of_two();
+        let width = self.trace_width();
+        let mut values = vec![Val::<SC>::zero(); height * width];
+        // This zip only goes through records. The padding rows between records.len()..height
+        // are filled with zeros - in particular count = 0 so nothing is added to bus.
+        for (row, record) in values.chunks_mut(width).zip(self.records) {
+            let row: &mut DummyMemoryInteractionCols<Val<SC>, WORD_SIZE> = row.borrow_mut();
+            row.address = record.address;
+            row.data = record.data.try_into().unwrap();
+            row.timestamp = record.timestamp;
+            row.count = match record.interaction_type {
+                InteractionType::Send => Val::<SC>::one(),
+                InteractionType::Receive => -Val::<SC>::one(),
+            };
+        }
+        AirProofInput::simple_no_pis(air, RowMajorMatrix::new(values, width))
+    }
+}
+
+impl<F: PrimeField32> ChipUsageGetter for MemoryTester<F> {
+    fn air_name(&self) -> String {
+        "MemoryDummyAir".to_string()
+    }
+    fn current_trace_height(&self) -> usize {
+        self.records.len() / self.trace_width()
+    }
+
+    fn trace_width(&self) -> usize {
+        size_of::<DummyMemoryInteractionCols<u8, WORD_SIZE>>()
     }
 }
 
