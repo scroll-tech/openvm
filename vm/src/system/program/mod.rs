@@ -1,12 +1,10 @@
 use std::{error::Error, fmt::Display};
 
 use afs_stark_backend::ChipUsageGetter;
-pub use air::*;
 use axvm_instructions::{
     instruction::{DebugInfo, Instruction},
     program::Program,
 };
-pub use bus::*;
 use p3_field::PrimeField64;
 
 use crate::system::{program::trace::padding_instruction, vm::chip_set::READ_INSTRUCTION_BUS};
@@ -19,11 +17,18 @@ mod bus;
 pub mod trace;
 pub mod util;
 
+pub use air::*;
+pub use bus::*;
+
 const EXIT_CODE_FAIL: usize = 1;
 
 #[derive(Debug)]
 pub enum ExecutionError {
+    /// pc
     Fail(u32),
+    /// pc, step, pc_base, program_len
+    PcNotFound(u32, u32, u32, usize),
+    /// pc, step, pc_base, program_len
     PcOutOfBounds(u32, u32, u32, usize),
     DisabledOperation(u32, usize),
     HintOutOfBounds(u32),
@@ -36,6 +41,11 @@ impl Display for ExecutionError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ExecutionError::Fail(pc) => write!(f, "execution failed at pc = {}", pc),
+            ExecutionError::PcNotFound(pc, step, pc_base, program_len) => write!(
+                f,
+                "pc = {} not found for program of length {}, with pc_base = {} and step = {}",
+                pc, program_len, pc_base, step
+            ),
             ExecutionError::PcOutOfBounds(pc, step, pc_base, program_len) => write!(
                 f,
                 "pc = {} out of bounds for program of length {}, with pc_base = {} and step = {}",
@@ -133,7 +143,16 @@ impl<F: PrimeField64> ProgramChip<F> {
     ) -> Result<(Instruction<F>, Option<DebugInfo>), ExecutionError> {
         let pc_index = self.get_pc_index(pc)?;
         self.execution_frequencies[pc_index] += 1;
-        Ok(self.program.instructions_and_debug_infos[&pc].clone())
+        self.program
+            .instructions_and_debug_infos
+            .get(&pc)
+            .cloned()
+            .ok_or(ExecutionError::PcNotFound(
+                pc,
+                self.program.step,
+                self.program.pc_base,
+                self.program.instructions_and_debug_infos.len(),
+            ))
     }
 }
 

@@ -5,8 +5,12 @@ use itertools::Itertools;
 use crate::instruction::{DebugInfo, Instruction};
 
 pub const PC_BITS: usize = 30;
+/// We use default PC step of 4 whenever possible for consistency with RISC-V, where 4 comes
+/// from the fact that each standard RISC-V instruction is 32-bits = 4 bytes.
+pub const DEFAULT_PC_STEP: u32 = 4;
 
 const MAX_ALLOWED_PC: u32 = (1 << PC_BITS) - 1;
+
 #[derive(Clone, Debug, Default)]
 pub struct Program<F> {
     /// A map from program counter to instruction.
@@ -51,7 +55,8 @@ impl<F> Program<F> {
         }
     }
 
-    // We assume that pc_start = pc_base = 0 everywhere except the RISC-V programs, until we need otherwise
+    /// We assume that pc_start = pc_base = 0 everywhere except the RISC-V programs, until we need otherwise
+    /// We use [DEFAULT_PC_STEP] for consistency with RISC-V
     pub fn from_instructions_and_debug_infos(
         instructions: &[Instruction<F>],
         debug_infos: &[Option<DebugInfo>],
@@ -67,12 +72,12 @@ impl<F> Program<F> {
                 .enumerate()
                 .map(|(index, (instruction, debug_info))| {
                     (
-                        index as u32,
+                        (index as u32) * DEFAULT_PC_STEP,
                         ((*instruction).clone(), (*debug_info).clone()),
                     )
                 })
                 .collect(),
-            step: 1,
+            step: DEFAULT_PC_STEP,
             pc_start: 0,
             pc_base: 0,
         }
@@ -82,7 +87,7 @@ impl<F> Program<F> {
     where
         F: Clone,
     {
-        Self::from_instructions_and_step(instructions, 1, 0, 0)
+        Self::from_instructions_and_step(instructions, DEFAULT_PC_STEP, 0, 0)
     }
 
     pub fn len(&self) -> usize {

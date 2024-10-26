@@ -13,7 +13,11 @@ use ax_sdk::{
     engine::{StarkEngine, StarkFriEngine},
     utils::create_seeded_rng,
 };
-use axvm_instructions::{instruction::Instruction, program::Program, PublishOpcode::PUBLISH};
+use axvm_instructions::{
+    instruction::Instruction,
+    program::{Program, DEFAULT_PC_STEP},
+    PublishOpcode::PUBLISH,
+};
 use p3_baby_bear::BabyBear;
 use p3_field::{AbstractField, PrimeField32};
 use rand::Rng;
@@ -113,19 +117,26 @@ fn test_vm_1() {
     let instructions = vec![
         // word[0]_1 <- word[n]_0
         Instruction::from_isize(STOREW.with_default_offset(), n, 0, 0, 0, 1),
-        // if word[0]_1 == 0 then pc += 3
+        // if word[0]_1 == 0 then pc += 3 * DEFAULT_PC_STEP
         Instruction::from_isize(
             NativeBranchEqualOpcode(BEQ).with_default_offset(),
             0,
             0,
-            3,
+            3 * DEFAULT_PC_STEP as isize,
             1,
             0,
         ),
         // word[0]_1 <- word[0]_1 - word[1]_0
         Instruction::large_from_isize(SUB.with_default_offset(), 0, 0, 1, 1, 1, 0, 0),
-        // word[2]_1 <- pc + 1, pc -= 2
-        Instruction::from_isize(JAL.with_default_offset(), 2, -2, 0, 1, 0),
+        // word[2]_1 <- pc + DEFAULT_PC_STEP, pc -= 2 * DEFAULT_PC_STEP
+        Instruction::from_isize(
+            JAL.with_default_offset(),
+            2,
+            -2 * DEFAULT_PC_STEP as isize,
+            0,
+            1,
+            0,
+        ),
         // terminate
         Instruction::from_isize(TERMINATE.with_default_offset(), 0, 0, 0, 0, 0),
     ];
@@ -157,7 +168,7 @@ fn test_vm_1_optional_air() {
                 NativeBranchEqualOpcode(BNE).with_default_offset(),
                 0,
                 0,
-                -1,
+                -(DEFAULT_PC_STEP as isize),
                 1,
                 0,
             ),
@@ -218,7 +229,7 @@ fn test_vm_initial_memory() {
             NativeBranchEqualOpcode(BEQ).with_default_offset(),
             0,
             101,
-            2,
+            2 * DEFAULT_PC_STEP as isize,
             1,
             0,
         ),
@@ -267,7 +278,7 @@ fn test_vm_1_persistent() {
             NativeBranchEqualOpcode(BNE).with_default_offset(),
             0,
             0,
-            -1,
+            -(DEFAULT_PC_STEP as isize),
             1,
             0,
         ),
@@ -339,7 +350,7 @@ fn test_vm_continuations() {
             NativeBranchEqualOpcode(BNE).with_default_offset(),
             n,
             0,
-            -4,
+            -4 * DEFAULT_PC_STEP as isize,
             0,
             1,
         ),
@@ -476,17 +487,24 @@ fn test_vm_without_field_arithmetic() {
     let instructions = vec![
         // word[0]_1 <- word[5]_0
         Instruction::from_isize(STOREW.with_default_offset(), 5, 0, 0, 0, 1),
-        // if word[0]_1 != 4 then pc += 2
+        // if word[0]_1 != 4 then pc += 3 * DEFAULT_PC_STEP
         Instruction::from_isize(
             NativeBranchEqualOpcode(BNE).with_default_offset(),
             0,
             4,
-            3,
+            3 * DEFAULT_PC_STEP as isize,
             1,
             0,
         ),
-        // word[2]_1 <- pc + 1, pc -= 2
-        Instruction::from_isize(JAL.with_default_offset(), 2, -2, 0, 1, 0),
+        // word[2]_1 <- pc + DEFAULT_PC_STEP, pc -= 2 * DEFAULT_PC_STEP
+        Instruction::from_isize(
+            JAL.with_default_offset(),
+            2,
+            -2 * DEFAULT_PC_STEP as isize,
+            0,
+            1,
+            0,
+        ),
         // terminate
         Instruction::from_isize(TERMINATE.with_default_offset(), 0, 0, 0, 0, 0),
         // if word[0]_1 == 5 then pc -= 1
@@ -494,7 +512,7 @@ fn test_vm_without_field_arithmetic() {
             NativeBranchEqualOpcode(BEQ).with_default_offset(),
             0,
             5,
-            -1,
+            -(DEFAULT_PC_STEP as isize),
             1,
             0,
         ),
@@ -525,7 +543,7 @@ fn test_vm_fibonacci_old() {
             NativeBranchEqualOpcode(BEQ).with_default_offset(),
             2,
             0,
-            7,
+            7 * DEFAULT_PC_STEP as isize,
             1,
             1,
         ),
@@ -534,7 +552,14 @@ fn test_vm_fibonacci_old() {
         Instruction::from_isize(LOADW.with_default_offset(), 5, -1, 2, 1, 2),
         Instruction::large_from_isize(ADD.with_default_offset(), 6, 4, 5, 1, 1, 1, 0),
         Instruction::from_isize(STOREW.with_default_offset(), 6, 0, 2, 1, 2),
-        Instruction::from_isize(JAL.with_default_offset(), 7, -6, 0, 1, 0),
+        Instruction::from_isize(
+            JAL.with_default_offset(),
+            7,
+            -6 * DEFAULT_PC_STEP as isize,
+            0,
+            1,
+            0,
+        ),
         Instruction::from_isize(TERMINATE.with_default_offset(), 0, 0, 0, 0, 0),
     ];
 
@@ -563,7 +588,7 @@ fn test_vm_fibonacci_old_cycle_tracker() {
             NativeBranchEqualOpcode(BEQ).with_default_offset(),
             2,
             0,
-            9,
+            9 * DEFAULT_PC_STEP as isize,
             1,
             1,
         ), // Instruction::from_isize(BEQ.with_default_offset(), 2, 0, 7, 1, 1),
@@ -574,7 +599,14 @@ fn test_vm_fibonacci_old_cycle_tracker() {
         Instruction::large_from_isize(ADD.with_default_offset(), 6, 4, 5, 1, 1, 1, 0),
         Instruction::from_isize(STOREW.with_default_offset(), 6, 0, 2, 1, 2),
         Instruction::debug(CT_END.with_default_offset(), "inner loop"),
-        Instruction::from_isize(JAL.with_default_offset(), 7, -8, 0, 1, 0), // Instruction::from_isize(JAL.with_default_offset(), 7, -6, 0, 1, 0),
+        Instruction::from_isize(
+            JAL.with_default_offset(),
+            7,
+            -8 * DEFAULT_PC_STEP as isize,
+            0,
+            1,
+            0,
+        ),
         Instruction::debug(CT_END.with_default_offset(), "total loop"),
         Instruction::debug(CT_END.with_default_offset(), "full program"),
         Instruction::from_isize(TERMINATE.with_default_offset(), 0, 0, 0, 0, 0),
@@ -667,7 +699,14 @@ fn test_vm_hint() {
         Instruction::from_isize(MUL.with_default_offset(), 24, 38, 1, 1, 0),
         Instruction::large_from_isize(ADD.with_default_offset(), 20, 20, 24, 1, 1, 1, 0),
         Instruction::large_from_isize(ADD.with_default_offset(), 50, 16, 0, 1, 1, 0, 0),
-        Instruction::from_isize(JAL.with_default_offset(), 24, 6, 0, 1, 0),
+        Instruction::from_isize(
+            JAL.with_default_offset(),
+            24,
+            6 * DEFAULT_PC_STEP as isize,
+            0,
+            1,
+            0,
+        ),
         Instruction::from_isize(MUL.with_default_offset(), 0, 50, 1, 1, 0),
         Instruction::large_from_isize(ADD.with_default_offset(), 0, 44, 0, 1, 1, 1, 0),
         Instruction::from_isize(SHINTW.with_default_offset(), 0, 0, 0, 1, 2),
@@ -676,7 +715,7 @@ fn test_vm_hint() {
             NativeBranchEqualOpcode(BNE).with_default_offset(),
             50,
             38,
-            2013265917,
+            -4 * (DEFAULT_PC_STEP as isize),
             1,
             1,
         ),
@@ -684,7 +723,7 @@ fn test_vm_hint() {
             NativeBranchEqualOpcode(BNE).with_default_offset(),
             50,
             38,
-            2013265916,
+            -5 * (DEFAULT_PC_STEP as isize),
             1,
             1,
         ),
@@ -792,7 +831,7 @@ fn instructions_for_keccak256_test(input: &[u8]) -> Vec<Instruction<BabyBear>> {
     instructions.push(Instruction::from_isize(
         JAL.with_default_offset(),
         0,
-        2,
+        2 * DEFAULT_PC_STEP as isize,
         0,
         1,
         0,
@@ -869,7 +908,7 @@ fn instructions_for_keccak256_test(input: &[u8]) -> Vec<Instruction<BabyBear>> {
             NativeBranchEqualOpcode(BNE).with_default_offset(),
             dst + i as isize,
             expected_byte as isize,
-            -(instructions.len() as isize) + 1, // jump to fail
+            (-(instructions.len() as isize) + 1) * DEFAULT_PC_STEP as isize, // jump to fail
             2,
             0,
         ));

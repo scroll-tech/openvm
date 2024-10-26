@@ -1,4 +1,5 @@
 use afs_stark_backend::interaction::InteractionBuilder;
+use axvm_instructions::program::DEFAULT_PC_STEP;
 use p3_field::AbstractField;
 
 use super::{columns::CoreIoCols, CoreAir};
@@ -17,7 +18,7 @@ impl CoreAir {
                 [io.a, io.b, io.c, io.d, io.e],
                 ExecutionState::new(io.pc, io.timestamp),
                 ExecutionState::<AB::Expr>::new(
-                    io.pc + AB::Expr::one(),
+                    io.pc + AB::Expr::from_canonical_u32(DEFAULT_PC_STEP),
                     io.timestamp + AB::Expr::one(),
                 ),
             )

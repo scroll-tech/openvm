@@ -6,7 +6,7 @@ use std::{
 
 use afs_derive::AlignedBorrow;
 use afs_stark_backend::interaction::InteractionBuilder;
-use axvm_instructions::instruction::Instruction;
+use axvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP};
 use p3_air::BaseAir;
 use p3_field::{AbstractField, Field, PrimeField32};
 
@@ -144,7 +144,7 @@ impl<AB: InteractionBuilder, const N: usize> VmAdapterAir<AB> for NativeVectoriz
                 ],
                 cols.from_state,
                 AB::F::from_canonical_usize(timestamp_delta),
-                (1, ctx.to_pc),
+                (DEFAULT_PC_STEP, ctx.to_pc),
             )
             .eval(builder, ctx.instruction.is_valid);
     }
@@ -193,7 +193,7 @@ impl<F: PrimeField32, const N: usize> VmAdapterChip<F> for NativeVectorizedAdapt
 
         Ok((
             ExecutionState {
-                pc: from_state.pc + 1,
+                pc: output.to_pc.unwrap_or(from_state.pc + DEFAULT_PC_STEP),
                 timestamp: memory.timestamp(),
             },
             Self::WriteRecord {

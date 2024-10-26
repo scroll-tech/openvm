@@ -26,6 +26,7 @@ use p3_field::PrimeField32;
 use p3_matrix::Matrix;
 use parking_lot::Mutex;
 use poseidon2_air::poseidon2::Poseidon2Config;
+use program::DEFAULT_PC_STEP;
 use strum::EnumCount;
 
 use super::Streams;
@@ -344,7 +345,7 @@ impl VmConfig {
                             program_bus,
                             memory_controller.clone(),
                         ),
-                        BranchEqualCoreChip::new(offset, 1usize),
+                        BranchEqualCoreChip::new(offset, DEFAULT_PC_STEP),
                         memory_controller.clone(),
                     )));
                     for opcode in range {
@@ -592,7 +593,7 @@ impl VmConfig {
                             program_bus,
                             memory_controller.clone(),
                         ),
-                        BranchEqualCoreChip::new(offset, 4usize),
+                        BranchEqualCoreChip::new(offset, DEFAULT_PC_STEP),
                         memory_controller.clone(),
                     )));
                     for opcode in range {

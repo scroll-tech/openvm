@@ -20,7 +20,7 @@ mod columns;
 mod trace;
 
 pub use air::*;
-use axvm_instructions::instruction::Instruction;
+use axvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP};
 pub use columns::*;
 
 #[cfg(test)]
@@ -152,7 +152,7 @@ impl<T: PrimeField32, const NUM_LIMBS: usize, const LIMB_BITS: usize> Instructio
         });
 
         Ok(ExecutionState {
-            pc: from_state.pc + 1,
+            pc: from_state.pc + DEFAULT_PC_STEP,
             timestamp: memory_controller.timestamp(),
         })
     }

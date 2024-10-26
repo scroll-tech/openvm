@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use axvm_instructions::instruction::Instruction;
+use axvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP};
 use p3_field::PrimeField32;
 use strum::IntoEnumIterator;
 
@@ -115,7 +115,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for CoreChip<F> {
 
         self.memory_controller.borrow_mut().increment_timestamp();
         Ok(ExecutionState::new(
-            pc + 1,
+            pc + DEFAULT_PC_STEP,
             self.memory_controller.borrow().timestamp(),
         ))
     }

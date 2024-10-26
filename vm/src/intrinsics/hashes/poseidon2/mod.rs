@@ -1,6 +1,6 @@
 use std::array;
 
-use axvm_instructions::instruction::Instruction;
+use axvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP};
 use columns::*;
 use p3_field::PrimeField32;
 use poseidon2_air::poseidon2::{Poseidon2Air, Poseidon2Cols, Poseidon2Config};
@@ -316,7 +316,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for Poseidon2Chip<F> {
         });
 
         Ok(ExecutionState {
-            pc: from_state.pc + 1,
+            pc: from_state.pc + DEFAULT_PC_STEP,
             timestamp: memory_controller.timestamp(),
         })
     }
