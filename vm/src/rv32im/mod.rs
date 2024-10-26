@@ -9,6 +9,7 @@ pub mod loadstore;
 pub mod mul;
 pub mod mulh;
 pub mod rv32_auipc;
+pub mod rv32_hintstore;
 pub mod rv32_jal_lui;
 pub mod rv32_jalr;
 pub mod shift;

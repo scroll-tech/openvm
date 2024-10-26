@@ -63,8 +63,8 @@ use crate::{
     rv32im::{
         adapters::{
             Rv32BaseAluAdapterChip, Rv32BranchAdapterChip, Rv32CondRdWriteAdapterChip,
-            Rv32JalrAdapterChip, Rv32LoadStoreAdapterChip, Rv32MultAdapterChip,
-            Rv32RdWriteAdapterChip, Rv32VecHeapAdapterChip,
+            Rv32HintStoreAdapterChip, Rv32JalrAdapterChip, Rv32LoadStoreAdapterChip,
+            Rv32MultAdapterChip, Rv32RdWriteAdapterChip, Rv32VecHeapAdapterChip,
         },
         base_alu::{BaseAluCoreChip, Rv32BaseAluChip},
         branch_eq::{BranchEqualCoreChip, Rv32BranchEqualChip},
@@ -76,6 +76,7 @@ use crate::{
         mul::{MultiplicationCoreChip, Rv32MultiplicationChip},
         mulh::{MulHCoreChip, Rv32MulHChip},
         rv32_auipc::{Rv32AuipcChip, Rv32AuipcCoreChip},
+        rv32_hintstore::{Rv32HintStoreChip, Rv32HintStoreCoreChip},
         rv32_jal_lui::{Rv32JalLuiChip, Rv32JalLuiCoreChip},
         rv32_jalr::{Rv32JalrChip, Rv32JalrCoreChip},
         shift::{Rv32ShiftChip, ShiftCoreChip},
@@ -546,7 +547,7 @@ impl VmConfig {
                             range_checker.clone(),
                             offset,
                         ),
-                        LoadStoreCoreChip::new(streams.clone(), offset),
+                        LoadStoreCoreChip::new(offset),
                         memory_controller.clone(),
                     )));
                     for opcode in range {
@@ -570,6 +571,22 @@ impl VmConfig {
                         executors.insert(opcode, chip.clone().into());
                     }
                     chips.push(AxVmChip::LoadSignExtendRv32(chip));
+                }
+                ExecutorName::HintStoreRv32 => {
+                    let chip = Rc::new(RefCell::new(Rv32HintStoreChip::new(
+                        Rv32HintStoreAdapterChip::new(
+                            execution_bus,
+                            program_bus,
+                            memory_controller.clone(),
+                            range_checker.clone(),
+                        ),
+                        Rv32HintStoreCoreChip::new(streams.clone(), byte_xor_chip.clone(), offset),
+                        memory_controller.clone(),
+                    )));
+                    for opcode in range {
+                        executors.insert(opcode, chip.clone().into());
+                    }
+                    chips.push(AxVmChip::HintStoreRv32(chip));
                 }
                 ExecutorName::BranchEqualRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32BranchEqualChip::new(
@@ -1016,14 +1033,21 @@ fn default_executor_range(executor: ExecutorName) -> (Range<usize>, usize) {
             AluOpcode::default_offset(),
         ),
         ExecutorName::LoadStoreRv32 => (
+            // LOADW through STOREB
             Rv32LoadStoreOpcode::default_offset(),
-            7,
+            Rv32LoadStoreOpcode::STOREB as usize + 1,
             Rv32LoadStoreOpcode::default_offset(),
         ),
         ExecutorName::LoadSignExtendRv32 => (
-            Rv32LoadStoreOpcode::default_offset() + 7,
+            // [LOADB, LOADH]
+            Rv32LoadStoreOpcode::LOADB.with_default_offset(),
             2,
             Rv32LoadStoreOpcode::default_offset(),
+        ),
+        ExecutorName::HintStoreRv32 => (
+            Rv32HintStoreOpcode::default_offset(),
+            Rv32HintStoreOpcode::COUNT,
+            Rv32HintStoreOpcode::default_offset(),
         ),
         ExecutorName::JalLuiRv32 => (
             Rv32JalLuiOpcode::default_offset(),
