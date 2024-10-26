@@ -119,20 +119,6 @@ fn inst_large<F: PrimeField64>(
     }
 }
 
-fn dbg<F: PrimeField64>(opcode: usize, debug: String) -> Instruction<F> {
-    Instruction {
-        opcode,
-        a: F::zero(),
-        b: F::zero(),
-        c: F::zero(),
-        d: F::zero(),
-        e: F::zero(),
-        f: F::zero(),
-        g: F::zero(),
-        debug,
-    }
-}
-
 #[derive(Clone, Copy)]
 enum AS {
     Immediate,
@@ -362,61 +348,33 @@ pub fn convert_field_extension<F: PrimeField32, EF: ExtensionField<F>>(
 
 fn convert_print_instruction<F: PrimeField32, EF: ExtensionField<F>>(
     instruction: AsmInstruction<F, EF>,
-    options: &CompilerOptions,
+    _options: &CompilerOptions,
 ) -> Vec<Instruction<F>> {
     let word_size_i32 = 1;
 
     match instruction {
-        AsmInstruction::PrintV(src) => vec![inst(
-            options.opcode_with_offset(CoreOpcode::PRINTF),
+        AsmInstruction::PrintV(src) => vec![Instruction::phantom(
+            PhantomInstruction::PrintF,
             i32_f(src),
             F::zero(),
-            F::zero(),
-            AS::Memory,
-            AS::Immediate,
+            0,
         )],
-        AsmInstruction::PrintF(src) => vec![inst(
-            options.opcode_with_offset(CoreOpcode::PRINTF),
+        AsmInstruction::PrintF(src) => vec![Instruction::phantom(
+            PhantomInstruction::PrintF,
             i32_f(src),
             F::zero(),
-            F::zero(),
-            AS::Memory,
-            AS::Immediate,
+            0,
         )],
-        AsmInstruction::PrintE(src) => vec![
-            inst(
-                options.opcode_with_offset(CoreOpcode::PRINTF),
-                i32_f(src),
-                F::zero(),
-                F::zero(),
-                AS::Memory,
-                AS::Immediate,
-            ),
-            inst(
-                options.opcode_with_offset(CoreOpcode::PRINTF),
-                i32_f(src + word_size_i32),
-                F::zero(),
-                F::zero(),
-                AS::Memory,
-                AS::Immediate,
-            ),
-            inst(
-                options.opcode_with_offset(CoreOpcode::PRINTF),
-                i32_f(src + 2 * word_size_i32),
-                F::zero(),
-                F::zero(),
-                AS::Memory,
-                AS::Immediate,
-            ),
-            inst(
-                options.opcode_with_offset(CoreOpcode::PRINTF),
-                i32_f(src + 3 * word_size_i32),
-                F::zero(),
-                F::zero(),
-                AS::Memory,
-                AS::Immediate,
-            ),
-        ],
+        AsmInstruction::PrintE(src) => (0..EF::D as i32)
+            .map(|i| {
+                Instruction::phantom(
+                    PhantomInstruction::PrintF,
+                    i32_f(src + i * word_size_i32),
+                    F::zero(),
+                    0,
+                )
+            })
+            .collect(),
         _ => panic!(
             "Illegal argument to convert_print_instruction: {:?}",
             instruction
@@ -598,20 +556,12 @@ fn convert_instruction<F: PrimeField32, EF: ExtensionField<F>>(
             ))
             .collect(),
         AsmInstruction::Trap => vec![
-            // pc <- -1 (causes trace generation to fail)
-            inst(
-                options.opcode_with_offset(CoreOpcode::FAIL),
-                F::zero(),
-                F::zero(),
-                F::zero(),
-                AS::Immediate,
-                AS::Immediate,
-            ),
+            Instruction::phantom(PhantomInstruction::DebugPanic, F::zero(), F::zero(), 0),
         ],
         AsmInstruction::Halt => vec![
             // terminate
             inst(
-                options.opcode_with_offset(TerminateOpcode::TERMINATE),
+                options.opcode_with_offset(CommonOpcode::TERMINATE),
                 F::zero(),
                 F::zero(),
                 F::zero(),
@@ -619,30 +569,12 @@ fn convert_instruction<F: PrimeField32, EF: ExtensionField<F>>(
                 AS::Immediate,
             ),
         ],
-        AsmInstruction::HintInputVec() => vec![inst(
-            options.opcode_with_offset(CoreOpcode::HINT_INPUT),
-            F::zero(),
-            F::zero(),
-            F::zero(),
-            AS::Memory,
-            AS::Memory,
-        )],
-        AsmInstruction::HintBits(src, len) => vec![inst(
-            options.opcode_with_offset(CoreOpcode::HINT_BITS),
-            i32_f(src),
-            F::zero(),
-            F::from_canonical_u32(len),
-            AS::Memory,
-            AS::Memory,
-        )],
-        AsmInstruction::HintBytes(src, len) => vec![inst(
-            options.opcode_with_offset(CoreOpcode::HINT_BYTES),
-            i32_f(src),
-            F::zero(),
-            F::from_canonical_u32(len),
-            AS::Memory,
-            AS::Memory,
-        )],
+        AsmInstruction::HintInputVec() => vec![
+            Instruction::phantom(PhantomInstruction::HintInput, F::zero(), F::zero(), 0)
+        ],
+        AsmInstruction::HintBits(src, len) => vec![
+            Instruction::phantom(PhantomInstruction::HintBits, i32_f(src), F::from_canonical_u32(len), AS::Memory as u16)
+        ],
         AsmInstruction::StoreHintWordI(val, offset) => vec![inst(
             options.opcode_with_offset(NativeLoadStoreOpcode::SHINTW),
             F::zero(),
@@ -891,14 +823,14 @@ fn convert_instruction<F: PrimeField32, EF: ExtensionField<F>>(
         )],
         AsmInstruction::CycleTrackerStart(name) => {
             if options.enable_cycle_tracker {
-                vec![dbg(options.opcode_with_offset(CoreOpcode::CT_START), name)]
+                vec![Instruction::debug(PhantomInstruction::CtStart, &name)]
             } else {
                 vec![]
             }
         }
         AsmInstruction::CycleTrackerEnd(name) => {
             if options.enable_cycle_tracker {
-                vec![dbg(options.opcode_with_offset(CoreOpcode::CT_END), name)]
+                vec![Instruction::debug(PhantomInstruction::CtEnd, &name)]
             } else {
                 vec![]
             }
