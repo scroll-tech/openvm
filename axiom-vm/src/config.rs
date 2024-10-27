@@ -1,15 +1,15 @@
 use std::sync::Arc;
 
-use afs_compiler::conversion::CompilerOptions;
 use ax_sdk::{
-    afs_stark_backend::{config::StarkGenericConfig, keygen::types::MultiStarkProvingKey},
+    ax_stark_backend::{config::StarkGenericConfig, keygen::types::MultiStarkProvingKey},
     config::{
         baby_bear_poseidon2::{BabyBearPoseidon2Config, BabyBearPoseidon2Engine},
         FriParameters,
     },
     engine::{StarkEngine, StarkFriEngine},
 };
-use stark_vm::{arch::VmConfig, system::program::trace::CommittedProgram};
+use axvm_circuit::{arch::VmConfig, system::program::trace::CommittedProgram};
+use axvm_native_compiler::conversion::CompilerOptions;
 
 use crate::verifier::leaf::LeafVmVerifierConfig;
 

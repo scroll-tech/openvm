@@ -8,23 +8,23 @@ use std::{
 };
 
 use afs_derive::AlignedBorrow;
-use afs_primitives::var_range::{VariableRangeCheckerBus, VariableRangeCheckerChip};
-use afs_stark_backend::{
+use ax_circuit_primitives::var_range::{VariableRangeCheckerBus, VariableRangeCheckerChip};
+use ax_poseidon2_air::poseidon2::Poseidon2Config;
+use ax_sdk::{
+    config::baby_bear_poseidon2::BabyBearPoseidon2Engine, engine::StarkFriEngine,
+    utils::create_seeded_rng,
+};
+use ax_stark_backend::{
     interaction::InteractionBuilder,
     prover::types::AirProofInput,
     rap::{BaseAirWithPublicValues, PartitionedBaseAir},
     Chip,
-};
-use ax_sdk::{
-    config::baby_bear_poseidon2::BabyBearPoseidon2Engine, engine::StarkFriEngine,
-    utils::create_seeded_rng,
 };
 use itertools::Itertools;
 use p3_air::{Air, BaseAir};
 use p3_baby_bear::BabyBear;
 use p3_field::{AbstractField, PrimeField32};
 use p3_matrix::{dense::RowMajorMatrix, Matrix};
-use poseidon2_air::poseidon2::Poseidon2Config;
 use rand::{
     prelude::{SliceRandom, StdRng},
     Rng,

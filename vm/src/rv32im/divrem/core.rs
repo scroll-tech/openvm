@@ -5,13 +5,13 @@ use std::{
 };
 
 use afs_derive::AlignedBorrow;
-use afs_primitives::{
+use ax_circuit_primitives::{
     bigint::utils::big_uint_to_num_limbs,
     range_tuple::{RangeTupleCheckerBus, RangeTupleCheckerChip},
     utils::{not, select},
     xor::{XorBus, XorLookupChip},
 };
-use afs_stark_backend::{interaction::InteractionBuilder, rap::BaseAirWithPublicValues};
+use ax_stark_backend::{interaction::InteractionBuilder, rap::BaseAirWithPublicValues};
 use axvm_instructions::instruction::Instruction;
 use num_bigint_dig::BigUint;
 use p3_air::{AirBuilder, BaseAir};

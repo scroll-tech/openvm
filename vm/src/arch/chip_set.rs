@@ -7,12 +7,13 @@ use std::{
     sync::Arc,
 };
 
-use afs_primitives::{
+use ax_circuit_primitives::{
     range_tuple::{RangeTupleCheckerBus, RangeTupleCheckerChip},
     var_range::{VariableRangeCheckerBus, VariableRangeCheckerChip},
     xor::XorLookupChip,
 };
-use afs_stark_backend::{
+use ax_poseidon2_air::poseidon2::Poseidon2Config;
+use ax_stark_backend::{
     config::{Domain, StarkGenericConfig},
     p3_commit::PolynomialSpace,
     prover::types::{AirProofInput, CommittedTraceData, ProofInput},
@@ -25,7 +26,6 @@ use num_bigint_dig::BigUint;
 use p3_field::PrimeField32;
 use p3_matrix::Matrix;
 use parking_lot::Mutex;
-use poseidon2_air::poseidon2::Poseidon2Config;
 use program::DEFAULT_PC_STEP;
 use strum::EnumCount;
 

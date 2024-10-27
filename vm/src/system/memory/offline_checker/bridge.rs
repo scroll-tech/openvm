@@ -1,11 +1,11 @@
-use afs_primitives::{
+use ax_circuit_primitives::{
     assert_less_than::{AssertLessThanIo, AssertLtSubAir},
     is_zero::{IsZeroIo, IsZeroSubAir},
     utils::not,
     var_range::VariableRangeCheckerBus,
     SubAir,
 };
-use afs_stark_backend::interaction::InteractionBuilder;
+use ax_stark_backend::interaction::InteractionBuilder;
 use p3_air::AirBuilder;
 use p3_field::AbstractField;
 

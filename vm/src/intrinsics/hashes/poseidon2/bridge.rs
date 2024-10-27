@@ -1,6 +1,6 @@
-use afs_stark_backend::interaction::InteractionBuilder;
+use ax_poseidon2_air::poseidon2::columns::Poseidon2IoCols;
+use ax_stark_backend::interaction::InteractionBuilder;
 use p3_field::{AbstractField, Field};
-use poseidon2_air::poseidon2::columns::Poseidon2IoCols;
 
 use super::{air::Poseidon2VmAir, columns::Poseidon2VmIoCols, WIDTH};
 use crate::arch::{instructions::Poseidon2Opcode::PERM_POS2, ExecutionState, POSEIDON2_DIRECT_BUS};

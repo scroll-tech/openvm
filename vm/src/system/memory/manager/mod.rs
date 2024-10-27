@@ -9,14 +9,14 @@ use std::{
 };
 
 use afs_derive::AlignedBorrow;
-use afs_primitives::{
+use ax_circuit_primitives::{
     assert_less_than::{AssertLtSubAir, LessThanAuxCols},
     is_less_than::IsLtSubAir,
     is_zero::IsZeroSubAir,
     var_range::{VariableRangeCheckerBus, VariableRangeCheckerChip},
     TraceSubRowGenerator,
 };
-use afs_stark_backend::{
+use ax_stark_backend::{
     config::{Domain, StarkGenericConfig},
     p3_commit::PolynomialSpace,
     prover::types::AirProofInput,
@@ -753,7 +753,7 @@ impl<F: PrimeField32> MemoryAuxColsFactory<F> {
 mod tests {
     use std::sync::Arc;
 
-    use afs_primitives::var_range::{VariableRangeCheckerBus, VariableRangeCheckerChip};
+    use ax_circuit_primitives::var_range::{VariableRangeCheckerBus, VariableRangeCheckerChip};
     use p3_baby_bear::BabyBear;
     use p3_field::AbstractField;
     use rand::{prelude::SliceRandom, thread_rng, Rng};

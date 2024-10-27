@@ -2,9 +2,6 @@
 /// Proofs:
 /// 1. Prove Fibonacci AIR.
 /// 2. Verify the proof of 1. by execution VM program in STARK VM.
-use afs_compiler::conversion::CompilerOptions;
-use afs_recursion::testing_utils::recursive_stark_test;
-use afs_stark_backend::Chip;
 use ax_sdk::{
     bench::run_with_metric_collection,
     config::{
@@ -14,7 +11,10 @@ use ax_sdk::{
     dummy_airs::fib_air::chip::FibonacciChip,
     engine::StarkFriEngine,
 };
-use stark_vm::arch::VmConfig;
+use ax_stark_backend::Chip;
+use axvm_circuit::arch::VmConfig;
+use axvm_native_compiler::conversion::CompilerOptions;
+use axvm_recursion::testing_utils::recursive_stark_test;
 
 fn main() {
     run_with_metric_collection("OUTPUT_PATH", || {
