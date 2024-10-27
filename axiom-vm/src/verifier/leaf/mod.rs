@@ -1,7 +1,6 @@
 use std::{array, borrow::BorrowMut};
 
-use afs_derive::AlignedBorrow;
-use ax_sdk::{
+use ax_stark_sdk::{
     ax_stark_backend::{
         keygen::types::MultiStarkVerifyingKey, p3_field::AbstractField, prover::types::Proof,
     },
@@ -12,6 +11,7 @@ use axvm_circuit::{
         instructions::program::Program, VmConfig, CONNECTOR_AIR_ID, MERKLE_AIR_ID,
         PROGRAM_CACHED_TRACE_INDEX,
     },
+    circuit_derive::AlignedBorrow,
     system::{connector::VmConnectorPvs, memory::merkle::MemoryMerklePvs},
 };
 use axvm_native_compiler::{conversion::CompilerOptions, prelude::*};

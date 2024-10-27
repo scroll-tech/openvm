@@ -12,10 +12,10 @@ p3-baby-bear = { workspace = true }
 p3-bn254-fr = { workspace = true }
 zkhash = { workspace = true }
 
-afs-derive = { workspace = true }
+axvm-native-compiler-derive = { workspace = true }
 axvm-instructions = { workspace = true }
 ax-circuit-primitives = { workspace = true }
-ax-sdk = { workspace = true }
+ax-stark-sdk = { workspace = true }
 axvm-circuit = { workspace = true }
 # disable jemalloc to be compatible with afs-starkbackend
 snark-verifier-sdk = { workspace = true, optional = true }
