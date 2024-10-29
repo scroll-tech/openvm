@@ -1,10 +1,12 @@
-use ax_ecc_primitives::test_utils::{bls12381_fq12_random, bn254_fq12_random};
+use ax_ecc_primitives::test_utils::{
+    bls12381_fq12_random, bn254_fq12_random, bn254_fq12_to_biguint_vec,
+};
 use axvm_ecc_constants::{BLS12381, BN254};
 use axvm_instructions::{Bls12381Fp12Opcode, Bn254Fp12Opcode, Fp12Opcode, UsizeOpcode};
 use p3_baby_bear::BabyBear;
 use p3_field::AbstractField;
 
-use super::fp12_multiply_expr;
+use super::{fp12_multiply_expr, mul_013_by_013_expr};
 use crate::{
     arch::{testing::VmChipTestBuilder, VmChipWrapper},
     intrinsics::field_expression::FieldExpressionCoreChip,
@@ -42,8 +44,8 @@ fn test_fp12_multiply_bn254() {
         tester.memory_controller(),
     );
 
-    let x = bn254_fq12_random(1);
-    let y = bn254_fq12_random(2);
+    let x = bn254_fq12_to_biguint_vec(&bn254_fq12_random(1));
+    let y = bn254_fq12_to_biguint_vec(&bn254_fq12_random(2));
 
     let x_limbs = x
         .iter()
@@ -127,6 +129,64 @@ fn test_fp12_multiply_bls12381() {
         x_limbs,
         y_limbs,
         chip.core.air.offset + Fp12Opcode::MUL as usize,
+    );
+    tester.execute(&mut chip, instruction);
+
+    let tester = tester.build().load(chip).finalize();
+    tester.simple_test().expect("Verification failed");
+}
+
+fn test_mul_013_by_013() {
+    const NUM_LIMBS: usize = 32;
+    const LIMB_BITS: usize = 8;
+
+    let mut tester: VmChipTestBuilder<F> = VmChipTestBuilder::default();
+    let modulus = BN254.MODULUS.clone();
+    let xi = BN254.XI;
+    let expr = mul_013_by_013_expr(
+        modulus,
+        NUM_LIMBS,
+        LIMB_BITS,
+        tester.memory_controller().borrow().range_checker.bus(),
+        xi,
+    );
+    let core = FieldExpressionCoreChip::new(
+        expr,
+        Bn254Fp12Opcode::default_offset(),
+        vec![Fp12Opcode::MUL_013_BY_013 as usize],
+        tester.memory_controller().borrow().range_checker.clone(),
+        "Bn254Fp12Mul013By013",
+    );
+    let adapter = Rv32VecHeapAdapterChip::<F, 2, 12, 12, NUM_LIMBS, NUM_LIMBS>::new(
+        tester.execution_bus(),
+        tester.program_bus(),
+        tester.memory_controller(),
+    );
+
+    let x = bn254_fq12_to_biguint_vec(&bn254_fq12_random(1));
+    let y = bn254_fq12_to_biguint_vec(&bn254_fq12_random(2));
+
+    let x_limbs = x
+        .iter()
+        .map(|x| {
+            biguint_to_limbs::<NUM_LIMBS>(x.clone(), LIMB_BITS).map(BabyBear::from_canonical_u32)
+        })
+        .collect::<Vec<[BabyBear; NUM_LIMBS]>>();
+    let y_limbs = y
+        .iter()
+        .map(|y| {
+            biguint_to_limbs::<NUM_LIMBS>(y.clone(), LIMB_BITS).map(BabyBear::from_canonical_u32)
+        })
+        .collect::<Vec<[BabyBear; NUM_LIMBS]>>();
+    let mut chip = VmChipWrapper::new(adapter, core, tester.memory_controller());
+
+    let _res = chip.core.air.expr.execute([x, y].concat(), vec![]);
+
+    let instruction = rv32_write_heap_default(
+        &mut tester,
+        x_limbs,
+        y_limbs,
+        chip.core.air.offset + Fp12Opcode::MUL_013_BY_013 as usize,
     );
     tester.execute(&mut chip, instruction);
 

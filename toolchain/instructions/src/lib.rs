@@ -402,9 +402,8 @@ pub enum Rv32ModularArithmeticOpcode {
 #[repr(usize)]
 #[allow(non_camel_case_types)]
 pub enum Fp12Opcode {
-    ADD,
-    SUB,
     MUL,
+    MUL_013_BY_013,
 }
 
 // =================================================================================================

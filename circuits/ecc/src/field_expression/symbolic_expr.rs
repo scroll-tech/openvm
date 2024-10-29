@@ -22,6 +22,8 @@ pub enum SymbolicExpr {
     Mul(Box<SymbolicExpr>, Box<SymbolicExpr>),
     // Division is not allowed in "constraints", but can only be used in "computes"
     Div(Box<SymbolicExpr>, Box<SymbolicExpr>),
+    // Add integer
+    IntAdd(Box<SymbolicExpr>, isize),
     // Multiply each limb with an integer. For BigInt this is just scalar multiplication.
     IntMul(Box<SymbolicExpr>, isize),
     // Select one of the two expressions based on the flag.
@@ -38,6 +40,7 @@ impl std::fmt::Display for SymbolicExpr {
             SymbolicExpr::Sub(lhs, rhs) => write!(f, "({} - {})", lhs, rhs),
             SymbolicExpr::Mul(lhs, rhs) => write!(f, "({} * {})", lhs, rhs),
             SymbolicExpr::Div(lhs, rhs) => write!(f, "({} / {})", lhs, rhs),
+            SymbolicExpr::IntAdd(lhs, s) => write!(f, "({} + {})", lhs, s),
             SymbolicExpr::IntMul(lhs, s) => write!(f, "({} x {})", lhs, s),
             SymbolicExpr::Select(flag_id, lhs, rhs) => {
                 write!(f, "(if {} then {} else {})", flag_id, lhs, rhs)
@@ -140,6 +143,11 @@ impl SymbolicExpr {
                 // Should not have division in expression when calling this.
                 unreachable!()
             }
+            SymbolicExpr::IntAdd(lhs, s) => {
+                let (lhs_max_pos, lhs_max_neg) = lhs.max_abs(prime);
+                let scalar = BigUint::from_usize(s.unsigned_abs()).unwrap();
+                (lhs_max_pos + &scalar, lhs_max_neg + &scalar)
+            }
             SymbolicExpr::IntMul(lhs, s) => {
                 let (lhs_max_pos, lhs_max_neg) = lhs.max_abs(prime);
                 let scalar = BigUint::from_usize(s.unsigned_abs()).unwrap();
@@ -167,6 +175,7 @@ impl SymbolicExpr {
             SymbolicExpr::Div(_, _) => {
                 unimplemented!()
             }
+            SymbolicExpr::IntAdd(lhs, _) => lhs.expr_limbs(num_limbs),
             SymbolicExpr::IntMul(lhs, _) => lhs.expr_limbs(num_limbs),
             SymbolicExpr::Select(_, lhs, rhs) => {
                 let left = lhs.expr_limbs(num_limbs);
@@ -207,6 +216,9 @@ impl SymbolicExpr {
         flags: &[bool],
     ) -> BigInt {
         match self {
+            SymbolicExpr::IntAdd(lhs, s) => {
+                lhs.evaluate_bigint(inputs, variables, flags) + BigInt::from_isize(*s).unwrap()
+            }
             SymbolicExpr::IntMul(lhs, s) => {
                 lhs.evaluate_bigint(inputs, variables, flags) * BigInt::from_isize(*s).unwrap()
             }
@@ -243,6 +255,15 @@ impl SymbolicExpr {
         flags: &[bool],
     ) -> OverflowInt<isize> {
         match self {
+            SymbolicExpr::IntAdd(lhs, s) => {
+                let mut left = lhs.evaluate_overflow_isize(inputs, variables, flags);
+                for limb in left.limbs.iter_mut() {
+                    *limb += *s;
+                }
+                left.limb_max_abs += s.unsigned_abs();
+                left.max_overflow_bits = log2_ceil_usize(left.limb_max_abs);
+                left
+            }
             SymbolicExpr::IntMul(lhs, s) => {
                 let mut left = lhs.evaluate_overflow_isize(inputs, variables, flags);
                 for limb in left.limbs.iter_mut() {
@@ -285,6 +306,20 @@ impl SymbolicExpr {
         flags: &[AB::Var],
     ) -> OverflowInt<AB::Expr> {
         match self {
+            SymbolicExpr::IntAdd(lhs, s) => {
+                let mut left = lhs.evaluate_overflow_expr::<AB>(inputs, variables, flags);
+                let scalar = if *s >= 0 {
+                    AB::Expr::from_canonical_usize(*s as usize)
+                } else {
+                    -AB::Expr::from_canonical_usize(s.unsigned_abs())
+                };
+                for limb in left.limbs.iter_mut() {
+                    *limb += scalar.clone();
+                }
+                left.limb_max_abs += s.unsigned_abs();
+                left.max_overflow_bits = log2_ceil_usize(left.limb_max_abs);
+                left
+            }
             SymbolicExpr::IntMul(lhs, s) => {
                 let mut left = lhs.evaluate_overflow_expr::<AB>(inputs, variables, flags);
                 let scalar = if *s >= 0 {
@@ -366,6 +401,15 @@ impl SymbolicExpr {
                 let right = rhs.compute(inputs, variables, flags, prime);
                 let right_inv = big_uint_mod_inverse(&right, prime);
                 (left * right_inv) % prime
+            }
+            SymbolicExpr::IntAdd(lhs, s) => {
+                let left = lhs.compute(inputs, variables, flags, prime);
+                let right = if *s >= 0 {
+                    BigUint::from_usize(*s as usize).unwrap()
+                } else {
+                    prime - BigUint::from_usize(s.unsigned_abs()).unwrap()
+                };
+                (left + right) % prime
             }
             SymbolicExpr::IntMul(lhs, s) => {
                 let left = lhs.compute(inputs, variables, flags, prime);

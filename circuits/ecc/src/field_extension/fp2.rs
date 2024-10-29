@@ -89,10 +89,18 @@ impl Fp2 {
         }
     }
 
+    pub fn int_add(&mut self, c: [isize; 2]) -> Fp2 {
+        Fp2 {
+            c0: self.c0.int_add(c[0]),
+            c1: self.c1.int_add(c[1]),
+        }
+    }
+
     pub fn int_mul(&mut self, c: [isize; 2]) -> Fp2 {
-        let c0 = self.c0.int_mul(c[0]) - self.c1.int_mul(c[1]);
-        let c1 = self.c0.int_mul(c[1]) + self.c1.int_mul(c[0]);
-        Fp2 { c0, c1 }
+        Fp2 {
+            c0: self.c0.int_mul(c[0]) - self.c1.int_mul(c[1]),
+            c1: self.c0.int_mul(c[1]) + self.c1.int_mul(c[0]),
+        }
     }
 }
 
@@ -115,11 +123,6 @@ mod tests {
         super::super::{field_expression::*, test_utils::*},
         *,
     };
-
-    fn generate_random_fq2() -> Fq2 {
-        let mut rng = create_seeded_rng();
-        Fq2::random(&mut rng)
-    }
 
     fn two_fp2_input(x: &Fq2, y: &Fq2) -> Vec<BigUint> {
         vec![
@@ -153,8 +156,8 @@ mod tests {
         };
         let width = BaseAir::<BabyBear>::width(&air);
 
-        let x_fp2 = generate_random_fq2();
-        let y_fp2 = generate_random_fq2();
+        let x_fp2 = bn254_fq2_random(1);
+        let y_fp2 = bn254_fq2_random(5);
         let r_fp2 = fq2_fn(&x_fp2, &y_fp2);
         let inputs = two_fp2_input(&x_fp2, &y_fp2);
 
@@ -218,9 +221,9 @@ mod tests {
         };
         let width = BaseAir::<BabyBear>::width(&air);
 
-        let x_fp2 = generate_random_fq2();
-        let y_fp2 = generate_random_fq2();
-        let z_fp2 = generate_random_fq2();
+        let x_fp2 = bn254_fq2_random(5);
+        let y_fp2 = bn254_fq2_random(15);
+        let z_fp2 = bn254_fq2_random(95);
         let r_fp2 = z_fp2.invert().unwrap() * x_fp2 * y_fp2;
         let inputs = vec![
             bn254_fq_to_biguint(&x_fp2.c0),
