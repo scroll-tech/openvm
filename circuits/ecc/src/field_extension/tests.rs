@@ -1,13 +1,18 @@
-#[cfg(test)]
+use std::ops::{Mul, MulAssign};
+
 use ax_circuit_primitives::TraceSubRowGenerator;
-#[cfg(test)]
-use ax_ecc_execution::curves::bn254::{Fq, Fq2};
-use ax_ecc_execution::{common::EcPoint, curves::bn254::point_to_013};
+use ax_ecc_execution::{
+    common::{EcPoint, FieldExtension},
+    curves::bn254::point_to_013,
+};
 use ax_stark_sdk::{
     any_rap_arc_vec, config::baby_bear_blake3::BabyBearBlake3Engine, engine::StarkFriEngine,
 };
 use axvm_ecc_constants::BN254;
-use halo2curves_axiom::bn256::G1Affine;
+use halo2curves_axiom::{
+    bn256::{Fq, Fq2, G1Affine},
+    ff::Field,
+};
 use num_bigint_dig::BigUint;
 use p3_air::BaseAir;
 use p3_baby_bear::BabyBear;
@@ -19,6 +24,73 @@ use super::{
     super::{field_expression::*, test_utils::*},
     *,
 };
+
+pub struct FieldExtFq2(pub Fq2);
+
+impl Field for FieldExtFq2 {
+    const ZERO: Self = Self(Fq2::ZERO);
+    const ONE: Self = Self(Fq2::ONE);
+
+    fn random(mut rng: impl rand_core::RngCore) -> Self {
+        Self(Fq2::random(&mut rng))
+    }
+
+    fn square(&self) -> Self {
+        Self(self.0.square())
+    }
+
+    fn double(&self) -> Self {
+        Self(self.0.double())
+    }
+
+    fn invert(&self) -> Option<Self> {
+        self.0.invert().map(Self)
+    }
+}
+
+impl FieldExtension for FieldExtFq2 {
+    type BaseField = Fq;
+
+    fn from_coeffs(coeffs: &[Self::BaseField]) -> Self {
+        FieldExtFq2(Fq2::from_coeffs(coeffs))
+    }
+
+    fn embed(base_elem: &Self::BaseField) -> Self {
+        FieldExtFq2(Fq2::embed(base_elem))
+    }
+
+    fn conjugate(&self) -> Self {
+        let mut s = self.0;
+        s.conjugate();
+        FieldExtFq2(s)
+    }
+
+    fn frobenius_map(&self, power: Option<usize>) -> Self {
+        let mut s = self.0;
+        s.frobenius_map(power);
+        FieldExtFq2(s)
+    }
+
+    fn mul_base(&self, rhs: &Self::BaseField) -> Self {
+        let mut s = self.0;
+        s = s.mul_base(rhs);
+        FieldExtFq2(s)
+    }
+}
+
+impl MulAssign<&FieldExtFq2> for FieldExtFq2 {
+    fn mul_assign(&mut self, rhs: &FieldExtFq2) {
+        self.0.mul_assign(&rhs.0);
+    }
+}
+
+impl Mul for FieldExtFq2 {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self {
+        Self(self.0 * rhs.0)
+    }
+}
 
 pub fn bn254_fq_to_biguint(fq: Fq) -> BigUint {
     let bytes = fq.to_bytes();

@@ -7,6 +7,7 @@ use strum_macros::{EnumCount, EnumIter, FromRepr};
 
 pub mod config;
 mod curves;
+pub mod exe;
 pub mod instruction;
 mod phantom;
 pub mod program;
@@ -402,6 +403,8 @@ pub enum Rv32ModularArithmeticOpcode {
 #[repr(usize)]
 #[allow(non_camel_case_types)]
 pub enum Fp12Opcode {
+    ADD,
+    SUB,
     MUL,
     MUL_013_BY_013,
 }

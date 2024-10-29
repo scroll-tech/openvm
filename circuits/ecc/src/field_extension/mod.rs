@@ -8,3 +8,6 @@ pub use line::*;
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod test_impls;

@@ -1,8 +1,12 @@
+mod add;
 mod line;
-mod multiply;
+mod mul;
+mod sub;
 
+pub use add::*;
 pub use line::*;
-pub use multiply::*;
+pub use mul::*;
+pub use sub::*;
 
 #[cfg(test)]
 mod tests;

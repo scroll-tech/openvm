@@ -5,9 +5,8 @@ mod line;
 mod miller_loop;
 
 pub use curve::*;
+pub use field::{FieldExtFq, FieldExtFq12, FieldExtFq2};
 pub use line::*;
 
 #[cfg(test)]
 mod tests;
-
-pub use halo2curves_axiom::bn256::{Fq, Fq12, Fq2};

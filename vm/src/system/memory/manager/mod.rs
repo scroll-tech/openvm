@@ -20,6 +20,7 @@ use ax_stark_backend::{
     prover::types::AirProofInput,
     rap::AnyRap,
 };
+use axvm_instructions::exe::MemoryImage;
 use itertools::{izip, zip_eq};
 pub use memory::{MemoryReadRecord, MemoryWriteRecord};
 use p3_air::BaseAir;
@@ -89,7 +90,7 @@ pub type TimestampedEquipartition<F, const N: usize> =
 /// If a key is not present in the map, then the block is uninitialized (and therefore zero).
 pub type Equipartition<F, const N: usize> = BTreeMap<(F, usize), [F; N]>;
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct MemoryController<F> {
     pub memory_bus: MemoryBus,
     pub interface_chip: MemoryInterface<F>,
@@ -164,7 +165,9 @@ impl<F: PrimeField32> MemoryController<F> {
         }
         match &mut self.interface_chip {
             MemoryInterface::Volatile { .. } => {
-                panic!("Cannot set initial memory for volatile memory");
+                if !memory.is_empty() {
+                    panic!("Cannot set initial memory for volatile memory");
+                }
             }
             MemoryInterface::Persistent { initial_memory, .. } => {
                 *initial_memory = memory;
@@ -594,6 +597,19 @@ impl<F: PrimeField32> MemoryAuxColsFactory<F> {
         );
         LessThanAuxCols::new(decomp)
     }
+}
+
+pub fn memory_image_to_equipartition<F: PrimeField32, const N: usize>(
+    memory_image: MemoryImage<F>,
+) -> Equipartition<F, { N }> {
+    let mut result = Equipartition::new();
+    for ((addr_space, addr), word) in memory_image {
+        let addr_u32 = addr.as_canonical_u32();
+        let shift = addr_u32 as usize % N;
+        let key = (addr_space, (addr_u32 / N as u32) as usize);
+        result.entry(key).or_insert([F::zero(); N])[shift] = word;
+    }
+    result
 }
 
 #[cfg(test)]

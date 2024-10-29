@@ -5,18 +5,17 @@ use ax_circuit_primitives::{
 };
 use ax_ecc_primitives::{
     field_expression::{ExprBuilder, FieldExpr},
-    field_extension::{mul_013_by_013, Fp2},
+    field_extension::Fp12,
 };
 use num_bigint_dig::BigUint;
 
 use crate::intrinsics::ecc::FIELD_ELEMENT_BITS;
 
-pub fn mul_013_by_013_expr(
+pub fn fp12_sub_expr(
     modulus: BigUint,
     num_limbs: usize,
     limb_bits: usize,
     range_bus: VariableRangeCheckerBus,
-    xi: [isize; 2],
 ) -> FieldExpr {
     assert!(modulus.bits() <= num_limbs * limb_bits);
     let subair = CheckCarryModToZeroSubAir::new(
@@ -29,18 +28,10 @@ pub fn mul_013_by_013_expr(
     let builder = ExprBuilder::new(modulus, limb_bits, num_limbs, range_bus.range_max_bits);
     let builder = Rc::new(RefCell::new(builder));
 
-    let mut b0 = Fp2::new(builder.clone()); // x1
-    let mut c0 = Fp2::new(builder.clone()); // x3
-    let mut b1 = Fp2::new(builder.clone()); // y1
-    let mut c1 = Fp2::new(builder.clone()); // y3
-
-    let [mut l0, mut l1, mut l2, mut l3, mut l4] =
-        mul_013_by_013(&mut b0, &mut c0, &mut b1, &mut c1, xi);
-    l0.save_output();
-    l1.save_output();
-    l2.save_output();
-    l3.save_output();
-    l4.save_output();
+    let mut x = Fp12::new(builder.clone());
+    let mut y = Fp12::new(builder.clone());
+    let mut res = x.sub(&mut y);
+    res.save_output();
 
     let builder = builder.borrow().clone();
     FieldExpr {
