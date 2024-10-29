@@ -27,10 +27,6 @@ pub struct ExecutionSegment<F: PrimeField32> {
     pub config: VmConfig,
     pub chip_set: VmChipSet<F>,
 
-    // The streams should be mutated in serial without thread-safety,
-    // but the `VmCoreChip` trait requires thread-safety.
-    pub streams: Arc<Mutex<Streams<F>>>,
-
     pub final_memory: Option<Equipartition<F, CHUNK>>,
 
     pub cycle_tracker: CycleTracker,
@@ -81,7 +77,6 @@ impl<F: PrimeField32> ExecutionSegment<F> {
         Self {
             config,
             chip_set,
-            streams,
             final_memory: None,
             collected_metrics: Default::default(),
             cycle_tracker: CycleTracker::new(),
