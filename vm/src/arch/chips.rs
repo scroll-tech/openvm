@@ -15,13 +15,13 @@ use strum_macros::IntoStaticStr;
 use crate::{
     arch::ExecutionState,
     intrinsics::{
+        ecc::sw::{EcAddNeChip, EcDoubleChip},
         hashes::{keccak::hasher::KeccakVmChip, poseidon2::Poseidon2Chip},
         modular::{ModularAddSubChip, ModularMulDivChip},
     },
     kernels::{
         branch_eq::KernelBranchEqChip,
         castf::CastFChip,
-        ecc::{KernelEcAddNeChip, KernelEcDoubleChip},
         field_arithmetic::FieldArithmeticChip,
         field_extension::FieldExtensionChip,
         jal::KernelJalChip,
@@ -103,12 +103,14 @@ pub enum AxVmInstructionExecutor<F: PrimeField32> {
     ModularMulDivRv32_1x32(Rc<RefCell<ModularMulDivChip<F, 1, 32>>>),
     ModularAddSubRv32_3x16(Rc<RefCell<ModularAddSubChip<F, 3, 16>>>),
     ModularMulDivRv32_3x16(Rc<RefCell<ModularMulDivChip<F, 3, 16>>>),
+    EcAddNeRv32_2x32(Rc<RefCell<EcAddNeChip<F, 2, 32>>>),
+    EcDoubleRv32_2x32(Rc<RefCell<EcDoubleChip<F, 2, 32>>>),
+    EcAddNeRv32_6x16(Rc<RefCell<EcAddNeChip<F, 6, 16>>>),
+    EcDoubleRv32_6x16(Rc<RefCell<EcDoubleChip<F, 6, 16>>>),
     // TO BE REPLACED:
     CastF(Rc<RefCell<CastFChip<F>>>),
     ModularAddSub(Rc<RefCell<KernelModularAddSubChip<F, 32>>>),
     ModularMultDiv(Rc<RefCell<KernelModularMulDivChip<F, 32>>>),
-    Secp256k1AddUnequal(Rc<RefCell<KernelEcAddNeChip<F, 32>>>),
-    Secp256k1Double(Rc<RefCell<KernelEcDoubleChip<F, 32>>>),
 }
 
 /// ATTENTION: CAREFULLY MODIFY THE ORDER OF ENTRIES. the order of entries determines the AIR ID of
@@ -148,10 +150,12 @@ pub enum AxVmChip<F: PrimeField32> {
     ModularMulDivRv32_1x32(Rc<RefCell<ModularMulDivChip<F, 1, 32>>>),
     ModularAddSubRv32_3x16(Rc<RefCell<ModularAddSubChip<F, 3, 16>>>),
     ModularMulDivRv32_3x16(Rc<RefCell<ModularMulDivChip<F, 3, 16>>>),
+    EcAddNeRv32_2x32(Rc<RefCell<EcAddNeChip<F, 2, 32>>>),
+    EcDoubleRv32_2x32(Rc<RefCell<EcDoubleChip<F, 2, 32>>>),
+    EcAddNeRv32_6x16(Rc<RefCell<EcAddNeChip<F, 6, 16>>>),
+    EcDoubleRv32_6x16(Rc<RefCell<EcDoubleChip<F, 6, 16>>>),
     // TO BE REPLACED:
     CastF(Rc<RefCell<CastFChip<F>>>),
     ModularAddSub(Rc<RefCell<KernelModularAddSubChip<F, 32>>>),
     ModularMultDiv(Rc<RefCell<KernelModularMulDivChip<F, 32>>>),
-    Secp256k1AddUnequal(Rc<RefCell<KernelEcAddNeChip<F, 32>>>),
-    Secp256k1Double(Rc<RefCell<KernelEcDoubleChip<F, 32>>>),
 }
