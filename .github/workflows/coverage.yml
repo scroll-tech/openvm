@@ -8,7 +8,10 @@ on:
 
 jobs:
   coverage:
-    runs-on: ubuntu-latest
+    runs-on: 
+      - runs-on=${{ github.run_id }}
+      - runner=16cpu-linux-arm64
+      - tag=coverage
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
