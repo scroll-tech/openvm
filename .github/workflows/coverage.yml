@@ -23,7 +23,7 @@ jobs:
         run: cargo install cargo-llvm-cov
 
       - name: Run coverage
-        run: cargo llvm-cov --json --output-path=coverage
+        run: RUST_MIN_STACK=8388608 cargo llvm-cov --json --output-path=coverage
 
       - name: Parse detailed coverage report
         id: parse
