@@ -14,13 +14,20 @@ jobs:
       - tag=coverage
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Rust toolchain (nightly)
-        run: rustup toolchain install nightly --component llvm-tools-preview
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Install llvm-tools-preview component
+        run: rustup component add llvm-tools-preview --toolchain nightly      
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true        
 
       - name: Install cargo-llvm-cov
-        run: cargo install cargo-llvm-cov
+        run: cargo install cargo-llvm-cov          
 
       - name: Run coverage
         run: RUST_MIN_STACK=8388608 cargo llvm-cov --json --output-path=coverage --profile=fast --features parallel
