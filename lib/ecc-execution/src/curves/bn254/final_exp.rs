@@ -1,15 +1,20 @@
 use halo2curves_axiom::{
-    bn256::{Fq, Fq12, Fq2, Gt},
+    bn256::{Fq, Gt},
     ff::Field,
     pairing::MillerLoopResult,
 };
 
-use super::{Bn254, EXP1, EXP2, M_INV, R_INV, U27_COEFF_0, U27_COEFF_1};
+use super::{Bn254, FieldExtFq12, FieldExtFq2, EXP1, EXP2, M_INV, R_INV, U27_COEFF_0, U27_COEFF_1};
 use crate::common::{EcPoint, ExpBigInt, FieldExtension, FinalExp, MultiMillerLoop};
 
 #[allow(non_snake_case)]
-impl FinalExp<Fq, Fq2, Fq12> for Bn254 {
-    fn assert_final_exp_is_one(&self, f: Fq12, P: &[EcPoint<Fq>], Q: &[EcPoint<Fq2>]) {
+impl FinalExp<Fq, FieldExtFq2, FieldExtFq12> for Bn254 {
+    fn assert_final_exp_is_one(
+        &self,
+        f: FieldExtFq12,
+        P: &[EcPoint<Fq>],
+        Q: &[EcPoint<FieldExtFq2>],
+    ) {
         let (c, u) = self.final_exp_hint(f);
         let c_inv = c.invert().unwrap();
 
@@ -27,16 +32,16 @@ impl FinalExp<Fq, Fq2, Fq12> for Bn254 {
         // Compute miller loop with c_inv
         let fc = self.multi_miller_loop_embedded_exp(P, Q, Some(c_inv));
 
-        assert_eq!(fc * c_mul * u, Fq12::ONE);
+        assert_eq!(fc * c_mul * u, FieldExtFq12::ONE);
     }
 
     // Adapted from the Gnark implementation:
     // https://github.com/Consensys/gnark/blob/af754dd1c47a92be375930ae1abfbd134c5310d8/std/algebra/emulated/sw_bn254/hints.go#L23
     // returns c (residueWitness) and u (cubicNonResiduePower)
-    fn final_exp_hint(&self, f: Fq12) -> (Fq12, Fq12) {
+    fn final_exp_hint(&self, f: FieldExtFq12) -> (FieldExtFq12, FieldExtFq12) {
         debug_assert_eq!(
-            Gt(f).final_exponentiation(),
-            Gt(Fq12::one()),
+            Gt(f.0).final_exponentiation(),
+            Gt(FieldExtFq12::ONE.0),
             "Trying to call final_exp_hint on {f:?} which does not final exponentiate to 1."
         );
         // Residue witness
@@ -47,26 +52,26 @@ impl FinalExp<Fq, Fq2, Fq12> for Bn254 {
         // get the 27th root of unity
         let u0 = U27_COEFF_0.to_u64_digits().1;
         let u1 = U27_COEFF_1.to_u64_digits().1;
-        let u_coeffs = Fq2::from_coeffs(&[
+        let u_coeffs = FieldExtFq2::from_coeffs(&[
             Fq::from_raw([u0[0], u0[1], u0[2], u0[3]]),
             Fq::from_raw([u1[0], u1[1], u1[2], u1[3]]),
         ]);
-        let unity_root_27 = Fq12::from_coeffs(&[
-            Fq2::ZERO,
-            Fq2::ZERO,
+        let unity_root_27 = FieldExtFq12::from_coeffs(&[
+            FieldExtFq2::ZERO,
+            FieldExtFq2::ZERO,
             u_coeffs,
-            Fq2::ZERO,
-            Fq2::ZERO,
-            Fq2::ZERO,
+            FieldExtFq2::ZERO,
+            FieldExtFq2::ZERO,
+            FieldExtFq2::ZERO,
         ]);
-        debug_assert_eq!(unity_root_27.pow([27]), Fq12::one());
+        debug_assert_eq!(unity_root_27.pow([27]), FieldExtFq12::ONE);
 
-        if f.exp_bigint(EXP1.clone()) == Fq12::ONE {
+        if f.exp_bigint(EXP1.clone()) == FieldExtFq12::ONE {
             c = f;
-            u = Fq12::ONE;
+            u = FieldExtFq12::ONE;
         } else {
             let f_mul_unity_root_27 = f * unity_root_27;
-            if f_mul_unity_root_27.exp_bigint(EXP1.clone()) == Fq12::ONE {
+            if f_mul_unity_root_27.exp_bigint(EXP1.clone()) == FieldExtFq12::ONE {
                 c = f_mul_unity_root_27;
                 u = unity_root_27;
             } else {
@@ -99,8 +104,8 @@ impl FinalExp<Fq, Fq2, Fq12> for Bn254 {
         let mut tmp = x3.square();
 
         // Modified Tonelli-Shanks algorithm for computing the cube root
-        fn tonelli_shanks_loop(x3: &mut Fq12, tmp: &mut Fq12, t: &mut i32) {
-            while *x3 != Fq12::ONE {
+        fn tonelli_shanks_loop(x3: &mut FieldExtFq12, tmp: &mut FieldExtFq12, t: &mut i32) {
+            while *x3 != FieldExtFq12::ONE {
                 *tmp = (*x3).square();
                 *x3 *= *tmp;
                 *t += 1;

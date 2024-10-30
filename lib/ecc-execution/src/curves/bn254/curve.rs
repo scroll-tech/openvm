@@ -1,13 +1,14 @@
 use std::ops::Mul;
 
 use halo2curves_axiom::{
-    bn256::{Fq, Fq2, Fr, G1Affine, G2Affine},
+    bn256::{Fq, Fr, G1Affine, G2Affine},
     group::prime::PrimeCurveAffine,
 };
 use lazy_static::lazy_static;
 use num::{BigInt, Num};
 use rand::Rng;
 
+use super::FieldExtFq2;
 use crate::common::{AffineCoords, FieldExtension, ScalarMul};
 
 lazy_static! {
@@ -59,8 +60,8 @@ pub const BN254_PBE_NAF: [i8; BN254_PBE_BITS] = [
 pub struct Bn254;
 
 impl Bn254 {
-    pub fn xi() -> Fq2 {
-        Fq2::from_coeffs(&[Fq::from_raw([9, 0, 0, 0]), Fq::one()])
+    pub fn xi() -> FieldExtFq2 {
+        FieldExtFq2::from_coeffs(&[Fq::from_raw([9, 0, 0, 0]), Fq::one()])
     }
 
     pub fn seed() -> u64 {
@@ -102,13 +103,13 @@ impl ScalarMul<Fr> for G1Affine {
     }
 }
 
-impl AffineCoords<Fq2> for G2Affine {
-    fn x(&self) -> Fq2 {
-        self.x
+impl AffineCoords<FieldExtFq2> for G2Affine {
+    fn x(&self) -> FieldExtFq2 {
+        FieldExtFq2(self.x)
     }
 
-    fn y(&self) -> Fq2 {
-        self.y
+    fn y(&self) -> FieldExtFq2 {
+        FieldExtFq2(self.y)
     }
 
     fn neg(&self) -> Self {

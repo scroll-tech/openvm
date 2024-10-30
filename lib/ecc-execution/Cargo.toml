@@ -11,8 +11,8 @@ rand_core = "0.6.4"
 num = "0.4.3"
 rand.workspace = true
 lazy_static.workspace = true
+subtle = "2.6.1"
 
 [dev-dependencies]
 rng = "0.1.0"
-subtle = "2.6.1"
 axvm-ecc-constants = { workspace = true }

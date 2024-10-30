@@ -1,15 +1,17 @@
-use halo2curves_axiom::bn256::{Fq, Fq12, Fq2, FROBENIUS_COEFF_FQ6_C1, XI_TO_Q_MINUS_1_OVER_2};
+use halo2curves_axiom::bn256::{Fq, FROBENIUS_COEFF_FQ6_C1, XI_TO_Q_MINUS_1_OVER_2};
 use itertools::izip;
 
-use super::{mul_013_by_013, mul_by_01234, mul_by_013, Bn254, BN254_PBE_BITS};
+use super::{
+    mul_013_by_013, mul_by_01234, mul_by_013, Bn254, FieldExtFq12, FieldExtFq2, BN254_PBE_BITS,
+};
 use crate::common::{
     fp12_square, miller_add_step, miller_double_step, EcPoint, EvaluatedLine, FieldExtension,
     MultiMillerLoop,
 };
 
 #[allow(non_snake_case)]
-impl MultiMillerLoop<Fq, Fq2, Fq12, BN254_PBE_BITS> for Bn254 {
-    fn xi() -> Fq2 {
+impl MultiMillerLoop<Fq, FieldExtFq2, FieldExtFq12, BN254_PBE_BITS> for Bn254 {
+    fn xi() -> FieldExtFq2 {
         Self::xi()
     }
 
@@ -21,7 +23,11 @@ impl MultiMillerLoop<Fq, Fq2, Fq12, BN254_PBE_BITS> for Bn254 {
         Self::pseudo_binary_encoding()
     }
 
-    fn evaluate_lines_vec(&self, f: Fq12, lines: Vec<EvaluatedLine<Fq, Fq2>>) -> Fq12 {
+    fn evaluate_lines_vec(
+        &self,
+        f: FieldExtFq12,
+        lines: Vec<EvaluatedLine<Fq, FieldExtFq2>>,
+    ) -> FieldExtFq12 {
         let mut f = f;
         let mut lines = lines;
         if lines.len() % 2 == 1 {
@@ -40,13 +46,13 @@ impl MultiMillerLoop<Fq, Fq2, Fq12, BN254_PBE_BITS> for Bn254 {
 
     fn pre_loop(
         &self,
-        f: Fq12,
-        Q_acc: Vec<EcPoint<Fq2>>,
-        _Q: &[EcPoint<Fq2>],
-        c: Option<Fq12>,
+        f: FieldExtFq12,
+        Q_acc: Vec<EcPoint<FieldExtFq2>>,
+        _Q: &[EcPoint<FieldExtFq2>],
+        c: Option<FieldExtFq12>,
         x_over_ys: Vec<Fq>,
         y_invs: Vec<Fq>,
-    ) -> (Fq12, Vec<EcPoint<Fq2>>) {
+    ) -> (FieldExtFq12, Vec<EcPoint<FieldExtFq2>>) {
         let mut f = f;
 
         if c.is_some() {
@@ -54,11 +60,11 @@ impl MultiMillerLoop<Fq, Fq2, Fq12, BN254_PBE_BITS> for Bn254 {
         }
 
         let mut Q_acc = Q_acc;
-        let mut initial_lines = Vec::<EvaluatedLine<Fq, Fq2>>::new();
+        let mut initial_lines = Vec::<EvaluatedLine<Fq, FieldExtFq2>>::new();
 
         let (Q_out_double, lines_2S) = Q_acc
             .into_iter()
-            .map(|Q| miller_double_step::<Fq, Fq2>(Q.clone()))
+            .map(|Q| miller_double_step::<Fq, FieldExtFq2>(Q.clone()))
             .unzip::<_, _, Vec<_>, Vec<_>>();
         Q_acc = Q_out_double;
 
@@ -75,25 +81,25 @@ impl MultiMillerLoop<Fq, Fq2, Fq12, BN254_PBE_BITS> for Bn254 {
 
     fn post_loop(
         &self,
-        f: Fq12,
-        Q_acc: Vec<EcPoint<Fq2>>,
-        Q: &[EcPoint<Fq2>],
-        _c: Option<Fq12>,
+        f: FieldExtFq12,
+        Q_acc: Vec<EcPoint<FieldExtFq2>>,
+        Q: &[EcPoint<FieldExtFq2>],
+        _c: Option<FieldExtFq12>,
         x_over_ys: Vec<Fq>,
         y_invs: Vec<Fq>,
-    ) -> (Fq12, Vec<EcPoint<Fq2>>) {
+    ) -> (FieldExtFq12, Vec<EcPoint<FieldExtFq2>>) {
         let mut Q_acc = Q_acc;
-        let mut lines = Vec::<EvaluatedLine<Fq, Fq2>>::new();
+        let mut lines = Vec::<EvaluatedLine<Fq, FieldExtFq2>>::new();
 
-        let x_to_q_minus_1_over_3 = FROBENIUS_COEFF_FQ6_C1[1];
-        let x_to_q_sq_minus_1_over_3 = FROBENIUS_COEFF_FQ6_C1[2];
+        let x_to_q_minus_1_over_3 = FieldExtFq2(FROBENIUS_COEFF_FQ6_C1[1]);
+        let x_to_q_sq_minus_1_over_3 = FieldExtFq2(FROBENIUS_COEFF_FQ6_C1[2]);
         let q1_vec = Q
             .iter()
             .map(|Q| {
                 let x = Q.x.frobenius_map(Some(1));
                 let x = x * x_to_q_minus_1_over_3;
                 let y = Q.y.frobenius_map(Some(1));
-                let y = y * XI_TO_Q_MINUS_1_OVER_2;
+                let y = y * FieldExtFq2(XI_TO_Q_MINUS_1_OVER_2);
                 EcPoint { x, y }
             })
             .collect::<Vec<_>>();
@@ -101,7 +107,7 @@ impl MultiMillerLoop<Fq, Fq2, Fq12, BN254_PBE_BITS> for Bn254 {
         let (Q_out_add, lines_S_plus_Q) = Q_acc
             .iter()
             .zip(q1_vec.iter())
-            .map(|(Q_acc, q1)| miller_add_step::<Fq, Fq2>(Q_acc.clone(), q1.clone()))
+            .map(|(Q_acc, q1)| miller_add_step::<Fq, FieldExtFq2>(Q_acc.clone(), q1.clone()))
             .unzip::<_, _, Vec<_>, Vec<_>>();
         Q_acc = Q_out_add;
 
@@ -123,7 +129,7 @@ impl MultiMillerLoop<Fq, Fq2, Fq12, BN254_PBE_BITS> for Bn254 {
         let (Q_out_add, lines_S_plus_Q) = Q_acc
             .iter()
             .zip(q2_vec.iter())
-            .map(|(Q_acc, q2)| miller_add_step::<Fq, Fq2>(Q_acc.clone(), q2.clone()))
+            .map(|(Q_acc, q2)| miller_add_step::<Fq, FieldExtFq2>(Q_acc.clone(), q2.clone()))
             .unzip::<_, _, Vec<_>, Vec<_>>();
         Q_acc = Q_out_add;
 

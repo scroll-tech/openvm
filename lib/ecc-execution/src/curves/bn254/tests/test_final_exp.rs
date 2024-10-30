@@ -3,7 +3,7 @@ use num::{BigInt, Num};
 
 use crate::{
     common::{ExpBigInt, FinalExp, MultiMillerLoop},
-    curves::bn254::Bn254,
+    curves::bn254::{Bn254, FieldExtFq2},
     tests::utils::generate_test_points_generator_scalar,
 };
 
@@ -11,7 +11,7 @@ use crate::{
 #[allow(non_snake_case)]
 fn test_bn254_final_exp_hint() {
     let (_P_vec, _Q_vec, P_ecpoints, Q_ecpoints) =
-        generate_test_points_generator_scalar::<G1Affine, G2Affine, Fr, Fq, Fq2, 2>(
+        generate_test_points_generator_scalar::<G1Affine, G2Affine, Fr, Fq, FieldExtFq2, 2>(
             &[Fr::from(3), Fr::from(6)],
             &[Fr::from(8), Fr::from(4)],
         );
@@ -48,7 +48,7 @@ fn test_bn254_assert_final_exp_is_one_scalar_other() {
 #[allow(non_snake_case)]
 fn assert_final_exp_one<const N: usize>(a: &[Fr; N], b: &[Fr; N]) {
     let (_P_vec, _Q_vec, P_ecpoints, Q_ecpoints) =
-        generate_test_points_generator_scalar::<G1Affine, G2Affine, Fr, Fq, Fq2, N>(a, b);
+        generate_test_points_generator_scalar::<G1Affine, G2Affine, Fr, Fq, FieldExtFq2, N>(a, b);
     let bn254 = Bn254;
     let f = bn254.multi_miller_loop(&P_ecpoints, &Q_ecpoints);
     bn254.assert_final_exp_is_one(f, &P_ecpoints, &Q_ecpoints);
