@@ -25,17 +25,19 @@ jobs:
       - name: Run coverage
         run: cargo llvm-cov --json --output-path=coverage
 
-    - name: Parse detailed coverage report
+      - name: Parse detailed coverage report
         id: parse
         run: |
-          # Parse file-level coverage data into a markdown table format
+          # Initialize the markdown table header
           echo "| File               | Coverage | Total Lines | Covered Lines |" > coverage_table.md
           echo "|--------------------|----------|-------------|---------------|" >> coverage_table.md
+          
+          # Parse each file's data and append it to the table
           jq -r '.files[] | "| \(.file) | \(.coverage.lines.percent)% | \(.coverage.lines.total) | \(.coverage.lines.covered) |"' coverage.json >> coverage_table.md
 
-          # Read the markdown table as an output
-          table=$(cat coverage_table.md)
-          echo "table=$table" >> $GITHUB_ENV
+      - name: Set markdown table as output
+        id: table_output
+        run: echo "table=$(< coverage_table.md)" >> $GITHUB_ENV
 
       - name: Post detailed coverage results as PR comment
         uses: actions/github-script@v6
@@ -47,5 +49,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `### Detailed Coverage Report\n\n${table}`
+              body: `### Detailed Coverage Report\n\n${table.replace(/\|/g, '\\|')}`
             });
