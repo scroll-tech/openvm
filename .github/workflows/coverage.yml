@@ -23,10 +23,29 @@ jobs:
         run: cargo install cargo-llvm-cov
 
       - name: Run coverage
-        run: cargo llvm-cov --html --lcov --output-path=coverage
+        run: cargo llvm-cov --json --output-path=coverage
 
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v3
+    - name: Parse detailed coverage report
+        id: parse
+        run: |
+          # Parse file-level coverage data into a markdown table format
+          echo "| File               | Coverage | Total Lines | Covered Lines |" > coverage_table.md
+          echo "|--------------------|----------|-------------|---------------|" >> coverage_table.md
+          jq -r '.files[] | "| \(.file) | \(.coverage.lines.percent)% | \(.coverage.lines.total) | \(.coverage.lines.covered) |"' coverage.json >> coverage_table.md
+
+          # Read the markdown table as an output
+          table=$(cat coverage_table.md)
+          echo "table=$table" >> $GITHUB_ENV
+
+      - name: Post detailed coverage results as PR comment
+        uses: actions/github-script@v6
         with:
-          name: coverage-report
-          path: coverage/
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const table = process.env.table;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `### Detailed Coverage Report\n\n${table}`
+            });
