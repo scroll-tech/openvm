@@ -23,7 +23,7 @@ jobs:
         run: cargo install cargo-llvm-cov
 
       - name: Run coverage
-        run: cargo llvm-cov --report-html --lcov --output-path=coverage
+        run: cargo llvm-cov --html --lcov --output-path=coverage
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v3
