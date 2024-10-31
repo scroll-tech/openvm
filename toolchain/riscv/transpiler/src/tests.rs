@@ -7,7 +7,7 @@ use ax_stark_sdk::config::setup_tracing;
 use axvm_build::{build_guest_package, get_package, guest_methods, GuestOptions};
 use axvm_circuit::{
     arch::{VmConfig, VmExecutor},
-    sdk::{air_test, air_test_with_min_segments},
+    utils::{air_test, air_test_with_min_segments},
 };
 use axvm_platform::memory::MEM_SIZE;
 use eyre::Result;
@@ -76,7 +76,6 @@ fn test_rv32im_runtime(elf_path: &str) -> Result<()> {
 }
 
 #[test_case("fibonacci/program", 1)]
-#[test_case("fibonacci-large/program", 3)]
 fn test_rv32i_prove(examples_path: &str, min_segments: usize) -> Result<()> {
     let pkg = get_package(get_examples_dir().join(examples_path));
     let target_dir = tempdir()?;

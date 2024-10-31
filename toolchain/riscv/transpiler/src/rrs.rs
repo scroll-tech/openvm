@@ -1,16 +1,12 @@
 use std::marker::PhantomData;
 
-use axvm_circuit::{
-    arch::instructions::{
-        BaseAluOpcode, BranchEqualOpcode, BranchLessThanOpcode, DivRemOpcode, LessThanOpcode,
-        MulHOpcode, MulOpcode, Rv32AuipcOpcode, Rv32JalLuiOpcode, Rv32JalrOpcode,
-        Rv32LoadStoreOpcode, ShiftOpcode, UsizeOpcode,
-    },
-    rv32im::adapters::RV32_REGISTER_NUM_LIMBS,
-};
 use axvm_instructions::{
-    instruction::Instruction, riscv::RvIntrinsic, EccOpcode, PhantomInstruction,
-    Rv32HintStoreOpcode, Rv32ModularArithmeticOpcode,
+    instruction::Instruction,
+    riscv::{RvIntrinsic, RV32_REGISTER_NUM_LIMBS},
+    BaseAluOpcode, BranchEqualOpcode, BranchLessThanOpcode, DivRemOpcode, EccOpcode,
+    LessThanOpcode, MulHOpcode, MulOpcode, PhantomInstruction, Rv32AuipcOpcode,
+    Rv32HintStoreOpcode, Rv32JalLuiOpcode, Rv32JalrOpcode, Rv32LoadStoreOpcode,
+    Rv32ModularArithmeticOpcode, ShiftOpcode, UsizeOpcode,
 };
 use axvm_platform::intrinsics::{CUSTOM_0, CUSTOM_1};
 use p3_field::PrimeField32;
@@ -320,7 +316,6 @@ fn process_custom_instruction<F: PrimeField32>(instruction_u32: u32) -> Instruct
 /// # Panics
 ///
 /// This function will return an error if the [`Instruction`] cannot be processed.
-#[allow(dead_code)]
 pub(crate) fn transpile<F: PrimeField32>(instructions_u32: &[u32]) -> Vec<Instruction<F>> {
     let mut instructions = Vec::new();
     let mut transpiler = InstructionTranspiler::<F>(PhantomData);
