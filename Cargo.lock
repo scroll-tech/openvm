@@ -377,6 +377,7 @@ name = "ax-ecc-primitives"
 version = "0.1.0"
 dependencies = [
  "ax-circuit-primitives",
+ "ax-ecc-execution",
  "ax-stark-backend",
  "ax-stark-sdk",
  "axvm-ecc-constants",

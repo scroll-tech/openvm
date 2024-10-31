@@ -26,6 +26,7 @@ ax-circuit-primitives = { path = "../primitives" }
 hex-literal = { workspace = true }
 sha3 = "0.10.8"
 lazy_static.workspace = true
+ax-ecc-execution = { workspace = true }
 axvm-ecc-constants = { workspace = true }
 halo2curves-axiom = { workspace = true }
 
