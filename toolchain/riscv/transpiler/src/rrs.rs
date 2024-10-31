@@ -9,8 +9,10 @@ use axvm_circuit::{
     rv32im::adapters::RV32_REGISTER_NUM_LIMBS,
 };
 use axvm_instructions::{
-    instruction::Instruction, riscv::RvIntrinsic, EccOpcode, Rv32ModularArithmeticOpcode,
+    instruction::Instruction, riscv::RvIntrinsic, EccOpcode, PhantomInstruction,
+    Rv32HintStoreOpcode, Rv32ModularArithmeticOpcode,
 };
+use axvm_platform::intrinsics::{CUSTOM_0, CUSTOM_1};
 use p3_field::PrimeField32;
 use rrs_lib::{
     instruction_formats::{BType, IType, ITypeShamt, JType, RType, SType, UType},
@@ -245,24 +247,32 @@ fn process_custom_instruction<F: PrimeField32>(instruction_u32: u32) -> Instruct
     let funct3 = ((instruction_u32 >> 12) & 0b111) as u8; // All our instructions are R- or I-type
 
     match opcode {
-        0x0b => {
-            match funct3 {
-                0b000 => {
-                    let imm = (instruction_u32 >> 20) & 0xfff;
-                    Some(terminate(imm.try_into().expect("exit code must be byte")))
-                }
-                0b001 => {
-                    // keccak or poseidon
-                    None
-                }
-                0b010 => {
-                    // u256
-                    todo!("Implement u256 transpiler");
-                }
-                _ => None,
+        CUSTOM_0 => match funct3 {
+            0b000 => {
+                let imm = (instruction_u32 >> 20) & 0xfff;
+                Some(terminate(imm.try_into().expect("exit code must be byte")))
             }
-        }
-        0x2b => {
+            0b001 => {
+                let rd = (instruction_u32 >> 7) & 0x1f;
+                let imm = (instruction_u32 >> 20) & 0xfff;
+                Some(Instruction::from_isize(
+                    Rv32HintStoreOpcode::HINT_STOREW.with_default_offset(),
+                    0,
+                    (RV32_REGISTER_NUM_LIMBS * rd as usize) as isize,
+                    imm as isize,
+                    1,
+                    2,
+                ))
+            }
+            0b011 => Some(Instruction::phantom(
+                PhantomInstruction::HintInputRv32,
+                F::zero(),
+                F::zero(),
+                0,
+            )),
+            _ => unimplemented!(),
+        },
+        CUSTOM_1 => {
             match funct3 {
                 Rv32ModularArithmeticOpcode::FUNCT3 => {
                     // mod operations
@@ -315,7 +325,6 @@ pub(crate) fn transpile<F: PrimeField32>(instructions_u32: &[u32]) -> Vec<Instru
     let mut instructions = Vec::new();
     let mut transpiler = InstructionTranspiler::<F>(PhantomData);
     for instruction_u32 in instructions_u32 {
-        // TODO: we probably want to forbid such instructions, but for now we just skip them
         assert!(*instruction_u32 != 115, "ecall is not supported");
         let instruction = process_instruction(&mut transpiler, *instruction_u32)
             .unwrap_or_else(|| process_custom_instruction(*instruction_u32));
