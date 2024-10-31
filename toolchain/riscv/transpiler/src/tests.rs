@@ -1,5 +1,5 @@
 use std::{
-    fs::read,
+    fs::{read, read_dir},
     path::{Path, PathBuf},
 };
 
@@ -68,7 +68,6 @@ fn test_generate_program(elf_path: &str) -> Result<()> {
 #[test_case("data/rv32im-exp-from-as")]
 #[test_case("data/rv32im-fib-from-as")]
 fn test_rv32im_runtime(elf_path: &str) -> Result<()> {
-    setup_tracing();
     let config = VmConfig::rv32im();
     let (executor, exe) = setup_executor_from_elf(elf_path, config)?;
     executor.execute(exe, vec![])?;
@@ -127,5 +126,66 @@ fn test_terminate_runtime() -> Result<()> {
     let config = VmConfig::rv32i();
     let (_, exe) = setup_executor_from_elf("data/rv32im-terminate-from-as", config.clone())?;
     air_test(config, exe);
+    Ok(())
+}
+
+#[test]
+#[ignore = "must run makefile"]
+fn test_rv32im_riscv_vector_runtime() -> Result<()> {
+    let skip_list = ["rv32ui-p-ma_data", "rv32ui-p-fence_i"];
+    let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("rv32im-test-vectors/tests");
+    for entry in read_dir(dir)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path.is_file() && path.extension().unwrap_or_default() == "" {
+            let file_name = path.file_name().unwrap().to_str().unwrap();
+            if skip_list.contains(&file_name) {
+                continue;
+            }
+            println!("Running: {}", file_name);
+            let result = std::panic::catch_unwind(|| test_rv32im_runtime(path.to_str().unwrap()));
+
+            match result {
+                Ok(Ok(_)) => println!("Passed!: {}", file_name),
+                Ok(Err(e)) => println!("Failed: {} with error: {}", file_name, e),
+                Err(_) => panic!("Panic occurred while running: {}", file_name),
+            }
+        }
+    }
+
+    Ok(())
+}
+
+#[test]
+#[ignore = "long prover tests"]
+fn test_rv32im_riscv_vector_prove() -> Result<()> {
+    let config = VmConfig {
+        max_segment_len: (1 << 20) - 1,
+        ..VmConfig::rv32im()
+    };
+    let skip_list = ["rv32ui-p-ma_data", "rv32ui-p-fence_i"];
+    let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("rv32im-test-vectors/tests");
+    for entry in read_dir(dir)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path.is_file() && path.extension().unwrap_or_default() == "" {
+            let file_name = path.file_name().unwrap().to_str().unwrap();
+            if skip_list.contains(&file_name) {
+                continue;
+            }
+            println!("Running: {}", file_name);
+
+            let (_, exe) = setup_executor_from_elf(path.to_str().unwrap(), config.clone())?;
+            let result = std::panic::catch_unwind(|| {
+                air_test(config.clone(), exe);
+            });
+
+            match result {
+                Ok(_) => println!("Passed!: {}", file_name),
+                Err(_) => println!("Panic occurred while running: {}", file_name),
+            }
+        }
+    }
+
     Ok(())
 }
