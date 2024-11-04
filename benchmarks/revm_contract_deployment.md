@@ -1,6 +1,6 @@
 | group | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- |
-| revm_contract_deployment | <div style='text-align: right'>76,363,713</div>  | <div style='text-align: right'>1,879,274</div>  | <span style="color: red">(+113.0 [+0.8%])</span> <div style='text-align: right'>14,598.0</div>  |
+| revm_contract_deployment | <div style='text-align: right'>76,363,713</div>  | <div style='text-align: right'>1,879,274</div>  | <span style="color: green">(-37.0 [-0.3%])</span> <div style='text-align: right'>14,561.0</div>  |
 
 
 <details>
@@ -8,30 +8,16 @@
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| revm_contract_deployment | true | <span style="color: green">(-637.0 [-1.3%])</span> <div style='text-align: right'>47,610.0</div>  | <div style='text-align: right'>76,363,713</div>  | <div style='text-align: right'>1,879,274</div>  |
+| revm_contract_deployment | true | <span style="color: red">(+70.0 [+0.1%])</span> <div style='text-align: right'>47,680.0</div>  | <div style='text-align: right'>76,363,713</div>  | <div style='text-align: right'>1,879,274</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
-| revm_contract_deployment | AuipcRv32 | true | <div style='text-align: right'>961</div>  |
-| revm_contract_deployment | BaseAluRv32 | true | <div style='text-align: right'>860,561</div>  |
 | revm_contract_deployment | BitwiseOperationLookup | true | <div style='text-align: right'>65,536</div>  |
-| revm_contract_deployment | BranchEqualRv32 | true | <div style='text-align: right'>48,100</div>  |
-| revm_contract_deployment | BranchLessThanRv32 | true | <div style='text-align: right'>29,575</div>  |
-| revm_contract_deployment | HintStoreRv32 | true | <div style='text-align: right'>3,069</div>  |
-| revm_contract_deployment | JalLuiRv32 | true | <div style='text-align: right'>7,271</div>  |
-| revm_contract_deployment | JalrRv32 | true | <div style='text-align: right'>2,096</div>  |
-| revm_contract_deployment | LessThanRv32 | true | <div style='text-align: right'>14,117</div>  |
-| revm_contract_deployment | LoadSignExtendRv32 | true | <div style='text-align: right'>11,811</div>  |
-| revm_contract_deployment | LoadStoreRv32 | true | <div style='text-align: right'>633,356</div>  |
 | revm_contract_deployment | Memory AccessAdapter<8> | true | <div style='text-align: right'>11,553</div>  |
 | revm_contract_deployment | Memory Boundary | true | <div style='text-align: right'>23,106</div>  |
 | revm_contract_deployment | Memory Merkle | true | <div style='text-align: right'>24,352</div>  |
-| revm_contract_deployment | MultiplicationHighRv32 | true | <div style='text-align: right'>1,237</div>  |
-| revm_contract_deployment | MultiplicationRv32 | true | <div style='text-align: right'>2,117</div>  |
-| revm_contract_deployment | Phantom | true | <div style='text-align: right'>137</div>  |
 | revm_contract_deployment | ProgramChip | true | <div style='text-align: right'>250,207</div>  |
 | revm_contract_deployment | RangeTupleChecker | true | <div style='text-align: right'>524,288</div>  |
-| revm_contract_deployment | ShiftRv32 | true | <div style='text-align: right'>264,866</div>  |
 
 | group | collect_metrics | dsl_ir | opcode | frequency |
 | --- | --- | --- | --- | --- |
@@ -171,7 +157,7 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| revm_contract_deployment | <span style="color: red">(+1.0 [+1.2%])</span> <div style='text-align: right'>87.0</div>  | <span style="color: green">(-50.0 [-1.1%])</span> <div style='text-align: right'>4,635.0</div>  | <span style="color: green">(-40.0 [-1.0%])</span> <div style='text-align: right'>3,827.0</div>  | <span style="color: green">(-9.0 [-7.8%])</span> <div style='text-align: right'>106.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>76,363,713</div>  | <div style='text-align: right'>1,879,274</div>  | <span style="color: red">(+113.0 [+0.8%])</span> <div style='text-align: right'>14,598.0</div>  |
+| revm_contract_deployment | <div style='text-align: right'>87.0</div>  | <span style="color: green">(-9.0 [-0.2%])</span> <div style='text-align: right'>4,626.0</div>  | <span style="color: green">(-6.0 [-0.2%])</span> <div style='text-align: right'>3,821.0</div>  | <span style="color: red">(+4.0 [+3.8%])</span> <div style='text-align: right'>110.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>76,363,713</div>  | <div style='text-align: right'>1,879,274</div>  | <span style="color: green">(-37.0 [-0.3%])</span> <div style='text-align: right'>14,561.0</div>  |
 
 | group | air_name | segment | cells | main_cols | perm_cols | prep_cols | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -201,7 +187,7 @@
 
 | group | segment | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- |
-| revm_contract_deployment | 0 | <span style="color: red">(+163.0 [+1.7%])</span> <div style='text-align: right'>9,963.0</div>  | <div style='text-align: right'>363,216,416</div>  |
+| revm_contract_deployment | 0 | <span style="color: green">(-28.0 [-0.3%])</span> <div style='text-align: right'>9,935.0</div>  | <div style='text-align: right'>363,216,416</div>  |
 
 </details>
 
@@ -210,13 +196,13 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6423775f3fdac24e9e0b2292250ceb0db2550a82/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6423775f3fdac24e9e0b2292250ceb0db2550a82/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6423775f3fdac24e9e0b2292250ceb0db2550a82/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6423775f3fdac24e9e0b2292250ceb0db2550a82/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6423775f3fdac24e9e0b2292250ceb0db2550a82/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6423775f3fdac24e9e0b2292250ceb0db2550a82/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6423775f3fdac24e9e0b2292250ceb0db2550a82/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6423775f3fdac24e9e0b2292250ceb0db2550a82/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3585d560eb26bbc7fa8bd38fca1a4dae333c2d07/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3585d560eb26bbc7fa8bd38fca1a4dae333c2d07/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3585d560eb26bbc7fa8bd38fca1a4dae333c2d07/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3585d560eb26bbc7fa8bd38fca1a4dae333c2d07/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3585d560eb26bbc7fa8bd38fca1a4dae333c2d07/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3585d560eb26bbc7fa8bd38fca1a4dae333c2d07/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3585d560eb26bbc7fa8bd38fca1a4dae333c2d07/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3585d560eb26bbc7fa8bd38fca1a4dae333c2d07/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/6423775f3fdac24e9e0b2292250ceb0db2550a82
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/3585d560eb26bbc7fa8bd38fca1a4dae333c2d07
 Instance Type: 64cpu-linux-arm64
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11672165289)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11673578427)
