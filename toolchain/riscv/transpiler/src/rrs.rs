@@ -5,8 +5,8 @@ use axvm_instructions::{
     BranchEqualOpcode, BranchLessThanOpcode, DivRemOpcode, EccOpcode, LessThanOpcode, MulHOpcode,
     MulOpcode, PhantomInstruction, Rv32AuipcOpcode, Rv32BaseAlu256Opcode, Rv32BranchEqual256Opcode,
     Rv32HintStoreOpcode, Rv32JalLuiOpcode, Rv32JalrOpcode, Rv32LessThan256Opcode,
-    Rv32LoadStoreOpcode, Rv32ModularArithmeticOpcode, Rv32ModularEqualOpcode, Rv32Mul256Opcode,
-    Rv32Shift256Opcode, ShiftOpcode, UsizeOpcode,
+    Rv32LoadStoreOpcode, Rv32ModularArithmeticOpcode, Rv32Mul256Opcode, Rv32Shift256Opcode,
+    ShiftOpcode, UsizeOpcode,
 };
 use axvm_platform::constants::{
     Custom0Funct3::{self, *},
@@ -349,7 +349,6 @@ fn process_custom_instruction<F: PrimeField32>(instruction_u32: u32) -> Instruct
                     // mod operations
                     let dec_insn = RType::new(instruction_u32);
                     let base_funct7 = (dec_insn.funct7 as u8) % MODULAR_ARITHMETIC_MAX_KINDS;
-                    let mut e_as = 2;
                     let global_opcode = match ModArithBaseFunct7::from_repr(base_funct7) {
                         Some(ModArithBaseFunct7::AddMod) => {
                             Rv32ModularArithmeticOpcode::ADD as usize
@@ -368,17 +367,15 @@ fn process_custom_instruction<F: PrimeField32>(instruction_u32: u32) -> Instruct
                                 + Rv32ModularArithmeticOpcode::default_offset()
                         }
                         Some(ModArithBaseFunct7::IsEqMod) => {
-                            // e = 1 for IsEqMod
-                            e_as = 1;
-                            Rv32ModularEqualOpcode::IS_EQ as usize
-                                + Rv32ModularEqualOpcode::default_offset()
+                            Rv32ModularArithmeticOpcode::IS_EQ as usize
+                                + Rv32ModularArithmeticOpcode::default_offset()
                         }
                         _ => unimplemented!(),
                     };
                     let mod_idx_shift = ((dec_insn.funct7 as u8) / MODULAR_ARITHMETIC_MAX_KINDS)
                         * MODULAR_ARITHMETIC_MAX_KINDS;
                     let global_opcode = global_opcode + mod_idx_shift as usize;
-                    Some(from_r_type(global_opcode, e_as, &dec_insn))
+                    Some(from_r_type(global_opcode, 2, &dec_insn))
                 }
                 Some(ShortWeierstrass) => {
                     // short weierstrass ec

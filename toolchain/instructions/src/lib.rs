@@ -356,6 +356,7 @@ pub enum Rv32ModularArithmeticOpcode {
     SUB,
     MUL,
     DIV,
+    IS_EQ,
 }
 
 // to be deleted and replaced by Rv32SwOpcode
@@ -369,15 +370,6 @@ pub enum EccOpcode {
     EC_DOUBLE,
 }
 
-#[derive(
-    Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, EnumCount, EnumIter, FromRepr, UsizeOpcode,
-)]
-#[opcode_offset = 0x510]
-#[repr(usize)]
-#[allow(non_camel_case_types)]
-pub enum Rv32ModularEqualOpcode {
-    IS_EQ,
-}
 #[derive(
     Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, EnumCount, EnumIter, FromRepr, UsizeOpcode,
 )]
