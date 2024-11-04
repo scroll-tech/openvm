@@ -32,7 +32,7 @@ use strum::EnumCount;
 
 use super::{vm_poseidon2_config, EcCurve, Streams};
 use crate::{
-    arch::{AxVmChip, AxVmInstructionExecutor, ExecutionBus, ExecutorName, VmConfig},
+    arch::{AxVmChip, AxVmExecutor, ExecutionBus, ExecutorName, VmConfig},
     intrinsics::{
         ecc::{
             pairing::{
@@ -110,7 +110,7 @@ pub const PUBLIC_VALUES_AIR_ID: usize = 2;
 pub const MERKLE_AIR_ID: usize = CONNECTOR_AIR_ID + 1 + MERKLE_AIR_OFFSET;
 
 pub struct VmChipSet<F: PrimeField32> {
-    pub executors: BTreeMap<usize, AxVmInstructionExecutor<F>>,
+    pub executors: BTreeMap<usize, AxVmExecutor<F>>,
 
     // ATTENTION: chip destruction should follow the following field order:
     pub program_chip: ProgramChip<F>,
@@ -128,13 +128,17 @@ impl<F: PrimeField32> VmChipSet<F> {
     }
     pub(crate) fn set_streams(&mut self, streams: Arc<Mutex<Streams<F>>>) {
         for chip in self.chips.iter_mut() {
-            match chip {
-                AxVmChip::LoadStore(chip) => chip.borrow_mut().core.set_streams(streams.clone()),
-                AxVmChip::HintStoreRv32(chip) => {
-                    chip.borrow_mut().core.set_streams(streams.clone())
+            if let AxVmChip::Executor(chip) = chip {
+                match chip {
+                    AxVmExecutor::LoadStore(chip) => {
+                        chip.borrow_mut().core.set_streams(streams.clone())
+                    }
+                    AxVmExecutor::HintStoreRv32(chip) => {
+                        chip.borrow_mut().core.set_streams(streams.clone())
+                    }
+                    AxVmExecutor::Phantom(chip) => chip.borrow_mut().set_streams(streams.clone()),
+                    _ => {}
                 }
-                AxVmChip::Phantom(chip) => chip.borrow_mut().set_streams(streams.clone()),
-                _ => {}
             }
         }
     }
@@ -248,7 +252,7 @@ impl VmConfig {
         };
         let program_chip = ProgramChip::default();
 
-        let mut executors: BTreeMap<usize, AxVmInstructionExecutor<F>> = BTreeMap::new();
+        let mut executors: BTreeMap<usize, AxVmExecutor<F>> = BTreeMap::new();
 
         // Use BTreeSet to ensure deterministic order.
         // NOTE: The order of entries in `chips` must be a linear extension of the dependency DAG.
@@ -308,7 +312,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, phantom_chip.clone().into());
                     }
-                    chips.push(AxVmChip::Phantom(phantom_chip));
+                    chips.push(AxVmChip::Executor(phantom_chip.into()));
                 }
                 ExecutorName::LoadStore => {
                     let chip = Rc::new(RefCell::new(KernelLoadStoreChip::<F, 1>::new(
@@ -324,7 +328,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::LoadStore(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::BranchEqual => {
                     let chip = Rc::new(RefCell::new(KernelBranchEqChip::new(
@@ -339,7 +343,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::BranchEqual(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::Jal => {
                     let chip = Rc::new(RefCell::new(KernelJalChip::new(
@@ -354,7 +358,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::Jal(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::FieldArithmetic => {
                     let chip = Rc::new(RefCell::new(FieldArithmeticChip::new(
@@ -369,7 +373,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::FieldArithmetic(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::FieldExtension => {
                     let chip = Rc::new(RefCell::new(FieldExtensionChip::new(
@@ -384,7 +388,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::FieldExtension(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::PublicValues => {}
                 ExecutorName::Poseidon2 => {}
@@ -399,7 +403,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::Keccak256Rv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::FriMatOpening => {
                     let chip = Rc::new(RefCell::new(FriMatOpeningChip::new(
@@ -411,7 +415,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::FriMatOpening(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::BaseAluRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32BaseAluChip::new(
@@ -426,7 +430,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::BaseAluRv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::LessThanRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32LessThanChip::new(
@@ -441,7 +445,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::LessThanRv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::MultiplicationRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32MultiplicationChip::new(
@@ -456,7 +460,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::MultiplicationRv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::MultiplicationHighRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32MulHChip::new(
@@ -475,7 +479,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::MultiplicationHighRv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::DivRemRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32DivRemChip::new(
@@ -494,7 +498,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::DivRemRv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::ShiftRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32ShiftChip::new(
@@ -513,7 +517,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::ShiftRv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::LoadStoreRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32LoadStoreChip::new(
@@ -530,7 +534,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::LoadStoreRv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::LoadSignExtendRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32LoadSignExtendChip::new(
@@ -547,7 +551,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::LoadSignExtendRv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::HintStoreRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32HintStoreChip::new(
@@ -563,7 +567,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::HintStoreRv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::BranchEqualRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32BranchEqualChip::new(
@@ -578,7 +582,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::BranchEqualRv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::BranchLessThanRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32BranchLessThanChip::new(
@@ -593,7 +597,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::BranchLessThanRv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::JalLuiRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32JalLuiChip::new(
@@ -608,7 +612,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::JalLuiRv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::JalrRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32JalrChip::new(
@@ -627,7 +631,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::JalrRv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::AuipcRv32 => {
                     let chip = Rc::new(RefCell::new(Rv32AuipcChip::new(
@@ -642,7 +646,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::AuipcRv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::BaseAlu256Rv32 => {
                     let chip = Rc::new(RefCell::new(Rv32BaseAlu256Chip::new(
@@ -658,7 +662,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::BaseAlu256Rv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::LessThan256Rv32 => {
                     let chip = Rc::new(RefCell::new(Rv32LessThan256Chip::new(
@@ -674,7 +678,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::LessThan256Rv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::Multiplication256Rv32 => {
                     let chip = Rc::new(RefCell::new(Rv32Multiplication256Chip::new(
@@ -690,7 +694,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::Multiplication256Rv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::Shift256Rv32 => {
                     let chip = Rc::new(RefCell::new(Rv32Shift256Chip::new(
@@ -710,7 +714,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::Shift256Rv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::BranchEqual256Rv32 => {
                     let chip = Rc::new(RefCell::new(Rv32BranchEqual256Chip::new(
@@ -726,7 +730,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::BranchEqual256Rv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::BranchLessThan256Rv32 => {
                     let chip = Rc::new(RefCell::new(Rv32BranchLessThan256Chip::new(
@@ -742,7 +746,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::BranchLessThan256Rv32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::CastF => {
                     let chip = Rc::new(RefCell::new(CastFChip::new(
@@ -760,7 +764,7 @@ impl VmConfig {
                     for opcode in range {
                         executors.insert(opcode, chip.clone().into());
                     }
-                    chips.push(AxVmChip::CastF(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 _ => {
                     unreachable!("Unsupported executor")
@@ -781,7 +785,7 @@ impl VmConfig {
             for opcode in range {
                 executors.insert(opcode, poseidon_chip.clone().into());
             }
-            chips.push(AxVmChip::Poseidon2(poseidon_chip));
+            chips.push(AxVmChip::Executor(poseidon_chip.into()));
         }
 
         for (local_opcode_idx, class_offset, executor, modulus) in
@@ -815,7 +819,7 @@ impl VmConfig {
                         class_offset,
                     )));
                     executors.insert(global_opcode_idx, chip.clone().into());
-                    chips.push(AxVmChip::EcAddNeRv32_2x32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::EcDoubleRv32_2x32 => {
                     let chip = Rc::new(RefCell::new(EcDoubleChip::new(
@@ -830,7 +834,7 @@ impl VmConfig {
                         class_offset,
                     )));
                     executors.insert(global_opcode_idx, chip.clone().into());
-                    chips.push(AxVmChip::EcDoubleRv32_2x32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::EcAddNeRv32_6x16 => {
                     let chip = Rc::new(RefCell::new(EcAddNeChip::new(
@@ -845,7 +849,7 @@ impl VmConfig {
                         class_offset,
                     )));
                     executors.insert(global_opcode_idx, chip.clone().into());
-                    chips.push(AxVmChip::EcAddNeRv32_6x16(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::EcDoubleRv32_6x16 => {
                     let chip = Rc::new(RefCell::new(EcDoubleChip::new(
@@ -860,7 +864,7 @@ impl VmConfig {
                         class_offset,
                     )));
                     executors.insert(global_opcode_idx, chip.clone().into());
-                    chips.push(AxVmChip::EcDoubleRv32_6x16(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::EcLineMul013By013 => {
                     let chip = Rc::new(RefCell::new(EcLineMul013By013Chip::new(
@@ -875,7 +879,7 @@ impl VmConfig {
                         class_offset,
                     )));
                     executors.insert(global_opcode_idx, chip.clone().into());
-                    chips.push(AxVmChip::EcLineMul013By013(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::EcLineMulBy01234 => {
                     let chip = Rc::new(RefCell::new(EcLineMulBy01234Chip::new(
@@ -890,7 +894,7 @@ impl VmConfig {
                         class_offset,
                     )));
                     executors.insert(global_opcode_idx, chip.clone().into());
-                    chips.push(AxVmChip::EcLineMulBy01234(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 _ => unreachable!("Unsupported executor"),
             }
@@ -927,7 +931,7 @@ impl VmConfig {
                         class_offset,
                     )));
                     executors.insert(global_opcode_idx, chip.clone().into());
-                    chips.push(AxVmChip::MillerDoubleStepRv32_32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::MillerDoubleStepRv32_48 => {
                     let chip = Rc::new(RefCell::new(MillerDoubleStepChip::new(
@@ -942,7 +946,7 @@ impl VmConfig {
                         class_offset,
                     )));
                     executors.insert(global_opcode_idx, chip.clone().into());
-                    chips.push(AxVmChip::MillerDoubleStepRv32_48(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::MillerDoubleAndAddStepRv32_32 => {
                     let chip = Rc::new(RefCell::new(MillerDoubleAndAddStepChip::new(
@@ -957,7 +961,7 @@ impl VmConfig {
                         class_offset,
                     )));
                     executors.insert(global_opcode_idx, chip.clone().into());
-                    chips.push(AxVmChip::MillerDoubleAndAddStepRv32_32(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 ExecutorName::MillerDoubleAndAddStepRv32_48 => {
                     let chip = Rc::new(RefCell::new(MillerDoubleAndAddStepChip::new(
@@ -972,7 +976,7 @@ impl VmConfig {
                         class_offset,
                     )));
                     executors.insert(global_opcode_idx, chip.clone().into());
-                    chips.push(AxVmChip::MillerDoubleAndAddStepRv32_48(chip));
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 _ => unreachable!("Unsupported executor"),
             }
@@ -1016,7 +1020,7 @@ impl VmConfig {
                     for global_opcode in range {
                         executors.insert(global_opcode, new_chip.clone().into());
                     }
-                    chips.push(AxVmChip::ModularAddSubRv32_1x32(new_chip));
+                    chips.push(AxVmExecutor::ModularAddSubRv32_1x32(new_chip).into());
                 }
                 ExecutorName::ModularMulDivRv32_1x32 => {
                     let new_chip = Rc::new(RefCell::new(ModularMulDivChip::new(
@@ -1036,7 +1040,7 @@ impl VmConfig {
                     for global_opcode in range {
                         executors.insert(global_opcode, new_chip.clone().into());
                     }
-                    chips.push(AxVmChip::ModularMulDivRv32_1x32(new_chip));
+                    chips.push(AxVmExecutor::ModularMulDivRv32_1x32(new_chip).into());
                 }
                 ExecutorName::ModularIsEqualRv32_1x32 => {
                     let new_chip = Rc::new(RefCell::new(ModularIsEqualChip::new(
@@ -1056,7 +1060,7 @@ impl VmConfig {
                     for global_opcode in range {
                         executors.insert(global_opcode, new_chip.clone().into());
                     }
-                    chips.push(AxVmChip::ModularIsEqualRv32_1x32(new_chip));
+                    chips.push(AxVmExecutor::ModularIsEqualRv32_1x32(new_chip).into());
                 }
                 ExecutorName::ModularAddSubRv32_3x16 => {
                     let new_chip = Rc::new(RefCell::new(ModularAddSubChip::new(
@@ -1076,7 +1080,7 @@ impl VmConfig {
                     for global_opcode in range {
                         executors.insert(global_opcode, new_chip.clone().into());
                     }
-                    chips.push(AxVmChip::ModularAddSubRv32_3x16(new_chip));
+                    chips.push(AxVmExecutor::ModularAddSubRv32_3x16(new_chip).into());
                 }
                 ExecutorName::ModularMulDivRv32_3x16 => {
                     let new_chip = Rc::new(RefCell::new(ModularMulDivChip::new(
@@ -1096,7 +1100,7 @@ impl VmConfig {
                     for global_opcode in range {
                         executors.insert(global_opcode, new_chip.clone().into());
                     }
-                    chips.push(AxVmChip::ModularMulDivRv32_3x16(new_chip));
+                    chips.push(AxVmExecutor::ModularMulDivRv32_3x16(new_chip).into());
                 }
                 ExecutorName::ModularIsEqualRv32_3x16 => {
                     let new_chip = Rc::new(RefCell::new(ModularIsEqualChip::new(
@@ -1116,7 +1120,7 @@ impl VmConfig {
                     for global_opcode in range {
                         executors.insert(global_opcode, new_chip.clone().into());
                     }
-                    chips.push(AxVmChip::ModularIsEqualRv32_3x16(new_chip));
+                    chips.push(AxVmExecutor::ModularIsEqualRv32_3x16(new_chip).into());
                 }
                 _ => unreachable!(
                     "modular_executors should only contain ModularAddSub and ModularMultDiv"
