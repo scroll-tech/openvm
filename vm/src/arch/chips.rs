@@ -24,7 +24,8 @@ use crate::{
         },
         hashes::{keccak256::KeccakVmChip, poseidon2::Poseidon2Chip},
         int256::{
-            Rv32BaseAlu256Chip, Rv32LessThan256Chip, Rv32Multiplication256Chip, Rv32Shift256Chip,
+            Rv32BaseAlu256Chip, Rv32BranchEqual256Chip, Rv32BranchLessThan256Chip,
+            Rv32LessThan256Chip, Rv32Multiplication256Chip, Rv32Shift256Chip,
         },
         modular::{ModularAddSubChip, ModularMulDivChip},
     },
@@ -105,6 +106,8 @@ pub enum AxVmInstructionExecutor<F: PrimeField32> {
     BaseAlu256Rv32(Rc<RefCell<Rv32BaseAlu256Chip<F>>>),
     Shift256Rv32(Rc<RefCell<Rv32Shift256Chip<F>>>),
     LessThan256Rv32(Rc<RefCell<Rv32LessThan256Chip<F>>>),
+    BranchEqual256Rv32(Rc<RefCell<Rv32BranchEqual256Chip<F>>>),
+    BranchLessThan256Rv32(Rc<RefCell<Rv32BranchLessThan256Chip<F>>>),
     Multiplication256Rv32(Rc<RefCell<Rv32Multiplication256Chip<F>>>),
     // Modular arithmetic:
     ModularAddSubRv32_1x32(Rc<RefCell<ModularAddSubChip<F, 1, 32>>>),
@@ -165,6 +168,8 @@ pub enum AxVmChip<F: PrimeField32> {
     LessThan256Rv32(Rc<RefCell<Rv32LessThan256Chip<F>>>),
     Multiplication256Rv32(Rc<RefCell<Rv32Multiplication256Chip<F>>>),
     Shift256Rv32(Rc<RefCell<Rv32Shift256Chip<F>>>),
+    BranchEqual256Rv32(Rc<RefCell<Rv32BranchEqual256Chip<F>>>),
+    BranchLessThan256Rv32(Rc<RefCell<Rv32BranchLessThan256Chip<F>>>),
     // Modular arithmetic:
     ModularAddSubRv32_1x32(Rc<RefCell<ModularAddSubChip<F, 1, 32>>>),
     ModularMulDivRv32_1x32(Rc<RefCell<ModularMulDivChip<F, 1, 32>>>),
