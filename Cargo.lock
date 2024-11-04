@@ -539,6 +539,7 @@ dependencies = [
  "axvm-transpiler",
  "criterion",
  "eyre",
+ "hex",
  "metrics",
  "p3-field",
  "pprof",

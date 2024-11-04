@@ -237,7 +237,7 @@ impl<F: PrimeField32> InstructionProcessor for InstructionTranspiler<F> {
     }
 
     fn process_fence(&mut self, dec_insn: IType) -> Self::InstructionResult {
-        eprintln!("trying to transpile fence ({:?})", dec_insn);
+        eprintln!("Transpiling fence ({:?}) to nop", dec_insn);
         nop()
     }
 }
@@ -404,6 +404,21 @@ fn process_custom_instruction<F: PrimeField32>(instruction_u32: u32) -> Instruct
         _ => None,
     }
     .unwrap_or_else(|| {
+        if opcode == 0b1110011 {
+            let dec_insn = IType::new(instruction_u32);
+            if dec_insn.funct3 == 0b001 {
+                // CSRRW
+                if dec_insn.rs1 == 0 && dec_insn.rd == 0 {
+                    // This resets the CSR counter to zero. Since we don't have any CSR registers, this is a nop.
+                    return nop();
+                }
+            }
+            eprintln!(
+                "Transpiling system / CSR instruction: {:b} (opcode = {:07b}, funct3 = {:03b}) to unimp",
+                instruction_u32, opcode, funct3
+            );
+            return unimp();
+        }
         panic!(
             "Failed to transpile custom instruction: {:b} (opcode = {:07b}, funct3 = {:03b})",
             instruction_u32, opcode, funct3
