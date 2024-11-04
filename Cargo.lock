@@ -526,7 +526,6 @@ dependencies = [
  "hex-literal",
  "num-bigint-dig",
  "num-traits",
- "once_cell",
  "serde",
  "tiny-keccak",
 ]
