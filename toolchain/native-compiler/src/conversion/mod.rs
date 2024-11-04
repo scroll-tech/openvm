@@ -320,13 +320,13 @@ fn convert_print_instruction<F: PrimeField32, EF: ExtensionField<F>>(
             PhantomInstruction::PrintF,
             i32_f(src),
             F::zero(),
-            0,
+            2,
         )],
         AsmInstruction::PrintF(src) => vec![Instruction::phantom(
             PhantomInstruction::PrintF,
             i32_f(src),
             F::zero(),
-            0,
+            2,
         )],
         AsmInstruction::PrintE(src) => (0..EF::D as i32)
             .map(|i| {
@@ -334,7 +334,7 @@ fn convert_print_instruction<F: PrimeField32, EF: ExtensionField<F>>(
                     PhantomInstruction::PrintF,
                     i32_f(src + i * word_size_i32),
                     F::zero(),
-                    0,
+                    2,
                 )
             })
             .collect(),
