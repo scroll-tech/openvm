@@ -39,7 +39,8 @@ use crate::{
             fp2::{Fp2AddSubChip, Fp2MulDivChip},
             pairing::{
                 EcLineMul013By013Chip, EcLineMul023By023Chip, EcLineMulBy01234Chip,
-                EcLineMulBy02345Chip, MillerDoubleAndAddStepChip, MillerDoubleStepChip,
+                EcLineMulBy02345Chip, EvaluateLineChip, MillerDoubleAndAddStepChip,
+                MillerDoubleStepChip,
             },
             sw::{EcAddNeChip, EcDoubleChip},
         },
@@ -75,6 +76,7 @@ use crate::{
             Rv32BaseAluAdapterChip, Rv32BranchAdapterChip, Rv32CondRdWriteAdapterChip,
             Rv32HintStoreAdapterChip, Rv32JalrAdapterChip, Rv32LoadStoreAdapterChip,
             Rv32MultAdapterChip, Rv32RdWriteAdapterChip, Rv32VecHeapAdapterChip,
+            Rv32VecHeapTwoReadsAdapterChip,
         },
         *,
     },
@@ -1075,6 +1077,34 @@ impl VmConfig {
                     executors.insert(global_opcode_idx, chip.clone().into());
                     chips.push(AxVmChip::Executor(chip.into()));
                 }
+                ExecutorName::EvaluateLineRv32_32 => {
+                    let chip = Rc::new(RefCell::new(EvaluateLineChip::new(
+                        Rv32VecHeapTwoReadsAdapterChip::<F, 4, 2, 4, 32, 32>::new(
+                            execution_bus,
+                            program_bus,
+                            memory_controller.clone(),
+                        ),
+                        memory_controller.clone(),
+                        config32,
+                        class_offset,
+                    )));
+                    executors.insert(global_opcode_idx, chip.clone().into());
+                    chips.push(AxVmChip::Executor(chip.into()));
+                }
+                ExecutorName::EvaluateLineRv32_48 => {
+                    let chip = Rc::new(RefCell::new(EvaluateLineChip::new(
+                        Rv32VecHeapTwoReadsAdapterChip::<F, 12, 6, 12, 16, 16>::new(
+                            execution_bus,
+                            program_bus,
+                            memory_controller.clone(),
+                        ),
+                        memory_controller.clone(),
+                        config48,
+                        class_offset,
+                    )));
+                    executors.insert(global_opcode_idx, chip.clone().into());
+                    chips.push(AxVmChip::Executor(chip.into()));
+                }
                 _ => unreachable!("Unsupported executor"),
             }
         }
@@ -1319,6 +1349,12 @@ fn gen_pairing_executor_tuple(
                         curve.prime(),
                     ),
                     (
+                        PairingOpcode::EVALUATE_LINE as usize,
+                        pairing_class_offset,
+                        ExecutorName::EvaluateLineRv32_32,
+                        curve.prime(),
+                    ),
+                    (
                         Fp2Opcode::ADD as usize,
                         fp2_class_offset,
                         ExecutorName::Fp2AddSubRv32_32,
@@ -1355,6 +1391,12 @@ fn gen_pairing_executor_tuple(
                         PairingOpcode::MILLER_DOUBLE_AND_ADD_STEP as usize,
                         pairing_class_offset,
                         ExecutorName::MillerDoubleAndAddStepRv32_48,
+                        curve.prime(),
+                    ),
+                    (
+                        PairingOpcode::EVALUATE_LINE as usize,
+                        pairing_class_offset,
+                        ExecutorName::EvaluateLineRv32_48,
                         curve.prime(),
                     ),
                     (
