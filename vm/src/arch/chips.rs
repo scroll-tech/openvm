@@ -16,6 +16,7 @@ use crate::{
     arch::ExecutionState,
     intrinsics::{
         ecc::{
+            fp2::{Fp2AddSubChip, Fp2MulDivChip},
             pairing::{
                 EcLineMul013By013Chip, EcLineMul023By023Chip, EcLineMulBy01234Chip,
                 EcLineMulBy02345Chip, MillerDoubleAndAddStepChip, MillerDoubleStepChip,
@@ -122,6 +123,11 @@ pub enum AxVmExecutor<F: PrimeField32> {
     EcAddNeRv32_6x16(Rc<RefCell<EcAddNeChip<F, 6, 16>>>),
     EcDoubleRv32_6x16(Rc<RefCell<EcDoubleChip<F, 6, 16>>>),
     // Pairing:
+    // Fp2 for 32-bytes or 48-bytes prime.
+    Fp2AddSubRv32_32(Rc<RefCell<Fp2AddSubChip<F, 1, 32>>>),
+    Fp2AddSubRv32_48(Rc<RefCell<Fp2AddSubChip<F, 3, 16>>>),
+    Fp2MulDivRv32_32(Rc<RefCell<Fp2MulDivChip<F, 1, 32>>>),
+    Fp2MulDivRv32_48(Rc<RefCell<Fp2MulDivChip<F, 3, 16>>>),
     /// Only for BN254 for now
     EcLineMul013By013(Rc<RefCell<EcLineMul013By013Chip<F, 4, 10, 32>>>),
     /// Only for BN254 for now
