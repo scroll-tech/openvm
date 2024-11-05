@@ -35,7 +35,7 @@ impl IntModN {
     /// Creates a new IntModN from a BigUint.
     #[cfg(not(target_os = "zkvm"))]
     pub fn from_biguint(biguint: BigUint) -> Self {
-        Self(biguint_to_limbs(biguint))
+        Self(biguint_to_limbs(&biguint))
     }
 
     /// Value of this IntModN as a BigUint.
@@ -54,7 +54,7 @@ impl IntModN {
     fn add_assign_impl(&mut self, other: &Self) {
         #[cfg(not(target_os = "zkvm"))]
         {
-            self.0 = biguint_to_limbs(
+            *self = Self::from_biguint(
                 (self.as_biguint() + other.as_biguint()) % Self::modulus_biguint(),
             );
         }
@@ -69,7 +69,7 @@ impl IntModN {
         #[cfg(not(target_os = "zkvm"))]
         {
             let modulus = Self::modulus_biguint();
-            self.0 = biguint_to_limbs(
+            *self = Self::from_biguint(
                 (self.as_biguint() + modulus.clone() - other.as_biguint()) % modulus,
             );
         }
@@ -83,7 +83,7 @@ impl IntModN {
     fn mul_assign_impl(&mut self, other: &Self) {
         #[cfg(not(target_os = "zkvm"))]
         {
-            self.0 = biguint_to_limbs(
+            *self = Self::from_biguint(
                 (self.as_biguint() * other.as_biguint()) % Self::modulus_biguint(),
             );
         }
@@ -106,7 +106,7 @@ impl IntModN {
             }
             .to_biguint()
             .unwrap();
-            self.0 = biguint_to_limbs((self.as_biguint() * inv) % modulus);
+            *self = Self::from_biguint((self.as_biguint() * inv) % modulus);
         }
         #[cfg(target_os = "zkvm")]
         {
