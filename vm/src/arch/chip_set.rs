@@ -21,6 +21,7 @@ use ax_stark_backend::{
     rap::AnyRap,
     Chip, ChipUsageGetter,
 };
+use axvm_ecc_constants::{BLS12381, BN254};
 use axvm_instructions::{program::Program, *};
 use itertools::zip_eq;
 use num_bigint_dig::BigUint;
@@ -36,8 +37,8 @@ use crate::{
     intrinsics::{
         ecc::{
             pairing::{
-                EcLineMul013By013Chip, EcLineMulBy01234Chip, MillerDoubleAndAddStepChip,
-                MillerDoubleStepChip,
+                EcLineMul013By013Chip, EcLineMul023By023Chip, EcLineMulBy01234Chip,
+                MillerDoubleAndAddStepChip, MillerDoubleStepChip,
             },
             sw::{EcAddNeChip, EcDoubleChip},
         },
@@ -876,6 +877,7 @@ impl VmConfig {
                         ),
                         memory_controller.clone(),
                         config32,
+                        BN254.XI,
                         class_offset,
                     )));
                     executors.insert(global_opcode_idx, chip.clone().into());
@@ -891,10 +893,27 @@ impl VmConfig {
                         ),
                         memory_controller.clone(),
                         config32,
+                        BN254.XI,
                         class_offset,
                     )));
                     executors.insert(global_opcode_idx, chip.clone().into());
                     chips.push(AxVmChip::Executor(chip.into()));
+                }
+                ExecutorName::EcLineMul023By023 => {
+                    let chip = Rc::new(RefCell::new(EcLineMul023By023Chip::new(
+                        Rv32VecHeapAdapterChip::<F, 2, 12, 30, 16, 16>::new(
+                            execution_bus,
+                            program_bus,
+                            memory_controller.clone(),
+                            bitwise_lookup_chip.clone(),
+                        ),
+                        memory_controller.clone(),
+                        config48,
+                        BLS12381.XI,
+                        class_offset,
+                    )));
+                    executors.insert(global_opcode_idx, chip.clone().into());
+                    chips.push(AxVmExecutor::EcLineMul023By023(chip).into());
                 }
                 _ => unreachable!("Unsupported executor"),
             }

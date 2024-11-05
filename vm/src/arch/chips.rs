@@ -18,8 +18,8 @@ use crate::{
     intrinsics::{
         ecc::{
             pairing::{
-                EcLineMul013By013Chip, EcLineMulBy01234Chip, MillerDoubleAndAddStepChip,
-                MillerDoubleStepChip,
+                EcLineMul013By013Chip, EcLineMul023By023Chip, EcLineMulBy01234Chip,
+                MillerDoubleAndAddStepChip, MillerDoubleStepChip,
             },
             sw::{EcAddNeChip, EcDoubleChip},
         },
@@ -111,6 +111,7 @@ pub enum AxVmExecutor<F: PrimeField32> {
     BranchLessThan256Rv32(Rc<RefCell<Rv32BranchLessThan256Chip<F>>>),
     Multiplication256Rv32(Rc<RefCell<Rv32Multiplication256Chip<F>>>),
     // Modular arithmetic:
+    // 32-bytes or 48-bytes modulus.
     ModularAddSubRv32_1x32(Rc<RefCell<ModularAddSubChip<F, 1, 32>>>),
     ModularMulDivRv32_1x32(Rc<RefCell<ModularMulDivChip<F, 1, 32>>>),
     ModularAddSubRv32_3x16(Rc<RefCell<ModularAddSubChip<F, 3, 16>>>),
@@ -121,9 +122,13 @@ pub enum AxVmExecutor<F: PrimeField32> {
     EcDoubleRv32_2x32(Rc<RefCell<EcDoubleChip<F, 2, 32>>>),
     EcAddNeRv32_6x16(Rc<RefCell<EcAddNeChip<F, 6, 16>>>),
     EcDoubleRv32_6x16(Rc<RefCell<EcDoubleChip<F, 6, 16>>>),
+    // Pairing:
+    /// Only for BN254 for now
     EcLineMul013By013(Rc<RefCell<EcLineMul013By013Chip<F, 4, 10, 32>>>),
+    /// Only for BN254 for now
     EcLineMulBy01234(Rc<RefCell<EcLineMulBy01234Chip<F, 12, 12, 32>>>),
-    // 32-bytes or 48-bytes prime.
+    /// Only for BLS12-381 for now
+    EcLineMul023By023(Rc<RefCell<EcLineMul023By023Chip<F, 12, 30, 16>>>),
     MillerDoubleStepRv32_32(Rc<RefCell<MillerDoubleStepChip<F, 4, 8, 32>>>),
     MillerDoubleStepRv32_48(Rc<RefCell<MillerDoubleStepChip<F, 12, 24, 16>>>),
     MillerDoubleAndAddStepRv32_32(Rc<RefCell<MillerDoubleAndAddStepChip<F, 4, 12, 32>>>),
