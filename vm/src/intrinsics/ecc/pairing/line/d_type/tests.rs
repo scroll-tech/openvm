@@ -22,7 +22,7 @@ use crate::{
     arch::{testing::VmChipTestBuilder, BITWISE_OP_LOOKUP_BUS},
     intrinsics::ecc::pairing::{EcLineMul013By013Chip, EcLineMulBy01234Chip},
     rv32im::adapters::Rv32VecHeapAdapterChip,
-    utils::{biguint_to_limbs, rv32_write_heap_default},
+    utils::{biguint_to_limbs, rv32_write_heap_default, rv32_write_heap_default_with_increment},
 };
 
 type F = BabyBear;
@@ -212,10 +212,11 @@ fn test_mul_by_01234() {
         })
         .collect::<Vec<_>>();
 
-    let instruction = rv32_write_heap_default(
+    let instruction = rv32_write_heap_default_with_increment(
         &mut tester,
         input_f_limbs,
         input_x_limbs,
+        512,
         chip.0.core.air.offset + PairingOpcode::MUL_BY_01234 as usize,
     );
 

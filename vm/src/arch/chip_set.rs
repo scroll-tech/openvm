@@ -38,7 +38,7 @@ use crate::{
         ecc::{
             pairing::{
                 EcLineMul013By013Chip, EcLineMul023By023Chip, EcLineMulBy01234Chip,
-                MillerDoubleAndAddStepChip, MillerDoubleStepChip,
+                EcLineMulBy02345Chip, MillerDoubleAndAddStepChip, MillerDoubleStepChip,
             },
             sw::{EcAddNeChip, EcDoubleChip},
         },
@@ -883,6 +883,22 @@ impl VmConfig {
                     executors.insert(global_opcode_idx, chip.clone().into());
                     chips.push(AxVmChip::Executor(chip.into()));
                 }
+                ExecutorName::EcLineMul023By023 => {
+                    let chip = Rc::new(RefCell::new(EcLineMul023By023Chip::new(
+                        Rv32VecHeapAdapterChip::<F, 2, 12, 30, 16, 16>::new(
+                            execution_bus,
+                            program_bus,
+                            memory_controller.clone(),
+                            bitwise_lookup_chip.clone(),
+                        ),
+                        memory_controller.clone(),
+                        config48,
+                        BLS12381.XI,
+                        class_offset,
+                    )));
+                    executors.insert(global_opcode_idx, chip.clone().into());
+                    chips.push(AxVmChip::Executor(chip.into()));
+                }
                 ExecutorName::EcLineMulBy01234 => {
                     let chip = Rc::new(RefCell::new(EcLineMulBy01234Chip::new(
                         Rv32VecHeapAdapterChip::<F, 2, 12, 12, 32, 32>::new(
@@ -899,9 +915,9 @@ impl VmConfig {
                     executors.insert(global_opcode_idx, chip.clone().into());
                     chips.push(AxVmChip::Executor(chip.into()));
                 }
-                ExecutorName::EcLineMul023By023 => {
-                    let chip = Rc::new(RefCell::new(EcLineMul023By023Chip::new(
-                        Rv32VecHeapAdapterChip::<F, 2, 12, 30, 16, 16>::new(
+                ExecutorName::EcLineMulBy02345 => {
+                    let chip = Rc::new(RefCell::new(EcLineMulBy02345Chip::new(
+                        Rv32VecHeapAdapterChip::<F, 2, 36, 36, 16, 16>::new(
                             execution_bus,
                             program_bus,
                             memory_controller.clone(),
@@ -913,7 +929,7 @@ impl VmConfig {
                         class_offset,
                     )));
                     executors.insert(global_opcode_idx, chip.clone().into());
-                    chips.push(AxVmExecutor::EcLineMul023By023(chip).into());
+                    chips.push(AxVmChip::Executor(chip.into()));
                 }
                 _ => unreachable!("Unsupported executor"),
             }
