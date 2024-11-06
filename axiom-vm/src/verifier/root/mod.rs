@@ -85,7 +85,7 @@ impl RootVmVerifierConfig {
                 let is_internal =
                     eq_felt_slice(builder, &program_commit, &internal_vm_verifier_commit);
                 let proof_leaf_commit: [Felt<_>; DIGEST_SIZE] = builder.uninit();
-                builder.if_eq(is_internal, F::one()).then_or_else(
+                builder.if_eq(is_internal, F::ONE).then_or_else(
                     |builder| {
                         // assert self_program_commit == program_commit
                         builder.assert_eq::<[_; DIGEST_SIZE]>(
@@ -140,9 +140,9 @@ impl RootVmVerifierConfig {
                 );
             });
             // App Program should terminate
-            builder.assert_felt_eq(merged_pvs.connector.is_terminate, F::one());
+            builder.assert_felt_eq(merged_pvs.connector.is_terminate, F::ONE);
             // App Program should exit successfully
-            builder.assert_felt_eq(merged_pvs.connector.exit_code, F::zero());
+            builder.assert_felt_eq(merged_pvs.connector.exit_code, F::ZERO);
 
             builder.assert_eq::<Usize<_>>(public_values.len(), RVar::from(self.num_public_values));
             let public_values_vec: Vec<Felt<F>> = (0..self.num_public_values)
