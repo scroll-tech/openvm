@@ -1,6 +1,6 @@
 | group | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- |
-| revm_contract_deployment | <div style='text-align: right'>76,374,302</div>  | <div style='text-align: right'>1,879,268</div>  | <span style="color: green">(-98.0 [-0.7%])</span> <div style='text-align: right'>14,566.0</div>  |
+| revm_contract_deployment | <div style='text-align: right'>76,374,302</div>  | <div style='text-align: right'>1,879,268</div>  | <span style="color: green">(-3,297.0 [-22.6%])</span> <div style='text-align: right'>11,269.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| revm_contract_deployment | true | <span style="color: red">(+37.0 [+0.1%])</span> <div style='text-align: right'>48,379.0</div>  | <div style='text-align: right'>76,374,302</div>  | <div style='text-align: right'>1,879,268</div>  |
+| revm_contract_deployment | true | <span style="color: red">(+883.0 [+1.8%])</span> <div style='text-align: right'>49,262.0</div>  | <div style='text-align: right'>76,374,302</div>  | <div style='text-align: right'>1,879,268</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
@@ -164,14 +164,14 @@
 | revm_contract_deployment | VmAirWrapper<Rv32MultAdapterAir, MulHCoreAir<4, 8> | <div style='text-align: right'>38</div>  | <div style='text-align: right'>24</div>  | <div style='text-align: right'>2</div>  |
 | revm_contract_deployment | VmAirWrapper<Rv32MultAdapterAir, DivRemCoreAir<4, 8> | <div style='text-align: right'>88</div>  | <div style='text-align: right'>25</div>  | <div style='text-align: right'>2</div>  |
 | revm_contract_deployment | VmAirWrapper<Rv32HintStoreAdapterAir, Rv32HintStoreCoreAir> | <div style='text-align: right'>17</div>  | <div style='text-align: right'>15</div>  | <div style='text-align: right'>2</div>  |
-| revm_contract_deployment | Poseidon2VmAir<BabyBear> | <div style='text-align: right'>525</div>  | <div style='text-align: right'>32</div>  | <div style='text-align: right'>2</div>  |
+| revm_contract_deployment | Poseidon2VmAir<BabyBearParameters> | <div style='text-align: right'>525</div>  | <div style='text-align: right'>32</div>  | <div style='text-align: right'>2</div>  |
 | revm_contract_deployment | BitwiseOperationLookupAir<8> | <div style='text-align: right'>4</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>2</div>  |
 | revm_contract_deployment | RangeTupleCheckerAir<2> | <div style='text-align: right'>4</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>1</div>  |
 | revm_contract_deployment | VariableRangeCheckerAir | <div style='text-align: right'>4</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>1</div>  |
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| revm_contract_deployment | <span style="color: green">(-1.0 [-1.2%])</span> <div style='text-align: right'>84.0</div>  | <span style="color: red">(+6.0 [+0.1%])</span> <div style='text-align: right'>4,689.0</div>  | <span style="color: red">(+13.0 [+0.3%])</span> <div style='text-align: right'>3,892.0</div>  | <span style="color: green">(-5.0 [-4.2%])</span> <div style='text-align: right'>114.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>76,374,302</div>  | <div style='text-align: right'>1,879,268</div>  | <span style="color: green">(-98.0 [-0.7%])</span> <div style='text-align: right'>14,566.0</div>  |
+| revm_contract_deployment | <span style="color: green">(-2.0 [-2.4%])</span> <div style='text-align: right'>82.0</div>  | <span style="color: green">(-27.0 [-0.6%])</span> <div style='text-align: right'>4,662.0</div>  | <span style="color: green">(-18.0 [-0.5%])</span> <div style='text-align: right'>3,874.0</div>  | <span style="color: red">(+8.0 [+7.0%])</span> <div style='text-align: right'>122.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>76,374,302</div>  | <div style='text-align: right'>1,879,268</div>  | <span style="color: green">(-3,297.0 [-22.6%])</span> <div style='text-align: right'>11,269.0</div>  |
 
 | group | air_name | segment | cells | main_cols | perm_cols | prep_cols | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -194,14 +194,14 @@
 | revm_contract_deployment | VmAirWrapper<Rv32MultAdapterAir, MultiplicationCoreAir<4, 8> | 0 | <div style='text-align: right'>454,656</div>  | <div style='text-align: right'>31</div>  | <div style='text-align: right'>80</div>  |  | <div style='text-align: right'>4,096</div>  |
 | revm_contract_deployment | VmAirWrapper<Rv32MultAdapterAir, MulHCoreAir<4, 8> | 0 | <div style='text-align: right'>284,672</div>  | <div style='text-align: right'>39</div>  | <div style='text-align: right'>100</div>  |  | <div style='text-align: right'>2,048</div>  |
 | revm_contract_deployment | VmAirWrapper<Rv32HintStoreAdapterAir, Rv32HintStoreCoreAir> | 0 | <div style='text-align: right'>253,952</div>  | <div style='text-align: right'>26</div>  | <div style='text-align: right'>36</div>  |  | <div style='text-align: right'>4,096</div>  |
-| revm_contract_deployment | Poseidon2VmAir<BabyBear> | 0 | <div style='text-align: right'>41,091,072</div>  | <div style='text-align: right'>559</div>  | <div style='text-align: right'>68</div>  |  | <div style='text-align: right'>65,536</div>  |
+| revm_contract_deployment | Poseidon2VmAir<BabyBearParameters> | 0 | <div style='text-align: right'>41,091,072</div>  | <div style='text-align: right'>559</div>  | <div style='text-align: right'>68</div>  |  | <div style='text-align: right'>65,536</div>  |
 | revm_contract_deployment | BitwiseOperationLookupAir<8> | 0 | <div style='text-align: right'>655,360</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>8</div>  | <div style='text-align: right'>3</div>  | <div style='text-align: right'>65,536</div>  |
 | revm_contract_deployment | RangeTupleCheckerAir<2> | 0 | <div style='text-align: right'>4,718,592</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>8</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>524,288</div>  |
 | revm_contract_deployment | VariableRangeCheckerAir | 0 | <div style='text-align: right'>1,179,648</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>8</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>131,072</div>  |
 
 | group | segment | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- |
-| revm_contract_deployment | 0 | <span style="color: green">(-104.0 [-1.0%])</span> <div style='text-align: right'>9,877.0</div>  | <div style='text-align: right'>363,216,416</div>  |
+| revm_contract_deployment | 0 | <span style="color: green">(-3,270.0 [-33.1%])</span> <div style='text-align: right'>6,607.0</div>  | <div style='text-align: right'>363,216,416</div>  |
 
 </details>
 
@@ -210,13 +210,13 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/226f67b334ef42154bf673ef7aa1193190e8c756/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/226f67b334ef42154bf673ef7aa1193190e8c756/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/226f67b334ef42154bf673ef7aa1193190e8c756/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/226f67b334ef42154bf673ef7aa1193190e8c756/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/226f67b334ef42154bf673ef7aa1193190e8c756/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/226f67b334ef42154bf673ef7aa1193190e8c756/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/226f67b334ef42154bf673ef7aa1193190e8c756/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/226f67b334ef42154bf673ef7aa1193190e8c756/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3f6a3f441cbc9d8565ff780ecd881a086fff5451/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3f6a3f441cbc9d8565ff780ecd881a086fff5451/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3f6a3f441cbc9d8565ff780ecd881a086fff5451/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3f6a3f441cbc9d8565ff780ecd881a086fff5451/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3f6a3f441cbc9d8565ff780ecd881a086fff5451/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3f6a3f441cbc9d8565ff780ecd881a086fff5451/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3f6a3f441cbc9d8565ff780ecd881a086fff5451/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3f6a3f441cbc9d8565ff780ecd881a086fff5451/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/226f67b334ef42154bf673ef7aa1193190e8c756
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/3f6a3f441cbc9d8565ff780ecd881a086fff5451
 Instance Type: 64cpu-linux-arm64
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11712298006)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11712693899)
