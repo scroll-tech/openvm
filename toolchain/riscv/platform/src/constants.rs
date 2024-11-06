@@ -2,6 +2,7 @@ use strum_macros::FromRepr;
 
 pub const CUSTOM_0: u8 = 0x0b;
 pub const CUSTOM_1: u8 = 0x2b;
+pub const CUSTOM_2: u8 = 0x4b;
 
 /// Different funct3 for custom RISC-V instructions using the [CUSTOM_0] 7-bit opcode prefix.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, FromRepr)]
@@ -22,6 +23,14 @@ pub enum Custom0Funct3 {
 pub enum Custom1Funct3 {
     ModularArithmetic = 0,
     ShortWeierstrass,
+}
+
+/// Different funct3 for custom RISC-V instructions using the [CUSTOM_2] 7-bit opcode prefix.
+#[derive(Debug, Copy, Clone, PartialEq, Eq, FromRepr)]
+#[repr(u8)]
+pub enum Custom2Funct3 {
+    Fp2Bn254 = 0,
+    Fp2Bls12381,
 }
 
 /// imm options for system phantom instructions
@@ -70,4 +79,13 @@ pub const SHORT_WEIERSTRASS_MAX_KINDS: u8 = 8;
 pub enum SwBaseFunct7 {
     SwAddNe = 0,
     SwDouble,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, FromRepr)]
+#[repr(u8)]
+pub enum Fp2BaseFunct7 {
+    AddFp2 = 0,
+    SubFp2,
+    MulFp2,
+    DivFp2,
 }
