@@ -1,5 +1,8 @@
-use axvm_ecc::{field::FieldExtension, pairing::EvaluatedLine, point::EcPoint};
-use ff::Field;
+use axvm_ecc::{
+    field::{Field, FieldExtension},
+    pairing::EvaluatedLine,
+    point::EcPoint,
+};
 
 /// Multiplies two elements in 013 form and outputs the product in 01234 form
 pub fn mul_013_by_013<Fp, Fp2>(
@@ -67,9 +70,9 @@ where
     //   = -3x^3 / 2y^2
     // c = (λ * x - y) / y
     //   = 3x^3/2y^2 - 1
-    let x_squared = x.square();
+    let x_squared = x * x;
     let x_cubed = x_squared * x;
-    let y_squared = y.square();
+    let y_squared = y * y;
     let three_x_cubed = three * x_cubed;
     let over_two_y_squared = (two * y_squared).invert().unwrap();
 

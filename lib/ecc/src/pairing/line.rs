@@ -1,6 +1,4 @@
-use ff::Field;
-
-use crate::field::FieldExtension;
+use crate::field::{Field, FieldExtension};
 
 #[derive(Clone, Copy, Debug)]
 pub struct UnevaluatedLine<Fp, Fp2>

@@ -1,7 +1,8 @@
 // use alloc::vec::Vec;
 
-use ff::Field;
 use num::BigInt;
+
+use crate::field::Field;
 
 pub trait ExpBigInt<F: Field>: Field {
     /// Exponentiates a field element by a BigInt
@@ -20,14 +21,16 @@ pub trait ExpBigInt<F: Field>: Field {
 
         let mut res = Self::ONE;
 
-        let x_sq = x.square();
+        let x_sq = x * x;
         let ops = [x, x_sq, x_sq * x];
 
         let bytes = e.to_bytes_be();
         for &b in bytes.1.iter() {
             let mut mask = 0xc0;
             for j in 0..4 {
-                res = res.square().square();
+                // res = res.square().square()
+                res = res * res;
+                res = res * res;
                 let c = (b & mask) >> (6 - 2 * j);
                 if c != 0 {
                     res *= &ops[(c - 1) as usize];

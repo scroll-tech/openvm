@@ -1,5 +1,6 @@
-use ff::Field;
 use rand::Rng;
+
+use crate::field::Field;
 
 #[derive(Debug, Clone)]
 pub struct EcPoint<F> {

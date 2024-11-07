@@ -1,5 +1,6 @@
 use axvm::intrinsics::{Fp2, Fp2Bn254, BN256_LIMBS};
 
+/// Trait definition for line multiplication opcodes for BN254
 pub trait LineMulBn254 {
     fn mul_013_by_013(l0: [Fp2Bn254; 2], l1: [Fp2Bn254; 2]) -> [Fp2Bn254; 5];
 

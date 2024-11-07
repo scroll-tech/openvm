@@ -1,8 +1,10 @@
 use axvm::intrinsics::Fp2;
-use ff::Field;
 
 use super::UnevaluatedLine;
-use crate::{field::FieldExtension, point::EcPoint};
+use crate::{
+    field::{Field, FieldExtension},
+    point::EcPoint,
+};
 
 /// Trait definition for Miller step opcodes
 pub trait MillerStepOpcode<const LIMBS: usize, T: Fp2<LIMBS>> {
@@ -25,9 +27,9 @@ where
     let y = S.y;
     // λ = (3x^2) / (2y)
     let two_y_inv = (two * y).invert().unwrap();
-    let lambda = (three * x.square()) * two_y_inv;
+    let lambda = (three * x * x) * two_y_inv;
     // x_2S = λ^2 - 2x
-    let x_2S = lambda.square() - two * x;
+    let x_2S = lambda * lambda - two * x;
     // y_2S = λ(x - x_2S) - y
     let y_2S = lambda * (x - x_2S) - y;
     let two_s = EcPoint { x: x_2S, y: y_2S };
@@ -61,7 +63,7 @@ where
     // λ1 = (y_s - y_q) / (x_s - x_q)
     let x_s_minus_x_q_inv = (x_s - x_q).invert().unwrap();
     let lambda = (y_s - y_q) * x_s_minus_x_q_inv;
-    let x_s_plus_q = lambda.square() - x_s - x_q;
+    let x_s_plus_q = lambda * lambda - x_s - x_q;
     let y_s_plus_q = lambda * (x_q - x_s_plus_q) - y_q;
 
     let s_plus_q = EcPoint {
@@ -99,11 +101,11 @@ where
 
     // λ1 = (y_s - y_q) / (x_s - x_q)
     let lambda1 = (y_s - y_q) * (x_s - x_q).invert().unwrap();
-    let x_s_plus_q = lambda1.square() - x_s - x_q;
+    let x_s_plus_q = lambda1 * lambda1 - x_s - x_q;
 
     // λ2 = -λ1 - 2y_s / (x_{s+q} - x_s)
     let lambda2 = lambda1.neg() - two * y_s * (x_s_plus_q - x_s).invert().unwrap();
-    let x_s_plus_q_plus_s = lambda2.square() - x_s - x_s_plus_q;
+    let x_s_plus_q_plus_s = lambda2 * lambda2 - x_s - x_s_plus_q;
     let y_s_plus_q_plus_s = lambda2 * (x_s - x_s_plus_q_plus_s) - y_s;
 
     let s_plus_q_plus_s = EcPoint {

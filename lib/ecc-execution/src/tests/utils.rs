@@ -1,9 +1,8 @@
 use axvm_ecc::{
-    field::FieldExtension,
+    field::{Field, FieldExtension},
     point::{AffineCoords, EcPoint},
 };
 use group::ScalarMul;
-use halo2curves_axiom::ff::Field;
 use itertools::izip;
 use rand::{rngs::StdRng, SeedableRng};
 

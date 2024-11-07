@@ -1,7 +1,5 @@
-use ff::Field;
-
 use crate::{
-    field::{ExpBigInt, FieldExtension},
+    field::{ExpBigInt, Field, FieldExtension},
     point::EcPoint,
 };
 

@@ -1,11 +1,10 @@
 use alloc::vec::Vec;
 
-use ff::Field;
 use itertools::{izip, Itertools};
 
 use super::EvaluatedLine;
 use crate::{
-    field::FieldExtension,
+    field::{Field, FieldExtension},
     pairing::miller_step::{miller_double_and_add_step, miller_double_step},
     point::EcPoint,
 };
@@ -104,7 +103,7 @@ where
 
         let pseudo_binary_encoding = Self::pseudo_binary_encoding();
         for i in (0..pseudo_binary_encoding.len() - 2).rev() {
-            f = f.square();
+            f = f * f;
 
             let mut lines = Vec::<EvaluatedLine<Fp, Fp2>>::new();
 
