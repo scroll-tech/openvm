@@ -1,7 +1,15 @@
+use axvm::intrinsics::Fp2;
 use ff::Field;
 
 use super::UnevaluatedLine;
 use crate::{field::FieldExtension, point::EcPoint};
+
+/// Trait definition for Miller step opcodes
+pub trait MillerStepOpcode<const LIMBS: usize, T: Fp2<LIMBS>> {
+    fn miller_double_step(s: [T; 2]) -> ([T; 2], [T; 2]);
+
+    fn miller_double_and_add_step(s: [T; 2], q: [T; 2]) -> ([T; 2], [T; 2], [T; 2]);
+}
 
 #[allow(non_snake_case)]
 pub fn miller_double_step<Fp, Fp2>(S: EcPoint<Fp2>) -> (EcPoint<Fp2>, UnevaluatedLine<Fp, Fp2>)

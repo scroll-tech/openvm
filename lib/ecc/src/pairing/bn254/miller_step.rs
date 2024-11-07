@@ -1,15 +1,8 @@
-use axvm::intrinsics::{Fp2, Fp2Bn254};
+use axvm::intrinsics::{Fp2, Fp2Bn254, BN256_LIMBS};
 
-pub trait MillerStepBn254 {
-    fn miller_double_step(s: [Fp2Bn254; 2]) -> ([Fp2Bn254; 2], [Fp2Bn254; 2]);
+use crate::pairing::MillerStepOpcode;
 
-    fn miller_double_and_add_step(
-        s: [Fp2Bn254; 2],
-        q: [Fp2Bn254; 2],
-    ) -> ([Fp2Bn254; 2], [Fp2Bn254; 2], [Fp2Bn254; 2]);
-}
-
-impl MillerStepBn254 for Fp2Bn254 {
+impl MillerStepOpcode<BN256_LIMBS, Fp2Bn254> for Fp2Bn254 {
     fn miller_double_step(s: [Fp2Bn254; 2]) -> ([Fp2Bn254; 2], [Fp2Bn254; 2]) {
         #[cfg(not(target_os = "zkvm"))]
         {

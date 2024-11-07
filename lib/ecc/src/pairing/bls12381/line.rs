@@ -1,5 +1,6 @@
 use axvm::intrinsics::{Fp2, Fp2Bls12381, BLS12_381_LIMBS};
 
+/// Trait definition for line multiplication opcodes for BLS12-381
 pub trait LineMulBls12381 {
     fn mul_023_by_023(l0: [Fp2Bls12381; 2], l1: [Fp2Bls12381; 2]) -> [Fp2Bls12381; 6];
 
