@@ -22,3 +22,4 @@ static_assertions.workspace = true
 [features]
 default = ["parallel"]
 parallel = ["axvm-circuit/parallel"]
+test-utils = ["axvm-circuit/test-utils"]

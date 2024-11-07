@@ -361,7 +361,10 @@ dependencies = [
 name = "ax-ecc-execution"
 version = "0.1.0"
 dependencies = [
+ "axvm-ecc",
  "axvm-ecc-constants",
+ "ff 0.13.0",
+ "group 0.13.0",
  "halo2curves-axiom 0.7.0",
  "itertools 0.13.0",
  "lazy_static",
@@ -582,6 +585,7 @@ dependencies = [
  "ax-stark-sdk",
  "axvm-circuit",
  "axvm-circuit-derive",
+ "axvm-ecc",
  "axvm-ecc-constants",
  "axvm-instructions",
  "backtrace",
@@ -647,6 +651,12 @@ name = "axvm-ecc"
 version = "0.1.0"
 dependencies = [
  "axvm",
+ "ff 0.13.0",
+ "group 0.13.0",
+ "halo2curves-axiom 0.7.0",
+ "itertools 0.13.0",
+ "num",
+ "rand 0.8.5",
 ]
 
 [[package]]
