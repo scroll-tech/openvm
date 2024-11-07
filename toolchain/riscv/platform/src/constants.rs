@@ -2,7 +2,6 @@ use strum_macros::FromRepr;
 
 pub const CUSTOM_0: u8 = 0x0b;
 pub const CUSTOM_1: u8 = 0x2b;
-pub const CUSTOM_2: u8 = 0x4b;
 
 /// Different funct3 for custom RISC-V instructions using the [CUSTOM_0] 7-bit opcode prefix.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, FromRepr)]
@@ -21,16 +20,14 @@ pub enum Custom0Funct3 {
 #[derive(Debug, Copy, Clone, PartialEq, Eq, FromRepr)]
 #[repr(u8)]
 pub enum Custom1Funct3 {
+    /// Modular arithmetic
     ModularArithmetic = 0,
+    /// Short Weierstrass elliptic curve arithmetic
     ShortWeierstrass,
-}
-
-/// Different funct3 for custom RISC-V instructions using the [CUSTOM_2] 7-bit opcode prefix.
-#[derive(Debug, Copy, Clone, PartialEq, Eq, FromRepr)]
-#[repr(u8)]
-pub enum Custom2Funct3 {
-    Fp2Bn254 = 0,
-    Fp2Bls12381,
+    /// Arithmetic for quadratic extension field of a prime field, with irreducible polynomial `X^2 + 1`.
+    ComplexExtField,
+    /// Instructions for optimal Ate pairing
+    Pairing,
 }
 
 /// imm options for system phantom instructions
@@ -60,7 +57,8 @@ pub enum Int256Funct7 {
 
 pub const MODULAR_ARITHMETIC_MAX_KINDS: u8 = 8;
 
-/// Modular arithmetic is configurable. The funct7 field equals `mod_idx * MODULAR_ARITHMETIC_MAX_KINDS + base_funct7`.
+/// Modular arithmetic is configurable.
+/// The funct7 field equals `mod_idx * MODULAR_ARITHMETIC_MAX_KINDS + base_funct7`.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, FromRepr)]
 #[repr(u8)]
 pub enum ModArithBaseFunct7 {
@@ -73,7 +71,8 @@ pub enum ModArithBaseFunct7 {
 
 pub const SHORT_WEIERSTRASS_MAX_KINDS: u8 = 8;
 
-/// Short Weierstrass curves are configurable. The funct7 field equals `curve_idx * SHORT_WEIERSTRASS_MAX_KINDS + base_funct7`.
+/// Short Weierstrass curves are configurable.
+/// The funct7 field equals `curve_idx * SHORT_WEIERSTRASS_MAX_KINDS + base_funct7`.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, FromRepr)]
 #[repr(u8)]
 pub enum SwBaseFunct7 {
@@ -81,11 +80,33 @@ pub enum SwBaseFunct7 {
     SwDouble,
 }
 
+pub const COMPLEX_EXT_FIELD_MAX_KINDS: u8 = 8;
+
+/// Complex extension field is configurable.
+/// The funct7 field equals `fp2_idx * COMPLEX_EXT_FIELD_MAX_KINDS + base_funct7`.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, FromRepr)]
 #[repr(u8)]
-pub enum Fp2BaseFunct7 {
-    AddFp2 = 0,
-    SubFp2,
-    MulFp2,
-    DivFp2,
+pub enum ComplexExtFieldBaseFunct7 {
+    Add = 0,
+    Sub,
+    Mul,
+    Div,
+}
+
+pub const PAIRING_MAX_KINDS: u8 = 16;
+
+/// The funct7 field equals `pairing_idx * PAIRING_MAX_KINDS + base_funct7`.
+#[derive(Debug, Copy, Clone, PartialEq, Eq, FromRepr)]
+#[repr(u8)]
+pub enum PairingBaseFunct7 {
+    MillerDoubleStep = 0,
+    MillerDoubleAndAddStep,
+    Fp12Mul,
+    EvaluateLine,
+    Mul013By013,
+    MulBy013,
+    MulBy01234,
+    Mul023By023,
+    MulBy023,
+    MulBy02345,
 }
