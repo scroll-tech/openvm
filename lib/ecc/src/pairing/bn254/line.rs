@@ -1,11 +1,11 @@
 use axvm::intrinsics::{Fp2, Fp2Bn254, BN256_LIMBS};
 
 pub trait LineMulBn254 {
-    fn mul_013_by_013(b: [Fp2Bn254; 2], c: [Fp2Bn254; 2]) -> [Fp2Bn254; 5];
+    fn mul_013_by_013(l0: [Fp2Bn254; 2], l1: [Fp2Bn254; 2]) -> [Fp2Bn254; 5];
 
     fn mul_by_013(f: [Fp2Bn254; 6], l: [Fp2Bn254; 2]) -> [Fp2Bn254; 6];
 
-    fn mul_by_012345(f: [Fp2Bn254; 6], x: [Fp2Bn254; 5]) -> [Fp2Bn254; 6];
+    fn mul_by_01234(f: [Fp2Bn254; 6], x: [Fp2Bn254; 5]) -> [Fp2Bn254; 6];
 
     fn evaluate_line(
         l: [Fp2Bn254; 2],
@@ -25,6 +25,10 @@ impl LineMulBn254 for Fp2Bn254 {
 
             let one = Fp2Bn254::from_u32((1, 0));
             let xi = Fp2Bn254::from_u32((9, 1));
+
+            // where w⁶ = xi
+            // l0 * l1 = 1 + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + b1c0)w⁴ + (c0c1)w⁶
+            //         = (1 + c0c1 * xi) + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + b1c0)w⁴
             let x0 = one + c0 * c1 + xi;
             let x1 = b0 + b1;
             let x2 = b0 * b1;
@@ -42,9 +46,8 @@ impl LineMulBn254 for Fp2Bn254 {
     fn mul_by_013(f: [Fp2Bn254; 6], l: [Fp2Bn254; 2]) -> [Fp2Bn254; 6] {
         #[cfg(not(target_os = "zkvm"))]
         {
-            //     mul_by_01234(f, [Fp2::ONE, line.b, Fp2::ZERO, line.c, Fp2::ZERO])
             let one = Fp2Bn254::from_u32((1, 0));
-            Self::mul_by_012345(
+            Self::mul_by_01234(
                 f,
                 [
                     one,
@@ -61,7 +64,7 @@ impl LineMulBn254 for Fp2Bn254 {
         }
     }
 
-    fn mul_by_012345(f: [Fp2Bn254; 6], x: [Fp2Bn254; 5]) -> [Fp2Bn254; 6] {
+    fn mul_by_01234(f: [Fp2Bn254; 6], x: [Fp2Bn254; 5]) -> [Fp2Bn254; 6] {
         #[cfg(not(target_os = "zkvm"))]
         {
             let xi = Fp2Bn254::from_u32((9, 1));
