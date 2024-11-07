@@ -20,6 +20,9 @@ halo2curves-axiom = { workspace = true, optional = true }
 num = { version = "0.4.3", optional = true }
 group = "0.13.0"
 
+[target.'cfg(not(target_os = "zkvm"))'.dependencies]
+num-bigint-dig.workspace = true
+
 [features]
 default = []
 std = ["axvm/std", "ff/std"]

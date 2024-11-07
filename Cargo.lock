@@ -529,6 +529,7 @@ name = "axvm"
 version = "0.1.0"
 dependencies = [
  "axvm-platform",
+ "axvm-setup-macro",
  "chrono",
  "hex-literal",
  "num-bigint-dig",
@@ -656,6 +657,7 @@ dependencies = [
  "halo2curves-axiom 0.7.0",
  "itertools 0.13.0",
  "num",
+ "num-bigint-dig",
  "rand 0.8.5",
 ]
 
@@ -749,6 +751,7 @@ dependencies = [
 name = "axvm-platform"
 version = "0.1.0"
 dependencies = [
+ "axvm-setup-macro",
  "bincode 2.0.0-rc.3",
  "bytemuck",
  "critical-section",
@@ -801,6 +804,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "axvm-setup-macro"
+version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn 2.0.87",
+]
+
+[[package]]
 name = "axvm-toolchain-tests"
 version = "0.1.0"
 dependencies = [
@@ -809,6 +820,7 @@ dependencies = [
  "axvm-circuit",
  "axvm-transpiler",
  "eyre",
+ "num-bigint-dig",
  "p3-baby-bear",
  "serde",
  "tempfile",
@@ -826,6 +838,7 @@ dependencies = [
  "axvm-platform",
  "elf",
  "eyre",
+ "num-bigint-dig",
  "p3-baby-bear",
  "p3-field",
  "rrs-lib",
