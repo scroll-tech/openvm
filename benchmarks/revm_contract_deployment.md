@@ -1,6 +1,6 @@
 | group | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- |
-| revm_contract_deployment | <span style="color: red">(+4,250 [+0.0%])</span> <div style='text-align: right'>20,519,983</div>  | <span style="color: red">(+133 [+0.0%])</span> <div style='text-align: right'>310,417</div>  | <span style="color: red">(+134.0 [+2.8%])</span> <div style='text-align: right'>4,979.0</div>  |
+| revm_contract_deployment | <div style='text-align: right'>20,519,983</div>  | <div style='text-align: right'>310,417</div>  | <span style="color: green">(-74.0 [-1.5%])</span> <div style='text-align: right'>4,905.0</div>  |
 
 
 <details>
@@ -8,108 +8,108 @@
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| revm_contract_deployment | true | <span style="color: red">(+110.0 [+1.2%])</span> <div style='text-align: right'>9,502.0</div>  | <span style="color: red">(+4,250 [+0.0%])</span> <div style='text-align: right'>20,519,983</div>  | <span style="color: red">(+133 [+0.0%])</span> <div style='text-align: right'>310,417</div>  |
+| revm_contract_deployment | true | <span style="color: green">(-13.0 [-0.1%])</span> <div style='text-align: right'>9,489.0</div>  | <div style='text-align: right'>20,519,983</div>  | <div style='text-align: right'>310,417</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
-| revm_contract_deployment | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true | <span style="color: red">(+77 [+0.1%])</span> <div style='text-align: right'>110,826</div>  |
-| revm_contract_deployment | <Rv32BaseAluAdapterAir,LessThanCoreAir<4, 8>> | true | <span style="color: red">(+2 [+0.0%])</span> <div style='text-align: right'>14,111</div>  |
-| revm_contract_deployment | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | true | <span style="color: red">(+12 [+0.1%])</span> <div style='text-align: right'>11,545</div>  |
-| revm_contract_deployment | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> | true | <span style="color: red">(+11 [+0.0%])</span> <div style='text-align: right'>33,665</div>  |
+| revm_contract_deployment | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true | <div style='text-align: right'>110,826</div>  |
+| revm_contract_deployment | <Rv32BaseAluAdapterAir,LessThanCoreAir<4, 8>> | true | <div style='text-align: right'>14,111</div>  |
+| revm_contract_deployment | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | true | <div style='text-align: right'>11,545</div>  |
+| revm_contract_deployment | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> | true | <div style='text-align: right'>33,665</div>  |
 | revm_contract_deployment | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> | true | <div style='text-align: right'>29,056</div>  |
-| revm_contract_deployment | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true | <span style="color: red">(+4 [+0.1%])</span> <div style='text-align: right'>4,915</div>  |
+| revm_contract_deployment | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true | <div style='text-align: right'>4,915</div>  |
 | revm_contract_deployment | <Rv32HintStoreAdapterAir,Rv32HintStoreCoreAir> | true | <div style='text-align: right'>3,069</div>  |
-| revm_contract_deployment | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true | <span style="color: red">(+3 [+0.2%])</span> <div style='text-align: right'>1,898</div>  |
+| revm_contract_deployment | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true | <div style='text-align: right'>1,898</div>  |
 | revm_contract_deployment | <Rv32LoadStoreAdapterAir,LoadSignExtendCoreAir<4, 8>> | true | <div style='text-align: right'>11,811</div>  |
-| revm_contract_deployment | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true | <span style="color: red">(+20 [+0.0%])</span> <div style='text-align: right'>85,165</div>  |
+| revm_contract_deployment | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true | <div style='text-align: right'>85,165</div>  |
 | revm_contract_deployment | <Rv32MultAdapterAir,MulHCoreAir<4, 8>> | true | <div style='text-align: right'>1,237</div>  |
-| revm_contract_deployment | <Rv32MultAdapterAir,MultiplicationCoreAir<4, 8>> | true | <span style="color: red">(+2 [+0.1%])</span> <div style='text-align: right'>2,117</div>  |
-| revm_contract_deployment | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | true | <span style="color: red">(+2 [+0.2%])</span> <div style='text-align: right'>863</div>  |
+| revm_contract_deployment | <Rv32MultAdapterAir,MultiplicationCoreAir<4, 8>> | true | <div style='text-align: right'>2,117</div>  |
+| revm_contract_deployment | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | true | <div style='text-align: right'>863</div>  |
 | revm_contract_deployment | BitwiseOperationLookupAir<8> | true | <div style='text-align: right'>65,536</div>  |
 | revm_contract_deployment | KeccakVmAir | true | <div style='text-align: right'>2,184</div>  |
 | revm_contract_deployment | Memory AccessAdapter<8> | true | <div style='text-align: right'>11,767</div>  |
 | revm_contract_deployment | Memory Boundary | true | <div style='text-align: right'>23,534</div>  |
-| revm_contract_deployment | Memory Merkle | true | <span style="color: green">(-18 [-0.1%])</span> <div style='text-align: right'>24,800</div>  |
+| revm_contract_deployment | Memory Merkle | true | <div style='text-align: right'>24,800</div>  |
 | revm_contract_deployment | PhantomAir | true | <div style='text-align: right'>137</div>  |
-| revm_contract_deployment | ProgramChip | true | <span style="color: green">(-2 [-0.0%])</span> <div style='text-align: right'>256,030</div>  |
+| revm_contract_deployment | ProgramChip | true | <div style='text-align: right'>256,030</div>  |
 | revm_contract_deployment | RangeTupleCheckerAir<2> | true | <div style='text-align: right'>524,288</div>  |
 
 | group | collect_metrics | dsl_ir | opcode | frequency |
 | --- | --- | --- | --- | --- |
-| revm_contract_deployment | true |  | ADD | <span style="color: red">(+40 [+0.0%])</span> <div style='text-align: right'>91,392</div>  |
-| revm_contract_deployment | true |  | AND | <span style="color: red">(+20 [+0.3%])</span> <div style='text-align: right'>7,688</div>  |
-| revm_contract_deployment | true |  | AUIPC | <span style="color: red">(+2 [+0.2%])</span> <div style='text-align: right'>863</div>  |
-| revm_contract_deployment | true |  | BEQ | <span style="color: red">(+7 [+0.1%])</span> <div style='text-align: right'>13,634</div>  |
+| revm_contract_deployment | true |  | ADD | <div style='text-align: right'>91,392</div>  |
+| revm_contract_deployment | true |  | AND | <div style='text-align: right'>7,688</div>  |
+| revm_contract_deployment | true |  | AUIPC | <div style='text-align: right'>863</div>  |
+| revm_contract_deployment | true |  | BEQ | <div style='text-align: right'>13,634</div>  |
 | revm_contract_deployment | true |  | BGE | <div style='text-align: right'>10,842</div>  |
 | revm_contract_deployment | true |  | BGEU | <div style='text-align: right'>11,676</div>  |
 | revm_contract_deployment | true |  | BLT | <div style='text-align: right'>151</div>  |
 | revm_contract_deployment | true |  | BLTU | <div style='text-align: right'>6,387</div>  |
-| revm_contract_deployment | true |  | BNE | <span style="color: red">(+4 [+0.0%])</span> <div style='text-align: right'>20,031</div>  |
+| revm_contract_deployment | true |  | BNE | <div style='text-align: right'>20,031</div>  |
 | revm_contract_deployment | true |  | HINT_STOREW | <div style='text-align: right'>3,069</div>  |
-| revm_contract_deployment | true |  | JAL | <span style="color: red">(+3 [+0.1%])</span> <div style='text-align: right'>3,207</div>  |
-| revm_contract_deployment | true |  | JALR | <span style="color: red">(+3 [+0.2%])</span> <div style='text-align: right'>1,898</div>  |
+| revm_contract_deployment | true |  | JAL | <div style='text-align: right'>3,207</div>  |
+| revm_contract_deployment | true |  | JALR | <div style='text-align: right'>1,898</div>  |
 | revm_contract_deployment | true |  | KECCAK256 | <div style='text-align: right'>2</div>  |
 | revm_contract_deployment | true |  | LOADB | <div style='text-align: right'>11,806</div>  |
-| revm_contract_deployment | true |  | LOADBU | <span style="color: red">(+11 [+0.1%])</span> <div style='text-align: right'>20,191</div>  |
+| revm_contract_deployment | true |  | LOADBU | <div style='text-align: right'>20,191</div>  |
 | revm_contract_deployment | true |  | LOADH | <div style='text-align: right'>5</div>  |
 | revm_contract_deployment | true |  | LOADHU | <div style='text-align: right'>20</div>  |
-| revm_contract_deployment | true |  | LOADW | <span style="color: red">(+7 [+0.0%])</span> <div style='text-align: right'>30,198</div>  |
-| revm_contract_deployment | true |  | LUI | <span style="color: red">(+1 [+0.1%])</span> <div style='text-align: right'>1,708</div>  |
-| revm_contract_deployment | true |  | MUL | <span style="color: red">(+2 [+0.1%])</span> <div style='text-align: right'>2,117</div>  |
+| revm_contract_deployment | true |  | LOADW | <div style='text-align: right'>30,198</div>  |
+| revm_contract_deployment | true |  | LUI | <div style='text-align: right'>1,708</div>  |
+| revm_contract_deployment | true |  | MUL | <div style='text-align: right'>2,117</div>  |
 | revm_contract_deployment | true |  | MULH | <div style='text-align: right'>3</div>  |
 | revm_contract_deployment | true |  | MULHU | <div style='text-align: right'>1,234</div>  |
-| revm_contract_deployment | true |  | OR | <span style="color: red">(+6 [+0.1%])</span> <div style='text-align: right'>7,151</div>  |
+| revm_contract_deployment | true |  | OR | <div style='text-align: right'>7,151</div>  |
 | revm_contract_deployment | true |  | PHANTOM | <div style='text-align: right'>137</div>  |
-| revm_contract_deployment | true |  | SLL | <span style="color: red">(+10 [+0.1%])</span> <div style='text-align: right'>7,092</div>  |
+| revm_contract_deployment | true |  | SLL | <div style='text-align: right'>7,092</div>  |
 | revm_contract_deployment | true |  | SLT | <div style='text-align: right'>2</div>  |
-| revm_contract_deployment | true |  | SLTU | <span style="color: red">(+2 [+0.0%])</span> <div style='text-align: right'>14,109</div>  |
+| revm_contract_deployment | true |  | SLTU | <div style='text-align: right'>14,109</div>  |
 | revm_contract_deployment | true |  | SRA | <div style='text-align: right'>493</div>  |
-| revm_contract_deployment | true |  | SRL | <span style="color: red">(+2 [+0.1%])</span> <div style='text-align: right'>3,960</div>  |
+| revm_contract_deployment | true |  | SRL | <div style='text-align: right'>3,960</div>  |
 | revm_contract_deployment | true |  | STOREB | <div style='text-align: right'>1,660</div>  |
 | revm_contract_deployment | true |  | STOREH | <div style='text-align: right'>12</div>  |
-| revm_contract_deployment | true |  | STOREW | <span style="color: red">(+2 [+0.0%])</span> <div style='text-align: right'>33,084</div>  |
-| revm_contract_deployment | true |  | SUB | <span style="color: red">(+3 [+0.2%])</span> <div style='text-align: right'>1,970</div>  |
-| revm_contract_deployment | true |  | XOR | <span style="color: red">(+8 [+0.3%])</span> <div style='text-align: right'>2,625</div>  |
+| revm_contract_deployment | true |  | STOREW | <div style='text-align: right'>33,084</div>  |
+| revm_contract_deployment | true |  | SUB | <div style='text-align: right'>1,970</div>  |
+| revm_contract_deployment | true |  | XOR | <div style='text-align: right'>2,625</div>  |
 
 | group | air_name | collect_metrics | dsl_ir | opcode | cells_used |
 | --- | --- | --- | --- | --- | --- |
-| revm_contract_deployment | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | ADD | <span style="color: red">(+1,440 [+0.0%])</span> <div style='text-align: right'>3,290,112</div>  |
-| revm_contract_deployment | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | AND | <span style="color: red">(+720 [+0.3%])</span> <div style='text-align: right'>276,768</div>  |
-| revm_contract_deployment | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | true |  | AUIPC | <span style="color: red">(+42 [+0.2%])</span> <div style='text-align: right'>18,123</div>  |
+| revm_contract_deployment | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | ADD | <div style='text-align: right'>3,290,112</div>  |
+| revm_contract_deployment | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | AND | <div style='text-align: right'>276,768</div>  |
+| revm_contract_deployment | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | true |  | AUIPC | <div style='text-align: right'>18,123</div>  |
 | revm_contract_deployment | AccessAdapter<8> | true |  | AUIPC | <div style='text-align: right'>51</div>  |
 | revm_contract_deployment | Boundary | true |  | AUIPC | <div style='text-align: right'>120</div>  |
 | revm_contract_deployment | Merkle | true |  | AUIPC | <div style='text-align: right'>3,520</div>  |
-| revm_contract_deployment | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> | true |  | BEQ | <span style="color: red">(+182 [+0.1%])</span> <div style='text-align: right'>354,484</div>  |
+| revm_contract_deployment | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> | true |  | BEQ | <div style='text-align: right'>354,484</div>  |
 | revm_contract_deployment | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> | true |  | BGE | <div style='text-align: right'>346,944</div>  |
 | revm_contract_deployment | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> | true |  | BGEU | <div style='text-align: right'>373,632</div>  |
 | revm_contract_deployment | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> | true |  | BLT | <div style='text-align: right'>4,832</div>  |
 | revm_contract_deployment | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> | true |  | BLTU | <div style='text-align: right'>204,384</div>  |
-| revm_contract_deployment | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> | true |  | BNE | <span style="color: red">(+104 [+0.0%])</span> <div style='text-align: right'>520,806</div>  |
+| revm_contract_deployment | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> | true |  | BNE | <div style='text-align: right'>520,806</div>  |
 | revm_contract_deployment | <Rv32HintStoreAdapterAir,Rv32HintStoreCoreAir> | true |  | HINT_STOREW | <div style='text-align: right'>79,794</div>  |
 | revm_contract_deployment | AccessAdapter<8> | true |  | HINT_STOREW | <div style='text-align: right'>26,095</div>  |
 | revm_contract_deployment | Boundary | true |  | HINT_STOREW | <div style='text-align: right'>61,400</div>  |
 | revm_contract_deployment | Merkle | true |  | HINT_STOREW | <div style='text-align: right'>98,560</div>  |
-| revm_contract_deployment | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true |  | JAL | <span style="color: red">(+54 [+0.1%])</span> <div style='text-align: right'>57,726</div>  |
-| revm_contract_deployment | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true |  | JALR | <span style="color: red">(+84 [+0.2%])</span> <div style='text-align: right'>53,144</div>  |
+| revm_contract_deployment | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true |  | JAL | <div style='text-align: right'>57,726</div>  |
+| revm_contract_deployment | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true |  | JALR | <div style='text-align: right'>53,144</div>  |
 | revm_contract_deployment | KeccakVmAir | true |  | KECCAK256 | <div style='text-align: right'>6,910,176</div>  |
 | revm_contract_deployment | <Rv32LoadStoreAdapterAir,LoadSignExtendCoreAir<4, 8>> | true |  | LOADB | <div style='text-align: right'>413,210</div>  |
-| revm_contract_deployment | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADBU | <span style="color: red">(+440 [+0.1%])</span> <div style='text-align: right'>807,640</div>  |
+| revm_contract_deployment | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADBU | <div style='text-align: right'>807,640</div>  |
 | revm_contract_deployment | AccessAdapter<8> | true |  | LOADBU | <div style='text-align: right'>323</div>  |
 | revm_contract_deployment | Boundary | true |  | LOADBU | <div style='text-align: right'>760</div>  |
-| revm_contract_deployment | Merkle | true |  | LOADBU | <span style="color: red">(+448 [+11.5%])</span> <div style='text-align: right'>4,352</div>  |
+| revm_contract_deployment | Merkle | true |  | LOADBU | <div style='text-align: right'>4,352</div>  |
 | revm_contract_deployment | <Rv32LoadStoreAdapterAir,LoadSignExtendCoreAir<4, 8>> | true |  | LOADH | <div style='text-align: right'>175</div>  |
 | revm_contract_deployment | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADHU | <div style='text-align: right'>800</div>  |
 | revm_contract_deployment | AccessAdapter<8> | true |  | LOADHU | <div style='text-align: right'>85</div>  |
 | revm_contract_deployment | Boundary | true |  | LOADHU | <div style='text-align: right'>200</div>  |
-| revm_contract_deployment | Merkle | true |  | LOADHU | <span style="color: red">(+64 [+25.0%])</span> <div style='text-align: right'>320</div>  |
-| revm_contract_deployment | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADW | <span style="color: red">(+280 [+0.0%])</span> <div style='text-align: right'>1,207,920</div>  |
-| revm_contract_deployment | AccessAdapter<8> | true |  | LOADW | <span style="color: green">(-102 [-0.5%])</span> <div style='text-align: right'>20,434</div>  |
-| revm_contract_deployment | Boundary | true |  | LOADW | <span style="color: green">(-240 [-0.5%])</span> <div style='text-align: right'>48,080</div>  |
-| revm_contract_deployment | Merkle | true |  | LOADW | <span style="color: green">(-1,152 [-1.2%])</span> <div style='text-align: right'>91,520</div>  |
-| revm_contract_deployment | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true |  | LUI | <span style="color: red">(+18 [+0.1%])</span> <div style='text-align: right'>30,744</div>  |
+| revm_contract_deployment | Merkle | true |  | LOADHU | <div style='text-align: right'>320</div>  |
+| revm_contract_deployment | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADW | <div style='text-align: right'>1,207,920</div>  |
+| revm_contract_deployment | AccessAdapter<8> | true |  | LOADW | <div style='text-align: right'>20,434</div>  |
+| revm_contract_deployment | Boundary | true |  | LOADW | <div style='text-align: right'>48,080</div>  |
+| revm_contract_deployment | Merkle | true |  | LOADW | <div style='text-align: right'>91,520</div>  |
+| revm_contract_deployment | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true |  | LUI | <div style='text-align: right'>30,744</div>  |
 | revm_contract_deployment | AccessAdapter<8> | true |  | LUI | <div style='text-align: right'>34</div>  |
 | revm_contract_deployment | Boundary | true |  | LUI | <div style='text-align: right'>80</div>  |
-| revm_contract_deployment | <Rv32MultAdapterAir,MultiplicationCoreAir<4, 8>> | true |  | MUL | <span style="color: red">(+62 [+0.1%])</span> <div style='text-align: right'>65,627</div>  |
+| revm_contract_deployment | <Rv32MultAdapterAir,MultiplicationCoreAir<4, 8>> | true |  | MUL | <div style='text-align: right'>65,627</div>  |
 | revm_contract_deployment | AccessAdapter<8> | true |  | MUL | <div style='text-align: right'>34</div>  |
 | revm_contract_deployment | Boundary | true |  | MUL | <div style='text-align: right'>80</div>  |
 | revm_contract_deployment | Merkle | true |  | MUL | <div style='text-align: right'>64</div>  |
@@ -117,27 +117,27 @@
 | revm_contract_deployment | <Rv32MultAdapterAir,MulHCoreAir<4, 8>> | true |  | MULHU | <div style='text-align: right'>48,126</div>  |
 | revm_contract_deployment | AccessAdapter<8> | true |  | MULHU | <div style='text-align: right'>17</div>  |
 | revm_contract_deployment | Boundary | true |  | MULHU | <div style='text-align: right'>40</div>  |
-| revm_contract_deployment | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | OR | <span style="color: red">(+216 [+0.1%])</span> <div style='text-align: right'>257,436</div>  |
+| revm_contract_deployment | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | OR | <div style='text-align: right'>257,436</div>  |
 | revm_contract_deployment | PhantomAir | true |  | PHANTOM | <div style='text-align: right'>822</div>  |
-| revm_contract_deployment | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | true |  | SLL | <span style="color: red">(+530 [+0.1%])</span> <div style='text-align: right'>375,876</div>  |
+| revm_contract_deployment | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | true |  | SLL | <div style='text-align: right'>375,876</div>  |
 | revm_contract_deployment | <Rv32BaseAluAdapterAir,LessThanCoreAir<4, 8>> | true |  | SLT | <div style='text-align: right'>74</div>  |
-| revm_contract_deployment | <Rv32BaseAluAdapterAir,LessThanCoreAir<4, 8>> | true |  | SLTU | <span style="color: red">(+74 [+0.0%])</span> <div style='text-align: right'>522,033</div>  |
+| revm_contract_deployment | <Rv32BaseAluAdapterAir,LessThanCoreAir<4, 8>> | true |  | SLTU | <div style='text-align: right'>522,033</div>  |
 | revm_contract_deployment | AccessAdapter<8> | true |  | SLTU | <div style='text-align: right'>34</div>  |
 | revm_contract_deployment | Boundary | true |  | SLTU | <div style='text-align: right'>80</div>  |
 | revm_contract_deployment | Merkle | true |  | SLTU | <div style='text-align: right'>64</div>  |
 | revm_contract_deployment | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | true |  | SRA | <div style='text-align: right'>26,129</div>  |
-| revm_contract_deployment | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | true |  | SRL | <span style="color: red">(+106 [+0.1%])</span> <div style='text-align: right'>209,880</div>  |
+| revm_contract_deployment | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | true |  | SRL | <div style='text-align: right'>209,880</div>  |
 | revm_contract_deployment | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | STOREB | <div style='text-align: right'>66,400</div>  |
 | revm_contract_deployment | AccessAdapter<8> | true |  | STOREB | <div style='text-align: right'>2,006</div>  |
 | revm_contract_deployment | Boundary | true |  | STOREB | <div style='text-align: right'>4,720</div>  |
-| revm_contract_deployment | Merkle | true |  | STOREB | <span style="color: green">(-832 [-4.2%])</span> <div style='text-align: right'>19,200</div>  |
+| revm_contract_deployment | Merkle | true |  | STOREB | <div style='text-align: right'>19,200</div>  |
 | revm_contract_deployment | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | STOREH | <div style='text-align: right'>480</div>  |
-| revm_contract_deployment | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | STOREW | <span style="color: red">(+80 [+0.0%])</span> <div style='text-align: right'>1,323,360</div>  |
-| revm_contract_deployment | AccessAdapter<8> | true |  | STOREW | <span style="color: red">(+102 [+0.1%])</span> <div style='text-align: right'>150,926</div>  |
-| revm_contract_deployment | Boundary | true |  | STOREW | <span style="color: red">(+240 [+0.1%])</span> <div style='text-align: right'>355,120</div>  |
-| revm_contract_deployment | Merkle | true |  | STOREW | <span style="color: red">(+896 [+0.2%])</span> <div style='text-align: right'>575,936</div>  |
-| revm_contract_deployment | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | SUB | <span style="color: red">(+108 [+0.2%])</span> <div style='text-align: right'>70,920</div>  |
-| revm_contract_deployment | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | XOR | <span style="color: red">(+288 [+0.3%])</span> <div style='text-align: right'>94,500</div>  |
+| revm_contract_deployment | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | STOREW | <div style='text-align: right'>1,323,360</div>  |
+| revm_contract_deployment | AccessAdapter<8> | true |  | STOREW | <div style='text-align: right'>150,926</div>  |
+| revm_contract_deployment | Boundary | true |  | STOREW | <div style='text-align: right'>355,120</div>  |
+| revm_contract_deployment | Merkle | true |  | STOREW | <div style='text-align: right'>575,936</div>  |
+| revm_contract_deployment | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | SUB | <div style='text-align: right'>70,920</div>  |
+| revm_contract_deployment | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | XOR | <div style='text-align: right'>94,500</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -174,7 +174,7 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| revm_contract_deployment | <span style="color: green">(-1.0 [-1.3%])</span> <div style='text-align: right'>74.0</div>  | <span style="color: red">(+87.0 [+3.6%])</span> <div style='text-align: right'>2,488.0</div>  | <span style="color: green">(-2.0 [-0.1%])</span> <div style='text-align: right'>1,878.0</div>  | <span style="color: green">(-2.0 [-1.6%])</span> <div style='text-align: right'>127.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: red">(+4,250 [+0.0%])</span> <div style='text-align: right'>20,519,983</div>  | <span style="color: red">(+133 [+0.0%])</span> <div style='text-align: right'>310,417</div>  | <span style="color: red">(+134.0 [+2.8%])</span> <div style='text-align: right'>4,979.0</div>  |
+| revm_contract_deployment | <span style="color: red">(+2.0 [+2.7%])</span> <div style='text-align: right'>76.0</div>  | <span style="color: green">(-12.0 [-0.5%])</span> <div style='text-align: right'>2,476.0</div>  | <span style="color: green">(-11.0 [-0.6%])</span> <div style='text-align: right'>1,867.0</div>  | <span style="color: red">(+4.0 [+3.1%])</span> <div style='text-align: right'>131.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>20,519,983</div>  | <div style='text-align: right'>310,417</div>  | <span style="color: green">(-74.0 [-1.5%])</span> <div style='text-align: right'>4,905.0</div>  |
 
 | group | air_name | segment | cells | main_cols | perm_cols | prep_cols | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -205,7 +205,7 @@
 
 | group | segment | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- |
-| revm_contract_deployment | 0 | <span style="color: red">(+47.0 [+1.9%])</span> <div style='text-align: right'>2,491.0</div>  | <div style='text-align: right'>118,799,904</div>  |
+| revm_contract_deployment | 0 | <span style="color: green">(-62.0 [-2.5%])</span> <div style='text-align: right'>2,429.0</div>  | <div style='text-align: right'>118,799,904</div>  |
 
 </details>
 
@@ -214,13 +214,13 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/a511acc8d1b74eb3ab7237b0823b7b9092daa763/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/a511acc8d1b74eb3ab7237b0823b7b9092daa763/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/a511acc8d1b74eb3ab7237b0823b7b9092daa763/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/a511acc8d1b74eb3ab7237b0823b7b9092daa763/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/a511acc8d1b74eb3ab7237b0823b7b9092daa763/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/a511acc8d1b74eb3ab7237b0823b7b9092daa763/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/a511acc8d1b74eb3ab7237b0823b7b9092daa763/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/a511acc8d1b74eb3ab7237b0823b7b9092daa763/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6843bb5878b3283429e4b4446d4e0f2dd8b741d0/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6843bb5878b3283429e4b4446d4e0f2dd8b741d0/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6843bb5878b3283429e4b4446d4e0f2dd8b741d0/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6843bb5878b3283429e4b4446d4e0f2dd8b741d0/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6843bb5878b3283429e4b4446d4e0f2dd8b741d0/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6843bb5878b3283429e4b4446d4e0f2dd8b741d0/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6843bb5878b3283429e4b4446d4e0f2dd8b741d0/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6843bb5878b3283429e4b4446d4e0f2dd8b741d0/revm_contract_deployment-revm_contract_deployment.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/a511acc8d1b74eb3ab7237b0823b7b9092daa763
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/6843bb5878b3283429e4b4446d4e0f2dd8b741d0
 Instance Type: 64cpu-linux-arm64
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11725267863)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11727834733)
