@@ -1,7 +1,12 @@
-#[cfg(feature = "halo2curves")]
-mod exp_bytes_be;
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
+// use ff::Field;
+
+mod complex;
+pub use complex::*;
+
+#[cfg(feature = "halo2curves")]
+mod exp_bytes_be;
 #[cfg(feature = "halo2curves")]
 pub use exp_bytes_be::*;
 
