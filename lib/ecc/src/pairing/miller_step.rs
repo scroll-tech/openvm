@@ -1,7 +1,5 @@
 use core::ops::{Add, Mul, Sub};
 
-use axvm::intrinsics::Fp2;
-
 use super::UnevaluatedLine;
 use crate::{
     field::{Field, FieldExtension},
@@ -9,14 +7,7 @@ use crate::{
 };
 
 /// Trait definition for Miller step opcodes
-pub trait MillerStepOpcode<const LIMBS: usize, T: Fp2<LIMBS>> {
-    fn miller_double_step(s: [T; 2]) -> ([T; 2], [T; 2]);
-
-    fn miller_double_and_add_step(s: [T; 2], q: [T; 2]) -> ([T; 2], [T; 2], [T; 2]);
-}
-
-#[allow(non_snake_case)]
-pub fn miller_double_step<Fp, Fp2>(S: EcPoint<Fp2>) -> (EcPoint<Fp2>, UnevaluatedLine<Fp, Fp2>)
+pub trait MillerStepOpcode<Fp, Fp2>
 where
     Fp: Field,
     Fp2: FieldExtension<BaseField = Fp>,
@@ -24,32 +15,132 @@ where
     for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
     for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
 {
-    let one = &Fp2::ONE;
-    let two = &(one + one);
-    let three = &(one + two);
+    /// Miller double step
+    fn miller_double_step(s: EcPoint<Fp2>) -> (EcPoint<Fp2>, UnevaluatedLine<Fp, Fp2>) {
+        #[cfg(not(target_os = "zkvm"))]
+        {
+            let one = &Fp2::ONE;
+            let two = &(one + one);
+            let three = &(one + two);
 
-    let x = &S.x;
-    let y = &S.y;
-    // λ = (3x^2) / (2y)
-    let two_y_inv = &(two * y).invert().unwrap();
-    let lambda = &((three * x * x) * two_y_inv);
-    // x_2S = λ^2 - 2x
-    let x_2S = lambda * lambda - two * x;
-    // y_2S = λ(x - x_2S) - y
-    let y_2S = lambda * &(x - &x_2S) - y;
-    let two_s = EcPoint { x: x_2S, y: y_2S };
+            let x = &s.x;
+            let y = &s.y;
+            // λ = (3x^2) / (2y)
+            let two_y_inv = &(two * y).invert().unwrap();
+            let lambda = &((three * x * x) * two_y_inv);
+            // x_2s = λ^2 - 2x
+            let x_2s = lambda * lambda - two * x;
+            // y_2s = λ(x - x_2s) - y
+            let y_2s = lambda * &(x - &x_2s) - y;
+            let two_s = EcPoint { x: x_2s, y: y_2s };
 
-    // Tangent line
-    //   1 + b' (x_P / y_P) w^-1 + c' (1 / y_P) w^-3
-    // where
-    //   l_{\Psi(S),\Psi(S)}(P) = (λ * x_S - y_S) (1 / y_P)  - λ (x_P / y_P) w^2 + w^3
-    // x0 = λ * x_S - y_S
-    // x2 = - λ
-    let b = lambda.clone().neg();
-    let c = lambda * x - y;
+            // Tangent line
+            //   1 + b' (x_P / y_P) w^-1 + c' (1 / y_P) w^-3
+            // where
+            //   l_{\Psi(S),\Psi(S)}(P) = (λ * x_S - y_S) (1 / y_P)  - λ (x_P / y_P) w^2 + w^3
+            // x0 = λ * x_S - y_S
+            // x2 = - λ
+            let b = lambda.clone().neg();
+            let c = lambda * x - y;
 
-    (two_s, UnevaluatedLine { b, c })
+            (two_s, UnevaluatedLine { b, c })
+        }
+        #[cfg(target_os = "zkvm")]
+        {
+            todo!()
+        }
+    }
+
+    /// Miller double and add step (2S + Q implemented as S + Q + S for efficiency)
+    fn miller_double_and_add_step(
+        s: EcPoint<Fp2>,
+        q: EcPoint<Fp2>,
+    ) -> (
+        EcPoint<Fp2>,
+        UnevaluatedLine<Fp, Fp2>,
+        UnevaluatedLine<Fp, Fp2>,
+    ) {
+        #[cfg(not(target_os = "zkvm"))]
+        {
+            let one = &Fp2::ONE;
+            let two = &(one + one);
+
+            let x_s = &s.x;
+            let y_s = &s.y;
+            let x_q = &q.x;
+            let y_q = &q.y;
+
+            // λ1 = (y_s - y_q) / (x_s - x_q)
+            let lambda1 = &((y_s - y_q) * (x_s - x_q).invert().unwrap());
+            let x_s_plus_q = lambda1 * lambda1 - x_s - x_q;
+
+            // λ2 = -λ1 - 2y_s / (x_{s+q} - x_s)
+            let lambda2 =
+                &(lambda1.clone().neg() - two * y_s * (&x_s_plus_q - x_s).invert().unwrap());
+            let x_s_plus_q_plus_s = lambda2 * lambda2 - x_s - &x_s_plus_q;
+            let y_s_plus_q_plus_s = lambda2 * &(x_s - &x_s_plus_q_plus_s) - y_s;
+
+            let s_plus_q_plus_s = EcPoint {
+                x: x_s_plus_q_plus_s,
+                y: y_s_plus_q_plus_s,
+            };
+
+            // l_{\Psi(S),\Psi(Q)}(P) = (λ_1 * x_S - y_S) (1 / y_P) - λ_1 (x_P / y_P) w^2 + w^3
+            let b0 = lambda1.clone().neg();
+            let c0 = lambda1 * x_s - y_s;
+
+            // l_{\Psi(S+Q),\Psi(S)}(P) = (λ_2 * x_S - y_S) (1 / y_P) - λ_2 (x_P / y_P) w^2 + w^3
+            let b1 = lambda2.clone().neg();
+            let c1 = lambda2 * x_s - y_s;
+
+            (
+                s_plus_q_plus_s,
+                UnevaluatedLine { b: b0, c: c0 },
+                UnevaluatedLine { b: b1, c: c1 },
+            )
+        }
+        #[cfg(target_os = "zkvm")]
+        {
+            todo!()
+        }
+    }
 }
+
+// #[allow(non_snake_case)]
+// pub fn miller_double_step<Fp, Fp2>(S: EcPoint<Fp2>) -> (EcPoint<Fp2>, UnevaluatedLine<Fp, Fp2>)
+// where
+//     Fp: Field,
+//     Fp2: FieldExtension<BaseField = Fp>,
+//     for<'a> &'a Fp2: Add<&'a Fp2, Output = Fp2>,
+//     for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
+//     for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
+// {
+//     let one = &Fp2::ONE;
+//     let two = &(one + one);
+//     let three = &(one + two);
+
+//     let x = &S.x;
+//     let y = &S.y;
+//     // λ = (3x^2) / (2y)
+//     let two_y_inv = &(two * y).invert().unwrap();
+//     let lambda = &((three * x * x) * two_y_inv);
+//     // x_2S = λ^2 - 2x
+//     let x_2S = lambda * lambda - two * x;
+//     // y_2S = λ(x - x_2S) - y
+//     let y_2S = lambda * &(x - &x_2S) - y;
+//     let two_s = EcPoint { x: x_2S, y: y_2S };
+
+//     // Tangent line
+//     //   1 + b' (x_P / y_P) w^-1 + c' (1 / y_P) w^-3
+//     // where
+//     //   l_{\Psi(S),\Psi(S)}(P) = (λ * x_S - y_S) (1 / y_P)  - λ (x_P / y_P) w^2 + w^3
+//     // x0 = λ * x_S - y_S
+//     // x2 = - λ
+//     let b = lambda.clone().neg();
+//     let c = lambda * x - y;
+
+//     (two_s, UnevaluatedLine { b, c })
+// }
 
 #[allow(non_snake_case)]
 pub fn miller_add_step<Fp, Fp2>(
@@ -86,55 +177,55 @@ where
     (s_plus_q, UnevaluatedLine { b, c })
 }
 
-#[allow(non_snake_case)]
-pub fn miller_double_and_add_step<Fp, Fp2>(
-    S: EcPoint<Fp2>,
-    Q: EcPoint<Fp2>,
-) -> (
-    EcPoint<Fp2>,
-    UnevaluatedLine<Fp, Fp2>,
-    UnevaluatedLine<Fp, Fp2>,
-)
-where
-    Fp: Field,
-    Fp2: FieldExtension<BaseField = Fp>,
-    for<'a> &'a Fp2: Add<&'a Fp2, Output = Fp2>,
-    for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
-    for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
-{
-    let one = &Fp2::ONE;
-    let two = &(one + one);
+// #[allow(non_snake_case)]
+// pub fn miller_double_and_add_step<Fp, Fp2>(
+//     S: EcPoint<Fp2>,
+//     Q: EcPoint<Fp2>,
+// ) -> (
+//     EcPoint<Fp2>,
+//     UnevaluatedLine<Fp, Fp2>,
+//     UnevaluatedLine<Fp, Fp2>,
+// )
+// where
+//     Fp: Field,
+//     Fp2: FieldExtension<BaseField = Fp>,
+//     for<'a> &'a Fp2: Add<&'a Fp2, Output = Fp2>,
+//     for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
+//     for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
+// {
+//     let one = &Fp2::ONE;
+//     let two = &(one + one);
 
-    let x_s = &S.x;
-    let y_s = &S.y;
-    let x_q = &Q.x;
-    let y_q = &Q.y;
+//     let x_s = &S.x;
+//     let y_s = &S.y;
+//     let x_q = &Q.x;
+//     let y_q = &Q.y;
 
-    // λ1 = (y_s - y_q) / (x_s - x_q)
-    let lambda1 = &((y_s - y_q) * (x_s - x_q).invert().unwrap());
-    let x_s_plus_q = lambda1 * lambda1 - x_s - x_q;
+//     // λ1 = (y_s - y_q) / (x_s - x_q)
+//     let lambda1 = &((y_s - y_q) * (x_s - x_q).invert().unwrap());
+//     let x_s_plus_q = lambda1 * lambda1 - x_s - x_q;
 
-    // λ2 = -λ1 - 2y_s / (x_{s+q} - x_s)
-    let lambda2 = &(lambda1.clone().neg() - two * y_s * (&x_s_plus_q - x_s).invert().unwrap());
-    let x_s_plus_q_plus_s = lambda2 * lambda2 - x_s - &x_s_plus_q;
-    let y_s_plus_q_plus_s = lambda2 * &(x_s - &x_s_plus_q_plus_s) - y_s;
+//     // λ2 = -λ1 - 2y_s / (x_{s+q} - x_s)
+//     let lambda2 = &(lambda1.clone().neg() - two * y_s * (&x_s_plus_q - x_s).invert().unwrap());
+//     let x_s_plus_q_plus_s = lambda2 * lambda2 - x_s - &x_s_plus_q;
+//     let y_s_plus_q_plus_s = lambda2 * &(x_s - &x_s_plus_q_plus_s) - y_s;
 
-    let s_plus_q_plus_s = EcPoint {
-        x: x_s_plus_q_plus_s,
-        y: y_s_plus_q_plus_s,
-    };
+//     let s_plus_q_plus_s = EcPoint {
+//         x: x_s_plus_q_plus_s,
+//         y: y_s_plus_q_plus_s,
+//     };
 
-    // l_{\Psi(S),\Psi(Q)}(P) = (λ_1 * x_S - y_S) (1 / y_P) - λ_1 (x_P / y_P) w^2 + w^3
-    let b0 = lambda1.clone().neg();
-    let c0 = lambda1 * x_s - y_s;
+//     // l_{\Psi(S),\Psi(Q)}(P) = (λ_1 * x_S - y_S) (1 / y_P) - λ_1 (x_P / y_P) w^2 + w^3
+//     let b0 = lambda1.clone().neg();
+//     let c0 = lambda1 * x_s - y_s;
 
-    // l_{\Psi(S+Q),\Psi(S)}(P) = (λ_2 * x_S - y_S) (1 / y_P) - λ_2 (x_P / y_P) w^2 + w^3
-    let b1 = lambda2.clone().neg();
-    let c1 = lambda2 * x_s - y_s;
+//     // l_{\Psi(S+Q),\Psi(S)}(P) = (λ_2 * x_S - y_S) (1 / y_P) - λ_2 (x_P / y_P) w^2 + w^3
+//     let b1 = lambda2.clone().neg();
+//     let c1 = lambda2 * x_s - y_s;
 
-    (
-        s_plus_q_plus_s,
-        UnevaluatedLine { b: b0, c: c0 },
-        UnevaluatedLine { b: b1, c: c1 },
-    )
-}
+//     (
+//         s_plus_q_plus_s,
+//         UnevaluatedLine { b: b0, c: c0 },
+//         UnevaluatedLine { b: b1, c: c1 },
+//     )
+// }

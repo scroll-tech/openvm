@@ -2,6 +2,7 @@ mod line;
 use core::ops::Neg;
 
 use axvm::intrinsics::{Fp2, Fp2Bls12381, BLS12_381_LIMBS};
+use lazy_static::lazy_static;
 pub use line::*;
 
 mod miller_step;
@@ -20,4 +21,8 @@ impl Field for Fp2Bls12381 {
     fn invert(&self) -> Option<Self> {
         unimplemented!()
     }
+}
+
+lazy_static! {
+    pub static ref BLS12381_XI: Fp2Bls12381 = Fp2Bls12381::from_u32((1, 1));
 }

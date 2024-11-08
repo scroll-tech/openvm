@@ -1,13 +1,21 @@
 use axvm::intrinsics::{Fp2, Fp2Bn254, BN256_LIMBS};
 
-use crate::pairing::MillerStepOpcode;
+use crate::{
+    pairing::{
+        bn254::{BN254_THREE, BN254_TWO},
+        MillerStepOpcode, UnevaluatedLine,
+    },
+    point::EcPoint,
+};
 
 impl MillerStepOpcode<BN256_LIMBS, Fp2Bn254> for Fp2Bn254 {
-    fn miller_double_step(s: [Fp2Bn254; 2]) -> ([Fp2Bn254; 2], [Fp2Bn254; 2]) {
+    fn miller_double_step(
+        s: EcPoint<Fp2Bn254>,
+    ) -> (EcPoint<Fp2Bn254>, UnevaluatedLine<Fp2Bn254, Fp2Bn254>) {
         #[cfg(not(target_os = "zkvm"))]
         {
-            let two = &Fp2Bn254::from_u32((2, 0));
-            let three = &Fp2Bn254::from_u32((3, 0));
+            let two = &BN254_TWO.clone();
+            let three = &BN254_THREE.clone();
 
             let x = &s[0];
             let y = &s[1];
@@ -38,7 +46,7 @@ impl MillerStepOpcode<BN256_LIMBS, Fp2Bn254> for Fp2Bn254 {
     ) -> ([Fp2Bn254; 2], [Fp2Bn254; 2], [Fp2Bn254; 2]) {
         #[cfg(not(target_os = "zkvm"))]
         {
-            let two = &Fp2Bn254::from_u32((2, 0));
+            let two = &BN254_TWO.clone();
             let x_s = &s[0];
             let y_s = &s[1];
             let x_q = &q[0];

@@ -1,34 +1,46 @@
 use axvm::intrinsics::{Fp2, Fp2Bls12381, BLS12_381_LIMBS};
 
+use super::Bls12381;
+use crate::{
+    field::{Field, FieldExtension},
+    pairing::{bls12381::BLS12381_XI, EvaluatedLine, UnevaluatedLine},
+};
+
 /// Trait definition for line multiplication opcodes for BLS12-381
-pub trait LineMulBls12381 {
-    fn mul_023_by_023(l0: [Fp2Bls12381; 2], l1: [Fp2Bls12381; 2]) -> [Fp2Bls12381; 6];
+pub trait LineMulMType<Fp, Fp2>
+where
+    Fp: Field,
+    Fp2: FieldExtension<BaseField = Fp>,
+{
+    fn mul_023_by_023(l0: EvaluatedLine<Fp, Fp2>, l1: EvaluatedLine<Fp, Fp2>) -> [Fp2; 6];
 
-    fn mul_by_023(f: [Fp2Bls12381; 6], l: [Fp2Bls12381; 2]) -> [Fp2Bls12381; 6];
+    fn mul_by_023(f: [Fp2; 6], l: EvaluatedLine<Fp, Fp2>) -> [Fp2; 6];
 
-    fn mul_by_02345(f: [Fp2Bls12381; 6], x: [Fp2Bls12381; 6]) -> [Fp2Bls12381; 6];
+    fn mul_by_02345(f: [Fp2; 6], x: [Fp2; 6]) -> [Fp2; 6];
 
     fn evaluate_line(
-        l: [Fp2Bls12381; 2],
+        l: UnevaluatedLine<Fp, Fp2>,
         x_over_y: [u8; BLS12_381_LIMBS],
         y_inv: [u8; BLS12_381_LIMBS],
-    ) -> [Fp2Bls12381; 2];
+    ) -> EvaluatedLine<Fp, Fp2>;
 }
 
-impl LineMulBls12381 for Fp2Bls12381 {
-    fn mul_023_by_023(l0: [Fp2Bls12381; 2], l1: [Fp2Bls12381; 2]) -> [Fp2Bls12381; 6] {
+impl LineMulMType<FpBls12381, Fp2Bls12381> for Bls12381 {
+    fn mul_023_by_023(
+        l0: EvaluatedLine<FpBls12381, Fp2Bls12381>,
+        l1: EvaluatedLine<FpBls12381, Fp2Bls12381>,
+    ) -> [Fp2Bls12381; 6] {
         #[cfg(not(target_os = "zkvm"))]
         {
-            let b0 = &l0[0];
-            let c0 = &l0[1];
-            let b1 = &l1[0];
-            let c1 = &l1[1];
+            let b0 = &l0.b;
+            let c0 = &l0.c;
+            let b1 = &l1.b;
+            let c1 = &l1.c;
 
-            let xi = Fp2Bls12381::from_u32((1, 1));
             // where w⁶ = xi
             // l0 * l1 = c0c1 + (c0b1 + c1b0)w² + (c0 + c1)w³ + (b0b1)w⁴ + (b0 +b1)w⁵ + w⁶
             //         = (c0c1 + xi) + (c0b1 + c1b0)w² + (c0 + c1)w³ + (b0b1)w⁴ + (b0 + b1)w⁵
-            let x0 = c0 * c1 + xi;
+            let x0 = c0 * c1 + BLS12381_XI.clone();
             let x2 = c0 * b1 + c1 * b0;
             let x3 = c0 + c1;
             let x4 = b0 * b1;
@@ -45,7 +57,7 @@ impl LineMulBls12381 for Fp2Bls12381 {
     fn mul_by_023(f: [Fp2Bls12381; 6], l: [Fp2Bls12381; 2]) -> [Fp2Bls12381; 6] {
         #[cfg(not(target_os = "zkvm"))]
         {
-            let one = Fp2Bls12381::from_u32((1, 0));
+            let one = Fp2Bls12381::ONE;
             Self::mul_by_02345(
                 f,
                 [
@@ -67,8 +79,6 @@ impl LineMulBls12381 for Fp2Bls12381 {
     fn mul_by_02345(f: [Fp2Bls12381; 6], x: [Fp2Bls12381; 6]) -> [Fp2Bls12381; 6] {
         #[cfg(not(target_os = "zkvm"))]
         {
-            let xi = Fp2Bls12381::from_u32((1, 1));
-
             // we update the order of the coefficients to match the Fp12 coefficient ordering:
             // Fp12 {
             //   c0: Fp6 {
@@ -87,6 +97,8 @@ impl LineMulBls12381 for Fp2Bls12381 {
             let o2 = &x[4];
             let o4 = &x[3];
             let o5 = &x[5];
+
+            let xi = BLS12381_XI.clone();
 
             // NOTE[yj]: Hand-calculated multiplication for Fp12 * 02345 ∈ Fp2; this is likely not the most efficient implementation
             // c0 = cs0co0 + xi(cs1co2 + cs2co1 + cs3co5 + cs4co4)

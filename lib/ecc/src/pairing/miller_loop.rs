@@ -3,19 +3,26 @@ use core::ops::{Add, Mul, Sub};
 
 use itertools::{izip, Itertools};
 
-use super::EvaluatedLine;
+use super::{EvaluatedLine, MillerStepOpcode};
 use crate::{
     field::{Field, FieldExtension},
-    pairing::miller_step::{miller_double_and_add_step, miller_double_step},
+    // pairing::miller_step::{miller_double_and_add_step, miller_double_step},
     point::EcPoint,
 };
 
 #[allow(non_snake_case)]
-pub trait MultiMillerLoop<Fp, Fp2, Fp12, const BITS: usize>
+pub trait MultiMillerLoop<Fp, Fp2, Fp12, const BITS: usize>: MillerStepOpcode<Fp, Fp2>
 where
     Fp: Field,
     Fp2: FieldExtension<BaseField = Fp>,
     Fp12: FieldExtension<BaseField = Fp2>,
+    for<'a> &'a Fp: Add<&'a Fp, Output = Fp>,
+    for<'a> &'a Fp: Sub<&'a Fp, Output = Fp>,
+    for<'a> &'a Fp: Mul<&'a Fp, Output = Fp>,
+    for<'a> &'a Fp2: Add<&'a Fp2, Output = Fp2>,
+    for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
+    for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
+    for<'a> &'a Fp12: Mul<&'a Fp12, Output = Fp12>,
 {
     /// We use the field extension tower `Fp12 = Fp2[w]/(w^6 - xi)`.
     fn xi() -> Fp2;
@@ -53,16 +60,7 @@ where
 
     /// Runs the multi-Miller loop with no embedded exponent
     #[allow(non_snake_case)]
-    fn multi_miller_loop(&self, P: &[EcPoint<Fp>], Q: &[EcPoint<Fp2>]) -> Fp12
-    where
-        for<'a> &'a Fp: Add<&'a Fp, Output = Fp>,
-        for<'a> &'a Fp: Sub<&'a Fp, Output = Fp>,
-        for<'a> &'a Fp: Mul<&'a Fp, Output = Fp>,
-        for<'a> &'a Fp2: Add<&'a Fp2, Output = Fp2>,
-        for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
-        for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
-        for<'a> &'a Fp12: Mul<&'a Fp12, Output = Fp12>,
-    {
+    fn multi_miller_loop(&self, P: &[EcPoint<Fp>], Q: &[EcPoint<Fp2>]) -> Fp12 {
         self.multi_miller_loop_embedded_exp(P, Q, None)
     }
 
@@ -74,16 +72,7 @@ where
         P: &[EcPoint<Fp>],
         Q: &[EcPoint<Fp2>],
         c: Option<Fp12>,
-    ) -> Fp12
-    where
-        for<'a> &'a Fp: Add<&'a Fp, Output = Fp>,
-        for<'a> &'a Fp: Sub<&'a Fp, Output = Fp>,
-        for<'a> &'a Fp: Mul<&'a Fp, Output = Fp>,
-        for<'a> &'a Fp2: Add<&'a Fp2, Output = Fp2>,
-        for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
-        for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
-        for<'a> &'a Fp12: Mul<&'a Fp12, Output = Fp12>,
-    {
+    ) -> Fp12 {
         assert!(!P.is_empty());
         assert_eq!(P.len(), Q.len());
 
@@ -135,7 +124,7 @@ where
                 // Run miller double step if \sigma_i == 0
                 let (Q_out, lines_2S) = Q_acc
                     .into_iter()
-                    .map(miller_double_step::<Fp, Fp2>)
+                    .map(Self::miller_double_step)
                     .unzip::<_, _, Vec<_>, Vec<_>>();
                 Q_acc = Q_out;
 
@@ -163,7 +152,7 @@ where
                         .iter()
                         .zip(Q_signed.iter())
                         .map(|(Q_acc, Q_signed)| {
-                            miller_double_and_add_step::<Fp, Fp2>(Q_acc.clone(), Q_signed.clone())
+                            Self::miller_double_and_add_step(Q_acc.clone(), Q_signed.clone())
                         })
                         .multiunzip();
                 Q_acc = Q_out;
