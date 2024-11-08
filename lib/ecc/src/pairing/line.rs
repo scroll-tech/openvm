@@ -1,3 +1,5 @@
+use axvm::intrinsics::{BLS12_381_LIMBS, BN256_LIMBS};
+
 use crate::field::{Field, FieldExtension};
 
 #[derive(Clone, Copy, Debug)]
@@ -33,6 +35,7 @@ where
     pub c: Fp2,
 }
 
+/// Convert M-type lines into Fp12 elements
 pub trait LineMType<Fp, Fp2, Fp12>
 where
     Fp: Field,
@@ -42,6 +45,26 @@ where
     fn from_evaluated_line_m_type(line: EvaluatedLine<Fp, Fp2>) -> Fp12;
 }
 
+/// Trait definition for line multiplication opcodes for M-type lines
+pub trait LineMulMType<Fp, Fp2>
+where
+    Fp: Field,
+    Fp2: FieldExtension<BaseField = Fp>,
+{
+    fn mul_023_by_023(l0: EvaluatedLine<Fp, Fp2>, l1: EvaluatedLine<Fp, Fp2>) -> [Fp2; 6];
+
+    fn mul_by_023(f: [Fp2; 6], l: EvaluatedLine<Fp, Fp2>) -> [Fp2; 6];
+
+    fn mul_by_02345(f: [Fp2; 6], x: [Fp2; 6]) -> [Fp2; 6];
+
+    fn evaluate_line(
+        l: UnevaluatedLine<Fp, Fp2>,
+        x_over_y: [u8; BLS12_381_LIMBS],
+        y_inv: [u8; BLS12_381_LIMBS],
+    ) -> EvaluatedLine<Fp, Fp2>;
+}
+
+/// Convert D-type lines into Fp12 elements
 pub trait LineDType<Fp, Fp2, Fp12>
 where
     Fp: Field,
@@ -49,4 +72,23 @@ where
     Fp12: FieldExtension<BaseField = Fp2>,
 {
     fn from_evaluated_line_d_type(line: EvaluatedLine<Fp, Fp2>) -> Fp12;
+}
+
+/// Trait definition for line multiplication opcodes for D-type lines
+pub trait LineMulDType<Fp, Fp2>
+where
+    Fp: Field,
+    Fp2: FieldExtension<BaseField = Fp>,
+{
+    fn mul_013_by_013(l0: EvaluatedLine<Fp, Fp2>, l1: EvaluatedLine<Fp, Fp2>) -> [Fp2; 5];
+
+    fn mul_by_013(f: [Fp2; 6], l: EvaluatedLine<Fp, Fp2>) -> [Fp2; 6];
+
+    fn mul_by_01234(f: [Fp2; 6], x: [Fp2; 5]) -> [Fp2; 6];
+
+    fn evaluate_line(
+        l: UnevaluatedLine<Fp, Fp2>,
+        x_over_y: [u8; BN256_LIMBS],
+        y_inv: [u8; BN256_LIMBS],
+    ) -> EvaluatedLine<Fp, Fp2>;
 }

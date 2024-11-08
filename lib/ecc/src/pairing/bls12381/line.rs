@@ -3,27 +3,8 @@ use axvm::intrinsics::{Fp2, Fp2Bls12381, BLS12_381_LIMBS};
 use super::Bls12381;
 use crate::{
     field::{Field, FieldExtension},
-    pairing::{bls12381::BLS12381_XI, EvaluatedLine, UnevaluatedLine},
+    pairing::{bls12381::BLS12381_XI, EvaluatedLine, LineMulMType, UnevaluatedLine},
 };
-
-/// Trait definition for line multiplication opcodes for BLS12-381
-pub trait LineMulMType<Fp, Fp2>
-where
-    Fp: Field,
-    Fp2: FieldExtension<BaseField = Fp>,
-{
-    fn mul_023_by_023(l0: EvaluatedLine<Fp, Fp2>, l1: EvaluatedLine<Fp, Fp2>) -> [Fp2; 6];
-
-    fn mul_by_023(f: [Fp2; 6], l: EvaluatedLine<Fp, Fp2>) -> [Fp2; 6];
-
-    fn mul_by_02345(f: [Fp2; 6], x: [Fp2; 6]) -> [Fp2; 6];
-
-    fn evaluate_line(
-        l: UnevaluatedLine<Fp, Fp2>,
-        x_over_y: [u8; BLS12_381_LIMBS],
-        y_inv: [u8; BLS12_381_LIMBS],
-    ) -> EvaluatedLine<Fp, Fp2>;
-}
 
 impl LineMulMType<FpBls12381, Fp2Bls12381> for Bls12381 {
     fn mul_023_by_023(
@@ -124,17 +105,17 @@ impl LineMulMType<FpBls12381, Fp2Bls12381> for Bls12381 {
     }
 
     fn evaluate_line(
-        l: [Fp2Bls12381; 2],
+        l: UnevaluatedLine<FpBls12381, Fp2Bls12381>,
         x_over_y: [u8; BLS12_381_LIMBS],
         y_inv: [u8; BLS12_381_LIMBS],
-    ) -> [Fp2Bls12381; 2] {
+    ) -> EvaluatedLine<FpBls12381, Fp2Bls12381> {
         #[cfg(not(target_os = "zkvm"))]
         {
             let x_over_y_fp2 = Fp2Bls12381::from_bytes([x_over_y, x_over_y].into());
             let y_inv_fp2 = Fp2Bls12381::from_bytes([y_inv, y_inv].into());
 
-            let r0 = &l[0] * &x_over_y_fp2;
-            let r1 = &l[1] * &y_inv_fp2;
+            let r0 = &l.b * &x_over_y_fp2;
+            let r1 = &l.c * &y_inv_fp2;
 
             [r0, r1]
         }
