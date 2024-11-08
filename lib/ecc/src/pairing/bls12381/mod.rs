@@ -1,8 +1,6 @@
-mod line;
-use core::ops::Neg;
-
-use axvm::intrinsics::{Fp2, Fp2Bls12381, BLS12_381_LIMBS};
 use lazy_static::lazy_static;
+
+mod line;
 pub use line::*;
 
 mod miller_step;

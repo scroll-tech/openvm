@@ -16,8 +16,5 @@ mod u256;
 mod modular;
 pub use modular::*;
 
-mod fp2;
-pub use fp2::*;
-
 mod utils;
 pub use utils::*;

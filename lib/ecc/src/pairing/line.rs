@@ -1,5 +1,3 @@
-use axvm::intrinsics::{BLS12_381_LIMBS, BN256_LIMBS};
-
 use crate::field::{Field, FieldExtension, SexticExtFieldDtype, SexticExtFieldMtype};
 
 #[derive(Clone, Copy, Debug)]
@@ -63,8 +61,8 @@ where
 
     fn evaluate_line(
         l: UnevaluatedLine<Fp, Fp2>,
-        x_over_y: [u8; BLS12_381_LIMBS],
-        y_inv: [u8; BLS12_381_LIMBS],
+        x_over_y: Fp,
+        y_inv: Fp,
     ) -> EvaluatedLine<Fp, Fp2>;
 }
 
@@ -96,7 +94,7 @@ where
 
     fn evaluate_line(
         l: UnevaluatedLine<Fp, Fp2>,
-        x_over_y: [u8; BN256_LIMBS],
-        y_inv: [u8; BN256_LIMBS],
+        x_over_y: Fp,
+        y_inv: Fp,
     ) -> EvaluatedLine<Fp, Fp2>;
 }

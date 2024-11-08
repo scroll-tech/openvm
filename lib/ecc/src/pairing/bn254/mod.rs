@@ -1,6 +1,6 @@
-mod line;
-use axvm::intrinsics::{Fp2, Fp2Bn254};
 use lazy_static::lazy_static;
+
+mod line;
 pub use line::*;
 
 mod miller_step;

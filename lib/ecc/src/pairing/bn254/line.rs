@@ -29,7 +29,7 @@ impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
             let x3 = c0 + c1;
             let x4 = b0 * c1 + b1 * c0;
 
-            [x0, x1, x2, x3, x4]
+            SexticExtFieldDtype([x0, x1, x2, x3, x4])
         }
         #[cfg(target_os = "zkvm")]
         {
@@ -74,11 +74,11 @@ impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
             //     c2: x5,
             //   },
             // }
-            let o0 = &x[0];
-            let o1 = &x[2];
-            let o2 = &x[4];
-            let o3 = &x[1];
-            let o4 = &x[3];
+            let o0 = &x.0[0];
+            let o1 = &x.0[2];
+            let o2 = &x.0[4];
+            let o3 = &x.0[1];
+            let o4 = &x.0[3];
 
             let xi = BN254_XI.clone();
 
@@ -117,7 +117,7 @@ impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
             let r0 = &l.b * &x_over_y_fp2;
             let r1 = &l.c * &y_inv_fp2;
 
-            [r0, r1]
+            EvaluatedLine { b: r0, c: r1 }
         }
         #[cfg(target_os = "zkvm")]
         {
