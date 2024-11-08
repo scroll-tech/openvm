@@ -2,15 +2,15 @@ use axvm::intrinsics::{Fp2, Fp2Bn254, BN256_LIMBS};
 
 use super::Bn254;
 use crate::{
-    field::{Field, FieldExtension},
+    field::{Field, FieldExtension, SexticExtFieldDtype},
     pairing::{bn254::BN254_XI, EvaluatedLine, LineMulDType, UnevaluatedLine},
 };
 
-impl LineMulDType<FpBn254, Fp2Bn254> for Bn254 {
+impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
     fn mul_013_by_013(
         l0: EvaluatedLine<FpBn254, Fp2Bn254>,
         l1: EvaluatedLine<FpBn254, Fp2Bn254>,
-    ) -> [Fp2Bn254; 5] {
+    ) -> SexticExtFieldDtype<Fp2Bn254> {
         #[cfg(not(target_os = "zkvm"))]
         {
             let b0 = &l0.b;
@@ -37,19 +37,19 @@ impl LineMulDType<FpBn254, Fp2Bn254> for Bn254 {
         }
     }
 
-    fn mul_by_013(f: [Fp2Bn254; 6], l: [Fp2Bn254; 2]) -> [Fp2Bn254; 6] {
+    fn mul_by_013(f: Fp12Bn254, l: EvaluatedLine<FpBn254, Fp2Bn254>) -> Fp12Bn254 {
         #[cfg(not(target_os = "zkvm"))]
         {
             let one = Fp2Bn254::from_u32((1, 0));
             Self::mul_by_01234(
                 f,
-                [
+                SexticExtFieldDtype([
                     Fp2Bn254::ONE,
                     l[0].clone(),
                     Fp2Bn254::ZERO,
                     l[1].clone(),
                     Fp2Bn254::ZERO,
-                ],
+                ]),
             )
         }
         #[cfg(target_os = "zkvm")]
@@ -58,7 +58,7 @@ impl LineMulDType<FpBn254, Fp2Bn254> for Bn254 {
         }
     }
 
-    fn mul_by_01234(f: [Fp2Bn254; 6], x: [Fp2Bn254; 5]) -> [Fp2Bn254; 6] {
+    fn mul_by_01234(f: Fp12Bn254, x: SexticExtFieldDtype<Fp2Bn254>) -> Fp12Bn254 {
         #[cfg(not(target_os = "zkvm"))]
         {
             // we update the order of the coefficients to match the Fp12 coefficient ordering:
@@ -106,8 +106,8 @@ impl LineMulDType<FpBn254, Fp2Bn254> for Bn254 {
 
     fn evaluate_line(
         l: UnevaluatedLine<FpBn254, Fp2Bn254>,
-        x_over_y: [u8; BN256_LIMBS],
-        y_inv: [u8; BN256_LIMBS],
+        x_over_y: FpBn254,
+        y_inv: FpBn254,
     ) -> EvaluatedLine<FpBn254, Fp2Bn254> {
         #[cfg(not(target_os = "zkvm"))]
         {

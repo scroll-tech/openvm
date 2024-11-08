@@ -1,6 +1,6 @@
 use axvm::intrinsics::{BLS12_381_LIMBS, BN256_LIMBS};
 
-use crate::field::{Field, FieldExtension};
+use crate::field::{Field, FieldExtension, SexticExtFieldDtype, SexticExtFieldMtype};
 
 #[derive(Clone, Copy, Debug)]
 pub struct UnevaluatedLine<Fp, Fp2>
@@ -46,16 +46,20 @@ where
 }
 
 /// Trait definition for line multiplication opcodes for M-type lines
-pub trait LineMulMType<Fp, Fp2>
+pub trait LineMulMType<Fp, Fp2, Fp12>
 where
     Fp: Field,
     Fp2: FieldExtension<BaseField = Fp>,
+    Fp12: FieldExtension<BaseField = Fp2>,
 {
-    fn mul_023_by_023(l0: EvaluatedLine<Fp, Fp2>, l1: EvaluatedLine<Fp, Fp2>) -> [Fp2; 6];
+    fn mul_023_by_023(
+        l0: EvaluatedLine<Fp, Fp2>,
+        l1: EvaluatedLine<Fp, Fp2>,
+    ) -> SexticExtFieldMtype<Fp2>;
 
-    fn mul_by_023(f: [Fp2; 6], l: EvaluatedLine<Fp, Fp2>) -> [Fp2; 6];
+    fn mul_by_023(f: Fp12, l: EvaluatedLine<Fp, Fp2>) -> Fp12;
 
-    fn mul_by_02345(f: [Fp2; 6], x: [Fp2; 6]) -> [Fp2; 6];
+    fn mul_by_02345(f: Fp12, x: SexticExtFieldMtype<Fp2>) -> Fp12;
 
     fn evaluate_line(
         l: UnevaluatedLine<Fp, Fp2>,
@@ -75,16 +79,20 @@ where
 }
 
 /// Trait definition for line multiplication opcodes for D-type lines
-pub trait LineMulDType<Fp, Fp2>
+pub trait LineMulDType<Fp, Fp2, Fp12>
 where
     Fp: Field,
     Fp2: FieldExtension<BaseField = Fp>,
+    Fp12: FieldExtension<BaseField = Fp2>,
 {
-    fn mul_013_by_013(l0: EvaluatedLine<Fp, Fp2>, l1: EvaluatedLine<Fp, Fp2>) -> [Fp2; 5];
+    fn mul_013_by_013(
+        l0: EvaluatedLine<Fp, Fp2>,
+        l1: EvaluatedLine<Fp, Fp2>,
+    ) -> SexticExtFieldDtype<Fp2>;
 
-    fn mul_by_013(f: [Fp2; 6], l: EvaluatedLine<Fp, Fp2>) -> [Fp2; 6];
+    fn mul_by_013(f: Fp12, l: EvaluatedLine<Fp, Fp2>) -> Fp12;
 
-    fn mul_by_01234(f: [Fp2; 6], x: [Fp2; 5]) -> [Fp2; 6];
+    fn mul_by_01234(f: Fp12, x: SexticExtFieldDtype<Fp2>) -> Fp12;
 
     fn evaluate_line(
         l: UnevaluatedLine<Fp, Fp2>,

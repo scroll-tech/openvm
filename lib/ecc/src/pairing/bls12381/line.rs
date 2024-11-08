@@ -2,15 +2,15 @@ use axvm::intrinsics::{Fp2, Fp2Bls12381, BLS12_381_LIMBS};
 
 use super::Bls12381;
 use crate::{
-    field::{Field, FieldExtension},
+    field::{Field, FieldExtension, SexticExtFieldMtype},
     pairing::{bls12381::BLS12381_XI, EvaluatedLine, LineMulMType, UnevaluatedLine},
 };
 
-impl LineMulMType<FpBls12381, Fp2Bls12381> for Bls12381 {
+impl LineMulMType<FpBls12381, Fp2Bls12381, Fp12Bls12381> for Bls12381 {
     fn mul_023_by_023(
         l0: EvaluatedLine<FpBls12381, Fp2Bls12381>,
         l1: EvaluatedLine<FpBls12381, Fp2Bls12381>,
-    ) -> [Fp2Bls12381; 6] {
+    ) -> SexticExtFieldMtype<Fp2Bls12381> {
         #[cfg(not(target_os = "zkvm"))]
         {
             let b0 = &l0.b;
@@ -35,7 +35,7 @@ impl LineMulMType<FpBls12381, Fp2Bls12381> for Bls12381 {
         }
     }
 
-    fn mul_by_023(f: [Fp2Bls12381; 6], l: [Fp2Bls12381; 2]) -> [Fp2Bls12381; 6] {
+    fn mul_by_023(f: Fp12Bls12381, l: EvaluatedLine<FpBls12381, Fp2Bls12381>) -> Fp12Bls12381 {
         #[cfg(not(target_os = "zkvm"))]
         {
             let one = Fp2Bls12381::ONE;
@@ -57,7 +57,7 @@ impl LineMulMType<FpBls12381, Fp2Bls12381> for Bls12381 {
         }
     }
 
-    fn mul_by_02345(f: [Fp2Bls12381; 6], x: [Fp2Bls12381; 6]) -> [Fp2Bls12381; 6] {
+    fn mul_by_02345(f: Fp12Bls12381, x: SexticExtFieldMtype<Fp2Bls12381>) -> Fp12Bls12381 {
         #[cfg(not(target_os = "zkvm"))]
         {
             // we update the order of the coefficients to match the Fp12 coefficient ordering:
@@ -106,8 +106,8 @@ impl LineMulMType<FpBls12381, Fp2Bls12381> for Bls12381 {
 
     fn evaluate_line(
         l: UnevaluatedLine<FpBls12381, Fp2Bls12381>,
-        x_over_y: [u8; BLS12_381_LIMBS],
-        y_inv: [u8; BLS12_381_LIMBS],
+        x_over_y: FpBls12381,
+        y_inv: FpBls12381,
     ) -> EvaluatedLine<FpBls12381, Fp2Bls12381> {
         #[cfg(not(target_os = "zkvm"))]
         {
