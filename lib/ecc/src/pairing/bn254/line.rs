@@ -1,16 +1,14 @@
-use axvm::intrinsics::{Fp2, Fp2Bn254, BN256_LIMBS};
-
-use super::Bn254;
+use super::{Bn254, Fp, Fp12, Fp2};
 use crate::{
     field::SexticExtField,
     pairing::{bn254::BN254_XI, EvaluatedLine, LineMulDType, UnevaluatedLine},
 };
 
-impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
+impl LineMulDType<Fp, Fp2, Fp12> for Bn254 {
     fn mul_013_by_013(
-        l0: EvaluatedLine<FpBn254, Fp2Bn254>,
-        l1: EvaluatedLine<FpBn254, Fp2Bn254>,
-    ) -> SexticExtField<Fp2Bn254> {
+        l0: EvaluatedLine<Fp, Fp2>,
+        l1: EvaluatedLine<Fp, Fp2>,
+    ) -> SexticExtField<Fp2> {
         #[cfg(not(target_os = "zkvm"))]
         {
             let b0 = &l0.b;
@@ -18,7 +16,7 @@ impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
             let b1 = &l1.b;
             let c1 = &l1.c;
 
-            let one = Fp2Bn254::ONE;
+            let one = Fp2::ONE;
 
             // where w⁶ = xi
             // l0 * l1 = 1 + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + b1c0)w⁴ + (c0c1)w⁶
@@ -30,7 +28,7 @@ impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
             let x4 = b0 * c1 + b1 * c0;
 
             SexticExtField {
-                c: [x0, x1, x2, x3, x4, Fp2Bn254::ZERO],
+                c: [x0, x1, x2, x3, x4, Fp2::ZERO],
             }
         }
         #[cfg(target_os = "zkvm")]
@@ -39,20 +37,20 @@ impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
         }
     }
 
-    fn mul_by_013(f: Fp12Bn254, l: EvaluatedLine<FpBn254, Fp2Bn254>) -> Fp12Bn254 {
+    fn mul_by_013(f: Fp12, l: EvaluatedLine<Fp, Fp2>) -> Fp12 {
         #[cfg(not(target_os = "zkvm"))]
         {
-            let one = Fp2Bn254::from_u32((1, 0));
+            let one = Fp2::from_u32((1, 0));
             Self::mul_by_01234(
                 f,
                 SexticExtField {
                     c: [
-                        Fp2Bn254::ONE,
+                        Fp2::ONE,
                         l[0].clone(),
-                        Fp2Bn254::ZERO,
+                        Fp2::ZERO,
                         l[1].clone(),
-                        Fp2Bn254::ZERO,
-                        Fp2Bn254::ZERO,
+                        Fp2::ZERO,
+                        Fp2::ZERO,
                     ],
                 },
             )
@@ -63,7 +61,7 @@ impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
         }
     }
 
-    fn mul_by_01234(f: Fp12Bn254, x: SexticExtField<Fp2Bn254>) -> Fp12Bn254 {
+    fn mul_by_01234(f: Fp12, x: SexticExtField<Fp2>) -> Fp12 {
         #[cfg(not(target_os = "zkvm"))]
         {
             // we update the order of the coefficients to match the Fp12 coefficient ordering:
@@ -110,14 +108,14 @@ impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
     }
 
     fn evaluate_line(
-        l: UnevaluatedLine<FpBn254, Fp2Bn254>,
-        x_over_y: FpBn254,
-        y_inv: FpBn254,
-    ) -> EvaluatedLine<FpBn254, Fp2Bn254> {
+        l: UnevaluatedLine<Fp, Fp2>,
+        x_over_y: Fp,
+        y_inv: Fp,
+    ) -> EvaluatedLine<Fp, Fp2> {
         #[cfg(not(target_os = "zkvm"))]
         {
-            let x_over_y_fp2 = Fp2Bn254::from_bytes([x_over_y, x_over_y].into());
-            let y_inv_fp2 = Fp2Bn254::from_bytes([y_inv, y_inv].into());
+            let x_over_y_fp2 = Fp2::from_bytes([x_over_y, x_over_y].into());
+            let y_inv_fp2 = Fp2::from_bytes([y_inv, y_inv].into());
 
             let r0 = &l.b * &x_over_y_fp2;
             let r1 = &l.c * &y_inv_fp2;
