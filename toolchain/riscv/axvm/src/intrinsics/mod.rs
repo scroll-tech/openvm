@@ -19,4 +19,4 @@ mod fp2;
 pub use fp2::*;
 
 mod utils;
-use utils::*;
+pub use utils::*;
