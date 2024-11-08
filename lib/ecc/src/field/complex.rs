@@ -21,14 +21,14 @@ pub struct Complex<F> {
 }
 
 impl<F> Complex<F> {
-    const fn new(c0: F, c1: F) -> Self {
+    pub const fn new(c0: F, c1: F) -> Self {
         Self { c0, c1 }
     }
 }
 
 impl<F: IntMod> Complex<F> {
-    const ZERO: Self = Self::new(F::ZERO, F::ZERO);
-    const ONE: Self = Self::new(F::ONE, F::ZERO);
+    pub const ZERO: Self = Self::new(F::ZERO, F::ZERO);
+    pub const ONE: Self = Self::new(F::ONE, F::ZERO);
 
     #[inline(always)]
     fn add_assign_impl(&mut self, other: &Self) {

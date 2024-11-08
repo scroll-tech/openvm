@@ -40,18 +40,10 @@ impl LineMulDType<Fp, Fp2, Fp12> for Bn254 {
     fn mul_by_013(f: Fp12, l: EvaluatedLine<Fp, Fp2>) -> Fp12 {
         #[cfg(not(target_os = "zkvm"))]
         {
-            let one = Fp2::from_u32((1, 0));
             Self::mul_by_01234(
                 f,
                 SexticExtField {
-                    c: [
-                        Fp2::ONE,
-                        l[0].clone(),
-                        Fp2::ZERO,
-                        l[1].clone(),
-                        Fp2::ZERO,
-                        Fp2::ZERO,
-                    ],
+                    c: [Fp2::ONE, l.b, Fp2::ZERO, l.c, Fp2::ZERO, Fp2::ZERO],
                 },
             )
         }

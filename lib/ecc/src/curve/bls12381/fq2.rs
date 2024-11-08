@@ -5,7 +5,7 @@ use crate::field::{Field, FieldExt};
 /// FieldExtension for Fq2 with Fq as base field
 impl FieldExt for Fq2 {
     type BaseField = Fq;
-    type Coeffs = [Self::BaseField; 2];
+    type Coeffs = [Fq; 2];
     type SelfRef<'a> = &'a Self;
 
     fn from_coeffs(coeffs: Self::Coeffs) -> Self {
