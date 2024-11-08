@@ -2,7 +2,7 @@ use axvm::intrinsics::{Fp2, Fp2Bn254, BN256_LIMBS};
 
 use super::Bn254;
 use crate::{
-    field::{Field, FieldExt, SexticExtFieldDtype},
+    field::SexticExtField,
     pairing::{bn254::BN254_XI, EvaluatedLine, LineMulDType, UnevaluatedLine},
 };
 
@@ -10,7 +10,7 @@ impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
     fn mul_013_by_013(
         l0: EvaluatedLine<FpBn254, Fp2Bn254>,
         l1: EvaluatedLine<FpBn254, Fp2Bn254>,
-    ) -> SexticExtFieldDtype<Fp2Bn254> {
+    ) -> SexticExtField<Fp2Bn254> {
         #[cfg(not(target_os = "zkvm"))]
         {
             let b0 = &l0.b;
@@ -29,8 +29,8 @@ impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
             let x3 = c0 + c1;
             let x4 = b0 * c1 + b1 * c0;
 
-            SexticExtFieldDtype {
-                c: [x0, x1, x2, x3, x4],
+            SexticExtField {
+                c: [x0, x1, x2, x3, x4, Fp2Bn254::ZERO],
             }
         }
         #[cfg(target_os = "zkvm")]
@@ -45,12 +45,13 @@ impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
             let one = Fp2Bn254::from_u32((1, 0));
             Self::mul_by_01234(
                 f,
-                SexticExtFieldDtype {
+                SexticExtField {
                     c: [
                         Fp2Bn254::ONE,
                         l[0].clone(),
                         Fp2Bn254::ZERO,
                         l[1].clone(),
+                        Fp2Bn254::ZERO,
                         Fp2Bn254::ZERO,
                     ],
                 },
@@ -62,7 +63,7 @@ impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
         }
     }
 
-    fn mul_by_01234(f: Fp12Bn254, x: SexticExtFieldDtype<Fp2Bn254>) -> Fp12Bn254 {
+    fn mul_by_01234(f: Fp12Bn254, x: SexticExtField<Fp2Bn254>) -> Fp12Bn254 {
         #[cfg(not(target_os = "zkvm"))]
         {
             // we update the order of the coefficients to match the Fp12 coefficient ordering:

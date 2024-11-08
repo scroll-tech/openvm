@@ -6,6 +6,9 @@ pub use field_ext::*;
 mod complex;
 pub use complex::*;
 
+mod sextic_ext_field;
+pub use sextic_ext_field::*;
+
 #[cfg(feature = "halo2curves")]
 mod exp_bytes_be;
 #[cfg(feature = "halo2curves")]
