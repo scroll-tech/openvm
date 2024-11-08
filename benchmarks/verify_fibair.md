@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| verify_fibair | <div style='text-align: right'>2</div>  | <div style='text-align: right'>8,172,372</div>  | <div style='text-align: right'>198,759</div>  | <span style="color: green">(-14.0 [-0.9%])</span> <div style='text-align: right'>1,584.0</div>  |
+| verify_fibair | <div style='text-align: right'>2</div>  | <div style='text-align: right'>8,172,372</div>  | <div style='text-align: right'>198,759</div>  | <span style="color: red">(+3.0 [+0.2%])</span> <div style='text-align: right'>1,587.0</div>  |
 
 
 <details>
@@ -12,11 +12,11 @@
 
 | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- |
-| <div style='text-align: right'>9.0</div>  | <div style='text-align: right'>32</div>  |
+| <span style="color: green">(-1.0 [-11.1%])</span> <div style='text-align: right'>8.0</div>  | <div style='text-align: right'>32</div>  |
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| verify_fibair | true | <span style="color: green">(-13.0 [-0.4%])</span> <div style='text-align: right'>3,021.0</div>  | <div style='text-align: right'>8,172,372</div>  | <div style='text-align: right'>198,759</div>  |
+| verify_fibair | true | <span style="color: red">(+5.0 [+0.2%])</span> <div style='text-align: right'>3,026.0</div>  | <div style='text-align: right'>8,172,372</div>  | <div style='text-align: right'>198,759</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
@@ -314,7 +314,7 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| verify_fibair | <div style='text-align: right'>16.0</div>  | <span style="color: green">(-3.0 [-0.9%])</span> <div style='text-align: right'>319.0</div>  | <span style="color: green">(-2.0 [-0.7%])</span> <div style='text-align: right'>272.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-1.0 [-2.1%])</span> <div style='text-align: right'>46.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>8,172,372</div>  | <div style='text-align: right'>198,759</div>  | <span style="color: green">(-14.0 [-0.9%])</span> <div style='text-align: right'>1,584.0</div>  | <div style='text-align: right'>21.0</div>  |
+| verify_fibair | <div style='text-align: right'>16.0</div>  | <span style="color: green">(-1.0 [-0.3%])</span> <div style='text-align: right'>318.0</div>  | <span style="color: green">(-3.0 [-1.1%])</span> <div style='text-align: right'>269.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>46.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>8,172,372</div>  | <div style='text-align: right'>198,759</div>  | <span style="color: red">(+3.0 [+0.2%])</span> <div style='text-align: right'>1,587.0</div>  | <span style="color: red">(+1.0 [+4.8%])</span> <div style='text-align: right'>22.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -357,7 +357,7 @@
 
 | group | segment | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- |
-| verify_fibair | 0 | <span style="color: green">(-11.0 [-0.9%])</span> <div style='text-align: right'>1,265.0</div>  | <div style='text-align: right'>23,085,080</div>  |
+| verify_fibair | 0 | <span style="color: red">(+4.0 [+0.3%])</span> <div style='text-align: right'>1,269.0</div>  | <div style='text-align: right'>23,085,080</div>  |
 
 </details>
 
@@ -366,13 +366,13 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/f0265bf3d813773f3add03b8b24571938691b384/verify_fibair-verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/f0265bf3d813773f3add03b8b24571938691b384/verify_fibair-verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/f0265bf3d813773f3add03b8b24571938691b384/verify_fibair-verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/f0265bf3d813773f3add03b8b24571938691b384/verify_fibair-verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/f0265bf3d813773f3add03b8b24571938691b384/verify_fibair-verify_fibair.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/f0265bf3d813773f3add03b8b24571938691b384/verify_fibair-verify_fibair.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/f0265bf3d813773f3add03b8b24571938691b384/verify_fibair-verify_fibair.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/f0265bf3d813773f3add03b8b24571938691b384/verify_fibair-verify_fibair.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b300c171a5831a076b9ecda25bca8f39d62f2100/verify_fibair-verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b300c171a5831a076b9ecda25bca8f39d62f2100/verify_fibair-verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b300c171a5831a076b9ecda25bca8f39d62f2100/verify_fibair-verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b300c171a5831a076b9ecda25bca8f39d62f2100/verify_fibair-verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b300c171a5831a076b9ecda25bca8f39d62f2100/verify_fibair-verify_fibair.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b300c171a5831a076b9ecda25bca8f39d62f2100/verify_fibair-verify_fibair.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b300c171a5831a076b9ecda25bca8f39d62f2100/verify_fibair-verify_fibair.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b300c171a5831a076b9ecda25bca8f39d62f2100/verify_fibair-verify_fibair.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/f0265bf3d813773f3add03b8b24571938691b384
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/b300c171a5831a076b9ecda25bca8f39d62f2100
 Instance Type: 64cpu-linux-arm64
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11736081227)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11739348109)
