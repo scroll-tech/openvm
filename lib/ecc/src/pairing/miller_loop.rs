@@ -1,66 +1,69 @@
 use alloc::vec::Vec;
-use core::ops::{Add, Mul, Sub};
+use core::ops::{Add, Mul, Neg, Sub};
 
 use itertools::{izip, Itertools};
 
-use super::{EvaluatedLine, MillerStepOpcode};
+use super::{EvaluatedLine, MillerStep};
 use crate::{
-    field::{Field, FieldExtension},
-    // pairing::miller_step::{miller_double_and_add_step, miller_double_step},
+    field::{Field, FieldExt},
     point::EcPoint,
 };
 
 #[allow(non_snake_case)]
-pub trait MultiMillerLoop<Fp, Fp2, Fp12, const BITS: usize>: MillerStepOpcode<Fp, Fp2>
+pub trait MultiMillerLoop: MillerStep
 where
-    Fp: Field,
-    Fp2: FieldExtension<BaseField = Fp>,
-    Fp12: FieldExtension<BaseField = Fp2>,
-    for<'a> &'a Fp: Add<&'a Fp, Output = Fp>,
-    for<'a> &'a Fp: Sub<&'a Fp, Output = Fp>,
-    for<'a> &'a Fp: Mul<&'a Fp, Output = Fp>,
-    for<'a> &'a Fp2: Add<&'a Fp2, Output = Fp2>,
-    for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
-    for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
-    for<'a> &'a Fp12: Mul<&'a Fp12, Output = Fp12>,
+    for<'a> &'a Self::Fp: Add<&'a Self::Fp, Output = Self::Fp>,
+    for<'a> &'a Self::Fp: Sub<&'a Self::Fp, Output = Self::Fp>,
+    for<'a> &'a Self::Fp: Mul<&'a Self::Fp, Output = Self::Fp>,
+    for<'a> &'a Self::Fp2: Add<&'a Self::Fp2, Output = Self::Fp2>,
+    for<'a> &'a Self::Fp2: Sub<&'a Self::Fp2, Output = Self::Fp2>,
+    for<'a> &'a Self::Fp2: Mul<&'a Self::Fp2, Output = Self::Fp2>,
+    for<'a> &'a Self::Fp2: Neg<Output = Self::Fp2>,
+    for<'a> &'a Self::Fp12: Mul<&'a Self::Fp12, Output = Self::Fp12>,
 {
+    type Fp12: FieldExt<BaseField = Self::Fp2>;
+
     /// We use the field extension tower `Fp12 = Fp2[w]/(w^6 - xi)`.
-    fn xi() -> Fp2;
+    fn xi() -> Self::Fp2;
 
     /// Seed value for the curve
     fn seed() -> u64;
 
     /// Pseudo-binary used for the loop counter of the curve
-    fn pseudo_binary_encoding() -> [i8; BITS];
+    fn pseudo_binary_encoding() -> Vec<i8>;
 
     /// Function to evaluate the line functions of the Miller loop
-    fn evaluate_lines_vec(&self, f: Fp12, lines: Vec<EvaluatedLine<Fp, Fp2>>) -> Fp12;
+    fn evaluate_lines_vec(
+        &self,
+        f: Self::Fp12,
+        lines: Vec<EvaluatedLine<Self::Fp, Self::Fp2>>,
+    ) -> Self::Fp12;
 
     /// Runs before the main loop in the Miller loop function
     fn pre_loop(
         &self,
-        f: &Fp12,
-        Q_acc: Vec<EcPoint<Fp2>>,
-        Q: &[EcPoint<Fp2>],
-        c: Option<Fp12>,
-        x_over_ys: Vec<Fp>,
-        y_invs: Vec<Fp>,
-    ) -> (Fp12, Vec<EcPoint<Fp2>>);
+        f: &Self::Fp12,
+        Q_acc: Vec<EcPoint<Self::Fp2>>,
+        Q: &[EcPoint<Self::Fp2>],
+        c: Option<Self::Fp12>,
+        x_over_ys: Vec<Self::Fp>,
+        y_invs: Vec<Self::Fp>,
+    ) -> (Self::Fp12, Vec<EcPoint<Self::Fp2>>);
 
     /// Runs after the main loop in the Miller loop function
     fn post_loop(
         &self,
-        f: &Fp12,
-        Q_acc: Vec<EcPoint<Fp2>>,
-        Q: &[EcPoint<Fp2>],
-        c: Option<Fp12>,
-        x_over_ys: Vec<Fp>,
-        y_invs: Vec<Fp>,
-    ) -> (Fp12, Vec<EcPoint<Fp2>>);
+        f: &Self::Fp12,
+        Q_acc: Vec<EcPoint<Self::Fp2>>,
+        Q: &[EcPoint<Self::Fp2>],
+        c: Option<Self::Fp12>,
+        x_over_ys: Vec<Self::Fp>,
+        y_invs: Vec<Self::Fp>,
+    ) -> (Self::Fp12, Vec<EcPoint<Self::Fp2>>);
 
     /// Runs the multi-Miller loop with no embedded exponent
     #[allow(non_snake_case)]
-    fn multi_miller_loop(&self, P: &[EcPoint<Fp>], Q: &[EcPoint<Fp2>]) -> Fp12 {
+    fn multi_miller_loop(&self, P: &[EcPoint<Self::Fp>], Q: &[EcPoint<Self::Fp2>]) -> Self::Fp12 {
         self.multi_miller_loop_embedded_exp(P, Q, None)
     }
 
@@ -69,29 +72,32 @@ where
     #[allow(non_snake_case)]
     fn multi_miller_loop_embedded_exp(
         &self,
-        P: &[EcPoint<Fp>],
-        Q: &[EcPoint<Fp2>],
-        c: Option<Fp12>,
-    ) -> Fp12 {
+        P: &[EcPoint<Self::Fp>],
+        Q: &[EcPoint<Self::Fp2>],
+        c: Option<Self::Fp12>,
+    ) -> Self::Fp12 {
         assert!(!P.is_empty());
         assert_eq!(P.len(), Q.len());
 
-        let y_invs = P.iter().map(|P| P.y.invert().unwrap()).collect::<Vec<Fp>>();
+        let y_invs = P
+            .iter()
+            .map(|P| P.y.invert().unwrap())
+            .collect::<Vec<Self::Fp>>();
         let x_over_ys = P
             .iter()
             .zip(y_invs.iter())
             .map(|(P, y_inv)| &P.x * y_inv)
-            .collect::<Vec<Fp>>();
+            .collect::<Vec<Self::Fp>>();
         let c_inv = if let Some(c) = c.clone() {
             c.invert().unwrap()
         } else {
-            Fp12::ONE
+            Self::Fp12::ONE
         };
 
         let mut f = if let Some(c) = c.clone() {
             c
         } else {
-            Fp12::ONE
+            Self::Fp12::ONE
         };
         let mut Q_acc = Q.to_vec();
 
@@ -103,7 +109,7 @@ where
         fn q_signed<Fp, Fp2>(Q: &[EcPoint<Fp2>], sigma_i: i8) -> Vec<EcPoint<Fp2>>
         where
             Fp: Field,
-            Fp2: FieldExtension<BaseField = Fp>,
+            Fp2: FieldExt<BaseField = Fp>,
         {
             Q.iter()
                 .map(|q| match sigma_i {
@@ -118,7 +124,7 @@ where
         for i in (0..pseudo_binary_encoding.len() - 2).rev() {
             f = &f * &f;
 
-            let mut lines = Vec::<EvaluatedLine<Fp, Fp2>>::new();
+            let mut lines = Vec::<EvaluatedLine<Self::Fp, Self::Fp2>>::new();
 
             if pseudo_binary_encoding[i] == 0 {
                 // Run miller double step if \sigma_i == 0

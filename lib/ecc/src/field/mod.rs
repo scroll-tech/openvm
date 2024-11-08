@@ -1,7 +1,7 @@
 use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-mod field_extension;
-pub use field_extension::*;
+mod field_ext;
+pub use field_ext::*;
 
 mod complex;
 pub use complex::*;

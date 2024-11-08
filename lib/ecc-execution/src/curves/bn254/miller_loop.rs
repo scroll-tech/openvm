@@ -41,7 +41,7 @@ impl MultiMillerLoop<Fq, Fq2, Fq12, BN254_PBE_BITS> for Bn254 {
 
     fn pre_loop(
         &self,
-        f: Fq12,
+        f: &Fq12,
         Q_acc: Vec<EcPoint<Fq2>>,
         _Q: &[EcPoint<Fq2>],
         c: Option<Fq12>,

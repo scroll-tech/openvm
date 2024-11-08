@@ -1,25 +1,29 @@
-use core::ops::{Add, Mul, Sub};
+use core::ops::{Add, Mul, Neg, Sub};
 
 use super::UnevaluatedLine;
 use crate::{
-    field::{Field, FieldExtension},
+    field::{Field, FieldExt},
     point::EcPoint,
 };
 
 /// Trait definition for Miller step opcodes
-pub trait MillerStepOpcode<Fp, Fp2>
+pub trait MillerStep
 where
-    Fp: Field,
-    Fp2: FieldExtension<BaseField = Fp>,
-    for<'a> &'a Fp2: Add<&'a Fp2, Output = Fp2>,
-    for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
-    for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
+    for<'a> &'a Self::Fp2: Add<&'a Self::Fp2, Output = Self::Fp2>,
+    for<'a> &'a Self::Fp2: Sub<&'a Self::Fp2, Output = Self::Fp2>,
+    for<'a> &'a Self::Fp2: Mul<&'a Self::Fp2, Output = Self::Fp2>,
+    for<'a> &'a Self::Fp2: Neg<Output = Self::Fp2>,
 {
+    type Fp: Field;
+    type Fp2: FieldExt<BaseField = Self::Fp>;
+
     /// Miller double step
-    fn miller_double_step(s: EcPoint<Fp2>) -> (EcPoint<Fp2>, UnevaluatedLine<Fp, Fp2>) {
+    fn miller_double_step(
+        s: EcPoint<Self::Fp2>,
+    ) -> (EcPoint<Self::Fp2>, UnevaluatedLine<Self::Fp, Self::Fp2>) {
         #[cfg(not(target_os = "zkvm"))]
         {
-            let one = &Fp2::ONE;
+            let one = &Self::Fp2::ONE;
             let two = &(one + one);
             let three = &(one + two);
 
@@ -51,18 +55,46 @@ where
         }
     }
 
+    /// Miller add step
+    fn miller_add_step(
+        s: EcPoint<Self::Fp2>,
+        q: EcPoint<Self::Fp2>,
+    ) -> (EcPoint<Self::Fp2>, UnevaluatedLine<Self::Fp, Self::Fp2>) {
+        let x_s = &s.x;
+        let y_s = &s.y;
+        let x_q = &q.x;
+        let y_q = &q.y;
+
+        // λ1 = (y_s - y_q) / (x_s - x_q)
+        let x_s_minus_x_q_inv = &(x_s - x_q).invert().unwrap();
+        let lambda = &((y_s - y_q) * x_s_minus_x_q_inv);
+        let x_s_plus_q = lambda * lambda - x_s - x_q;
+        let y_s_plus_q = lambda * &(x_q - &x_s_plus_q) - y_q;
+
+        let s_plus_q = EcPoint {
+            x: x_s_plus_q,
+            y: y_s_plus_q,
+        };
+
+        // l_{\Psi(S),\Psi(Q)}(P) = (λ_1 * x_S - y_S) (1 / y_P) - λ_1 (x_P / y_P) w^2 + w^3
+        let b = lambda.clone().neg();
+        let c = lambda * x_s - y_s;
+
+        (s_plus_q, UnevaluatedLine { b, c })
+    }
+
     /// Miller double and add step (2S + Q implemented as S + Q + S for efficiency)
     fn miller_double_and_add_step(
-        s: EcPoint<Fp2>,
-        q: EcPoint<Fp2>,
+        s: EcPoint<Self::Fp2>,
+        q: EcPoint<Self::Fp2>,
     ) -> (
-        EcPoint<Fp2>,
-        UnevaluatedLine<Fp, Fp2>,
-        UnevaluatedLine<Fp, Fp2>,
+        EcPoint<Self::Fp2>,
+        UnevaluatedLine<Self::Fp, Self::Fp2>,
+        UnevaluatedLine<Self::Fp, Self::Fp2>,
     ) {
         #[cfg(not(target_os = "zkvm"))]
         {
-            let one = &Fp2::ONE;
+            let one = &Self::Fp2::ONE;
             let two = &(one + one);
 
             let x_s = &s.x;
@@ -110,7 +142,7 @@ where
 // pub fn miller_double_step<Fp, Fp2>(S: EcPoint<Fp2>) -> (EcPoint<Fp2>, UnevaluatedLine<Fp, Fp2>)
 // where
 //     Fp: Field,
-//     Fp2: FieldExtension<BaseField = Fp>,
+//     Fp2: FieldExt<BaseField = Fp>,
 //     for<'a> &'a Fp2: Add<&'a Fp2, Output = Fp2>,
 //     for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
 //     for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
@@ -142,40 +174,40 @@ where
 //     (two_s, UnevaluatedLine { b, c })
 // }
 
-#[allow(non_snake_case)]
-pub fn miller_add_step<Fp, Fp2>(
-    S: EcPoint<Fp2>,
-    Q: EcPoint<Fp2>,
-) -> (EcPoint<Fp2>, UnevaluatedLine<Fp, Fp2>)
-where
-    Fp: Field,
-    Fp2: FieldExtension<BaseField = Fp>,
-    for<'a> &'a Fp2: Add<&'a Fp2, Output = Fp2>,
-    for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
-    for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
-{
-    let x_s = &S.x;
-    let y_s = &S.y;
-    let x_q = &Q.x;
-    let y_q = &Q.y;
+// #[allow(non_snake_case)]
+// pub fn miller_add_step<Fp, Fp2>(
+//     S: EcPoint<Fp2>,
+//     Q: EcPoint<Fp2>,
+// ) -> (EcPoint<Fp2>, UnevaluatedLine<Fp, Fp2>)
+// where
+//     Fp: Field,
+//     Fp2: FieldExt<BaseField = Fp>,
+//     for<'a> &'a Fp2: Add<&'a Fp2, Output = Fp2>,
+//     for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
+//     for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
+// {
+//     let x_s = &S.x;
+//     let y_s = &S.y;
+//     let x_q = &Q.x;
+//     let y_q = &Q.y;
 
-    // λ1 = (y_s - y_q) / (x_s - x_q)
-    let x_s_minus_x_q_inv = &(x_s - x_q).invert().unwrap();
-    let lambda = &((y_s - y_q) * x_s_minus_x_q_inv);
-    let x_s_plus_q = lambda * lambda - x_s - x_q;
-    let y_s_plus_q = lambda * &(x_q - &x_s_plus_q) - y_q;
+//     // λ1 = (y_s - y_q) / (x_s - x_q)
+//     let x_s_minus_x_q_inv = &(x_s - x_q).invert().unwrap();
+//     let lambda = &((y_s - y_q) * x_s_minus_x_q_inv);
+//     let x_s_plus_q = lambda * lambda - x_s - x_q;
+//     let y_s_plus_q = lambda * &(x_q - &x_s_plus_q) - y_q;
 
-    let s_plus_q = EcPoint {
-        x: x_s_plus_q,
-        y: y_s_plus_q,
-    };
+//     let s_plus_q = EcPoint {
+//         x: x_s_plus_q,
+//         y: y_s_plus_q,
+//     };
 
-    // l_{\Psi(S),\Psi(Q)}(P) = (λ_1 * x_S - y_S) (1 / y_P) - λ_1 (x_P / y_P) w^2 + w^3
-    let b = lambda.clone().neg();
-    let c = lambda * x_s - y_s;
+//     // l_{\Psi(S),\Psi(Q)}(P) = (λ_1 * x_S - y_S) (1 / y_P) - λ_1 (x_P / y_P) w^2 + w^3
+//     let b = lambda.clone().neg();
+//     let c = lambda * x_s - y_s;
 
-    (s_plus_q, UnevaluatedLine { b, c })
-}
+//     (s_plus_q, UnevaluatedLine { b, c })
+// }
 
 // #[allow(non_snake_case)]
 // pub fn miller_double_and_add_step<Fp, Fp2>(
@@ -188,7 +220,7 @@ where
 // )
 // where
 //     Fp: Field,
-//     Fp2: FieldExtension<BaseField = Fp>,
+//     Fp2: FieldExt<BaseField = Fp>,
 //     for<'a> &'a Fp2: Add<&'a Fp2, Output = Fp2>,
 //     for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
 //     for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,

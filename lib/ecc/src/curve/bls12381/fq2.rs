@@ -1,6 +1,6 @@
 pub use halo2curves_axiom::bls12_381::{Fq, Fq2};
 
-use crate::field::{Field, FieldExtension};
+use crate::field::{Field, FieldExt};
 
 /// FieldExtension for Fq2 with Fq as base field
 impl FieldExtension for Fq2 {

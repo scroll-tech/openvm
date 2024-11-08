@@ -1,5 +1,5 @@
 use axvm_ecc::{
-    field::{Field, FieldExtension},
+    field::{Field, FieldExt},
     pairing::EvaluatedLine,
     point::EcPoint,
 };
@@ -13,7 +13,7 @@ pub fn mul_013_by_013<Fp, Fp2>(
 ) -> [Fp2; 5]
 where
     Fp: Field,
-    Fp2: FieldExtension<BaseField = Fp>,
+    Fp2: FieldExt<BaseField = Fp>,
 {
     let b0 = line_0.b;
     let c0 = line_0.c;
@@ -35,8 +35,8 @@ where
 pub fn mul_by_013<Fp, Fp2, Fp12>(f: Fp12, line: EvaluatedLine<Fp, Fp2>) -> Fp12
 where
     Fp: Field,
-    Fp2: FieldExtension<BaseField = Fp>,
-    Fp12: FieldExtension<BaseField = Fp2, Coeffs = [Fp2; 6]>,
+    Fp2: FieldExt<BaseField = Fp>,
+    Fp12: FieldExt<BaseField = Fp2, Coeffs = [Fp2; 6]>,
 {
     mul_by_01234(f, [Fp2::ONE, line.b, Fp2::ZERO, line.c, Fp2::ZERO])
 }
@@ -44,8 +44,8 @@ where
 pub fn mul_by_01234<Fp, Fp2, Fp12>(f: Fp12, x: [Fp2; 5]) -> Fp12
 where
     Fp: Field,
-    Fp2: FieldExtension<BaseField = Fp>,
-    Fp12: FieldExtension<BaseField = Fp2, Coeffs = [Fp2; 6]>,
+    Fp2: FieldExt<BaseField = Fp>,
+    Fp12: FieldExt<BaseField = Fp2, Coeffs = [Fp2; 6]>,
 {
     let x_fp12 = Fp12::from_coeffs([x[0], x[1], x[2], x[3], x[4], Fp2::ZERO]);
     f * x_fp12
@@ -56,7 +56,7 @@ where
 pub fn tangent_line_013<Fp, Fp2>(P: EcPoint<Fp>) -> EvaluatedLine<Fp, Fp2>
 where
     Fp: Field,
-    Fp2: FieldExtension<BaseField = Fp>,
+    Fp2: FieldExt<BaseField = Fp>,
 {
     let one = Fp2::ONE;
     let two = one + one;

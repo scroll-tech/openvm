@@ -1,5 +1,5 @@
 use axvm_ecc::{
-    field::{Field, FieldExtension},
+    field::{Field, FieldExt},
     point::{AffineCoords, EcPoint},
 };
 use group::ScalarMul;
@@ -17,7 +17,7 @@ where
     A1: AffineCoords<Fp>,
     A2: AffineCoords<Fp2>,
     Fp: Field,
-    Fp2: FieldExtension<BaseField = Fp>,
+    Fp2: FieldExt<BaseField = Fp>,
 {
     let (P_vec, Q_vec) = rand_seeds
         .iter()
@@ -55,7 +55,7 @@ where
     A2: AffineCoords<Fp2> + ScalarMul<Fr>,
     Fr: Field,
     Fp: Field,
-    Fp2: FieldExtension<BaseField = Fp>,
+    Fp2: FieldExt<BaseField = Fp>,
 {
     assert!(N % 2 == 0, "Must have even number of P and Q scalars");
     let mut P_vec = vec![];

@@ -2,7 +2,7 @@ pub use halo2curves_axiom::bls12_381::{Fq, Fq12, Fq2, Fq6};
 
 // use super::{Fq, Fq12, Fq2, Fq6};
 use crate::{
-    field::{ExpBigInt, Field, FieldExtension},
+    field::{ExpBigInt, Field, FieldExt},
     pairing::{EvaluatedLine, LineMType},
 };
 

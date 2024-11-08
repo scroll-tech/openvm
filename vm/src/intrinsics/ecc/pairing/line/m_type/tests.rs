@@ -10,7 +10,7 @@ use ax_ecc_primitives::{
         bls12381_fq12_to_biguint_vec, bls12381_fq2_to_biguint_vec, bls12381_fq_to_biguint,
     },
 };
-use axvm_ecc::{field::FieldExtension, point::EcPoint};
+use axvm_ecc::{field::FieldExt, point::EcPoint};
 use axvm_ecc_constants::BLS12381;
 use axvm_instructions::{riscv::RV32_CELL_BITS, PairingOpcode, UsizeOpcode};
 use halo2curves_axiom::{

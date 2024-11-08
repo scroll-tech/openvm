@@ -1,5 +1,5 @@
 use axvm_ecc::{
-    field::{ExpBigInt, FieldExtension},
+    field::{ExpBigInt, FieldExt},
     pairing::{FinalExp, MultiMillerLoop},
     point::EcPoint,
 };

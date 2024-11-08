@@ -2,7 +2,7 @@ use axvm::intrinsics::{Fp2, Fp2Bn254, BN256_LIMBS};
 
 use super::Bn254;
 use crate::{
-    field::{Field, FieldExtension, SexticExtFieldDtype},
+    field::{Field, FieldExt, SexticExtFieldDtype},
     pairing::{bn254::BN254_XI, EvaluatedLine, LineMulDType, UnevaluatedLine},
 };
 

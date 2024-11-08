@@ -1,4 +1,4 @@
-use axvm_ecc::{field::FieldExtension, pairing::LineDType, point::EcPoint};
+use axvm_ecc::{field::FieldExt, pairing::LineDType, point::EcPoint};
 use halo2curves_axiom::{
     bn256::{Fq, Fq12, Fq2, G1Affine},
     ff::Field,

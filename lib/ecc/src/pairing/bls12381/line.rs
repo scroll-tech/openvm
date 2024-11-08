@@ -1,8 +1,6 @@
-use axvm::intrinsics::{Fp2, Fp2Bls12381, BLS12_381_LIMBS};
-
 use super::Bls12381;
 use crate::{
-    field::{Field, FieldExtension, SexticExtFieldMtype},
+    field::{Field, FieldExt, SexticExtFieldMtype},
     pairing::{bls12381::BLS12381_XI, EvaluatedLine, LineMulMType, UnevaluatedLine},
 };
 
@@ -73,11 +71,11 @@ impl LineMulMType<FpBls12381, Fp2Bls12381, Fp12Bls12381> for Bls12381 {
             //     c2: x5,
             //   },
             // }
-            let o0 = &x[0];
-            let o1 = &x[2];
-            let o2 = &x[4];
-            let o4 = &x[3];
-            let o5 = &x[5];
+            let o0 = &x.0[0];
+            let o1 = &x.0[2];
+            let o2 = &x.0[4];
+            let o4 = &x.0[3];
+            let o5 = &x.0[5];
 
             let xi = BLS12381_XI.clone();
 

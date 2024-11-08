@@ -2,7 +2,9 @@ use core::ops::{Add, Mul, Sub};
 
 use super::Field;
 
-pub trait FieldExtension: Field {
+/// Field extension trait. BaseField is the base field of the extension field. Coeffs is a fixed size array
+/// of coefficients of base field types and how many there are to get to the extension field.
+pub trait FieldExt: Field {
     type BaseField: Field;
     type Coeffs: Sized;
     type SelfRef<'a>: Add<&'a Self, Output = Self>
