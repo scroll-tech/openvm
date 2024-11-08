@@ -1,4 +1,4 @@
-use crate::field::{Field, FieldExt, SexticExtFieldDtype, SexticExtFieldMtype};
+use crate::field::{Field, FieldExt, SexticExtField};
 
 #[derive(Clone, Copy, Debug)]
 pub struct UnevaluatedLine<Fp, Fp2>
@@ -53,11 +53,11 @@ where
     fn mul_023_by_023(
         l0: EvaluatedLine<Fp, Fp2>,
         l1: EvaluatedLine<Fp, Fp2>,
-    ) -> SexticExtFieldMtype<Fp2>;
+    ) -> SexticExtField<Fp2>;
 
     fn mul_by_023(f: Fp12, l: EvaluatedLine<Fp, Fp2>) -> Fp12;
 
-    fn mul_by_02345(f: Fp12, x: SexticExtFieldMtype<Fp2>) -> Fp12;
+    fn mul_by_02345(f: Fp12, x: SexticExtField<Fp2>) -> Fp12;
 
     fn evaluate_line(
         l: UnevaluatedLine<Fp, Fp2>,
@@ -86,11 +86,11 @@ where
     fn mul_013_by_013(
         l0: EvaluatedLine<Fp, Fp2>,
         l1: EvaluatedLine<Fp, Fp2>,
-    ) -> SexticExtFieldDtype<Fp2>;
+    ) -> SexticExtField<Fp2>;
 
     fn mul_by_013(f: Fp12, l: EvaluatedLine<Fp, Fp2>) -> Fp12;
 
-    fn mul_by_01234(f: Fp12, x: SexticExtFieldDtype<Fp2>) -> Fp12;
+    fn mul_by_01234(f: Fp12, x: SexticExtField<Fp2>) -> Fp12;
 
     fn evaluate_line(
         l: UnevaluatedLine<Fp, Fp2>,
