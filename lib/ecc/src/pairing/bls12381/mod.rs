@@ -1,5 +1,7 @@
 mod line;
-use axvm::intrinsics::{Fp2Bls12381, BLS12_381_LIMBS};
+use core::ops::Neg;
+
+use axvm::intrinsics::{Fp2, Fp2Bls12381, BLS12_381_LIMBS};
 pub use line::*;
 
 mod miller_step;
@@ -7,5 +9,15 @@ pub use miller_step::*;
 
 use crate::field::Field;
 
-#[derive(Clone, Copy, Debug)]
-pub struct FpBls12381([u8; BLS12_381_LIMBS]);
+pub struct Bls12381;
+
+impl Field for Fp2Bls12381 {
+    type SelfRef<'a> = Fp2Bls12381;
+
+    const ZERO: Self = Fp2Bls12381::ZERO;
+    const ONE: Self = Fp2Bls12381::ONE;
+
+    fn invert(&self) -> Option<Self> {
+        unimplemented!()
+    }
+}

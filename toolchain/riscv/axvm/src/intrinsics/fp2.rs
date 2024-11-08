@@ -1,4 +1,4 @@
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[cfg(target_os = "zkvm")]
 use axvm_platform::constants::Custom2Funct3;
@@ -201,6 +201,15 @@ impl Fp2Bn254 {
 
     /// Zero element of this field.
     pub const ZERO: Self = Self([[0; BN256_LIMBS]; 2]);
+
+    /// One element of this field.
+    pub const ONE: Self = Self([
+        [
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0,
+        ],
+        [0; BN256_LIMBS],
+    ]);
 }
 
 impl Fp2<BN256_LIMBS> for Fp2Bn254 {
@@ -405,6 +414,15 @@ impl Fp2Bls12381 {
 
     /// Zero element of this field.
     pub const ZERO: Self = Self([[0; BLS12_381_LIMBS]; 2]);
+
+    /// One element of this field.
+    pub const ONE: Self = Self([
+        [
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ],
+        [0; BLS12_381_LIMBS],
+    ]);
 }
 
 impl Fp2<BLS12_381_LIMBS> for Fp2Bls12381 {
@@ -595,5 +613,22 @@ impl<'a> Div<&'a Fp2Bls12381> for &Fp2Bls12381 {
     #[inline(always)]
     fn div(self, other: &'a Fp2Bls12381) -> Self::Output {
         self.div_no_store_impl(other)
+    }
+}
+
+impl Neg for Fp2Bls12381 {
+    type Output = Self;
+    #[inline(always)]
+    fn neg(self) -> Self::Output {
+        #[cfg(not(target_os = "zkvm"))]
+        {
+            let (c0, c1) = self.as_biguint();
+            let modulus = Self::modulus_biguint();
+            Self::from_biguint(((&modulus - &c0) % &modulus, (&modulus - &c1) % &modulus))
+        }
+        #[cfg(target_os = "zkvm")]
+        {
+            todo!()
+        }
     }
 }

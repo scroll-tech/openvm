@@ -15,8 +15,8 @@ impl<F: Field> EcPoint<F> {
 
     pub fn neg(&self) -> Self {
         Self {
-            x: self.x,
-            y: self.y.neg(),
+            x: self.x.clone(),
+            y: self.y.clone().neg(),
         }
     }
 }

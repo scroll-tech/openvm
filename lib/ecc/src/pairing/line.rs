@@ -15,10 +15,10 @@ where
     Fp: Field,
     Fp2: FieldExtension<BaseField = Fp>,
 {
-    pub fn evaluate(self, x_over_y: Fp, y_inv: Fp) -> EvaluatedLine<Fp, Fp2> {
+    pub fn evaluate(&self, x_over_y: &Fp, y_inv: &Fp) -> EvaluatedLine<Fp, Fp2> {
         EvaluatedLine {
-            b: self.b.mul_base(x_over_y),
-            c: self.c.mul_base(y_inv),
+            b: self.b.mul_base(x_over_y.clone()),
+            c: self.c.mul_base(y_inv.clone()),
         }
     }
 }

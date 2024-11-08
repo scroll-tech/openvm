@@ -7,7 +7,6 @@ description = "axVM elliptic curve cryptography library."
 
 [dependencies]
 axvm = { workspace = true }
-ff = { workspace = true }
 itertools.workspace = true
 rand.workspace = true
 
@@ -22,6 +21,6 @@ group = "0.13.0"
 
 [features]
 default = []
-std = ["axvm/std", "ff/std"]
+std = ["axvm/std"]
 # TODO[yj]: Switch to `halo2curves` and remove `num` dependency
 halo2curves = ["dep:halo2curves-axiom", "dep:num"]

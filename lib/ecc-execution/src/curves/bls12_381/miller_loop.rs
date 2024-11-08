@@ -41,20 +41,20 @@ impl MultiMillerLoop<Fq, Fq2, Fq12, BLS12_381_PBE_BITS> for Bls12_381 {
     /// The expected output of this function when running the Miller loop with embedded exponent is c^3 * l_{3Q}
     fn pre_loop(
         &self,
-        f: Fq12,
+        f: &Fq12,
         Q_acc: Vec<EcPoint<Fq2>>,
         Q: &[EcPoint<Fq2>],
         c: Option<Fq12>,
         x_over_ys: Vec<Fq>,
         y_invs: Vec<Fq>,
     ) -> (Fq12, Vec<EcPoint<Fq2>>) {
-        let mut f = f;
+        let mut f = *f;
 
         if c.is_some() {
             // for the miller loop with embedded exponent, f will be set to c at the beginning of the function, and we
             // will multiply by c again due to the last two values of the pseudo-binary encoding (BN12_381_PBE) being 1.
             // Therefore, the final value of f at the end of this block is c^3.
-            f = f.square() * c.unwrap();
+            f = &f * &f * &c.unwrap();
         }
 
         let mut Q_acc = Q_acc;
@@ -72,7 +72,7 @@ impl MultiMillerLoop<Fq, Fq2, Fq12, BLS12_381_PBE_BITS> for Bls12_381 {
 
         let lines_iter = izip!(lines_2S.iter(), x_over_ys.iter(), y_invs.iter());
         for (line_2S, x_over_y, y_inv) in lines_iter {
-            let line = line_2S.evaluate(*x_over_y, *y_inv);
+            let line = line_2S.evaluate(x_over_y, y_inv);
             initial_lines.push(line);
         }
 
@@ -85,7 +85,7 @@ impl MultiMillerLoop<Fq, Fq2, Fq12, BLS12_381_PBE_BITS> for Bls12_381 {
 
         let lines_iter = izip!(lines_S_plus_Q.iter(), x_over_ys.iter(), y_invs.iter());
         for (lines_S_plus_Q, x_over_y, y_inv) in lines_iter {
-            let line = lines_S_plus_Q.evaluate(*x_over_y, *y_inv);
+            let line = lines_S_plus_Q.evaluate(x_over_y, y_inv);
             initial_lines.push(line);
         }
 
@@ -97,7 +97,7 @@ impl MultiMillerLoop<Fq, Fq2, Fq12, BLS12_381_PBE_BITS> for Bls12_381 {
     /// After running the main body of the Miller loop, we conjugate f due to the curve seed x being negative.
     fn post_loop(
         &self,
-        f: Fq12,
+        f: &Fq12,
         Q_acc: Vec<EcPoint<Fq2>>,
         _Q: &[EcPoint<Fq2>],
         _c: Option<Fq12>,

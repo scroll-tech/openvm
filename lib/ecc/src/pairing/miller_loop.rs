@@ -1,4 +1,5 @@
 use alloc::vec::Vec;
+use core::ops::{Add, Mul, Sub};
 
 use itertools::{izip, Itertools};
 
@@ -31,7 +32,7 @@ where
     /// Runs before the main loop in the Miller loop function
     fn pre_loop(
         &self,
-        f: Fp12,
+        f: &Fp12,
         Q_acc: Vec<EcPoint<Fp2>>,
         Q: &[EcPoint<Fp2>],
         c: Option<Fp12>,
@@ -42,7 +43,7 @@ where
     /// Runs after the main loop in the Miller loop function
     fn post_loop(
         &self,
-        f: Fp12,
+        f: &Fp12,
         Q_acc: Vec<EcPoint<Fp2>>,
         Q: &[EcPoint<Fp2>],
         c: Option<Fp12>,
@@ -52,7 +53,16 @@ where
 
     /// Runs the multi-Miller loop with no embedded exponent
     #[allow(non_snake_case)]
-    fn multi_miller_loop(&self, P: &[EcPoint<Fp>], Q: &[EcPoint<Fp2>]) -> Fp12 {
+    fn multi_miller_loop(&self, P: &[EcPoint<Fp>], Q: &[EcPoint<Fp2>]) -> Fp12
+    where
+        for<'a> &'a Fp: Add<&'a Fp, Output = Fp>,
+        for<'a> &'a Fp: Sub<&'a Fp, Output = Fp>,
+        for<'a> &'a Fp: Mul<&'a Fp, Output = Fp>,
+        for<'a> &'a Fp2: Add<&'a Fp2, Output = Fp2>,
+        for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
+        for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
+        for<'a> &'a Fp12: Mul<&'a Fp12, Output = Fp12>,
+    {
         self.multi_miller_loop_embedded_exp(P, Q, None)
     }
 
@@ -64,7 +74,16 @@ where
         P: &[EcPoint<Fp>],
         Q: &[EcPoint<Fp2>],
         c: Option<Fp12>,
-    ) -> Fp12 {
+    ) -> Fp12
+    where
+        for<'a> &'a Fp: Add<&'a Fp, Output = Fp>,
+        for<'a> &'a Fp: Sub<&'a Fp, Output = Fp>,
+        for<'a> &'a Fp: Mul<&'a Fp, Output = Fp>,
+        for<'a> &'a Fp2: Add<&'a Fp2, Output = Fp2>,
+        for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
+        for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
+        for<'a> &'a Fp12: Mul<&'a Fp12, Output = Fp12>,
+    {
         assert!(!P.is_empty());
         assert_eq!(P.len(), Q.len());
 
@@ -72,18 +91,23 @@ where
         let x_over_ys = P
             .iter()
             .zip(y_invs.iter())
-            .map(|(P, y_inv)| P.x * y_inv)
+            .map(|(P, y_inv)| &P.x * y_inv)
             .collect::<Vec<Fp>>();
-        let c_inv = if let Some(c) = c {
+        let c_inv = if let Some(c) = c.clone() {
             c.invert().unwrap()
         } else {
             Fp12::ONE
         };
 
-        let mut f = if let Some(c) = c { c } else { Fp12::ONE };
+        let mut f = if let Some(c) = c.clone() {
+            c
+        } else {
+            Fp12::ONE
+        };
         let mut Q_acc = Q.to_vec();
 
-        let (f_out, Q_acc_out) = self.pre_loop(f, Q_acc, Q, c, x_over_ys.clone(), y_invs.clone());
+        let (f_out, Q_acc_out) =
+            self.pre_loop(&f, Q_acc, Q, c.clone(), x_over_ys.clone(), y_invs.clone());
         f = f_out;
         Q_acc = Q_acc_out;
 
@@ -103,7 +127,7 @@ where
 
         let pseudo_binary_encoding = Self::pseudo_binary_encoding();
         for i in (0..pseudo_binary_encoding.len() - 2).rev() {
-            f = f * f;
+            f = &f * &f;
 
             let mut lines = Vec::<EvaluatedLine<Fp, Fp2>>::new();
 
@@ -117,15 +141,15 @@ where
 
                 let lines_iter = izip!(lines_2S.iter(), x_over_ys.iter(), y_invs.iter());
                 for (line_2S, x_over_y, y_inv) in lines_iter {
-                    let line = line_2S.evaluate(*x_over_y, *y_inv);
+                    let line = line_2S.evaluate(x_over_y, y_inv);
                     lines.push(line);
                 }
             } else {
                 // use embedded exponent technique if c is provided
-                f = if let Some(c) = c {
+                f = if let Some(c) = c.clone() {
                     match pseudo_binary_encoding[i] {
-                        1 => f * c,
-                        -1 => f * c_inv,
+                        1 => &f * &c,
+                        -1 => &f * &c_inv,
                         _ => panic!("Invalid sigma_i"),
                     }
                 } else {
@@ -151,8 +175,8 @@ where
                     y_invs.iter()
                 );
                 for (line_S_plus_Q, line_S_plus_Q_plus_S, x_over_y, y_inv) in lines_iter {
-                    let line0 = line_S_plus_Q.evaluate(*x_over_y, *y_inv);
-                    let line1 = line_S_plus_Q_plus_S.evaluate(*x_over_y, *y_inv);
+                    let line0 = line_S_plus_Q.evaluate(x_over_y, y_inv);
+                    let line1 = line_S_plus_Q_plus_S.evaluate(x_over_y, y_inv);
                     lines.push(line0);
                     lines.push(line1);
                 }
@@ -161,7 +185,7 @@ where
             f = self.evaluate_lines_vec(f, lines);
         }
 
-        let (f_out, _) = self.post_loop(f, Q_acc, Q, c, x_over_ys, y_invs);
+        let (f_out, _) = self.post_loop(&f, Q_acc, Q, c, x_over_ys, y_invs);
         f = f_out;
 
         f

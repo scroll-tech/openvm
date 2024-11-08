@@ -9,6 +9,8 @@ pub use point::{G1Affine, G2Affine};
 use crate::field::Field;
 
 impl Field for Fr {
+    type SelfRef<'a> = &'a Self;
+
     const ZERO: Self = Fr::zero();
     const ONE: Self = Fr::one();
 
@@ -18,6 +20,8 @@ impl Field for Fr {
 }
 
 impl Field for Fq {
+    type SelfRef<'a> = &'a Self;
+
     const ZERO: Self = Fq::zero();
     const ONE: Self = Fq::one();
 
@@ -27,6 +31,8 @@ impl Field for Fq {
 }
 
 impl Field for Fq2 {
+    type SelfRef<'a> = &'a Self;
+
     const ZERO: Self = Fq2 {
         c0: Fq::zero(),
         c1: Fq::zero(),
@@ -43,6 +49,8 @@ impl Field for Fq2 {
 }
 
 impl Field for Fq12 {
+    type SelfRef<'a> = &'a Self;
+
     const ZERO: Self = Fq12 {
         c0: Fq6::zero(),
         c1: Fq6::zero(),

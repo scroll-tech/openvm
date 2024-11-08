@@ -13,6 +13,7 @@ use crate::{
 impl FieldExtension for Fq12 {
     type BaseField = Fq2;
     type Coeffs = [Self::BaseField; 6];
+    type SelfRef<'a> = &'a Self;
 
     fn from_coeffs(coeffs: Self::Coeffs) -> Self {
         Fq12 {
