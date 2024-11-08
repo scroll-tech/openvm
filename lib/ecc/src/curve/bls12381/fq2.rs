@@ -3,7 +3,7 @@ pub use halo2curves_axiom::bls12_381::{Fq, Fq2};
 use crate::field::{Field, FieldExt};
 
 /// FieldExtension for Fq2 with Fq as base field
-impl FieldExtension for Fq2 {
+impl FieldExt for Fq2 {
     type BaseField = Fq;
     type Coeffs = [Self::BaseField; 2];
     type SelfRef<'a> = &'a Self;
