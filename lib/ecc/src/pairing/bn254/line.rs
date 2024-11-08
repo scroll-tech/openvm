@@ -29,7 +29,9 @@ impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
             let x3 = c0 + c1;
             let x4 = b0 * c1 + b1 * c0;
 
-            SexticExtFieldDtype([x0, x1, x2, x3, x4])
+            SexticExtFieldDtype {
+                c: [x0, x1, x2, x3, x4],
+            }
         }
         #[cfg(target_os = "zkvm")]
         {
@@ -43,13 +45,15 @@ impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
             let one = Fp2Bn254::from_u32((1, 0));
             Self::mul_by_01234(
                 f,
-                SexticExtFieldDtype([
-                    Fp2Bn254::ONE,
-                    l[0].clone(),
-                    Fp2Bn254::ZERO,
-                    l[1].clone(),
-                    Fp2Bn254::ZERO,
-                ]),
+                SexticExtFieldDtype {
+                    c: [
+                        Fp2Bn254::ONE,
+                        l[0].clone(),
+                        Fp2Bn254::ZERO,
+                        l[1].clone(),
+                        Fp2Bn254::ZERO,
+                    ],
+                },
             )
         }
         #[cfg(target_os = "zkvm")]
@@ -74,11 +78,11 @@ impl LineMulDType<FpBn254, Fp2Bn254, Fp12Bn254> for Bn254 {
             //     c2: x5,
             //   },
             // }
-            let o0 = &x.0[0];
-            let o1 = &x.0[2];
-            let o2 = &x.0[4];
-            let o3 = &x.0[1];
-            let o4 = &x.0[3];
+            let o0 = &x.c[0];
+            let o1 = &x.c[2];
+            let o2 = &x.c[4];
+            let o3 = &x.c[1];
+            let o4 = &x.c[3];
 
             let xi = BN254_XI.clone();
 

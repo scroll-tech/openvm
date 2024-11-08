@@ -25,7 +25,9 @@ impl LineMulMType<FpBls12381, Fp2Bls12381, Fp12Bls12381> for Bls12381 {
             let x4 = b0 * b1;
             let x5 = b0 + b1;
 
-            [x0, Fp2Bls12381::ZERO, x2, x3, x4, x5]
+            SexticExtFieldMtype {
+                c: [x0, x2, x3, x4, x5],
+            }
         }
         #[cfg(target_os = "zkvm")]
         {
@@ -39,14 +41,15 @@ impl LineMulMType<FpBls12381, Fp2Bls12381, Fp12Bls12381> for Bls12381 {
             let one = Fp2Bls12381::ONE;
             Self::mul_by_02345(
                 f,
-                [
-                    l[1].clone(),
-                    Fp2Bls12381::ZERO,
-                    l[0].clone(),
-                    one,
-                    Fp2Bls12381::ZERO,
-                    Fp2Bls12381::ZERO,
-                ],
+                SexticExtFieldMtype {
+                    c: [
+                        l[1].clone(),
+                        l[0].clone(),
+                        one,
+                        Fp2Bls12381::ZERO,
+                        Fp2Bls12381::ZERO,
+                    ],
+                },
             )
         }
         #[cfg(target_os = "zkvm")]
@@ -71,11 +74,11 @@ impl LineMulMType<FpBls12381, Fp2Bls12381, Fp12Bls12381> for Bls12381 {
             //     c2: x5,
             //   },
             // }
-            let o0 = &x.0[0];
-            let o1 = &x.0[2];
-            let o2 = &x.0[4];
-            let o4 = &x.0[3];
-            let o5 = &x.0[5];
+            let o0 = &x.c[0];
+            let o1 = &x.c[2];
+            let o2 = &x.c[4];
+            let o4 = &x.c[3];
+            let o5 = &x.c[5];
 
             let xi = BLS12381_XI.clone();
 

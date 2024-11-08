@@ -29,6 +29,10 @@ pub trait FieldExt: Field {
     fn mul_base(&self, rhs: Self::BaseField) -> Self;
 }
 
-pub struct SexticExtFieldMtype<Fp2>(pub(crate) [Fp2; 5]);
+pub struct SexticExtFieldMtype<Fp2> {
+    pub(crate) c: [Fp2; 5],
+}
 
-pub struct SexticExtFieldDtype<Fp2>(pub(crate) [Fp2; 5]);
+pub struct SexticExtFieldDtype<Fp2> {
+    pub(crate) c: [Fp2; 5],
+}
