@@ -116,7 +116,6 @@ impl<F: PrimeField32> ExecutionSegment<F> {
 
         loop {
             let (instruction, debug_info) = self.chip_set.program_chip.get_instruction(pc)?;
-            tracing::trace!("pc: {pc:#x} | time: {timestamp} | {:?}", instruction);
 
             let (dsl_instr, trace) = debug_info.map_or(
                 (None, None),
