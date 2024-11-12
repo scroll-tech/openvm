@@ -1,6 +1,6 @@
 use std::array;
 
-use ax_poseidon2_air::poseidon2::Poseidon2Air;
+use ax_hashes::poseidon2::Poseidon2Air;
 use p3_field::{PrimeField, PrimeField32};
 
 use crate::{

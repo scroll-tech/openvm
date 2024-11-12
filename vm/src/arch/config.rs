@@ -1,4 +1,4 @@
-use ax_poseidon2_air::poseidon2::Poseidon2Config;
+use ax_hashes::poseidon2::Poseidon2Config;
 use ax_stark_backend::{
     config::{StarkGenericConfig, Val},
     keygen::{types::MultiStarkProvingKey, MultiStarkKeygenBuilder},

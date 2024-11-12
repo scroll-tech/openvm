@@ -9,7 +9,7 @@
 //! add any padding.
 use std::array;
 
-use ax_poseidon2_air::poseidon2::{Poseidon2Air, Poseidon2Cols, Poseidon2Config};
+use ax_hashes::poseidon2::{Poseidon2Air, Poseidon2Cols, Poseidon2Config};
 use axvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP};
 use columns::*;
 use p3_field::PrimeField32;

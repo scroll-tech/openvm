@@ -1,4 +1,4 @@
-use ax_poseidon2_air::poseidon2::{Poseidon2Air, Poseidon2Config};
+use ax_hashes::poseidon2::{Poseidon2Air, Poseidon2Config};
 use ax_stark_backend::{utils::disable_debug_builder, verifier::VerificationError};
 use ax_stark_sdk::{
     config::{

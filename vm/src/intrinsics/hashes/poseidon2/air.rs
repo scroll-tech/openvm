@@ -1,6 +1,6 @@
 use std::borrow::Borrow;
 
-use ax_poseidon2_air::poseidon2::Poseidon2Air;
+use ax_hashes::poseidon2::Poseidon2Air;
 use ax_stark_backend::{
     interaction::InteractionBuilder,
     rap::{BaseAirWithPublicValues, PartitionedBaseAir},
