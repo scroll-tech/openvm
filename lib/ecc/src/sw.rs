@@ -1,6 +1,6 @@
 use core::ops::{Add, AddAssign, Neg, Sub, SubAssign};
 
-use axvm::intrinsics::IntMod;
+use axvm::intrinsics::{DivUnsafe, IntMod};
 #[cfg(target_os = "zkvm")]
 use {
     axvm_platform::constants::{Custom1Funct3, ModArithBaseFunct7, SwBaseFunct7, CUSTOM_1},
@@ -30,7 +30,7 @@ impl EcPointN {
     fn add_ne(p1: &EcPointN, p2: &EcPointN) -> EcPointN {
         #[cfg(not(target_os = "zkvm"))]
         {
-            let lambda = (&p2.y - &p1.y) / (&p2.x - &p1.x);
+            let lambda = (&p2.y - &p1.y).div_unsafe(&p2.x - &p1.x);
             let x3 = &lambda * &lambda - &p1.x - &p2.x;
             let y3 = &lambda * &(&p1.x - &x3) - &p1.y;
             EcPointN { x: x3, y: y3 }
@@ -54,7 +54,7 @@ impl EcPointN {
     fn add_ne_assign(&mut self, p2: &EcPointN) {
         #[cfg(not(target_os = "zkvm"))]
         {
-            let lambda = (&p2.y - &self.y) / (&p2.x - &self.x);
+            let lambda = (&p2.y - &self.y).div_unsafe(&p2.x - &self.x);
             let x3 = &lambda * &lambda - &self.x - &p2.x;
             let y3 = &lambda * &(&self.x - &x3) - &self.y;
             self.x = x3;
@@ -78,7 +78,7 @@ impl EcPointN {
         #[cfg(not(target_os = "zkvm"))]
         {
             let two = IntModN::from_u8(2);
-            let lambda = &p.x * &p.x * IntModN::from_u8(3) / (&p.y * &two);
+            let lambda = &p.x * &p.x * IntModN::from_u8(3).div_unsafe(&p.y * &two);
             let x3 = &lambda * &lambda - &p.x * &two;
             let y3 = &lambda * &(&p.x - &x3) - &p.y;
             EcPointN { x: x3, y: y3 }
@@ -103,7 +103,7 @@ impl EcPointN {
         #[cfg(not(target_os = "zkvm"))]
         {
             let two = IntModN::from_u8(2);
-            let lambda = &self.x * &self.x * IntModN::from_u8(3) / (&self.y * &two);
+            let lambda = &self.x * &self.x * IntModN::from_u8(3).div_unsafe(&self.y * &two);
             let x3 = &lambda * &lambda - &self.x * &two;
             let y3 = &lambda * &(&self.x - &x3) - &self.y;
             self.x = x3;

@@ -217,7 +217,7 @@ pub fn moduli_setup(input: TokenStream) -> TokenStream {
                                             }
 
                                             #[inline(always)]
-                                            fn div_assign_impl(&mut self, other: &Self) {
+                                            fn div_assign_unsafe_impl(&mut self, other: &Self) {
                                                 #[cfg(not(target_os = "zkvm"))]
                                                 {
                                                     let modulus = Self::modulus_biguint();
@@ -309,12 +309,12 @@ pub fn moduli_setup(input: TokenStream) -> TokenStream {
                                             }
 
                                             #[inline(always)]
-                                            fn div_refs_impl(&self, other: &Self) -> Self {
+                                            fn div_unsafe_refs_impl(&self, other: &Self) -> Self {
                                                 #[cfg(not(target_os = "zkvm"))]
                                                 {
-                                                    let mut res = self.clone();
-                                                    res /= other;
-                                                    res
+                                                    let modulus = Self::modulus_biguint();
+                                                    let inv = axvm::intrinsics::uint_mod_inverse(&other.as_biguint(), &modulus);
+                                                    Self::from_biguint((self.as_biguint() * inv) % modulus)
                                                 }
                                                 #[cfg(target_os = "zkvm")]
                                                 {
@@ -548,48 +548,48 @@ pub fn moduli_setup(input: TokenStream) -> TokenStream {
                                             }
                                         }
 
-                                        impl<'a> core::ops::DivAssign<&'a #struct_name> for #struct_name {
+                                        impl<'a> axvm::intrinsics::DivAssignUnsafe<&'a #struct_name> for #struct_name {
                                             /// Undefined behaviour when denominator is not coprime to N
                                             #[inline(always)]
-                                            fn div_assign(&mut self, other: &'a #struct_name) {
-                                                self.div_assign_impl(other);
+                                            fn div_assign_unsafe(&mut self, other: &'a #struct_name) {
+                                                self.div_assign_unsafe_impl(other);
                                             }
                                         }
 
-                                        impl core::ops::DivAssign for #struct_name {
+                                        impl axvm::intrinsics::DivAssignUnsafe for #struct_name {
                                             /// Undefined behaviour when denominator is not coprime to N
                                             #[inline(always)]
-                                            fn div_assign(&mut self, other: Self) {
-                                                self.div_assign_impl(&other);
+                                            fn div_assign_unsafe(&mut self, other: Self) {
+                                                self.div_assign_unsafe_impl(&other);
                                             }
                                         }
 
-                                        impl core::ops::Div for #struct_name {
+                                        impl axvm::intrinsics::DivUnsafe for #struct_name {
                                             type Output = Self;
                                             /// Undefined behaviour when denominator is not coprime to N
                                             #[inline(always)]
-                                            fn div(mut self, other: Self) -> Self::Output {
-                                                self /= other;
+                                            fn div_unsafe(mut self, other: Self) -> Self::Output {
+                                                self.div_assign_unsafe_impl(&other);
                                                 self
                                             }
                                         }
 
-                                        impl<'a> core::ops::Div<&'a #struct_name> for #struct_name {
+                                        impl<'a> axvm::intrinsics::DivUnsafe<&'a #struct_name> for #struct_name {
                                             type Output = Self;
                                             /// Undefined behaviour when denominator is not coprime to N
                                             #[inline(always)]
-                                            fn div(mut self, other: &'a #struct_name) -> Self::Output {
-                                                self /= other;
+                                            fn div_unsafe(mut self, other: &'a #struct_name) -> Self::Output {
+                                                self.div_assign_unsafe_impl(other);
                                                 self
                                             }
                                         }
 
-                                        impl<'a> core::ops::Div<&'a #struct_name> for &#struct_name {
+                                        impl<'a> axvm::intrinsics::DivUnsafe<&'a #struct_name> for &#struct_name {
                                             type Output = #struct_name;
                                             /// Undefined behaviour when denominator is not coprime to N
                                             #[inline(always)]
-                                            fn div(self, other: &'a #struct_name) -> Self::Output {
-                                                self.div_refs_impl(other)
+                                            fn div_unsafe(self, other: &'a #struct_name) -> Self::Output {
+                                                self.div_unsafe_refs_impl(other)
                                             }
                                         }
 
