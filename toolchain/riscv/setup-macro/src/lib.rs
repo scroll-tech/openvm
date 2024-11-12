@@ -103,6 +103,7 @@ pub fn moduli_setup(input: TokenStream) -> TokenStream {
                                     .chain(vec![0u8; limbs])
                                     .take(limbs)
                                     .collect::<Vec<_>>();
+                                let num_bytes = modulus_bytes.len();
 
                                 let block_size = proc_macro::Literal::usize_unsuffixed(block_size);
                                 let block_size =
@@ -342,6 +343,8 @@ pub fn moduli_setup(input: TokenStream) -> TokenStream {
                                             const MODULUS: Self::Repr = [#(#modulus_bytes),*];
 
                                             const ZERO: Self = Self([0; #limbs]);
+
+                                            const NUM_BYTES: usize = #num_bytes;
 
                                             const ONE: Self = Self::from_const_u8(1);
 
