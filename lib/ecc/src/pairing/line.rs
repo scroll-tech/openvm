@@ -100,7 +100,16 @@ where
         }
         #[cfg(target_os = "zkvm")]
         {
-            todo!()
+            let mut uninit: MaybeUninit<[Fp2; 5]> = MaybeUninit::uninit();
+            custom_insn_r!(
+                CUSTOM_1,
+                Custom1Funct3::Pairing as usize,
+                SwBaseFunct7::Mul013By013 as usize,
+                uninit.as_mut_ptr(),
+                line0 as *const EvaluatedLine<Fp, Fp2>,
+                line1 as *const EvaluatedLine<Fp, Fp2>
+            );
+            unsafe { uninit.assume_init() }
         }
     }
 
@@ -111,7 +120,16 @@ where
         }
         #[cfg(target_os = "zkvm")]
         {
-            todo!()
+            let mut uninit: MaybeUninit<Fp12> = MaybeUninit::uninit();
+            custom_insn_r!(
+                CUSTOM_1,
+                Custom1Funct3::Pairing as usize,
+                SwBaseFunct7::MulBy013 as usize,
+                uninit.as_mut_ptr(),
+                f as *const Fp12,
+                l as *const EvaluatedLine<Fp, Fp2>
+            );
+            unsafe { uninit.assume_init() }
         }
     }
 
@@ -165,7 +183,16 @@ where
         }
         #[cfg(target_os = "zkvm")]
         {
-            todo!()
+            let mut uninit: MaybeUninit<Fp12> = MaybeUninit::uninit();
+            custom_insn_r!(
+                CUSTOM_1,
+                Custom1Funct3::Pairing as usize,
+                SwBaseFunct7::MulBy01234 as usize,
+                uninit.as_mut_ptr(),
+                f as *const Fp12,
+                x as *const [Fp2; 5]
+            );
+            unsafe { uninit.assume_init() }
         }
     }
 }

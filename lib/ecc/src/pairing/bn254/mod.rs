@@ -24,25 +24,33 @@ moduli_setup! {
 //     const XI: Self = Self::new(Fp::from_const_u8(9), Fp::from_const_u8(1));
 // }
 
-impl Field for Fp
-where
-    Self: IntMod + Clone + core::fmt::Debug,
-{
-    type SelfRef<'a> = &'a Self;
+mod field_impl {
+    use axvm::intrinsics::IntMod;
 
-    const ZERO: Self = <Self as IntMod>::ZERO;
-    const ONE: Self = <Self as IntMod>::ONE;
+    use super::Fp;
+    use crate::field::Field;
 
-    fn square(&self) -> Self {
-        todo!()
-        // IntMod::square(self)
-    }
+    impl Field for Fp
+    where
+        Self: IntMod + Clone + core::fmt::Debug,
+    {
+        type SelfRef<'a> = &'a Self;
 
-    fn invert(&self) -> Option<Self> {
-        todo!()
-        // Some(<Fp as IntMod>::ONE.div_unsafe(self))
+        const ZERO: Self = <Self as IntMod>::ZERO;
+        const ONE: Self = <Self as IntMod>::ONE;
+
+        fn square(&self) -> Self {
+            todo!()
+            // IntMod::square(self)
+        }
+
+        fn invert(&self) -> Option<Self> {
+            todo!()
+            // Some(<Fp as IntMod>::ONE.div_unsafe(self))
+        }
     }
 }
+pub use field_impl::*;
 
 // impl FieldExtension for Bn254Fp2 {
 //     type BaseField = Bn254Fp;
