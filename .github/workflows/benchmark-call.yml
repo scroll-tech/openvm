@@ -13,6 +13,7 @@ on:
           - revm_transfer
           - regex
           - base64_json
+          - fib_e2e
       instance_type:
         type: string
         required: false
@@ -112,6 +113,12 @@ jobs:
         run: |
           python3 ../ci/scripts/bench.py $BIN_NAME $CMD_ARGS
 
+      - name: Run benchmark
+        if: inputs.benchmark_name == 'fib_e2e'
+        working-directory: benchmarks
+        run: |
+          python3 ../ci/scripts/bench.py $BIN_NAME $CMD_ARGS
+
       ######################################################
       - name: Store metric json and compute diff with previous
         run: |
@@ -204,7 +211,12 @@ jobs:
         with:
           script: |
             const fs = require('fs')
-            const newBenchmark = fs.readFileSync('./results.md', { encoding: 'utf8', flag: 'r' })
+            let newBenchmark = fs.readFileSync('./results.md', { encoding: 'utf8', flag: 'r' })
+            const text_len = newBenchmark.length
+            // Github comment has a limit of 65,536 characters
+            if (text_len > 60000) {
+              newBenchmark = newBenchmark.substring(0, 30000) + '\n\n...(truncated)...\n\n' + newBenchmark.substring(text_len - 30000)
+            }
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
