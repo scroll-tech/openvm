@@ -9,9 +9,15 @@ pub use muldiv::*;
 use num_bigint_dig::BigUint;
 use once_cell::sync::Lazy;
 
+mod setup;
+pub use setup::*;
+
 use crate::{
     arch::{VmAirWrapper, VmChipWrapper},
-    rv32im::adapters::{Rv32IsEqualModAdapterChip, Rv32VecHeapAdapterAir, Rv32VecHeapAdapterChip},
+    rv32im::adapters::{
+        Rv32IsEqualModAdapterChip, Rv32RdReadAdapterAir, Rv32RdReadAdapterChip,
+        Rv32VecHeapAdapterAir, Rv32VecHeapAdapterChip,
+    },
 };
 
 #[cfg(test)]
@@ -53,6 +59,12 @@ pub type ModularIsEqualChip<
     Rv32IsEqualModAdapterChip<F, 2, NUM_LANES, LANE_SIZE, TOTAL_LIMBS>,
     ModularIsEqualCoreChip<TOTAL_LIMBS, RV32_REGISTER_NUM_LIMBS, RV32_CELL_BITS>,
 >;
+
+pub type ModularSetupAir<const NUM_LANES: usize, const LANE_SIZE: usize> =
+    VmAirWrapper<Rv32RdReadAdapterAir, ModularSetupCoreAir<NUM_LANES, LANE_SIZE>>;
+/// See [ModularSetupAir].
+pub type ModularSetupChip<F, const NUM_LANES: usize, const LANE_SIZE: usize> =
+    VmChipWrapper<F, Rv32RdReadAdapterChip<F>, ModularSetupCoreChip<NUM_LANES, LANE_SIZE>>;
 
 pub static SECP256K1_COORD_PRIME: Lazy<BigUint> = Lazy::new(|| {
     BigUint::from_bytes_be(&hex!(

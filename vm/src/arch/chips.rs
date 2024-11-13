@@ -29,7 +29,7 @@ use crate::{
             Rv32BaseAlu256Chip, Rv32BranchEqual256Chip, Rv32BranchLessThan256Chip,
             Rv32LessThan256Chip, Rv32Multiplication256Chip, Rv32Shift256Chip,
         },
-        modular::{ModularAddSubChip, ModularIsEqualChip, ModularMulDivChip},
+        modular::{ModularAddSubChip, ModularIsEqualChip, ModularMulDivChip, ModularSetupChip},
     },
     kernels::{
         branch_eq::KernelBranchEqChip, castf::CastFChip, field_arithmetic::FieldArithmeticChip,
@@ -119,6 +119,8 @@ pub enum AxVmExecutor<F: PrimeField32> {
     ModularMulDivRv32_3x16(Rc<RefCell<ModularMulDivChip<F, 3, 16>>>),
     ModularIsEqualRv32_1x32(Rc<RefCell<ModularIsEqualChip<F, 1, 32, 32>>>),
     ModularIsEqualRv32_3x16(Rc<RefCell<ModularIsEqualChip<F, 3, 16, 48>>>),
+    ModularSetupRv32_1x32(Rc<RefCell<ModularSetupChip<F, 1, 32>>>),
+    ModularSetupRv32_3x16(Rc<RefCell<ModularSetupChip<F, 3, 16>>>),
     EcAddNeRv32_2x32(Rc<RefCell<EcAddNeChip<F, 2, 32>>>),
     EcDoubleRv32_2x32(Rc<RefCell<EcDoubleChip<F, 2, 32>>>),
     EcAddNeRv32_6x16(Rc<RefCell<EcAddNeChip<F, 6, 16>>>),

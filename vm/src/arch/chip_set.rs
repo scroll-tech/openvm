@@ -1443,6 +1443,13 @@ fn gen_modular_executor_tuple(
                             ..=(Rv32ModularArithmeticOpcode::IS_EQ as usize),
                         ExecutorName::ModularIsEqualRv32_1x32,
                         class_offset,
+                        modulus.clone(),
+                    ),
+                    (
+                        Rv32ModularArithmeticOpcode::SETUP as usize
+                            ..=(Rv32ModularArithmeticOpcode::SETUP as usize),
+                        ExecutorName::ModularSetupRv32_1x32,
+                        class_offset,
                         modulus,
                     ),
                 ])
@@ -1466,6 +1473,13 @@ fn gen_modular_executor_tuple(
                         Rv32ModularArithmeticOpcode::IS_EQ as usize
                             ..=(Rv32ModularArithmeticOpcode::IS_EQ as usize),
                         ExecutorName::ModularIsEqualRv32_3x16,
+                        class_offset,
+                        modulus.clone(),
+                    ),
+                    (
+                        Rv32ModularArithmeticOpcode::SETUP as usize
+                            ..=(Rv32ModularArithmeticOpcode::SETUP as usize),
+                        ExecutorName::ModularSetupRv32_3x16,
                         class_offset,
                         modulus,
                     ),
