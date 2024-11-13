@@ -16,6 +16,8 @@ use {
     core::mem::MaybeUninit,
 };
 
+use super::Field;
+
 /// Quadratic extension field of `F` with irreducible polynomial `X^2 + 1`.
 /// Elements are represented as `c0 + c1 * u` where `u^2 = -1`.
 ///
@@ -445,4 +447,26 @@ impl<F: IntMod> Debug for Complex<F> {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         write!(f, "{:?} + {:?} * u", self.c0, self.c1)
     }
+}
+
+impl<F: Field + IntMod> Field for Complex<F> {
+    type SelfRef<'a>
+        = &'a Self
+    where
+        F: 'a;
+
+    const ZERO: Self = Self::ZERO;
+    const ONE: Self = Self::ONE;
+
+    fn square(&self) -> Self {
+        self * self
+    }
+
+    fn invert(&self) -> Option<Self> {
+        Some(Self::ONE.div_unsafe(self))
+    }
+}
+
+pub trait Xi {
+    const XI: Self;
 }

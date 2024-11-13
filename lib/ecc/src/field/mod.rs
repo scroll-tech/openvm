@@ -95,3 +95,18 @@ impl<F: Field> SexticExtField<F> {
         Self { c }
     }
 }
+
+// impl<F: Field> Field for SexticExtField<F> {
+//     type SelfRef<'a> = &'a Self;
+
+//     const ZERO: Self = Self::new([F::ZERO; 6]);
+//     const ONE: Self = Self::new([F::ONE, F::ZERO, F::ZERO, F::ZERO, F::ZERO, F::ZERO]);
+
+//     fn square(&self) -> Self {
+//         todo!()
+//     }
+
+//     fn invert(&self) -> Option<Self> {
+//         todo!()
+//     }
+// }
