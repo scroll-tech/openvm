@@ -9,7 +9,7 @@ pub use fp2::*;
 mod fp12;
 pub use fp12::*;
 
-use super::LineMulMType;
+use super::{LineMulMType, MillerStep};
 
 pub struct Bls12381Intrinsic;
 
@@ -34,3 +34,8 @@ impl Field for Bls12381Fp {
 }
 
 impl LineMulMType<Bls12381Fp, Bls12381Fp2, Bls12381Fp12> for Bls12381Intrinsic {}
+
+impl MillerStep for Bls12381Intrinsic {
+    type Fp = Bls12381Fp;
+    type Fp2 = Bls12381Fp2;
+}

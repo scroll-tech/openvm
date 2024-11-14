@@ -9,7 +9,7 @@ pub use fp2::*;
 mod fp12;
 pub use fp12::*;
 
-use super::LineMulDType;
+use super::{LineMulDType, MillerStep, MultiMillerLoop};
 
 pub struct Bn254Intrinsic;
 
@@ -34,3 +34,8 @@ impl Field for Bn254Fp {
 }
 
 impl LineMulDType<Bn254Fp, Bn254Fp2, Bn254Fp12> for Bn254Intrinsic {}
+
+impl MillerStep for Bn254Intrinsic {
+    type Fp = Bn254Fp;
+    type Fp2 = Bn254Fp2;
+}

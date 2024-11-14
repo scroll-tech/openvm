@@ -72,29 +72,41 @@ mod bn254 {
         Ok(())
     }
 
-    // #[test]
-    // fn test_bn254_miller_steps() -> Result<()> {
-    //     let elf = build_example_program("miller_steps")?;
-    //     let executor = VmExecutor::<F>::new(VmConfig::rv32im().add_canonical_pairing_curves());
+    #[test]
+    fn test_bn254_miller_step() -> Result<()> {
+        let elf = build_example_program("bn254_miller_step")?;
+        let executor = VmExecutor::<F>::new(VmConfig::rv32im().add_canonical_pairing_curves());
 
-    //     let mut rng = rand::rngs::StdRng::seed_from_u64(20);
-    //     let S = G2Affine::random(&mut rng);
-    //     let Q = G2Affine::random(&mut rng);
+        let mut rng = rand::rngs::StdRng::seed_from_u64(20);
+        let S = G2Affine::random(&mut rng);
+        let Q = G2Affine::random(&mut rng);
 
-    //     let s = AffinePoint::new(S.x(), S.y());
-    //     let p = AffinePoint::new(Q.x(), Q.y());
+        let s = AffinePoint::new(S.x(), S.y());
+        let q = AffinePoint::new(Q.x(), Q.y());
 
-    //     // Test miller_double_step
-    //     let (f, l) = Bn254::miller_double_step(s);
-    //     let io0 = [f.x, f.y, l.b, l.c]
-    //         .into_iter()
-    //         .flat_map(|fp| fp.to_bytes())
-    //         .map(AbstractField::from_canonical_u8)
-    //         .collect::<Vec<_>>();
+        // Test miller_double_step
+        let (pt, l) = Bn254::miller_double_step(s.clone());
+        let io0 = [s.x, s.y, pt.x, pt.y, l.b, l.c]
+            .into_iter()
+            .flat_map(|fp| fp.to_bytes())
+            .map(AbstractField::from_canonical_u8)
+            .collect::<Vec<_>>();
 
-    //     executor.execute(elf, vec![io0])?;
-    //     Ok(())
-    // }
+        executor.execute(elf, vec![io0])?;
+
+        // Test miller_double_and_add_step
+        // let (pt, l0, l1) = Bn254::miller_double_and_add_step(pt, q);
+        // let io1 = [pt.x, pt.y, l0.b, l0.c, l1.b, l1.c]
+        //     .into_iter()
+        //     .flat_map(|fp| fp.to_bytes())
+        //     .map(AbstractField::from_canonical_u8)
+        //     .collect::<Vec<_>>();
+
+        // let io = io0.into_iter().chain(io1).collect::<Vec<_>>();
+
+        // executor.execute(elf, vec![io])?;
+        Ok(())
+    }
 }
 
 mod bls12_381 {

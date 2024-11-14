@@ -19,7 +19,6 @@ where
     for<'a> &'a Self::Fp2: Add<&'a Self::Fp2, Output = Self::Fp2>,
     for<'a> &'a Self::Fp2: Sub<&'a Self::Fp2, Output = Self::Fp2>,
     for<'a> &'a Self::Fp2: Mul<&'a Self::Fp2, Output = Self::Fp2>,
-    for<'a> &'a Self::Fp2: Neg<Output = Self::Fp2>,
 {
     type Fp: Field;
     type Fp2: FieldExtension<BaseField = Self::Fp>;
@@ -52,7 +51,7 @@ where
             //   l_{\Psi(S),\Psi(S)}(P) = (λ * x_S - y_S) (1 / y_P)  - λ (x_P / y_P) w^2 + w^3
             // x0 = λ * x_S - y_S
             // x2 = - λ
-            let b = lambda.clone().neg();
+            let b = Self::Fp2::zero() - lambda.clone();
             let c = lambda * x - y;
 
             (two_s, UnevaluatedLine { b, c })
@@ -98,7 +97,7 @@ where
         };
 
         // l_{\Psi(S),\Psi(Q)}(P) = (λ_1 * x_S - y_S) (1 / y_P) - λ_1 (x_P / y_P) w^2 + w^3
-        let b = lambda.clone().neg();
+        let b = Self::Fp2::zero() - lambda.clone();
         let c = lambda * x_s - y_s;
 
         (s_plus_q, UnevaluatedLine { b, c })
@@ -129,8 +128,9 @@ where
             let x_s_plus_q = lambda1 * lambda1 - x_s - x_q;
 
             // λ2 = -λ1 - 2y_s / (x_{s+q} - x_s)
-            let lambda2 =
-                &(lambda1.clone().neg() - two * y_s * (&x_s_plus_q - x_s).invert().unwrap());
+            let lambda2 = &(Self::Fp2::zero()
+                - lambda1.clone()
+                - two * y_s * (&x_s_plus_q - x_s).invert().unwrap());
             let x_s_plus_q_plus_s = lambda2 * lambda2 - x_s - &x_s_plus_q;
             let y_s_plus_q_plus_s = lambda2 * &(x_s - &x_s_plus_q_plus_s) - y_s;
 
@@ -140,11 +140,11 @@ where
             };
 
             // l_{\Psi(S),\Psi(Q)}(P) = (λ_1 * x_S - y_S) (1 / y_P) - λ_1 (x_P / y_P) w^2 + w^3
-            let b0 = lambda1.clone().neg();
+            let b0 = Self::Fp2::zero() - lambda1.clone();
             let c0 = lambda1 * x_s - y_s;
 
             // l_{\Psi(S+Q),\Psi(S)}(P) = (λ_2 * x_S - y_S) (1 / y_P) - λ_2 (x_P / y_P) w^2 + w^3
-            let b1 = lambda2.clone().neg();
+            let b1 = Self::Fp2::zero() - lambda1.clone();
             let c1 = lambda2 * x_s - y_s;
 
             (
