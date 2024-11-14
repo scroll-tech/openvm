@@ -11,7 +11,7 @@ pub use fp12::*;
 
 use super::LineMulDType;
 
-pub struct Bn254;
+pub struct Bn254Intrinsic;
 
 moduli_setup! {
     Bn254Fp = "21888242871839275222246405745257275088696311157297823662689037894645226208583";
@@ -33,4 +33,4 @@ impl Field for Bn254Fp {
     }
 }
 
-impl LineMulDType<Bn254Fp, Bn254Fp2, Bn254Fp12> for Bn254 {}
+impl LineMulDType<Bn254Fp, Bn254Fp2, Bn254Fp12> for Bn254Intrinsic {}

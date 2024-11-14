@@ -1,7 +1,7 @@
 use axvm_algebra::IntMod;
 
 use super::Bls12381Fp;
-use crate::field::{Complex, Field, FieldExtension, SexticExtField, Xi};
+use crate::field::{Complex, Field, FieldExtension, Xi};
 
 pub type Bls12381Fp2 = Complex<Bls12381Fp>;
 

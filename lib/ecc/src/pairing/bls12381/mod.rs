@@ -1,7 +1,7 @@
 use axvm::moduli_setup;
 use axvm_algebra::{DivUnsafe, IntMod};
 
-use crate::field::{Complex, Field, FieldExtension, SexticExtField, Xi};
+use crate::field::Field;
 
 mod fp2;
 pub use fp2::*;
@@ -11,7 +11,7 @@ pub use fp12::*;
 
 use super::LineMulMType;
 
-pub struct Bls12381;
+pub struct Bls12381Intrinsic;
 
 moduli_setup! {
     Bls12381Fp = "0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab";
@@ -33,4 +33,4 @@ impl Field for Bls12381Fp {
     }
 }
 
-impl LineMulMType<Bls12381Fp, Bls12381Fp2, Bls12381Fp12> for Bls12381 {}
+impl LineMulMType<Bls12381Fp, Bls12381Fp2, Bls12381Fp12> for Bls12381Intrinsic {}

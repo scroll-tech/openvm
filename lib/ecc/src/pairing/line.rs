@@ -42,6 +42,18 @@ where
     pub c: Fp2,
 }
 
+impl<Fp, Fp2> IntoIterator for EvaluatedLine<Fp, Fp2>
+where
+    Fp: Field,
+    Fp2: FieldExtension<BaseField = Fp>,
+{
+    type Item = Fp2;
+    type IntoIter = core::array::IntoIter<Fp2, 2>;
+    fn into_iter(self) -> Self::IntoIter {
+        [self.b, self.c].into_iter()
+    }
+}
+
 /// Convert M-type lines into Fp12 elements
 pub trait LineMType<Fp, Fp2, Fp12>
 where
@@ -62,6 +74,7 @@ where
     for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
     for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
 {
+    /// Multiplies two lines in 023-form to get an element in 02345-form
     fn mul_023_by_023(l0: EvaluatedLine<Fp, Fp2>, l1: EvaluatedLine<Fp, Fp2>) -> [Fp2; 5] {
         #[cfg(not(target_os = "zkvm"))]
         {
@@ -96,6 +109,7 @@ where
         }
     }
 
+    /// Multiplies a line in 02345-form with a Fp12 element to get an Fp12 element
     fn mul_by_023(f: Fp12, l: EvaluatedLine<Fp, Fp2>) -> Fp12 {
         #[cfg(not(target_os = "zkvm"))]
         {
@@ -116,6 +130,7 @@ where
         }
     }
 
+    /// Multiplies a line in 02345-form with a Fp12 element to get an Fp12 element
     fn mul_by_02345(f: Fp12, x: [Fp2; 5]) -> Fp12 {
         #[cfg(not(target_os = "zkvm"))]
         {
@@ -201,6 +216,7 @@ where
     for<'a> &'a Fp2: Sub<&'a Fp2, Output = Fp2>,
     for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
 {
+    /// Multiplies two lines in 013-form to get an element in 01234-form
     fn mul_013_by_013(l0: EvaluatedLine<Fp, Fp2>, l1: EvaluatedLine<Fp, Fp2>) -> [Fp2; 5] {
         #[cfg(not(target_os = "zkvm"))]
         {
@@ -235,6 +251,7 @@ where
         }
     }
 
+    /// Multiplies a line in 013-form with a Fp12 element to get an Fp12 element
     fn mul_by_013(f: Fp12, l: EvaluatedLine<Fp, Fp2>) -> Fp12 {
         #[cfg(not(target_os = "zkvm"))]
         {
@@ -255,6 +272,7 @@ where
         }
     }
 
+    /// Multiplies a line in 01234-form with a Fp12 element to get an Fp12 element
     fn mul_by_01234(f: Fp12, x: [Fp2; 5]) -> Fp12 {
         #[cfg(not(target_os = "zkvm"))]
         {
