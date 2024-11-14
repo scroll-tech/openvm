@@ -144,7 +144,7 @@ where
             let c0 = lambda1 * x_s - y_s;
 
             // l_{\Psi(S+Q),\Psi(S)}(P) = (λ_2 * x_S - y_S) (1 / y_P) - λ_2 (x_P / y_P) w^2 + w^3
-            let b1 = Self::Fp2::zero() - lambda1.clone();
+            let b1 = Self::Fp2::zero() - lambda2.clone();
             let c1 = lambda2 * x_s - y_s;
 
             (

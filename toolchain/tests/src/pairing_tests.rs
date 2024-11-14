@@ -92,19 +92,19 @@ mod bn254 {
             .map(AbstractField::from_canonical_u8)
             .collect::<Vec<_>>();
 
-        executor.execute(elf, vec![io0])?;
+        // executor.execute(elf, vec![io0])?;
 
         // Test miller_double_and_add_step
-        // let (pt, l0, l1) = Bn254::miller_double_and_add_step(pt, q);
-        // let io1 = [pt.x, pt.y, l0.b, l0.c, l1.b, l1.c]
-        //     .into_iter()
-        //     .flat_map(|fp| fp.to_bytes())
-        //     .map(AbstractField::from_canonical_u8)
-        //     .collect::<Vec<_>>();
+        let (pt, l0, l1) = Bn254::miller_double_and_add_step(s.clone(), q.clone());
+        let io1 = [s.x, s.y, q.x, q.y, pt.x, pt.y, l0.b, l0.c, l1.b, l1.c]
+            .into_iter()
+            .flat_map(|fp| fp.to_bytes())
+            .map(AbstractField::from_canonical_u8)
+            .collect::<Vec<_>>();
 
-        // let io = io0.into_iter().chain(io1).collect::<Vec<_>>();
+        let io = io0.into_iter().chain(io1).collect::<Vec<_>>();
 
-        // executor.execute(elf, vec![io])?;
+        executor.execute(elf, vec![io])?;
         Ok(())
     }
 }
