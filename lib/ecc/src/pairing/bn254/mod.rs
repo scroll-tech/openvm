@@ -30,10 +30,7 @@ mod field_impl {
     use super::Fp;
     use crate::field::Field;
 
-    impl Field for Fp
-    where
-        Self: IntMod + Clone + core::fmt::Debug,
-    {
+    impl Field for Fp {
         type SelfRef<'a> = &'a Self;
 
         const ZERO: Self = <Self as IntMod>::ZERO;
