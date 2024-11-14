@@ -29,11 +29,11 @@ impl LineMulMType<Fq, Fq2, Fq12> for Bls12_381 {
     }
 
     fn mul_by_023(f: Fq12, l: EvaluatedLine<Fq, Fq2>) -> Fq12 {
-        Self::mul_by_02345(f, [l.c, l.b, Fq2::ONE, Fq2::ZERO, Fq2::ZERO])
+        Self::mul_by_02345(f, [l.c, l.b, Fq2::one(), Fq2::zero(), Fq2::zero()])
     }
 
     fn mul_by_02345(f: Fq12, x: [Fq2; 5]) -> Fq12 {
-        let x_fp12 = Fq12::from_coeffs([x[0], Fq2::ZERO, x[1], x[2], x[3], x[4]]);
+        let x_fp12 = Fq12::from_coeffs([x[0], Fq2::zero(), x[1], x[2], x[3], x[4]]);
         f * x_fp12
     }
 }
@@ -52,7 +52,7 @@ where
     for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
     for<'a> &'a Fp2: Neg<Output = Fp2>,
 {
-    let one = &Fp2::ONE;
+    let one = &Fp2::one();
     let two = &(one + one);
     let three = &(one + two);
     let x = &Fp2::embed(P.x);
@@ -73,7 +73,7 @@ where
     let over_two_y_squared = &(two * y_squared).invert().unwrap();
 
     let b = three_x_cubed.neg() * over_two_y_squared;
-    let c = three_x_cubed * over_two_y_squared - &Fp2::ONE;
+    let c = three_x_cubed * over_two_y_squared - &Fp2::one();
 
     EvaluatedLine { b, c }
 }

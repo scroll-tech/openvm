@@ -19,7 +19,7 @@ impl LineMulDType<Fq, Fq2, Fq12> for Bn254 {
         // where w⁶ = xi
         // l0 * l1 = 1 + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + b1c0)w⁴ + (c0c1)w⁶
         //         = (1 + c0c1 * xi) + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + b1c0)w⁴
-        let l0 = Fq2::ONE + c0 * c1 * *BN254_XI;
+        let l0 = Fq2::one() + c0 * c1 * *BN254_XI;
         let l1 = b0 + b1;
         let l2 = b0 * b1;
         let l3 = c0 + c1;
@@ -29,11 +29,11 @@ impl LineMulDType<Fq, Fq2, Fq12> for Bn254 {
     }
 
     fn mul_by_013(f: Fq12, l: EvaluatedLine<Fq, Fq2>) -> Fq12 {
-        Self::mul_by_01234(f, [Fq2::ONE, l.b, Fq2::ZERO, l.c, Fq2::ZERO])
+        Self::mul_by_01234(f, [Fq2::one(), l.b, Fq2::zero(), l.c, Fq2::zero()])
     }
 
     fn mul_by_01234(f: Fq12, x: [Fq2; 5]) -> Fq12 {
-        let x_fp12 = Fq12::from_coeffs([x[0], x[1], x[2], x[3], x[4], Fq2::ZERO]);
+        let x_fp12 = Fq12::from_coeffs([x[0], x[1], x[2], x[3], x[4], Fq2::zero()]);
         f * x_fp12
     }
 }
@@ -52,7 +52,7 @@ where
     for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
     for<'a> &'a Fp2: Neg<Output = Fp2>,
 {
-    let one = &Fp2::ONE;
+    let one = &Fp2::one();
     let two = &(one + one);
     let three = &(one + two);
     let x = &Fp2::embed(P.x);
@@ -71,7 +71,7 @@ where
     let over_two_y_squared = &(two * y_squared).invert().unwrap();
 
     let b = three_x_cubed.neg() * over_two_y_squared;
-    let c = three_x_cubed * over_two_y_squared - &Fp2::ONE;
+    let c = three_x_cubed * over_two_y_squared - &Fp2::one();
 
     EvaluatedLine { b, c }
 }

@@ -1,6 +1,7 @@
+use group::ff::Field;
 pub use halo2curves_axiom::bn256::{Fq, Fq2};
 
-use crate::field::{Field, FieldExtension};
+use crate::field::{FieldExtension, Xi};
 
 /// FieldExtension for Fq2 with Fq as base field
 impl FieldExtension for Fq2 {
@@ -44,4 +45,11 @@ impl FieldExtension for Fq2 {
             c1: self.c1 * rhs,
         }
     }
+}
+
+impl Xi for Fq2 {
+    const XI: Self = Fq2 {
+        c0: Fq::from_raw([9, 0, 0, 0]),
+        c1: Fq::ONE,
+    };
 }

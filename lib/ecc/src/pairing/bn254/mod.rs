@@ -20,9 +20,9 @@ moduli_setup! {
 type Fp2 = Complex<Fp>;
 type Fp12 = SexticExtField<Fp2>;
 
-// impl Xi for Fp2 {
-//     const XI: Self = Self::new(Fp::from_const_u8(9), Fp::from_const_u8(1));
-// }
+impl Xi for Fp2 {
+    const XI: Self = Self::new(Fp::from_const_u8(9), Fp::from_const_u8(1));
+}
 
 // mod field_impl {
 //     use axvm::intrinsics::IntMod;
@@ -94,32 +94,47 @@ impl FieldExtension for Fp12 {
     type SelfRef<'a> = &'a Self;
 
     fn from_coeffs(coeffs: Self::Coeffs) -> Self {
-        Self {
-            c0: coeffs[0].clone(),
-            c1: coeffs[1].clone(),
-            c2: coeffs[2].clone(),
-            c3: coeffs[3].clone(),
-            c4: coeffs[4].clone(),
-            c5: coeffs[5].clone(),
-        }
+        Self::new([
+            coeffs[0].clone(),
+            coeffs[1].clone(),
+            coeffs[2].clone(),
+            coeffs[3].clone(),
+            coeffs[4].clone(),
+            coeffs[5].clone(),
+        ])
     }
 
     fn to_coeffs(self) -> Self::Coeffs {
-        [self.c0, self.c1, self.c2, self.c3, self.c4, self.c5]
+        [
+            self.c[0].clone(),
+            self.c[1].clone(),
+            self.c[2].clone(),
+            self.c[3].clone(),
+            self.c[4].clone(),
+            self.c[5].clone(),
+        ]
     }
 
     fn embed(base_elem: Self::BaseField) -> Self {
-        Self {
-            c0: base_elem,
-            c1: <Self::BaseField as Field>::zero(),
-        }
+        Self::new([
+            base_elem,
+            <Self::BaseField as Field>::zero(),
+            <Self::BaseField as Field>::zero(),
+            <Self::BaseField as Field>::zero(),
+            <Self::BaseField as Field>::zero(),
+            <Self::BaseField as Field>::zero(),
+        ])
     }
 
     fn conjugate(&self) -> Self {
-        Self {
-            c0: self.c0.clone(),
-            c1: -self.c1.clone(),
-        }
+        Self::new([
+            self.c[0].clone(),
+            -self.c[1].clone(),
+            self.c[2].clone(),
+            -self.c[3].clone(),
+            self.c[4].clone(),
+            -self.c[5].clone(),
+        ])
     }
 
     fn frobenius_map(&self, power: Option<usize>) -> Self {
@@ -127,9 +142,13 @@ impl FieldExtension for Fp12 {
     }
 
     fn mul_base(&self, rhs: Self::BaseField) -> Self {
-        Self {
-            c0: &self.c0 * &rhs,
-            c1: &self.c1 * &rhs,
-        }
+        Self::new([
+            &self.c[0] * &rhs,
+            &self.c[1] * &rhs,
+            &self.c[2] * &rhs,
+            &self.c[3] * &rhs,
+            &self.c[4] * &rhs,
+            &self.c[5] * &rhs,
+        ])
     }
 }

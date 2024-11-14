@@ -6,6 +6,9 @@ use core::{
 mod complex;
 pub use complex::*;
 
+mod sextic_ext_field;
+pub use sextic_ext_field::*;
+
 #[cfg(feature = "halo2curves")]
 mod exp_bytes_be;
 #[cfg(feature = "halo2curves")]
@@ -74,54 +77,4 @@ pub trait FieldExtension: Field {
 
     /// Multiply an extension field element by an element in the base field
     fn mul_base(&self, rhs: Self::BaseField) -> Self;
-}
-
-/// Sextic extension field of `F` with irreducible polynomial `X^6 + \xi`.
-/// Elements are represented as `c0 + c1 * w` where `w^6 = \xi`, where \xi depends on the twist of the curve.
-///
-/// Memory alignment follows alignment of `F`.
-/// Memory layout is concatenation of `c0` and `c1`.
-#[derive(Clone, PartialEq, Eq)]
-#[repr(C)]
-pub struct SexticExtField<F> {
-    pub c: [F; 6],
-}
-
-impl<F: Field> SexticExtField<F> {
-    pub const fn new(c: [F; 6]) -> Self {
-        Self { c }
-    }
-}
-
-impl<F: Field> Field for SexticExtField<F> {
-    type SelfRef<'a>
-        = &'a Self
-    where
-        F: 'a;
-
-    fn zero() -> Self {
-        Self::new([
-            F::zero(),
-            F::zero(),
-            F::zero(),
-            F::zero(),
-            F::zero(),
-            F::zero(),
-        ])
-    }
-
-    fn one() -> Self {
-        Self::new([
-            F::one(),
-            F::zero(),
-            F::zero(),
-            F::zero(),
-            F::zero(),
-            F::zero(),
-        ])
-    }
-
-    fn invert(&self) -> Option<Self> {
-        todo!()
-    }
 }
