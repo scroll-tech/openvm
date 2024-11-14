@@ -22,7 +22,7 @@ impl FieldExtension for Fq2 {
     fn embed(base_elem: Self::BaseField) -> Self {
         Fq2 {
             c0: base_elem,
-            c1: Fq::ZERO,
+            c1: Fq::zero(),
         }
     }
 

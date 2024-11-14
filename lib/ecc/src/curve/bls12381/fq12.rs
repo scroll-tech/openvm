@@ -71,7 +71,14 @@ impl FieldExtension for Fq12 {
 
 impl LineMType<Fq, Fq2, Fq12> for Fq12 {
     fn from_evaluated_line_m_type(line: EvaluatedLine<Fq, Fq2>) -> Fq12 {
-        Fq12::from_coeffs([line.c, Fq2::ZERO, line.b, Fq2::ONE, Fq2::ZERO, Fq2::ZERO])
+        Fq12::from_coeffs([
+            line.c,
+            Fq2::zero(),
+            line.b,
+            Fq2::one(),
+            Fq2::zero(),
+            Fq2::zero(),
+        ])
     }
 }
 

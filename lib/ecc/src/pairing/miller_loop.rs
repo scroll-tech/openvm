@@ -99,13 +99,13 @@ where
         let c_inv = if let Some(c) = c.clone() {
             c.invert().unwrap()
         } else {
-            Self::Fp12::ONE
+            Self::Fp12::one()
         };
 
         let mut f = if let Some(c) = c.clone() {
             c
         } else {
-            Self::Fp12::ONE
+            Self::Fp12::one()
         };
         let mut Q_acc = Q.to_vec();
 

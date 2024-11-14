@@ -13,7 +13,7 @@ pub trait ExpBigInt<F: Field>: Field {
         for<'a> &'a Self: Mul<&'a Self, Output = Self>,
     {
         if k == BigInt::from(0) {
-            return Self::ONE;
+            return Self::one();
         }
 
         let mut e = k.clone();
@@ -24,7 +24,7 @@ pub trait ExpBigInt<F: Field>: Field {
             e = -k;
         }
 
-        let mut res = Self::ONE;
+        let mut res = Self::one();
 
         let x_sq = &x * &x;
         let ops = [x.clone(), x_sq.clone(), &x_sq * &x];

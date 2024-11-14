@@ -24,7 +24,7 @@ where
     ) -> (AffinePoint<Self::Fp2>, UnevaluatedLine<Self::Fp, Self::Fp2>) {
         #[cfg(not(target_os = "zkvm"))]
         {
-            let one = &Self::Fp2::ONE;
+            let one = &Self::Fp2::one();
             let two = &(one + one);
             let three = &(one + two);
 
@@ -97,7 +97,7 @@ where
     ) {
         #[cfg(not(target_os = "zkvm"))]
         {
-            let one = &Self::Fp2::ONE;
+            let one = &Self::Fp2::one();
             let two = &(one + one);
 
             let x_s = &s.x;

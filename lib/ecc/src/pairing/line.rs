@@ -90,7 +90,7 @@ where
             // where w⁶ = xi
             // l0 * l1 = 1 + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + b1c0)w⁴ + (c0c1)w⁶
             //         = (1 + c0c1 * xi) + (b0 + b1)w + (b0b1)w² + (c0 + c1)w³ + (b0c1 + b1c0)w⁴
-            let l0 = Fp2::ONE + &c0 * &c1 * Fp2::XI;
+            let l0 = Fp2::one() + &c0 * &c1 * &Fp2::XI;
             let l1 = &b0 + &b1;
             let l2 = &b0 * &b1;
             let l3 = &c0 + &c1;
@@ -116,7 +116,7 @@ where
     fn mul_by_013(f: Fp12, l: EvaluatedLine<Fp, Fp2>) -> Fp12 {
         #[cfg(not(target_os = "zkvm"))]
         {
-            Self::mul_by_01234(f, [Fp2::ONE, l.b, Fp2::ZERO, l.c, Fp2::ZERO])
+            Self::mul_by_01234(f, [Fp2::one(), l.b, Fp2::zero(), l.c, Fp2::zero()])
         }
         #[cfg(target_os = "zkvm")]
         {

@@ -37,13 +37,10 @@ pub trait Field:
         Self: 'a;
 
     /// The zero element of the field, the additive identity.
-    const ZERO: Self;
+    fn zero() -> Self;
 
     /// The one element of the field, the multiplicative identity.
-    const ONE: Self;
-
-    /// Squares this field element.
-    fn square(&self) -> Self;
+    fn one() -> Self;
 
     /// Inverts this element, returning `None` if this element is zero.
     fn invert(&self) -> Option<Self>;
@@ -96,17 +93,35 @@ impl<F: Field> SexticExtField<F> {
     }
 }
 
-// impl<F: Field> Field for SexticExtField<F> {
-//     type SelfRef<'a> = &'a Self;
+impl<F: Field> Field for SexticExtField<F> {
+    type SelfRef<'a>
+        = &'a Self
+    where
+        F: 'a;
 
-//     const ZERO: Self = Self::new([F::ZERO; 6]);
-//     const ONE: Self = Self::new([F::ONE, F::ZERO, F::ZERO, F::ZERO, F::ZERO, F::ZERO]);
+    fn zero() -> Self {
+        Self::new([
+            F::zero(),
+            F::zero(),
+            F::zero(),
+            F::zero(),
+            F::zero(),
+            F::zero(),
+        ])
+    }
 
-//     fn square(&self) -> Self {
-//         todo!()
-//     }
+    fn one() -> Self {
+        Self::new([
+            F::one(),
+            F::zero(),
+            F::zero(),
+            F::zero(),
+            F::zero(),
+            F::zero(),
+        ])
+    }
 
-//     fn invert(&self) -> Option<Self> {
-//         todo!()
-//     }
-// }
+    fn invert(&self) -> Option<Self> {
+        todo!()
+    }
+}

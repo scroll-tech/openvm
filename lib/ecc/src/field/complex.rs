@@ -455,11 +455,12 @@ impl<F: Field + IntMod> Field for Complex<F> {
     where
         F: 'a;
 
-    const ZERO: Self = Self::ZERO;
-    const ONE: Self = Self::ONE;
+    fn zero() -> Self {
+        Self::ZERO
+    }
 
-    fn square(&self) -> Self {
-        self * self
+    fn one() -> Self {
+        Self::ONE
     }
 
     fn invert(&self) -> Option<Self> {

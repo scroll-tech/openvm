@@ -71,7 +71,14 @@ impl FieldExtension for Fq12 {
 
 impl LineDType<Fq, Fq2, Fq12> for Fq12 {
     fn from_evaluated_line_d_type(line: EvaluatedLine<Fq, Fq2>) -> Fq12 {
-        Fq12::from_coeffs([Fq2::ONE, line.b, Fq2::ZERO, line.c, Fq2::ZERO, Fq2::ZERO])
+        Fq12::from_coeffs([
+            Fq2::one(),
+            line.b,
+            Fq2::zero(),
+            line.c,
+            Fq2::zero(),
+            Fq2::zero(),
+        ])
     }
 }
 

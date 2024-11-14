@@ -11,73 +11,75 @@ use crate::field::Field;
 impl Field for Fr {
     type SelfRef<'a> = &'a Self;
 
-    const ZERO: Self = Fr::zero();
-    const ONE: Self = Fr::one();
+    fn zero() -> Self {
+        Fr::zero()
+    }
+
+    fn one() -> Self {
+        Fr::one()
+    }
 
     fn invert(&self) -> Option<Self> {
         self.invert().into()
-    }
-
-    fn square(&self) -> Self {
-        self.square()
     }
 }
 
 impl Field for Fq {
     type SelfRef<'a> = &'a Self;
 
-    const ZERO: Self = Fq::zero();
-    const ONE: Self = Fq::one();
+    fn zero() -> Self {
+        Fq::zero()
+    }
+
+    fn one() -> Self {
+        Fq::one()
+    }
 
     fn invert(&self) -> Option<Self> {
         self.invert().into()
-    }
-
-    fn square(&self) -> Self {
-        self.square()
     }
 }
 
 impl Field for Fq2 {
     type SelfRef<'a> = &'a Self;
 
-    const ZERO: Self = Fq2 {
-        c0: Fq::zero(),
-        c1: Fq::zero(),
-    };
+    fn zero() -> Self {
+        Fq2 {
+            c0: Fq::zero(),
+            c1: Fq::zero(),
+        }
+    }
 
-    const ONE: Self = Fq2 {
-        c0: Fq::one(),
-        c1: Fq::zero(),
-    };
+    fn one() -> Self {
+        Fq2 {
+            c0: Fq::one(),
+            c1: Fq::zero(),
+        }
+    }
 
     fn invert(&self) -> Option<Self> {
         self.invert().into()
-    }
-
-    fn square(&self) -> Self {
-        self.square()
     }
 }
 
 impl Field for Fq12 {
     type SelfRef<'a> = &'a Self;
 
-    const ZERO: Self = Fq12 {
-        c0: Fq6::zero(),
-        c1: Fq6::zero(),
-    };
+    fn zero() -> Self {
+        Fq12 {
+            c0: Fq6::zero(),
+            c1: Fq6::zero(),
+        }
+    }
 
-    const ONE: Self = Fq12 {
-        c0: Fq6::one(),
-        c1: Fq6::zero(),
-    };
+    fn one() -> Self {
+        Fq12 {
+            c0: Fq6::one(),
+            c1: Fq6::zero(),
+        }
+    }
 
     fn invert(&self) -> Option<Self> {
         self.invert().into()
-    }
-
-    fn square(&self) -> Self {
-        self.square()
     }
 }

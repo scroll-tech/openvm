@@ -17,76 +17,119 @@ pub struct Bn254;
 moduli_setup! {
     Fp = "21888242871839275222246405745257275088696311157297823662689037894645226208583";
 }
-// type Fp2 = Complex<Fp>;
-// type Fp12 = SexticExtField<Fp2>;
+type Fp2 = Complex<Fp>;
+type Fp12 = SexticExtField<Fp2>;
 
 // impl Xi for Fp2 {
 //     const XI: Self = Self::new(Fp::from_const_u8(9), Fp::from_const_u8(1));
 // }
 
-mod field_impl {
-    use axvm::intrinsics::IntMod;
+// mod field_impl {
+//     use axvm::intrinsics::IntMod;
 
-    use super::Fp;
-    use crate::field::Field;
+//     use super::Fp;
+//     use crate::field::Field;
 
-    impl Field for Fp {
-        type SelfRef<'a> = &'a Self;
+impl Field for Fp {
+    type SelfRef<'a> = &'a Self;
 
-        const ZERO: Self = <Self as IntMod>::ZERO;
-        const ONE: Self = <Self as IntMod>::ONE;
+    fn zero() -> Self {
+        <Self as IntMod>::ZERO
+    }
 
-        fn square(&self) -> Self {
-            todo!()
-            // IntMod::square(self)
+    fn one() -> Self {
+        <Self as IntMod>::ONE
+    }
+
+    fn invert(&self) -> Option<Self> {
+        Some(<Fp as IntMod>::ONE.div_unsafe(self))
+    }
+}
+
+impl FieldExtension for Fp2 {
+    type BaseField = Fp;
+    type Coeffs = [Fp; 2];
+    type SelfRef<'a> = &'a Self;
+
+    fn from_coeffs(coeffs: Self::Coeffs) -> Self {
+        Self {
+            c0: coeffs[0].clone(),
+            c1: coeffs[1].clone(),
         }
+    }
 
-        fn invert(&self) -> Option<Self> {
-            todo!()
-            // Some(<Fp as IntMod>::ONE.div_unsafe(self))
+    fn to_coeffs(self) -> Self::Coeffs {
+        [self.c0, self.c1]
+    }
+
+    fn embed(base_elem: Self::BaseField) -> Self {
+        Self {
+            c0: base_elem,
+            c1: <Self::BaseField as Field>::zero(),
+        }
+    }
+
+    fn conjugate(&self) -> Self {
+        Self {
+            c0: self.c0.clone(),
+            c1: -self.c1.clone(),
+        }
+    }
+
+    fn frobenius_map(&self, power: Option<usize>) -> Self {
+        todo!()
+    }
+
+    fn mul_base(&self, rhs: Self::BaseField) -> Self {
+        Self {
+            c0: &self.c0 * &rhs,
+            c1: &self.c1 * &rhs,
         }
     }
 }
-pub use field_impl::*;
 
-// impl FieldExtension for Bn254Fp2 {
-//     type BaseField = Bn254Fp;
-//     type Coeffs = [Bn254Fp; 2];
-//     type SelfRef<'a> = &'a Self;
+impl FieldExtension for Fp12 {
+    type BaseField = Fp2;
+    type Coeffs = [Fp2; 6];
+    type SelfRef<'a> = &'a Self;
 
-//     fn from_coeffs(coeffs: Self::Coeffs) -> Self {
-//         Self {
-//             c0: coeffs[0].clone(),
-//             c1: coeffs[1].clone(),
-//         }
-//     }
+    fn from_coeffs(coeffs: Self::Coeffs) -> Self {
+        Self {
+            c0: coeffs[0].clone(),
+            c1: coeffs[1].clone(),
+            c2: coeffs[2].clone(),
+            c3: coeffs[3].clone(),
+            c4: coeffs[4].clone(),
+            c5: coeffs[5].clone(),
+        }
+    }
 
-//     fn to_coeffs(self) -> Self::Coeffs {
-//         [self.c0, self.c1]
-//     }
+    fn to_coeffs(self) -> Self::Coeffs {
+        [self.c0, self.c1, self.c2, self.c3, self.c4, self.c5]
+    }
 
-//     fn embed(base_elem: Self::BaseField) -> Self {
-//         Self {
-//             c0: base_elem,
-//             c1: <Self::BaseField as Field>::ZERO,
-//         }
-//     }
+    fn embed(base_elem: Self::BaseField) -> Self {
+        Self {
+            c0: base_elem,
+            c1: <Self::BaseField as Field>::zero(),
+        }
+    }
 
-//     fn conjugate(&self) -> Self {
-//         Self {
-//             c0: self.c0.clone(),
-//             c1: -self.c1.clone(),
-//         }
-//     }
+    fn conjugate(&self) -> Self {
+        Self {
+            c0: self.c0.clone(),
+            c1: -self.c1.clone(),
+        }
+    }
 
-//     fn frobenius_map(&self, power: Option<usize>) -> Self {
-//         todo!()
-//     }
+    fn frobenius_map(&self, power: Option<usize>) -> Self {
+        todo!()
+    }
 
-//     fn mul_base(&self, rhs: Self::BaseField) -> Self {
-//         Self {
-//             c0: &self.c0 * &rhs,
-//             c1: &self.c1 * &rhs,
-//         }
-//     }
-// }
+    fn mul_base(&self, rhs: Self::BaseField) -> Self {
+        Self {
+            c0: &self.c0 * &rhs,
+            c1: &self.c1 * &rhs,
+        }
+    }
+}
