@@ -1,5 +1,12 @@
 use core::ops::{Add, Mul, Neg, Sub};
 
+#[cfg(target_os = "zkvm")]
+use {
+    axvm_platform::constants::{Custom1Funct3, PairingBaseFunct7, SwBaseFunct7, CUSTOM_1},
+    axvm_platform::custom_insn_r,
+    core::mem::MaybeUninit,
+};
+
 use super::UnevaluatedLine;
 use crate::{
     field::{Field, FieldExtension},
@@ -52,7 +59,19 @@ where
         }
         #[cfg(target_os = "zkvm")]
         {
-            todo!()
+            let mut uninit: MaybeUninit<(
+                AffinePoint<Self::Fp2>,
+                UnevaluatedLine<Self::Fp, Self::Fp2>,
+            )> = MaybeUninit::uninit();
+            custom_insn_r!(
+                CUSTOM_1,
+                Custom1Funct3::Pairing as usize,
+                PairingBaseFunct7::MillerDoubleStep as usize,
+                uninit.as_mut_ptr(),
+                &s as *const AffinePoint<Self::Fp2>,
+                "x0"
+            );
+            unsafe { uninit.assume_init() }
         }
     }
 
@@ -136,7 +155,20 @@ where
         }
         #[cfg(target_os = "zkvm")]
         {
-            todo!()
+            let mut uninit: MaybeUninit<(
+                AffinePoint<Self::Fp2>,
+                UnevaluatedLine<Self::Fp, Self::Fp2>,
+                UnevaluatedLine<Self::Fp, Self::Fp2>,
+            )> = MaybeUninit::uninit();
+            custom_insn_r!(
+                CUSTOM_1,
+                Custom1Funct3::Pairing as usize,
+                PairingBaseFunct7::MillerDoubleAndAddStep as usize,
+                uninit.as_mut_ptr(),
+                &s as *const AffinePoint<Self::Fp2>,
+                &q as *const AffinePoint<Self::Fp2>
+            );
+            unsafe { uninit.assume_init() }
         }
     }
 }

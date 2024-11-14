@@ -7,36 +7,9 @@ use axvm_ecc::{
     point::AffinePoint,
 };
 
-use super::{Bls12_381, BLS12381_XI};
+use super::Bls12_381;
 
-impl LineMulMType<Fq, Fq2, Fq12> for Bls12_381 {
-    fn mul_023_by_023(line_0: EvaluatedLine<Fq, Fq2>, line_1: EvaluatedLine<Fq, Fq2>) -> [Fq2; 5] {
-        let b0 = line_0.b;
-        let c0 = line_0.c;
-        let b1 = line_1.b;
-        let c1 = line_1.c;
-
-        // where w⁶ = xi
-        // l0 * l1 = c0c1 + (c0b1 + c1b0)w² + (c0 + c1)w³ + (b0b1)w⁴ + (b0 +b1)w⁵ + w⁶
-        //         = (c0c1 + xi) + (c0b1 + c1b0)w² + (c0 + c1)w³ + (b0b1)w⁴ + (b0 + b1)w⁵
-        let x0 = c0 * c1 + *BLS12381_XI;
-        let x2 = c0 * b1 + c1 * b0;
-        let x3 = c0 + c1;
-        let x4 = b0 * b1;
-        let x5 = b0 + b1;
-
-        [x0, x2, x3, x4, x5]
-    }
-
-    fn mul_by_023(f: Fq12, l: EvaluatedLine<Fq, Fq2>) -> Fq12 {
-        Self::mul_by_02345(f, [l.c, l.b, Fq2::one(), Fq2::zero(), Fq2::zero()])
-    }
-
-    fn mul_by_02345(f: Fq12, x: [Fq2; 5]) -> Fq12 {
-        let x_fp12 = Fq12::from_coeffs([x[0], Fq2::zero(), x[1], x[2], x[3], x[4]]);
-        f * x_fp12
-    }
-}
+impl LineMulMType<Fq, Fq2, Fq12> for Bls12_381 {}
 
 /// Returns a line function for a tangent line at the point P
 #[allow(non_snake_case)]

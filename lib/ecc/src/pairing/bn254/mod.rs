@@ -6,13 +6,8 @@ use axvm::{
 use crate::field::{Complex, Field, FieldExtension, SexticExtField, Xi};
 
 mod line;
-pub use line::*;
 
 pub struct Bn254;
-
-// impl Bn254 {
-//     pub const XI: Fp2 = Fp2::new(Fp::from_const_u8(9), Fp::from_const_u8(1));
-// }
 
 moduli_setup! {
     Fp = "21888242871839275222246405745257275088696311157297823662689037894645226208583";
@@ -23,12 +18,6 @@ type Fp12 = SexticExtField<Fp2>;
 impl Xi for Fp2 {
     const XI: Self = Self::new(Fp::from_const_u8(9), Fp::from_const_u8(1));
 }
-
-// mod field_impl {
-//     use axvm::intrinsics::IntMod;
-
-//     use super::Fp;
-//     use crate::field::Field;
 
 impl Field for Fp {
     type SelfRef<'a> = &'a Self;
