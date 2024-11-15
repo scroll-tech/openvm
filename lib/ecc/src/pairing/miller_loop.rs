@@ -5,7 +5,7 @@ use itertools::{izip, Itertools};
 
 use super::{EvaluatedLine, MillerStep};
 use crate::{
-    field::{Field, FieldExtension},
+    field::{Field, FieldExtension, Fp12Mul, Xi},
     point::AffinePoint,
 };
 
@@ -21,7 +21,7 @@ where
     for<'a> &'a Self::Fp2: Neg<Output = Self::Fp2>,
     for<'a> &'a Self::Fp12: Mul<&'a Self::Fp12, Output = Self::Fp12>,
 {
-    type Fp12: FieldExtension<BaseField = Self::Fp2>;
+    type Fp12: FieldExtension<BaseField = Self::Fp2> + Fp12Mul;
 
     const SEED_ABS: u64;
     const PSEUDO_BINARY_ENCODING: &[i8];
@@ -129,7 +129,7 @@ where
         }
 
         for i in (0..PSEUDO_BINARY_ENCODING.len() - 2).rev() {
-            f = &f * &f;
+            f = f.fp12_mul_refs(&f, &<<Self as MultiMillerLoop>::Fp12 as Fp12Mul>::Fp2::XI);
 
             let mut lines = Vec::<EvaluatedLine<Self::Fp, Self::Fp2>>::new();
 

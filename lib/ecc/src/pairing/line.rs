@@ -255,7 +255,8 @@ where
     fn mul_by_013(f: Fp12, l: EvaluatedLine<Fp, Fp2>) -> Fp12 {
         #[cfg(not(target_os = "zkvm"))]
         {
-            Self::mul_by_01234(f, [Fp2::one(), l.b, Fp2::zero(), l.c, Fp2::zero()])
+            let x = [Fp2::one(), l.b, Fp2::zero(), l.c, Fp2::zero()];
+            Self::mul_by_01234(f, x)
         }
         #[cfg(target_os = "zkvm")]
         {

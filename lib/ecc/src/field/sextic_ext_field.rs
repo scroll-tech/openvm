@@ -3,7 +3,16 @@ use core::{
     ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign},
 };
 
-use super::Field;
+use super::{Field, FieldExtension, Xi};
+
+pub trait Fp12Mul {
+    type Fp: Field;
+    type Fp2: FieldExtension<BaseField = Self::Fp> + Xi;
+
+    fn fp12_mul(&mut self, other: &Self, xi: &Self::Fp2);
+
+    fn fp12_mul_refs(&self, other: &Self, xi: &Self::Fp2) -> Self;
+}
 
 /// Sextic extension field of `F` with irreducible polynomial `X^6 + \xi`.
 /// Elements are represented as `c0 + c1 * w` where `w^6 = \xi`, where \xi depends on the twist of the curve.
@@ -24,49 +33,37 @@ impl<F: Field> SexticExtField<F> {
 
 impl<F: Field> SexticExtField<F> {
     /// Implementation of AddAssign
-    fn add_assign_impl(&mut self, other: &Self) {
-        todo!()
+    fn add_assign_impl(&mut self, _other: &Self) {
+        unimplemented!()
     }
 
     /// Implementation of SubAssign.
     #[inline(always)]
-    fn sub_assign_impl(&mut self, other: &Self) {
-        todo!()
+    fn sub_assign_impl(&mut self, _other: &Self) {
+        unimplemented!()
     }
 
     /// Implementation of MulAssign.
     #[inline(always)]
     fn mul_assign_impl(&mut self, other: &Self) {
-        todo!()
-    }
-
-    /// Implementation of DivAssignUnsafe.
-    #[inline(always)]
-    fn div_assign_unsafe_impl(&mut self, other: &Self) {
-        todo!()
+        unimplemented!()
     }
 
     /// Implementation of Add that doesn't cause zkvm to use an additional store.
-    fn add_refs_impl(&self, other: &Self) -> Self {
-        todo!()
+    fn add_refs_impl(&self, _other: &Self) -> Self {
+        unimplemented!()
     }
 
     /// Implementation of Sub that doesn't cause zkvm to use an additional store.
     #[inline(always)]
-    fn sub_refs_impl(&self, other: &Self) -> Self {
-        todo!()
+    fn sub_refs_impl(&self, _other: &Self) -> Self {
+        unimplemented!()
     }
 
     /// Implementation of Mul that doesn't cause zkvm to use an additional store.
     #[inline(always)]
     fn mul_refs_impl(&self, other: &Self) -> Self {
-        todo!()
-    }
-
-    /// Implementation of DivUnsafe that doesn't cause zkvm to use an additional store.
-    #[inline(always)]
-    fn div_unsafe_refs_impl(&self, other: &Self) -> Self {
-        todo!()
+        unimplemented!()
     }
 }
 

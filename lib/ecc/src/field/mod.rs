@@ -26,6 +26,7 @@ pub trait Field:
     + for<'a> Add<&'a Self, Output = Self>
     + for<'a> Sub<&'a Self, Output = Self>
     + for<'a> Mul<&'a Self, Output = Self>
+    + for<'a, 'b> Mul<&'b Self, Output = Self>
     + AddAssign
     + SubAssign
     + MulAssign
@@ -36,6 +37,7 @@ pub trait Field:
     type SelfRef<'a>: Add<&'a Self, Output = Self>
         + Sub<&'a Self, Output = Self>
         + Mul<&'a Self, Output = Self>
+        + for<'b> Mul<&'b Self, Output = Self>
     where
         Self: 'a;
 

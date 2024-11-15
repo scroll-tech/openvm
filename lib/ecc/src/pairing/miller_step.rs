@@ -1,4 +1,4 @@
-use core::ops::{Add, Mul, Neg, Sub};
+use core::ops::{Add, Mul, Sub};
 
 #[cfg(target_os = "zkvm")]
 use {
@@ -9,7 +9,7 @@ use {
 
 use super::UnevaluatedLine;
 use crate::{
-    field::{Field, FieldExtension},
+    field::{Field, FieldExtension, Xi},
     point::AffinePoint,
 };
 
@@ -21,7 +21,7 @@ where
     for<'a> &'a Self::Fp2: Mul<&'a Self::Fp2, Output = Self::Fp2>,
 {
     type Fp: Field;
-    type Fp2: FieldExtension<BaseField = Self::Fp>;
+    type Fp2: FieldExtension<BaseField = Self::Fp> + Xi;
 
     /// Miller double step
     #[allow(clippy::type_complexity)]
