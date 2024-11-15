@@ -1,7 +1,7 @@
 pub use halo2curves_axiom::bn256::{Fq, Fq12, Fq2, Fq6};
 
 use crate::{
-    field::{ExpBigInt, Field, FieldExtension, Fp12Mul},
+    field::{ExpBigInt, FieldExtension, Fp12Mul},
     pairing::{EvaluatedLine, LineDType},
 };
 

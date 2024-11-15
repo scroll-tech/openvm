@@ -11,10 +11,10 @@ impl FieldExtension for Bn254Fp12 {
     fn from_coeffs(coeffs: Self::Coeffs) -> Self {
         Self::new([
             coeffs[0].clone(),
-            coeffs[1].clone(),
             coeffs[2].clone(),
-            coeffs[3].clone(),
             coeffs[4].clone(),
+            coeffs[1].clone(),
+            coeffs[3].clone(),
             coeffs[5].clone(),
         ])
     }
@@ -85,14 +85,14 @@ impl Fp12Mul for Bn254Fp12 {
             //   where cs*: self.c*, co*: other.c*
 
             let (s0, s1, s2, s3, s4, s5) = (
-                &self.c[0], &self.c[1], &self.c[2], &self.c[3], &self.c[4], &self.c[5],
+                &self.c[0], &self.c[2], &self.c[4], &self.c[1], &self.c[3], &self.c[5],
             );
             let (o0, o1, o2, o3, o4, o5) = (
                 &other.c[0],
-                &other.c[1],
                 &other.c[2],
-                &other.c[3],
                 &other.c[4],
+                &other.c[1],
+                &other.c[3],
                 &other.c[5],
             );
             *self = Self::new([

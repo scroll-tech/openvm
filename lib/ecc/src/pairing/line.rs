@@ -157,10 +157,10 @@ where
 
             let self_coeffs = f.to_coeffs();
             let s0 = &self_coeffs[0];
-            let s1 = &self_coeffs[1];
-            let s2 = &self_coeffs[2];
-            let s3 = &self_coeffs[3];
-            let s4 = &self_coeffs[4];
+            let s1 = &self_coeffs[2];
+            let s2 = &self_coeffs[4];
+            let s3 = &self_coeffs[1];
+            let s4 = &self_coeffs[3];
             let s5 = &self_coeffs[5];
 
             // NOTE[yj]: Hand-calculated multiplication for Fp12 * 02345 ∈ Fp2; this is likely not the most efficient implementation
@@ -178,7 +178,7 @@ where
             let c4 = s0 * o4 + s3 * o1 + s4 * o0 + xi * &(s2 * o5 + s5 * o2);
             let c5 = s0 * o5 + s1 * o4 + s3 * o2 + s4 * o1 + s5 * o0;
 
-            Fp12::from_coeffs([c0, c1, c2, c3, c4, c5])
+            Fp12::from_coeffs([c0, c3, c1, c4, c2, c5])
         }
         #[cfg(target_os = "zkvm")]
         {
@@ -300,10 +300,10 @@ where
 
             let self_coeffs = f.to_coeffs();
             let s0 = &self_coeffs[0];
-            let s1 = &self_coeffs[1];
-            let s2 = &self_coeffs[2];
-            let s3 = &self_coeffs[3];
-            let s4 = &self_coeffs[4];
+            let s1 = &self_coeffs[2];
+            let s2 = &self_coeffs[4];
+            let s3 = &self_coeffs[1];
+            let s4 = &self_coeffs[3];
             let s5 = &self_coeffs[5];
 
             // NOTE[yj]: Hand-calculated multiplication for Fp12 * 01234 ∈ Fp2; this is likely not the most efficient implementation
@@ -320,7 +320,7 @@ where
             let c4 = s0 * o4 + s1 * o3 + s3 * o1 + s4 * o0 + xi * &(s5 * o2);
             let c5 = s1 * o4 + s2 * o3 + s3 * o2 + s4 * o1 + s5 * o0;
 
-            Fp12::from_coeffs([c0, c1, c2, c3, c4, c5])
+            Fp12::from_coeffs([c0, c3, c1, c4, c2, c5])
         }
         #[cfg(target_os = "zkvm")]
         {
