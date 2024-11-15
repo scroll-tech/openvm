@@ -1,3 +1,10 @@
+#[cfg(target_os = "zkvm")]
+use {
+    axvm_platform::constants::{Custom1Funct3, PairingBaseFunct7, CUSTOM_1},
+    axvm_platform::custom_insn_r,
+    core::mem::MaybeUninit,
+};
+
 use super::{Bls12381Fp, Bls12381Fp2};
 use crate::field::{Field, FieldExtension, Fp12Mul, SexticExtField};
 
