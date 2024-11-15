@@ -11,10 +11,10 @@ impl FieldExtension for Bls12381Fp12 {
     fn from_coeffs(coeffs: Self::Coeffs) -> Self {
         Self::new([
             coeffs[0].clone(),
-            coeffs[1].clone(),
             coeffs[2].clone(),
-            coeffs[3].clone(),
             coeffs[4].clone(),
+            coeffs[1].clone(),
+            coeffs[3].clone(),
             coeffs[5].clone(),
         ])
     }

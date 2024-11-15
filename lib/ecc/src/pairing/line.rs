@@ -24,10 +24,28 @@ where
     Fp: Field,
     Fp2: FieldExtension<BaseField = Fp>,
 {
-    pub fn evaluate(&self, (x_over_y, y_inv): &(Fp, Fp)) -> EvaluatedLine<Fp, Fp2> {
-        EvaluatedLine {
-            b: self.b.mul_base(x_over_y.clone()),
-            c: self.c.mul_base(y_inv.clone()),
+    pub fn evaluate(&self, xy: &(Fp, Fp)) -> EvaluatedLine<Fp, Fp2> {
+        #[cfg(not(target_os = "zkvm"))]
+        {
+            let x_over_y = &xy.0;
+            let y_inv = &xy.1;
+            EvaluatedLine {
+                b: self.b.mul_base(x_over_y.clone()),
+                c: self.c.mul_base(y_inv.clone()),
+            }
+        }
+        #[cfg(target_os = "zkvm")]
+        {
+            let mut uninit: MaybeUninit<EvaluatedLine<Fp, Fp2>> = MaybeUninit::uninit();
+            custom_insn_r!(
+                CUSTOM_1,
+                Custom1Funct3::Pairing as usize,
+                PairingBaseFunct7::EvaluateLine as usize,
+                uninit.as_mut_ptr(),
+                self as *const UnevaluatedLine<Fp, Fp2>,
+                xy as *const (Fp, Fp)
+            );
+            unsafe { uninit.assume_init() }
         }
     }
 }
@@ -255,8 +273,7 @@ where
     fn mul_by_013(f: Fp12, l: EvaluatedLine<Fp, Fp2>) -> Fp12 {
         #[cfg(not(target_os = "zkvm"))]
         {
-            let x = [Fp2::one(), l.b, Fp2::zero(), l.c, Fp2::zero()];
-            Self::mul_by_01234(f, x)
+            Self::mul_by_01234(f, [Fp2::one(), l.b, Fp2::zero(), l.c, Fp2::zero()])
         }
         #[cfg(target_os = "zkvm")]
         {

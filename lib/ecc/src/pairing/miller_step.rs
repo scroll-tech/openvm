@@ -2,7 +2,7 @@ use core::ops::{Add, Mul, Sub};
 
 #[cfg(target_os = "zkvm")]
 use {
-    axvm_platform::constants::{Custom1Funct3, PairingBaseFunct7, SwBaseFunct7, CUSTOM_1},
+    axvm_platform::constants::{Custom1Funct3, PairingBaseFunct7, CUSTOM_1},
     axvm_platform::custom_insn_r,
     core::mem::MaybeUninit,
 };

@@ -49,6 +49,12 @@ fn test_mul_by_01234(io: &[u8]) {
         i += 64;
     }
     assert_eq!(r_bytes, expected);
+    // assert_eq!(r_bytes[0..64], expected[0..64]);
+    // assert_eq!(r_bytes[64..128], expected[64..128]);
+    // assert_eq!(r_bytes[128..192], expected[128..192]);
+    // assert_eq!(r_bytes[192..256], expected[192..256]);
+    // assert_eq!(r_bytes[256..320], expected[256..320]);
+    // assert_eq!(r_bytes[320..384], expected[320..384]);
 }
 
 pub fn main() {

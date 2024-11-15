@@ -45,7 +45,7 @@ impl<F: Field> SexticExtField<F> {
 
     /// Implementation of MulAssign.
     #[inline(always)]
-    fn mul_assign_impl(&mut self, other: &Self) {
+    fn mul_assign_impl(&mut self, _other: &Self) {
         unimplemented!()
     }
 
@@ -62,7 +62,7 @@ impl<F: Field> SexticExtField<F> {
 
     /// Implementation of Mul that doesn't cause zkvm to use an additional store.
     #[inline(always)]
-    fn mul_refs_impl(&self, other: &Self) -> Self {
+    fn mul_refs_impl(&self, _other: &Self) -> Self {
         unimplemented!()
     }
 }

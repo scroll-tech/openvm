@@ -9,7 +9,7 @@ pub use fp2::*;
 mod fp12;
 pub use fp12::*;
 
-use super::{LineMulDType, MillerStep, MultiMillerLoop};
+use super::{LineMulDType, MillerStep};
 
 pub struct Bn254Intrinsic;
 

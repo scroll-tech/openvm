@@ -1,3 +1,10 @@
+#[cfg(target_os = "zkvm")]
+use {
+    axvm_platform::constants::{Custom1Funct3, PairingBaseFunct7, CUSTOM_1},
+    axvm_platform::custom_insn_r,
+    core::mem::MaybeUninit,
+};
+
 use super::{Bn254Fp, Bn254Fp2};
 use crate::field::{Field, FieldExtension, Fp12Mul, SexticExtField};
 
@@ -109,8 +116,7 @@ impl Fp12Mul for Bn254Fp12 {
             custom_insn_r!(
                 CUSTOM_1,
                 Custom1Funct3::Pairing as usize,
-                PairingBaseFunct7::Fp12Mul as usize
-                    + F::MOD_IDX * (COMPLEX_EXT_FIELD_MAX_KINDS as usize),
+                PairingBaseFunct7::Fp12Mul as usize,
                 self as *mut Self,
                 self as *const Self,
                 other as *const Self
@@ -131,9 +137,8 @@ impl Fp12Mul for Bn254Fp12 {
             custom_insn_r!(
                 CUSTOM_1,
                 Custom1Funct3::Pairing as usize,
-                PairingBaseFunct7::Fp12Mul as usize
-                    + F::MOD_IDX * (COMPLEX_EXT_FIELD_MAX_KINDS as usize),
-                self as *mut Self,
+                PairingBaseFunct7::Fp12Mul as usize,
+                uninit.as_mut_ptr(),
                 self as *const Self,
                 other as *const Self
             );
