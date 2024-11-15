@@ -2,7 +2,7 @@ pub use halo2curves_axiom::bls12_381::{Fq, Fq12, Fq2, Fq6};
 
 // use super::{Fq, Fq12, Fq2, Fq6};
 use crate::{
-    field::{ExpBigInt, FieldExtension, Fp12Mul},
+    field::{ExpBigInt, FieldExtension, Fp12Mul, Xi},
     pairing::{EvaluatedLine, LineMType},
 };
 
@@ -87,12 +87,13 @@ impl ExpBigInt<Fq12> for Fq12 {}
 impl Fp12Mul for Fq12 {
     type Fp = Fq;
     type Fp2 = Fq2;
+    const XI: Self::Fp2 = Fq2::XI;
 
-    fn fp12_mul(&mut self, other: &Self, _xi: &Self::Fp2) {
+    fn fp12_mul(&mut self, other: &Self) {
         *self *= other;
     }
 
-    fn fp12_mul_refs(&self, other: &Self, _xi: &Self::Fp2) -> Self {
+    fn fp12_mul_refs(&self, other: &Self) -> Self {
         self * other
     }
 }

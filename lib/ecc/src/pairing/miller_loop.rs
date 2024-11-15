@@ -129,7 +129,7 @@ where
         }
 
         for i in (0..PSEUDO_BINARY_ENCODING.len() - 2).rev() {
-            f = f.fp12_mul_refs(&f, &<<Self as MultiMillerLoop>::Fp12 as Fp12Mul>::Fp2::XI);
+            f = f.fp12_mul_refs(&f);
 
             let mut lines = Vec::<EvaluatedLine<Self::Fp, Self::Fp2>>::new();
 

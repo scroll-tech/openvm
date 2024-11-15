@@ -6,7 +6,7 @@ use {
 };
 
 use super::{Bls12381Fp, Bls12381Fp2};
-use crate::field::{Field, FieldExtension, Fp12Mul, SexticExtField};
+use crate::field::{Field, FieldExtension, Fp12Mul, SexticExtField, Xi};
 
 pub type Bls12381Fp12 = SexticExtField<Bls12381Fp2>;
 
@@ -78,9 +78,10 @@ impl FieldExtension for Bls12381Fp12 {
 impl Fp12Mul for Bls12381Fp12 {
     type Fp = Bls12381Fp;
     type Fp2 = Bls12381Fp2;
+    const XI: Self::Fp2 = Bls12381Fp2::XI;
 
     #[inline(always)]
-    fn fp12_mul(&mut self, other: &Self, xi: &Self::Fp2) {
+    fn fp12_mul(&mut self, other: &Self) {
         #[cfg(not(target_os = "zkvm"))]
         {
             // The following multiplication is hand-derived for Fp12 * Fp12:
@@ -104,11 +105,11 @@ impl Fp12Mul for Bls12381Fp12 {
                 &other.c[5],
             );
 
-            let c0 = s0 * o0 + xi * &(s1 * o2 + s2 * o1 + s3 * o5 + s4 * o4 + s5 * o3);
-            let c1 = s0 * o1 + s1 * o0 + s3 * o3 + xi * &(s2 * o2 + s4 * o5 + s5 * o4);
-            let c2 = s0 * o2 + s1 * o1 + s2 * o0 + s3 * o4 + s4 * o3 + xi * &(s5 * o5);
-            let c3 = s0 * o3 + s3 * o0 + xi * &(s1 * o5 + s2 * o4 + s4 * o2 + s5 * o1);
-            let c4 = s0 * o4 + s1 * o3 + s3 * o1 + s4 * o0 + xi * &(s2 * o5 + s5 * o2);
+            let c0 = s0 * o0 + Self::XI * &(s1 * o2 + s2 * o1 + s3 * o5 + s4 * o4 + s5 * o3);
+            let c1 = s0 * o1 + s1 * o0 + s3 * o3 + Self::XI * &(s2 * o2 + s4 * o5 + s5 * o4);
+            let c2 = s0 * o2 + s1 * o1 + s2 * o0 + s3 * o4 + s4 * o3 + Self::XI * &(s5 * o5);
+            let c3 = s0 * o3 + s3 * o0 + Self::XI * &(s1 * o5 + s2 * o4 + s4 * o2 + s5 * o1);
+            let c4 = s0 * o4 + s1 * o3 + s3 * o1 + s4 * o0 + Self::XI * &(s2 * o5 + s5 * o2);
             let c5 = s0 * o5 + s1 * o4 + s2 * o3 + s3 * o2 + s4 * o1 + s5 * o0;
 
             *self = Self::new([c0, c3, c1, c4, c2, c5]);
@@ -127,11 +128,11 @@ impl Fp12Mul for Bls12381Fp12 {
     }
 
     #[inline(always)]
-    fn fp12_mul_refs(&self, other: &Self, xi: &Self::Fp2) -> Self {
+    fn fp12_mul_refs(&self, other: &Self) -> Self {
         #[cfg(not(target_os = "zkvm"))]
         {
             let mut res = self.clone();
-            res.fp12_mul(other, xi);
+            res.fp12_mul(other);
             res
         }
         #[cfg(target_os = "zkvm")]

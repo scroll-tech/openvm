@@ -8,10 +8,11 @@ use super::{Field, FieldExtension, Xi};
 pub trait Fp12Mul {
     type Fp: Field;
     type Fp2: FieldExtension<BaseField = Self::Fp> + Xi;
+    const XI: Self::Fp2;
 
-    fn fp12_mul(&mut self, other: &Self, xi: &Self::Fp2);
+    fn fp12_mul(&mut self, other: &Self);
 
-    fn fp12_mul_refs(&self, other: &Self, xi: &Self::Fp2) -> Self;
+    fn fp12_mul_refs(&self, other: &Self) -> Self;
 }
 
 /// Sextic extension field of `F` with irreducible polynomial `X^6 + \xi`.
