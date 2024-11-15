@@ -79,6 +79,7 @@ impl Fp12Mul for Bn254Fp12 {
     type Fp = Bn254Fp;
     type Fp2 = Bn254Fp2;
 
+    #[inline(always)]
     fn fp12_mul(&mut self, other: &Self, xi: &Self::Fp2) {
         #[cfg(not(target_os = "zkvm"))]
         {
@@ -125,6 +126,7 @@ impl Fp12Mul for Bn254Fp12 {
         }
     }
 
+    #[inline(always)]
     fn fp12_mul_refs(&self, other: &Self, xi: &Self::Fp2) -> Self {
         #[cfg(not(target_os = "zkvm"))]
         {

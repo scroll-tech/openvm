@@ -25,6 +25,7 @@ where
 
     /// Miller double step
     #[allow(clippy::type_complexity)]
+    #[inline(always)]
     fn miller_double_step(
         s: AffinePoint<Self::Fp2>,
     ) -> (AffinePoint<Self::Fp2>, UnevaluatedLine<Self::Fp, Self::Fp2>) {
@@ -105,6 +106,7 @@ where
 
     /// Miller double and add step (2S + Q implemented as S + Q + S for efficiency)
     #[allow(clippy::type_complexity)]
+    #[inline(always)]
     fn miller_double_and_add_step(
         s: AffinePoint<Self::Fp2>,
         q: AffinePoint<Self::Fp2>,

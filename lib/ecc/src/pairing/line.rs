@@ -24,6 +24,8 @@ where
     Fp: Field,
     Fp2: FieldExtension<BaseField = Fp>,
 {
+    /// Evaluates a line function by multiplying the coefficient b by x/y and c by 1/y
+    #[inline(always)]
     pub fn evaluate(&self, xy: &(Fp, Fp)) -> EvaluatedLine<Fp, Fp2> {
         #[cfg(not(target_os = "zkvm"))]
         {
@@ -93,6 +95,7 @@ where
     for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
 {
     /// Multiplies two lines in 023-form to get an element in 02345-form
+    #[inline(always)]
     fn mul_023_by_023(l0: EvaluatedLine<Fp, Fp2>, l1: EvaluatedLine<Fp, Fp2>) -> [Fp2; 5] {
         #[cfg(not(target_os = "zkvm"))]
         {
@@ -128,6 +131,7 @@ where
     }
 
     /// Multiplies a line in 02345-form with a Fp12 element to get an Fp12 element
+    #[inline(always)]
     fn mul_by_023(f: Fp12, l: EvaluatedLine<Fp, Fp2>) -> Fp12 {
         #[cfg(not(target_os = "zkvm"))]
         {
@@ -149,6 +153,7 @@ where
     }
 
     /// Multiplies a line in 02345-form with a Fp12 element to get an Fp12 element
+    #[inline(always)]
     fn mul_by_02345(f: Fp12, x: [Fp2; 5]) -> Fp12 {
         #[cfg(not(target_os = "zkvm"))]
         {
@@ -235,6 +240,7 @@ where
     for<'a> &'a Fp2: Mul<&'a Fp2, Output = Fp2>,
 {
     /// Multiplies two lines in 013-form to get an element in 01234-form
+    #[inline(always)]
     fn mul_013_by_013(l0: EvaluatedLine<Fp, Fp2>, l1: EvaluatedLine<Fp, Fp2>) -> [Fp2; 5] {
         #[cfg(not(target_os = "zkvm"))]
         {
@@ -270,6 +276,7 @@ where
     }
 
     /// Multiplies a line in 013-form with a Fp12 element to get an Fp12 element
+    #[inline(always)]
     fn mul_by_013(f: Fp12, l: EvaluatedLine<Fp, Fp2>) -> Fp12 {
         #[cfg(not(target_os = "zkvm"))]
         {
@@ -291,6 +298,7 @@ where
     }
 
     /// Multiplies a line in 01234-form with a Fp12 element to get an Fp12 element
+    #[inline(always)]
     fn mul_by_01234(f: Fp12, x: [Fp2; 5]) -> Fp12 {
         #[cfg(not(target_os = "zkvm"))]
         {

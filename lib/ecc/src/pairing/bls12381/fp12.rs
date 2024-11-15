@@ -1,5 +1,5 @@
-use super::Bls12381Fp2;
-use crate::field::{Field, FieldExtension, SexticExtField};
+use super::{Bls12381Fp, Bls12381Fp2};
+use crate::field::{Field, FieldExtension, Fp12Mul, SexticExtField};
 
 pub type Bls12381Fp12 = SexticExtField<Bls12381Fp2>;
 
@@ -65,5 +65,80 @@ impl FieldExtension for Bls12381Fp12 {
             &self.c[4] * &rhs,
             &self.c[5] * &rhs,
         ])
+    }
+}
+
+impl Fp12Mul for Bls12381Fp12 {
+    type Fp = Bls12381Fp;
+    type Fp2 = Bls12381Fp2;
+
+    #[inline(always)]
+    fn fp12_mul(&mut self, other: &Self, xi: &Self::Fp2) {
+        #[cfg(not(target_os = "zkvm"))]
+        {
+            // The following multiplication is hand-derived for Fp12 * Fp12:
+            // c0 = cs0co0 + xi(cs1co2 + cs2co1 + cs3co5 + cs4co4 + cs5co3)
+            // c1 = cs0co1 + cs1co0 + cs3co3 + xi(cs2co2 + cs4co5 + cs5co4)
+            // c2 = cs0co2 + cs1co1 + cs2co0 + cs3co4 + cs4co3 + xi(cs5co5)
+            // c3 = cs0co3 + cs3co0 + xi(cs1co5 + cs2co4 + cs4co2 + cs5co1)
+            // c4 = cs0co4 + cs1co3 + cs3co1 + cs4co0 + xi(cs2co5 + cs5co2)
+            // c5 = cs0co5 + cs1co4 + cs2co3 + cs3co2 + cs4co1 + cs5co0
+            //   where cs*: self.c*, co*: other.c*
+
+            let (s0, s1, s2, s3, s4, s5) = (
+                &self.c[0], &self.c[2], &self.c[4], &self.c[1], &self.c[3], &self.c[5],
+            );
+            let (o0, o1, o2, o3, o4, o5) = (
+                &other.c[0],
+                &other.c[2],
+                &other.c[4],
+                &other.c[1],
+                &other.c[3],
+                &other.c[5],
+            );
+
+            let c0 = s0 * o0 + xi * &(s1 * o2 + s2 * o1 + s3 * o5 + s4 * o4 + s5 * o3);
+            let c1 = s0 * o1 + s1 * o0 + s3 * o3 + xi * &(s2 * o2 + s4 * o5 + s5 * o4);
+            let c2 = s0 * o2 + s1 * o1 + s2 * o0 + s3 * o4 + s4 * o3 + xi * &(s5 * o5);
+            let c3 = s0 * o3 + s3 * o0 + xi * &(s1 * o5 + s2 * o4 + s4 * o2 + s5 * o1);
+            let c4 = s0 * o4 + s1 * o3 + s3 * o1 + s4 * o0 + xi * &(s2 * o5 + s5 * o2);
+            let c5 = s0 * o5 + s1 * o4 + s2 * o3 + s3 * o2 + s4 * o1 + s5 * o0;
+
+            *self = Self::new([c0, c3, c1, c4, c2, c5]);
+        }
+        #[cfg(target_os = "zkvm")]
+        {
+            custom_insn_r!(
+                CUSTOM_1,
+                Custom1Funct3::Pairing as usize,
+                PairingBaseFunct7::Fp12Mul as usize,
+                self as *mut Self,
+                self as *const Self,
+                other as *const Self
+            )
+        }
+    }
+
+    #[inline(always)]
+    fn fp12_mul_refs(&self, other: &Self, xi: &Self::Fp2) -> Self {
+        #[cfg(not(target_os = "zkvm"))]
+        {
+            let mut res = self.clone();
+            res.fp12_mul(other, xi);
+            res
+        }
+        #[cfg(target_os = "zkvm")]
+        {
+            let mut uninit: MaybeUninit<Self> = MaybeUninit::uninit();
+            custom_insn_r!(
+                CUSTOM_1,
+                Custom1Funct3::Pairing as usize,
+                PairingBaseFunct7::Fp12Mul as usize,
+                uninit.as_mut_ptr(),
+                self as *const Self,
+                other as *const Self
+            );
+            unsafe { uninit.assume_init() }
+        }
     }
 }
