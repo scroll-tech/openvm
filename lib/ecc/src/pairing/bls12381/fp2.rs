@@ -39,8 +39,11 @@ impl FieldExtension for Bls12381Fp2 {
         }
     }
 
-    fn frobenius_map(&self, _power: Option<usize>) -> Self {
-        todo!()
+    fn frobenius_map(&self, power: usize) -> Self {
+        if power != 1 {
+            panic!("BLS12-381 frobenius map power must be 1");
+        }
+        self.conjugate()
     }
 
     fn mul_base(&self, rhs: Self::BaseField) -> Self {

@@ -11,6 +11,10 @@ pub use fp12::*;
 
 use super::{LineMulDType, MillerStep};
 
+#[cfg(feature = "halo2curves")]
+#[cfg(test)]
+mod tests;
+
 pub struct Bn254Intrinsic;
 
 moduli_setup! {

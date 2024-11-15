@@ -75,7 +75,7 @@ pub trait FieldExtension: Field {
     fn conjugate(&self) -> Self;
 
     /// Frobenius map
-    fn frobenius_map(&self, power: Option<usize>) -> Self;
+    fn frobenius_map(&self, power: usize) -> Self;
 
     /// Multiply an extension field element by an element in the base field
     fn mul_base(&self, rhs: Self::BaseField) -> Self;

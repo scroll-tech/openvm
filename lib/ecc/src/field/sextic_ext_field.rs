@@ -15,6 +15,12 @@ pub trait Fp12Mul {
     fn fp12_mul_refs(&self, other: &Self) -> Self;
 }
 
+pub trait FrobeniusCoeffs {
+    type Fp: Field;
+    type Fp2: FieldExtension<BaseField = Self::Fp>;
+    const FROBENIUS_COEFFS: [[Self::Fp2; 5]; 4];
+}
+
 /// Sextic extension field of `F` with irreducible polynomial `X^6 + \xi`.
 /// Elements are represented as `c0 + c1 * w` where `w^6 = \xi`, where \xi depends on the twist of the curve.
 ///

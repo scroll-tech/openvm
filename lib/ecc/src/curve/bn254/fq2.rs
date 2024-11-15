@@ -33,9 +33,9 @@ impl FieldExtension for Fq2 {
         s
     }
 
-    fn frobenius_map(&self, power: Option<usize>) -> Self {
+    fn frobenius_map(&self, power: usize) -> Self {
         let mut s = *self;
-        Fq2::frobenius_map(&mut s, power.unwrap());
+        Fq2::frobenius_map(&mut s, power);
         s
     }
 

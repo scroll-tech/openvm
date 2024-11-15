@@ -468,6 +468,7 @@ impl<F: Field + IntMod> Field for Complex<F> {
     }
 }
 
-pub trait Xi {
+/// Trait for elliptic curve pairing constants in Fp2 of a field extension tower
+pub trait Xi: Sized {
     const XI: Self;
 }

@@ -90,9 +90,9 @@ impl MultiMillerLoop for Bn254 {
         let q1_vec = Q
             .iter()
             .map(|Q| {
-                let x = Q.x.frobenius_map(Some(1));
+                let x = Q.x.frobenius_map(1);
                 let x = x * x_to_q_minus_1_over_3;
-                let y = Q.y.frobenius_map(Some(1));
+                let y = Q.y.frobenius_map(1);
                 let y = y * XI_TO_Q_MINUS_1_OVER_2;
                 AffinePoint { x, y }
             })

@@ -52,7 +52,10 @@ impl FieldExtension for Fq12 {
         Fq12::conjugate(self)
     }
 
-    fn frobenius_map(&self, _power: Option<usize>) -> Self {
+    fn frobenius_map(&self, power: usize) -> Self {
+        if power != 1 {
+            panic!("BLS12-381 frobenius map power must be 1");
+        }
         Fq12::frobenius_map(self)
     }
 

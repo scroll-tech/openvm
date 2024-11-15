@@ -19,10 +19,10 @@ impl FinalExp<Fq, Fq2, Fq12> for Bn254 {
         // f * c^-{6x + 2} * u * c^-{q^3 - q^2 + q} == 1
         // where fc == f * c^-{6x + 2}
         // c_mul = c^-{q^3 - q^2 + q}
-        let c_q3 = c_inv.frobenius_map(Some(3));
-        let c_q2 = c_inv.frobenius_map(Some(2));
+        let c_q3 = c_inv.frobenius_map(3);
+        let c_q2 = c_inv.frobenius_map(2);
         let c_q2_inv = c_q2.invert().unwrap();
-        let c_q = c_inv.frobenius_map(Some(1));
+        let c_q = c_inv.frobenius_map(1);
         let c_mul = c_q3 * c_q2_inv * c_q;
 
         // Compute miller loop with c_inv

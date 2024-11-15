@@ -1,3 +1,5 @@
+use axvm_algebra::IntMod;
+
 use super::Bn254Fp;
 use crate::field::{Complex, Field, FieldExtension, Xi};
 
@@ -37,8 +39,12 @@ impl FieldExtension for Bn254Fp2 {
         }
     }
 
-    fn frobenius_map(&self, _power: Option<usize>) -> Self {
-        todo!()
+    fn frobenius_map(&self, power: usize) -> Self {
+        let mut res = self.clone();
+        if power % 2 != 0 {
+            res = res.conjugate();
+        }
+        res
     }
 
     fn mul_base(&self, rhs: Self::BaseField) -> Self {

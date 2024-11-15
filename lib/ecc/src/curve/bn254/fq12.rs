@@ -50,9 +50,9 @@ impl FieldExtension for Fq12 {
         s
     }
 
-    fn frobenius_map(&self, power: Option<usize>) -> Self {
+    fn frobenius_map(&self, power: usize) -> Self {
         let mut s = *self;
-        Fq12::frobenius_map(&mut s, power.unwrap());
+        Fq12::frobenius_map(&mut s, power);
         s
     }
 
