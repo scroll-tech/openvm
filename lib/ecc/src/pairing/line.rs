@@ -133,23 +133,7 @@ where
     /// Multiplies a line in 02345-form with a Fp12 element to get an Fp12 element
     #[inline(always)]
     fn mul_by_023(f: Fp12, l: EvaluatedLine<Fp, Fp2>) -> Fp12 {
-        #[cfg(not(target_os = "zkvm"))]
-        {
-            Self::mul_by_02345(f, [l.c, l.b, Fp2::one(), Fp2::zero(), Fp2::zero()])
-        }
-        #[cfg(target_os = "zkvm")]
-        {
-            let mut uninit: MaybeUninit<Fp12> = MaybeUninit::uninit();
-            custom_insn_r!(
-                CUSTOM_1,
-                Custom1Funct3::Pairing as usize,
-                PairingBaseFunct7::MulBy023 as usize,
-                uninit.as_mut_ptr(),
-                &f as *const Fp12,
-                &l as *const EvaluatedLine<Fp, Fp2>
-            );
-            unsafe { uninit.assume_init() }
-        }
+        Self::mul_by_02345(f, [l.c, l.b, Fp2::one(), Fp2::zero(), Fp2::zero()])
     }
 
     /// Multiplies a line in 02345-form with a Fp12 element to get an Fp12 element
@@ -278,23 +262,7 @@ where
     /// Multiplies a line in 013-form with a Fp12 element to get an Fp12 element
     #[inline(always)]
     fn mul_by_013(f: Fp12, l: EvaluatedLine<Fp, Fp2>) -> Fp12 {
-        #[cfg(not(target_os = "zkvm"))]
-        {
-            Self::mul_by_01234(f, [Fp2::one(), l.b, Fp2::zero(), l.c, Fp2::zero()])
-        }
-        #[cfg(target_os = "zkvm")]
-        {
-            let mut uninit: MaybeUninit<Fp12> = MaybeUninit::uninit();
-            custom_insn_r!(
-                CUSTOM_1,
-                Custom1Funct3::Pairing as usize,
-                PairingBaseFunct7::MulBy013 as usize,
-                uninit.as_mut_ptr(),
-                &f as *const Fp12,
-                &l as *const EvaluatedLine<Fp, Fp2>
-            );
-            unsafe { uninit.assume_init() }
-        }
+        Self::mul_by_01234(f, [Fp2::one(), l.b, Fp2::zero(), l.c, Fp2::zero()])
     }
 
     /// Multiplies a line in 01234-form with a Fp12 element to get an Fp12 element
