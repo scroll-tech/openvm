@@ -56,11 +56,11 @@ mod bn254 {
         // Test mul_by_01234
         let x = [c.x(), c.y(), b.x(), b.y(), a.x()];
         let r1 = Bn254::mul_by_01234(f, x);
-        let io1 = f
-            .to_coeffs()
+        // NOTE[yj]: this is ugly but calling `to_coeffs` gives us a different coefficient ordering
+        let io1 = [f.c0.c0, f.c0.c1, f.c0.c2, f.c1.c0, f.c1.c1, f.c1.c2]
             .into_iter()
             .chain(x)
-            .chain(r1.to_coeffs())
+            .chain([r1.c0.c0, r1.c0.c1, r1.c0.c2, r1.c1.c0, r1.c1.c1, r1.c1.c2])
             .flat_map(|fp2| fp2.to_coeffs())
             .flat_map(|fp| fp.to_bytes())
             .map(AbstractField::from_canonical_u8)
