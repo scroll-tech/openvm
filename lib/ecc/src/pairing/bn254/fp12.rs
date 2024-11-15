@@ -102,14 +102,15 @@ impl Fp12Mul for Bn254Fp12 {
                 &other.c[3],
                 &other.c[5],
             );
-            *self = Self::new([
-                s0 * o0 + xi * &(s1 * o2 + s2 * o1 + s3 * o5 + s4 * o4 + s5 * o3),
-                s0 * o1 + s1 * o0 + s3 * o3 + xi * &(s2 * o2 + s4 * o5 + s5 * o4),
-                s0 * o2 + s1 * o1 + s2 * o0 + s3 * o4 + s4 * o3 + xi * &(s5 * o5),
-                s0 * o3 + s3 * o0 + xi * &(s1 * o5 + s2 * o4 + s4 * o2 + s5 * o1),
-                s0 * o4 + s1 * o3 + s3 * o1 + s4 * o0 + xi * &(s2 * o5 + s5 * o2),
-                s0 * o5 + s1 * o4 + s2 * o3 + s3 * o2 + s4 * o1 + s5 * o0,
-            ]);
+
+            let c0 = s0 * o0 + xi * &(s1 * o2 + s2 * o1 + s3 * o5 + s4 * o4 + s5 * o3);
+            let c1 = s0 * o1 + s1 * o0 + s3 * o3 + xi * &(s2 * o2 + s4 * o5 + s5 * o4);
+            let c2 = s0 * o2 + s1 * o1 + s2 * o0 + s3 * o4 + s4 * o3 + xi * &(s5 * o5);
+            let c3 = s0 * o3 + s3 * o0 + xi * &(s1 * o5 + s2 * o4 + s4 * o2 + s5 * o1);
+            let c4 = s0 * o4 + s1 * o3 + s3 * o1 + s4 * o0 + xi * &(s2 * o5 + s5 * o2);
+            let c5 = s0 * o5 + s1 * o4 + s2 * o3 + s3 * o2 + s4 * o1 + s5 * o0;
+
+            *self = Self::new([c0, c3, c1, c4, c2, c5]);
         }
         #[cfg(target_os = "zkvm")]
         {
