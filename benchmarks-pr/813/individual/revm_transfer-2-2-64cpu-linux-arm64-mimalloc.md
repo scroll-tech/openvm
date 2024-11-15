@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| revm_100_transfers | <div style='text-align: right'>2</div>  | <span style="color: red">(+231,547 [+0.3%])</span> <div style='text-align: right'>90,388,317</div>  | <span style="color: red">(+7,722 [+0.3%])</span> <div style='text-align: right'>2,337,237</div>  | <span style="color: red">(+307.0 [+1.9%])</span> <div style='text-align: right'>16,752.0</div>  |
+| revm_100_transfers | <div style='text-align: right'>2</div>  | <span style="color: red">(+231,547 [+0.3%])</span> <div style='text-align: right'>90,388,317</div>  | <span style="color: red">(+7,722 [+0.3%])</span> <div style='text-align: right'>2,337,237</div>  | <span style="color: green">(-291.0 [-1.7%])</span> <div style='text-align: right'>16,688.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| revm_100_transfers | true | <span style="color: red">(+808.0 [+1.3%])</span> <div style='text-align: right'>63,297.0</div>  | <span style="color: red">(+231,547 [+0.3%])</span> <div style='text-align: right'>90,388,317</div>  | <span style="color: red">(+7,722 [+0.3%])</span> <div style='text-align: right'>2,337,237</div>  |
+| revm_100_transfers | true | <span style="color: green">(-901.0 [-1.4%])</span> <div style='text-align: right'>63,393.0</div>  | <span style="color: red">(+231,547 [+0.3%])</span> <div style='text-align: right'>90,388,317</div>  | <span style="color: red">(+7,722 [+0.3%])</span> <div style='text-align: right'>2,337,237</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
@@ -126,7 +126,7 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| revm_100_transfers | <span style="color: red">(+1.0 [+0.9%])</span> <div style='text-align: right'>112.0</div>  | <span style="color: green">(-19.0 [-0.3%])</span> <div style='text-align: right'>5,915.0</div>  | <span style="color: green">(-44.0 [-0.9%])</span> <div style='text-align: right'>4,670.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>211.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: red">(+231,547 [+0.3%])</span> <div style='text-align: right'>90,388,317</div>  | <span style="color: red">(+7,722 [+0.3%])</span> <div style='text-align: right'>2,337,237</div>  | <span style="color: red">(+307.0 [+1.9%])</span> <div style='text-align: right'>16,752.0</div>  |
+| revm_100_transfers | <span style="color: red">(+3.0 [+2.8%])</span> <div style='text-align: right'>112.0</div>  | <span style="color: green">(-429.0 [-6.8%])</span> <div style='text-align: right'>5,889.0</div>  | <span style="color: green">(-415.0 [-8.1%])</span> <div style='text-align: right'>4,680.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+1.0 [+0.5%])</span> <div style='text-align: right'>212.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: red">(+231,547 [+0.3%])</span> <div style='text-align: right'>90,388,317</div>  | <span style="color: red">(+7,722 [+0.3%])</span> <div style='text-align: right'>2,337,237</div>  | <span style="color: green">(-291.0 [-1.7%])</span> <div style='text-align: right'>16,688.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -189,7 +189,7 @@
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| revm_100_transfers | 0 | <span style="color: red">(+25.0 [+2.1%])</span> <div style='text-align: right'>1,202.0</div>  | <span style="color: red">(+301.0 [+3.2%])</span> <div style='text-align: right'>9,635.0</div>  | <div style='text-align: right'>411,492,740</div>  |
+| revm_100_transfers | 0 | <span style="color: green">(-15.0 [-1.3%])</span> <div style='text-align: right'>1,166.0</div>  | <span style="color: red">(+153.0 [+1.6%])</span> <div style='text-align: right'>9,633.0</div>  | <div style='text-align: right'>411,492,740</div>  |
 
 </details>
 
@@ -198,17 +198,17 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/785542e4a978c5fc627210ba92b35558113dca57/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/785542e4a978c5fc627210ba92b35558113dca57/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/785542e4a978c5fc627210ba92b35558113dca57/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/785542e4a978c5fc627210ba92b35558113dca57/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/785542e4a978c5fc627210ba92b35558113dca57/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/785542e4a978c5fc627210ba92b35558113dca57/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/785542e4a978c5fc627210ba92b35558113dca57/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/785542e4a978c5fc627210ba92b35558113dca57/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/955c821416f435e6bdc4e3a7e5e655c1bef6d040/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/955c821416f435e6bdc4e3a7e5e655c1bef6d040/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/955c821416f435e6bdc4e3a7e5e655c1bef6d040/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/955c821416f435e6bdc4e3a7e5e655c1bef6d040/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/955c821416f435e6bdc4e3a7e5e655c1bef6d040/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/955c821416f435e6bdc4e3a7e5e655c1bef6d040/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/955c821416f435e6bdc4e3a7e5e655c1bef6d040/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/955c821416f435e6bdc4e3a7e5e655c1bef6d040/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/785542e4a978c5fc627210ba92b35558113dca57
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/955c821416f435e6bdc4e3a7e5e655c1bef6d040
 
 Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11847955805)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11848294561)
