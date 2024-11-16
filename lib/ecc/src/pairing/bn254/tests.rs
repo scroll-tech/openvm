@@ -22,6 +22,14 @@ fn convert_fq2_to_bn254fp2(x: Fq2) -> Bn254Fp2 {
 
 fn convert_fq12_to_bn254fp12(x: Fq12) -> Bn254Fp12 {
     Bn254Fp12 {
+        // c: [
+        //     convert_fq2_to_bn254fp2(x.c0.c0),
+        //     convert_fq2_to_bn254fp2(x.c1.c0),
+        //     convert_fq2_to_bn254fp2(x.c0.c1),
+        //     convert_fq2_to_bn254fp2(x.c1.c1),
+        //     convert_fq2_to_bn254fp2(x.c0.c2),
+        //     convert_fq2_to_bn254fp2(x.c1.c2),
+        // ],
         c: [
             convert_fq2_to_bn254fp2(x.c0.c0),
             convert_fq2_to_bn254fp2(x.c0.c1),
@@ -36,7 +44,7 @@ fn convert_fq12_to_bn254fp12(x: Fq12) -> Bn254Fp12 {
 #[test]
 fn test_frobenius() {
     let mut rng = StdRng::seed_from_u64(15);
-    let pow = 0;
+    let pow = 3;
     let a = Fq12::random(&mut rng);
     let b = a.frobenius_map(pow);
 
@@ -44,5 +52,6 @@ fn test_frobenius() {
     let ff = SexticExtField::frobenius_map(&f, pow);
 
     let cmp = convert_fq12_to_bn254fp12(b);
+
     assert_eq!(ff, cmp);
 }

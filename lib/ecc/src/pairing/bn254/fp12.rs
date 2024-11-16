@@ -52,21 +52,37 @@ impl FieldExtension for Bn254Fp12 {
     fn conjugate(&self) -> Self {
         Self::new([
             self.c[0].clone(),
-            -self.c[1].clone(),
+            self.c[1].clone(),
             self.c[2].clone(),
             -self.c[3].clone(),
-            self.c[4].clone(),
+            -self.c[4].clone(),
             -self.c[5].clone(),
         ])
     }
 
     fn frobenius_map(&self, power: usize) -> Self {
-        let c0 = self.c[0].conjugate();
-        let c1 = self.c[1].conjugate() * Self::FROBENIUS_COEFFS[power][0].clone();
-        let c2 = self.c[2].conjugate() * Self::FROBENIUS_COEFFS[power][1].clone();
-        let c3 = self.c[3].conjugate() * Self::FROBENIUS_COEFFS[power][2].clone();
-        let c4 = self.c[4].conjugate() * Self::FROBENIUS_COEFFS[power][3].clone();
-        let c5 = self.c[5].conjugate() * Self::FROBENIUS_COEFFS[power][4].clone();
+        let mut c0 = self.c[0].clone();
+        let mut c1 = self.c[1].clone();
+        let mut c2 = self.c[2].clone();
+        let mut c3 = self.c[3].clone();
+        let mut c4 = self.c[4].clone();
+        let mut c5 = self.c[5].clone();
+
+        if power % 2 != 0 {
+            c0 = c0.conjugate();
+            c1 = c1.conjugate();
+            c2 = c2.conjugate();
+            c3 = c3.conjugate();
+            c4 = c4.conjugate();
+            c5 = c5.conjugate();
+        }
+
+        c1 *= &Self::FROBENIUS_COEFFS[power][0];
+        c2 *= &Self::FROBENIUS_COEFFS[power][1];
+        c3 *= &Self::FROBENIUS_COEFFS[power][2];
+        c4 *= &Self::FROBENIUS_COEFFS[power][3];
+        c5 *= &Self::FROBENIUS_COEFFS[power][4];
+
         Self::new([c0, c1, c2, c3, c4, c5])
     }
 
