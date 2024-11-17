@@ -8,7 +8,6 @@ use ax_stark_sdk::{
     bench::run_with_metric_collection,
     config::{
         baby_bear_poseidon2::{BabyBearPoseidon2Config, BabyBearPoseidon2Engine},
-        baby_bear_poseidon2_outer::{BabyBearPoseidon2OuterConfig, BabyBearPoseidon2OuterEngine},
         fri_params::standard_fri_params_with_100_bits_conjectured_security,
         FriParameters,
     },
@@ -16,7 +15,9 @@ use ax_stark_sdk::{
     p3_baby_bear::BabyBear,
 };
 use axiom_vm::{
-    config::{AxiomVmConfig, AxiomVmProvingKey},
+    config::AxiomVmConfig,
+    keygen::AxiomVmProvingKey,
+    prover::RootVerifierLocalProver,
     verifier::{
         internal::types::InternalVmVerifierInput, leaf::types::LeafVmVerifierInput,
         root::types::RootVmVerifierInput,
@@ -39,7 +40,6 @@ use metrics::counter;
 use p3_field::{AbstractField, PrimeField32};
 use tracing::info_span;
 
-type OuterSC = BabyBearPoseidon2OuterConfig;
 type SC = BabyBearPoseidon2Config;
 type F = BabyBear;
 const NUM_PUBLIC_VALUES: usize = DEFAULT_MAX_NUM_PUBLIC_VALUES;
@@ -157,15 +157,14 @@ async fn main() -> Result<()> {
         };
         #[allow(unused_variables)]
         let root_proof = info_span!("root verifier", group = "root_verifier").in_scope(move || {
-            let root_prover = VmLocalProver::<OuterSC, BabyBearPoseidon2OuterEngine>::new(
-                axiom_vm_pk.root_vm_pk.clone(),
-                axiom_vm_pk.root_committed_exe.clone(),
-            );
+            let root_prover = RootVerifierLocalProver::new(axiom_vm_pk.root_verifier_pk.clone());
             let root_input = RootVmVerifierInput {
                 proofs: vec![final_internal_proof],
                 public_values: app_proofs.user_public_values.public_values,
             };
-            single_segment_execute_and_prove(&root_prover, root_input.write())
+            let input = root_input.write();
+            bench_root_verifier_prover(&root_prover, input.clone());
+            SingleSegmentVmProver::prove(&root_prover, input)
         });
     });
 
@@ -205,4 +204,16 @@ where
     vm.execute(prover.committed_exe.exe.clone(), input.clone())
         .unwrap();
     SingleSegmentVmProver::prove(prover, input)
+}
+
+fn bench_root_verifier_prover(prover: &RootVerifierLocalProver, input: Vec<Vec<F>>) {
+    counter!("fri.log_blowup").absolute(prover.root_verifier_pk.vm_pk.fri_params.log_blowup as u64);
+    let mut vm_config = prover.root_verifier_pk.vm_pk.vm_config.clone();
+    vm_config.collect_metrics = true;
+    let vm = SingleSegmentVmExecutor::new(vm_config);
+    vm.execute(
+        prover.root_verifier_pk.root_committed_exe.exe.clone(),
+        input,
+    )
+    .unwrap();
 }

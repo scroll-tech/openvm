@@ -4,14 +4,15 @@ use ax_stark_sdk::{
     ax_stark_backend::{config::StarkGenericConfig, p3_field::AbstractField},
     config::{
         baby_bear_poseidon2::{BabyBearPoseidon2Config, BabyBearPoseidon2Engine},
-        baby_bear_poseidon2_outer::{BabyBearPoseidon2OuterConfig, BabyBearPoseidon2OuterEngine},
         fri_params::standard_fri_params_with_100_bits_conjectured_security,
     },
     engine::{StarkEngine, StarkFriEngine},
 };
 use axiom_vm::{
     commit::AppExecutionCommit,
-    config::{AxiomVmConfig, AxiomVmProvingKey},
+    config::AxiomVmConfig,
+    keygen::AxiomVmProvingKey,
+    prover::RootVerifierLocalProver,
     verifier::{
         common::types::VmVerifierPvs,
         internal::types::InternalVmVerifierInput,
@@ -22,7 +23,7 @@ use axiom_vm::{
 use axvm_circuit::{
     arch::{
         hasher::poseidon2::vm_poseidon2_hasher, ExecutorName, SingleSegmentVmExecutor, VmConfig,
-        VmExecutor, PUBLIC_VALUES_AIR_ID,
+        VmExecutor,
     },
     prover::{local::VmLocalProver, SingleSegmentVmProver},
     system::{
@@ -35,7 +36,6 @@ use axvm_recursion::{hints::Hintable, types::InnerConfig};
 use p3_baby_bear::BabyBear;
 
 type SC = BabyBearPoseidon2Config;
-type OuterSC = BabyBearPoseidon2OuterConfig;
 type C = InnerConfig;
 type F = BabyBear;
 #[test]
@@ -226,10 +226,7 @@ fn test_1() {
         .write(),
     )];
 
-    let root_prover = VmLocalProver::<OuterSC, BabyBearPoseidon2OuterEngine>::new(
-        axiom_vm_pk.root_vm_pk.clone(),
-        axiom_vm_pk.root_committed_exe.clone(),
-    );
+    let root_prover = RootVerifierLocalProver::new(axiom_vm_pk.root_verifier_pk.clone());
     let app_exe_commit = AppExecutionCommit::compute(
         &axiom_vm_pk.app_vm_pk.vm_config,
         &committed_exe,
@@ -244,8 +241,10 @@ fn test_1() {
         }
         .write(),
     );
+    let air_id_perm = axiom_vm_pk.root_verifier_pk.air_id_permutation();
+    let special_air_ids = air_id_perm.get_special_air_ids();
     let root_pvs = RootVmVerifierPvs::from_flatten(
-        root_proof.per_air[PUBLIC_VALUES_AIR_ID]
+        root_proof.per_air[special_air_ids.public_values_air_id]
             .public_values
             .clone(),
     );
