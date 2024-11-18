@@ -64,7 +64,8 @@ fn test_1() {
         },
     };
     let max_num_user_public_values = axiom_vm_config.max_num_user_public_values;
-    let axiom_vm_pk = AxiomVmProvingKey::keygen(axiom_vm_config);
+    #[allow(unused_variables)]
+    let (axiom_vm_pk, dummy_internal_proof) = AxiomVmProvingKey::keygen_impl(axiom_vm_config);
     let app_engine = BabyBearPoseidon2Engine::new(axiom_vm_pk.app_vm_pk.fri_params);
 
     let mut program = {
@@ -253,4 +254,35 @@ fn test_1() {
         root_pvs.leaf_verifier_commit,
         app_exe_commit.leaf_vm_verifier_commit
     );
+    #[cfg(feature = "static-verifier")]
+    static_verifier::test_static_verifier(
+        &axiom_vm_pk.root_verifier_pk,
+        dummy_internal_proof,
+        &root_proof,
+    );
+}
+#[cfg(feature = "static-verifier")]
+mod static_verifier {
+    use ax_stark_sdk::{
+        ax_stark_backend::prover::types::Proof,
+        config::baby_bear_poseidon2_outer::BabyBearPoseidon2OuterConfig,
+    };
+    use axiom_vm::keygen::RootVerifierProvingKey;
+    use axvm_native_compiler::prelude::Witness;
+    use axvm_recursion::witness::Witnessable;
+
+    use crate::SC;
+
+    pub(crate) fn test_static_verifier(
+        root_verifier_pk: &RootVerifierProvingKey,
+        dummy_internal_proof: Proof<SC>,
+        root_proot: &Proof<BabyBearPoseidon2OuterConfig>,
+    ) {
+        let static_verifier = root_verifier_pk.keygen_static_verifier(23, dummy_internal_proof);
+        let mut witness = Witness::default();
+        root_proot.write(&mut witness);
+        // Here the proof is verified inside.
+        // FIXME: explicitly verify the proof.
+        static_verifier.prove(witness);
+    }
 }

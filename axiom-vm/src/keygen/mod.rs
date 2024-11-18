@@ -1,7 +1,10 @@
 use std::sync::Arc;
 
 use ax_stark_sdk::{
-    ax_stark_backend::config::{Com, StarkGenericConfig},
+    ax_stark_backend::{
+        config::{Com, StarkGenericConfig},
+        prover::types::Proof,
+    },
     config::{
         baby_bear_poseidon2::BabyBearPoseidon2Engine,
         baby_bear_poseidon2_outer::BabyBearPoseidon2OuterEngine,
@@ -62,6 +65,11 @@ pub struct RootVerifierProvingKey {
 
 impl AxiomVmProvingKey {
     pub fn keygen(config: AxiomVmConfig) -> Self {
+        Self::keygen_impl(config).0
+    }
+
+    /// Returns AxiomVmProvingKey and a dummy proof of internal verifier.
+    pub fn keygen_impl(config: AxiomVmConfig) -> (Self, Proof<SC>) {
         let leaf_vm_config = config.leaf_vm_config();
         let internal_vm_config = config.internal_vm_config();
         let mut root_vm_config = config.root_verifier_vm_config();
@@ -187,14 +195,17 @@ impl AxiomVmProvingKey {
                 heights,
             }
         };
-        Self {
-            app_vm_pk,
-            leaf_vm_pk,
-            leaf_committed_exe,
-            internal_vm_pk,
-            internal_committed_exe,
-            root_verifier_pk,
-        }
+        (
+            Self {
+                app_vm_pk,
+                leaf_vm_pk,
+                leaf_committed_exe,
+                internal_vm_pk,
+                internal_committed_exe,
+                root_verifier_pk,
+            },
+            internal_proof,
+        )
     }
 
     pub fn internal_program_commit(&self) -> [F; DIGEST_SIZE] {
