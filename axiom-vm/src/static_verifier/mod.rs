@@ -80,12 +80,20 @@ fn build_static_verifier_operations(
         let pcs = TwoAdicFriPcsVariable {
             config: const_fri_config(&mut builder, &root_verifier_pk.vm_pk.fri_params),
         };
+        {
+            let x = builder.eval(Bn254Fr::from_canonical_u32(0));
+            builder.print_v(x);
+        }
         StarkVerifier::verify::<MultiField32ChallengerVariable<_>>(
             &mut builder,
             &pcs,
             &advice,
             &input,
         );
+        {
+            let x = builder.eval(Bn254Fr::from_canonical_u32(1));
+            builder.print_v(x);
+        }
         {
             // Program AIR is the only AIR with a cached trace. The cached trace index doesn't
             // change after reordering.
@@ -102,11 +110,21 @@ fn build_static_verifier_operations(
                 .into();
             builder.assert_var_eq(commit, expected_program_commit[0]);
         }
+
+        {
+            let x = builder.eval(Bn254Fr::from_canonical_u32(2));
+            builder.print_v(x);
+        }
         assert_single_segment_vm_exit_successfully_with_connector_air_id(
             &mut builder,
             &input,
             special_air_ids.connector_air_id,
         );
+
+        {
+            let x = builder.eval(Bn254Fr::from_canonical_u32(3));
+            builder.print_v(x);
+        }
 
         let pv_air = builder.get(&input.per_air, special_air_ids.public_values_air_id);
         let public_values: Vec<_> = pv_air
@@ -123,6 +141,10 @@ fn build_static_verifier_operations(
         builder.static_commit_public_value(1, leaf_commit);
         for (i, x) in pvs.public_values.into_iter().enumerate() {
             builder.static_commit_public_value(i + 2, x);
+        }
+        {
+            let x = builder.eval(Bn254Fr::from_canonical_u32(4));
+            builder.print_v(x);
         }
         builder.cycle_tracker_end("VerifierProgram");
         num_public_values
