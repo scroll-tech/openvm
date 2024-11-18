@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| regex_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>160,101,856</div>  | <div style='text-align: right'>4,190,890</div>  | <span style="color: green">(-522.0 [-1.7%])</span> <div style='text-align: right'>30,615.0</div>  |
+| regex_program | <div style='text-align: right'>2</div>  | <span style="color: green">(-78,740,791 [-33.0%])</span> <div style='text-align: right'>160,103,110</div>  | <div style='text-align: right'>4,190,909</div>  | <span style="color: red">(+2,017.0 [+7.0%])</span> <div style='text-align: right'>30,726.0</div>  |
 
 
 <details>
@@ -8,40 +8,40 @@
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| regex_program | true | <span style="color: red">(+1,115.0 [+1.0%])</span> <div style='text-align: right'>113,479.0</div>  | <div style='text-align: right'>160,101,856</div>  | <div style='text-align: right'>4,190,890</div>  |
+| regex_program | true | <span style="color: red">(+91,537.0 [+406.9%])</span> <div style='text-align: right'>114,033.0</div>  | <span style="color: green">(-78,740,791 [-33.0%])</span> <div style='text-align: right'>160,103,110</div>  | <div style='text-align: right'>4,190,909</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
-| regex_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true | <div style='text-align: right'>1,150,469</div>  |
+| regex_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true | <div style='text-align: right'>1,150,473</div>  |
 | regex_program | <Rv32BaseAluAdapterAir,LessThanCoreAir<4, 8>> | true | <div style='text-align: right'>38,005</div>  |
 | regex_program | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | true | <div style='text-align: right'>218,625</div>  |
 | regex_program | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> | true | <div style='text-align: right'>282,074</div>  |
 | regex_program | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> | true | <div style='text-align: right'>198,078</div>  |
 | regex_program | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true | <div style='text-align: right'>106,071</div>  |
 | regex_program | <Rv32HintStoreAdapterAir,Rv32HintStoreCoreAir> | true | <div style='text-align: right'>12,767</div>  |
-| regex_program | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true | <div style='text-align: right'>130,443</div>  |
+| regex_program | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true | <div style='text-align: right'>130,445</div>  |
 | regex_program | <Rv32LoadStoreAdapterAir,LoadSignExtendCoreAir<4, 8>> | true | <div style='text-align: right'>687</div>  |
-| regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true | <div style='text-align: right'>1,961,380</div>  |
+| regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true | <div style='text-align: right'>1,961,392</div>  |
 | regex_program | <Rv32MultAdapterAir,DivRemCoreAir<4, 8>> | true | <div style='text-align: right'>114</div>  |
 | regex_program | <Rv32MultAdapterAir,MulHCoreAir<4, 8>> | true | <div style='text-align: right'>244</div>  |
 | regex_program | <Rv32MultAdapterAir,MultiplicationCoreAir<4, 8>> | true | <div style='text-align: right'>52,087</div>  |
-| regex_program | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | true | <div style='text-align: right'>39,556</div>  |
+| regex_program | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | true | <div style='text-align: right'>39,557</div>  |
 | regex_program | BitwiseOperationLookupAir<8> | true | <div style='text-align: right'>65,536</div>  |
 | regex_program | KeccakVmAir | true | <div style='text-align: right'>24</div>  |
 | regex_program | Memory AccessAdapter<2> | true | <div style='text-align: right'>21</div>  |
 | regex_program | Memory AccessAdapter<4> | true | <div style='text-align: right'>11</div>  |
-| regex_program | Memory AccessAdapter<8> | true | <div style='text-align: right'>34,637</div>  |
-| regex_program | Memory Boundary | true | <div style='text-align: right'>69,274</div>  |
-| regex_program | Memory Merkle | true | <div style='text-align: right'>70,522</div>  |
+| regex_program | Memory AccessAdapter<8> | true | <div style='text-align: right'>34,639</div>  |
+| regex_program | Memory Boundary | true | <div style='text-align: right'>69,278</div>  |
+| regex_program | Memory Merkle | true | <div style='text-align: right'>70,528</div>  |
 | regex_program | PhantomAir | true | <div style='text-align: right'>289</div>  |
-| regex_program | ProgramChip | true | <div style='text-align: right'>89,489</div>  |
+| regex_program | ProgramChip | true | <div style='text-align: right'>89,736</div>  |
 | regex_program | RangeTupleCheckerAir<2> | true | <div style='text-align: right'>524,288</div>  |
 
 | group | collect_metrics | dsl_ir | opcode | frequency |
 | --- | --- | --- | --- | --- |
-| regex_program | true |  | ADD | <div style='text-align: right'>1,007,997</div>  |
+| regex_program | true |  | ADD | <div style='text-align: right'>1,008,001</div>  |
 | regex_program | true |  | AND | <div style='text-align: right'>66,789</div>  |
-| regex_program | true |  | AUIPC | <div style='text-align: right'>39,556</div>  |
+| regex_program | true |  | AUIPC | <div style='text-align: right'>39,557</div>  |
 | regex_program | true |  | BEQ | <div style='text-align: right'>178,501</div>  |
 | regex_program | true |  | BGE | <div style='text-align: right'>294</div>  |
 | regex_program | true |  | BGEU | <div style='text-align: right'>121,597</div>  |
@@ -51,13 +51,13 @@
 | regex_program | true |  | DIVU | <div style='text-align: right'>114</div>  |
 | regex_program | true |  | HINT_STOREW | <div style='text-align: right'>12,767</div>  |
 | regex_program | true |  | JAL | <div style='text-align: right'>61,575</div>  |
-| regex_program | true |  | JALR | <div style='text-align: right'>130,443</div>  |
+| regex_program | true |  | JALR | <div style='text-align: right'>130,445</div>  |
 | regex_program | true |  | KECCAK256 | <div style='text-align: right'>1</div>  |
 | regex_program | true |  | LOADB | <div style='text-align: right'>679</div>  |
 | regex_program | true |  | LOADBU | <div style='text-align: right'>27,294</div>  |
 | regex_program | true |  | LOADH | <div style='text-align: right'>8</div>  |
 | regex_program | true |  | LOADHU | <div style='text-align: right'>95</div>  |
-| regex_program | true |  | LOADW | <div style='text-align: right'>1,142,834</div>  |
+| regex_program | true |  | LOADW | <div style='text-align: right'>1,142,840</div>  |
 | regex_program | true |  | LUI | <div style='text-align: right'>44,496</div>  |
 | regex_program | true |  | MUL | <div style='text-align: right'>52,087</div>  |
 | regex_program | true |  | MULHU | <div style='text-align: right'>244</div>  |
@@ -70,18 +70,18 @@
 | regex_program | true |  | SRL | <div style='text-align: right'>5,082</div>  |
 | regex_program | true |  | STOREB | <div style='text-align: right'>12,721</div>  |
 | regex_program | true |  | STOREH | <div style='text-align: right'>10,074</div>  |
-| regex_program | true |  | STOREW | <div style='text-align: right'>768,362</div>  |
+| regex_program | true |  | STOREW | <div style='text-align: right'>768,368</div>  |
 | regex_program | true |  | SUB | <div style='text-align: right'>42,583</div>  |
 | regex_program | true |  | XOR | <div style='text-align: right'>9,564</div>  |
 
 | group | air_name | collect_metrics | dsl_ir | opcode | cells_used |
 | --- | --- | --- | --- | --- | --- |
-| regex_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | ADD | <div style='text-align: right'>36,287,892</div>  |
+| regex_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | ADD | <div style='text-align: right'>36,288,036</div>  |
 | regex_program | AccessAdapter<8> | true |  | ADD | <div style='text-align: right'>102</div>  |
 | regex_program | Boundary | true |  | ADD | <div style='text-align: right'>240</div>  |
 | regex_program | Merkle | true |  | ADD | <div style='text-align: right'>128</div>  |
 | regex_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | AND | <div style='text-align: right'>2,404,404</div>  |
-| regex_program | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | true |  | AUIPC | <div style='text-align: right'>830,676</div>  |
+| regex_program | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | true |  | AUIPC | <div style='text-align: right'>830,697</div>  |
 | regex_program | AccessAdapter<8> | true |  | AUIPC | <div style='text-align: right'>34</div>  |
 | regex_program | Boundary | true |  | AUIPC | <div style='text-align: right'>80</div>  |
 | regex_program | Merkle | true |  | AUIPC | <div style='text-align: right'>3,456</div>  |
@@ -95,24 +95,22 @@
 | regex_program | <Rv32HintStoreAdapterAir,Rv32HintStoreCoreAir> | true |  | HINT_STOREW | <div style='text-align: right'>331,942</div>  |
 | regex_program | AccessAdapter<8> | true |  | HINT_STOREW | <div style='text-align: right'>108,511</div>  |
 | regex_program | Boundary | true |  | HINT_STOREW | <div style='text-align: right'>255,320</div>  |
-| regex_program | Merkle | true |  | HINT_STOREW | <div style='text-align: right'>408,704</div>  |
+| regex_program | Merkle | true |  | HINT_STOREW | <div style='text-align: right'>408,640</div>  |
 | regex_program | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true |  | JAL | <div style='text-align: right'>1,108,350</div>  |
-| regex_program | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true |  | JALR | <div style='text-align: right'>3,652,404</div>  |
+| regex_program | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true |  | JALR | <div style='text-align: right'>3,652,460</div>  |
 | regex_program | AccessAdapter<2> | true |  | KECCAK256 | <div style='text-align: right'>231</div>  |
 | regex_program | AccessAdapter<4> | true |  | KECCAK256 | <div style='text-align: right'>143</div>  |
 | regex_program | KeccakVmAir | true |  | KECCAK256 | <div style='text-align: right'>75,936</div>  |
 | regex_program | <Rv32LoadStoreAdapterAir,LoadSignExtendCoreAir<4, 8>> | true |  | LOADB | <div style='text-align: right'>23,765</div>  |
-| regex_program | AccessAdapter<8> | true |  | LOADB | <div style='text-align: right'>17</div>  |
-| regex_program | Boundary | true |  | LOADB | <div style='text-align: right'>40</div>  |
 | regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADBU | <div style='text-align: right'>1,091,760</div>  |
-| regex_program | AccessAdapter<8> | true |  | LOADBU | <div style='text-align: right'>153</div>  |
-| regex_program | Boundary | true |  | LOADBU | <div style='text-align: right'>360</div>  |
-| regex_program | Merkle | true |  | LOADBU | <div style='text-align: right'>2,176</div>  |
+| regex_program | AccessAdapter<8> | true |  | LOADBU | <div style='text-align: right'>187</div>  |
+| regex_program | Boundary | true |  | LOADBU | <div style='text-align: right'>440</div>  |
+| regex_program | Merkle | true |  | LOADBU | <div style='text-align: right'>1,984</div>  |
 | regex_program | <Rv32LoadStoreAdapterAir,LoadSignExtendCoreAir<4, 8>> | true |  | LOADH | <div style='text-align: right'>280</div>  |
 | regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADHU | <div style='text-align: right'>3,800</div>  |
-| regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADW | <div style='text-align: right'>45,713,360</div>  |
-| regex_program | AccessAdapter<8> | true |  | LOADW | <div style='text-align: right'>3,026</div>  |
-| regex_program | Boundary | true |  | LOADW | <div style='text-align: right'>7,120</div>  |
+| regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADW | <div style='text-align: right'>45,713,600</div>  |
+| regex_program | AccessAdapter<8> | true |  | LOADW | <div style='text-align: right'>3,043</div>  |
+| regex_program | Boundary | true |  | LOADW | <div style='text-align: right'>7,160</div>  |
 | regex_program | Merkle | true |  | LOADW | <div style='text-align: right'>24,768</div>  |
 | regex_program | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true |  | LUI | <div style='text-align: right'>800,928</div>  |
 | regex_program | AccessAdapter<8> | true |  | LUI | <div style='text-align: right'>17</div>  |
@@ -132,21 +130,21 @@
 | regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | STOREB | <div style='text-align: right'>508,840</div>  |
 | regex_program | AccessAdapter<8> | true |  | STOREB | <div style='text-align: right'>2,159</div>  |
 | regex_program | Boundary | true |  | STOREB | <div style='text-align: right'>5,080</div>  |
-| regex_program | Merkle | true |  | STOREB | <div style='text-align: right'>11,776</div>  |
+| regex_program | Merkle | true |  | STOREB | <div style='text-align: right'>12,288</div>  |
 | regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | STOREH | <div style='text-align: right'>402,960</div>  |
 | regex_program | AccessAdapter<8> | true |  | STOREH | <div style='text-align: right'>85,255</div>  |
 | regex_program | Boundary | true |  | STOREH | <div style='text-align: right'>200,600</div>  |
-| regex_program | Merkle | true |  | STOREH | <div style='text-align: right'>321,280</div>  |
-| regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | STOREW | <div style='text-align: right'>30,734,480</div>  |
+| regex_program | Merkle | true |  | STOREH | <div style='text-align: right'>321,344</div>  |
+| regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | STOREW | <div style='text-align: right'>30,734,720</div>  |
 | regex_program | AccessAdapter<8> | true |  | STOREW | <div style='text-align: right'>389,538</div>  |
 | regex_program | Boundary | true |  | STOREW | <div style='text-align: right'>916,560</div>  |
-| regex_program | Merkle | true |  | STOREW | <div style='text-align: right'>1,484,288</div>  |
+| regex_program | Merkle | true |  | STOREW | <div style='text-align: right'>1,484,160</div>  |
 | regex_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | SUB | <div style='text-align: right'>1,532,988</div>  |
 | regex_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | XOR | <div style='text-align: right'>344,304</div>  |
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| regex_program | <span style="color: green">(-1.0 [-2.2%])</span> <div style='text-align: right'>44.0</div>  | <span style="color: green">(-387.0 [-3.8%])</span> <div style='text-align: right'>9,771.0</div>  | <span style="color: green">(-131.0 [-1.8%])</span> <div style='text-align: right'>7,298.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+3.0 [+1.5%])</span> <div style='text-align: right'>203.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>160,101,856</div>  | <div style='text-align: right'>4,190,890</div>  | <span style="color: green">(-522.0 [-1.7%])</span> <div style='text-align: right'>30,615.0</div>  |
+| regex_program | <span style="color: red">(+4.0 [+9.3%])</span> <div style='text-align: right'>47.0</div>  | <span style="color: red">(+1,971.0 [+25.0%])</span> <div style='text-align: right'>9,847.0</div>  | <span style="color: red">(+1,950.0 [+36.2%])</span> <div style='text-align: right'>7,339.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+11.0 [+5.6%])</span> <div style='text-align: right'>208.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-78,740,791 [-33.0%])</span> <div style='text-align: right'>160,103,110</div>  | <div style='text-align: right'>4,190,909</div>  | <span style="color: red">(+2,017.0 [+7.0%])</span> <div style='text-align: right'>30,726.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -213,7 +211,7 @@
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| regex_program | 0 | <span style="color: green">(-256.0 [-9.4%])</span> <div style='text-align: right'>2,462.0</div>  | <span style="color: red">(+121.0 [+0.7%])</span> <div style='text-align: right'>18,382.0</div>  | <div style='text-align: right'>790,590,848</div>  |
+| regex_program | 0 | <span style="color: red">(+20.0 [+0.8%])</span> <div style='text-align: right'>2,496.0</div>  | <span style="color: red">(+26.0 [+0.1%])</span> <div style='text-align: right'>18,383.0</div>  | <div style='text-align: right'>790,590,848</div>  |
 
 </details>
 
@@ -222,17 +220,17 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0288bccb5794f679081f63728320cbe26ed51855/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0288bccb5794f679081f63728320cbe26ed51855/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0288bccb5794f679081f63728320cbe26ed51855/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0288bccb5794f679081f63728320cbe26ed51855/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0288bccb5794f679081f63728320cbe26ed51855/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0288bccb5794f679081f63728320cbe26ed51855/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0288bccb5794f679081f63728320cbe26ed51855/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0288bccb5794f679081f63728320cbe26ed51855/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4adb2a6034579c5170b3ce135f234a8791c007ff/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4adb2a6034579c5170b3ce135f234a8791c007ff/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4adb2a6034579c5170b3ce135f234a8791c007ff/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4adb2a6034579c5170b3ce135f234a8791c007ff/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4adb2a6034579c5170b3ce135f234a8791c007ff/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4adb2a6034579c5170b3ce135f234a8791c007ff/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4adb2a6034579c5170b3ce135f234a8791c007ff/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/4adb2a6034579c5170b3ce135f234a8791c007ff/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/0288bccb5794f679081f63728320cbe26ed51855
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/4adb2a6034579c5170b3ce135f234a8791c007ff
 
 Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11861704582)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11885713220)
