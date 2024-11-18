@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| regex_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>238,843,901</div>  | <div style='text-align: right'>4,190,909</div>  | <span style="color: red">(+420.0 [+1.5%])</span> <div style='text-align: right'>29,129.0</div>  |
+| regex_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>238,843,901</div>  | <div style='text-align: right'>4,190,909</div>  | <span style="color: red">(+303.0 [+1.1%])</span> <div style='text-align: right'>29,012.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| regex_program | true | <span style="color: red">(+239.0 [+1.1%])</span> <div style='text-align: right'>22,735.0</div>  | <div style='text-align: right'>238,843,901</div>  | <div style='text-align: right'>4,190,909</div>  |
+| regex_program | true | <span style="color: red">(+443.0 [+2.0%])</span> <div style='text-align: right'>22,939.0</div>  | <div style='text-align: right'>238,843,901</div>  | <div style='text-align: right'>4,190,909</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
@@ -147,7 +147,7 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| regex_program | <div style='text-align: right'>43.0</div>  | <span style="color: red">(+59.0 [+0.7%])</span> <div style='text-align: right'>7,935.0</div>  | <span style="color: red">(+28.0 [+0.5%])</span> <div style='text-align: right'>5,417.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-1.0 [-0.5%])</span> <div style='text-align: right'>196.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>238,843,901</div>  | <div style='text-align: right'>4,190,909</div>  | <span style="color: red">(+420.0 [+1.5%])</span> <div style='text-align: right'>29,129.0</div>  |
+| regex_program | <span style="color: red">(+1.0 [+2.3%])</span> <div style='text-align: right'>44.0</div>  | <span style="color: green">(-23.0 [-0.3%])</span> <div style='text-align: right'>7,853.0</div>  | <span style="color: green">(-13.0 [-0.2%])</span> <div style='text-align: right'>5,376.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>197.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>238,843,901</div>  | <div style='text-align: right'>4,190,909</div>  | <span style="color: red">(+303.0 [+1.1%])</span> <div style='text-align: right'>29,012.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -214,7 +214,7 @@
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| regex_program | 0 | <span style="color: red">(+30.0 [+1.2%])</span> <div style='text-align: right'>2,506.0</div>  | <span style="color: red">(+331.0 [+1.8%])</span> <div style='text-align: right'>18,688.0</div>  | <div style='text-align: right'>790,590,848</div>  |
+| regex_program | 0 | <span style="color: green">(-11.0 [-0.4%])</span> <div style='text-align: right'>2,465.0</div>  | <span style="color: red">(+337.0 [+1.8%])</span> <div style='text-align: right'>18,694.0</div>  | <div style='text-align: right'>790,590,848</div>  |
 
 </details>
 
@@ -223,17 +223,17 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/330a492863636415127f2c6f8fc688468a30a999/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/330a492863636415127f2c6f8fc688468a30a999/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/330a492863636415127f2c6f8fc688468a30a999/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/330a492863636415127f2c6f8fc688468a30a999/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/330a492863636415127f2c6f8fc688468a30a999/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/330a492863636415127f2c6f8fc688468a30a999/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/330a492863636415127f2c6f8fc688468a30a999/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/330a492863636415127f2c6f8fc688468a30a999/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cfc4f3eb3917d2f9471000ffa0054f2576ad33f7/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cfc4f3eb3917d2f9471000ffa0054f2576ad33f7/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cfc4f3eb3917d2f9471000ffa0054f2576ad33f7/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cfc4f3eb3917d2f9471000ffa0054f2576ad33f7/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cfc4f3eb3917d2f9471000ffa0054f2576ad33f7/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cfc4f3eb3917d2f9471000ffa0054f2576ad33f7/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cfc4f3eb3917d2f9471000ffa0054f2576ad33f7/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cfc4f3eb3917d2f9471000ffa0054f2576ad33f7/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/330a492863636415127f2c6f8fc688468a30a999
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/cfc4f3eb3917d2f9471000ffa0054f2576ad33f7
 
 Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11888397578)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11888644848)
