@@ -1,3 +1,5 @@
+#[cfg(target_os = "zkvm")]
+use core::hint::black_box;
 use core::ops::{Add, AddAssign, Neg, Sub, SubAssign};
 
 use axvm_algebra::{DivUnsafe, IntMod};
@@ -10,13 +12,20 @@ use {
 
 use super::group::Group;
 
-// Secp256k1 modulus
-// TODO[jpw] rename to Secp256k1Coord
 axvm::moduli_setup! {
-    IntModN = "0xFFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFE FFFFFC2F";
+    Secp256k1Coord = "0xFFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFE FFFFFC2F";
+    Secp256k1Scalar = "0xFFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFE BAAEDCE6 AF48A03B BFD25E8C D0364141";
 }
 
 // TODO[jpw] rename to Secp256k1
 axvm::sw_setup! {
-    EcPointN = IntModN;
+    Secp256k1Point = Secp256k1Coord;
+}
+
+pub fn setup_moduli() {
+    #[cfg(target_os = "zkvm")]
+    {
+        black_box(AXIOM_SERIALIZED_MODULUS_Secp256k1Coord);
+        black_box(AXIOM_SERIALIZED_MODULUS_Secp256k1Scalar);
+    }
 }
