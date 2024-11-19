@@ -953,70 +953,6 @@ impl VmConfig {
                     executors.insert(global_opcode_idx, chip.clone().into());
                     chips.push(AxVmChip::Executor(chip.into()));
                 }
-                ExecutorName::EcLineMul013By013 => {
-                    let chip = Rc::new(RefCell::new(EcLineMul013By013Chip::new(
-                        Rv32VecHeapAdapterChip::<F, 2, 4, 10, 32, 32>::new(
-                            execution_bus,
-                            program_bus,
-                            memory_controller.clone(),
-                            bitwise_lookup_chip.clone(),
-                        ),
-                        memory_controller.clone(),
-                        config32,
-                        BN254.XI,
-                        class_offset,
-                    )));
-                    executors.insert(global_opcode_idx, chip.clone().into());
-                    chips.push(AxVmChip::Executor(chip.into()));
-                }
-                ExecutorName::EcLineMul023By023 => {
-                    let chip = Rc::new(RefCell::new(EcLineMul023By023Chip::new(
-                        Rv32VecHeapAdapterChip::<F, 2, 12, 30, 16, 16>::new(
-                            execution_bus,
-                            program_bus,
-                            memory_controller.clone(),
-                            bitwise_lookup_chip.clone(),
-                        ),
-                        memory_controller.clone(),
-                        config48,
-                        BLS12381.XI,
-                        class_offset,
-                    )));
-                    executors.insert(global_opcode_idx, chip.clone().into());
-                    chips.push(AxVmChip::Executor(chip.into()));
-                }
-                ExecutorName::EcLineMulBy01234 => {
-                    let chip = Rc::new(RefCell::new(EcLineMulBy01234Chip::new(
-                        Rv32VecHeapTwoReadsAdapterChip::<F, 12, 10, 12, 32, 32>::new(
-                            execution_bus,
-                            program_bus,
-                            memory_controller.clone(),
-                            bitwise_lookup_chip.clone(),
-                        ),
-                        memory_controller.clone(),
-                        config32,
-                        BN254.XI,
-                        class_offset,
-                    )));
-                    executors.insert(global_opcode_idx, chip.clone().into());
-                    chips.push(AxVmChip::Executor(chip.into()));
-                }
-                ExecutorName::EcLineMulBy02345 => {
-                    let chip = Rc::new(RefCell::new(EcLineMulBy02345Chip::new(
-                        Rv32VecHeapTwoReadsAdapterChip::<F, 36, 30, 36, 16, 16>::new(
-                            execution_bus,
-                            program_bus,
-                            memory_controller.clone(),
-                            bitwise_lookup_chip.clone(),
-                        ),
-                        memory_controller.clone(),
-                        config48,
-                        BLS12381.XI,
-                        class_offset,
-                    )));
-                    executors.insert(global_opcode_idx, chip.clone().into());
-                    chips.push(AxVmChip::Executor(chip.into()));
-                }
                 _ => unreachable!("Unsupported executor"),
             }
         }
@@ -1125,6 +1061,70 @@ impl VmConfig {
                         ),
                         memory_controller.clone(),
                         config48,
+                        class_offset,
+                    )));
+                    executors.insert(global_opcode_idx, chip.clone().into());
+                    chips.push(AxVmChip::Executor(chip.into()));
+                }
+                ExecutorName::EcLineMul013By013 => {
+                    let chip = Rc::new(RefCell::new(EcLineMul013By013Chip::new(
+                        Rv32VecHeapAdapterChip::<F, 2, 4, 10, 32, 32>::new(
+                            execution_bus,
+                            program_bus,
+                            memory_controller.clone(),
+                            bitwise_lookup_chip.clone(),
+                        ),
+                        memory_controller.clone(),
+                        config32,
+                        BN254.XI,
+                        class_offset,
+                    )));
+                    executors.insert(global_opcode_idx, chip.clone().into());
+                    chips.push(AxVmChip::Executor(chip.into()));
+                }
+                ExecutorName::EcLineMul023By023 => {
+                    let chip = Rc::new(RefCell::new(EcLineMul023By023Chip::new(
+                        Rv32VecHeapAdapterChip::<F, 2, 12, 30, 16, 16>::new(
+                            execution_bus,
+                            program_bus,
+                            memory_controller.clone(),
+                            bitwise_lookup_chip.clone(),
+                        ),
+                        memory_controller.clone(),
+                        config48,
+                        BLS12381.XI,
+                        class_offset,
+                    )));
+                    executors.insert(global_opcode_idx, chip.clone().into());
+                    chips.push(AxVmChip::Executor(chip.into()));
+                }
+                ExecutorName::EcLineMulBy01234 => {
+                    let chip = Rc::new(RefCell::new(EcLineMulBy01234Chip::new(
+                        Rv32VecHeapTwoReadsAdapterChip::<F, 12, 10, 12, 32, 32>::new(
+                            execution_bus,
+                            program_bus,
+                            memory_controller.clone(),
+                            bitwise_lookup_chip.clone(),
+                        ),
+                        memory_controller.clone(),
+                        config32,
+                        BN254.XI,
+                        class_offset,
+                    )));
+                    executors.insert(global_opcode_idx, chip.clone().into());
+                    chips.push(AxVmChip::Executor(chip.into()));
+                }
+                ExecutorName::EcLineMulBy02345 => {
+                    let chip = Rc::new(RefCell::new(EcLineMulBy02345Chip::new(
+                        Rv32VecHeapTwoReadsAdapterChip::<F, 36, 30, 36, 16, 16>::new(
+                            execution_bus,
+                            program_bus,
+                            memory_controller.clone(),
+                            bitwise_lookup_chip.clone(),
+                        ),
+                        memory_controller.clone(),
+                        config48,
+                        BLS12381.XI,
                         class_offset,
                     )));
                     executors.insert(global_opcode_idx, chip.clone().into());
@@ -1438,9 +1438,10 @@ fn gen_pairing_executor_tuple(
 ) -> Vec<(usize, usize, ExecutorName, BigUint)> {
     supported_pairing_curves
         .iter()
-        .enumerate()
-        .flat_map(|(i, curve)| {
-            let pairing_class_offset = PairingOpcode::default_offset() + i * PairingOpcode::COUNT;
+        .flat_map(|curve| {
+            let pairing_idx = *curve as usize;
+            let pairing_class_offset =
+                PairingOpcode::default_offset() + pairing_idx * PairingOpcode::COUNT;
             let bytes = curve.prime().bits().div_ceil(8);
             if bytes <= 32 {
                 vec![
@@ -1462,6 +1463,18 @@ fn gen_pairing_executor_tuple(
                         ExecutorName::EvaluateLineRv32_32,
                         curve.prime(),
                     ),
+                    (
+                        PairingOpcode::MUL_013_BY_013 as usize,
+                        pairing_class_offset,
+                        ExecutorName::EcLineMul013By013,
+                        curve.prime(),
+                    ),
+                    (
+                        PairingOpcode::MUL_BY_01234 as usize,
+                        pairing_class_offset,
+                        ExecutorName::EcLineMulBy01234,
+                        curve.prime(),
+                    ),
                 ]
             } else if bytes <= 48 {
                 vec![
@@ -1481,6 +1494,18 @@ fn gen_pairing_executor_tuple(
                         PairingOpcode::EVALUATE_LINE as usize,
                         pairing_class_offset,
                         ExecutorName::EvaluateLineRv32_48,
+                        curve.prime(),
+                    ),
+                    (
+                        PairingOpcode::MUL_023_BY_023 as usize,
+                        pairing_class_offset,
+                        ExecutorName::EcLineMul023By023,
+                        curve.prime(),
+                    ),
+                    (
+                        PairingOpcode::MUL_BY_02345 as usize,
+                        pairing_class_offset,
+                        ExecutorName::EcLineMulBy02345,
                         curve.prime(),
                     ),
                 ]

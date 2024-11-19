@@ -1,27 +1,25 @@
-// use alloc::vec::Vec;
-
 use core::ops::Mul;
 
-use num::BigInt;
+use axvm_algebra::Field;
+use num_bigint::{BigUint, Sign};
 
-use crate::field::Field;
+mod bls12_381;
+mod bn254;
 
-pub trait ExpBigInt<F: Field>: Field {
-    /// Exponentiates a field element by a BigInt
-    fn exp_bigint(&self, k: BigInt) -> Self
+pub trait ExpBigInt: Field {
+    /// Exponentiates a field element by a BigUint with sign
+    fn exp_bigint(&self, sign: Sign, k: BigUint) -> Self
     where
         for<'a> &'a Self: Mul<&'a Self, Output = Self>,
     {
-        if k == BigInt::from(0) {
+        if k == BigUint::from(0u32) {
             return Self::ONE;
         }
 
-        let mut e = k.clone();
         let mut x = self.clone();
 
-        if k < BigInt::from(0) {
-            x = x.invert().unwrap();
-            e = -k;
+        if sign == Sign::Minus {
+            x = Self::ONE.div_unsafe(&x);
         }
 
         let mut res = Self::ONE;
@@ -29,11 +27,10 @@ pub trait ExpBigInt<F: Field>: Field {
         let x_sq = &x * &x;
         let ops = [x.clone(), x_sq.clone(), &x_sq * &x];
 
-        let bytes = e.to_bytes_be();
-        for &b in bytes.1.iter() {
+        let bytes = k.to_bytes_be();
+        for &b in bytes.iter() {
             let mut mask = 0xc0;
             for j in 0..4 {
-                // res = res.square().square()
                 res = &res * &res * &res * &res;
                 let c = (b & mask) >> (6 - 2 * j);
                 if c != 0 {
@@ -42,9 +39,8 @@ pub trait ExpBigInt<F: Field>: Field {
                 mask >>= 2;
             }
         }
-
         res
     }
-
-    // fn exp_bigint(&self, is_positive: bool, k: Vec<u8>) -> Self {}
 }
+
+impl<F: Field> ExpBigInt for F where for<'a> &'a Self: Mul<&'a Self, Output = Self> {}
