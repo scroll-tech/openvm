@@ -44,16 +44,19 @@ impl RootVerifierProvingKey {
         halo2_k: usize,
         dummy_internal_proof: Proof<SC>,
     ) -> Halo2VerifierCircuit {
-        // let dummy_root_proof = self.generate_dummy_root_proof(dummy_internal_proof);
-        // serde_json::to_writer(
-        //     std::fs::File::create("dummy_root_proof.json").unwrap(),
-        //     &dummy_root_proof,
-        // )
-        // .unwrap();
-        let dummy_root_proof = serde_json::from_reader::<_, Proof<_>>(
-            std::fs::File::open("dummy_root_proof.json").unwrap(),
-        )
-        .unwrap();
+        let file = std::fs::File::open("dummy_root_proof.json");
+        let dummy_root_proof = match file {
+            Ok(file) => serde_json::from_reader::<_, Proof<_>>(file).unwrap(),
+            Err(_) => {
+                let dummy_root_proof = self.generate_dummy_root_proof(dummy_internal_proof);
+                serde_json::to_writer(
+                    std::fs::File::create("dummy_root_proof.json").unwrap(),
+                    &dummy_root_proof,
+                )
+                .unwrap();
+                dummy_root_proof
+            }
+        };
         {
             let e = BabyBearPoseidon2OuterEngine::new(self.vm_pk.fri_params);
             e.verify(&self.vm_pk.vm_pk.get_vk(), &dummy_root_proof)
