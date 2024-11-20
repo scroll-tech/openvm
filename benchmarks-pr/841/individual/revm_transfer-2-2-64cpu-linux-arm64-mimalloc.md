@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| revm_100_transfers | <div style='text-align: right'>2</div>  | <div style='text-align: right'>139,366,735</div>  | <div style='text-align: right'>2,346,349</div>  | <span style="color: red">(+281.0 [+1.8%])</span> <div style='text-align: right'>16,135.0</div>  |
+| revm_100_transfers | <div style='text-align: right'>2</div>  | <div style='text-align: right'>139,366,735</div>  | <div style='text-align: right'>2,346,349</div>  | <span style="color: red">(+93.0 [+0.6%])</span> <div style='text-align: right'>15,793.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| revm_100_transfers | true | <span style="color: green">(-38.0 [-0.3%])</span> <div style='text-align: right'>13,800.0</div>  | <div style='text-align: right'>139,366,735</div>  | <div style='text-align: right'>2,346,349</div>  |
+| revm_100_transfers | true | <span style="color: red">(+222.0 [+1.6%])</span> <div style='text-align: right'>13,867.0</div>  | <div style='text-align: right'>139,366,735</div>  | <div style='text-align: right'>2,346,349</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
@@ -130,7 +130,7 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| revm_100_transfers | <span style="color: green">(-5.0 [-4.6%])</span> <div style='text-align: right'>104.0</div>  | <span style="color: red">(+75.0 [+1.4%])</span> <div style='text-align: right'>5,308.0</div>  | <span style="color: red">(+68.0 [+1.7%])</span> <div style='text-align: right'>4,076.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+6.0 [+3.2%])</span> <div style='text-align: right'>194.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>139,366,735</div>  | <div style='text-align: right'>2,346,349</div>  | <span style="color: red">(+281.0 [+1.8%])</span> <div style='text-align: right'>16,135.0</div>  |
+| revm_100_transfers | <div style='text-align: right'>109.0</div>  | <span style="color: red">(+80.0 [+1.5%])</span> <div style='text-align: right'>5,306.0</div>  | <span style="color: red">(+85.0 [+2.1%])</span> <div style='text-align: right'>4,083.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+12.0 [+6.4%])</span> <div style='text-align: right'>200.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>139,366,735</div>  | <div style='text-align: right'>2,346,349</div>  | <span style="color: red">(+93.0 [+0.6%])</span> <div style='text-align: right'>15,793.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -193,7 +193,7 @@
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| revm_100_transfers | 0 | <span style="color: red">(+9.0 [+0.8%])</span> <div style='text-align: right'>1,192.0</div>  | <span style="color: red">(+197.0 [+2.1%])</span> <div style='text-align: right'>9,635.0</div>  | <div style='text-align: right'>411,492,740</div>  |
+| revm_100_transfers | 0 | <span style="color: green">(-6.0 [-0.5%])</span> <div style='text-align: right'>1,181.0</div>  | <span style="color: red">(+19.0 [+0.2%])</span> <div style='text-align: right'>9,306.0</div>  | <div style='text-align: right'>411,492,740</div>  |
 
 </details>
 
@@ -202,17 +202,17 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e552f9ed20b261c3c8ff8629fa956ace62292444/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e552f9ed20b261c3c8ff8629fa956ace62292444/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e552f9ed20b261c3c8ff8629fa956ace62292444/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e552f9ed20b261c3c8ff8629fa956ace62292444/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e552f9ed20b261c3c8ff8629fa956ace62292444/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e552f9ed20b261c3c8ff8629fa956ace62292444/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e552f9ed20b261c3c8ff8629fa956ace62292444/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e552f9ed20b261c3c8ff8629fa956ace62292444/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e1631d41398a3ef0e27b9363cc8ce2e40a9ab6bb/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e1631d41398a3ef0e27b9363cc8ce2e40a9ab6bb/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e1631d41398a3ef0e27b9363cc8ce2e40a9ab6bb/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e1631d41398a3ef0e27b9363cc8ce2e40a9ab6bb/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e1631d41398a3ef0e27b9363cc8ce2e40a9ab6bb/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e1631d41398a3ef0e27b9363cc8ce2e40a9ab6bb/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e1631d41398a3ef0e27b9363cc8ce2e40a9ab6bb/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e1631d41398a3ef0e27b9363cc8ce2e40a9ab6bb/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/e552f9ed20b261c3c8ff8629fa956ace62292444
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/e1631d41398a3ef0e27b9363cc8ce2e40a9ab6bb
 
 Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11925170822)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11925799386)
