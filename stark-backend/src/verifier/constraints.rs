@@ -106,6 +106,9 @@ where
     let after_challenge = after_challenge_ext_values
         .iter()
         .map(|(local, next)| {
+            for (a, b) in local.iter().zip(next) {
+                println!("local {} next {}", a, b);
+            }
             VerticalPair::new(
                 RowMajorMatrixView::new_row(local),
                 RowMajorMatrixView::new_row(next),
@@ -113,6 +116,10 @@ where
         })
         .collect();
 
+    // println!("alpha {}", alpha);
+    // println!("challenges {:?}", challenges);
+    // println!("public values {:?}", public_values);
+    // println!("exposed values {:?}", exposed_values_after_challenge);
     let mut folder: VerifierConstraintFolder<'_, SC> = GenericVerifierConstraintFolder {
         preprocessed,
         partitioned_main,
@@ -130,6 +137,7 @@ where
     folder.eval_constraints(constraints);
 
     let folded_constraints = folder.accumulator;
+    println!("{}", folded_constraints);
     // Finally, check that
     //     folded_constraints(zeta) / Z_H(zeta) = quotient(zeta)
     if folded_constraints * sels.inv_zeroifier != quotient {

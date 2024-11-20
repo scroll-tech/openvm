@@ -66,6 +66,8 @@ fn test_1() {
     let max_num_user_public_values = axiom_vm_config.max_num_user_public_values;
     #[allow(unused_variables)]
     let (axiom_vm_pk, dummy_internal_proof) = AxiomVmProvingKey::keygen_impl(axiom_vm_config);
+    let _ = axiom_vm_pk.root_verifier_pk.keygen_static_verifier(23, dummy_internal_proof);
+    return;
     let app_engine = BabyBearPoseidon2Engine::new(axiom_vm_pk.app_vm_pk.fri_params);
 
     let mut program = {

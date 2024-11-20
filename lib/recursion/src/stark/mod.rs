@@ -753,6 +753,7 @@ where
             after_challenge_values.next.len(),
             RVar::from(after_challenge_width),
         );
+        builder.print_debug(2222222);
         for i in 0..after_challenge_width {
             after_challenge
                 .local
@@ -761,6 +762,21 @@ where
                 .next
                 .push(builder.get(&after_challenge_values.next, i));
         }
+
+        // builder.print_e(alpha);
+        // for phase_challenges in challenges {
+        //     for c in phase_challenges {
+        //         builder.print_e(*c);
+        //     }
+        // }
+        // for &pv in public_values {
+        //     builder.print_f(pv);
+        // }
+        // for ev_phase in exposed_values_after_challenge {
+        //     for &ev in ev_phase {
+        //         builder.print_e(ev);
+        //     }
+        // }
 
         let folded_constraints = Self::eval_constraints(
             builder,
@@ -796,6 +812,8 @@ where
         let quotient: Ext<_, _> = Self::recompute_quotient(builder, &quotient, qc_domains, zeta);
 
         // Assert that the quotient times the zerofier is equal to the folded constraints.
+        builder.print_debug(11111);
+        builder.print_e(folded_constraints);
         builder.assert_ext_eq(folded_constraints * sels.inv_zeroifier, quotient);
     }
 
@@ -830,6 +848,10 @@ where
             local: unflatten(&after_challenge.local),
             next: unflatten(&after_challenge.next),
         };
+        for i in 0..(after_challenge_values.local.len()) {
+            builder.print_e(after_challenge.local[i]);
+            builder.print_e(after_challenge.next[i]);
+        }
 
         let mut folder: RecursiveVerifierConstraintFolder<C> = GenericVerifierConstraintFolder {
             preprocessed: VerticalPair::new(

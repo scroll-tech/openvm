@@ -21,7 +21,9 @@ use axvm_recursion::{
     witness::Witnessable,
 };
 use p3_baby_bear::BabyBear;
-
+use ax_stark_sdk::config::baby_bear_poseidon2::BabyBearPoseidon2Engine;
+use ax_stark_sdk::config::baby_bear_poseidon2_outer::BabyBearPoseidon2OuterEngine;
+use ax_stark_sdk::engine::{StarkEngine, StarkFriEngine};
 use crate::{
     keygen::RootVerifierProvingKey,
     prover::RootVerifierLocalProver,
@@ -40,6 +42,10 @@ impl RootVerifierProvingKey {
         dummy_internal_proof: Proof<SC>,
     ) -> Halo2VerifierCircuit {
         let dummy_root_proof = self.generate_dummy_root_proof(dummy_internal_proof);
+        {
+            let e = BabyBearPoseidon2OuterEngine::new(self.vm_pk.fri_params);
+            e.verify(&self.vm_pk.vm_pk.get_vk(), &dummy_root_proof).unwrap();
+        }
         let mut witness = Witness::default();
         dummy_root_proof.write(&mut witness);
         let dsl_operations = build_static_verifier_operations(self, &dummy_root_proof);
@@ -60,7 +66,7 @@ impl RootVerifierProvingKey {
                 proofs: vec![dummy_internal_proof],
                 public_values: vec![F::ZERO; num_public_values],
             }
-            .write(),
+                .write(),
         )
     }
 }
