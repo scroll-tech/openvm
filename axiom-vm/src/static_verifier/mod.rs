@@ -62,6 +62,7 @@ impl RootVerifierProvingKey {
         let mut witness = Witness::default();
         dummy_root_proof.write(&mut witness);
         let dsl_operations = build_static_verifier_operations(self, &dummy_root_proof);
+        println!("MOCK");
         Halo2Prover::mock(halo2_k, dsl_operations.clone(), witness.clone());
         panic!("done");
         Halo2VerifierCircuit {

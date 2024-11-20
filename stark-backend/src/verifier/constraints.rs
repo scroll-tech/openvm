@@ -94,6 +94,12 @@ where
             )
         })
         .collect();
+    tracing::debug!("new batch");
+    for v in after_challenge_values.iter() {
+        for e in v.local.iter() {
+            tracing::debug!("after_challenge.local {:?}", e);
+        }
+    }
 
     let after_challenge_ext_values: Vec<_> = after_challenge_values
         .into_iter()

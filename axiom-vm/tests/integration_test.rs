@@ -6,6 +6,7 @@ use ax_stark_sdk::{
         baby_bear_poseidon2::{BabyBearPoseidon2Config, BabyBearPoseidon2Engine},
         baby_bear_poseidon2_outer::BabyBearPoseidon2OuterConfig,
         fri_params::standard_fri_params_with_100_bits_conjectured_security,
+        setup_tracing, setup_tracing_with_log_level,
     },
     engine::{StarkEngine, StarkFriEngine},
 };
@@ -41,6 +42,7 @@ type C = InnerConfig;
 type F = BabyBear;
 #[test]
 fn test_1() {
+    setup_tracing();
     let fri_params = standard_fri_params_with_100_bits_conjectured_security(3);
     let axiom_vm_config = AxiomVmConfig {
         max_num_user_public_values: 16,

@@ -655,6 +655,7 @@ where
                     })
                     .collect_vec();
 
+                builder.print_debug(1234234);
                 Self::verify_single_rap_constraints(
                     builder,
                     air_const,
@@ -761,6 +762,9 @@ where
             after_challenge
                 .next
                 .push(builder.get(&after_challenge_values.next, i));
+        }
+        for c in after_challenge.local.iter() {
+            builder.print_e(*c);
         }
 
         // builder.print_e(alpha);

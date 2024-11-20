@@ -264,6 +264,7 @@ impl<'c, SC: StarkGenericConfig> MultiTraceStarkVerifier<'c, SC> {
         let mut cached_main_commit_idx = 0;
         let mut common_main_matrix_idx = 0;
 
+        dbg!(proof.per_air.len());
         // Verify each RAP's constraints
         for (domain, qc_domains, quotient_chunks, vk, air_proof) in izip!(
             domains,
