@@ -1,9 +1,10 @@
 use std::{borrow::Borrow, sync::Arc};
 
 use ax_stark_sdk::{
-    ax_stark_backend::{config::StarkGenericConfig, p3_field::AbstractField},
+    ax_stark_backend::{config::StarkGenericConfig, p3_field::AbstractField, prover::types::Proof},
     config::{
         baby_bear_poseidon2::{BabyBearPoseidon2Config, BabyBearPoseidon2Engine},
+        baby_bear_poseidon2_outer::BabyBearPoseidon2OuterConfig,
         fri_params::standard_fri_params_with_100_bits_conjectured_security,
     },
     engine::{StarkEngine, StarkFriEngine},
@@ -66,7 +67,9 @@ fn test_1() {
     let max_num_user_public_values = axiom_vm_config.max_num_user_public_values;
     #[allow(unused_variables)]
     let (axiom_vm_pk, dummy_internal_proof) = AxiomVmProvingKey::keygen_impl(axiom_vm_config);
-    let _ = axiom_vm_pk.root_verifier_pk.keygen_static_verifier(23, dummy_internal_proof);
+    let _ = axiom_vm_pk
+        .root_verifier_pk
+        .keygen_static_verifier(23, dummy_internal_proof);
     return;
     let app_engine = BabyBearPoseidon2Engine::new(axiom_vm_pk.app_vm_pk.fri_params);
 
@@ -256,6 +259,51 @@ fn test_1() {
         root_pvs.leaf_verifier_commit,
         app_exe_commit.leaf_vm_verifier_commit
     );
+    serde_json::to_writer(
+        std::fs::File::create("root_proof.json").unwrap(),
+        &root_proof,
+    )
+    .unwrap();
+    #[cfg(feature = "static-verifier")]
+    static_verifier::test_static_verifier(
+        &axiom_vm_pk.root_verifier_pk,
+        dummy_internal_proof,
+        &root_proof,
+    );
+}
+
+#[test]
+fn test_2() {
+    let fri_params = standard_fri_params_with_100_bits_conjectured_security(3);
+    let axiom_vm_config = AxiomVmConfig {
+        max_num_user_public_values: 16,
+        app_fri_params: fri_params,
+        leaf_fri_params: fri_params,
+        internal_fri_params: fri_params,
+        root_fri_params: fri_params,
+        app_vm_config: VmConfig {
+            max_segment_len: 200,
+            continuation_enabled: true,
+            num_public_values: 16,
+            ..Default::default()
+        }
+        .add_executor(ExecutorName::BranchEqual)
+        .add_executor(ExecutorName::Jal)
+        .add_executor(ExecutorName::LoadStore)
+        .add_executor(ExecutorName::FieldArithmetic),
+        compiler_options: CompilerOptions {
+            enable_cycle_tracker: true,
+            compile_prints: true,
+            ..Default::default()
+        },
+    };
+    let max_num_user_public_values = axiom_vm_config.max_num_user_public_values;
+    #[allow(unused_variables)]
+    let (axiom_vm_pk, dummy_internal_proof) = AxiomVmProvingKey::keygen_impl(axiom_vm_config);
+    let root_proof = serde_json::from_reader::<_, Proof<BabyBearPoseidon2OuterConfig>>(
+        std::fs::File::open("root_proof.json").unwrap(),
+    )
+    .unwrap();
     #[cfg(feature = "static-verifier")]
     static_verifier::test_static_verifier(
         &axiom_vm_pk.root_verifier_pk,

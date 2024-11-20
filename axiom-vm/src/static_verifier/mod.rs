@@ -5,6 +5,11 @@ use ax_stark_sdk::{
         p3_field::{AbstractField, PrimeField32},
         prover::types::Proof,
     },
+    config::{
+        baby_bear_poseidon2::BabyBearPoseidon2Engine,
+        baby_bear_poseidon2_outer::BabyBearPoseidon2OuterEngine,
+    },
+    engine::{StarkEngine, StarkFriEngine},
     p3_bn254_fr::Bn254Fr,
 };
 use axvm_circuit::{arch::PROGRAM_CACHED_TRACE_INDEX, prover::SingleSegmentVmProver};
@@ -21,9 +26,7 @@ use axvm_recursion::{
     witness::Witnessable,
 };
 use p3_baby_bear::BabyBear;
-use ax_stark_sdk::config::baby_bear_poseidon2::BabyBearPoseidon2Engine;
-use ax_stark_sdk::config::baby_bear_poseidon2_outer::BabyBearPoseidon2OuterEngine;
-use ax_stark_sdk::engine::{StarkEngine, StarkFriEngine};
+
 use crate::{
     keygen::RootVerifierProvingKey,
     prover::RootVerifierLocalProver,
@@ -41,14 +44,26 @@ impl RootVerifierProvingKey {
         halo2_k: usize,
         dummy_internal_proof: Proof<SC>,
     ) -> Halo2VerifierCircuit {
-        let dummy_root_proof = self.generate_dummy_root_proof(dummy_internal_proof);
+        // let dummy_root_proof = self.generate_dummy_root_proof(dummy_internal_proof);
+        // serde_json::to_writer(
+        //     std::fs::File::create("dummy_root_proof.json").unwrap(),
+        //     &dummy_root_proof,
+        // )
+        // .unwrap();
+        let dummy_root_proof = serde_json::from_reader::<_, Proof<_>>(
+            std::fs::File::open("dummy_root_proof.json").unwrap(),
+        )
+        .unwrap();
         {
             let e = BabyBearPoseidon2OuterEngine::new(self.vm_pk.fri_params);
-            e.verify(&self.vm_pk.vm_pk.get_vk(), &dummy_root_proof).unwrap();
+            e.verify(&self.vm_pk.vm_pk.get_vk(), &dummy_root_proof)
+                .unwrap();
         }
         let mut witness = Witness::default();
         dummy_root_proof.write(&mut witness);
         let dsl_operations = build_static_verifier_operations(self, &dummy_root_proof);
+        Halo2Prover::mock(halo2_k, dsl_operations.clone(), witness.clone());
+        panic!("done");
         Halo2VerifierCircuit {
             pinning: Halo2Prover::keygen(halo2_k, dsl_operations.clone(), witness),
             dsl_ops: dsl_operations,
@@ -66,7 +81,7 @@ impl RootVerifierProvingKey {
                 proofs: vec![dummy_internal_proof],
                 public_values: vec![F::ZERO; num_public_values],
             }
-                .write(),
+            .write(),
         )
     }
 }
