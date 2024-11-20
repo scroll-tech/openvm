@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| revm_100_transfers | <div style='text-align: right'>2</div>  | <div style='text-align: right'>89,874,563</div>  | <div style='text-align: right'>2,322,088</div>  | <span style="color: red">(+301.0 [+1.7%])</span> <div style='text-align: right'>17,503.0</div>  |
+| revm_100_transfers | <div style='text-align: right'>2</div>  | <span style="color: green">(-48,455,487 [-34.8%])</span> <div style='text-align: right'>90,672,928</div>  | <span style="color: red">(+16,411 [+0.7%])</span> <div style='text-align: right'>2,346,349</div>  | <span style="color: red">(+1,441.0 [+9.1%])</span> <div style='text-align: right'>17,279.0</div>  |
 
 
 <details>
@@ -8,125 +8,126 @@
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| revm_100_transfers | true | <span style="color: green">(-268.0 [-0.4%])</span> <div style='text-align: right'>63,758.0</div>  | <div style='text-align: right'>89,874,563</div>  | <div style='text-align: right'>2,322,088</div>  |
+| revm_100_transfers | true | <span style="color: red">(+50,825.0 [+371.1%])</span> <div style='text-align: right'>64,522.0</div>  | <span style="color: green">(-48,455,487 [-34.8%])</span> <div style='text-align: right'>90,672,928</div>  | <span style="color: red">(+16,411 [+0.7%])</span> <div style='text-align: right'>2,346,349</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
-| revm_100_transfers | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true | <div style='text-align: right'>811,513</div>  |
+| revm_100_transfers | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true | <span style="color: red">(+6,812 [+0.8%])</span> <div style='text-align: right'>822,347</div>  |
 | revm_100_transfers | <Rv32BaseAluAdapterAir,LessThanCoreAir<4, 8>> | true | <div style='text-align: right'>29,893</div>  |
-| revm_100_transfers | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | true | <div style='text-align: right'>120,388</div>  |
-| revm_100_transfers | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> | true | <div style='text-align: right'>145,497</div>  |
+| revm_100_transfers | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | true | <span style="color: red">(+246 [+0.2%])</span> <div style='text-align: right'>121,451</div>  |
+| revm_100_transfers | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> | true | <span style="color: red">(+4,467 [+3.1%])</span> <div style='text-align: right'>150,342</div>  |
 | revm_100_transfers | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> | true | <div style='text-align: right'>73,629</div>  |
-| revm_100_transfers | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true | <div style='text-align: right'>46,968</div>  |
-| revm_100_transfers | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true | <div style='text-align: right'>36,990</div>  |
+| revm_100_transfers | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true | <span style="color: green">(-8 [-0.0%])</span> <div style='text-align: right'>48,201</div>  |
+| revm_100_transfers | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true | <span style="color: red">(+291 [+0.8%])</span> <div style='text-align: right'>37,280</div>  |
 | revm_100_transfers | <Rv32LoadStoreAdapterAir,LoadSignExtendCoreAir<4, 8>> | true | <div style='text-align: right'>15,137</div>  |
-| revm_100_transfers | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true | <div style='text-align: right'>959,405</div>  |
+| revm_100_transfers | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true | <span style="color: red">(+4,314 [+0.4%])</span> <div style='text-align: right'>965,114</div>  |
 | revm_100_transfers | <Rv32MultAdapterAir,MulHCoreAir<4, 8>> | true | <div style='text-align: right'>23,081</div>  |
-| revm_100_transfers | <Rv32MultAdapterAir,MultiplicationCoreAir<4, 8>> | true | <div style='text-align: right'>41,136</div>  |
-| revm_100_transfers | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | true | <div style='text-align: right'>17,172</div>  |
+| revm_100_transfers | <Rv32MultAdapterAir,MultiplicationCoreAir<4, 8>> | true | <span style="color: red">(+95 [+0.2%])</span> <div style='text-align: right'>41,230</div>  |
+| revm_100_transfers | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | true | <span style="color: red">(+194 [+1.1%])</span> <div style='text-align: right'>17,365</div>  |
 | revm_100_transfers | BitwiseOperationLookupAir<8> | true | <div style='text-align: right'>65,536</div>  |
-| revm_100_transfers | Memory AccessAdapter<8> | true | <div style='text-align: right'>19,856</div>  |
-| revm_100_transfers | Memory Boundary | true | <div style='text-align: right'>39,712</div>  |
-| revm_100_transfers | Memory Merkle | true | <div style='text-align: right'>48,056</div>  |
+| revm_100_transfers | Memory AccessAdapter<8> | true | <div style='text-align: right'>19,755</div>  |
+| revm_100_transfers | Memory Boundary | true | <div style='text-align: right'>39,510</div>  |
+| revm_100_transfers | Memory Merkle | true | <div style='text-align: right'>46,998</div>  |
 | revm_100_transfers | PhantomAir | true | <div style='text-align: right'>1,279</div>  |
-| revm_100_transfers | ProgramChip | true | <div style='text-align: right'>247,616</div>  |
+| revm_100_transfers | ProgramChip | true | <span style="color: red">(+1 [+0.0%])</span> <div style='text-align: right'>247,620</div>  |
 | revm_100_transfers | RangeTupleCheckerAir<2> | true | <div style='text-align: right'>524,288</div>  |
 
 | group | collect_metrics | dsl_ir | opcode | frequency |
 | --- | --- | --- | --- | --- |
-| revm_100_transfers | true |  | ADD | <div style='text-align: right'>522,354</div>  |
-| revm_100_transfers | true |  | AND | <div style='text-align: right'>89,222</div>  |
-| revm_100_transfers | true |  | AUIPC | <div style='text-align: right'>17,172</div>  |
-| revm_100_transfers | true |  | BEQ | <div style='text-align: right'>49,922</div>  |
+| revm_100_transfers | true |  | ADD | <span style="color: red">(+6,338 [+1.2%])</span> <div style='text-align: right'>530,680</div>  |
+| revm_100_transfers | true |  | AND | <span style="color: red">(+234 [+0.3%])</span> <div style='text-align: right'>90,476</div>  |
+| revm_100_transfers | true |  | AUIPC | <span style="color: red">(+194 [+1.1%])</span> <div style='text-align: right'>17,365</div>  |
+| revm_100_transfers | true |  | BEQ | <span style="color: red">(+749 [+1.5%])</span> <div style='text-align: right'>49,848</div>  |
 | revm_100_transfers | true |  | BGE | <div style='text-align: right'>41</div>  |
-| revm_100_transfers | true |  | BGEU | <div style='text-align: right'>5,680</div>  |
+| revm_100_transfers | true |  | BGEU | <div style='text-align: right'>4,640</div>  |
 | revm_100_transfers | true |  | BLT | <div style='text-align: right'>3,139</div>  |
-| revm_100_transfers | true |  | BLTU | <div style='text-align: right'>64,769</div>  |
-| revm_100_transfers | true |  | BNE | <div style='text-align: right'>95,575</div>  |
-| revm_100_transfers | true |  | JAL | <div style='text-align: right'>11,992</div>  |
-| revm_100_transfers | true |  | JALR | <div style='text-align: right'>36,990</div>  |
+| revm_100_transfers | true |  | BLTU | <div style='text-align: right'>65,809</div>  |
+| revm_100_transfers | true |  | BNE | <span style="color: red">(+3,718 [+3.8%])</span> <div style='text-align: right'>100,494</div>  |
+| revm_100_transfers | true |  | JAL | <span style="color: green">(-8 [-0.1%])</span> <div style='text-align: right'>13,225</div>  |
+| revm_100_transfers | true |  | JALR | <span style="color: red">(+291 [+0.8%])</span> <div style='text-align: right'>37,280</div>  |
 | revm_100_transfers | true |  | LOADB | <div style='text-align: right'>15,137</div>  |
-| revm_100_transfers | true |  | LOADBU | <div style='text-align: right'>190,101</div>  |
-| revm_100_transfers | true |  | LOADW | <div style='text-align: right'>383,886</div>  |
+| revm_100_transfers | true |  | LOADBU | <span style="color: red">(+3,967 [+2.1%])</span> <div style='text-align: right'>194,846</div>  |
+| revm_100_transfers | true |  | LOADW | <span style="color: red">(+167 [+0.0%])</span> <div style='text-align: right'>384,464</div>  |
 | revm_100_transfers | true |  | LUI | <div style='text-align: right'>34,976</div>  |
-| revm_100_transfers | true |  | MUL | <div style='text-align: right'>41,136</div>  |
+| revm_100_transfers | true |  | MUL | <span style="color: red">(+95 [+0.2%])</span> <div style='text-align: right'>41,230</div>  |
 | revm_100_transfers | true |  | MULHU | <div style='text-align: right'>23,081</div>  |
-| revm_100_transfers | true |  | OR | <div style='text-align: right'>106,462</div>  |
+| revm_100_transfers | true |  | OR | <span style="color: green">(-36 [-0.0%])</span> <div style='text-align: right'>107,038</div>  |
 | revm_100_transfers | true |  | PHANTOM | <div style='text-align: right'>1,279</div>  |
-| revm_100_transfers | true |  | SLL | <div style='text-align: right'>99,231</div>  |
+| revm_100_transfers | true |  | SLL | <span style="color: red">(+52 [+0.1%])</span> <div style='text-align: right'>100,100</div>  |
 | revm_100_transfers | true |  | SLT | <div style='text-align: right'>100</div>  |
 | revm_100_transfers | true |  | SLTU | <div style='text-align: right'>29,793</div>  |
 | revm_100_transfers | true |  | SRA | <div style='text-align: right'>40</div>  |
-| revm_100_transfers | true |  | SRL | <div style='text-align: right'>21,117</div>  |
+| revm_100_transfers | true |  | SRL | <span style="color: red">(+194 [+0.9%])</span> <div style='text-align: right'>21,311</div>  |
 | revm_100_transfers | true |  | STOREB | <div style='text-align: right'>28,966</div>  |
 | revm_100_transfers | true |  | STOREH | <div style='text-align: right'>300</div>  |
-| revm_100_transfers | true |  | STOREW | <div style='text-align: right'>356,152</div>  |
-| revm_100_transfers | true |  | SUB | <div style='text-align: right'>30,346</div>  |
-| revm_100_transfers | true |  | XOR | <div style='text-align: right'>63,129</div>  |
+| revm_100_transfers | true |  | STOREW | <span style="color: red">(+180 [+0.1%])</span> <div style='text-align: right'>356,538</div>  |
+| revm_100_transfers | true |  | SUB | <span style="color: red">(+291 [+1.0%])</span> <div style='text-align: right'>30,637</div>  |
+| revm_100_transfers | true |  | XOR | <span style="color: green">(-15 [-0.0%])</span> <div style='text-align: right'>63,516</div>  |
 
 | group | air_name | collect_metrics | dsl_ir | opcode | cells_used |
 | --- | --- | --- | --- | --- | --- |
-| revm_100_transfers | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | ADD | <div style='text-align: right'>18,804,744</div>  |
+| revm_100_transfers | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | ADD | <span style="color: red">(+228,168 [+1.2%])</span> <div style='text-align: right'>19,104,480</div>  |
 | revm_100_transfers | AccessAdapter<8> | true |  | ADD | <div style='text-align: right'>51</div>  |
 | revm_100_transfers | Boundary | true |  | ADD | <div style='text-align: right'>120</div>  |
 | revm_100_transfers | Merkle | true |  | ADD | <div style='text-align: right'>64</div>  |
-| revm_100_transfers | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | AND | <div style='text-align: right'>3,211,992</div>  |
-| revm_100_transfers | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | true |  | AUIPC | <div style='text-align: right'>360,612</div>  |
-| revm_100_transfers | AccessAdapter<8> | true |  | AUIPC | <div style='text-align: right'>51</div>  |
-| revm_100_transfers | Boundary | true |  | AUIPC | <div style='text-align: right'>120</div>  |
-| revm_100_transfers | Merkle | true |  | AUIPC | <div style='text-align: right'>3,520</div>  |
-| revm_100_transfers | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> | true |  | BEQ | <div style='text-align: right'>1,297,972</div>  |
+| revm_100_transfers | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | AND | <span style="color: red">(+8,424 [+0.3%])</span> <div style='text-align: right'>3,257,136</div>  |
+| revm_100_transfers | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | true |  | AUIPC | <span style="color: red">(+4,074 [+1.1%])</span> <div style='text-align: right'>364,665</div>  |
+| revm_100_transfers | AccessAdapter<8> | true |  | AUIPC | <div style='text-align: right'>34</div>  |
+| revm_100_transfers | Boundary | true |  | AUIPC | <div style='text-align: right'>80</div>  |
+| revm_100_transfers | Merkle | true |  | AUIPC | <div style='text-align: right'>3,456</div>  |
+| revm_100_transfers | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> | true |  | BEQ | <span style="color: red">(+19,474 [+1.5%])</span> <div style='text-align: right'>1,296,048</div>  |
 | revm_100_transfers | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> | true |  | BGE | <div style='text-align: right'>1,312</div>  |
-| revm_100_transfers | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> | true |  | BGEU | <div style='text-align: right'>181,760</div>  |
+| revm_100_transfers | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> | true |  | BGEU | <div style='text-align: right'>148,480</div>  |
 | revm_100_transfers | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> | true |  | BLT | <div style='text-align: right'>100,448</div>  |
-| revm_100_transfers | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> | true |  | BLTU | <div style='text-align: right'>2,072,608</div>  |
-| revm_100_transfers | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> | true |  | BNE | <div style='text-align: right'>2,484,950</div>  |
-| revm_100_transfers | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true |  | JAL | <div style='text-align: right'>215,856</div>  |
-| revm_100_transfers | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true |  | JALR | <div style='text-align: right'>1,035,720</div>  |
+| revm_100_transfers | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> | true |  | BLTU | <div style='text-align: right'>2,105,888</div>  |
+| revm_100_transfers | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> | true |  | BNE | <span style="color: red">(+96,668 [+3.8%])</span> <div style='text-align: right'>2,612,844</div>  |
+| revm_100_transfers | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true |  | JAL | <span style="color: green">(-144 [-0.1%])</span> <div style='text-align: right'>238,050</div>  |
+| revm_100_transfers | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true |  | JALR | <span style="color: red">(+8,148 [+0.8%])</span> <div style='text-align: right'>1,043,840</div>  |
 | revm_100_transfers | <Rv32LoadStoreAdapterAir,LoadSignExtendCoreAir<4, 8>> | true |  | LOADB | <div style='text-align: right'>529,795</div>  |
 | revm_100_transfers | AccessAdapter<8> | true |  | LOADB | <div style='text-align: right'>68</div>  |
 | revm_100_transfers | Boundary | true |  | LOADB | <div style='text-align: right'>160</div>  |
 | revm_100_transfers | Merkle | true |  | LOADB | <div style='text-align: right'>640</div>  |
-| revm_100_transfers | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADBU | <div style='text-align: right'>7,604,040</div>  |
+| revm_100_transfers | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADBU | <span style="color: red">(+158,680 [+2.1%])</span> <div style='text-align: right'>7,793,840</div>  |
 | revm_100_transfers | AccessAdapter<8> | true |  | LOADBU | <div style='text-align: right'>204</div>  |
 | revm_100_transfers | Boundary | true |  | LOADBU | <div style='text-align: right'>480</div>  |
-| revm_100_transfers | Merkle | true |  | LOADBU | <div style='text-align: right'>2,240</div>  |
-| revm_100_transfers | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADW | <div style='text-align: right'>15,355,440</div>  |
-| revm_100_transfers | AccessAdapter<8> | true |  | LOADW | <div style='text-align: right'>9,265</div>  |
-| revm_100_transfers | Boundary | true |  | LOADW | <div style='text-align: right'>21,800</div>  |
-| revm_100_transfers | Merkle | true |  | LOADW | <div style='text-align: right'>47,360</div>  |
+| revm_100_transfers | Merkle | true |  | LOADBU | <div style='text-align: right'>2,368</div>  |
+| revm_100_transfers | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADW | <span style="color: red">(+6,680 [+0.0%])</span> <div style='text-align: right'>15,378,560</div>  |
+| revm_100_transfers | AccessAdapter<8> | true |  | LOADW | <span style="color: red">(+17 [+0.2%])</span> <div style='text-align: right'>9,248</div>  |
+| revm_100_transfers | Boundary | true |  | LOADW | <span style="color: red">(+40 [+0.2%])</span> <div style='text-align: right'>21,760</div>  |
+| revm_100_transfers | Merkle | true |  | LOADW | <span style="color: red">(+448 [+1.0%])</span> <div style='text-align: right'>47,360</div>  |
 | revm_100_transfers | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true |  | LUI | <div style='text-align: right'>629,568</div>  |
 | revm_100_transfers | AccessAdapter<8> | true |  | LUI | <div style='text-align: right'>17</div>  |
 | revm_100_transfers | Boundary | true |  | LUI | <div style='text-align: right'>40</div>  |
-| revm_100_transfers | <Rv32MultAdapterAir,MultiplicationCoreAir<4, 8>> | true |  | MUL | <div style='text-align: right'>1,275,216</div>  |
-| revm_100_transfers | AccessAdapter<8> | true |  | MUL | <div style='text-align: right'>34</div>  |
-| revm_100_transfers | Boundary | true |  | MUL | <div style='text-align: right'>80</div>  |
+| revm_100_transfers | <Rv32MultAdapterAir,MultiplicationCoreAir<4, 8>> | true |  | MUL | <span style="color: red">(+2,945 [+0.2%])</span> <div style='text-align: right'>1,278,130</div>  |
+| revm_100_transfers | AccessAdapter<8> | true |  | MUL | <div style='text-align: right'>51</div>  |
+| revm_100_transfers | Boundary | true |  | MUL | <div style='text-align: right'>120</div>  |
 | revm_100_transfers | Merkle | true |  | MUL | <div style='text-align: right'>64</div>  |
 | revm_100_transfers | <Rv32MultAdapterAir,MulHCoreAir<4, 8>> | true |  | MULHU | <div style='text-align: right'>900,159</div>  |
 | revm_100_transfers | AccessAdapter<8> | true |  | MULHU | <div style='text-align: right'>17</div>  |
 | revm_100_transfers | Boundary | true |  | MULHU | <div style='text-align: right'>40</div>  |
-| revm_100_transfers | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | OR | <div style='text-align: right'>3,832,632</div>  |
+| revm_100_transfers | Merkle | true |  | MULHU | <div style='text-align: right'>64</div>  |
+| revm_100_transfers | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | OR | <span style="color: green">(-1,296 [-0.0%])</span> <div style='text-align: right'>3,853,368</div>  |
 | revm_100_transfers | PhantomAir | true |  | PHANTOM | <div style='text-align: right'>7,674</div>  |
-| revm_100_transfers | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | true |  | SLL | <div style='text-align: right'>5,259,243</div>  |
+| revm_100_transfers | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | true |  | SLL | <span style="color: red">(+2,756 [+0.1%])</span> <div style='text-align: right'>5,305,300</div>  |
 | revm_100_transfers | <Rv32BaseAluAdapterAir,LessThanCoreAir<4, 8>> | true |  | SLT | <div style='text-align: right'>3,700</div>  |
 | revm_100_transfers | <Rv32BaseAluAdapterAir,LessThanCoreAir<4, 8>> | true |  | SLTU | <div style='text-align: right'>1,102,341</div>  |
 | revm_100_transfers | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | true |  | SRA | <div style='text-align: right'>2,120</div>  |
-| revm_100_transfers | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | true |  | SRL | <div style='text-align: right'>1,119,201</div>  |
+| revm_100_transfers | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | true |  | SRL | <span style="color: red">(+10,282 [+0.9%])</span> <div style='text-align: right'>1,129,483</div>  |
 | revm_100_transfers | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | STOREB | <div style='text-align: right'>1,158,640</div>  |
 | revm_100_transfers | AccessAdapter<8> | true |  | STOREB | <div style='text-align: right'>39,576</div>  |
 | revm_100_transfers | Boundary | true |  | STOREB | <div style='text-align: right'>93,120</div>  |
-| revm_100_transfers | Merkle | true |  | STOREB | <div style='text-align: right'>361,216</div>  |
+| revm_100_transfers | Merkle | true |  | STOREB | <div style='text-align: right'>333,184</div>  |
 | revm_100_transfers | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | STOREH | <div style='text-align: right'>12,000</div>  |
-| revm_100_transfers | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | STOREW | <div style='text-align: right'>14,246,080</div>  |
-| revm_100_transfers | AccessAdapter<8> | true |  | STOREW | <div style='text-align: right'>288,269</div>  |
-| revm_100_transfers | Boundary | true |  | STOREW | <div style='text-align: right'>678,280</div>  |
-| revm_100_transfers | Merkle | true |  | STOREW | <div style='text-align: right'>1,122,624</div>  |
-| revm_100_transfers | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | SUB | <div style='text-align: right'>1,092,456</div>  |
-| revm_100_transfers | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | XOR | <div style='text-align: right'>2,272,644</div>  |
+| revm_100_transfers | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | STOREW | <span style="color: red">(+7,200 [+0.1%])</span> <div style='text-align: right'>14,261,520</div>  |
+| revm_100_transfers | AccessAdapter<8> | true |  | STOREW | <span style="color: green">(-1,700 [-0.6%])</span> <div style='text-align: right'>286,569</div>  |
+| revm_100_transfers | Boundary | true |  | STOREW | <span style="color: green">(-4,000 [-0.6%])</span> <div style='text-align: right'>674,280</div>  |
+| revm_100_transfers | Merkle | true |  | STOREW | <span style="color: green">(-11,584 [-1.0%])</span> <div style='text-align: right'>1,116,672</div>  |
+| revm_100_transfers | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | SUB | <span style="color: red">(+10,476 [+1.0%])</span> <div style='text-align: right'>1,102,932</div>  |
+| revm_100_transfers | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | XOR | <span style="color: green">(-540 [-0.0%])</span> <div style='text-align: right'>2,286,576</div>  |
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| revm_100_transfers | <div style='text-align: right'>112.0</div>  | <span style="color: red">(+170.0 [+2.7%])</span> <div style='text-align: right'>6,513.0</div>  | <span style="color: red">(+17.0 [+0.3%])</span> <div style='text-align: right'>5,137.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-1.0 [-0.5%])</span> <div style='text-align: right'>214.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>89,874,563</div>  | <div style='text-align: right'>2,322,088</div>  | <span style="color: red">(+301.0 [+1.7%])</span> <div style='text-align: right'>17,503.0</div>  |
+| revm_100_transfers | <span style="color: green">(-5.0 [-4.3%])</span> <div style='text-align: right'>110.0</div>  | <span style="color: red">(+1,259.0 [+24.0%])</span> <div style='text-align: right'>6,495.0</div>  | <span style="color: red">(+1,103.0 [+27.5%])</span> <div style='text-align: right'>5,121.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+11.0 [+5.5%])</span> <div style='text-align: right'>211.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-48,455,487 [-34.8%])</span> <div style='text-align: right'>90,672,928</div>  | <span style="color: red">(+16,411 [+0.7%])</span> <div style='text-align: right'>2,346,349</div>  | <span style="color: red">(+1,441.0 [+9.1%])</span> <div style='text-align: right'>17,279.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -189,7 +190,7 @@
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| revm_100_transfers | 0 | <span style="color: red">(+151.0 [+12.8%])</span> <div style='text-align: right'>1,332.0</div>  | <span style="color: green">(-20.0 [-0.2%])</span> <div style='text-align: right'>9,658.0</div>  | <div style='text-align: right'>411,492,740</div>  |
+| revm_100_transfers | 0 | <span style="color: red">(+155.0 [+13.2%])</span> <div style='text-align: right'>1,331.0</div>  | <span style="color: red">(+27.0 [+0.3%])</span> <div style='text-align: right'>9,453.0</div>  | <div style='text-align: right'>411,492,740</div>  |
 
 </details>
 
@@ -198,17 +199,17 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/338eded45d2c6a99d4fce928211d927ab8487f12/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/338eded45d2c6a99d4fce928211d927ab8487f12/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/338eded45d2c6a99d4fce928211d927ab8487f12/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/338eded45d2c6a99d4fce928211d927ab8487f12/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/338eded45d2c6a99d4fce928211d927ab8487f12/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/338eded45d2c6a99d4fce928211d927ab8487f12/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/338eded45d2c6a99d4fce928211d927ab8487f12/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/338eded45d2c6a99d4fce928211d927ab8487f12/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bdb82e423fd2fa72458377e68e371bb51b818019/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bdb82e423fd2fa72458377e68e371bb51b818019/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bdb82e423fd2fa72458377e68e371bb51b818019/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bdb82e423fd2fa72458377e68e371bb51b818019/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bdb82e423fd2fa72458377e68e371bb51b818019/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bdb82e423fd2fa72458377e68e371bb51b818019/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bdb82e423fd2fa72458377e68e371bb51b818019/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bdb82e423fd2fa72458377e68e371bb51b818019/revm_transfer-2-2-64cpu-linux-arm64-mimalloc-revm_100_transfers.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/338eded45d2c6a99d4fce928211d927ab8487f12
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/bdb82e423fd2fa72458377e68e371bb51b818019
 
 Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11853782824)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11925024985)
