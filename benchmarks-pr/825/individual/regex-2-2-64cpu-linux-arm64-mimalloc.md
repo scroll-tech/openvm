@@ -1,7 +1,7 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| regex_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>238,560,455</div>  | <div style='text-align: right'>4,181,220</div>  | <span style="color: green">(-962.0 [-3.3%])</span> <div style='text-align: right'>28,069.0</div>  |
-| leaf_aggregation | <div style='text-align: right'>2</div>  | <span style="color: red">(+22,676 [+0.0%])</span> <div style='text-align: right'>314,413,467</div>  | <span style="color: red">(+1,981 [+0.0%])</span> <div style='text-align: right'>7,303,295</div>  | <span style="color: green">(-887.0 [-2.2%])</span> <div style='text-align: right'>39,521.0</div>  |
+| regex_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>238,560,455</div>  | <div style='text-align: right'>4,181,220</div>  | <span style="color: green">(-626.0 [-2.2%])</span> <div style='text-align: right'>28,405.0</div>  |
+| leaf_aggregation | <div style='text-align: right'>2</div>  | <span style="color: red">(+19,936 [+0.0%])</span> <div style='text-align: right'>314,410,727</div>  | <span style="color: red">(+1,810 [+0.0%])</span> <div style='text-align: right'>7,303,124</div>  | <span style="color: green">(-913.0 [-2.3%])</span> <div style='text-align: right'>39,495.0</div>  |
 
 
 <details>
@@ -9,7 +9,7 @@
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| regex_program | true | <span style="color: green">(-40.0 [-0.1%])</span> <div style='text-align: right'>68,052.0</div>  | <div style='text-align: right'>238,560,455</div>  | <div style='text-align: right'>4,181,220</div>  |
+| regex_program | true | <span style="color: red">(+780.0 [+1.1%])</span> <div style='text-align: right'>68,872.0</div>  | <div style='text-align: right'>238,560,455</div>  | <div style='text-align: right'>4,181,220</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
@@ -151,8 +151,8 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| regex_program | <span style="color: green">(-2.0 [-4.5%])</span> <div style='text-align: right'>42.0</div>  | <span style="color: green">(-56.0 [-0.7%])</span> <div style='text-align: right'>7,845.0</div>  | <span style="color: green">(-43.0 [-0.8%])</span> <div style='text-align: right'>5,309.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-5.0 [-2.4%])</span> <div style='text-align: right'>201.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>238,560,455</div>  | <div style='text-align: right'>4,181,220</div>  | <span style="color: green">(-962.0 [-3.3%])</span> <div style='text-align: right'>28,069.0</div>  |
-| leaf_aggregation |  |  |  | <div style='text-align: right'>2</div>  |  |  | <span style="color: red">(+22,676 [+0.0%])</span> <div style='text-align: right'>314,413,467</div>  | <span style="color: red">(+1,981 [+0.0%])</span> <div style='text-align: right'>7,303,295</div>  | <span style="color: green">(-887.0 [-2.2%])</span> <div style='text-align: right'>39,521.0</div>  |
+| regex_program | <div style='text-align: right'>44.0</div>  | <span style="color: green">(-26.0 [-0.3%])</span> <div style='text-align: right'>7,875.0</div>  | <span style="color: red">(+4.0 [+0.1%])</span> <div style='text-align: right'>5,356.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-9.0 [-4.4%])</span> <div style='text-align: right'>197.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>238,560,455</div>  | <div style='text-align: right'>4,181,220</div>  | <span style="color: green">(-626.0 [-2.2%])</span> <div style='text-align: right'>28,405.0</div>  |
+| leaf_aggregation |  |  |  | <div style='text-align: right'>2</div>  |  |  | <span style="color: red">(+19,936 [+0.0%])</span> <div style='text-align: right'>314,410,727</div>  | <span style="color: red">(+1,810 [+0.0%])</span> <div style='text-align: right'>7,303,124</div>  | <span style="color: green">(-913.0 [-2.3%])</span> <div style='text-align: right'>39,495.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -234,26 +234,26 @@
 
 | group | segment | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | stark_prove_excluding_trace_time_ms | total_cells | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| regex_program | 0 |  | <span style="color: green">(-13.0 [-0.5%])</span> <div style='text-align: right'>2,525.0</div>  |  |  |  |  | <span style="color: green">(-893.0 [-4.8%])</span> <div style='text-align: right'>17,699.0</div>  | <div style='text-align: right'>790,590,848</div>  |  |
-| leaf_aggregation | 0 | <span style="color: green">(-8.0 [-4.3%])</span> <div style='text-align: right'>177.0</div>  | <span style="color: green">(-114.0 [-1.1%])</span> <div style='text-align: right'>10,138.0</div>  | <span style="color: green">(-107.0 [-1.2%])</span> <div style='text-align: right'>8,465.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-7.0 [-11.7%])</span> <div style='text-align: right'>53.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-773.0 [-2.6%])</span> <div style='text-align: right'>29,383.0</div>  | <div style='text-align: right'>806,027,288</div>  | <span style="color: red">(+88.0 [+0.2%])</span> <div style='text-align: right'>48,035.0</div>  |
+| regex_program | 0 |  | <span style="color: green">(-31.0 [-1.2%])</span> <div style='text-align: right'>2,507.0</div>  |  |  |  |  | <span style="color: green">(-569.0 [-3.1%])</span> <div style='text-align: right'>18,023.0</div>  | <div style='text-align: right'>790,590,848</div>  |  |
+| leaf_aggregation | 0 | <span style="color: green">(-8.0 [-4.3%])</span> <div style='text-align: right'>177.0</div>  | <span style="color: green">(-102.0 [-1.0%])</span> <div style='text-align: right'>10,150.0</div>  | <span style="color: green">(-132.0 [-1.5%])</span> <div style='text-align: right'>8,440.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>60.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-811.0 [-2.7%])</span> <div style='text-align: right'>29,345.0</div>  | <div style='text-align: right'>806,027,288</div>  | <span style="color: red">(+60.0 [+0.1%])</span> <div style='text-align: right'>48,007.0</div>  |
 
 | group | collect_metrics | segment | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- | --- |
-| leaf_aggregation | true | 0 | <span style="color: green">(-126.0 [-0.3%])</span> <div style='text-align: right'>42,494.0</div>  | <span style="color: red">(+22,676 [+0.0%])</span> <div style='text-align: right'>314,413,467</div>  | <span style="color: red">(+1,981 [+0.0%])</span> <div style='text-align: right'>7,303,295</div>  |
+| leaf_aggregation | true | 0 | <span style="color: red">(+163.0 [+0.4%])</span> <div style='text-align: right'>42,783.0</div>  | <span style="color: red">(+19,936 [+0.0%])</span> <div style='text-align: right'>314,410,727</div>  | <span style="color: red">(+1,810 [+0.0%])</span> <div style='text-align: right'>7,303,124</div>  |
 
 | group | chip_name | collect_metrics | segment | rows_used |
 | --- | --- | --- | --- | --- |
 | leaf_aggregation | ProgramChip | true | 0 | <div style='text-align: right'>303,079</div>  |
 | leaf_aggregation | VmConnectorAir | true | 0 | <div style='text-align: right'>2</div>  |
 | leaf_aggregation | Boundary | true | 0 | <div style='text-align: right'>1,050,920</div>  |
-| leaf_aggregation | AccessAdapter<2> | true | 0 | <span style="color: red">(+132 [+0.0%])</span> <div style='text-align: right'>1,106,988</div>  |
-| leaf_aggregation | AccessAdapter<4> | true | 0 | <span style="color: red">(+66 [+0.0%])</span> <div style='text-align: right'>553,704</div>  |
+| leaf_aggregation | AccessAdapter<2> | true | 0 | <span style="color: red">(+88 [+0.0%])</span> <div style='text-align: right'>1,106,944</div>  |
+| leaf_aggregation | AccessAdapter<4> | true | 0 | <span style="color: red">(+44 [+0.0%])</span> <div style='text-align: right'>553,682</div>  |
 | leaf_aggregation | AccessAdapter<8> | true | 0 | <div style='text-align: right'>114,682</div>  |
 | leaf_aggregation | PhantomAir | true | 0 | <div style='text-align: right'>648,017</div>  |
 | leaf_aggregation | <NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>> | true | 0 | <span style="color: green">(-4 [-0.0%])</span> <div style='text-align: right'>2,059,156</div>  |
 | leaf_aggregation | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | 0 | <div style='text-align: right'>1,463,812</div>  |
-| leaf_aggregation | <JalNativeAdapterAir,JalCoreAir> | true | 0 | <span style="color: red">(+1,951 [+2.0%])</span> <div style='text-align: right'>98,845</div>  |
-| leaf_aggregation | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | 0 | <span style="color: red">(+34 [+0.0%])</span> <div style='text-align: right'>2,859,772</div>  |
+| leaf_aggregation | <JalNativeAdapterAir,JalCoreAir> | true | 0 | <span style="color: red">(+1,793 [+1.9%])</span> <div style='text-align: right'>98,687</div>  |
+| leaf_aggregation | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | 0 | <span style="color: red">(+21 [+0.0%])</span> <div style='text-align: right'>2,859,759</div>  |
 | leaf_aggregation | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | true | 0 | <div style='text-align: right'>110,473</div>  |
 | leaf_aggregation | FriReducedOpeningAir | true | 0 | <div style='text-align: right'>570,948</div>  |
 | leaf_aggregation | Poseidon2VmAir<BabyBearParameters> | true | 0 | <div style='text-align: right'>56,122</div>  |
@@ -268,7 +268,7 @@
 | leaf_aggregation | true | AddEFFI | STOREW | 0 | <div style='text-align: right'>582</div>  |
 | leaf_aggregation | true | AddEFI | ADD | 0 | <div style='text-align: right'>556</div>  |
 | leaf_aggregation | true | AddEI | ADD | 0 | <span style="color: red">(+4 [+0.0%])</span> <div style='text-align: right'>96,944</div>  |
-| leaf_aggregation | true | AddFI | ADD | 0 | <span style="color: red">(+30 [+0.0%])</span> <div style='text-align: right'>79,875</div>  |
+| leaf_aggregation | true | AddFI | ADD | 0 | <span style="color: red">(+17 [+0.0%])</span> <div style='text-align: right'>79,862</div>  |
 | leaf_aggregation | true | AddV | ADD | 0 | <div style='text-align: right'>17,371</div>  |
 | leaf_aggregation | true | AddVI | ADD | 0 | <div style='text-align: right'>834,090</div>  |
 | leaf_aggregation | true | Alloc | ADD | 0 | <div style='text-align: right'>62,111</div>  |
@@ -313,7 +313,7 @@
 | leaf_aggregation | true | HintInputVec | PHANTOM | 0 | <div style='text-align: right'>25,432</div>  |
 | leaf_aggregation | true | IfEq | BNE | 0 | <div style='text-align: right'>28,704</div>  |
 | leaf_aggregation | true | IfEqI | BNE | 0 | <div style='text-align: right'>396,434</div>  |
-| leaf_aggregation | true | IfEqI | JAL | 0 | <span style="color: red">(+1,951 [+4.2%])</span> <div style='text-align: right'>48,150</div>  |
+| leaf_aggregation | true | IfEqI | JAL | 0 | <span style="color: red">(+1,793 [+3.9%])</span> <div style='text-align: right'>47,992</div>  |
 | leaf_aggregation | true | IfNe | BEQ | 0 | <div style='text-align: right'>16,989</div>  |
 | leaf_aggregation | true | IfNe | JAL | 0 | <div style='text-align: right'>3</div>  |
 | leaf_aggregation | true | IfNeI | BEQ | 0 | <div style='text-align: right'>2,866</div>  |
@@ -377,10 +377,10 @@
 | leaf_aggregation | AccessAdapter<4> | true | AddEFI | ADD | 0 | <div style='text-align: right'>1,547</div>  |
 | leaf_aggregation | Boundary | true | AddEFI | ADD | 0 | <div style='text-align: right'>2,112</div>  |
 | leaf_aggregation | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | AddEI | ADD | 0 | <span style="color: red">(+120 [+0.0%])</span> <div style='text-align: right'>2,908,320</div>  |
-| leaf_aggregation | AccessAdapter<2> | true | AddEI | ADD | 0 | <span style="color: red">(+132 [+0.0%])</span> <div style='text-align: right'>610,808</div>  |
-| leaf_aggregation | AccessAdapter<4> | true | AddEI | ADD | 0 | <span style="color: red">(+78 [+0.0%])</span> <div style='text-align: right'>360,932</div>  |
+| leaf_aggregation | AccessAdapter<2> | true | AddEI | ADD | 0 | <span style="color: green">(-110 [-0.0%])</span> <div style='text-align: right'>610,566</div>  |
+| leaf_aggregation | AccessAdapter<4> | true | AddEI | ADD | 0 | <span style="color: green">(-65 [-0.0%])</span> <div style='text-align: right'>360,789</div>  |
 | leaf_aggregation | Boundary | true | AddEI | ADD | 0 | <div style='text-align: right'>708,752</div>  |
-| leaf_aggregation | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | AddFI | ADD | 0 | <span style="color: red">(+900 [+0.0%])</span> <div style='text-align: right'>2,396,250</div>  |
+| leaf_aggregation | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | AddFI | ADD | 0 | <span style="color: red">(+510 [+0.0%])</span> <div style='text-align: right'>2,395,860</div>  |
 | leaf_aggregation | Boundary | true | AddFI | ADD | 0 | <div style='text-align: right'>253</div>  |
 | leaf_aggregation | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | AddV | ADD | 0 | <div style='text-align: right'>521,130</div>  |
 | leaf_aggregation | Boundary | true | AddV | ADD | 0 | <div style='text-align: right'>22</div>  |
@@ -448,7 +448,7 @@
 | leaf_aggregation | PhantomAir | true | HintInputVec | PHANTOM | 0 | <div style='text-align: right'>152,592</div>  |
 | leaf_aggregation | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | IfEq | BNE | 0 | <div style='text-align: right'>660,192</div>  |
 | leaf_aggregation | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | IfEqI | BNE | 0 | <div style='text-align: right'>9,117,982</div>  |
-| leaf_aggregation | <JalNativeAdapterAir,JalCoreAir> | true | IfEqI | JAL | 0 | <span style="color: red">(+19,510 [+4.2%])</span> <div style='text-align: right'>481,500</div>  |
+| leaf_aggregation | <JalNativeAdapterAir,JalCoreAir> | true | IfEqI | JAL | 0 | <span style="color: red">(+17,930 [+3.9%])</span> <div style='text-align: right'>479,920</div>  |
 | leaf_aggregation | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | IfNe | BEQ | 0 | <div style='text-align: right'>390,747</div>  |
 | leaf_aggregation | <JalNativeAdapterAir,JalCoreAir> | true | IfNe | JAL | 0 | <div style='text-align: right'>30</div>  |
 | leaf_aggregation | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | IfNeI | BEQ | 0 | <div style='text-align: right'>65,918</div>  |
@@ -483,8 +483,8 @@
 | leaf_aggregation | <NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>> | true | LoadV | LOADW2 | 0 | <div style='text-align: right'>11,023,506</div>  |
 | leaf_aggregation | Boundary | true | LoadV | LOADW2 | 0 | <div style='text-align: right'>979</div>  |
 | leaf_aggregation | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | true | MulE | BBE4MUL | 0 | <div style='text-align: right'>1,318,760</div>  |
-| leaf_aggregation | AccessAdapter<2> | true | MulE | BBE4MUL | 0 | <span style="color: red">(+726 [+0.1%])</span> <div style='text-align: right'>835,384</div>  |
-| leaf_aggregation | AccessAdapter<4> | true | MulE | BBE4MUL | 0 | <span style="color: red">(+429 [+0.1%])</span> <div style='text-align: right'>493,636</div>  |
+| leaf_aggregation | AccessAdapter<2> | true | MulE | BBE4MUL | 0 | <span style="color: red">(+484 [+0.1%])</span> <div style='text-align: right'>835,142</div>  |
+| leaf_aggregation | AccessAdapter<4> | true | MulE | BBE4MUL | 0 | <span style="color: red">(+286 [+0.1%])</span> <div style='text-align: right'>493,493</div>  |
 | leaf_aggregation | Boundary | true | MulE | BBE4MUL | 0 | <div style='text-align: right'>935,792</div>  |
 | leaf_aggregation | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | MulEF | MUL | 0 | <div style='text-align: right'>123,840</div>  |
 | leaf_aggregation | AccessAdapter<2> | true | MulEF | MUL | 0 | <div style='text-align: right'>20,636</div>  |
@@ -574,21 +574,21 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/5cbd0792a66412e65ca7b81284639425a1580791/regex-2-2-64cpu-linux-arm64-mimalloc-leaf_aggregation.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/5cbd0792a66412e65ca7b81284639425a1580791/regex-2-2-64cpu-linux-arm64-mimalloc-leaf_aggregation.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/5cbd0792a66412e65ca7b81284639425a1580791/regex-2-2-64cpu-linux-arm64-mimalloc-leaf_aggregation.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/5cbd0792a66412e65ca7b81284639425a1580791/regex-2-2-64cpu-linux-arm64-mimalloc-leaf_aggregation.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/5cbd0792a66412e65ca7b81284639425a1580791/regex-2-2-64cpu-linux-arm64-mimalloc-leaf_aggregation.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/5cbd0792a66412e65ca7b81284639425a1580791/regex-2-2-64cpu-linux-arm64-mimalloc-leaf_aggregation.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/5cbd0792a66412e65ca7b81284639425a1580791/regex-2-2-64cpu-linux-arm64-mimalloc-leaf_aggregation.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/5cbd0792a66412e65ca7b81284639425a1580791/regex-2-2-64cpu-linux-arm64-mimalloc-leaf_aggregation.dsl_ir.opcode.frequency.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/5cbd0792a66412e65ca7b81284639425a1580791/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/5cbd0792a66412e65ca7b81284639425a1580791/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/5cbd0792a66412e65ca7b81284639425a1580791/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/5cbd0792a66412e65ca7b81284639425a1580791/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/5cbd0792a66412e65ca7b81284639425a1580791/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/5cbd0792a66412e65ca7b81284639425a1580791/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/5cbd0792a66412e65ca7b81284639425a1580791/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/5cbd0792a66412e65ca7b81284639425a1580791/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cbaf6515e35d2e30b46bcd10e634d20341727b3e/regex-2-2-64cpu-linux-arm64-mimalloc-leaf_aggregation.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cbaf6515e35d2e30b46bcd10e634d20341727b3e/regex-2-2-64cpu-linux-arm64-mimalloc-leaf_aggregation.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cbaf6515e35d2e30b46bcd10e634d20341727b3e/regex-2-2-64cpu-linux-arm64-mimalloc-leaf_aggregation.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cbaf6515e35d2e30b46bcd10e634d20341727b3e/regex-2-2-64cpu-linux-arm64-mimalloc-leaf_aggregation.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cbaf6515e35d2e30b46bcd10e634d20341727b3e/regex-2-2-64cpu-linux-arm64-mimalloc-leaf_aggregation.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cbaf6515e35d2e30b46bcd10e634d20341727b3e/regex-2-2-64cpu-linux-arm64-mimalloc-leaf_aggregation.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cbaf6515e35d2e30b46bcd10e634d20341727b3e/regex-2-2-64cpu-linux-arm64-mimalloc-leaf_aggregation.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cbaf6515e35d2e30b46bcd10e634d20341727b3e/regex-2-2-64cpu-linux-arm64-mimalloc-leaf_aggregation.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cbaf6515e35d2e30b46bcd10e634d20341727b3e/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cbaf6515e35d2e30b46bcd10e634d20341727b3e/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cbaf6515e35d2e30b46bcd10e634d20341727b3e/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cbaf6515e35d2e30b46bcd10e634d20341727b3e/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cbaf6515e35d2e30b46bcd10e634d20341727b3e/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cbaf6515e35d2e30b46bcd10e634d20341727b3e/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cbaf6515e35d2e30b46bcd10e634d20341727b3e/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/cbaf6515e35d2e30b46bcd10e634d20341727b3e/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/5cbd0792a66412e65ca7b81284639425a1580791
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/cbaf6515e35d2e30b46bcd10e634d20341727b3e
 
 Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11949731444)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11949870895)
