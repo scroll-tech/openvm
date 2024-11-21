@@ -1,7 +1,7 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
 | base64_json_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>14,982,416</div>  | <div style='text-align: right'>217,310</div>  | <span style="color: green">(-15.0 [-0.6%])</span> <div style='text-align: right'>2,529.0</div>  |
-| leaf_aggregation | <div style='text-align: right'>2</div>  | <span style="color: green">(-6,480 [-0.0%])</span> <div style='text-align: right'>293,133,894</div>  | <span style="color: green">(-609 [-0.0%])</span> <div style='text-align: right'>6,746,037</div>  | <span style="color: red">(+169.0 [+0.5%])</span> <div style='text-align: right'>35,633.0</div>  |
+| leaf_aggregation | <div style='text-align: right'>2</div>  | <span style="color: green">(-6,480 [-0.0%])</span> <div style='text-align: right'>293,133,894</div>  | <span style="color: green">(-609 [-0.0%])</span> <div style='text-align: right'>6,746,037</div>  | <span style="color: red">(+108.0 [+0.3%])</span> <div style='text-align: right'>35,572.0</div>  |
 
 
 <details>
@@ -9,7 +9,7 @@
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| base64_json_program | true | <span style="color: green">(-7.0 [-0.5%])</span> <div style='text-align: right'>1,416.0</div>  | <div style='text-align: right'>14,982,416</div>  | <div style='text-align: right'>217,310</div>  |
+| base64_json_program | true | <span style="color: green">(-4.0 [-0.3%])</span> <div style='text-align: right'>1,419.0</div>  | <div style='text-align: right'>14,982,416</div>  | <div style='text-align: right'>217,310</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
@@ -134,8 +134,8 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| base64_json_program | <span style="color: red">(+2.0 [+16.7%])</span> <div style='text-align: right'>14.0</div>  | <span style="color: green">(-6.0 [-1.1%])</span> <div style='text-align: right'>522.0</div>  | <span style="color: green">(-3.0 [-0.8%])</span> <div style='text-align: right'>350.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-1.0 [-0.5%])</span> <div style='text-align: right'>183.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>14,982,416</div>  | <div style='text-align: right'>217,310</div>  | <span style="color: green">(-15.0 [-0.6%])</span> <div style='text-align: right'>2,529.0</div>  |
-| leaf_aggregation |  |  |  | <div style='text-align: right'>2</div>  |  |  | <span style="color: green">(-6,480 [-0.0%])</span> <div style='text-align: right'>293,133,894</div>  | <span style="color: green">(-609 [-0.0%])</span> <div style='text-align: right'>6,746,037</div>  | <span style="color: red">(+169.0 [+0.5%])</span> <div style='text-align: right'>35,633.0</div>  |
+| base64_json_program | <span style="color: red">(+2.0 [+16.7%])</span> <div style='text-align: right'>14.0</div>  | <span style="color: green">(-4.0 [-0.8%])</span> <div style='text-align: right'>524.0</div>  | <span style="color: green">(-1.0 [-0.3%])</span> <div style='text-align: right'>352.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+6.0 [+3.3%])</span> <div style='text-align: right'>190.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>14,982,416</div>  | <div style='text-align: right'>217,310</div>  | <span style="color: green">(-15.0 [-0.6%])</span> <div style='text-align: right'>2,529.0</div>  |
+| leaf_aggregation |  |  |  | <div style='text-align: right'>2</div>  |  |  | <span style="color: green">(-6,480 [-0.0%])</span> <div style='text-align: right'>293,133,894</div>  | <span style="color: green">(-609 [-0.0%])</span> <div style='text-align: right'>6,746,037</div>  | <span style="color: red">(+108.0 [+0.3%])</span> <div style='text-align: right'>35,572.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -214,12 +214,12 @@
 
 | group | segment | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | stark_prove_excluding_trace_time_ms | total_cells | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| base64_json_program | 0 |  | <span style="color: green">(-3.0 [-1.8%])</span> <div style='text-align: right'>168.0</div>  |  |  |  |  | <span style="color: green">(-6.0 [-0.3%])</span> <div style='text-align: right'>1,839.0</div>  | <div style='text-align: right'>49,353,492</div>  |  |
-| leaf_aggregation | 0 | <span style="color: green">(-1.0 [-0.6%])</span> <div style='text-align: right'>176.0</div>  | <span style="color: red">(+154.0 [+1.6%])</span> <div style='text-align: right'>9,641.0</div>  | <span style="color: red">(+123.0 [+1.6%])</span> <div style='text-align: right'>7,872.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-4.0 [-5.9%])</span> <div style='text-align: right'>64.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: red">(+15.0 [+0.1%])</span> <div style='text-align: right'>25,992.0</div>  | <div style='text-align: right'>786,104,344</div>  | <span style="color: green">(-148.0 [-0.3%])</span> <div style='text-align: right'>48,000.0</div>  |
+| base64_json_program | 0 |  | <span style="color: green">(-3.0 [-1.8%])</span> <div style='text-align: right'>168.0</div>  |  |  |  |  | <span style="color: green">(-8.0 [-0.4%])</span> <div style='text-align: right'>1,837.0</div>  | <div style='text-align: right'>49,353,492</div>  |  |
+| leaf_aggregation | 0 | <span style="color: green">(-3.0 [-1.7%])</span> <div style='text-align: right'>174.0</div>  | <span style="color: red">(+1.0 [+0.0%])</span> <div style='text-align: right'>9,488.0</div>  | <span style="color: red">(+17.0 [+0.2%])</span> <div style='text-align: right'>7,766.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-9.0 [-13.2%])</span> <div style='text-align: right'>59.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: red">(+107.0 [+0.4%])</span> <div style='text-align: right'>26,084.0</div>  | <div style='text-align: right'>786,104,344</div>  | <span style="color: green">(-172.0 [-0.4%])</span> <div style='text-align: right'>47,976.0</div>  |
 
 | group | collect_metrics | segment | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- | --- |
-| leaf_aggregation | true | 0 | <span style="color: green">(-274.0 [-0.7%])</span> <div style='text-align: right'>37,299.0</div>  | <span style="color: green">(-6,480 [-0.0%])</span> <div style='text-align: right'>293,133,894</div>  | <span style="color: green">(-609 [-0.0%])</span> <div style='text-align: right'>6,746,037</div>  |
+| leaf_aggregation | true | 0 | <span style="color: green">(-226.0 [-0.6%])</span> <div style='text-align: right'>37,347.0</div>  | <span style="color: green">(-6,480 [-0.0%])</span> <div style='text-align: right'>293,133,894</div>  | <span style="color: green">(-609 [-0.0%])</span> <div style='text-align: right'>6,746,037</div>  |
 
 | group | chip_name | collect_metrics | segment | rows_used |
 | --- | --- | --- | --- | --- |
@@ -571,4 +571,4 @@ Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11956873128)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11957581650)
