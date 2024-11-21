@@ -238,6 +238,7 @@ impl<N: Field> Var<N> {
         builder: &mut Builder<C>,
         cache: &mut HashMap<SymbolicVar<N>, Self>,
     ) {
+        cache.clear();
         if let Some(v) = cache.get(&src) {
             builder.operations.push(DslIr::AddVI(*self, *v, C::N::ZERO));
             return;
@@ -552,6 +553,7 @@ impl<F: Field> Felt<F> {
         builder: &mut Builder<C>,
         cache: &mut HashMap<SymbolicFelt<F>, Self>,
     ) {
+        cache.clear();
         if let Some(v) = cache.get(&src) {
             builder.operations.push(DslIr::AddFI(*self, *v, C::F::ZERO));
             return;
@@ -891,6 +893,8 @@ impl<F: Field, EF: ExtensionField<F>> Ext<F, EF> {
         ext_cache: &mut HashMap<SymbolicExt<F, EF>, Ext<F, EF>>,
         base_cache: &mut HashMap<SymbolicFelt<F>, Felt<F>>,
     ) {
+        ext_cache.clear();
+        base_cache.clear();
         if let Some(v) = ext_cache.get(&src) {
             builder
                 .operations
