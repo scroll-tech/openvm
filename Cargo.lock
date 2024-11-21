@@ -422,6 +422,7 @@ name = "ax-hashes"
 version = "0.1.0"
 dependencies = [
  "ark-ff 0.4.2",
+ "ax-circuit-derive",
  "ax-circuit-primitives",
  "ax-stark-backend",
  "ax-stark-sdk",
@@ -659,6 +660,7 @@ dependencies = [
  "rand_xoshiro",
  "rustc-hash 2.0.0",
  "serde",
+ "sha2",
  "static_assertions",
  "strum",
  "strum_macros",

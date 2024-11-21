@@ -16,6 +16,7 @@ p3-util = { workspace = true }
 zkhash = { workspace = true }
 
 ax-circuit-primitives = { workspace = true }
+ax-circuit-derive = { workspace = true }
 ax-stark-backend = { workspace = true }
 ax-stark-sdk = { workspace = true }
 

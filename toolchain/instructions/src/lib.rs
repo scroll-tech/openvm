@@ -314,6 +314,15 @@ pub enum Rv32KeccakOpcode {
     KECCAK256,
 }
 
+#[derive(
+    Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, EnumCount, EnumIter, FromRepr, UsizeOpcode,
+)]
+#[opcode_offset = 0x320]
+#[repr(usize)]
+pub enum Rv32Sha256Opcode {
+    SHA256,
+}
+
 // =================================================================================================
 // Intrinsics: 256-bit Integers
 // =================================================================================================

@@ -5,3 +5,4 @@ pub use p3_poseidon2;
 pub use p3_symmetric;
 
 pub mod poseidon2;
+pub mod sha256;
