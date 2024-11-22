@@ -140,18 +140,18 @@ where
             Sha256Air::default_row(&local_cols.inner, &mut next_cols.inner);
         }
 
-        // Fill in the count_corrections
-        for i in (0..height).step_by(width) {
-            let rows = &mut values[i..i + width * 2];
-            let (local, next) = rows.split_at_mut(width);
-            let local_cols: &mut Sha256VmRoundCols<Val<SC>> = local.borrow_mut();
-            let next_cols: &mut Sha256VmRoundCols<Val<SC>> = next.borrow_mut();
-            Sha256Air::generate_count_correction::<Val<SC>>(
-                &local_cols.inner,
-                &mut next_cols.inner,
-                if i < non_padded_height { i % 17 } else { 17 },
-            );
-        }
+        // TODO: Fill in the w_3
+        // for i in (0..height).step_by(width) {
+        //     let rows = &mut values[i..i + width * 2];
+        //     let (local, next) = rows.split_at_mut(width);
+        //     let local_cols: &mut Sha256VmRoundCols<Val<SC>> = local.borrow_mut();
+        //     let next_cols: &mut Sha256VmRoundCols<Val<SC>> = next.borrow_mut();
+        //     Sha256Air::generate_count_correction::<Val<SC>>(
+        //         &local_cols.inner,
+        //         &mut next_cols.inner,
+        //         if i < non_padded_height { i % 17 } else { 17 },
+        //     );
+        // }
         AirProofInput::simple(air, RowMajorMatrix::new(values, width), vec![])
     }
 }

@@ -263,10 +263,11 @@ impl Sha256Air {
             }
         }
     }
+    /// TODO: change to generate w_3
     /// Puts the correct count correction in the `next_row`
     /// Here, row_idx is the index of the row in the block: 0..16 for the first 16 rows and
     /// some value outside of the 0..16 range for other rows (possibly invalid)
-    pub fn generate_count_correction<F: PrimeField32>(
+    pub fn generate_intermeds<F: PrimeField32>(
         local_cols: &Sha256RoundCols<F>,
         next_cols: &mut Sha256RoundCols<F>,
         row_idx: usize,
@@ -313,8 +314,7 @@ impl Sha256Air {
                 }
             }
         }
-        // TODO: need -count_correction?
-        next_cols.message_schedule.count_correction = count_correction;
+        
     }
 
     /// Fills the `next_row` as a padding row

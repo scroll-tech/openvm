@@ -12,9 +12,9 @@ use p3_field::{AbstractField, Field};
 use p3_matrix::Matrix;
 
 use super::{
-    compose, contains_flag, flag_with_val, u32_into_limbs, Sha256DigestCols, Sha256RoundCols,
-    SHA256_H, SHA256_HASH_WORDS, SHA256_K, SHA256_ROUNDS_PER_ROW, SHA256_WORD_BITS,
-    SHA256_WORD_U16S, SHA256_WORD_U8S,
+    compose, contains_flag, contains_flag_range, flag_with_val, u32_into_limbs, Sha256DigestCols,
+    Sha256RoundCols, SHA256_H, SHA256_HASH_WORDS, SHA256_K, SHA256_ROUNDS_PER_ROW,
+    SHA256_WORD_BITS, SHA256_WORD_U16S, SHA256_WORD_U8S,
 };
 
 #[derive(Clone, Debug)]
@@ -191,25 +191,18 @@ impl Sha256Air {
         builder.when_first_row().assert_zero(flags.global_block_idx);
         self.row_idx_encoder
             .eval(builder, &local_cols.flags.row_idx);
-        builder.assert_one(contains_flag::<AB>(
+        builder.assert_one(contains_flag_range::<AB>(
             &self.row_idx_encoder,
             &local_cols.flags.row_idx,
-            &(0..18).collect::<Vec<_>>(),
+            0,
+            17,
         ));
         builder.assert_eq(
-            contains_flag::<AB>(
-                &self.row_idx_encoder,
-                &local_cols.flags.row_idx,
-                &[0, 1, 2, 3],
-            ),
+            contains_flag_range::<AB>(&self.row_idx_encoder, &local_cols.flags.row_idx, 0, 3),
             flags.is_first_4_rows,
         );
         builder.assert_eq(
-            contains_flag::<AB>(
-                &self.row_idx_encoder,
-                &local_cols.flags.row_idx,
-                &(0..16).collect::<Vec<_>>(),
-            ),
+            contains_flag_range::<AB>(&self.row_idx_encoder, &local_cols.flags.row_idx, 0, 15),
             flags.is_round_row,
         );
         builder.assert_eq(
@@ -463,133 +456,81 @@ impl Sha256Air {
     ) {
         let w = [local.message_schedule.w, next.message_schedule.w].concat();
 
-        for i in 0..SHA256_ROUNDS_PER_ROW {
-            let cur = w[i + 4].map(|x| x.into());
-            let cur_sig = Self::small_sig0::<AB>(&w[i + 4]);
-            let cur_1 = w[i + 3].map(|x| x.into());
-            let cur_2 = w[i + 2];
-            let cur_2_sig = Self::small_sig1::<AB>(&cur_2);
+        // Constrain `w_3`
+        // We will only constrain w_3 for rows [4, 15], and let it unconstrained for other rows
+        // Other rows should put the needed value in w_3 to make the below summation constraint hold
+        let is_row_4_15 =
+            contains_flag_range::<AB>(&self.row_idx_encoder, &next.flags.row_idx, 4, 15);
+        for i in 0..SHA256_ROUNDS_PER_ROW - 1 {
+            let w_3 = w[i + 1].map(|x| x.into());
+            let expected_w_3 = next.message_schedule.w_3[i];
             for j in 0..SHA256_WORD_U16S {
-                // the current round index or 0 if it is not a valid round to do a message schedule addition
-                let round_idx = flag_with_val::<AB>(
-                    &self.row_idx_encoder,
-                    &next.flags.row_idx,
-                    &(4..16)
-                        .map(|rw_idx| (rw_idx, rw_idx * SHA256_ROUNDS_PER_ROW + i))
-                        .collect::<Vec<_>>(),
+                let w_3_limb = compose::<AB>(&w_3[j * 16..(j + 1) * 16], 1);
+                builder
+                    .when(is_row_4_15.clone())
+                    .assert_eq(w_3_limb, expected_w_3[j].into());
+            }
+        }
+        // Constrain intermed
+        for i in 0..SHA256_ROUNDS_PER_ROW {
+            // w_idx
+            let w_idx = w[i].map(|x| x.into());
+            // sig_0(w_{idx+1})
+            let sig_w = Self::small_sig0::<AB>(&w[i + 1]);
+            for j in 0..SHA256_WORD_U16S {
+                let w_idx_limb = compose::<AB>(&w_idx[j * 16..(j + 1) * 16], 1);
+                let sig_w_limb = compose::<AB>(&sig_w[j * 16..(j + 1) * 16], 1);
+                builder.assert_eq(
+                    next.message_schedule.intermed_4[i][j],
+                    w_idx_limb + sig_w_limb,
                 );
-                // 1 if the round index is in [16, 63] and 0 otherwise (ie is it a valid round to send an interaction)
-                let is_in_16_63 = contains_flag::<AB>(
-                    &self.row_idx_encoder,
-                    &next.flags.row_idx,
-                    &(4..16).collect::<Vec<_>>(),
+                builder.assert_eq(
+                    next.message_schedule.intermed_8[i][j],
+                    local.message_schedule.intermed_4[i][j],
                 );
-                // the round index + 7 or 0 if it is not a valid round for w_{t-7}
-                let round_idx_7 = flag_with_val::<AB>(
-                    &self.row_idx_encoder,
-                    &next.flags.row_idx,
-                    &if i == 0 {
-                        (3..15)
-                            .map(|rw_idx| (rw_idx, rw_idx * SHA256_ROUNDS_PER_ROW + i + 7))
-                            .collect::<Vec<_>>()
-                    } else {
-                        (2..14)
-                            .map(|rw_idx| (rw_idx, rw_idx * SHA256_ROUNDS_PER_ROW + i + 7))
-                            .collect::<Vec<_>>()
-                    },
-                );
-                // 1 if the round index is in [9, 56] and 0 otherwise
-                let is_in_9_56 = contains_flag::<AB>(
-                    &self.row_idx_encoder,
-                    &next.flags.row_idx,
-                    &if i == 0 {
-                        (3..15).collect::<Vec<_>>()
-                    } else {
-                        (2..14).collect::<Vec<_>>()
-                    },
-                );
-                // the round index + 15 or 0 if it is not a valid round for sig_0(w_{t-15}) + w_{t-16}
-                let round_idx_15 = flag_with_val::<AB>(
-                    &self.row_idx_encoder,
-                    &next.flags.row_idx,
-                    &if i == 0 {
-                        (1..13)
-                            .map(|rw_idx| (rw_idx, rw_idx * SHA256_ROUNDS_PER_ROW + i + 15))
-                            .collect::<Vec<_>>()
-                    } else {
-                        (0..12)
-                            .map(|rw_idx| (rw_idx, rw_idx * SHA256_ROUNDS_PER_ROW + i + 7))
-                            .collect::<Vec<_>>()
-                    },
-                );
-                // 1 if the round index is in [1, 48] and 0 otherwise
-                let is_in_1_48 = contains_flag::<AB>(
-                    &self.row_idx_encoder,
-                    &next.flags.row_idx,
-                    &if i == 0 {
-                        (1..13).collect::<Vec<_>>()
-                    } else {
-                        (0..12).collect::<Vec<_>>()
-                    },
-                );
-
-                let cur_limb = compose::<AB>(&cur[j * 16..(j + 1) * 16], 1);
-                let cur_sig_limb = compose::<AB>(&cur_sig[j * 16..(j + 1) * 16], 1);
-                let cur_1_limb = compose::<AB>(&cur_1[j * 16..(j + 1) * 16], 1);
-                let cur_2_sig_limb = compose::<AB>(&cur_2_sig[j * 16..(j + 1) * 16], 1);
-                let carry = next.message_schedule.carry_or_buffer[i][j * 2]
-                    + AB::Expr::TWO * next.message_schedule.carry_or_buffer[i][j * 2 + 1];
-                let count = cur_2_sig_limb
-                    - carry * AB::Expr::from_canonical_u32(1 << 16)
-                    - cur_limb.clone();
-                let count = if j == 0 {
-                    count
-                } else {
-                    count
-                        + next.message_schedule.carry_or_buffer[i][2 * j - 2]
-                        + AB::Expr::TWO * next.message_schedule.carry_or_buffer[i][j * 2 - 1]
-                };
-                // Pushing the sig_1(w_{t-2})[i] + carry_w[t][i-1] - carry_w[t][i] * 2^16 - w_t[i] part
-                builder.push_send(
-                    self.bus_idx,
-                    [
-                        local.flags.global_block_idx.into(),
-                        round_idx.clone(),
-                        is_in_16_63 * AB::Expr::from_canonical_usize(j),
-                    ],
-                    count,
-                );
-                // Pushing the w_{t-7}[i] part
-                builder.push_send(
-                    self.bus_idx,
-                    [
-                        local.flags.global_block_idx.into(),
-                        round_idx_7.clone(),
-                        is_in_9_56 * AB::Expr::from_canonical_usize(j),
-                    ],
-                    cur_limb.clone(),
-                );
-                // Pushing the sig_0(w_{t-15})[i] + w_{t-16}[i] part
-                builder.push_send(
-                    self.bus_idx,
-                    [
-                        local.flags.global_block_idx.into(),
-                        round_idx_15.clone(),
-                        is_in_1_48 * AB::Expr::from_canonical_usize(j),
-                    ],
-                    cur_1_limb + cur_sig_limb,
+                builder.assert_eq(
+                    next.message_schedule.intermed_12[i][j],
+                    local.message_schedule.intermed_8[i][j],
                 );
             }
         }
-        builder.push_send(
-            self.bus_idx,
-            [
-                local.flags.global_block_idx.into(),
-                AB::Expr::ZERO,
-                AB::Expr::ZERO,
-            ],
-            local.message_schedule.count_correction,
-        );
+
+        // Constrain the message schedule additions
+        for i in 0..SHA256_ROUNDS_PER_ROW {
+            // sig_1(w_{t-2})
+            let sig_w_2: [_; SHA256_WORD_U16S] = array::from_fn(|j| {
+                compose::<AB>(&Self::small_sig1::<AB>(&w[i + 2])[j * 16..(j + 1) * 16], 1)
+            });
+            // w_{t-7}
+            let w_7 = if i < 3 {
+                local.message_schedule.w_3[i].map(|x| x.into())
+            } else {
+                let w_3 = w[i - 3].map(|x| x.into());
+                array::from_fn(|j| compose::<AB>(&w_3[j * 16..(j + 1) * 16], 1))
+            };
+            // sig_0(w_{t-15}) + w_{t-16}
+            let intermed_16 = local.message_schedule.intermed_12[i].map(|x| x.into());
+            // w_t
+            let w_cur = w[i + 4].map(|x| x.into());
+            let w_cur: [_; SHA256_WORD_U16S] =
+                array::from_fn(|j| compose::<AB>(&w_cur[j * 16..(j + 1) * 16], 1));
+
+            for j in 0..SHA256_WORD_U16S {
+                let carry = next.message_schedule.carry_or_buffer[i][j * 2]
+                    + AB::Expr::TWO * next.message_schedule.carry_or_buffer[i][j * 2 + 1];
+                let sum = sig_w_2[j].clone() + w_7[j].clone() + intermed_16[j].clone()
+                    - carry * AB::Expr::from_canonical_u32(1 << 16)
+                    - w_cur[j].clone()
+                    + if j > 0 {
+                        next.message_schedule.carry_or_buffer[i][j * 2 - 2]
+                            + AB::Expr::TWO * next.message_schedule.carry_or_buffer[i][j * 2 - 1]
+                    } else {
+                        AB::Expr::ZERO
+                    };
+                // Note: here we can't do a conditional check because the degree of sum is already 3
+                builder.assert_zero(sum);
+            }
+        }
     }
 
     /// Constrain the work vars according to the sha256 documentation

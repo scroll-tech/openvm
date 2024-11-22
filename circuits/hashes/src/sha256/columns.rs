@@ -24,8 +24,14 @@ pub struct Sha256MessageScheduleCols<T> {
     /// Will be message schedule carries for rows 4..16 and a buffer for rows 0..4 to be used freely by wrapper chips
     /// Note: carries are represented as 2 bit numbers
     pub carry_or_buffer: [[T; SHA256_WORD_U16S * 2]; SHA256_ROUNDS_PER_ROW],
-    /// Need to correct the count of the interactions that were sent for invalid rounds
-    pub count_correction: T,
+    /// The following are used to move data forward to constrain the message schedule additions
+    /// The value of `w` from 3 rounds ago
+    pub w_3: [[T; SHA256_WORD_U16S]; SHA256_ROUNDS_PER_ROW - 1],
+    /// Here intermediate(i) =  w_i + sig_0(w_{i+1})
+    /// Intermed_t represents the intermediate t rounds ago
+    pub intermed_4: [[T; SHA256_WORD_U16S]; SHA256_ROUNDS_PER_ROW],
+    pub intermed_8: [[T; SHA256_WORD_U16S]; SHA256_ROUNDS_PER_ROW],
+    pub intermed_12: [[T; SHA256_WORD_U16S]; SHA256_ROUNDS_PER_ROW],
 }
 
 #[repr(C)]
