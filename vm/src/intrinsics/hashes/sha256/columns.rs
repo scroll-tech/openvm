@@ -20,7 +20,7 @@ pub struct Sha256VmRoundCols<T> {
     /// Need the timestamp as well since it has no information about the timestamp otherwise
     pub cur_timestamp: T,
     /// Padding flags which will be used to encode the the number of non-padding cells in the current row
-    pub pad_flags: [T; 5],
+    pub pad_flags: [T; 6],
     /// A flag that indicates if the current row includes a padding cell
     pub is_padding: T,
     /// Note: We will use the buffer in `inner.message_schedule` as the message
@@ -36,7 +36,7 @@ pub struct Sha256VmDigestCols<T> {
     /// read_ptr here is used to propogate the read pointer to the next row
     pub read_ptr: T,
     pub cur_timestamp: T,
-    pub pad_flags: [T; 5],
+    pub pad_flags: [T; 6],
     pub is_padding: T,
     pub inner: Sha256DigestCols<T>,
 

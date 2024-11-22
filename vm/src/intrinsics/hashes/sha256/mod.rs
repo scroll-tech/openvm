@@ -23,7 +23,8 @@ mod tests;
 use axvm_instructions::{
     instruction::Instruction,
     program::DEFAULT_PC_STEP,
-    riscv::{RV32_CELL_BITS, RV32_REGISTER_NUM_LIMBS}, Rv32Sha256Opcode, UsizeOpcode
+    riscv::{RV32_CELL_BITS, RV32_REGISTER_NUM_LIMBS},
+    Rv32Sha256Opcode, UsizeOpcode,
 };
 use sha2::{Digest, Sha256};
 

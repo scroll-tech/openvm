@@ -118,7 +118,7 @@ pub fn get_flag_pt_array<const N: usize>(encoder: &Encoder, flag_idx: usize) -> 
 }
 
 /// TODO: make this as a method of [Encoder]
-/// Returns an expression that is one if `flag_idxs` contains the encoded flag
+/// Returns an expression that is 1 if `flag_idxs` contains the encoded flag and 0 otherwise
 pub fn contains_flag<AB: InteractionBuilder>(
     encoder: &Encoder,
     vars: &[AB::Var],
@@ -130,7 +130,18 @@ pub fn contains_flag<AB: InteractionBuilder>(
 }
 
 /// TODO: make this as a method of [Encoder]
-/// Returns an expression that is zero if `flag_idxs` doesn't contain the encoded flag
+/// Returns an expression that is 1 if (l..=r) contains the encoded flag and 0 otherwise
+pub fn contains_flag_range<AB: InteractionBuilder>(
+    encoder: &Encoder,
+    vars: &[AB::Var],
+    l: usize,
+    r: usize,
+) -> AB::Expr {
+    contains_flag::<AB>(encoder, vars, &(l..=r).collect::<Vec<_>>())
+}
+
+/// TODO: make this as a method of [Encoder]
+/// Returns an expression that is 0 if `flag_idxs` doesn't contain the encoded flag
 /// and the corresponding value if it does
 pub fn flag_with_val<AB: InteractionBuilder>(
     encoder: &Encoder,

@@ -4,7 +4,8 @@ use ax_circuit_primitives::{
     bitwise_op_lookup::BitwiseOperationLookupBus, encoder::Encoder, utils::not, SubAir,
 };
 use ax_hashes::sha256::{
-    compose, Sha256Air, SHA256_HASH_WORDS, SHA256_WORD_BITS, SHA256_WORD_U16S, SHA256_WORD_U8S,
+    compose, contains_flag, contains_flag_range, flag_with_val, Sha256Air, SHA256_HASH_WORDS,
+    SHA256_WORD_BITS, SHA256_WORD_U16S, SHA256_WORD_U8S,
 };
 use ax_stark_backend::{
     interaction::InteractionBuilder,
@@ -47,10 +48,7 @@ impl<F: Field> BaseAir<F> for Sha256VmAir {
 
 impl<AB: InteractionBuilder> Air<AB> for Sha256VmAir {
     fn eval(&self, builder: &mut AB) {
-        let main = builder.main();
-        let local = main.row_slice(0);
-        let local_cols: &Sha256VmRoundCols<AB::Var> = (*local).borrow();
-
+        self.eval_padding(builder);
         self.eval_transitions(builder);
         self.eval_reads(builder);
         self.eval_last_row(builder);
@@ -58,8 +56,12 @@ impl<AB: InteractionBuilder> Air<AB> for Sha256VmAir {
 }
 
 /// Note: 4th row versions need to be seperated to keep the degree
+#[allow(dead_code)]
 enum PaddingFlags {
-    NotPadding = 1,
+    /// Not considered for padding
+    NotConsidered,
+    /// Not padding - should be equal to the message
+    NotPadding,
     /// FIRST_PADDING_i: it is the first row with padding and there are i cells of non-padding
     FirstPadding0,
     FirstPadding1,
@@ -86,10 +88,11 @@ enum PaddingFlags {
     FirstPadding5_4thRow,
     FirstPadding6_4thRow,
     FirstPadding7_4thRow,
-    /// The entire row is padding and it is not the first row with padding
-    EntirePadding,
+    /// NOTE: if the 4th row has padding it has to be at least 9 cells
     /// The entire row is padding and it is not the first row with padding and it is the 4th row in the block
     EntirePadding4thRow,
+    /// The entire row is padding and it is not the first row with padding
+    EntirePadding,
 }
 
 use PaddingFlags::*;
@@ -97,7 +100,6 @@ impl Sha256VmAir {
     fn eval_padding<AB: InteractionBuilder>(&self, builder: &mut AB) {
         let main = builder.main();
         let (local, next) = (main.row_slice(0), main.row_slice(1));
-        // Doesn't matter which columnn struct we use here
         let local_cols: &Sha256VmRoundCols<AB::Var> = (*local).borrow();
         let next_cols: &Sha256VmRoundCols<AB::Var> = (*next).borrow();
 
@@ -127,29 +129,201 @@ impl Sha256VmAir {
             .when(local_cols.is_padding)
             .when(next_cols.inner.flags.is_first_4_rows)
             .assert_one(next_cols.is_padding);
+
+        let is_row_idx_4 = contains_flag::<AB>(
+            &self.sha256_subair.row_idx_encoder,
+            &local_cols.inner.flags.row_idx,
+            &[3],
+        );
+
+        // Assert that on the 4th row of the last block we have padding
+        builder
+            .when(local_cols.inner.flags.is_last_block)
+            .assert_eq(is_row_idx_4.clone(), local_cols.is_padding);
+
         // indicates if the next row is the first row with padding
-        let is_first_padding = next_cols.is_padding - local_cols.is_padding;
+        let is_first_padding = next_cols.is_padding * not(local_cols.is_padding);
         self.padding_encoder.eval(builder, &local_cols.pad_flags);
 
-        todo!();
-        // Padding flags should be one of the above defined
-        // builder.assert_one(contains_flag::<AB>(
-        //     &self.padding_encoder,
-        //     &local_cols.pad_flags,
-        //     &(NotPadding as usize..=EntirePadding4thRow as usize).collect::<Vec<_>>(),
-        // ));
-        // // When we are not in the first 4 rows or the last block, there should be no padding
-        // builder
-        //     .when(
-        //         not::<AB::Expr>(local_cols.inner.flags.is_first_4_rows)
-        //             + not::<AB::Expr>(local_cols.inner.flags.is_last_block),
-        //     )
-        //     .assert_one(contains_flag::<AB>(
-        //         &self.padding_encoder,
-        //         &local_cols.pad_flags,
-        //         &[NotPadding as usize],
-        //     ));
+        let is_first_paddding_flag = contains_flag_range::<AB>(
+            &self.padding_encoder,
+            &local_cols.pad_flags,
+            FirstPadding0 as usize,
+            FirstPadding7_4thRow as usize,
+        );
+        let is_4th_row_flag = contains_flag_range::<AB>(
+            &self.padding_encoder,
+            &local_cols.pad_flags,
+            FirstPadding0_4thRow as usize,
+            EntirePadding4thRow as usize,
+        );
+        let is_not_considered_flag = contains_flag::<AB>(
+            &self.padding_encoder,
+            &local_cols.pad_flags,
+            &[NotConsidered as usize],
+        );
+
+        let is_not_padding_flag = contains_flag::<AB>(
+            &self.padding_encoder,
+            &local_cols.pad_flags,
+            &[NotPadding as usize],
+        );
+
+        // Padding flags should be one of the options define in [PaddingFlags]
+        builder.assert_one(contains_flag_range::<AB>(
+            &self.padding_encoder,
+            &local_cols.pad_flags,
+            NotConsidered as usize,
+            EntirePadding4thRow as usize,
+        ));
+
+        // When we are not in the first 4 rows it shouldn't be considered for padding
+        builder
+            .when(not::<AB::Expr>(local_cols.inner.flags.is_first_4_rows))
+            .assert_one(is_not_considered_flag.clone());
+        // When we are in the first 4 rows it should be considered for padding
+        builder
+            .when(local_cols.inner.flags.is_first_4_rows)
+            .assert_zero(is_not_considered_flag.clone());
+
+        // Constrains that `is_padding` and the padding flags match
+        builder
+            .when(not(local_cols.is_padding))
+            .assert_one(is_not_padding_flag.clone() + is_not_considered_flag.clone());
+
+        // Constrains that `is_padding` and the padding flags match
+        builder
+            .when(local_cols.is_padding)
+            .assert_zero(is_not_padding_flag.clone() + is_not_considered_flag.clone());
+
+        builder.assert_eq(is_first_padding, is_first_paddding_flag.clone());
+
+        builder
+            .when(local_cols.is_padding)
+            .assert_eq(is_4th_row_flag.clone(), is_row_idx_4);
+
+        // Check the `w`s on case by case basis
+        for i in 0..SHA256_READ_SIZE {
+            let w = get_ith_byte(i);
+            let should_be_message = is_not_padding_flag.clone()
+                + if i < 15 {
+                    contains_flag_range::<AB>(
+                        &self.padding_encoder,
+                        &local_cols.pad_flags,
+                        FirstPadding0 as usize + i + 1,
+                        FirstPadding15 as usize,
+                    )
+                } else {
+                    AB::Expr::ZERO
+                }
+                + if i < 7 {
+                    contains_flag_range::<AB>(
+                        &self.padding_encoder,
+                        &local_cols.pad_flags,
+                        FirstPadding0_4thRow as usize + i + 1,
+                        FirstPadding7_4thRow as usize,
+                    )
+                } else {
+                    AB::Expr::ZERO
+                };
+            builder
+                .when(should_be_message)
+                .assert_eq(w.clone(), message[i]);
+
+            let should_be_zero = contains_flag::<AB>(
+                &self.padding_encoder,
+                &local_cols.pad_flags,
+                &[EntirePadding as usize],
+            ) + if i < 12 {
+                contains_flag::<AB>(
+                    &self.padding_encoder,
+                    &local_cols.pad_flags,
+                    &[EntirePadding4thRow as usize],
+                ) + if i > 0 {
+                    contains_flag_range::<AB>(
+                        &self.padding_encoder,
+                        &local_cols.pad_flags,
+                        FirstPadding0_4thRow as usize,
+                        FirstPadding0_4thRow as usize + i - 1,
+                    )
+                } else {
+                    AB::Expr::ZERO
+                }
+            } else {
+                AB::Expr::ZERO
+            } + if i > 0 {
+                contains_flag_range::<AB>(
+                    &self.padding_encoder,
+                    &local_cols.pad_flags,
+                    FirstPadding0 as usize,
+                    FirstPadding0 as usize + i - 1,
+                )
+            } else {
+                AB::Expr::ZERO
+            };
+            builder.when(should_be_zero).assert_zero(w.clone());
+
+            let should_be_128 = contains_flag::<AB>(
+                &self.padding_encoder,
+                &local_cols.pad_flags,
+                &[FirstPadding0 as usize + i],
+            ) + if i < 8 {
+                contains_flag::<AB>(
+                    &self.padding_encoder,
+                    &local_cols.pad_flags,
+                    &[FirstPadding0_4thRow as usize + i],
+                )
+            } else {
+                AB::Expr::ZERO
+            };
+            builder
+                .when(should_be_128)
+                .assert_eq(w.clone(), AB::Expr::from_canonical_u32(1 << 7));
+
+            // should be len is handled outside of the loop
+        }
+        let appended_len = compose::<AB>(
+            &[
+                get_ith_byte(15),
+                get_ith_byte(14),
+                get_ith_byte(13),
+                get_ith_byte(12),
+            ],
+            RV32_CELL_BITS,
+        );
+
+        let len_val = local_cols.len[0] + local_cols.len[1] * AB::Expr::from_canonical_u32(1 << 6);
+        builder
+            .when(is_4th_row_flag.clone())
+            .assert_eq(appended_len, len_val);
+
+        // Finally, check that the amount of padding with respect to the length of the message
+        let row_idx_val = flag_with_val::<AB>(
+            &self.sha256_subair.row_idx_encoder,
+            &local_cols.inner.flags.row_idx,
+            &(0..4).map(|x| (x, x)).collect::<Vec<_>>(),
+        );
+
+        let row_message_amount = flag_with_val::<AB>(
+            &self.padding_encoder,
+            &local_cols.pad_flags,
+            &(0..16)
+                .map(|i| (FirstPadding0 as usize + i, i))
+                .collect::<Vec<_>>(),
+        ) + flag_with_val::<AB>(
+            &self.padding_encoder,
+            &local_cols.pad_flags,
+            &(0..8)
+                .map(|i| (FirstPadding0_4thRow as usize + i, i))
+                .collect::<Vec<_>>(),
+        );
+        let got_length =
+            row_idx_val * AB::Expr::from_canonical_usize(SHA256_READ_SIZE) + row_message_amount;
+        builder
+            .when(is_4th_row_flag)
+            .assert_eq(got_length, local_cols.len[0]);
     }
+
     /// Implement constraints on `len`, `read_ptr` and `cur_timestamp`
     fn eval_transitions<AB: InteractionBuilder>(&self, builder: &mut AB) {
         let main = builder.main();
@@ -182,6 +356,7 @@ impl Sha256VmAir {
                 local_cols.cur_timestamp + timestamp_delta,
             );
     }
+
     /// Implement the reads for the first 4 rows of a block
     fn eval_reads<AB: InteractionBuilder>(&self, builder: &mut AB) {
         let main = builder.main();
@@ -300,7 +475,7 @@ impl Sha256VmAir {
         // Assert that we read the correct length of the message
         let len_val = compose::<AB>(&local_cols.len_cells.map(|x| x.into()), RV32_CELL_BITS);
         builder.when(is_last_row.clone()).assert_eq(
-            local_cols.len[0] + local_cols.len[1] * AB::Expr::from_canonical_u32(1 << 16),
+            local_cols.len[0] + local_cols.len[1] * AB::Expr::from_canonical_u32(1 << 6),
             len_val,
         );
         // Assert that we started reading from the correct pointer initially
