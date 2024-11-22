@@ -1,10 +1,34498 @@
 Loading metrics from .bench_metrics/verify_fibair-2-2-64cpu-linux-arm64-mimalloc.json
 True
+{
+  "counter": [
+    {
+      "labels": [
+        [
+          "air_name",
+          "FibonacciAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "FibonacciAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "5"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "FibonacciAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "FibonacciAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "16"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "FibonacciAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "32"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "FibonacciAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "FibonacciAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "FibonacciAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "0"
+    },
+    {
+      "labels": [],
+      "metric": "total_cells",
+      "value": "32"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "total_cycles",
+      "value": "199142"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "22"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "82"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "10"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-VerifierProgram"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-VerifierProgram"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-ReadingProofFromInput"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-ReadingProofFromInput"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "6029"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1122"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "247189"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "6029"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "180870"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "HintInputVec"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1963"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "HintInputVec"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11778"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "SHINTW"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "13651"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "SHINTW"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "150161"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "SHINTW"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "559691"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4004"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "15092"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "164164"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "17307"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "15675"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "519210"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4066"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "121980"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "3807"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "462"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "156087"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4101"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "41010"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "21209"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "487807"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "10355"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "310650"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "17108"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "513240"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "5175"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "45210"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "212175"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1348"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "40440"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1510"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "34730"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2052"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "220"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "84132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2584"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "440"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "77520"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2032"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7568"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "83312"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "5596"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "341"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "229436"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1292"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "231"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "38760"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-InitializePcsConst"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-InitializePcsConst"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "5462"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "223942"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "3002"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1496"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "123082"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2772"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "30492"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "113652"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "650"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7150"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "26650"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "16258"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1678"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "15070"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "68798"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "9055"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "968"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "371255"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "IfEqI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "5175"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "IfEqI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "119025"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "848"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "34768"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "92"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "972"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "39852"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-c-build-rounds"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-c-build-rounds"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "939"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "28170"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BEQ"
+        ],
+        [
+          "dsl_ir",
+          "IfNeI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "255"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BEQ"
+        ],
+        [
+          "dsl_ir",
+          "IfNeI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "5865"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "265"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "22770"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "13455"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "8806"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "148135"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "78"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "17"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BEQ"
+        ],
+        [
+          "dsl_ir",
+          "IfNe"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1163"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BEQ"
+        ],
+        [
+          "dsl_ir",
+          "IfNe"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "26749"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          "IfNe"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          "IfNe"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "20"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1572"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "47160"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "396"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "234"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "204"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "IfEq"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "321"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "IfEq"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7383"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "70"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "176"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2870"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "210"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "528"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "8610"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "5412"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "924"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1892"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1118"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1320"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11858"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7007"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "682"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "390"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "492"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "792"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "10846"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "6409"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "19680"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "15191"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "583"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "39"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "680"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3718"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2197"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "20400"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "13456"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "148016"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "551696"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "30"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1429"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "42870"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1096"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "32880"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-verify-pcs"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-verify-pcs"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-1-verify-shape-and-sample-challenges"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-1-verify-shape-and-sample-challenges"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "156"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "HintBitsF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "43"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "HintBitsF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "258"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1333"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "39990"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "14641"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2059"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "47357"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "20"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "460"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "294"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "473"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12054"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-2-fri-fold"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-2-fri-fold"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "924"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "546"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1008"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-reduce-fast"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-reduce-fast"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-reduce-fast-setup"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-reduce-fast-setup"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1008"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash-setup"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash-setup"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          "IfEqI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "934"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          "IfEqI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "9340"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1092"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "48048"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "28392"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "18564"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "610428"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11088"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "6552"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "4284"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-compute-reduced-opening"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-compute-reduced-opening"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1008"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4536"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12056"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7124"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "185976"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-exp-reverse-bits-len"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-exp-reverse-bits-len"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1008"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-single-reduced-opening-eval"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "252"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-single-reduced-opening-eval"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1512"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "FRI_REDUCED_OPENING"
+        ],
+        [
+          "dsl_ir",
+          "FriReducedOpening"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "126"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "FRI_REDUCED_OPENING"
+        ],
+        [
+          "dsl_ir",
+          "FriReducedOpening"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "FRI_REDUCED_OPENING"
+        ],
+        [
+          "dsl_ir",
+          "FriReducedOpening"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1196"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ],
+        [
+          "opcode",
+          "FRI_REDUCED_OPENING"
+        ],
+        [
+          "dsl_ir",
+          "FriReducedOpening"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "21504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "131"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1419"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1677"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3930"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "393"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "16113"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1419"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "296"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2882"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1703"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11840"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3696"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2184"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-3-verify-challenges"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-3-verify-challenges"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-query"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "84"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-query"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "858"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "13838"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "8177"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "34320"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubVIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubVIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "5040"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3696"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2184"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7656"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "4524"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-ext"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "336"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-ext"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2016"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash-ext"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "336"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash-ext"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2016"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "506"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "220"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "18656"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "20240"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "572"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "172"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "946"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "559"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3956"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-e-verify-constraints"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-e-verify-constraints"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivFIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "3"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivFIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "90"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "SubEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "SubEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "SubEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "26"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "SubEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "240"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "164"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "22"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "13"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "40"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "99"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "ProgramChip"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "17628"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "44590"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "21996"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "10998"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "AccessAdapter<8>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "3220"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "5216"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "85882"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "31888"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "5038"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "67449"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "2186"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "336"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "1357"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "131072"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "opcode",
+          "JAL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "492"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "70"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "210"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2584"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddFI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1292"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddV"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "939"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddVI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "17307"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "6029"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "6029"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4066"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqE"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "172"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqEI"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqF"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2059"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqV"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1510"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqVI"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "20"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-InitializePcsConst"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-ReadingProofFromInput"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-VerifierProgram"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-compute-reduced-opening"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-exp-reverse-bits-len"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash-ext"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "336"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash-setup"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-single-reduced-opening-eval"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "252"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-c-build-rounds"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-1-verify-shape-and-sample-challenges"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-2-fri-fold"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-3-verify-challenges"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-verify-pcs"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-e-verify-constraints"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-ext"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "336"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-reduce-fast"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-reduce-fast-setup"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-query"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "84"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivE"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "296"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivFIN"
+        ],
+        [
+          "opcode",
+          "DIV"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "3"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "17108"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "21209"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4101"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "294"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "3807"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "FriReducedOpening"
+        ],
+        [
+          "opcode",
+          "FRI_REDUCED_OPENING"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "126"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "HintBitsF"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "43"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "HintInputVec"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1963"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfEq"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "321"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfEqI"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "5175"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfEqI"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "934"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfNe"
+        ],
+        [
+          "opcode",
+          "BEQ"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1163"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfNe"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfNeI"
+        ],
+        [
+          "opcode",
+          "BEQ"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "255"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "848"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmF"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "3002"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmV"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "5462"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2052"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4536"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "5596"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "972"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4004"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "9055"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "858"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "680"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulF"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1096"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulFI"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulV"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1333"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulVI"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1348"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1092"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "265"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "13456"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2032"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2772"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1678"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "10355"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "opcode",
+          "SHINTW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "13651"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "650"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "5175"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "506"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "393"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "131"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubV"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1429"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubVI"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1572"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubVIN"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "air_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "10"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "82"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "22"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "19680"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "10846"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "6409"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "792"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2870"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "156"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "176"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "8610"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "528"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "77520"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11858"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7007"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "440"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddFI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "38760"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddFI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "231"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddV"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "28170"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddV"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddVI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "519210"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddVI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "15675"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "180870"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "247189"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1122"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "121980"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "39"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqE"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3956"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqE"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "946"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqE"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "559"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqEI"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "92"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqF"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "47357"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqV"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "34730"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqVI"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "460"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-InitializePcsConst"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-ReadingProofFromInput"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-VerifierProgram"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-compute-reduced-opening"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1008"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-exp-reverse-bits-len"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1008"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1008"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash-ext"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2016"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash-setup"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-single-reduced-opening-eval"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1512"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-c-build-rounds"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-1-verify-shape-and-sample-challenges"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-2-fri-fold"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-3-verify-challenges"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-verify-pcs"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-e-verify-constraints"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1008"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-ext"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2016"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-reduce-fast"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-reduce-fast-setup"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-query"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivE"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11840"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivE"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2882"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivE"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1703"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "40"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "22"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "13"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "164"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivFIN"
+        ],
+        [
+          "opcode",
+          "DIV"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "90"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "513240"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "487807"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "air_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "41010"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12054"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "473"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "156087"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "462"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "FriReducedOpening"
+        ],
+        [
+          "opcode",
+          "FRI_REDUCED_OPENING"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "FriReducedOpening"
+        ],
+        [
+          "opcode",
+          "FRI_REDUCED_OPENING"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1196"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "FriReducedOpening"
+        ],
+        [
+          "opcode",
+          "FRI_REDUCED_OPENING"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "21504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "HintBitsF"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "258"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "HintInputVec"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11778"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfEq"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7383"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfEqI"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "119025"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfEqI"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "air_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "9340"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfNe"
+        ],
+        [
+          "opcode",
+          "BEQ"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "26749"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfNe"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "air_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "20"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfNeI"
+        ],
+        [
+          "opcode",
+          "BEQ"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "5865"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "34768"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "924"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "546"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmF"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "123082"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmF"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1496"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmV"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "223942"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmV"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "16258"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "84132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7656"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "4524"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "220"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "185976"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12056"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7124"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "229436"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11088"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "6552"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "4284"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "341"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "39852"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "396"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "234"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "204"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "583"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "164164"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "15092"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "371255"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "968"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "34320"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "13838"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "8177"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "572"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "20400"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3718"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2197"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1320"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1892"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1118"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "924"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "5412"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "682"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "390"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulF"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "32880"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulF"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulFI"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "30"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulFI"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulV"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "39990"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulV"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "14641"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulVI"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "40440"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulVI"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "48048"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "28392"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "18564"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "610428"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "22770"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "13455"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "8806"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "148135"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "551696"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3696"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2184"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "148016"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "83312"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3696"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2184"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7568"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "113652"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "30492"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "68798"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "78"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "17"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "15070"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "310650"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "opcode",
+          "SHINTW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "559691"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "opcode",
+          "SHINTW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "150161"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "26650"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7150"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "212175"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "45210"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "20240"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "18656"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "220"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "16113"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1419"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "99"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3930"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1419"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1677"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "240"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "26"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubV"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "42870"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubV"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubVI"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "47160"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubVI"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "15191"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubVIN"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "5040"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "total_cells_used",
+      "value": "8306107"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "fri.log_blowup",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "3"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VolatileBoundaryAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VolatileBoundaryAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "16"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VolatileBoundaryAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "5"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "5"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "5"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "3"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeLoadStoreAdapterAir<1>, KernelLoadStoreCoreAir<1>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeLoadStoreAdapterAir<1>, KernelLoadStoreCoreAir<1>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "31"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeLoadStoreAdapterAir<1>, KernelLoadStoreCoreAir<1>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "19"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "23"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<JalNativeAdapterAir, JalCoreAir>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<JalNativeAdapterAir, JalCoreAir>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "6"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<JalNativeAdapterAir, JalCoreAir>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "7"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "23"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "15"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "23"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "15"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "59"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "35"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "517"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "32"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "num_segments",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "32768"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "589824"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "10"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "24"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VolatileBoundaryAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "65536"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VolatileBoundaryAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "1245184"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VolatileBoundaryAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VolatileBoundaryAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VolatileBoundaryAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "32768"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "884736"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "16"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "16384"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "475136"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "13"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "16"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "4096"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "135168"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "17"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "16"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "8192"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "114688"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "6"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeLoadStoreAdapterAir<1>, KernelLoadStoreCoreAir<1>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "131072"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeLoadStoreAdapterAir<1>, KernelLoadStoreCoreAir<1>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "8519680"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeLoadStoreAdapterAir<1>, KernelLoadStoreCoreAir<1>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeLoadStoreAdapterAir<1>, KernelLoadStoreCoreAir<1>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "41"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeLoadStoreAdapterAir<1>, KernelLoadStoreCoreAir<1>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "24"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "32768"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "1671168"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "23"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "28"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<JalNativeAdapterAir, JalCoreAir>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "8192"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<JalNativeAdapterAir, JalCoreAir>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "180224"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<JalNativeAdapterAir, JalCoreAir>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<JalNativeAdapterAir, JalCoreAir>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "10"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<JalNativeAdapterAir, JalCoreAir>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "131072"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "6553600"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "30"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "20"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "4096"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "245760"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "40"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "20"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "512"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "71680"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "64"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "76"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "2048"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "1218560"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "559"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "36"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "131072"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "1179648"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "total_cells",
+      "value": "23085080"
+    }
+  ],
+  "gauge": [
+    {
+      "labels": [],
+      "metric": "stark_prove_excluding_trace_time_ms",
+      "value": "13"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "verify_program_compile_ms",
+      "value": "21"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "execute_time_ms",
+      "value": "1033"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "keygen_time_ms",
+      "value": "45"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "commit_exe_time_ms",
+      "value": "15"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "execute_and_trace_gen_time_ms",
+      "value": "267"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "execute_time_ms",
+      "value": "217"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "segment",
+          "0"
+        ]
+      ],
+      "metric": "execute_and_trace_gen_time_ms",
+      "value": "49"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "stark_prove_excluding_trace_time_ms",
+      "value": "1159"
+    }
+  ]
+}
 Loading metrics from prev.json
 True
+{
+  "counter": [
+    {
+      "labels": [
+        [
+          "air_name",
+          "FibonacciAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "FibonacciAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "5"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "FibonacciAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "FibonacciAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "16"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "FibonacciAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "32"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "FibonacciAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "FibonacciAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "FibonacciAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "0"
+    },
+    {
+      "labels": [],
+      "metric": "total_cells",
+      "value": "32"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "total_cycles",
+      "value": "199151"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "22"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "82"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "10"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-VerifierProgram"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-VerifierProgram"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-ReadingProofFromInput"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-ReadingProofFromInput"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "6029"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1122"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "247189"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "6029"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "180870"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "HintInputVec"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1963"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "HintInputVec"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11778"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "SHINTW"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "13651"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "SHINTW"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "150161"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "SHINTW"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "559691"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4004"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "15092"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "164164"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "17307"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "15675"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "519210"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4066"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "121980"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "3807"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "462"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "156087"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4101"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "41010"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "21209"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "487807"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "10355"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "310650"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "17108"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "513240"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "5175"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "45210"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "212175"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1348"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "40440"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1510"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "34730"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2052"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "220"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "84132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2584"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "440"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "77520"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2032"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7568"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "83312"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "5596"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "341"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "229436"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1279"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "231"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "38370"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-InitializePcsConst"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-InitializePcsConst"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "5462"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "223942"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "3002"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1496"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "123082"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2772"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "30492"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "113652"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "650"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7150"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "26650"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "16258"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1678"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "15070"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "68798"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "9055"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "968"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "371255"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "IfEqI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "5175"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "IfEqI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "119025"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "848"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "34768"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "92"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "972"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "39852"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-c-build-rounds"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-c-build-rounds"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "939"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "28170"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BEQ"
+        ],
+        [
+          "dsl_ir",
+          "IfNeI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "255"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BEQ"
+        ],
+        [
+          "dsl_ir",
+          "IfNeI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "5865"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "265"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "22770"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "13455"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "8806"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "148135"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "78"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "17"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BEQ"
+        ],
+        [
+          "dsl_ir",
+          "IfNe"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1163"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BEQ"
+        ],
+        [
+          "dsl_ir",
+          "IfNe"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "26749"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          "IfNe"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          "IfNe"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "20"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1572"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "47160"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "396"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "234"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "204"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "IfEq"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "321"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "IfEq"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7383"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "70"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "176"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2870"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "210"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "528"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "8610"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "5412"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "924"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1892"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1118"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1320"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11682"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "6903"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "682"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "390"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "492"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "792"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "10846"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "6409"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "19680"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "15191"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "583"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "39"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "680"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3718"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2197"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "20400"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "13456"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "148016"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "551696"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "AddV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "30"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1429"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "42870"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1096"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "32880"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-verify-pcs"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-verify-pcs"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-1-verify-shape-and-sample-challenges"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-1-verify-shape-and-sample-challenges"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "156"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "HintBitsF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "43"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "HintBitsF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "258"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1333"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "39990"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulV"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "14641"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2059"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "47357"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "20"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqVI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "460"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "294"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "473"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12054"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-2-fri-fold"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-2-fri-fold"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "924"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "546"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1008"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-reduce-fast"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-reduce-fast"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-reduce-fast-setup"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-reduce-fast-setup"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1008"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash-setup"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash-setup"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          "IfEqI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "956"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "dsl_ir",
+          "IfEqI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "9560"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1092"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "48048"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "28392"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "18564"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "610428"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11088"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "6552"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "4284"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-compute-reduced-opening"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-compute-reduced-opening"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1008"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4536"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12056"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7124"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "185976"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-exp-reverse-bits-len"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-exp-reverse-bits-len"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1008"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-single-reduced-opening-eval"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "252"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-single-reduced-opening-eval"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1512"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "FRI_REDUCED_OPENING"
+        ],
+        [
+          "dsl_ir",
+          "FriReducedOpening"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "126"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "FRI_REDUCED_OPENING"
+        ],
+        [
+          "dsl_ir",
+          "FriReducedOpening"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "FRI_REDUCED_OPENING"
+        ],
+        [
+          "dsl_ir",
+          "FriReducedOpening"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1196"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ],
+        [
+          "opcode",
+          "FRI_REDUCED_OPENING"
+        ],
+        [
+          "dsl_ir",
+          "FriReducedOpening"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "21504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "131"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1419"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1677"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3930"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "393"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "16113"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1419"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "296"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2882"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1703"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11840"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3696"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2184"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-3-verify-challenges"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-3-verify-challenges"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-query"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "84"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-query"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "858"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "13662"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "8073"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "34320"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubVIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubVIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "5040"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3696"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2184"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7656"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "4524"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-ext"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "336"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-ext"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2016"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash-ext"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "336"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash-ext"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2016"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "506"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "220"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "18656"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "20240"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "572"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "172"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "946"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "559"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3956"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-e-verify-constraints"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-e-verify-constraints"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivFIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "3"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivFIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "90"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "SubEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "SubEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "SubEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "26"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "dsl_ir",
+          "SubEI"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "240"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "164"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "22"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "13"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "40"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "99"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "cycle_tracker_span",
+          ""
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "ProgramChip"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "17628"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "44590"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "21964"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "10982"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "AccessAdapter<8>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "3220"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "5216"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "85882"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "31888"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "5060"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "67436"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "2186"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "336"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "1357"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "chip_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "rows_used",
+      "value": "131072"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "opcode",
+          "JAL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "492"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "70"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "210"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2584"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddFI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1279"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddV"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "939"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddVI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "17307"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "6029"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "6029"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4066"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqE"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "172"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqEI"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqF"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2059"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqV"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1510"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqVI"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "20"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-InitializePcsConst"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-ReadingProofFromInput"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-VerifierProgram"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-compute-reduced-opening"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-exp-reverse-bits-len"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash-ext"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "336"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash-setup"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-single-reduced-opening-eval"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "252"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-c-build-rounds"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-1-verify-shape-and-sample-challenges"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-2-fri-fold"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-3-verify-challenges"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-verify-pcs"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-e-verify-constraints"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-ext"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "336"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-reduce-fast"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-reduce-fast-setup"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-query"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "84"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivE"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "296"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivFIN"
+        ],
+        [
+          "opcode",
+          "DIV"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "3"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "17108"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "21209"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4101"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "294"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "3807"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "FriReducedOpening"
+        ],
+        [
+          "opcode",
+          "FRI_REDUCED_OPENING"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "126"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "HintBitsF"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "43"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "HintInputVec"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1963"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfEq"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "321"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfEqI"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "5175"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfEqI"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "956"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfNe"
+        ],
+        [
+          "opcode",
+          "BEQ"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1163"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfNe"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfNeI"
+        ],
+        [
+          "opcode",
+          "BEQ"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "255"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "848"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmF"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "3002"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmV"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "5462"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2052"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4536"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "5596"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "972"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "4004"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "9055"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "858"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "680"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulF"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1096"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulFI"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulV"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1333"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulVI"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1348"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1092"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "265"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "13456"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2032"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "2772"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1678"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "10355"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "opcode",
+          "SHINTW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "13651"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "650"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "5175"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "506"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "393"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "131"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubV"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1429"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubVI"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "1572"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubVIN"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ]
+      ],
+      "metric": "frequency",
+      "value": "168"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "air_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "10"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "82"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          ""
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "22"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "19680"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "10846"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "6409"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddE"
+        ],
+        [
+          "opcode",
+          "FE4ADD"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "792"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2870"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "156"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "176"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "8610"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEFFI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "528"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "77520"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11682"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "6903"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "440"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddFI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "38370"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddFI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "231"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddV"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "28170"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddV"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddVI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "519210"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AddVI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "15675"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "180870"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "247189"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1122"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "121980"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Alloc"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "39"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqE"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3956"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqE"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "946"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqE"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "559"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqEI"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "92"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqF"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "47357"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqV"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "34730"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "AssertEqVI"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "460"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-InitializePcsConst"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-ReadingProofFromInput"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-VerifierProgram"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-compute-reduced-opening"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1008"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-exp-reverse-bits-len"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1008"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1008"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash-ext"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2016"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-poseidon2-hash-setup"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-single-reduced-opening-eval"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1512"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-c-build-rounds"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-1-verify-shape-and-sample-challenges"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-2-fri-fold"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-3-verify-challenges"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-d-verify-pcs"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-stage-e-verify-constraints"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1008"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-ext"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2016"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-reduce-fast"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-batch-reduce-fast-setup"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "CT-verify-query"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivE"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11840"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivE"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2882"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivE"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1703"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "40"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "22"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "opcode",
+          "BBE4DIV"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "13"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "164"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivEIN"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "DivFIN"
+        ],
+        [
+          "opcode",
+          "DIV"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "90"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "513240"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "487807"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "air_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "41010"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12054"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "473"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "156087"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "For"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "462"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "FriReducedOpening"
+        ],
+        [
+          "opcode",
+          "FRI_REDUCED_OPENING"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "FriReducedOpening"
+        ],
+        [
+          "opcode",
+          "FRI_REDUCED_OPENING"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1196"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "FriReducedOpening"
+        ],
+        [
+          "opcode",
+          "FRI_REDUCED_OPENING"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "21504"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "HintBitsF"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "258"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "HintInputVec"
+        ],
+        [
+          "opcode",
+          "PHANTOM"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11778"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfEq"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7383"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfEqI"
+        ],
+        [
+          "opcode",
+          "BNE"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "119025"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfEqI"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "air_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "9560"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfNe"
+        ],
+        [
+          "opcode",
+          "BEQ"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "26749"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfNe"
+        ],
+        [
+          "opcode",
+          "JAL"
+        ],
+        [
+          "air_name",
+          "<JalNativeAdapterAir,JalCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "20"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "IfNeI"
+        ],
+        [
+          "opcode",
+          "BEQ"
+        ],
+        [
+          "air_name",
+          "<BranchNativeAdapterAir,BranchEqualCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "5865"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "34768"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "924"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "546"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmF"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "123082"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmF"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1496"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmV"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "223942"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "ImmV"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "16258"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "84132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7656"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "4524"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "220"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "185976"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "12056"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadE"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7124"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "229436"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11088"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "6552"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "4284"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "341"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "39852"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "396"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "234"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "204"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadF"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "583"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "164164"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "15092"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "371255"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "LoadV"
+        ],
+        [
+          "opcode",
+          "LOADW2"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "968"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "34320"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "13662"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "8073"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulE"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "572"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "20400"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3718"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2197"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEF"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1320"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1892"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1118"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "BBE4MUL"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "924"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "5412"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "682"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "390"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulEI"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulF"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "32880"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulF"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulFI"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "30"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulFI"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulV"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "39990"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulV"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "14641"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulVI"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "40440"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "MulVI"
+        ],
+        [
+          "opcode",
+          "MUL"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "48048"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "28392"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "18564"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2CompressBabyBear"
+        ],
+        [
+          "opcode",
+          "COMP_POS2"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "610428"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "22770"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "13455"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "8806"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "Poseidon2PermuteBabyBear"
+        ],
+        [
+          "opcode",
+          "PERM_POS2"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "148135"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "551696"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3696"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2184"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "148016"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "83312"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3696"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "2184"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreE"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7568"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "113652"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "30492"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "68798"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "132"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "78"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<8>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "17"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreF"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "15070"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "310650"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "opcode",
+          "SHINTW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "559691"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreHintWord"
+        ],
+        [
+          "opcode",
+          "SHINTW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "150161"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "26650"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "opcode",
+          "STOREW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "7150"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "212175"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "StoreV"
+        ],
+        [
+          "opcode",
+          "STOREW2"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "45210"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "air_name",
+          "<NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "20240"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "18656"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "11024"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubE"
+        ],
+        [
+          "opcode",
+          "FE4SUB"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "220"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "<NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "16113"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1419"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "LOADW"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "99"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "3930"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1419"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "1677"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEF"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "240"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<2>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubEI"
+        ],
+        [
+          "opcode",
+          "ADD"
+        ],
+        [
+          "air_name",
+          "AccessAdapter<4>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "26"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubV"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "42870"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubV"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubVI"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "47160"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubVI"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "Boundary"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "15191"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "dsl_ir",
+          "SubVIN"
+        ],
+        [
+          "opcode",
+          "SUB"
+        ],
+        [
+          "air_name",
+          "<NativeAdapterAir<2, 1>,FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells_used",
+      "value": "5040"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "total_cells_used",
+      "value": "8305377"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "fri.log_blowup",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "3"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VolatileBoundaryAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VolatileBoundaryAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "16"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VolatileBoundaryAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "5"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "5"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "5"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "3"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeLoadStoreAdapterAir<1>, KernelLoadStoreCoreAir<1>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeLoadStoreAdapterAir<1>, KernelLoadStoreCoreAir<1>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "31"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeLoadStoreAdapterAir<1>, KernelLoadStoreCoreAir<1>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "19"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "23"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<JalNativeAdapterAir, JalCoreAir>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<JalNativeAdapterAir, JalCoreAir>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "6"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<JalNativeAdapterAir, JalCoreAir>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "7"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "23"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "15"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "23"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "15"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "59"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "35"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "517"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "32"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "num_segments",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "32768"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "589824"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "10"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "24"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VolatileBoundaryAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "65536"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VolatileBoundaryAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "1245184"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VolatileBoundaryAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VolatileBoundaryAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VolatileBoundaryAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "32768"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "884736"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "16"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "16384"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "475136"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "13"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "16"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "4096"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "135168"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "17"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "16"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "8192"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "114688"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "6"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeLoadStoreAdapterAir<1>, KernelLoadStoreCoreAir<1>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "131072"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeLoadStoreAdapterAir<1>, KernelLoadStoreCoreAir<1>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "8519680"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeLoadStoreAdapterAir<1>, KernelLoadStoreCoreAir<1>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeLoadStoreAdapterAir<1>, KernelLoadStoreCoreAir<1>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "41"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeLoadStoreAdapterAir<1>, KernelLoadStoreCoreAir<1>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "24"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "32768"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "1671168"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "23"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "28"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<JalNativeAdapterAir, JalCoreAir>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "8192"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<JalNativeAdapterAir, JalCoreAir>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "180224"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<JalNativeAdapterAir, JalCoreAir>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<JalNativeAdapterAir, JalCoreAir>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "10"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<JalNativeAdapterAir, JalCoreAir>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "131072"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "6553600"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "30"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "20"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "4096"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "245760"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "40"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "20"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "512"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "71680"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "64"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "FriReducedOpeningAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "76"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "2048"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "1218560"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "559"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "Poseidon2VmAir<BabyBearParameters>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "36"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "131072"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "1179648"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "total_cells",
+      "value": "23085080"
+    }
+  ],
+  "gauge": [
+    {
+      "labels": [],
+      "metric": "stark_prove_excluding_trace_time_ms",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "verify_program_compile_ms",
+      "value": "21"
+    },
+    {
+      "labels": [
+        [
+          "collect_metrics",
+          "true"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "execute_time_ms",
+      "value": "1026"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "keygen_time_ms",
+      "value": "45"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "commit_exe_time_ms",
+      "value": "15"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "execute_and_trace_gen_time_ms",
+      "value": "257"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "execute_time_ms",
+      "value": "211"
+    },
+    {
+      "labels": [
+        [
+          "group",
+          "verify_fibair"
+        ],
+        [
+          "segment",
+          "0"
+        ]
+      ],
+      "metric": "execute_and_trace_gen_time_ms",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "segment",
+          "0"
+        ],
+        [
+          "group",
+          "verify_fibair"
+        ]
+      ],
+      "metric": "stark_prove_excluding_trace_time_ms",
+      "value": "1165"
+    }
+  ]
+}
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| verify_fibair | <div style='text-align: right'>2</div>  | <span style="color: green">(-2,200 [-0.0%])</span> <div style='text-align: right'>8,306,107</div>  | <span style="color: green">(-127 [-0.1%])</span> <div style='text-align: right'>199,142</div>  | <span style="color: red">(+3.0 [+0.2%])</span> <div style='text-align: right'>1,469.0</div>  |
+| verify_fibair | <div style='text-align: right'>2</div>  | <span style="color: red">(+730 [+0.0%])</span> <div style='text-align: right'>8,306,107</div>  | <span style="color: green">(-9 [-0.0%])</span> <div style='text-align: right'>199,142</div>  | <span style="color: red">(+9.0 [+0.6%])</span> <div style='text-align: right'>1,475.0</div>  |
 
 
 <details>
@@ -16,25 +34504,25 @@ True
 
 | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- |
-| <span style="color: red">(+1.0 [+9.1%])</span> <div style='text-align: right'>12.0</div>  | <div style='text-align: right'>32</div>  |
+| <span style="color: red">(+1.0 [+8.3%])</span> <div style='text-align: right'>13.0</div>  | <div style='text-align: right'>32</div>  |
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| verify_fibair | true | <div style='text-align: right'>1,031.0</div>  | <span style="color: green">(-2,200 [-0.0%])</span> <div style='text-align: right'>8,306,107</div>  | <span style="color: green">(-127 [-0.1%])</span> <div style='text-align: right'>199,142</div>  |
+| verify_fibair | true | <span style="color: red">(+7.0 [+0.7%])</span> <div style='text-align: right'>1,033.0</div>  | <span style="color: red">(+730 [+0.0%])</span> <div style='text-align: right'>8,306,107</div>  | <span style="color: green">(-9 [-0.0%])</span> <div style='text-align: right'>199,142</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
 | verify_fibair | ProgramChip | true | <div style='text-align: right'>17,628</div>  |
 | verify_fibair | VmConnectorAir | true | <div style='text-align: right'>2</div>  |
 | verify_fibair | Boundary | true | <div style='text-align: right'>44,590</div>  |
-| verify_fibair | AccessAdapter<2> | true | <span style="color: green">(-44 [-0.2%])</span> <div style='text-align: right'>21,996</div>  |
-| verify_fibair | AccessAdapter<4> | true | <span style="color: green">(-22 [-0.2%])</span> <div style='text-align: right'>10,998</div>  |
+| verify_fibair | AccessAdapter<2> | true | <span style="color: red">(+32 [+0.1%])</span> <div style='text-align: right'>21,996</div>  |
+| verify_fibair | AccessAdapter<4> | true | <span style="color: red">(+16 [+0.1%])</span> <div style='text-align: right'>10,998</div>  |
 | verify_fibair | AccessAdapter<8> | true | <div style='text-align: right'>3,220</div>  |
 | verify_fibair | PhantomAir | true | <div style='text-align: right'>5,216</div>  |
 | verify_fibair | <NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>> | true | <div style='text-align: right'>85,882</div>  |
 | verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | <div style='text-align: right'>31,888</div>  |
-| verify_fibair | <JalNativeAdapterAir,JalCoreAir> | true | <span style="color: green">(-119 [-2.3%])</span> <div style='text-align: right'>5,038</div>  |
-| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | <span style="color: green">(-8 [-0.0%])</span> <div style='text-align: right'>67,449</div>  |
+| verify_fibair | <JalNativeAdapterAir,JalCoreAir> | true | <span style="color: green">(-22 [-0.4%])</span> <div style='text-align: right'>5,038</div>  |
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | <span style="color: red">(+13 [+0.0%])</span> <div style='text-align: right'>67,449</div>  |
 | verify_fibair | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | true | <div style='text-align: right'>2,186</div>  |
 | verify_fibair | FriReducedOpeningAir | true | <div style='text-align: right'>336</div>  |
 | verify_fibair | Poseidon2VmAir<BabyBearParameters> | true | <div style='text-align: right'>1,357</div>  |
@@ -48,7 +34536,7 @@ True
 | verify_fibair | true | AddEFFI | LOADW | <div style='text-align: right'>70</div>  |
 | verify_fibair | true | AddEFFI | STOREW | <div style='text-align: right'>210</div>  |
 | verify_fibair | true | AddEI | ADD | <div style='text-align: right'>2,584</div>  |
-| verify_fibair | true | AddFI | ADD | <span style="color: green">(-8 [-0.6%])</span> <div style='text-align: right'>1,292</div>  |
+| verify_fibair | true | AddFI | ADD | <span style="color: red">(+13 [+1.0%])</span> <div style='text-align: right'>1,292</div>  |
 | verify_fibair | true | AddV | ADD | <div style='text-align: right'>939</div>  |
 | verify_fibair | true | AddVI | ADD | <div style='text-align: right'>17,307</div>  |
 | verify_fibair | true | Alloc | ADD | <div style='text-align: right'>6,029</div>  |
@@ -93,7 +34581,7 @@ True
 | verify_fibair | true | HintInputVec | PHANTOM | <div style='text-align: right'>1,963</div>  |
 | verify_fibair | true | IfEq | BNE | <div style='text-align: right'>321</div>  |
 | verify_fibair | true | IfEqI | BNE | <div style='text-align: right'>5,175</div>  |
-| verify_fibair | true | IfEqI | JAL | <span style="color: green">(-119 [-11.3%])</span> <div style='text-align: right'>934</div>  |
+| verify_fibair | true | IfEqI | JAL | <span style="color: green">(-22 [-2.3%])</span> <div style='text-align: right'>934</div>  |
 | verify_fibair | true | IfNe | BEQ | <div style='text-align: right'>1,163</div>  |
 | verify_fibair | true | IfNe | JAL | <div style='text-align: right'>2</div>  |
 | verify_fibair | true | IfNeI | BEQ | <div style='text-align: right'>255</div>  |
@@ -150,10 +34638,10 @@ True
 | verify_fibair | AccessAdapter<2> | true | AddEFFI | STOREW | <div style='text-align: right'>132</div>  |
 | verify_fibair | Boundary | true | AddEFFI | STOREW | <div style='text-align: right'>528</div>  |
 | verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | AddEI | ADD | <div style='text-align: right'>77,520</div>  |
-| verify_fibair | AccessAdapter<2> | true | AddEI | ADD | <span style="color: green">(-242 [-2.0%])</span> <div style='text-align: right'>11,858</div>  |
-| verify_fibair | AccessAdapter<4> | true | AddEI | ADD | <span style="color: green">(-143 [-2.0%])</span> <div style='text-align: right'>7,007</div>  |
+| verify_fibair | AccessAdapter<2> | true | AddEI | ADD | <span style="color: red">(+176 [+1.5%])</span> <div style='text-align: right'>11,858</div>  |
+| verify_fibair | AccessAdapter<4> | true | AddEI | ADD | <span style="color: red">(+104 [+1.5%])</span> <div style='text-align: right'>7,007</div>  |
 | verify_fibair | Boundary | true | AddEI | ADD | <div style='text-align: right'>440</div>  |
-| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | AddFI | ADD | <span style="color: green">(-240 [-0.6%])</span> <div style='text-align: right'>38,760</div>  |
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | AddFI | ADD | <span style="color: red">(+390 [+1.0%])</span> <div style='text-align: right'>38,760</div>  |
 | verify_fibair | Boundary | true | AddFI | ADD | <div style='text-align: right'>231</div>  |
 | verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | AddV | ADD | <div style='text-align: right'>28,170</div>  |
 | verify_fibair | Boundary | true | AddV | ADD | <div style='text-align: right'>33</div>  |
@@ -215,7 +34703,7 @@ True
 | verify_fibair | PhantomAir | true | HintInputVec | PHANTOM | <div style='text-align: right'>11,778</div>  |
 | verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | IfEq | BNE | <div style='text-align: right'>7,383</div>  |
 | verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | IfEqI | BNE | <div style='text-align: right'>119,025</div>  |
-| verify_fibair | <JalNativeAdapterAir,JalCoreAir> | true | IfEqI | JAL | <span style="color: green">(-1,190 [-11.3%])</span> <div style='text-align: right'>9,340</div>  |
+| verify_fibair | <JalNativeAdapterAir,JalCoreAir> | true | IfEqI | JAL | <span style="color: green">(-220 [-2.3%])</span> <div style='text-align: right'>9,340</div>  |
 | verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | IfNe | BEQ | <div style='text-align: right'>26,749</div>  |
 | verify_fibair | <JalNativeAdapterAir,JalCoreAir> | true | IfNe | JAL | <div style='text-align: right'>20</div>  |
 | verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | IfNeI | BEQ | <div style='text-align: right'>5,865</div>  |
@@ -249,8 +34737,8 @@ True
 | verify_fibair | <NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>> | true | LoadV | LOADW2 | <div style='text-align: right'>371,255</div>  |
 | verify_fibair | Boundary | true | LoadV | LOADW2 | <div style='text-align: right'>968</div>  |
 | verify_fibair | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | true | MulE | BBE4MUL | <div style='text-align: right'>34,320</div>  |
-| verify_fibair | AccessAdapter<2> | true | MulE | BBE4MUL | <span style="color: green">(-242 [-1.7%])</span> <div style='text-align: right'>13,838</div>  |
-| verify_fibair | AccessAdapter<4> | true | MulE | BBE4MUL | <span style="color: green">(-143 [-1.7%])</span> <div style='text-align: right'>8,177</div>  |
+| verify_fibair | AccessAdapter<2> | true | MulE | BBE4MUL | <span style="color: red">(+176 [+1.3%])</span> <div style='text-align: right'>13,838</div>  |
+| verify_fibair | AccessAdapter<4> | true | MulE | BBE4MUL | <span style="color: red">(+104 [+1.3%])</span> <div style='text-align: right'>8,177</div>  |
 | verify_fibair | Boundary | true | MulE | BBE4MUL | <div style='text-align: right'>572</div>  |
 | verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | MulEF | MUL | <div style='text-align: right'>20,400</div>  |
 | verify_fibair | AccessAdapter<2> | true | MulEF | MUL | <div style='text-align: right'>3,718</div>  |
@@ -324,7 +34812,7 @@ True
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| verify_fibair | <span style="color: green">(-1.0 [-6.7%])</span> <div style='text-align: right'>14.0</div>  | <span style="color: red">(+1.0 [+0.4%])</span> <div style='text-align: right'>259.0</div>  | <span style="color: green">(-1.0 [-0.5%])</span> <div style='text-align: right'>209.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+1.0 [+2.3%])</span> <div style='text-align: right'>45.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-2,200 [-0.0%])</span> <div style='text-align: right'>8,306,107</div>  | <span style="color: green">(-127 [-0.1%])</span> <div style='text-align: right'>199,142</div>  | <span style="color: red">(+3.0 [+0.2%])</span> <div style='text-align: right'>1,469.0</div>  | <div style='text-align: right'>21.0</div>  |
+| verify_fibair | <div style='text-align: right'>15.0</div>  | <span style="color: red">(+10.0 [+3.9%])</span> <div style='text-align: right'>267.0</div>  | <span style="color: red">(+6.0 [+2.8%])</span> <div style='text-align: right'>217.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>45.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: red">(+730 [+0.0%])</span> <div style='text-align: right'>8,306,107</div>  | <span style="color: green">(-9 [-0.0%])</span> <div style='text-align: right'>199,142</div>  | <span style="color: red">(+9.0 [+0.6%])</span> <div style='text-align: right'>1,475.0</div>  | <div style='text-align: right'>21.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -364,7 +34852,7 @@ True
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| verify_fibair | 0 | <span style="color: red">(+2.0 [+4.3%])</span> <div style='text-align: right'>48.0</div>  | <div style='text-align: right'>1,162.0</div>  | <div style='text-align: right'>23,085,080</div>  |
+| verify_fibair | 0 | <span style="color: red">(+5.0 [+11.4%])</span> <div style='text-align: right'>49.0</div>  | <span style="color: green">(-6.0 [-0.5%])</span> <div style='text-align: right'>1,159.0</div>  | <div style='text-align: right'>23,085,080</div>  |
 
 </details>
 
@@ -373,17 +34861,17 @@ True
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/2c9d3a77ec5a60b86bd375a9897100615fb5ef2c/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/2c9d3a77ec5a60b86bd375a9897100615fb5ef2c/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/2c9d3a77ec5a60b86bd375a9897100615fb5ef2c/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/2c9d3a77ec5a60b86bd375a9897100615fb5ef2c/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/2c9d3a77ec5a60b86bd375a9897100615fb5ef2c/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/2c9d3a77ec5a60b86bd375a9897100615fb5ef2c/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/2c9d3a77ec5a60b86bd375a9897100615fb5ef2c/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/2c9d3a77ec5a60b86bd375a9897100615fb5ef2c/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/2c9d3a77ec5a60b86bd375a9897100615fb5ef2c
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/8314313b435e7b9483b5f5e78dd69b99fa6969af
 
 Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11979912125)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11981285663)
