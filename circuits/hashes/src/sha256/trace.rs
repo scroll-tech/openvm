@@ -263,58 +263,104 @@ impl Sha256Air {
             }
         }
     }
-    /// TODO: change to generate w_3
-    /// Puts the correct count correction in the `next_row`
-    /// Here, row_idx is the index of the row in the block: 0..16 for the first 16 rows and
-    /// some value outside of the 0..16 range for other rows (possibly invalid)
-    pub fn generate_intermeds<F: PrimeField32>(
+
+    /// It is important to call the following generate functions in the correct order:
+    /// generate_intermed_4 should be called on every row before generate_intermed_8 is called
+    /// generate_intermed_12 should be called at the very end, when everything else is filled in
+
+    /// Puts the correct intermed_4 in the `next_row`
+    pub fn generate_intermed_4<F: PrimeField32>(
         local_cols: &Sha256RoundCols<F>,
         next_cols: &mut Sha256RoundCols<F>,
-        row_idx: usize,
     ) {
-        let mut count_correction = F::ZERO;
-        // Doesn't matter which columns struct we use here
         let w = [local_cols.message_schedule.w, next_cols.message_schedule.w].concat();
+        let w: Vec<u32> = w
+            .into_iter()
+            .map(|x| limbs_into_u32(x.map(|x| x.as_canonical_u32())))
+            .collect();
         for i in 0..SHA256_ROUNDS_PER_ROW {
-            let cur = limbs_into_u32(w[i + 4].map(|x| x.as_canonical_u32()));
-            let cur_sig = small_sig1(cur);
-            let cur_1 = limbs_into_u32(w[i + 3].map(|x| x.as_canonical_u32()));
-            let cur_2 = limbs_into_u32(w[i + 2].map(|x| x.as_canonical_u32()));
-            let cur_2_sig = small_sig1(cur_2);
+            let w_idx = w[i];
+            let sig_w = small_sig0(w[i + 1]);
             for j in 0..SHA256_WORD_U16S {
-                let round_idx = if (0..16).contains(&row_idx) {
-                    row_idx * SHA256_ROUNDS_PER_ROW + i
-                } else {
-                    // some invalid index
-                    280
-                };
-                let cur_limb = u32_into_limbs::<SHA256_WORD_U16S>(cur)[j];
-                let cur_sig_limb = u32_into_limbs::<SHA256_WORD_U16S>(cur_sig)[j];
-                let cur_1_limb = u32_into_limbs::<SHA256_WORD_U16S>(cur_1)[j];
-                let cur_2_sig_limb = u32_into_limbs::<SHA256_WORD_U16S>(cur_2_sig)[j];
-                let carry = next_cols.message_schedule.carry_or_buffer[i][j * 2].as_canonical_u32()
-                    + 2 * next_cols.message_schedule.carry_or_buffer[i][j * 2 + 1]
-                        .as_canonical_u32();
-                let mut count = cur_2_sig_limb - (carry << 16) - cur_limb;
-                if j > 0 {
-                    count += next_cols.message_schedule.carry_or_buffer[i][2 * j - 2]
-                        .as_canonical_u32()
-                        + 2 * next_cols.message_schedule.carry_or_buffer[i][2 * j - 1]
-                            .as_canonical_u32();
-                }
-                if !(16..64).contains(&round_idx) {
-                    count_correction += F::from_canonical_u32(count);
-                }
-                if !(1..48).contains(&round_idx) {
-                    count_correction += F::from_canonical_u32(cur_1_limb);
-                }
-                if !(9..56).contains(&round_idx) {
-                    count_correction +=
-                        F::from_canonical_u32(cur_1_limb) + F::from_canonical_u32(cur_sig_limb);
-                }
+                let w_limb = u32_into_limbs::<SHA256_WORD_U16S>(w_idx)[j];
+                let sig_w_limb = u32_into_limbs::<SHA256_WORD_U16S>(sig_w)[j];
+                next_cols.message_schedule.intermed_4[i][j] =
+                    F::from_canonical_u32(w_limb + sig_w_limb);
             }
         }
-        
+    }
+
+    /// Puts the correct intermed_8 in the `next_row`
+    pub fn generate_intermed_8<F: PrimeField32>(
+        local_cols: &Sha256RoundCols<F>,
+        next_cols: &mut Sha256RoundCols<F>,
+    ) {
+        for i in 0..SHA256_ROUNDS_PER_ROW {
+            for j in 0..SHA256_WORD_U16S {
+                next_cols.message_schedule.intermed_8[i][j] =
+                    local_cols.message_schedule.intermed_4[i][j];
+            }
+        }
+    }
+
+    /// Puts the needed intermed_12 in the `local_row`
+    pub fn generate_intermed_12<F: PrimeField32>(
+        local_cols: &mut Sha256RoundCols<F>,
+        next_cols: &Sha256RoundCols<F>,
+    ) {
+        let w = [local_cols.message_schedule.w, next_cols.message_schedule.w].concat();
+        let w: Vec<u32> = w
+            .into_iter()
+            .map(|x| limbs_into_u32(x.map(|x| x.as_canonical_u32())))
+            .collect();
+        for i in 0..SHA256_ROUNDS_PER_ROW {
+            // sig_1(w_{t-2})
+            let sig_w_2 =
+                u32_into_limbs::<SHA256_WORD_U16S>(small_sig1(w[i + 2])).map(F::from_canonical_u32);
+            // w_{t-7}
+            let w_7 = if i < 3 {
+                local_cols.message_schedule.w_3[i]
+            } else {
+                u32_into_limbs::<SHA256_WORD_U16S>(w[i - 3]).map(F::from_canonical_u32)
+            };
+            // w_t
+            let w_cur = u32_into_limbs::<SHA256_WORD_U16S>(w[i + 4]).map(F::from_canonical_u32);
+
+            for j in 0..SHA256_WORD_U16S {
+                let carry = next_cols.message_schedule.carry_or_buffer[i][j * 2]
+                    + F::from_canonical_u32(2)
+                        * next_cols.message_schedule.carry_or_buffer[i][j * 2 + 1];
+                let sum = sig_w_2[j].clone() + w_7[j].clone()
+                    - carry * F::from_canonical_u32(1 << 16)
+                    - w_cur[j].clone()
+                    + if j > 0 {
+                        next_cols.message_schedule.carry_or_buffer[i][j * 2 - 2]
+                            + F::from_canonical_u32(2)
+                                * next_cols.message_schedule.carry_or_buffer[i][j * 2 - 1]
+                    } else {
+                        F::ZERO
+                    };
+                local_cols.message_schedule.intermed_12[i][j] = -sum;
+            }
+        }
+    }
+
+    /// Puts the correct w_3 in the `next_row`
+    pub fn generate_w_3<F: PrimeField32>(
+        local_cols: &Sha256RoundCols<F>,
+        next_cols: &mut Sha256RoundCols<F>,
+    ) {
+        let w = [local_cols.message_schedule.w, next_cols.message_schedule.w].concat();
+        let w: Vec<u32> = w
+            .into_iter()
+            .map(|x| limbs_into_u32(x.map(|x| x.as_canonical_u32())))
+            .collect();
+        for i in 0..SHA256_ROUNDS_PER_ROW - 1 {
+            let w_limbs = u32_into_limbs::<SHA256_WORD_U16S>(w[i + 1]);
+            for j in 0..SHA256_WORD_U16S {
+                next_cols.message_schedule.w_3[i][j] = F::from_canonical_u32(w_limbs[j]);
+            }
+        }
     }
 
     /// Fills the `next_row` as a padding row

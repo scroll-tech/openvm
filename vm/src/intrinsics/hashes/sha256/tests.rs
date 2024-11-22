@@ -125,7 +125,7 @@ fn execute_roundtrip_sanity_test() {
         tester.execution_bus(),
         tester.program_bus(),
         tester.memory_controller(),
-        bitwise_chip.clone(),
+        bitwise_chip.clone(), 
         Rv32Sha256Opcode::default_offset(),
     );
 

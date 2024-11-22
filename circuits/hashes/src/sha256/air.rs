@@ -457,21 +457,20 @@ impl Sha256Air {
         let w = [local.message_schedule.w, next.message_schedule.w].concat();
 
         // Constrain `w_3`
-        // We will only constrain w_3 for rows [4, 15], and let it unconstrained for other rows
-        // Other rows should put the needed value in w_3 to make the below summation constraint hold
-        let is_row_4_15 =
-            contains_flag_range::<AB>(&self.row_idx_encoder, &next.flags.row_idx, 4, 15);
+
         for i in 0..SHA256_ROUNDS_PER_ROW - 1 {
             let w_3 = w[i + 1].map(|x| x.into());
             let expected_w_3 = next.message_schedule.w_3[i];
             for j in 0..SHA256_WORD_U16S {
                 let w_3_limb = compose::<AB>(&w_3[j * 16..(j + 1) * 16], 1);
-                builder
-                    .when(is_row_4_15.clone())
-                    .assert_eq(w_3_limb, expected_w_3[j].into());
+                builder.assert_eq(w_3_limb, expected_w_3[j].into());
             }
         }
         // Constrain intermed
+        // We will only constrain intermed_12 for rows [4, 15], and let it unconstrained for other rows
+        // Other rows should put the needed value in intermed_12 to make the below summation constraint hold
+        let is_row_4_15 =
+            contains_flag_range::<AB>(&self.row_idx_encoder, &next.flags.row_idx, 4, 15);
         for i in 0..SHA256_ROUNDS_PER_ROW {
             // w_idx
             let w_idx = w[i].map(|x| x.into());
@@ -488,7 +487,7 @@ impl Sha256Air {
                     next.message_schedule.intermed_8[i][j],
                     local.message_schedule.intermed_4[i][j],
                 );
-                builder.assert_eq(
+                builder.when(is_row_4_15.clone()).assert_eq(
                     next.message_schedule.intermed_12[i][j],
                     local.message_schedule.intermed_8[i][j],
                 );
