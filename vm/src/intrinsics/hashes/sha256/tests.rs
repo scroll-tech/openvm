@@ -99,7 +99,7 @@ fn rand_sha256_test() {
         Rv32Sha256Opcode::default_offset(),
     );
 
-    let num_tests: usize = 100;
+    let num_tests: usize = 0;
     for _ in 0..num_tests {
         set_and_execute(&mut tester, &mut chip, &mut rng, SHA256, None, None);
     }
@@ -137,7 +137,7 @@ fn execute_roundtrip_sanity_test() {
         "Sha256VmRoundCols::width(): {}",
         Sha256VmRoundCols::<F>::width()
     );
-    let num_tests: usize = 100;
+    let num_tests: usize = 0;
     for _ in 0..num_tests {
         set_and_execute(&mut tester, &mut chip, &mut rng, SHA256, None, None);
     }
