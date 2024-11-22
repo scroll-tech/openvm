@@ -37,7 +37,7 @@ jobs:
         run: |
           cargo nextest run --cargo-profile fast --features parallel
 
-      - name: Run tests for poseidon2-air
-        working-directory: circuits/hashes/poseidon2-air
+      - name: Run tests for hashes
+        working-directory: circuits/hashes
         run: |
           cargo nextest run --cargo-profile fast --features parallel
