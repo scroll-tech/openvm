@@ -1128,7 +1128,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "frequency",
@@ -1158,7 +1158,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -1184,7 +1184,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "frequency",
@@ -1214,7 +1214,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -1244,7 +1244,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -1274,7 +1274,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -1304,7 +1304,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -1330,7 +1330,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "frequency",
@@ -1360,7 +1360,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -1386,7 +1386,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "frequency",
@@ -1416,7 +1416,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -1442,7 +1442,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "frequency",
@@ -1472,7 +1472,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -1498,7 +1498,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "frequency",
@@ -1528,7 +1528,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "cells_used",
@@ -1558,7 +1558,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "cells_used",
@@ -1588,7 +1588,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "cells_used",
@@ -1618,7 +1618,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "cells_used",
@@ -1644,7 +1644,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "frequency",
@@ -1674,7 +1674,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "cells_used",
@@ -1700,7 +1700,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "frequency",
@@ -1730,7 +1730,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "cells_used",
@@ -1756,7 +1756,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "frequency",
@@ -1786,7 +1786,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "cells_used",
@@ -1812,7 +1812,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "frequency",
@@ -1842,7 +1842,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "cells_used",
@@ -1868,7 +1868,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "frequency",
@@ -1898,7 +1898,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "cells_used",
@@ -1924,7 +1924,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "frequency",
@@ -1954,7 +1954,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;_ZN4core5alloc6layout6Layout19is_size_align_valid17h87e6370a23aa4217E"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;_ZN4core5alloc6layout6Layout19is_size_align_valid17ha3d3fc1897b04607E"
         ]
       ],
       "metric": "cells_used",
@@ -1980,7 +1980,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "frequency",
@@ -2010,7 +2010,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -2036,7 +2036,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "frequency",
@@ -2066,7 +2066,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -2092,7 +2092,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "frequency",
@@ -2122,7 +2122,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "cells_used",
@@ -2148,7 +2148,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "frequency",
@@ -2178,7 +2178,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "cells_used",
@@ -2208,7 +2208,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "cells_used",
@@ -2238,7 +2238,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "cells_used",
@@ -2268,7 +2268,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "cells_used",
@@ -2294,7 +2294,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "frequency",
@@ -2324,7 +2324,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "cells_used",
@@ -2350,7 +2350,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "frequency",
@@ -2380,7 +2380,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "cells_used",
@@ -2406,7 +2406,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "frequency",
@@ -2436,7 +2436,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "cells_used",
@@ -2462,7 +2462,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "frequency",
@@ -2492,7 +2492,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "cells_used",
@@ -2518,7 +2518,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "frequency",
@@ -2548,7 +2548,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "cells_used",
@@ -2578,7 +2578,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "cells_used",
@@ -2608,7 +2608,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "cells_used",
@@ -2634,7 +2634,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "frequency",
@@ -2664,7 +2664,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "cells_used",
@@ -2690,7 +2690,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "frequency",
@@ -2720,7 +2720,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "cells_used",
@@ -2746,7 +2746,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "frequency",
@@ -2776,7 +2776,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE;__rust_alloc_zeroed"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E;__rust_alloc_zeroed"
         ]
       ],
       "metric": "cells_used",
@@ -2802,7 +2802,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "frequency",
@@ -2832,7 +2832,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -2862,7 +2862,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -2892,7 +2892,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -2918,7 +2918,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "frequency",
@@ -2948,7 +2948,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -2974,7 +2974,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "frequency",
@@ -3004,7 +3004,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -3030,7 +3030,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "frequency",
@@ -3060,7 +3060,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -3086,7 +3086,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "frequency",
@@ -3116,7 +3116,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -3142,7 +3142,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "frequency",
@@ -3172,7 +3172,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -3202,7 +3202,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN4axvm2io8read_vec17haf5e353be643fe0dE"
+          "__start;main;_ZN4axvm2io8read_vec17h71da2a701582e777E"
         ]
       ],
       "metric": "cells_used",
@@ -3340,7 +3340,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "frequency",
@@ -3370,7 +3370,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -3396,7 +3396,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "frequency",
@@ -3426,7 +3426,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -3452,7 +3452,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "frequency",
@@ -3482,7 +3482,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -3508,7 +3508,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "frequency",
@@ -3538,7 +3538,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -3568,7 +3568,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -3598,7 +3598,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -3624,7 +3624,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "frequency",
@@ -3654,7 +3654,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -3680,7 +3680,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "frequency",
@@ -3710,7 +3710,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -3736,7 +3736,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "frequency",
@@ -3766,7 +3766,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -3792,7 +3792,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "frequency",
@@ -3822,7 +3822,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -3848,7 +3848,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "frequency",
@@ -3878,7 +3878,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -3904,7 +3904,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "frequency",
@@ -3934,7 +3934,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -3960,7 +3960,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "frequency",
@@ -3990,7 +3990,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -4020,7 +4020,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -4050,7 +4050,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -4080,7 +4080,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -4106,7 +4106,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "frequency",
@@ -4136,7 +4136,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -4166,7 +4166,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -4196,7 +4196,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -4222,7 +4222,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "frequency",
@@ -4252,7 +4252,7 @@ True
         ],
         [
           "cycle_tracker_span",
-          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h989dd500056896bbE"
+          "__start;main;_ZN7bincode6varint15decode_unsigned27deserialize_varint_cold_u6417h58414cdf0d68b458E"
         ]
       ],
       "metric": "cells_used",
@@ -9966,7 +9966,7 @@ True
         ]
       ],
       "metric": "execute_time_ms",
-      "value": "6588"
+      "value": "6508"
     },
     {
       "labels": [
@@ -9976,7 +9976,7 @@ True
         ]
       ],
       "metric": "keygen_time_ms",
-      "value": "193"
+      "value": "191"
     },
     {
       "labels": [
@@ -9986,7 +9986,7 @@ True
         ]
       ],
       "metric": "commit_exe_time_ms",
-      "value": "5"
+      "value": "4"
     },
     {
       "labels": [
@@ -9996,7 +9996,7 @@ True
         ]
       ],
       "metric": "execute_and_trace_gen_time_ms",
-      "value": "1287"
+      "value": "1253"
     },
     {
       "labels": [
@@ -10006,7 +10006,7 @@ True
         ]
       ],
       "metric": "execute_time_ms",
-      "value": "1040"
+      "value": "990"
     },
     {
       "labels": [
@@ -10020,7 +10020,7 @@ True
         ]
       ],
       "metric": "execute_and_trace_gen_time_ms",
-      "value": "246"
+      "value": "262"
     },
     {
       "labels": [
@@ -10034,7 +10034,7 @@ True
         ]
       ],
       "metric": "stark_prove_excluding_trace_time_ms",
-      "value": "4934"
+      "value": "4928"
     }
   ]
 }
@@ -41158,7 +41158,7 @@ True
         ]
       ],
       "metric": "execute_time_ms",
-      "value": "6511"
+      "value": "6514"
     },
     {
       "labels": [
@@ -41168,7 +41168,7 @@ True
         ]
       ],
       "metric": "keygen_time_ms",
-      "value": "190"
+      "value": "192"
     },
     {
       "labels": [
@@ -41178,7 +41178,7 @@ True
         ]
       ],
       "metric": "commit_exe_time_ms",
-      "value": "5"
+      "value": "4"
     },
     {
       "labels": [
@@ -41188,7 +41188,7 @@ True
         ]
       ],
       "metric": "execute_and_trace_gen_time_ms",
-      "value": "1276"
+      "value": "1246"
     },
     {
       "labels": [
@@ -41198,7 +41198,7 @@ True
         ]
       ],
       "metric": "execute_time_ms",
-      "value": "1026"
+      "value": "992"
     },
     {
       "labels": [
@@ -41212,7 +41212,7 @@ True
         ]
       ],
       "metric": "execute_and_trace_gen_time_ms",
-      "value": "249"
+      "value": "253"
     },
     {
       "labels": [
@@ -41226,7 +41226,7 @@ True
         ]
       ],
       "metric": "stark_prove_excluding_trace_time_ms",
-      "value": "4937"
+      "value": "4920"
     },
     {
       "labels": [
@@ -41240,7 +41240,7 @@ True
         ]
       ],
       "metric": "verify_program_compile_ms",
-      "value": "240"
+      "value": "228"
     },
     {
       "labels": [
@@ -41258,7 +41258,7 @@ True
         ]
       ],
       "metric": "execute_time_ms",
-      "value": "18523"
+      "value": "18437"
     },
     {
       "labels": [
@@ -41272,7 +41272,7 @@ True
         ]
       ],
       "metric": "keygen_time_ms",
-      "value": "41"
+      "value": "43"
     },
     {
       "labels": [
@@ -41286,7 +41286,7 @@ True
         ]
       ],
       "metric": "commit_exe_time_ms",
-      "value": "42"
+      "value": "28"
     },
     {
       "labels": [
@@ -41300,7 +41300,7 @@ True
         ]
       ],
       "metric": "execute_and_trace_gen_time_ms",
-      "value": "4582"
+      "value": "4381"
     },
     {
       "labels": [
@@ -41314,7 +41314,7 @@ True
         ]
       ],
       "metric": "execute_time_ms",
-      "value": "3746"
+      "value": "3553"
     },
     {
       "labels": [
@@ -41328,13 +41328,13 @@ True
         ]
       ],
       "metric": "stark_prove_excluding_trace_time_ms",
-      "value": "13434"
+      "value": "13446"
     }
   ]
 }
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| fibonacci_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>51,516,958</div>  | <div style='text-align: right'>1,500,219</div>  | <span style="color: red">(+5.0 [+0.1%])</span> <div style='text-align: right'>6,467.0</div>  |
+| fibonacci_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>51,516,958</div>  | <div style='text-align: right'>1,500,219</div>  | <span style="color: red">(+24.0 [+0.4%])</span> <div style='text-align: right'>6,443.0</div>  |
 
 
 <details>
@@ -41342,7 +41342,7 @@ True
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| fibonacci_program | true | <span style="color: red">(+77.0 [+1.2%])</span> <div style='text-align: right'>6,588.0</div>  | <div style='text-align: right'>51,516,958</div>  | <div style='text-align: right'>1,500,219</div>  |
+| fibonacci_program | true | <span style="color: green">(-6.0 [-0.1%])</span> <div style='text-align: right'>6,508.0</div>  | <div style='text-align: right'>51,516,958</div>  | <div style='text-align: right'>1,500,219</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
@@ -41441,7 +41441,7 @@ True
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| fibonacci_program | <div style='text-align: right'>5.0</div>  | <span style="color: red">(+11.0 [+0.9%])</span> <div style='text-align: right'>1,287.0</div>  | <span style="color: red">(+14.0 [+1.4%])</span> <div style='text-align: right'>1,040.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+3.0 [+1.6%])</span> <div style='text-align: right'>193.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>51,516,958</div>  | <div style='text-align: right'>1,500,219</div>  | <span style="color: red">(+5.0 [+0.1%])</span> <div style='text-align: right'>6,467.0</div>  |
+| fibonacci_program | <div style='text-align: right'>4.0</div>  | <span style="color: red">(+7.0 [+0.6%])</span> <div style='text-align: right'>1,253.0</div>  | <span style="color: green">(-2.0 [-0.2%])</span> <div style='text-align: right'>990.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-1.0 [-0.5%])</span> <div style='text-align: right'>191.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>51,516,958</div>  | <div style='text-align: right'>1,500,219</div>  | <span style="color: red">(+24.0 [+0.4%])</span> <div style='text-align: right'>6,443.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -41500,7 +41500,7 @@ True
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| fibonacci_program | 0 | <span style="color: green">(-3.0 [-1.2%])</span> <div style='text-align: right'>246.0</div>  | <span style="color: green">(-3.0 [-0.1%])</span> <div style='text-align: right'>4,934.0</div>  | <div style='text-align: right'>196,595,668</div>  |
+| fibonacci_program | 0 | <span style="color: red">(+9.0 [+3.6%])</span> <div style='text-align: right'>262.0</div>  | <span style="color: red">(+8.0 [+0.2%])</span> <div style='text-align: right'>4,928.0</div>  | <div style='text-align: right'>196,595,668</div>  |
 
 </details>
 
@@ -41509,17 +41509,17 @@ True
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/fibonacci-2-2-64cpu-linux-arm64-mimalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/fibonacci-2-2-64cpu-linux-arm64-mimalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/fibonacci-2-2-64cpu-linux-arm64-mimalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/fibonacci-2-2-64cpu-linux-arm64-mimalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/fibonacci-2-2-64cpu-linux-arm64-mimalloc-fibonacci_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/fibonacci-2-2-64cpu-linux-arm64-mimalloc-fibonacci_program.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/fibonacci-2-2-64cpu-linux-arm64-mimalloc-fibonacci_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/fibonacci-2-2-64cpu-linux-arm64-mimalloc-fibonacci_program.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/901eb36808719fbd4420be317cf89581fd7b52a7/fibonacci-2-2-64cpu-linux-arm64-mimalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/901eb36808719fbd4420be317cf89581fd7b52a7/fibonacci-2-2-64cpu-linux-arm64-mimalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/901eb36808719fbd4420be317cf89581fd7b52a7/fibonacci-2-2-64cpu-linux-arm64-mimalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/901eb36808719fbd4420be317cf89581fd7b52a7/fibonacci-2-2-64cpu-linux-arm64-mimalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/901eb36808719fbd4420be317cf89581fd7b52a7/fibonacci-2-2-64cpu-linux-arm64-mimalloc-fibonacci_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/901eb36808719fbd4420be317cf89581fd7b52a7/fibonacci-2-2-64cpu-linux-arm64-mimalloc-fibonacci_program.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/901eb36808719fbd4420be317cf89581fd7b52a7/fibonacci-2-2-64cpu-linux-arm64-mimalloc-fibonacci_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/901eb36808719fbd4420be317cf89581fd7b52a7/fibonacci-2-2-64cpu-linux-arm64-mimalloc-fibonacci_program.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/8314313b435e7b9483b5f5e78dd69b99fa6969af
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/901eb36808719fbd4420be317cf89581fd7b52a7
 
 Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11981285663)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11985851981)
