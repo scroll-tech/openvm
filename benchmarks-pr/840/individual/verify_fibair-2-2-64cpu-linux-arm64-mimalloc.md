@@ -99,7 +99,7 @@ True
         ]
       ],
       "metric": "total_cycles",
-      "value": "199142"
+      "value": "199167"
     },
     {
       "labels": [
@@ -1803,7 +1803,7 @@ True
         ]
       ],
       "metric": "frequency",
-      "value": "1292"
+      "value": "1290"
     },
     {
       "labels": [
@@ -1863,7 +1863,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "38760"
+      "value": "38700"
     },
     {
       "labels": [
@@ -3811,7 +3811,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "11858"
+      "value": "11836"
     },
     {
       "labels": [
@@ -3841,7 +3841,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "7007"
+      "value": "6994"
     },
     {
       "labels": [
@@ -5651,7 +5651,7 @@ True
         ]
       ],
       "metric": "frequency",
-      "value": "934"
+      "value": "961"
     },
     {
       "labels": [
@@ -5681,7 +5681,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "9340"
+      "value": "9610"
     },
     {
       "labels": [
@@ -6863,7 +6863,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "13838"
+      "value": "13816"
     },
     {
       "labels": [
@@ -6893,7 +6893,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "8177"
+      "value": "8164"
     },
     {
       "labels": [
@@ -8095,7 +8095,7 @@ True
         ]
       ],
       "metric": "rows_used",
-      "value": "21996"
+      "value": "21992"
     },
     {
       "labels": [
@@ -8113,7 +8113,7 @@ True
         ]
       ],
       "metric": "rows_used",
-      "value": "10998"
+      "value": "10996"
     },
     {
       "labels": [
@@ -8203,7 +8203,7 @@ True
         ]
       ],
       "metric": "rows_used",
-      "value": "5038"
+      "value": "5065"
     },
     {
       "labels": [
@@ -8221,7 +8221,7 @@ True
         ]
       ],
       "metric": "rows_used",
-      "value": "67449"
+      "value": "67447"
     },
     {
       "labels": [
@@ -8447,7 +8447,7 @@ True
         ]
       ],
       "metric": "frequency",
-      "value": "1292"
+      "value": "1290"
     },
     {
       "labels": [
@@ -9437,7 +9437,7 @@ True
         ]
       ],
       "metric": "frequency",
-      "value": "934"
+      "value": "961"
     },
     {
       "labels": [
@@ -10693,7 +10693,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "11858"
+      "value": "11836"
     },
     {
       "labels": [
@@ -10719,7 +10719,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "7007"
+      "value": "6994"
     },
     {
       "labels": [
@@ -10771,7 +10771,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "38760"
+      "value": "38700"
     },
     {
       "labels": [
@@ -12383,7 +12383,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "9340"
+      "value": "9610"
     },
     {
       "labels": [
@@ -13267,7 +13267,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "13838"
+      "value": "13816"
     },
     {
       "labels": [
@@ -13293,7 +13293,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "8177"
+      "value": "8164"
     },
     {
       "labels": [
@@ -15127,7 +15127,7 @@ True
         ]
       ],
       "metric": "total_cells_used",
-      "value": "8306107"
+      "value": "8306247"
     },
     {
       "labels": [
@@ -17148,7 +17148,7 @@ True
     {
       "labels": [],
       "metric": "stark_prove_excluding_trace_time_ms",
-      "value": "13"
+      "value": "10"
     },
     {
       "labels": [
@@ -17158,7 +17158,7 @@ True
         ]
       ],
       "metric": "verify_program_compile_ms",
-      "value": "21"
+      "value": "17"
     },
     {
       "labels": [
@@ -17172,7 +17172,7 @@ True
         ]
       ],
       "metric": "execute_time_ms",
-      "value": "1033"
+      "value": "1017"
     },
     {
       "labels": [
@@ -17192,7 +17192,7 @@ True
         ]
       ],
       "metric": "commit_exe_time_ms",
-      "value": "15"
+      "value": "13"
     },
     {
       "labels": [
@@ -17202,7 +17202,7 @@ True
         ]
       ],
       "metric": "execute_and_trace_gen_time_ms",
-      "value": "267"
+      "value": "246"
     },
     {
       "labels": [
@@ -17212,7 +17212,7 @@ True
         ]
       ],
       "metric": "execute_time_ms",
-      "value": "217"
+      "value": "197"
     },
     {
       "labels": [
@@ -17226,7 +17226,7 @@ True
         ]
       ],
       "metric": "execute_and_trace_gen_time_ms",
-      "value": "49"
+      "value": "48"
     },
     {
       "labels": [
@@ -17240,7 +17240,7 @@ True
         ]
       ],
       "metric": "stark_prove_excluding_trace_time_ms",
-      "value": "1159"
+      "value": "1165"
     }
   ]
 }
@@ -17345,7 +17345,7 @@ True
         ]
       ],
       "metric": "total_cycles",
-      "value": "199151"
+      "value": "199167"
     },
     {
       "labels": [
@@ -19049,7 +19049,7 @@ True
         ]
       ],
       "metric": "frequency",
-      "value": "1279"
+      "value": "1290"
     },
     {
       "labels": [
@@ -19109,7 +19109,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "38370"
+      "value": "38700"
     },
     {
       "labels": [
@@ -21057,7 +21057,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "11682"
+      "value": "11836"
     },
     {
       "labels": [
@@ -21087,7 +21087,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "6903"
+      "value": "6994"
     },
     {
       "labels": [
@@ -22897,7 +22897,7 @@ True
         ]
       ],
       "metric": "frequency",
-      "value": "956"
+      "value": "961"
     },
     {
       "labels": [
@@ -22927,7 +22927,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "9560"
+      "value": "9610"
     },
     {
       "labels": [
@@ -24109,7 +24109,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "13662"
+      "value": "13816"
     },
     {
       "labels": [
@@ -24139,7 +24139,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "8073"
+      "value": "8164"
     },
     {
       "labels": [
@@ -25341,7 +25341,7 @@ True
         ]
       ],
       "metric": "rows_used",
-      "value": "21964"
+      "value": "21992"
     },
     {
       "labels": [
@@ -25359,7 +25359,7 @@ True
         ]
       ],
       "metric": "rows_used",
-      "value": "10982"
+      "value": "10996"
     },
     {
       "labels": [
@@ -25449,7 +25449,7 @@ True
         ]
       ],
       "metric": "rows_used",
-      "value": "5060"
+      "value": "5065"
     },
     {
       "labels": [
@@ -25467,7 +25467,7 @@ True
         ]
       ],
       "metric": "rows_used",
-      "value": "67436"
+      "value": "67447"
     },
     {
       "labels": [
@@ -25693,7 +25693,7 @@ True
         ]
       ],
       "metric": "frequency",
-      "value": "1279"
+      "value": "1290"
     },
     {
       "labels": [
@@ -26683,7 +26683,7 @@ True
         ]
       ],
       "metric": "frequency",
-      "value": "956"
+      "value": "961"
     },
     {
       "labels": [
@@ -27939,7 +27939,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "11682"
+      "value": "11836"
     },
     {
       "labels": [
@@ -27965,7 +27965,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "6903"
+      "value": "6994"
     },
     {
       "labels": [
@@ -28017,7 +28017,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "38370"
+      "value": "38700"
     },
     {
       "labels": [
@@ -29629,7 +29629,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "9560"
+      "value": "9610"
     },
     {
       "labels": [
@@ -30513,7 +30513,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "13662"
+      "value": "13816"
     },
     {
       "labels": [
@@ -30539,7 +30539,7 @@ True
         ]
       ],
       "metric": "cells_used",
-      "value": "8073"
+      "value": "8164"
     },
     {
       "labels": [
@@ -32373,7 +32373,7 @@ True
         ]
       ],
       "metric": "total_cells_used",
-      "value": "8305377"
+      "value": "8306247"
     },
     {
       "labels": [
@@ -34394,7 +34394,7 @@ True
     {
       "labels": [],
       "metric": "stark_prove_excluding_trace_time_ms",
-      "value": "12"
+      "value": "10"
     },
     {
       "labels": [
@@ -34404,7 +34404,7 @@ True
         ]
       ],
       "metric": "verify_program_compile_ms",
-      "value": "21"
+      "value": "17"
     },
     {
       "labels": [
@@ -34418,7 +34418,7 @@ True
         ]
       ],
       "metric": "execute_time_ms",
-      "value": "1026"
+      "value": "1006"
     },
     {
       "labels": [
@@ -34428,7 +34428,7 @@ True
         ]
       ],
       "metric": "keygen_time_ms",
-      "value": "45"
+      "value": "46"
     },
     {
       "labels": [
@@ -34438,7 +34438,7 @@ True
         ]
       ],
       "metric": "commit_exe_time_ms",
-      "value": "15"
+      "value": "13"
     },
     {
       "labels": [
@@ -34448,7 +34448,7 @@ True
         ]
       ],
       "metric": "execute_and_trace_gen_time_ms",
-      "value": "257"
+      "value": "248"
     },
     {
       "labels": [
@@ -34458,7 +34458,7 @@ True
         ]
       ],
       "metric": "execute_time_ms",
-      "value": "211"
+      "value": "197"
     },
     {
       "labels": [
@@ -34472,7 +34472,7 @@ True
         ]
       ],
       "metric": "execute_and_trace_gen_time_ms",
-      "value": "44"
+      "value": "50"
     },
     {
       "labels": [
@@ -34486,13 +34486,13 @@ True
         ]
       ],
       "metric": "stark_prove_excluding_trace_time_ms",
-      "value": "1165"
+      "value": "1164"
     }
   ]
 }
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| verify_fibair | <div style='text-align: right'>2</div>  | <span style="color: red">(+730 [+0.0%])</span> <div style='text-align: right'>8,306,107</div>  | <span style="color: green">(-9 [-0.0%])</span> <div style='text-align: right'>199,142</div>  | <span style="color: red">(+9.0 [+0.6%])</span> <div style='text-align: right'>1,475.0</div>  |
+| verify_fibair | <div style='text-align: right'>2</div>  | <div style='text-align: right'>8,306,247</div>  | <div style='text-align: right'>199,167</div>  | <span style="color: green">(-3.0 [-0.2%])</span> <div style='text-align: right'>1,459.0</div>  |
 
 
 <details>
@@ -34504,25 +34504,25 @@ True
 
 | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- |
-| <span style="color: red">(+1.0 [+8.3%])</span> <div style='text-align: right'>13.0</div>  | <div style='text-align: right'>32</div>  |
+| <div style='text-align: right'>10.0</div>  | <div style='text-align: right'>32</div>  |
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| verify_fibair | true | <span style="color: red">(+7.0 [+0.7%])</span> <div style='text-align: right'>1,033.0</div>  | <span style="color: red">(+730 [+0.0%])</span> <div style='text-align: right'>8,306,107</div>  | <span style="color: green">(-9 [-0.0%])</span> <div style='text-align: right'>199,142</div>  |
+| verify_fibair | true | <span style="color: red">(+11.0 [+1.1%])</span> <div style='text-align: right'>1,017.0</div>  | <div style='text-align: right'>8,306,247</div>  | <div style='text-align: right'>199,167</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
 | verify_fibair | ProgramChip | true | <div style='text-align: right'>17,628</div>  |
 | verify_fibair | VmConnectorAir | true | <div style='text-align: right'>2</div>  |
 | verify_fibair | Boundary | true | <div style='text-align: right'>44,590</div>  |
-| verify_fibair | AccessAdapter<2> | true | <span style="color: red">(+32 [+0.1%])</span> <div style='text-align: right'>21,996</div>  |
-| verify_fibair | AccessAdapter<4> | true | <span style="color: red">(+16 [+0.1%])</span> <div style='text-align: right'>10,998</div>  |
+| verify_fibair | AccessAdapter<2> | true | <div style='text-align: right'>21,992</div>  |
+| verify_fibair | AccessAdapter<4> | true | <div style='text-align: right'>10,996</div>  |
 | verify_fibair | AccessAdapter<8> | true | <div style='text-align: right'>3,220</div>  |
 | verify_fibair | PhantomAir | true | <div style='text-align: right'>5,216</div>  |
 | verify_fibair | <NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>> | true | <div style='text-align: right'>85,882</div>  |
 | verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | <div style='text-align: right'>31,888</div>  |
-| verify_fibair | <JalNativeAdapterAir,JalCoreAir> | true | <span style="color: green">(-22 [-0.4%])</span> <div style='text-align: right'>5,038</div>  |
-| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | <span style="color: red">(+13 [+0.0%])</span> <div style='text-align: right'>67,449</div>  |
+| verify_fibair | <JalNativeAdapterAir,JalCoreAir> | true | <div style='text-align: right'>5,065</div>  |
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | <div style='text-align: right'>67,447</div>  |
 | verify_fibair | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | true | <div style='text-align: right'>2,186</div>  |
 | verify_fibair | FriReducedOpeningAir | true | <div style='text-align: right'>336</div>  |
 | verify_fibair | Poseidon2VmAir<BabyBearParameters> | true | <div style='text-align: right'>1,357</div>  |
@@ -34536,7 +34536,7 @@ True
 | verify_fibair | true | AddEFFI | LOADW | <div style='text-align: right'>70</div>  |
 | verify_fibair | true | AddEFFI | STOREW | <div style='text-align: right'>210</div>  |
 | verify_fibair | true | AddEI | ADD | <div style='text-align: right'>2,584</div>  |
-| verify_fibair | true | AddFI | ADD | <span style="color: red">(+13 [+1.0%])</span> <div style='text-align: right'>1,292</div>  |
+| verify_fibair | true | AddFI | ADD | <div style='text-align: right'>1,290</div>  |
 | verify_fibair | true | AddV | ADD | <div style='text-align: right'>939</div>  |
 | verify_fibair | true | AddVI | ADD | <div style='text-align: right'>17,307</div>  |
 | verify_fibair | true | Alloc | ADD | <div style='text-align: right'>6,029</div>  |
@@ -34581,7 +34581,7 @@ True
 | verify_fibair | true | HintInputVec | PHANTOM | <div style='text-align: right'>1,963</div>  |
 | verify_fibair | true | IfEq | BNE | <div style='text-align: right'>321</div>  |
 | verify_fibair | true | IfEqI | BNE | <div style='text-align: right'>5,175</div>  |
-| verify_fibair | true | IfEqI | JAL | <span style="color: green">(-22 [-2.3%])</span> <div style='text-align: right'>934</div>  |
+| verify_fibair | true | IfEqI | JAL | <div style='text-align: right'>961</div>  |
 | verify_fibair | true | IfNe | BEQ | <div style='text-align: right'>1,163</div>  |
 | verify_fibair | true | IfNe | JAL | <div style='text-align: right'>2</div>  |
 | verify_fibair | true | IfNeI | BEQ | <div style='text-align: right'>255</div>  |
@@ -34638,10 +34638,10 @@ True
 | verify_fibair | AccessAdapter<2> | true | AddEFFI | STOREW | <div style='text-align: right'>132</div>  |
 | verify_fibair | Boundary | true | AddEFFI | STOREW | <div style='text-align: right'>528</div>  |
 | verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | AddEI | ADD | <div style='text-align: right'>77,520</div>  |
-| verify_fibair | AccessAdapter<2> | true | AddEI | ADD | <span style="color: red">(+176 [+1.5%])</span> <div style='text-align: right'>11,858</div>  |
-| verify_fibair | AccessAdapter<4> | true | AddEI | ADD | <span style="color: red">(+104 [+1.5%])</span> <div style='text-align: right'>7,007</div>  |
+| verify_fibair | AccessAdapter<2> | true | AddEI | ADD | <div style='text-align: right'>11,836</div>  |
+| verify_fibair | AccessAdapter<4> | true | AddEI | ADD | <div style='text-align: right'>6,994</div>  |
 | verify_fibair | Boundary | true | AddEI | ADD | <div style='text-align: right'>440</div>  |
-| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | AddFI | ADD | <span style="color: red">(+390 [+1.0%])</span> <div style='text-align: right'>38,760</div>  |
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | AddFI | ADD | <div style='text-align: right'>38,700</div>  |
 | verify_fibair | Boundary | true | AddFI | ADD | <div style='text-align: right'>231</div>  |
 | verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | AddV | ADD | <div style='text-align: right'>28,170</div>  |
 | verify_fibair | Boundary | true | AddV | ADD | <div style='text-align: right'>33</div>  |
@@ -34703,7 +34703,7 @@ True
 | verify_fibair | PhantomAir | true | HintInputVec | PHANTOM | <div style='text-align: right'>11,778</div>  |
 | verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | IfEq | BNE | <div style='text-align: right'>7,383</div>  |
 | verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | IfEqI | BNE | <div style='text-align: right'>119,025</div>  |
-| verify_fibair | <JalNativeAdapterAir,JalCoreAir> | true | IfEqI | JAL | <span style="color: green">(-220 [-2.3%])</span> <div style='text-align: right'>9,340</div>  |
+| verify_fibair | <JalNativeAdapterAir,JalCoreAir> | true | IfEqI | JAL | <div style='text-align: right'>9,610</div>  |
 | verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | IfNe | BEQ | <div style='text-align: right'>26,749</div>  |
 | verify_fibair | <JalNativeAdapterAir,JalCoreAir> | true | IfNe | JAL | <div style='text-align: right'>20</div>  |
 | verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | IfNeI | BEQ | <div style='text-align: right'>5,865</div>  |
@@ -34737,8 +34737,8 @@ True
 | verify_fibair | <NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>> | true | LoadV | LOADW2 | <div style='text-align: right'>371,255</div>  |
 | verify_fibair | Boundary | true | LoadV | LOADW2 | <div style='text-align: right'>968</div>  |
 | verify_fibair | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | true | MulE | BBE4MUL | <div style='text-align: right'>34,320</div>  |
-| verify_fibair | AccessAdapter<2> | true | MulE | BBE4MUL | <span style="color: red">(+176 [+1.3%])</span> <div style='text-align: right'>13,838</div>  |
-| verify_fibair | AccessAdapter<4> | true | MulE | BBE4MUL | <span style="color: red">(+104 [+1.3%])</span> <div style='text-align: right'>8,177</div>  |
+| verify_fibair | AccessAdapter<2> | true | MulE | BBE4MUL | <div style='text-align: right'>13,816</div>  |
+| verify_fibair | AccessAdapter<4> | true | MulE | BBE4MUL | <div style='text-align: right'>8,164</div>  |
 | verify_fibair | Boundary | true | MulE | BBE4MUL | <div style='text-align: right'>572</div>  |
 | verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | MulEF | MUL | <div style='text-align: right'>20,400</div>  |
 | verify_fibair | AccessAdapter<2> | true | MulEF | MUL | <div style='text-align: right'>3,718</div>  |
@@ -34812,7 +34812,7 @@ True
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| verify_fibair | <div style='text-align: right'>15.0</div>  | <span style="color: red">(+10.0 [+3.9%])</span> <div style='text-align: right'>267.0</div>  | <span style="color: red">(+6.0 [+2.8%])</span> <div style='text-align: right'>217.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>45.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: red">(+730 [+0.0%])</span> <div style='text-align: right'>8,306,107</div>  | <span style="color: green">(-9 [-0.0%])</span> <div style='text-align: right'>199,142</div>  | <span style="color: red">(+9.0 [+0.6%])</span> <div style='text-align: right'>1,475.0</div>  | <div style='text-align: right'>21.0</div>  |
+| verify_fibair | <div style='text-align: right'>13.0</div>  | <span style="color: green">(-2.0 [-0.8%])</span> <div style='text-align: right'>246.0</div>  | <div style='text-align: right'>197.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-1.0 [-2.2%])</span> <div style='text-align: right'>45.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>8,306,247</div>  | <div style='text-align: right'>199,167</div>  | <span style="color: green">(-3.0 [-0.2%])</span> <div style='text-align: right'>1,459.0</div>  | <div style='text-align: right'>17.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -34852,7 +34852,7 @@ True
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| verify_fibair | 0 | <span style="color: red">(+5.0 [+11.4%])</span> <div style='text-align: right'>49.0</div>  | <span style="color: green">(-6.0 [-0.5%])</span> <div style='text-align: right'>1,159.0</div>  | <div style='text-align: right'>23,085,080</div>  |
+| verify_fibair | 0 | <span style="color: green">(-2.0 [-4.0%])</span> <div style='text-align: right'>48.0</div>  | <span style="color: red">(+1.0 [+0.1%])</span> <div style='text-align: right'>1,165.0</div>  | <div style='text-align: right'>23,085,080</div>  |
 
 </details>
 
@@ -34861,17 +34861,17 @@ True
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8314313b435e7b9483b5f5e78dd69b99fa6969af/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/901eb36808719fbd4420be317cf89581fd7b52a7/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/901eb36808719fbd4420be317cf89581fd7b52a7/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/901eb36808719fbd4420be317cf89581fd7b52a7/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/901eb36808719fbd4420be317cf89581fd7b52a7/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/901eb36808719fbd4420be317cf89581fd7b52a7/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/901eb36808719fbd4420be317cf89581fd7b52a7/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/901eb36808719fbd4420be317cf89581fd7b52a7/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/901eb36808719fbd4420be317cf89581fd7b52a7/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/8314313b435e7b9483b5f5e78dd69b99fa6969af
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/901eb36808719fbd4420be317cf89581fd7b52a7
 
 Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11981285663)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/11985851981)
