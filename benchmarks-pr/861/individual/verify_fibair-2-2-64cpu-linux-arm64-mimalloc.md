@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| verify_fibair | <div style='text-align: right'>2</div>  | <span style="color: green">(-140 [-0.0%])</span> <div style='text-align: right'>8,306,107</div>  | <span style="color: green">(-25 [-0.0%])</span> <div style='text-align: right'>199,142</div>  | <span style="color: red">(+5.0 [+0.3%])</span> <div style='text-align: right'>1,467.0</div>  |
+| verify_fibair | <div style='text-align: right'>2</div>  | <span style="color: green">(-140 [-0.0%])</span> <div style='text-align: right'>8,306,107</div>  | <span style="color: green">(-25 [-0.0%])</span> <div style='text-align: right'>199,142</div>  | <span style="color: red">(+21.0 [+1.4%])</span> <div style='text-align: right'>1,483.0</div>  |
 
 
 <details>
@@ -16,7 +16,7 @@
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| verify_fibair | true | <span style="color: red">(+21.0 [+2.1%])</span> <div style='text-align: right'>1,027.0</div>  | <span style="color: green">(-140 [-0.0%])</span> <div style='text-align: right'>8,306,107</div>  | <span style="color: green">(-25 [-0.0%])</span> <div style='text-align: right'>199,142</div>  |
+| verify_fibair | true | <span style="color: red">(+23.0 [+2.3%])</span> <div style='text-align: right'>1,029.0</div>  | <span style="color: green">(-140 [-0.0%])</span> <div style='text-align: right'>8,306,107</div>  | <span style="color: green">(-25 [-0.0%])</span> <div style='text-align: right'>199,142</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
@@ -320,7 +320,7 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| verify_fibair | <span style="color: red">(+2.0 [+15.4%])</span> <div style='text-align: right'>15.0</div>  | <span style="color: red">(+11.0 [+4.4%])</span> <div style='text-align: right'>259.0</div>  | <span style="color: red">(+13.0 [+6.6%])</span> <div style='text-align: right'>210.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-1.0 [-2.2%])</span> <div style='text-align: right'>45.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-140 [-0.0%])</span> <div style='text-align: right'>8,306,107</div>  | <span style="color: green">(-25 [-0.0%])</span> <div style='text-align: right'>199,142</div>  | <span style="color: red">(+5.0 [+0.3%])</span> <div style='text-align: right'>1,467.0</div>  | <span style="color: red">(+3.0 [+17.6%])</span> <div style='text-align: right'>20.0</div>  |
+| verify_fibair | <span style="color: red">(+1.0 [+7.7%])</span> <div style='text-align: right'>14.0</div>  | <span style="color: red">(+13.0 [+5.2%])</span> <div style='text-align: right'>261.0</div>  | <span style="color: red">(+16.0 [+8.1%])</span> <div style='text-align: right'>213.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-2.0 [-4.3%])</span> <div style='text-align: right'>44.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-140 [-0.0%])</span> <div style='text-align: right'>8,306,107</div>  | <span style="color: green">(-25 [-0.0%])</span> <div style='text-align: right'>199,142</div>  | <span style="color: red">(+21.0 [+1.4%])</span> <div style='text-align: right'>1,483.0</div>  | <span style="color: red">(+3.0 [+17.6%])</span> <div style='text-align: right'>20.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -360,7 +360,7 @@
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| verify_fibair | 0 | <span style="color: green">(-4.0 [-8.0%])</span> <div style='text-align: right'>46.0</div>  | <span style="color: green">(-2.0 [-0.2%])</span> <div style='text-align: right'>1,162.0</div>  | <div style='text-align: right'>23,085,080</div>  |
+| verify_fibair | 0 | <span style="color: green">(-4.0 [-8.0%])</span> <div style='text-align: right'>46.0</div>  | <span style="color: red">(+12.0 [+1.0%])</span> <div style='text-align: right'>1,176.0</div>  | <div style='text-align: right'>23,085,080</div>  |
 
 </details>
 
@@ -382,4 +382,4 @@ Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12014514633)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12014783739)
