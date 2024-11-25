@@ -1,0 +1,8 @@
+[package]
+name = "pognale"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+test-macro = { path = "../macro" }
+intermediate = { path = "../intermediate" }
