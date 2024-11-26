@@ -1,11 +1,10 @@
 use intermediate::sample_func;
 use test_macro::declare;
 
+declare!(Baz);
+
 fn main() {
     sample_func();
-    declare!(j);
-    while j_0 < 2 {
-        println!("{}", j_0);
-        j_0 += 1;
-    }
+    let z = Baz;
+    z.print();
 }

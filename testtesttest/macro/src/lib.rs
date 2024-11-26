@@ -25,5 +25,12 @@ pub fn declare(input: TokenStream) -> TokenStream {
         format!("Current name: {}", new_name),
     )
     .emit();
-    TokenStream::from(quote! { let mut #new_name = 0; })
+    TokenStream::from(quote! {
+        pub struct #name;
+        impl #name {
+            pub fn print(&self) {
+                println!(stringify!(#new_name));
+            }
+        }
+    })
 }
