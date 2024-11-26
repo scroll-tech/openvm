@@ -337,7 +337,7 @@ dependencies = [
  "itertools 0.13.0",
  "proc-macro2",
  "quote",
- "syn 1.0.109",
+ "syn 2.0.87",
 ]
 
 [[package]]
@@ -610,6 +610,7 @@ dependencies = [
  "derive_more 1.0.0",
  "enum-utils",
  "eyre",
+ "getset",
  "halo2curves-axiom 0.7.0",
  "hex",
  "hex-literal",
@@ -659,7 +660,7 @@ dependencies = [
  "itertools 0.13.0",
  "proc-macro2",
  "quote",
- "syn 1.0.109",
+ "syn 2.0.87",
 ]
 
 [[package]]
@@ -718,7 +719,7 @@ dependencies = [
  "quote",
  "strum",
  "strum_macros",
- "syn 1.0.109",
+ "syn 2.0.87",
 ]
 
 [[package]]
@@ -781,7 +782,7 @@ dependencies = [
  "p3-field",
  "proc-macro2",
  "quote",
- "syn 1.0.109",
+ "syn 2.0.87",
 ]
 
 [[package]]
