@@ -1,7 +1,7 @@
 use intermediate::sample_func;
 use test_macro::declare;
 
-declare!(Baz);
+declare!(Baz, 4);
 
 fn main() {
     sample_func();

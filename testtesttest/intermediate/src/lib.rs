@@ -1,7 +1,7 @@
 use test_macro::declare;
 
-declare!(Foo);
-declare!(Bar);
+declare!(Foo, 2);
+declare!(Bar, 3);
 
 pub fn sample_func() {
     let x = Foo;
