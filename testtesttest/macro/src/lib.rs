@@ -51,7 +51,13 @@ pub fn declare(input: TokenStream) -> TokenStream {
         &format!("{}_{}", name.to_string().as_str(), idx),
         span.into(),
     );
-    let mod_name = syn::Ident::new(&format!("mod_name_lksjfhlahf_{}", idx), span.into());
+    let mod_name = syn::Ident::new(
+        &format!(
+            "mod_name_do_not_write_this_by_yourself_this_is_supposed_to_be_auto_generated_{}",
+            idx
+        ),
+        span.into(),
+    );
     let extern_func = syn::Ident::new(&format!("call_print_num_for_{}", num), span.into());
     proc_macro::Diagnostic::new(
         proc_macro::Level::Warning,
