@@ -46,14 +46,12 @@ impl Parse for DefineArgs {
 pub fn declare(input: TokenStream) -> TokenStream {
     let DeclareArgs { name, num } = parse_macro_input!(input);
     let span = proc_macro::Span::call_site();
+    let idx = IDX.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
     let new_name = syn::Ident::new(
-        &format!(
-            "{}_{}",
-            name.to_string().as_str(),
-            IDX.fetch_add(1, std::sync::atomic::Ordering::SeqCst)
-        ),
+        &format!("{}_{}", name.to_string().as_str(), idx),
         span.into(),
     );
+    let mod_name = syn::Ident::new(&format!("mod_name_lksjfhlahf_{}", idx), span.into());
     let extern_func = syn::Ident::new(&format!("call_print_num_for_{}", num), span.into());
     proc_macro::Diagnostic::new(
         proc_macro::Level::Warning,
@@ -61,8 +59,10 @@ pub fn declare(input: TokenStream) -> TokenStream {
     )
     .emit();
     TokenStream::from(quote! {
-        extern "C" {
-            pub fn #extern_func();
+        mod #mod_name {
+            extern "C" {
+                pub fn #extern_func();
+            }
         }
         pub struct #name;
         impl #name {
@@ -71,7 +71,7 @@ pub fn declare(input: TokenStream) -> TokenStream {
                 println!(stringify!(#new_name));
             }
             pub fn print_num(&self) {
-                unsafe { #extern_func() }
+                unsafe { #mod_name::#extern_func() }
             }
         }
     })
