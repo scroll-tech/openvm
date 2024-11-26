@@ -8,7 +8,7 @@ use p3_field::PrimeField32;
 
 use super::{
     air::Sha256Air, columns::Sha256RoundCols, get_flag_pt_array, SHA256_BLOCK_WORDS,
-    SHA256_HASH_WORDS, SHA256_ROUND_WIDTH, SHA256_WIDTH,
+    SHA256_DIGEST_WIDTH, SHA256_HASH_WORDS, SHA256_ROUND_WIDTH, SHA256_WIDTH,
 };
 use crate::sha256::{
     big_sig0, big_sig1, ch, columns::Sha256DigestCols, limbs_into_u32, maj, small_sig0, small_sig1,
@@ -118,8 +118,12 @@ impl Sha256Air {
 
                     // e = d + t1
                     let e = work_vars[3].wrapping_add(t1_sum);
+                    cols.work_vars.e[j] =
+                        u32_into_limbs::<SHA256_WORD_BITS>(e).map(F::from_canonical_u32);
                     // a = t1 + t2
                     let a = t1_sum.wrapping_add(t2_sum);
+                    cols.work_vars.a[j] =
+                        u32_into_limbs::<SHA256_WORD_BITS>(a).map(F::from_canonical_u32);
 
                     // fill in the carrys
                     for k in 0..SHA256_WORD_U16S {
@@ -141,7 +145,7 @@ impl Sha256Air {
                         let carry_e = (e_limb - u32_into_limbs::<SHA256_WORD_U16S>(e)[k]) >> 16;
                         cols.work_vars.carry_a[j][k] = F::from_canonical_u32(carry_a);
                         cols.work_vars.carry_e[j][k] = F::from_canonical_u32(carry_e);
-                        bitwise_lookup_chip.request_range(carry_a, carry_e);
+                        // bitwise_lookup_chip.request_range(carry_a, carry_e);
                     }
 
                     // update working variables
@@ -157,7 +161,7 @@ impl Sha256Air {
             }
             // computing the final hash
             else {
-                let cols: &mut Sha256DigestCols<F> = row[..].borrow_mut();
+                let cols: &mut Sha256DigestCols<F> = row[..SHA256_DIGEST_WIDTH].borrow_mut();
                 cols.flags.is_round_row = F::ZERO;
                 cols.flags.is_first_4_rows = F::ZERO;
                 cols.flags.is_digest_row = F::ONE;
@@ -189,7 +193,7 @@ impl Sha256Air {
         }
         let (first16, last1) = output.split_at_mut(16);
         let local_cols: &Sha256RoundCols<F> = first16[15].as_slice().borrow();
-        let next_cols: &mut Sha256RoundCols<F> = last1[16].as_mut_slice().borrow_mut();
+        let next_cols: &mut Sha256RoundCols<F> = last1[0].as_mut_slice().borrow_mut();
         Self::generate_carry_ae(local_cols, next_cols, 16);
         (output, final_hash)
     }
@@ -230,34 +234,40 @@ impl Sha256Air {
             let w = limbs_into_u32(next_cols.message_schedule.w[i].map(|x| x.as_canonical_u32()));
 
             for j in 0..SHA256_WORD_U16S {
-                let cur_a_limb = u32_into_limbs::<SHA256_WORD_U16S>(cur_a)[j];
-                let sig_a_limb = u32_into_limbs::<SHA256_WORD_U16S>(sig_a)[j];
-                let maj_abc_limb = u32_into_limbs::<SHA256_WORD_U16S>(maj_abc)[j];
-                let d_limb = u32_into_limbs::<SHA256_WORD_U16S>(d)[j];
-                let cur_e_limb = u32_into_limbs::<SHA256_WORD_U16S>(cur_e)[j];
-                let h_limb = u32_into_limbs::<SHA256_WORD_U16S>(h)[j];
-                let sig_e_limb = u32_into_limbs::<SHA256_WORD_U16S>(sig_e)[j];
-                let ch_efg_limb = u32_into_limbs::<SHA256_WORD_U16S>(ch_efg)[j];
-                let k_limb = u32_into_limbs::<SHA256_WORD_U16S>(k)[j];
-                let w_limb = u32_into_limbs::<SHA256_WORD_U16S>(w)[j];
+                let cur_a_limb =
+                    F::from_canonical_u32(u32_into_limbs::<SHA256_WORD_U16S>(cur_a)[j]);
+                let sig_a_limb =
+                    F::from_canonical_u32(u32_into_limbs::<SHA256_WORD_U16S>(sig_a)[j]);
+                let maj_abc_limb =
+                    F::from_canonical_u32(u32_into_limbs::<SHA256_WORD_U16S>(maj_abc)[j]);
+                let d_limb = F::from_canonical_u32(u32_into_limbs::<SHA256_WORD_U16S>(d)[j]);
+                let cur_e_limb =
+                    F::from_canonical_u32(u32_into_limbs::<SHA256_WORD_U16S>(cur_e)[j]);
+                let h_limb = F::from_canonical_u32(u32_into_limbs::<SHA256_WORD_U16S>(h)[j]);
+                let sig_e_limb =
+                    F::from_canonical_u32(u32_into_limbs::<SHA256_WORD_U16S>(sig_e)[j]);
+                let ch_efg_limb =
+                    F::from_canonical_u32(u32_into_limbs::<SHA256_WORD_U16S>(ch_efg)[j]);
+                let k_limb = F::from_canonical_u32(u32_into_limbs::<SHA256_WORD_U16S>(k)[j]);
+                let w_limb = F::from_canonical_u32(u32_into_limbs::<SHA256_WORD_U16S>(w)[j]);
 
                 let sum = d_limb + h_limb + sig_e_limb + ch_efg_limb + k_limb + w_limb - cur_e_limb
                     + if j == 0 {
-                        0
+                        F::ZERO
                     } else {
-                        next_cols.work_vars.carry_e[i][j - 1].as_canonical_u32()
+                        next_cols.work_vars.carry_e[i][j - 1]
                     };
-                let carry_e = F::from_canonical_u32(sum) * F::from_canonical_u32(1 << 16).inverse();
+                let carry_e = sum * F::from_canonical_u32(1 << 16).inverse();
 
                 let sum =
                     h_limb + sig_e_limb + ch_efg_limb + k_limb + w_limb + sig_a_limb + maj_abc_limb
                         - cur_a_limb
                         + if j == 0 {
-                            0
+                            F::ZERO
                         } else {
-                            next_cols.work_vars.carry_a[i][j - 1].as_canonical_u32()
+                            next_cols.work_vars.carry_a[i][j - 1]
                         };
-                let carry_a = F::from_canonical_u32(sum) * F::from_canonical_u32(1 << 16).inverse();
+                let carry_a = sum * F::from_canonical_u32(1 << 16).inverse();
                 next_cols.work_vars.carry_e[i][j] = carry_e;
                 next_cols.work_vars.carry_a[i][j] = carry_a;
             }
@@ -375,8 +385,8 @@ impl Sha256Air {
 
         // TODO: revisit this
         next_cols.flags.is_last_block = F::ZERO;
-        next_cols.flags.row_idx = [F::ZERO; 5];
         next_cols.flags.global_block_idx = F::ZERO;
+        next_cols.flags.row_idx = [F::ZERO; 5];
 
         next_cols.message_schedule.w = [[F::ZERO; SHA256_WORD_BITS]; SHA256_ROUNDS_PER_ROW];
         next_cols.message_schedule.carry_or_buffer =

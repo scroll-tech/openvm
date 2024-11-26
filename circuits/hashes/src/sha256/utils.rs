@@ -64,7 +64,8 @@ pub fn limbs_into_u32<const NUM_LIMBS: usize>(limbs: [u32; NUM_LIMBS]) -> u32 {
     let limb_bits = 32 / NUM_LIMBS;
     limbs
         .iter()
-        .fold(0, |acc, &limb| acc | (acc << limb_bits) | limb)
+        .rev()
+        .fold(0, |acc, &limb| (acc << limb_bits) | limb)
 }
 
 /// Choose function from SHA256

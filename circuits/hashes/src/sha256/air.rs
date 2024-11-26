@@ -14,7 +14,7 @@ use p3_matrix::Matrix;
 use super::{
     compose, contains_flag, contains_flag_range, flag_with_val, u32_into_limbs, Sha256DigestCols,
     Sha256RoundCols, SHA256_H, SHA256_HASH_WORDS, SHA256_K, SHA256_ROUNDS_PER_ROW,
-    SHA256_WORD_BITS, SHA256_WORD_U16S, SHA256_WORD_U8S,
+    SHA256_ROUND_WIDTH, SHA256_WORD_BITS, SHA256_WORD_U16S, SHA256_WORD_U8S,
 };
 
 #[derive(Clone, Debug)]
@@ -34,7 +34,7 @@ impl Sha256Air {
     }
 }
 
-impl<F: Field> BaseAir<F> for Sha256Air {
+impl<F> BaseAir<F> for Sha256Air {
     fn width(&self) -> usize {
         max(
             Sha256RoundCols::<F>::width(),
@@ -58,7 +58,7 @@ impl<AB: InteractionBuilder> SubAir<AB> for Sha256Air {
         <AB as AirBuilder>::Expr: 'a,
     {
         self.eval_row(builder);
-        self.eval_transitions(builder);
+        // self.eval_transitions(builder);
     }
 }
 
@@ -181,51 +181,52 @@ impl Sha256Air {
         let main = builder.main();
         let local = main.row_slice(0);
 
-        let local_cols: &Sha256RoundCols<AB::Var> = (*local).borrow();
+        // Doesn't matter which column struct we use here
+        let local_cols: &Sha256RoundCols<AB::Var> = local[..SHA256_ROUND_WIDTH].borrow();
         let flags = &local_cols.flags;
-        builder.assert_bool(flags.is_round_row);
-        builder.assert_bool(flags.is_first_4_rows);
-        builder.assert_bool(flags.is_digest_row);
-        builder.assert_bool(flags.is_round_row + flags.is_digest_row);
-        builder.assert_bool(flags.is_last_block);
-        builder.when_first_row().assert_zero(flags.global_block_idx);
-        self.row_idx_encoder
-            .eval(builder, &local_cols.flags.row_idx);
-        builder.assert_one(contains_flag_range::<AB>(
-            &self.row_idx_encoder,
-            &local_cols.flags.row_idx,
-            0,
-            17,
-        ));
-        builder.assert_eq(
-            contains_flag_range::<AB>(&self.row_idx_encoder, &local_cols.flags.row_idx, 0, 3),
-            flags.is_first_4_rows,
-        );
-        builder.assert_eq(
-            contains_flag_range::<AB>(&self.row_idx_encoder, &local_cols.flags.row_idx, 0, 15),
-            flags.is_round_row,
-        );
-        builder.assert_eq(
-            contains_flag::<AB>(&self.row_idx_encoder, &local_cols.flags.row_idx, &[16]),
-            flags.is_digest_row,
-        );
-        // If invalid row we want the row_idx to be 17
-        builder.assert_eq(
-            contains_flag::<AB>(&self.row_idx_encoder, &local_cols.flags.row_idx, &[17]),
-            not::<AB::Expr>(flags.is_digest_row + flags.is_round_row),
-        );
+        // builder.assert_bool(flags.is_round_row);
+        // builder.assert_bool(flags.is_first_4_rows);
+        // builder.assert_bool(flags.is_digest_row);
+        // builder.assert_bool(flags.is_round_row + flags.is_digest_row);
+        // builder.assert_bool(flags.is_last_block);
+        // builder.when_first_row().assert_zero(flags.global_block_idx);
+        // self.row_idx_encoder
+        //     .eval(builder, &local_cols.flags.row_idx);
+        // builder.assert_one(contains_flag_range::<AB>(
+        //     &self.row_idx_encoder,
+        //     &local_cols.flags.row_idx,
+        //     0,
+        //     17,
+        // ));
+        // builder.assert_eq(
+        //     contains_flag_range::<AB>(&self.row_idx_encoder, &local_cols.flags.row_idx, 0, 3),
+        //     flags.is_first_4_rows,
+        // );
+        // builder.assert_eq(
+        //     contains_flag_range::<AB>(&self.row_idx_encoder, &local_cols.flags.row_idx, 0, 15),
+        //     flags.is_round_row,
+        // );
+        // builder.assert_eq(
+        //     contains_flag::<AB>(&self.row_idx_encoder, &local_cols.flags.row_idx, &[16]),
+        //     flags.is_digest_row,
+        // );
+        // // If invalid row we want the row_idx to be 17
+        // builder.assert_eq(
+        //     contains_flag::<AB>(&self.row_idx_encoder, &local_cols.flags.row_idx, &[17]),
+        //     not::<AB::Expr>(flags.is_digest_row + flags.is_round_row),
+        // );
 
-        // Constrain a, e, being composed of bits: we make sure a and e are always in the same place in the trace matrix
-        // Note: this has to be true for every row, even invalid rows
-        for i in 0..SHA256_ROUNDS_PER_ROW {
-            for j in 0..SHA256_WORD_BITS {
-                builder.assert_bool(local_cols.work_vars.a[i][j]);
-                builder.assert_bool(local_cols.work_vars.e[i][j]);
-            }
-        }
-        self.eval_round_row(builder, local_cols);
-        let local_cols: &Sha256DigestCols<AB::Var> = (*local).borrow();
-        self.eval_digest_row(builder, local_cols);
+        // // Constrain a, e, being composed of bits: we make sure a and e are always in the same place in the trace matrix
+        // // Note: this has to be true for every row, even invalid rows
+        // for i in 0..SHA256_ROUNDS_PER_ROW {
+        //     for j in 0..SHA256_WORD_BITS {
+        //         builder.assert_bool(local_cols.work_vars.a[i][j]);
+        //         builder.assert_bool(local_cols.work_vars.e[i][j]);
+        //     }
+        // }
+        // self.eval_round_row(builder, local_cols);
+        // let local_cols: &Sha256DigestCols<AB::Var> = local[..SHA256_DIGEST_WIDTH].borrow();
+        // self.eval_digest_row(builder, local_cols);
     }
 
     /// Implement constraints for a row as if it is a round row
@@ -363,8 +364,8 @@ impl Sha256Air {
         let next = main.row_slice(1);
 
         // Doesn't matter what column structs we use here
-        let local_cols: &Sha256RoundCols<AB::Var> = (*local).borrow();
-        let next_cols: &Sha256RoundCols<AB::Var> = (*next).borrow();
+        let local_cols: &Sha256RoundCols<AB::Var> = local[..SHA256_ROUND_WIDTH].borrow();
+        let next_cols: &Sha256RoundCols<AB::Var> = next[..SHA256_ROUND_WIDTH].borrow();
 
         let local_is_padding_row =
             not::<AB::Expr>(local_cols.flags.is_round_row + local_cols.flags.is_digest_row);

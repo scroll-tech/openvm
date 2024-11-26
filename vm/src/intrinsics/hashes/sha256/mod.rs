@@ -89,7 +89,7 @@ impl<F: PrimeField32> Sha256VmChip<F> {
                 ptr_max_bits,
                 offset,
                 Sha256Air::new(bitwise_lookup_chip.bus(), SHA256_CHIP_BUS_IDX),
-                Encoder::new(17, 2),
+                Encoder::new(PaddingFlags::COUNT, 2),
             ),
             memory_controller,
             bitwise_lookup_chip,
@@ -151,21 +151,11 @@ impl<F: PrimeField32> InstructionExecutor<F> for Sha256VmChip<F> {
                     SHA256_READ_SIZE,
                     (max(read_ptr, src + len) - read_ptr) as usize,
                 );
-                println!(
-                    "num_reads: {}, read_ptr: {}, src: {}, len: {}, num_blocks: {}",
-                    num_reads, read_ptr, src, len, num_blocks
-                );
                 hasher.update(&read_record.data.map(|x| x.as_canonical_u32() as u8)[0..num_reads]);
                 read_ptr += SHA256_READ_SIZE as u32;
                 read_record
             });
             input_message.push(block_reads);
-        }
-
-        for p in input_message.iter() {
-            for p1 in p.iter() {
-                println!("p1: {:?}", p1.data);
-            }
         }
 
         let mut digest = [0u8; SHA256_WRITE_SIZE];
@@ -175,6 +165,8 @@ impl<F: PrimeField32> InstructionExecutor<F> for Sha256VmChip<F> {
             F::from_canonical_u32(dst),
             digest.map(|b| F::from_canonical_u8(b)),
         );
+
+        println!("digest: {:?}", digest);
 
         self.records.push(Sha256Record {
             from_state: from_state.map(F::from_canonical_u32),

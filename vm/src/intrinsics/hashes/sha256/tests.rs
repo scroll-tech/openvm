@@ -50,7 +50,8 @@ fn set_and_execute(
             .borrow()
             .mem_config
             .pointer_max_bits;
-    let dst_ptr = gen_pointer(rng, 4) as u32;
+    let dst_ptr = rng.gen_range(0..max_mem_ptr);
+    let dst_ptr = dst_ptr ^ (dst_ptr & 3);
     tester.write(1, rd, dst_ptr.to_le_bytes().map(F::from_canonical_u8));
     let src_ptr = rng.gen_range(0..(max_mem_ptr - len as u32));
     let src_ptr = src_ptr ^ (src_ptr & 3);
@@ -99,12 +100,23 @@ fn rand_sha256_test() {
         Rv32Sha256Opcode::default_offset(),
     );
 
-    let num_tests: usize = 0;
+    let num_tests: usize = 2;
     for _ in 0..num_tests {
-        set_and_execute(&mut tester, &mut chip, &mut rng, SHA256, None, None);
+        set_and_execute(
+            &mut tester,
+            &mut chip,
+            &mut rng,
+            SHA256,
+            Some(&[
+                1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4,
+                1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4,
+                1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4,
+            ]),
+            None,
+        );
     }
 
-    let tester = tester.build().load(chip).finalize();
+    let tester = tester.build().load(chip).load(bitwise_chip).finalize();
     tester.simple_test().expect("Verification failed");
 }
 
@@ -125,7 +137,7 @@ fn execute_roundtrip_sanity_test() {
         tester.execution_bus(),
         tester.program_bus(),
         tester.memory_controller(),
-        bitwise_chip.clone(), 
+        bitwise_chip.clone(),
         Rv32Sha256Opcode::default_offset(),
     );
 
@@ -137,7 +149,7 @@ fn execute_roundtrip_sanity_test() {
         "Sha256VmRoundCols::width(): {}",
         Sha256VmRoundCols::<F>::width()
     );
-    let num_tests: usize = 0;
+    let num_tests: usize = 1;
     for _ in 0..num_tests {
         set_and_execute(&mut tester, &mut chip, &mut rng, SHA256, None, None);
     }
