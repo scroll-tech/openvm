@@ -33,7 +33,7 @@ members = [
     "lib/recursion",
     "axvm-sdk",
     "benchmarks",
-    "testtesttest",
+    "testtesttest/guest",
 ]
 resolver = "2"
 
