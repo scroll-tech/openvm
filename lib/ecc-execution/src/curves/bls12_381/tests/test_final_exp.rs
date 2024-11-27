@@ -15,7 +15,6 @@ use crate::curves::bls12_381::{Bls12_381, SEED_NEG};
 fn test_bls12_381_final_exp_hint() {
     let (_P_vec, _Q_vec, P_ecpoints, Q_ecpoints) =
         generate_test_points_bls12_381(&[Fr::from(3), Fr::from(6)], &[Fr::from(8), Fr::from(4)]);
-    // generate_test_points_bls12_381(&[Fr::from(1), Fr::from(1)], &[Fr::from(1), Fr::from(1)]);
 
     let f = Bls12_381::multi_miller_loop(&P_ecpoints, &Q_ecpoints);
     let (c, s) = Bls12_381::final_exp_hint(&f);
@@ -33,7 +32,7 @@ fn test_bls12_381_final_exp_hint() {
 #[test]
 #[allow(non_snake_case)]
 fn test_bls12_381_assert_final_exp_is_one_scalar_ones() {
-    assert_final_exp_one(&[Fr::from(1), Fr::from(1)], &[Fr::from(1), Fr::from(1)]);
+    assert_final_exp_one(&[Fr::from(1), Fr::from(2)], &[Fr::from(2), Fr::from(1)]);
 }
 
 #[test]
