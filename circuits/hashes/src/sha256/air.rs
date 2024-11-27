@@ -59,7 +59,7 @@ impl<AB: InteractionBuilder> SubAir<AB> for Sha256Air {
         <AB as AirBuilder>::Expr: 'a,
     {
         self.eval_row(builder, start_col);
-        // self.eval_transitions(builder, start_col);
+        self.eval_transitions(builder, start_col);
     }
 }
 
@@ -191,7 +191,7 @@ impl Sha256Air {
         builder.assert_bool(flags.is_digest_row);
         builder.assert_bool(flags.is_round_row + flags.is_digest_row);
         builder.assert_bool(flags.is_last_block);
-        builder.when_first_row().assert_zero(flags.global_block_idx);
+
         self.row_idx_encoder
             .eval(builder, &local_cols.flags.row_idx);
         builder.assert_one(contains_flag_range::<AB>(
@@ -324,43 +324,6 @@ impl Sha256Air {
                     .assert_eq(prev_e_limb, cur_e[j].clone());
             }
         }
-
-        // Constrain that next block's `prev_hash` is equal to the current block's `hash`
-        let composed_hash: [[<AB as AirBuilder>::Expr; SHA256_WORD_U16S]; SHA256_HASH_WORDS] =
-            array::from_fn(|i| {
-                let hash_bits = if i < SHA256_ROUNDS_PER_ROW {
-                    local.hash.a[SHA256_ROUNDS_PER_ROW - 1 - i].map(|x| x.into())
-                } else {
-                    local.hash.e[SHA256_ROUNDS_PER_ROW + 3 - i].map(|x| x.into())
-                };
-                array::from_fn(|j| compose::<AB>(&hash_bits[j * 16..(j + 1) * 16], 1))
-            });
-
-        let next_local_block_id = select(
-            local.flags.is_last_block,
-            AB::Expr::ZERO,
-            local.local_block_idx + AB::Expr::ONE,
-        );
-        // The following interactions constrain certain values from block to block
-        builder.push_send(
-            self.bus_idx,
-            composed_hash
-                .into_iter()
-                .flatten()
-                .chain(once(next_local_block_id)),
-            local.flags.is_digest_row,
-        );
-
-        builder.push_receive(
-            self.bus_idx,
-            local
-                .prev_hash
-                .into_iter()
-                .flatten()
-                .map(|x| x.into())
-                .chain(once(local.local_block_idx.into())),
-            local.flags.is_digest_row,
-        );
     }
 
     fn eval_transitions<AB: InteractionBuilder>(&self, builder: &mut AB, start_col: usize) {
@@ -419,8 +382,8 @@ impl Sha256Air {
                 * next_cols.flags.is_round_row
                 * AB::Expr::from_canonical_u32(16)
                 * AB::Expr::NEG_ONE
-            + local_cols.flags.is_digest_row * next_is_padding_row * AB::Expr::ONE
-            + local_is_padding_row * AB::Expr::ZERO;
+            + local_cols.flags.is_digest_row * next_is_padding_row.clone() * AB::Expr::ONE
+            + local_is_padding_row.clone() * AB::Expr::ZERO;
 
         let local_row_idx = flag_with_val::<AB>(
             &self.row_idx_encoder,
@@ -438,19 +401,88 @@ impl Sha256Air {
             .assert_eq(local_row_idx.clone() + delta, next_row_idx.clone());
         builder.when_first_row().assert_zero(local_row_idx);
 
+        // Constrain the global block index
+        // We set the global block index to 0 for padding rows
+        // Starting with 1 so it is not the same as the padding rows
         builder
             .when_first_row()
-            .assert_zero(local_cols.flags.global_block_idx);
+            .assert_one(local_cols.flags.global_block_idx);
+
+        builder.when(local_cols.flags.is_round_row).assert_eq(
+            local_cols.flags.global_block_idx,
+            next_cols.flags.global_block_idx,
+        );
         builder
             .when_transition()
+            .when(local_cols.flags.is_digest_row)
             .when(next_cols.flags.is_digest_row)
             .assert_eq(
                 local_cols.flags.global_block_idx + AB::Expr::ONE,
                 next_cols.flags.global_block_idx,
             );
+        builder
+            .when(local_is_padding_row)
+            .assert_zero(local_cols.flags.global_block_idx);
 
-        self.eval_message_schedule::<AB>(builder, local_cols, next_cols);
-        self.eval_work_vars::<AB>(builder, local_cols, next_cols);
+        // self.eval_message_schedule::<AB>(builder, local_cols, next_cols);
+        // self.eval_work_vars::<AB>(builder, local_cols, next_cols);
+        let local_cols: &Sha256DigestCols<AB::Var> =
+            local[start_col..start_col + SHA256_DIGEST_WIDTH].borrow();
+        self.eval_prev_hash::<AB>(builder, local_cols, next_is_padding_row);
+    }
+
+    /// Constrains that the next block's `prev_hash` is equal to the current block's `hash`
+    /// Note: the constraining is done by interactions with the chip itself on every digest row
+    fn eval_prev_hash<AB: InteractionBuilder>(
+        &self,
+        builder: &mut AB,
+        local: &Sha256DigestCols<AB::Var>,
+        is_lastest_block: AB::Expr,
+    ) {
+        // Constrain that next block's `prev_hash` is equal to the current block's `hash`
+        let composed_hash: [[<AB as AirBuilder>::Expr; SHA256_WORD_U16S]; SHA256_HASH_WORDS] =
+            array::from_fn(|i| {
+                let hash_bits = if i < SHA256_ROUNDS_PER_ROW {
+                    local.hash.a[SHA256_ROUNDS_PER_ROW - 1 - i].map(|x| x.into())
+                } else {
+                    local.hash.e[SHA256_ROUNDS_PER_ROW + 3 - i].map(|x| x.into())
+                };
+                array::from_fn(|j| compose::<AB>(&hash_bits[j * 16..(j + 1) * 16], 1))
+            });
+
+        let next_local_block_idx = select(
+            local.flags.is_last_block,
+            AB::Expr::ZERO,
+            local.local_block_idx + AB::Expr::ONE,
+        );
+        // Need to handle the case if this is the very last block of the trace matrix
+        let next_global_block_idx = select(
+            is_lastest_block,
+            AB::Expr::ONE,
+            local.flags.global_block_idx + AB::Expr::ONE,
+        );
+        // The following interactions constrain certain values from block to block
+        builder.push_send(
+            self.bus_idx,
+            composed_hash
+                .into_iter()
+                .flatten()
+                .chain(once(next_local_block_idx))
+                .chain(once(next_global_block_idx)),
+            local.flags.is_digest_row,
+        );
+
+        builder.push_receive(
+            self.bus_idx,
+            local
+                .prev_hash
+                .into_iter()
+                .flatten()
+                .map(|x| x.into())
+                .chain(once(local.local_block_idx.into()))
+                .chain(once(local.flags.global_block_idx.into())),
+            local.flags.is_digest_row,
+        );
     }
 
     /// Constrain the message schedule additions

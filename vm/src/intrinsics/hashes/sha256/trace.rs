@@ -94,7 +94,7 @@ where
                         self.bitwise_lookup_chip.clone(),
                         &prev_hash,
                         is_last_block,
-                        global_block_idx as u32,
+                        global_block_idx as u32 + 1,
                         i as u32,
                         &buffer,
                     );
