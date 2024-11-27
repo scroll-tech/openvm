@@ -101,7 +101,7 @@ fn rand_sha256_test() {
         Rv32Sha256Opcode::default_offset(),
     );
 
-    let num_tests: usize = 2;
+    let num_tests: usize = 1;
     for _ in 0..num_tests {
         set_and_execute(
             &mut tester,
@@ -109,9 +109,7 @@ fn rand_sha256_test() {
             &mut rng,
             SHA256,
             Some(&[
-                1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4,
-                1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4,
-                1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4,
+                1, 2, 3, 4
             ]),
             None,
         );

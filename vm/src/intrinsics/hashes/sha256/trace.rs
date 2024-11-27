@@ -217,72 +217,85 @@ where
                 .default_row(&local_cols.inner, &mut next_cols.inner);
         }
 
-        // // Fill in the w_3 and intermed_4
-        // for i in (0..height - 1).step_by(width) {
-        //     let rows = &mut values[i * width..(i + 2) * width];
-        //     let (local, next) = rows.split_at_mut(width);
-        //     let local_cols: &mut Sha256VmRoundCols<Val<SC>> = local.borrow_mut();
-        //     let next_cols: &mut Sha256VmRoundCols<Val<SC>> = next.borrow_mut();
-        //     Sha256Air::generate_w_3::<Val<SC>>(&local_cols.inner, &mut next_cols.inner);
-        //     Sha256Air::generate_intermed_4::<Val<SC>>(&local_cols.inner, &mut next_cols.inner);
+        // Fill in the w_3 and intermed_4
+        for i in 0..height - 1 {
+            let rows = &mut values[i * width..(i + 2) * width];
+            let (local, next) = rows.split_at_mut(width);
+            let local_cols: &mut Sha256VmRoundCols<Val<SC>> = local.borrow_mut();
+            let next_cols: &mut Sha256VmRoundCols<Val<SC>> = next.borrow_mut();
+            Sha256Air::generate_w_3::<Val<SC>>(&local_cols.inner, &mut next_cols.inner);
+            Sha256Air::generate_intermed_4::<Val<SC>>(&local_cols.inner, &mut next_cols.inner);
+        }
+        // Fill in w_3 and intermed_4 for the last row
+        let (first, rest) = values.split_at_mut(width);
+        let rest_len = rest.len();
+        let last = &mut rest[rest_len - width..];
+        let local_cols: &mut Sha256VmRoundCols<Val<SC>> = last.borrow_mut();
+        let next_cols: &mut Sha256VmRoundCols<Val<SC>> = first.borrow_mut();
+        Sha256Air::generate_w_3::<Val<SC>>(&local_cols.inner, &mut next_cols.inner);
+        Sha256Air::generate_intermed_4::<Val<SC>>(&local_cols.inner, &mut next_cols.inner);
+
+        // Fill in intermed_8
+        for i in 0..height - 1 {
+            let rows = &mut values[i * width..(i + 2) * width];
+            let (local, next) = rows.split_at_mut(width);
+            let local_cols: &mut Sha256VmRoundCols<Val<SC>> = local.borrow_mut();
+            let next_cols: &mut Sha256VmRoundCols<Val<SC>> = next.borrow_mut();
+            Sha256Air::generate_intermed_8::<Val<SC>>(&local_cols.inner, &mut next_cols.inner);
+        }
+
+        // Fill in intermed_8 for the last row
+        let (first, rest) = values.split_at_mut(width);
+        let rest_len = rest.len();
+        let last = &mut rest[rest_len - width..];
+        let local_cols: &mut Sha256VmRoundCols<Val<SC>> = last.borrow_mut();
+        let next_cols: &mut Sha256VmRoundCols<Val<SC>> = first.borrow_mut();
+        Sha256Air::generate_intermed_8::<Val<SC>>(&local_cols.inner, &mut next_cols.inner);
+
+        // Fill in intermed_12
+        for i in 0..height - 1 {
+            let rows = &mut values[i * width..(i + 2) * width];
+            let (local, next) = rows.split_at_mut(width);
+            let local_cols: &mut Sha256VmRoundCols<Val<SC>> = local.borrow_mut();
+            let next_cols: &mut Sha256VmRoundCols<Val<SC>> = next.borrow_mut();
+            Sha256Air::generate_intermed_12::<Val<SC>>(&mut local_cols.inner, &next_cols.inner);
+        }
+
+        // Fill in intermed_12 for the last row
+        let (first, rest) = values.split_at_mut(width);
+        let rest_len = rest.len();
+        let last = &mut rest[rest_len - width..];
+        let local_cols: &mut Sha256VmRoundCols<Val<SC>> = last.borrow_mut();
+        let next_cols: &mut Sha256VmRoundCols<Val<SC>> = first.borrow_mut();
+        Sha256Air::generate_intermed_12::<Val<SC>>(&mut local_cols.inner, &next_cols.inner);
+
+        // for i in (0..values.len()).step_by(width) {
+        //     let rows = &mut values[i..i + width];
+        //     let local_cols: &mut Sha256VmDigestCols<Val<SC>> =
+        //         rows[..SHA256VM_DIGEST_WIDTH].borrow_mut();
+        //     // println!("local_cols: {:?}", local_cols.pad_flags);
+        //     println!(
+        //         "len: {:?}, cur_timestamp: {:?}, flags: {:?}, local_block_idx: {:?}, from_state: {:?}",
+        //         local_cols.control.len, local_cols.control.cur_timestamp, local_cols.inner.flags, local_cols.inner.local_block_idx, local_cols.from_state
+        //     );
         // }
-        // // Fill in w_3 and intermed_4 for the last row
-        // let (first, rest) = values.split_at_mut(width);
-        // let rest_len = rest.len();
-        // let last = &mut rest[rest_len - width..];
-        // let local_cols: &mut Sha256VmRoundCols<Val<SC>> = first.borrow_mut();
-        // let next_cols: &mut Sha256VmRoundCols<Val<SC>> = last.borrow_mut();
-        // Sha256Air::generate_w_3::<Val<SC>>(&local_cols.inner, &mut next_cols.inner);
-        // Sha256Air::generate_intermed_4::<Val<SC>>(&local_cols.inner, &mut next_cols.inner);
-
-        // // Fill in intermed_8
-        // for i in (0..height - 1).step_by(width) {
-        //     let rows = &mut values[i * width..(i + 2) * width];
-        //     let (local, next) = rows.split_at_mut(width);
-        //     let local_cols: &mut Sha256VmRoundCols<Val<SC>> = local.borrow_mut();
-        //     let next_cols: &mut Sha256VmRoundCols<Val<SC>> = next.borrow_mut();
-        //     Sha256Air::generate_intermed_8::<Val<SC>>(&local_cols.inner, &mut next_cols.inner);
-        // }
-
-        // // Fill in intermed_8 for the last row
-        // let (first, rest) = values.split_at_mut(width);
-        // let rest_len = rest.len();
-        // let last = &mut rest[rest_len - width..];
-        // let local_cols: &mut Sha256VmRoundCols<Val<SC>> = first.borrow_mut();
-        // let next_cols: &mut Sha256VmRoundCols<Val<SC>> = last.borrow_mut();
-        // Sha256Air::generate_intermed_8::<Val<SC>>(&local_cols.inner, &mut next_cols.inner);
-
-        // // Fill in intermed_12
-        // for i in (0..height - 1).step_by(width) {
-        //     let rows = &mut values[i * width..(i + 2) * width];
-        //     let (local, next) = rows.split_at_mut(width);
-        //     let local_cols: &mut Sha256VmRoundCols<Val<SC>> = local.borrow_mut();
-        //     let next_cols: &mut Sha256VmRoundCols<Val<SC>> = next.borrow_mut();
-        //     Sha256Air::generate_intermed_12::<Val<SC>>(&mut local_cols.inner, &next_cols.inner);
-        // }
-
-        // // Fill in intermed_12 for the last row
-        // let (first, rest) = values.split_at_mut(width);
-        // let rest_len = rest.len();
-        // let last = &mut rest[rest_len - width..];
-        // let local_cols: &mut Sha256VmRoundCols<Val<SC>> = first.borrow_mut();
-        // let next_cols: &mut Sha256VmRoundCols<Val<SC>> = last.borrow_mut();
-        // Sha256Air::generate_intermed_12::<Val<SC>>(&mut local_cols.inner, &mut next_cols.inner);
 
         for i in (0..values.len()).step_by(width) {
             let rows = &mut values[i..i + width];
-            let local_cols: &mut Sha256VmDigestCols<Val<SC>> =
-                rows[..SHA256VM_DIGEST_WIDTH].borrow_mut();
-            // println!("local_cols: {:?}", local_cols.pad_flags);
-            println!(
-                "len: {:?}, cur_timestamp: {:?}, flags: {:?}, local_block_idx: {:?}, from_state: {:?}",
-                local_cols.control.len, local_cols.control.cur_timestamp, local_cols.inner.flags, local_cols.inner.local_block_idx, local_cols.from_state
-            );
-            if local_cols.inner.flags.is_digest_row.as_canonical_u32() != 0 {
-                println!(
-                    "prev_hash: {:?}, final_hash: {:?}",
-                    local_cols.inner.prev_hash, local_cols.inner.final_hash
-                );
+            let local_cols: &mut Sha256VmRoundCols<Val<SC>> =
+                rows[..SHA256VM_ROUND_WIDTH].borrow_mut();
+
+            for j in 0..SHA256_ROUNDS_PER_ROW {
+                for k in 0..32 {
+                    print!("{}", local_cols.inner.work_vars.a[j][k]);
+                }
+                println!();
+            }
+            for j in 0..SHA256_ROUNDS_PER_ROW {
+                for k in 0..32 {
+                    print!("{}", local_cols.inner.work_vars.e[j][k]);
+                }
+                println!();
             }
         }
         AirProofInput::simple(air, RowMajorMatrix::new(values, width), vec![])

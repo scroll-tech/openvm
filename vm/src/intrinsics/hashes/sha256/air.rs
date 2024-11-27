@@ -124,7 +124,7 @@ impl Sha256VmAir {
             let word = local_cols.inner.message_schedule.w[word_idx].map(|x| x.into());
             // Need to reverse the byte order to match the endianness of the memory
             let byte_idx = 4 - i % 4 - 1;
-            compose::<AB>(&word[byte_idx * 8..(byte_idx + 1) * 8], 1)
+            compose::<AB::Expr>(&word[byte_idx * 8..(byte_idx + 1) * 8], 1)
         };
 
         builder.assert_bool(local_cols.control.is_padding);
@@ -297,7 +297,7 @@ impl Sha256VmAir {
 
             // should be len is handled outside of the loop
         }
-        let appended_len = compose::<AB>(
+        let appended_len = compose::<AB::Expr>(
             &[
                 get_ith_byte(15),
                 get_ith_byte(14),
@@ -473,7 +473,7 @@ impl Sha256VmAir {
                 [SHA256_WORD_U8S - i % SHA256_WORD_U8S - 1]
         });
 
-        let dst_ptr_val = compose::<AB>(&local_cols.dst_ptr.map(|x| x.into()), RV32_CELL_BITS);
+        let dst_ptr_val = compose::<AB::Expr>(&local_cols.dst_ptr.map(|x| x.into()), RV32_CELL_BITS);
 
         self.memory_bridge
             .write(
@@ -500,14 +500,14 @@ impl Sha256VmAir {
             .eval(builder, is_last_row.clone());
 
         // Assert that we read the correct length of the message
-        let len_val = compose::<AB>(&local_cols.len_data.map(|x| x.into()), RV32_CELL_BITS);
+        let len_val = compose::<AB::Expr>(&local_cols.len_data.map(|x| x.into()), RV32_CELL_BITS);
         builder.when(is_last_row.clone()).assert_eq(
             local_cols.control.len[0]
                 + local_cols.control.len[1] * AB::Expr::from_canonical_u32(1 << 6),
             len_val,
         );
         // Assert that we started reading from the correct pointer initially
-        let src_val = compose::<AB>(&local_cols.src_ptr.map(|x| x.into()), RV32_CELL_BITS);
+        let src_val = compose::<AB::Expr>(&local_cols.src_ptr.map(|x| x.into()), RV32_CELL_BITS);
         builder
             .when(is_last_row.clone())
             .assert_eq(local_cols.control.read_ptr, src_val + read_ptr_delta);

@@ -12,7 +12,8 @@ use p3_field::{AbstractField, Field};
 use p3_matrix::Matrix;
 
 use super::{
-    compose, contains_flag, contains_flag_range, flag_with_val, u32_into_limbs, Sha256DigestCols,
+    big_sig0_field, big_sig1_field, ch_field, compose, contains_flag, contains_flag_range,
+    flag_with_val, maj_field, small_sig0_field, small_sig1_field, u32_into_limbs, Sha256DigestCols,
     Sha256RoundCols, SHA256_DIGEST_WIDTH, SHA256_H, SHA256_HASH_WORDS, SHA256_K,
     SHA256_ROUNDS_PER_ROW, SHA256_ROUND_WIDTH, SHA256_WORD_BITS, SHA256_WORD_U16S, SHA256_WORD_U8S,
 };
@@ -64,119 +65,6 @@ impl<AB: InteractionBuilder> SubAir<AB> for Sha256Air {
 }
 
 impl Sha256Air {
-    /// Rotates `bits` right by `n` bits, assumes `bits` is in little-endian
-    #[inline]
-    fn rotr<AB: InteractionBuilder>(
-        bits: &[AB::Var; SHA256_WORD_BITS],
-        n: usize,
-    ) -> [AB::Expr; SHA256_WORD_BITS] {
-        array::from_fn(|i| bits[(i + n) % SHA256_WORD_BITS].into())
-    }
-
-    /// Shifts `bits` right by `n` bits, assumes `bits` is in little-endian
-    #[inline]
-    fn shr<AB: InteractionBuilder>(
-        bits: &[AB::Var; SHA256_WORD_BITS],
-        n: usize,
-    ) -> [AB::Expr; SHA256_WORD_BITS] {
-        array::from_fn(|i| {
-            if i + n < SHA256_WORD_BITS {
-                bits[i + n].into()
-            } else {
-                AB::Expr::ZERO
-            }
-        })
-    }
-
-    /// Computes x ^ y ^ z, where x, y, z are single bits
-    #[inline]
-    fn xor_single<AB: InteractionBuilder>(x: AB::Expr, y: AB::Expr, z: AB::Expr) -> AB::Expr {
-        (x.clone() * y.clone() * z.clone())
-            + (x.clone() * y.clone() * not::<AB::Expr>(z.clone()))
-            + (x.clone() * not::<AB::Expr>(y.clone()) * z.clone())
-            + (not::<AB::Expr>(x.clone()) * y.clone() * z.clone())
-    }
-
-    /// Computes x ^ y ^ z, where x, y, z are [SHA256_WORD_BITS] bit numbers
-    #[inline]
-    fn xor<AB: InteractionBuilder>(
-        x: &[AB::Expr; SHA256_WORD_BITS],
-        y: &[AB::Expr; SHA256_WORD_BITS],
-        z: &[AB::Expr; SHA256_WORD_BITS],
-    ) -> [AB::Expr; SHA256_WORD_BITS] {
-        array::from_fn(|i| Self::xor_single::<AB>(x[i].clone(), y[i].clone(), z[i].clone()))
-    }
-
-    /// Computes Ch(x,y,z), where x, y, z are [SHA256_WORD_BITS] bit numbers
-    #[inline]
-    fn ch<AB: InteractionBuilder>(
-        x: &[AB::Var; SHA256_WORD_BITS],
-        y: &[AB::Var; SHA256_WORD_BITS],
-        z: &[AB::Var; SHA256_WORD_BITS],
-    ) -> [AB::Expr; SHA256_WORD_BITS] {
-        array::from_fn(|i| select(x[i], y[i], z[i]))
-    }
-
-    /// Computes Maj(x,y,z), where x, y, z are [SHA256_WORD_BITS] bit numbers
-    #[inline]
-    fn maj<AB: InteractionBuilder>(
-        x: &[AB::Var; SHA256_WORD_BITS],
-        y: &[AB::Var; SHA256_WORD_BITS],
-        z: &[AB::Var; SHA256_WORD_BITS],
-    ) -> [AB::Expr; SHA256_WORD_BITS] {
-        array::from_fn(|i| {
-            x[i] * y[i] + x[i] * z[i] + y[i] * z[i] - AB::Expr::TWO * x[i] * y[i] * z[i]
-        })
-    }
-
-    /// Computes SmallSigma0(x), where x is a [SHA256_WORD_BITS] bit number in little-endian
-    #[inline]
-    fn small_sig0<AB: InteractionBuilder>(
-        x: &[AB::Var; SHA256_WORD_BITS],
-    ) -> [AB::Expr; SHA256_WORD_BITS] {
-        Self::xor::<AB>(
-            &Self::rotr::<AB>(x, 2),
-            &Self::rotr::<AB>(x, 13),
-            &Self::shr::<AB>(x, 22),
-        )
-    }
-
-    /// Computes SmallSigma1(x), where x is a [SHA256_WORD_BITS] bit number in little-endian
-    #[inline]
-    fn small_sig1<AB: InteractionBuilder>(
-        x: &[AB::Var; SHA256_WORD_BITS],
-    ) -> [AB::Expr; SHA256_WORD_BITS] {
-        Self::xor::<AB>(
-            &Self::rotr::<AB>(x, 6),
-            &Self::rotr::<AB>(x, 11),
-            &Self::shr::<AB>(x, 25),
-        )
-    }
-
-    /// Computes BigSigma0(x), where x is a [SHA256_WORD_BITS] bit number in little-endian
-    #[inline]
-    fn big_sig0<AB: InteractionBuilder>(
-        x: &[AB::Var; SHA256_WORD_BITS],
-    ) -> [AB::Expr; SHA256_WORD_BITS] {
-        Self::xor::<AB>(
-            &Self::rotr::<AB>(x, 2),
-            &Self::rotr::<AB>(x, 13),
-            &Self::rotr::<AB>(x, 22),
-        )
-    }
-
-    /// Computes BigSigma1(x), where x is a [SHA256_WORD_BITS] bit number in little-endian
-    #[inline]
-    fn big_sig1<AB: InteractionBuilder>(
-        x: &[AB::Var; SHA256_WORD_BITS],
-    ) -> [AB::Expr; SHA256_WORD_BITS] {
-        Self::xor::<AB>(
-            &Self::rotr::<AB>(x, 6),
-            &Self::rotr::<AB>(x, 11),
-            &Self::rotr::<AB>(x, 25),
-        )
-    }
-
     /// Implement constraints that need to be true for all rows
     fn eval_row<AB: InteractionBuilder>(&self, builder: &mut AB, start_col: usize) {
         let main = builder.main();
@@ -275,8 +163,8 @@ impl Sha256Air {
             let a = local.hash.a[i].map(|x| x.into());
             let e = local.hash.e[i].map(|x| x.into());
             for j in 0..SHA256_WORD_U16S {
-                let a_limb = compose::<AB>(&a[j * 16..(j + 1) * 16], 1);
-                let e_limb = compose::<AB>(&e[j * 16..(j + 1) * 16], 1);
+                let a_limb = compose::<AB::Expr>(&a[j * 16..(j + 1) * 16], 1);
+                let e_limb = compose::<AB::Expr>(&e[j * 16..(j + 1) * 16], 1);
 
                 // If it is a padding row or the last row of a message, the `hash` should be the [SHA256_H]
                 builder
@@ -312,8 +200,8 @@ impl Sha256Air {
             let cur_a = local.final_hash[SHA256_ROUNDS_PER_ROW - i - 1].map(|x| x.into());
             let cur_e = local.final_hash[SHA256_ROUNDS_PER_ROW - i + 3].map(|x| x.into());
             for j in 0..SHA256_WORD_U8S {
-                let prev_a_limb = compose::<AB>(&prev_a[j * 8..(j + 1) * 8], 1);
-                let prev_e_limb = compose::<AB>(&prev_e[j * 8..(j + 1) * 8], 1);
+                let prev_a_limb = compose::<AB::Expr>(&prev_a[j * 8..(j + 1) * 8], 1);
+                let prev_e_limb = compose::<AB::Expr>(&prev_e[j * 8..(j + 1) * 8], 1);
 
                 builder
                     .when(not(local.flags.is_last_block) * local.flags.is_digest_row)
@@ -424,8 +312,8 @@ impl Sha256Air {
             .when(local_is_padding_row)
             .assert_zero(local_cols.flags.global_block_idx);
 
-        // self.eval_message_schedule::<AB>(builder, local_cols, next_cols);
-        // self.eval_work_vars::<AB>(builder, local_cols, next_cols);
+        self.eval_message_schedule::<AB>(builder, local_cols, next_cols);
+        self.eval_work_vars::<AB>(builder, local_cols, next_cols);
         let local_cols: &Sha256DigestCols<AB::Var> =
             local[start_col..start_col + SHA256_DIGEST_WIDTH].borrow();
         self.eval_prev_hash::<AB>(builder, local_cols, next_is_padding_row);
@@ -447,7 +335,7 @@ impl Sha256Air {
                 } else {
                     local.hash.e[SHA256_ROUNDS_PER_ROW + 3 - i].map(|x| x.into())
                 };
-                array::from_fn(|j| compose::<AB>(&hash_bits[j * 16..(j + 1) * 16], 1))
+                array::from_fn(|j| compose::<AB::Expr>(&hash_bits[j * 16..(j + 1) * 16], 1))
             });
 
         let next_local_block_idx = select(
@@ -497,39 +385,42 @@ impl Sha256Air {
         let w = [local.message_schedule.w, next.message_schedule.w].concat();
 
         // Constrain `w_3`
-
         for i in 0..SHA256_ROUNDS_PER_ROW - 1 {
             let w_3 = w[i + 1].map(|x| x.into());
-            let expected_w_3 = next.message_schedule.w_3[i];
+            let expected_w_3 = next.schedule_helper.w_3[i];
             for j in 0..SHA256_WORD_U16S {
-                let w_3_limb = compose::<AB>(&w_3[j * 16..(j + 1) * 16], 1);
+                let w_3_limb = compose::<AB::Expr>(&w_3[j * 16..(j + 1) * 16], 1);
                 builder.assert_eq(w_3_limb, expected_w_3[j].into());
             }
         }
+
         // Constrain intermed
-        // We will only constrain intermed_12 for rows [4, 15], and let it unconstrained for other rows
+        // We will only constrain intermed_12 for rows [3, 14], and let it unconstrained for other rows
         // Other rows should put the needed value in intermed_12 to make the below summation constraint hold
-        let is_row_4_15 =
-            contains_flag_range::<AB>(&self.row_idx_encoder, &next.flags.row_idx, 4, 15);
+        let is_row_3_14 =
+            contains_flag_range::<AB>(&self.row_idx_encoder, &next.flags.row_idx, 3, 14);
         for i in 0..SHA256_ROUNDS_PER_ROW {
             // w_idx
             let w_idx = w[i].map(|x| x.into());
             // sig_0(w_{idx+1})
-            let sig_w = Self::small_sig0::<AB>(&w[i + 1]);
+            let sig_w = small_sig0_field::<AB::Expr>(&w[i + 1]);
             for j in 0..SHA256_WORD_U16S {
-                let w_idx_limb = compose::<AB>(&w_idx[j * 16..(j + 1) * 16], 1);
-                let sig_w_limb = compose::<AB>(&sig_w[j * 16..(j + 1) * 16], 1);
+                let w_idx_limb = compose::<AB::Expr>(&w_idx[j * 16..(j + 1) * 16], 1);
+                let sig_w_limb = compose::<AB::Expr>(&sig_w[j * 16..(j + 1) * 16], 1);
+
                 builder.assert_eq(
-                    next.message_schedule.intermed_4[i][j],
+                    next.schedule_helper.intermed_4[i][j],
                     w_idx_limb + sig_w_limb,
                 );
+
                 builder.assert_eq(
-                    next.message_schedule.intermed_8[i][j],
-                    local.message_schedule.intermed_4[i][j],
+                    next.schedule_helper.intermed_8[i][j],
+                    local.schedule_helper.intermed_4[i][j],
                 );
-                builder.when(is_row_4_15.clone()).assert_eq(
-                    next.message_schedule.intermed_12[i][j],
-                    local.message_schedule.intermed_8[i][j],
+
+                builder.when(is_row_3_14.clone()).assert_eq(
+                    next.schedule_helper.intermed_12[i][j],
+                    local.schedule_helper.intermed_8[i][j],
                 );
             }
         }
@@ -538,21 +429,24 @@ impl Sha256Air {
         for i in 0..SHA256_ROUNDS_PER_ROW {
             // sig_1(w_{t-2})
             let sig_w_2: [_; SHA256_WORD_U16S] = array::from_fn(|j| {
-                compose::<AB>(&Self::small_sig1::<AB>(&w[i + 2])[j * 16..(j + 1) * 16], 1)
+                compose::<AB::Expr>(
+                    &small_sig1_field::<AB::Expr>(&w[i + 2])[j * 16..(j + 1) * 16],
+                    1,
+                )
             });
             // w_{t-7}
             let w_7 = if i < 3 {
-                local.message_schedule.w_3[i].map(|x| x.into())
+                local.schedule_helper.w_3[i].map(|x| x.into())
             } else {
                 let w_3 = w[i - 3].map(|x| x.into());
-                array::from_fn(|j| compose::<AB>(&w_3[j * 16..(j + 1) * 16], 1))
+                array::from_fn(|j| compose::<AB::Expr>(&w_3[j * 16..(j + 1) * 16], 1))
             };
             // sig_0(w_{t-15}) + w_{t-16}
-            let intermed_16 = local.message_schedule.intermed_12[i].map(|x| x.into());
+            let intermed_16 = local.schedule_helper.intermed_12[i].map(|x| x.into());
             // w_t
             let w_cur = w[i + 4].map(|x| x.into());
             let w_cur: [_; SHA256_WORD_U16S] =
-                array::from_fn(|j| compose::<AB>(&w_cur[j * 16..(j + 1) * 16], 1));
+                array::from_fn(|j| compose::<AB::Expr>(&w_cur[j * 16..(j + 1) * 16], 1));
 
             for j in 0..SHA256_WORD_U16S {
                 let carry = next.message_schedule.carry_or_buffer[i][j * 2]
@@ -583,24 +477,24 @@ impl Sha256Air {
         let e = [local.work_vars.e, next.work_vars.e].concat();
         for i in 0..SHA256_ROUNDS_PER_ROW {
             let cur_a = a[i + 4].map(|x| x.into());
-            let sig_a = Self::big_sig0::<AB>(&a[i + 3]);
-            let maj_abc = Self::maj::<AB>(&a[i + 3], &a[i + 2], &a[i + 1]);
+            let sig_a = big_sig0_field::<AB::Expr>(&a[i + 3]);
+            let maj_abc = maj_field::<AB::Expr>(&a[i + 3], &a[i + 2], &a[i + 1]);
             let d = a[i].map(|x| x.into());
             let cur_e = e[i + 4].map(|x| x.into());
             let h = e[i].map(|x| x.into());
-            let sig_e = Self::big_sig1::<AB>(&e[i + 3]);
-            let ch_efg = Self::ch::<AB>(&e[i + 3], &e[i + 2], &e[i + 1]);
+            let sig_e = big_sig1_field::<AB::Expr>(&e[i + 3]);
+            let ch_efg = ch_field::<AB::Expr>(&e[i + 3], &e[i + 2], &e[i + 1]);
             let w = next.message_schedule.w[i].map(|x| x.into());
 
             for j in 0..SHA256_WORD_U16S {
-                let cur_a_limb = compose::<AB>(&cur_a[j * 16..(j + 1) * 16], 1);
-                let sig_a_limb = compose::<AB>(&sig_a[j * 16..(j + 1) * 16], 1);
-                let maj_abc_limb = compose::<AB>(&maj_abc[j * 16..(j + 1) * 16], 1);
-                let d_limb = compose::<AB>(&d[j * 16..(j + 1) * 16], 1);
-                let cur_e_limb = compose::<AB>(&cur_e[j * 16..(j + 1) * 16], 1);
-                let h_limb = compose::<AB>(&h[j * 16..(j + 1) * 16], 1);
-                let sig_e_limb = compose::<AB>(&sig_e[j * 16..(j + 1) * 16], 1);
-                let ch_efg_limb = compose::<AB>(&ch_efg[j * 16..(j + 1) * 16], 1);
+                let cur_a_limb = compose::<AB::Expr>(&cur_a[j * 16..(j + 1) * 16], 1);
+                let sig_a_limb = compose::<AB::Expr>(&sig_a[j * 16..(j + 1) * 16], 1);
+                let maj_abc_limb = compose::<AB::Expr>(&maj_abc[j * 16..(j + 1) * 16], 1);
+                let d_limb = compose::<AB::Expr>(&d[j * 16..(j + 1) * 16], 1);
+                let cur_e_limb = compose::<AB::Expr>(&cur_e[j * 16..(j + 1) * 16], 1);
+                let h_limb = compose::<AB::Expr>(&h[j * 16..(j + 1) * 16], 1);
+                let sig_e_limb = compose::<AB::Expr>(&sig_e[j * 16..(j + 1) * 16], 1);
+                let ch_efg_limb = compose::<AB::Expr>(&ch_efg[j * 16..(j + 1) * 16], 1);
                 let k_limb = flag_with_val::<AB>(
                     &self.row_idx_encoder,
                     &next.flags.row_idx,
@@ -614,7 +508,7 @@ impl Sha256Air {
                         })
                         .collect::<Vec<_>>(),
                 );
-                let w_limb = compose::<AB>(&w[j * 16..(j + 1) * 16], 1);
+                let w_limb = compose::<AB::Expr>(&w[j * 16..(j + 1) * 16], 1);
 
                 // Constrain `e`
                 builder.assert_zero(
@@ -633,17 +527,17 @@ impl Sha256Air {
                         },
                 );
 
-                // Constrain `a`
-                builder.assert_zero(
-                    h_limb + sig_e_limb + ch_efg_limb + k_limb + w_limb + sig_a_limb + maj_abc_limb
-                        - cur_a_limb
-                        - next.work_vars.carry_a[i][j] * AB::Expr::from_canonical_u32(1 << 16)
-                        + if j == 0 {
-                            AB::Expr::ZERO
-                        } else {
-                            next.work_vars.carry_a[i][j - 1].into()
-                        },
-                );
+                // // Constrain `a`
+                // builder.assert_zero(
+                //     h_limb + sig_e_limb + ch_efg_limb + k_limb + w_limb + sig_a_limb + maj_abc_limb
+                //         - cur_a_limb
+                //         - next.work_vars.carry_a[i][j] * AB::Expr::from_canonical_u32(1 << 16)
+                //         + if j == 0 {
+                //             AB::Expr::ZERO
+                //         } else {
+                //             next.work_vars.carry_a[i][j - 1].into()
+                //         },
+                // );
             }
         }
     }
