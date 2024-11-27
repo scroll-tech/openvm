@@ -325,12 +325,15 @@ impl Sha256Air {
             }
         }
 
-        // Need u16 limbs instead of u8 limbs before pushing
-        let composed_final_hash: [[<AB as AirBuilder>::Expr; SHA256_WORD_U16S]; SHA256_HASH_WORDS] =
-            local.final_hash.map(|x| {
-                // TODO: make the little endian into big endian
-                let x = x.map(|f| f.into()).into_iter().rev().collect::<Vec<_>>();
-                array::from_fn(|i| compose::<AB>(&x[i * 2..(i + 1) * 2], 8))
+        // Constrain that next block's `prev_hash` is equal to the current block's `hash`
+        let composed_hash: [[<AB as AirBuilder>::Expr; SHA256_WORD_U16S]; SHA256_HASH_WORDS] =
+            array::from_fn(|i| {
+                let hash_bits = if i < SHA256_ROUNDS_PER_ROW {
+                    local.hash.a[SHA256_ROUNDS_PER_ROW - 1 - i].map(|x| x.into())
+                } else {
+                    local.hash.e[SHA256_ROUNDS_PER_ROW + 3 - i].map(|x| x.into())
+                };
+                array::from_fn(|j| compose::<AB>(&hash_bits[j * 16..(j + 1) * 16], 1))
             });
 
         let next_local_block_id = select(
@@ -341,7 +344,7 @@ impl Sha256Air {
         // The following interactions constrain certain values from block to block
         builder.push_send(
             self.bus_idx,
-            composed_final_hash
+            composed_hash
                 .into_iter()
                 .flatten()
                 .chain(once(next_local_block_id)),

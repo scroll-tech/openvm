@@ -29,11 +29,11 @@ use axvm_instructions::{
 use sha2::{Digest, Sha256};
 
 use crate::{
-    arch::{ExecutionBridge, ExecutionBus, ExecutionState, InstructionExecutor},
+    arch::{ExecutionBridge, ExecutionBus, ExecutionError, ExecutionState, InstructionExecutor},
     rv32im::adapters::read_rv32_register,
     system::{
         memory::{MemoryControllerRef, MemoryReadRecord, MemoryWriteRecord},
-        program::{ExecutionError, ProgramBus},
+        program::ProgramBus,
     },
 };
 
