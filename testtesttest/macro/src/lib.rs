@@ -51,13 +51,6 @@ pub fn declare(input: TokenStream) -> TokenStream {
         &format!("{}_{}", name.to_string().as_str(), idx),
         span.into(),
     );
-    let mod_name = syn::Ident::new(
-        &format!(
-            "mod_name_do_not_write_this_by_yourself_this_is_supposed_to_be_auto_generated_{}",
-            idx
-        ),
-        span.into(),
-    );
     let extern_func = syn::Ident::new(&format!("call_print_num_for_{}", num), span.into());
     proc_macro::Diagnostic::new(
         proc_macro::Level::Warning,
@@ -65,10 +58,8 @@ pub fn declare(input: TokenStream) -> TokenStream {
     )
     .emit();
     TokenStream::from(quote! {
-        mod #mod_name {
-            extern "C" {
-                pub fn #extern_func();
-            }
+        extern "C" {
+            pub fn #extern_func();
         }
         pub struct #name;
         impl #name {
@@ -77,7 +68,7 @@ pub fn declare(input: TokenStream) -> TokenStream {
                 println!(stringify!(#new_name));
             }
             pub fn print_num(&self) {
-                unsafe { #mod_name::#extern_func() }
+                unsafe { #extern_func() }
             }
         }
     })
@@ -87,13 +78,23 @@ pub fn declare(input: TokenStream) -> TokenStream {
 pub fn define(input: TokenStream) -> TokenStream {
     let DefineArgs { args } = parse_macro_input!(input);
     let span = proc_macro::Span::call_site();
-    TokenStream::from_iter(args.into_iter().map(|arg| {
-        let extern_func = syn::Ident::new(&format!("call_print_num_for_{}", arg), span.into());
-        TokenStream::from(quote! {
-            #[no_mangle]
-            pub extern "C" fn #extern_func() {
-                println!("{}", #arg);
+    let mod_name = syn::Ident::new("axvm_intrinsics_ffi", span.into());
+    let extern_fns: Vec<_> = args
+        .into_iter()
+        .map(|arg| {
+            let extern_func = syn::Ident::new(&format!("call_print_num_for_{}", arg), span.into());
+            quote! {
+                #[no_mangle]
+                pub extern "C" fn #extern_func() {
+                    println!("{}", #arg);
+                }
             }
         })
-    }))
+        .collect();
+    quote! {
+        mod #mod_name {
+            #(#extern_fns)*
+        }
+    }
+    .into()
 }
