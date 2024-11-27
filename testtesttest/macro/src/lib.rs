@@ -59,7 +59,7 @@ pub fn declare(input: TokenStream) -> TokenStream {
     .emit();
     TokenStream::from(quote! {
         extern "C" {
-            pub fn #extern_func();
+            fn #extern_func();
         }
         pub struct #name;
         impl #name {
@@ -85,7 +85,7 @@ pub fn define(input: TokenStream) -> TokenStream {
             let extern_func = syn::Ident::new(&format!("call_print_num_for_{}", arg), span.into());
             quote! {
                 #[no_mangle]
-                pub extern "C" fn #extern_func() {
+                extern "C" fn #extern_func() {
                     println!("{}", #arg);
                 }
             }
