@@ -91,6 +91,7 @@ where
                 let (mut inner_trace, final_hash) =
                     self.air.sha256_subair.generate_block_trace::<Val<SC>>(
                         &padded_message,
+                        self.bitwise_lookup_chip.clone(),
                         &prev_hash,
                         is_last_block,
                         global_block_idx as u32,
@@ -211,7 +212,9 @@ where
             let (local, next) = rows.split_at_mut(width);
             let local_cols: &mut Sha256VmRoundCols<Val<SC>> = local.borrow_mut();
             let next_cols: &mut Sha256VmRoundCols<Val<SC>> = next.borrow_mut();
-            Sha256Air::default_row(&local_cols.inner, &mut next_cols.inner);
+            self.air
+                .sha256_subair
+                .default_row(&local_cols.inner, &mut next_cols.inner);
         }
 
         // // Fill in the w_3 and intermed_4
@@ -273,8 +276,14 @@ where
             // println!("local_cols: {:?}", local_cols.pad_flags);
             println!(
                 "len: {:?}, cur_timestamp: {:?}, flags: {:?}, local_block_idx: {:?}, from_state: {:?}",
-                local_cols.control.len, local_cols.control.cur_timestamp, local_cols.control.pad_flags, local_cols.inner.local_block_idx, local_cols.from_state
+                local_cols.control.len, local_cols.control.cur_timestamp, local_cols.inner.flags, local_cols.inner.local_block_idx, local_cols.from_state
             );
+            if local_cols.inner.flags.is_digest_row.as_canonical_u32() != 0 {
+                println!(
+                    "prev_hash: {:?}, final_hash: {:?}",
+                    local_cols.inner.prev_hash, local_cols.inner.final_hash
+                );
+            }
         }
         AirProofInput::simple(air, RowMajorMatrix::new(values, width), vec![])
     }

@@ -1,6 +1,7 @@
 use std::{
     array,
     borrow::{Borrow, BorrowMut},
+    sync::Arc,
 };
 
 use ax_circuit_primitives::bitwise_op_lookup::BitwiseOperationLookupChip;
@@ -23,17 +24,18 @@ impl Sha256Air {
     pub fn generate_block_trace<F: PrimeField32>(
         &self,
         input: &[u32; SHA256_BLOCK_WORDS],
+        bitwise_lookup_chip: Arc<BitwiseOperationLookupChip<8>>,
         prev_hash: &[u32; SHA256_HASH_WORDS],
         is_last_block: bool,
         global_block_idx: u32,
         local_block_idx: u32,
         buffer_vals: &[[u32; SHA256_WORD_U16S * SHA256_ROUNDS_PER_ROW * 2]; 4],
     ) -> ([[F; SHA256_WIDTH]; 17], [u32; SHA256_HASH_WORDS]) {
-        let mut output = [[F::ZERO; SHA256_WIDTH]; SHA256_ROWS_PER_BLOCK];
+        assert!(self.bitwise_lookup_bus == bitwise_lookup_chip.bus());
         if local_block_idx == 0 {
             debug_assert!(*prev_hash == SHA256_H);
         }
-        let bitwise_lookup_chip = BitwiseOperationLookupChip::<8>::new(self.bitwise_lookup_bus);
+        let mut output = [[F::ZERO; SHA256_WIDTH]; SHA256_ROWS_PER_BLOCK];
         let mut message_schedule: Vec<u32> = input.to_vec();
         let mut work_vars = *prev_hash;
         let mut final_hash = [0u32; SHA256_HASH_WORDS];
@@ -145,7 +147,8 @@ impl Sha256Air {
                         let carry_e = (e_limb - u32_into_limbs::<SHA256_WORD_U16S>(e)[k]) >> 16;
                         cols.work_vars.carry_a[j][k] = F::from_canonical_u32(carry_a);
                         cols.work_vars.carry_e[j][k] = F::from_canonical_u32(carry_e);
-                        // bitwise_lookup_chip.request_range(carry_a, carry_e);
+                        println!("{} {}", carry_a, carry_e);
+                        bitwise_lookup_chip.request_range(carry_a, carry_e);
                     }
 
                     // update working variables
@@ -166,7 +169,8 @@ impl Sha256Air {
                 cols.flags.is_first_4_rows = F::ZERO;
                 cols.flags.is_digest_row = F::ONE;
                 cols.flags.is_last_block = F::from_bool(is_last_block);
-                // TODO: cols.flags.row_idx = 16
+                cols.flags.row_idx =
+                    get_flag_pt_array(&self.row_idx_encoder, 16).map(F::from_canonical_u32);
                 cols.flags.global_block_idx = F::from_canonical_u32(global_block_idx);
 
                 cols.local_block_idx = F::from_canonical_u32(local_block_idx);
@@ -376,6 +380,7 @@ impl Sha256Air {
     /// Fills the `next_row` as a padding row
     /// Note: we still need to correctly fill in the hash values, carries and count corrections
     pub fn default_row<F: PrimeField32>(
+        self: &Sha256Air,
         local_cols: &Sha256RoundCols<F>,
         next_cols: &mut Sha256RoundCols<F>,
     ) {
@@ -386,7 +391,8 @@ impl Sha256Air {
         // TODO: revisit this
         next_cols.flags.is_last_block = F::ZERO;
         next_cols.flags.global_block_idx = F::ZERO;
-        next_cols.flags.row_idx = [F::ZERO; 5];
+        next_cols.flags.row_idx =
+            get_flag_pt_array(&self.row_idx_encoder, 17).map(F::from_canonical_u32);
 
         next_cols.message_schedule.w = [[F::ZERO; SHA256_WORD_BITS]; SHA256_ROUNDS_PER_ROW];
         next_cols.message_schedule.carry_or_buffer =

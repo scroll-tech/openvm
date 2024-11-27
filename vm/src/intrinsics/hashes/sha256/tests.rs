@@ -4,7 +4,7 @@ use ax_circuit_primitives::bitwise_op_lookup::{
     BitwiseOperationLookupBus, BitwiseOperationLookupChip,
 };
 use ax_hashes::sha256::get_random_message;
-use ax_stark_sdk::utils::create_seeded_rng;
+use ax_stark_sdk::{config::setup_tracing, utils::create_seeded_rng};
 use axvm_instructions::{
     instruction::Instruction,
     riscv::RV32_CELL_BITS,
@@ -86,6 +86,7 @@ fn set_and_execute(
 ///////////////////////////////////////////////////////////////////////////////////////
 #[test]
 fn rand_sha256_test() {
+    setup_tracing();
     let mut rng = create_seeded_rng();
     let mut tester = VmChipTestBuilder::default();
     let bitwise_bus = BitwiseOperationLookupBus::new(BITWISE_OP_LOOKUP_BUS);
