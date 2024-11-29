@@ -84,7 +84,7 @@ fn set_and_execute(
 /// Randomly generate computations and execute, ensuring that the generated trace
 /// passes all constraints.
 ///////////////////////////////////////////////////////////////////////////////////////
-#[test]
+#[test] 
 fn rand_sha256_test() {
     setup_tracing();
     let mut rng = create_seeded_rng();

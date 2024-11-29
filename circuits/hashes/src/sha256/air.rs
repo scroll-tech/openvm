@@ -481,63 +481,66 @@ impl Sha256Air {
             let maj_abc = maj_field::<AB::Expr>(&a[i + 3], &a[i + 2], &a[i + 1]);
             let d = a[i].map(|x| x.into());
             let cur_e = e[i + 4].map(|x| x.into());
-            let h = e[i].map(|x| x.into());
             let sig_e = big_sig1_field::<AB::Expr>(&e[i + 3]);
             let ch_efg = ch_field::<AB::Expr>(&e[i + 3], &e[i + 2], &e[i + 1]);
+            let h = e[i].map(|x| x.into());
             let w = next.message_schedule.w[i].map(|x| x.into());
 
+            // k is not included in t1 here and is handled a bit differently
+            let t1 = [h, sig_e, ch_efg, w];
+            let t2 = [sig_a, maj_abc];
             for j in 0..SHA256_WORD_U16S {
-                let cur_a_limb = compose::<AB::Expr>(&cur_a[j * 16..(j + 1) * 16], 1);
-                let sig_a_limb = compose::<AB::Expr>(&sig_a[j * 16..(j + 1) * 16], 1);
-                let maj_abc_limb = compose::<AB::Expr>(&maj_abc[j * 16..(j + 1) * 16], 1);
+                let t1_limb_sum = t1.iter().fold(AB::Expr::ZERO, |acc, x| {
+                    acc + compose::<AB::Expr>(&x[j * 16..(j + 1) * 16], 1)
+                });
+                let t2_limb_sum = t2.iter().fold(AB::Expr::ZERO, |acc, x| {
+                    acc + compose::<AB::Expr>(&x[j * 16..(j + 1) * 16], 1)
+                });
                 let d_limb = compose::<AB::Expr>(&d[j * 16..(j + 1) * 16], 1);
-                let cur_e_limb = compose::<AB::Expr>(&cur_e[j * 16..(j + 1) * 16], 1);
-                let h_limb = compose::<AB::Expr>(&h[j * 16..(j + 1) * 16], 1);
-                let sig_e_limb = compose::<AB::Expr>(&sig_e[j * 16..(j + 1) * 16], 1);
-                let ch_efg_limb = compose::<AB::Expr>(&ch_efg[j * 16..(j + 1) * 16], 1);
                 let k_limb = flag_with_val::<AB>(
                     &self.row_idx_encoder,
                     &next.flags.row_idx,
-                    &(4..16)
+                    &(0..16)
                         .map(|rw_idx| {
                             (
                                 rw_idx,
-                                u32_into_limbs::<2>(SHA256_K[rw_idx * SHA256_ROUNDS_PER_ROW + i])[j]
-                                    as usize,
+                                u32_into_limbs::<SHA256_WORD_U16S>(
+                                    SHA256_K[rw_idx * SHA256_ROUNDS_PER_ROW + i],
+                                )[j] as usize,
                             )
                         })
                         .collect::<Vec<_>>(),
                 );
-                let w_limb = compose::<AB::Expr>(&w[j * 16..(j + 1) * 16], 1);
 
                 // Constrain `e`
-                builder.assert_zero(
+                let cur_e_limb = compose::<AB::Expr>(&cur_e[j * 16..(j + 1) * 16], 1);
+                builder.assert_eq(
                     d_limb
-                        + h_limb.clone()
-                        + sig_e_limb.clone()
-                        + ch_efg_limb.clone()
+                        + t1_limb_sum.clone()
                         + k_limb.clone()
-                        + w_limb.clone()
-                        - cur_e_limb.clone()
-                        - next.work_vars.carry_e[i][j] * AB::Expr::from_canonical_u32(1 << 16)
                         + if j == 0 {
                             AB::Expr::ZERO
                         } else {
                             next.work_vars.carry_e[i][j - 1].into()
                         },
+                    cur_e_limb
+                        + next.work_vars.carry_e[i][j] * AB::Expr::from_canonical_u32(1 << 16),
                 );
 
-                // // Constrain `a`
-                // builder.assert_zero(
-                //     h_limb + sig_e_limb + ch_efg_limb + k_limb + w_limb + sig_a_limb + maj_abc_limb
-                //         - cur_a_limb
-                //         - next.work_vars.carry_a[i][j] * AB::Expr::from_canonical_u32(1 << 16)
-                //         + if j == 0 {
-                //             AB::Expr::ZERO
-                //         } else {
-                //             next.work_vars.carry_a[i][j - 1].into()
-                //         },
-                // );
+                // Constrain `a`
+                let cur_a_limb = compose::<AB::Expr>(&cur_a[j * 16..(j + 1) * 16], 1);
+                builder.assert_eq(
+                    t1_limb_sum
+                        + t2_limb_sum
+                        + k_limb
+                        + if j == 0 {
+                            AB::Expr::ZERO
+                        } else {
+                            next.work_vars.carry_a[i][j - 1].into()
+                        },
+                    cur_a_limb
+                        + next.work_vars.carry_a[i][j] * AB::Expr::from_canonical_u32(1 << 16),
+                );
             }
         }
     }
