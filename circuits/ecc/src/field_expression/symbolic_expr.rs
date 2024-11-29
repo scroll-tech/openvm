@@ -506,8 +506,8 @@ impl SymbolicExpr {
         flags: &[bool],
         prime: &BigUint,
     ) -> BigUint {
-        match self {
-            SymbolicExpr::Input(i) => inputs[*i].clone(),
+        let res = match self {
+            SymbolicExpr::Input(i) => inputs[*i].clone() % prime,
             SymbolicExpr::Var(i) => variables[*i].clone(),
             SymbolicExpr::Const(_, val, _) => val.clone(),
             SymbolicExpr::Add(lhs, rhs) => {
@@ -556,6 +556,12 @@ impl SymbolicExpr {
                     rhs.compute(inputs, variables, flags, prime)
                 }
             }
-        }
+        };
+        assert!(
+            res < prime.clone(),
+            "symbolic expr: {} evaluation exceeds prime",
+            self
+        );
+        res
     }
 }
