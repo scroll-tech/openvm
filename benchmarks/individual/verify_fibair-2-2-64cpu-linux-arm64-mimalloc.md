@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| verify_fibair | <div style='text-align: right'>2</div>  | <span style="color: green">(-410 [-0.0%])</span> <div style='text-align: right'>8,427,697</div>  | <span style="color: green">(-55 [-0.0%])</span> <div style='text-align: right'>198,614</div>  | <span style="color: green">(-21.0 [-1.2%])</span> <div style='text-align: right'>1,670.0</div>  |
+| verify_fibair | <div style='text-align: right'>2</div>  | <span style="color: green">(-970 [-0.0%])</span> <div style='text-align: right'>8,426,727</div>  | <span style="color: green">(-69 [-0.0%])</span> <div style='text-align: right'>198,545</div>  | <span style="color: green">(-14.0 [-0.8%])</span> <div style='text-align: right'>1,656.0</div>  |
 
 
 <details>
@@ -12,24 +12,24 @@
 
 | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- |
-| <div style='text-align: right'>11.0</div>  | <div style='text-align: right'>32</div>  |
+| <span style="color: green">(-1.0 [-9.1%])</span> <div style='text-align: right'>10.0</div>  | <div style='text-align: right'>32</div>  |
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| verify_fibair | true | <span style="color: red">(+20.0 [+2.0%])</span> <div style='text-align: right'>1,015.0</div>  | <span style="color: green">(-410 [-0.0%])</span> <div style='text-align: right'>8,427,697</div>  | <span style="color: green">(-55 [-0.0%])</span> <div style='text-align: right'>198,614</div>  |
+| verify_fibair | true | <span style="color: green">(-14.0 [-1.4%])</span> <div style='text-align: right'>1,001.0</div>  | <span style="color: green">(-970 [-0.0%])</span> <div style='text-align: right'>8,426,727</div>  | <span style="color: green">(-69 [-0.0%])</span> <div style='text-align: right'>198,545</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
 | verify_fibair | ProgramChip | true | <div style='text-align: right'>16,295</div>  |
 | verify_fibair | VmConnectorAir | true | <div style='text-align: right'>2</div>  |
 | verify_fibair | Boundary | true | <div style='text-align: right'>44,590</div>  |
-| verify_fibair | AccessAdapter<2> | true | <span style="color: red">(+8 [+0.0%])</span> <div style='text-align: right'>22,036</div>  |
-| verify_fibair | AccessAdapter<4> | true | <span style="color: red">(+4 [+0.0%])</span> <div style='text-align: right'>11,018</div>  |
+| verify_fibair | AccessAdapter<2> | true | <span style="color: green">(-16 [-0.1%])</span> <div style='text-align: right'>22,020</div>  |
+| verify_fibair | AccessAdapter<4> | true | <span style="color: green">(-8 [-0.1%])</span> <div style='text-align: right'>11,010</div>  |
 | verify_fibair | AccessAdapter<8> | true | <div style='text-align: right'>3,220</div>  |
 | verify_fibair | PhantomAir | true | <div style='text-align: right'>5,216</div>  |
 | verify_fibair | <NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>> | true | <div style='text-align: right'>85,882</div>  |
 | verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | <div style='text-align: right'>30,555</div>  |
-| verify_fibair | <JalNativeAdapterAir,JalCoreAir> | true | <span style="color: green">(-55 [-1.1%])</span> <div style='text-align: right'>5,155</div>  |
+| verify_fibair | <JalNativeAdapterAir,JalCoreAir> | true | <span style="color: green">(-69 [-1.3%])</span> <div style='text-align: right'>5,086</div>  |
 | verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | <div style='text-align: right'>68,137</div>  |
 | verify_fibair | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | true | <div style='text-align: right'>2,186</div>  |
 | verify_fibair | FriReducedOpeningAir | true | <div style='text-align: right'>336</div>  |
@@ -90,7 +90,7 @@
 | verify_fibair | true | HintInputVec | PHANTOM | <div style='text-align: right'>1,963</div>  |
 | verify_fibair | true | IfEq | BNE | <div style='text-align: right'>321</div>  |
 | verify_fibair | true | IfEqI | BNE | <div style='text-align: right'>3,842</div>  |
-| verify_fibair | true | IfEqI | JAL | <span style="color: green">(-55 [-5.0%])</span> <div style='text-align: right'>1,051</div>  |
+| verify_fibair | true | IfEqI | JAL | <span style="color: green">(-69 [-6.6%])</span> <div style='text-align: right'>982</div>  |
 | verify_fibair | true | IfNe | BEQ | <div style='text-align: right'>1,163</div>  |
 | verify_fibair | true | IfNe | JAL | <div style='text-align: right'>2</div>  |
 | verify_fibair | true | IfNeI | BEQ | <div style='text-align: right'>255</div>  |
@@ -147,8 +147,8 @@
 | verify_fibair | AccessAdapter<2> | true | AddEFFI | STOREW | <div style='text-align: right'>132</div>  |
 | verify_fibair | Boundary | true | AddEFFI | STOREW | <div style='text-align: right'>528</div>  |
 | verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | AddEI | ADD | <div style='text-align: right'>77,520</div>  |
-| verify_fibair | AccessAdapter<2> | true | AddEI | ADD | <span style="color: red">(+44 [+0.4%])</span> <div style='text-align: right'>12,078</div>  |
-| verify_fibair | AccessAdapter<4> | true | AddEI | ADD | <span style="color: red">(+26 [+0.4%])</span> <div style='text-align: right'>7,137</div>  |
+| verify_fibair | AccessAdapter<2> | true | AddEI | ADD | <span style="color: green">(-88 [-0.7%])</span> <div style='text-align: right'>11,990</div>  |
+| verify_fibair | AccessAdapter<4> | true | AddEI | ADD | <span style="color: green">(-52 [-0.7%])</span> <div style='text-align: right'>7,085</div>  |
 | verify_fibair | Boundary | true | AddEI | ADD | <div style='text-align: right'>440</div>  |
 | verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | AddF | ADD | <div style='text-align: right'>39,990</div>  |
 | verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | AddFI | ADD | <div style='text-align: right'>19,410</div>  |
@@ -213,7 +213,7 @@
 | verify_fibair | PhantomAir | true | HintInputVec | PHANTOM | <div style='text-align: right'>11,778</div>  |
 | verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | IfEq | BNE | <div style='text-align: right'>7,383</div>  |
 | verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | IfEqI | BNE | <div style='text-align: right'>88,366</div>  |
-| verify_fibair | <JalNativeAdapterAir,JalCoreAir> | true | IfEqI | JAL | <span style="color: green">(-550 [-5.0%])</span> <div style='text-align: right'>10,510</div>  |
+| verify_fibair | <JalNativeAdapterAir,JalCoreAir> | true | IfEqI | JAL | <span style="color: green">(-690 [-6.6%])</span> <div style='text-align: right'>9,820</div>  |
 | verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | IfNe | BEQ | <div style='text-align: right'>26,749</div>  |
 | verify_fibair | <JalNativeAdapterAir,JalCoreAir> | true | IfNe | JAL | <div style='text-align: right'>20</div>  |
 | verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | IfNeI | BEQ | <div style='text-align: right'>5,865</div>  |
@@ -247,8 +247,8 @@
 | verify_fibair | <NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>> | true | LoadV | LOADW2 | <div style='text-align: right'>371,255</div>  |
 | verify_fibair | Boundary | true | LoadV | LOADW2 | <div style='text-align: right'>968</div>  |
 | verify_fibair | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | true | MulE | BBE4MUL | <div style='text-align: right'>34,320</div>  |
-| verify_fibair | AccessAdapter<2> | true | MulE | BBE4MUL | <span style="color: red">(+44 [+0.3%])</span> <div style='text-align: right'>14,058</div>  |
-| verify_fibair | AccessAdapter<4> | true | MulE | BBE4MUL | <span style="color: red">(+26 [+0.3%])</span> <div style='text-align: right'>8,307</div>  |
+| verify_fibair | AccessAdapter<2> | true | MulE | BBE4MUL | <span style="color: green">(-88 [-0.6%])</span> <div style='text-align: right'>13,970</div>  |
+| verify_fibair | AccessAdapter<4> | true | MulE | BBE4MUL | <span style="color: green">(-52 [-0.6%])</span> <div style='text-align: right'>8,255</div>  |
 | verify_fibair | Boundary | true | MulE | BBE4MUL | <div style='text-align: right'>572</div>  |
 | verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | MulEF | MUL | <div style='text-align: right'>20,400</div>  |
 | verify_fibair | AccessAdapter<2> | true | MulEF | MUL | <div style='text-align: right'>3,718</div>  |
@@ -322,7 +322,7 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| verify_fibair | <span style="color: red">(+2.0 [+25.0%])</span> <div style='text-align: right'>10.0</div>  | <span style="color: green">(-2.0 [-0.8%])</span> <div style='text-align: right'>250.0</div>  | <div style='text-align: right'>199.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-4.0 [-5.8%])</span> <div style='text-align: right'>65.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-410 [-0.0%])</span> <div style='text-align: right'>8,427,697</div>  | <span style="color: green">(-55 [-0.0%])</span> <div style='text-align: right'>198,614</div>  | <span style="color: green">(-21.0 [-1.2%])</span> <div style='text-align: right'>1,670.0</div>  | <div style='text-align: right'>14.0</div>  |
+| verify_fibair | <span style="color: green">(-2.0 [-20.0%])</span> <div style='text-align: right'>8.0</div>  | <span style="color: red">(+1.0 [+0.4%])</span> <div style='text-align: right'>251.0</div>  | <div style='text-align: right'>199.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+3.0 [+4.6%])</span> <div style='text-align: right'>68.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-970 [-0.0%])</span> <div style='text-align: right'>8,426,727</div>  | <span style="color: green">(-69 [-0.0%])</span> <div style='text-align: right'>198,545</div>  | <span style="color: green">(-14.0 [-0.8%])</span> <div style='text-align: right'>1,656.0</div>  | <div style='text-align: right'>14.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -362,7 +362,7 @@
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| verify_fibair | 0 | <div style='text-align: right'>51.0</div>  | <span style="color: green">(-19.0 [-1.4%])</span> <div style='text-align: right'>1,369.0</div>  | <div style='text-align: right'>23,969,816</div>  |
+| verify_fibair | 0 | <div style='text-align: right'>51.0</div>  | <span style="color: green">(-15.0 [-1.1%])</span> <div style='text-align: right'>1,354.0</div>  | <div style='text-align: right'>23,969,816</div>  |
 
 </details>
 
@@ -371,17 +371,17 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b1a8b0a2dc87711bcd0a1e0555dc43e64e6ba3f1/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b1a8b0a2dc87711bcd0a1e0555dc43e64e6ba3f1/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b1a8b0a2dc87711bcd0a1e0555dc43e64e6ba3f1/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b1a8b0a2dc87711bcd0a1e0555dc43e64e6ba3f1/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b1a8b0a2dc87711bcd0a1e0555dc43e64e6ba3f1/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b1a8b0a2dc87711bcd0a1e0555dc43e64e6ba3f1/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b1a8b0a2dc87711bcd0a1e0555dc43e64e6ba3f1/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/b1a8b0a2dc87711bcd0a1e0555dc43e64e6ba3f1/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/11b575506be01b0798761dcc54a63579bc352982/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/11b575506be01b0798761dcc54a63579bc352982/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/11b575506be01b0798761dcc54a63579bc352982/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/11b575506be01b0798761dcc54a63579bc352982/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/11b575506be01b0798761dcc54a63579bc352982/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/11b575506be01b0798761dcc54a63579bc352982/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/11b575506be01b0798761dcc54a63579bc352982/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/11b575506be01b0798761dcc54a63579bc352982/verify_fibair-2-2-64cpu-linux-arm64-mimalloc-verify_fibair.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/b1a8b0a2dc87711bcd0a1e0555dc43e64e6ba3f1
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/11b575506be01b0798761dcc54a63579bc352982
 
 Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12091814157)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12092769110)
