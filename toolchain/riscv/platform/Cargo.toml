@@ -36,6 +36,7 @@ features = [
     "entrypoint",
     "export-libm",
     "export-getrandom",
+    "export-pal-abi",
     "getrandom",
     "unstable",
 ]
