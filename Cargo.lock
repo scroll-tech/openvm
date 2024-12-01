@@ -556,6 +556,7 @@ dependencies = [
  "ax-stark-sdk",
  "axvm-build",
  "axvm-circuit",
+ "axvm-keccak-transpiler",
  "axvm-native-compiler",
  "axvm-recursion",
  "axvm-rv32im-circuit",
@@ -727,6 +728,16 @@ dependencies = [
  "strum",
  "strum_macros",
  "syn 2.0.87",
+]
+
+[[package]]
+name = "axvm-keccak-transpiler"
+version = "0.1.0"
+dependencies = [
+ "axvm-instructions",
+ "axvm-transpiler",
+ "p3-field",
+ "rrs-lib",
 ]
 
 [[package]]
@@ -911,6 +922,7 @@ dependencies = [
  "axvm-circuit",
  "axvm-ecc",
  "axvm-ecc-constants",
+ "axvm-keccak-transpiler",
  "axvm-rv32im-circuit",
  "axvm-transpiler",
  "eyre",
