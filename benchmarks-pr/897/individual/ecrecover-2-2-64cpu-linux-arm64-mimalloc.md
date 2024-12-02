@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| ecrecover_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>306,767,663</div>  | <div style='text-align: right'>5,787,691</div>  | <span style="color: green">(-384.0 [-1.0%])</span> <div style='text-align: right'>38,117.0</div>  |
+| ecrecover_program | <div style='text-align: right'>2</div>  | <span style="color: green">(-1,894 [-0.0%])</span> <div style='text-align: right'>306,765,769</div>  | <div style='text-align: right'>5,787,691</div>  | <span style="color: green">(-316.0 [-0.8%])</span> <div style='text-align: right'>38,185.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| ecrecover_program | true | <span style="color: red">(+3,578.0 [+4.3%])</span> <div style='text-align: right'>85,854.0</div>  | <div style='text-align: right'>306,767,663</div>  | <div style='text-align: right'>5,787,691</div>  |
+| ecrecover_program | true | <span style="color: red">(+3,352.0 [+4.1%])</span> <div style='text-align: right'>85,628.0</div>  | <span style="color: green">(-1,894 [-0.0%])</span> <div style='text-align: right'>306,765,769</div>  | <div style='text-align: right'>5,787,691</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
@@ -16,8 +16,8 @@
 | ecrecover_program | VmConnectorAir | true | <div style='text-align: right'>2</div>  |
 | ecrecover_program | Boundary | true | <div style='text-align: right'>63,474</div>  |
 | ecrecover_program | Merkle | true | <div style='text-align: right'>63,814</div>  |
-| ecrecover_program | AccessAdapter<2> | true | <div style='text-align: right'>782</div>  |
-| ecrecover_program | AccessAdapter<4> | true | <div style='text-align: right'>398</div>  |
+| ecrecover_program | AccessAdapter<2> | true | <span style="color: green">(-132 [-16.9%])</span> <div style='text-align: right'>650</div>  |
+| ecrecover_program | AccessAdapter<4> | true | <span style="color: green">(-34 [-8.5%])</span> <div style='text-align: right'>364</div>  |
 | ecrecover_program | AccessAdapter<8> | true | <div style='text-align: right'>253,578</div>  |
 | ecrecover_program | AccessAdapter<16> | true | <div style='text-align: right'>95,116</div>  |
 | ecrecover_program | AccessAdapter<32> | true | <div style='text-align: right'>47,558</div>  |
@@ -148,9 +148,8 @@
 | ecrecover_program | <Rv32MultAdapterAir,MulHCoreAir<4, 8>> | true |  | MULHU | <div style='text-align: right'>7,205,445</div>  |
 | ecrecover_program | <Rv32VecHeapAdapterAir<2, 1, 1, 32, 32>,ModularAddSubCoreAir> | true |  | ModularAddSub | <div style='text-align: right'>257,108</div>  |
 | ecrecover_program | AccessAdapter<16> | true |  | ModularAddSub | <div style='text-align: right'>129,200</div>  |
-| ecrecover_program | AccessAdapter<2> | true |  | ModularAddSub | <div style='text-align: right'>726</div>  |
 | ecrecover_program | AccessAdapter<32> | true |  | ModularAddSub | <div style='text-align: right'>105,944</div>  |
-| ecrecover_program | AccessAdapter<4> | true |  | ModularAddSub | <div style='text-align: right'>442</div>  |
+| ecrecover_program | AccessAdapter<4> | true |  | ModularAddSub | <span style="color: green">(-221 [-50.0%])</span> <div style='text-align: right'>221</div>  |
 | ecrecover_program | AccessAdapter<8> | true |  | ModularAddSub | <div style='text-align: right'>175,746</div>  |
 | ecrecover_program | Boundary | true |  | ModularAddSub | <div style='text-align: right'>720</div>  |
 | ecrecover_program | Merkle | true |  | ModularAddSub | <div style='text-align: right'>2,752</div>  |
@@ -186,7 +185,7 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| ecrecover_program | <span style="color: red">(+2.0 [+15.4%])</span> <div style='text-align: right'>15.0</div>  | <span style="color: green">(-42.0 [-0.5%])</span> <div style='text-align: right'>8,433.0</div>  | <span style="color: green">(-37.0 [-0.6%])</span> <div style='text-align: right'>6,339.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-7.0 [-3.2%])</span> <div style='text-align: right'>214.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>306,767,663</div>  | <div style='text-align: right'>5,787,691</div>  | <span style="color: green">(-384.0 [-1.0%])</span> <div style='text-align: right'>38,117.0</div>  |
+| ecrecover_program | <span style="color: red">(+3.0 [+23.1%])</span> <div style='text-align: right'>16.0</div>  | <span style="color: green">(-73.0 [-0.9%])</span> <div style='text-align: right'>8,402.0</div>  | <span style="color: green">(-61.0 [-1.0%])</span> <div style='text-align: right'>6,315.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-5.0 [-2.3%])</span> <div style='text-align: right'>216.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-1,894 [-0.0%])</span> <div style='text-align: right'>306,765,769</div>  | <div style='text-align: right'>5,787,691</div>  | <span style="color: green">(-316.0 [-0.8%])</span> <div style='text-align: right'>38,185.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -265,7 +264,7 @@
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| ecrecover_program | 0 | <span style="color: green">(-6.0 [-0.3%])</span> <div style='text-align: right'>2,091.0</div>  | <span style="color: green">(-336.0 [-1.2%])</span> <div style='text-align: right'>27,593.0</div>  | <div style='text-align: right'>1,163,751,921</div>  |
+| ecrecover_program | 0 | <span style="color: green">(-11.0 [-0.5%])</span> <div style='text-align: right'>2,086.0</div>  | <span style="color: green">(-232.0 [-0.8%])</span> <div style='text-align: right'>27,697.0</div>  | <div style='text-align: right'>1,163,751,921</div>  |
 
 </details>
 
@@ -274,17 +273,17 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/826843058980525ad82272d307683be21e846c97/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/826843058980525ad82272d307683be21e846c97/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/826843058980525ad82272d307683be21e846c97/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/826843058980525ad82272d307683be21e846c97/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/826843058980525ad82272d307683be21e846c97/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/826843058980525ad82272d307683be21e846c97/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/826843058980525ad82272d307683be21e846c97/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/826843058980525ad82272d307683be21e846c97/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bda464978786b976630286276e8f2f8ff6869fcc/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bda464978786b976630286276e8f2f8ff6869fcc/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bda464978786b976630286276e8f2f8ff6869fcc/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bda464978786b976630286276e8f2f8ff6869fcc/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bda464978786b976630286276e8f2f8ff6869fcc/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bda464978786b976630286276e8f2f8ff6869fcc/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bda464978786b976630286276e8f2f8ff6869fcc/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bda464978786b976630286276e8f2f8ff6869fcc/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/826843058980525ad82272d307683be21e846c97
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/bda464978786b976630286276e8f2f8ff6869fcc
 
 Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12102615616)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12111595806)
