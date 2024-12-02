@@ -1,7 +1,7 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| fibonacci_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>51,643,290</div>  | <div style='text-align: right'>1,500,219</div>  | <span style="color: green">(-144.0 [-2.0%])</span> <div style='text-align: right'>6,955.0</div>  |
-| leaf_aggregation | <div style='text-align: right'>2</div>  | <span style="color: green">(-10,320 [-0.0%])</span> <div style='text-align: right'>143,604,711</div>  | <span style="color: green">(-941 [-0.0%])</span> <div style='text-align: right'>3,506,123</div>  | <span style="color: green">(-703.0 [-3.5%])</span> <div style='text-align: right'>19,209.0</div>  |
+| fibonacci_program | <div style='text-align: right'>2</div>  | <span style="color: red">(+2,374 [+0.0%])</span> <div style='text-align: right'>51,645,664</div>  | <div style='text-align: right'>1,500,219</div>  | <span style="color: green">(-14.0 [-0.2%])</span> <div style='text-align: right'>6,941.0</div>  |
+| leaf_aggregation | <div style='text-align: right'>2</div>  | <span style="color: red">(+16,630 [+0.0%])</span> <div style='text-align: right'>143,621,341</div>  | <span style="color: red">(+1,453 [+0.0%])</span> <div style='text-align: right'>3,507,576</div>  | <span style="color: red">(+96.0 [+0.5%])</span> <div style='text-align: right'>19,305.0</div>  |
 
 
 <details>
@@ -9,15 +9,15 @@
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| fibonacci_program | true | <span style="color: green">(-156.0 [-2.5%])</span> <div style='text-align: right'>6,004.0</div>  | <div style='text-align: right'>51,643,290</div>  | <div style='text-align: right'>1,500,219</div>  |
+| fibonacci_program | true | <span style="color: red">(+35.0 [+0.6%])</span> <div style='text-align: right'>6,039.0</div>  | <span style="color: red">(+2,374 [+0.0%])</span> <div style='text-align: right'>51,645,664</div>  | <div style='text-align: right'>1,500,219</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
 | fibonacci_program | ProgramChip | true | <div style='text-align: right'>6,547</div>  |
 | fibonacci_program | VmConnectorAir | true | <div style='text-align: right'>2</div>  |
-| fibonacci_program | Boundary | true | <div style='text-align: right'>54</div>  |
-| fibonacci_program | Merkle | true | <div style='text-align: right'>304</div>  |
-| fibonacci_program | AccessAdapter<8> | true | <div style='text-align: right'>54</div>  |
+| fibonacci_program | Boundary | true | <span style="color: red">(+2 [+3.7%])</span> <div style='text-align: right'>56</div>  |
+| fibonacci_program | Merkle | true | <span style="color: red">(+2 [+0.7%])</span> <div style='text-align: right'>306</div>  |
+| fibonacci_program | AccessAdapter<8> | true | <span style="color: red">(+2 [+3.7%])</span> <div style='text-align: right'>56</div>  |
 | fibonacci_program | <Rv32HintStoreAdapterAir,Rv32HintStoreCoreAir> | true | <div style='text-align: right'>3</div>  |
 | fibonacci_program | RangeTupleCheckerAir<2> | true | <div style='text-align: right'>524,288</div>  |
 | fibonacci_program | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | true | <div style='text-align: right'>11</div>  |
@@ -31,7 +31,7 @@
 | fibonacci_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true | <div style='text-align: right'>900,085</div>  |
 | fibonacci_program | BitwiseOperationLookupAir<8> | true | <div style='text-align: right'>65,536</div>  |
 | fibonacci_program | PhantomAir | true | <div style='text-align: right'>3</div>  |
-| fibonacci_program | Poseidon2VmAir<BabyBearParameters> | true | <div style='text-align: right'>358</div>  |
+| fibonacci_program | Poseidon2VmAir<BabyBearParameters> | true | <span style="color: red">(+4 [+1.1%])</span> <div style='text-align: right'>362</div>  |
 | fibonacci_program | VariableRangeCheckerAir | true | <div style='text-align: right'>262,144</div>  |
 
 | group | collect_metrics | dsl_ir | opcode | frequency |
@@ -77,8 +77,9 @@
 | fibonacci_program | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> | true |  | BLTU | <div style='text-align: right'>224</div>  |
 | fibonacci_program | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> | true |  | BNE | <div style='text-align: right'>2,600,182</div>  |
 | fibonacci_program | <Rv32HintStoreAdapterAir,Rv32HintStoreCoreAir> | true |  | HINT_STOREW | <div style='text-align: right'>78</div>  |
-| fibonacci_program | AccessAdapter<8> | true |  | HINT_STOREW | <div style='text-align: right'>17</div>  |
-| fibonacci_program | Boundary | true |  | HINT_STOREW | <div style='text-align: right'>40</div>  |
+| fibonacci_program | AccessAdapter<8> | true |  | HINT_STOREW | <span style="color: red">(+17 [+100.0%])</span> <div style='text-align: right'>34</div>  |
+| fibonacci_program | Boundary | true |  | HINT_STOREW | <span style="color: red">(+40 [+100.0%])</span> <div style='text-align: right'>80</div>  |
+| fibonacci_program | Merkle | true |  | HINT_STOREW | <div style='text-align: right'>64</div>  |
 | fibonacci_program | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true |  | JAL | <div style='text-align: right'>1,800,036</div>  |
 | fibonacci_program | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true |  | JALR | <div style='text-align: right'>476</div>  |
 | fibonacci_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADBU | <div style='text-align: right'>240</div>  |
@@ -107,8 +108,8 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| fibonacci_program | <div style='text-align: right'>6.0</div>  | <div style='text-align: right'>967.0</div>  | <span style="color: red">(+5.0 [+0.6%])</span> <div style='text-align: right'>799.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-13.0 [-5.8%])</span> <div style='text-align: right'>212.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>51,643,290</div>  | <div style='text-align: right'>1,500,219</div>  | <span style="color: green">(-144.0 [-2.0%])</span> <div style='text-align: right'>6,955.0</div>  |
-| leaf_aggregation |  |  |  | <div style='text-align: right'>2</div>  |  |  | <span style="color: green">(-10,320 [-0.0%])</span> <div style='text-align: right'>143,604,711</div>  | <span style="color: green">(-941 [-0.0%])</span> <div style='text-align: right'>3,506,123</div>  | <span style="color: green">(-703.0 [-3.5%])</span> <div style='text-align: right'>19,209.0</div>  |
+| fibonacci_program | <span style="color: red">(+1.0 [+16.7%])</span> <div style='text-align: right'>7.0</div>  | <span style="color: green">(-3.0 [-0.3%])</span> <div style='text-align: right'>964.0</div>  | <span style="color: green">(-3.0 [-0.4%])</span> <div style='text-align: right'>796.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+9.0 [+4.2%])</span> <div style='text-align: right'>221.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: red">(+2,374 [+0.0%])</span> <div style='text-align: right'>51,645,664</div>  | <div style='text-align: right'>1,500,219</div>  | <span style="color: green">(-14.0 [-0.2%])</span> <div style='text-align: right'>6,941.0</div>  |
+| leaf_aggregation |  |  |  | <div style='text-align: right'>2</div>  |  |  | <span style="color: red">(+16,630 [+0.0%])</span> <div style='text-align: right'>143,621,341</div>  | <span style="color: red">(+1,453 [+0.0%])</span> <div style='text-align: right'>3,507,576</div>  | <span style="color: red">(+96.0 [+0.5%])</span> <div style='text-align: right'>19,305.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -182,26 +183,26 @@
 
 | group | segment | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | stark_prove_excluding_trace_time_ms | total_cells | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| fibonacci_program | 0 |  | <span style="color: green">(-4.0 [-2.3%])</span> <div style='text-align: right'>167.0</div>  |  |  |  |  | <span style="color: green">(-140.0 [-2.3%])</span> <div style='text-align: right'>5,821.0</div>  | <div style='text-align: right'>197,775,316</div>  |  |
-| leaf_aggregation | 0 | <div style='text-align: right'>47.0</div>  | <span style="color: green">(-67.0 [-1.7%])</span> <div style='text-align: right'>3,971.0</div>  | <span style="color: green">(-64.0 [-1.9%])</span> <div style='text-align: right'>3,371.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+5.0 [+8.3%])</span> <div style='text-align: right'>65.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-636.0 [-4.0%])</span> <div style='text-align: right'>15,238.0</div>  | <div style='text-align: right'>399,933,464</div>  | <span style="color: green">(-35.0 [-12.5%])</span> <div style='text-align: right'>246.0</div>  |
+| fibonacci_program | 0 |  | <div style='text-align: right'>167.0</div>  |  |  |  |  | <span style="color: green">(-11.0 [-0.2%])</span> <div style='text-align: right'>5,810.0</div>  | <div style='text-align: right'>197,775,316</div>  |  |
+| leaf_aggregation | 0 | <span style="color: green">(-1.0 [-2.1%])</span> <div style='text-align: right'>46.0</div>  | <span style="color: green">(-158.0 [-4.0%])</span> <div style='text-align: right'>3,813.0</div>  | <span style="color: green">(-122.0 [-3.6%])</span> <div style='text-align: right'>3,249.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-4.0 [-6.2%])</span> <div style='text-align: right'>61.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: red">(+254.0 [+1.7%])</span> <div style='text-align: right'>15,492.0</div>  | <div style='text-align: right'>399,933,464</div>  | <span style="color: red">(+10.0 [+4.1%])</span> <div style='text-align: right'>256.0</div>  |
 
 | group | collect_metrics | segment | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- | --- |
-| leaf_aggregation | true | 0 | <span style="color: green">(-113.0 [-0.7%])</span> <div style='text-align: right'>16,937.0</div>  | <span style="color: green">(-10,320 [-0.0%])</span> <div style='text-align: right'>143,604,711</div>  | <span style="color: green">(-941 [-0.0%])</span> <div style='text-align: right'>3,506,123</div>  |
+| leaf_aggregation | true | 0 | <span style="color: red">(+396.0 [+2.3%])</span> <div style='text-align: right'>17,333.0</div>  | <span style="color: red">(+16,630 [+0.0%])</span> <div style='text-align: right'>143,621,341</div>  | <span style="color: red">(+1,453 [+0.0%])</span> <div style='text-align: right'>3,507,576</div>  |
 
 | group | chip_name | collect_metrics | segment | rows_used |
 | --- | --- | --- | --- | --- |
 | leaf_aggregation | ProgramChip | true | 0 | <div style='text-align: right'>104,501</div>  |
 | leaf_aggregation | VmConnectorAir | true | 0 | <div style='text-align: right'>2</div>  |
 | leaf_aggregation | Boundary | true | 0 | <div style='text-align: right'>421,827</div>  |
-| leaf_aggregation | AccessAdapter<2> | true | 0 | <span style="color: green">(-52 [-0.0%])</span> <div style='text-align: right'>401,104</div>  |
-| leaf_aggregation | AccessAdapter<4> | true | 0 | <span style="color: green">(-26 [-0.0%])</span> <div style='text-align: right'>200,804</div>  |
+| leaf_aggregation | AccessAdapter<2> | true | 0 | <span style="color: red">(+120 [+0.0%])</span> <div style='text-align: right'>401,224</div>  |
+| leaf_aggregation | AccessAdapter<4> | true | 0 | <span style="color: red">(+60 [+0.0%])</span> <div style='text-align: right'>200,864</div>  |
 | leaf_aggregation | AccessAdapter<8> | true | 0 | <div style='text-align: right'>58,308</div>  |
 | leaf_aggregation | Poseidon2VmAir<BabyBearParameters> | true | 0 | <div style='text-align: right'>27,977</div>  |
 | leaf_aggregation | FriReducedOpeningAir | true | 0 | <div style='text-align: right'>144,732</div>  |
 | leaf_aggregation | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | true | 0 | <div style='text-align: right'>34,795</div>  |
 | leaf_aggregation | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true | 0 | <div style='text-align: right'>1,356,274</div>  |
-| leaf_aggregation | <JalNativeAdapterAir,JalCoreAir> | true | 0 | <span style="color: green">(-941 [-1.3%])</span> <div style='text-align: right'>73,058</div>  |
+| leaf_aggregation | <JalNativeAdapterAir,JalCoreAir> | true | 0 | <span style="color: red">(+1,453 [+2.0%])</span> <div style='text-align: right'>74,511</div>  |
 | leaf_aggregation | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true | 0 | <div style='text-align: right'>674,404</div>  |
 | leaf_aggregation | <NativeLoadStoreAdapterAir<1>,KernelLoadStoreCoreAir<1>> | true | 0 | <div style='text-align: right'>1,124,416</div>  |
 | leaf_aggregation | PhantomAir | true | 0 | <div style='text-align: right'>209,865</div>  |
@@ -219,7 +220,7 @@
 | leaf_aggregation | true |  | FE4ADD | 0 | <div style='text-align: right'>13,124</div>  |
 | leaf_aggregation | true |  | FE4SUB | 0 | <div style='text-align: right'>3,557</div>  |
 | leaf_aggregation | true |  | FRI_REDUCED_OPENING | 0 | <div style='text-align: right'>5,334</div>  |
-| leaf_aggregation | true |  | JAL | 0 | <span style="color: green">(-941 [-1.3%])</span> <div style='text-align: right'>73,058</div>  |
+| leaf_aggregation | true |  | JAL | 0 | <span style="color: red">(+1,453 [+2.0%])</span> <div style='text-align: right'>74,511</div>  |
 | leaf_aggregation | true |  | LOADW | 0 | <div style='text-align: right'>153,132</div>  |
 | leaf_aggregation | true |  | LOADW2 | 0 | <div style='text-align: right'>360,217</div>  |
 | leaf_aggregation | true |  | MUL | 0 | <div style='text-align: right'>145,522</div>  |
@@ -233,16 +234,16 @@
 | group | air_name | collect_metrics | dsl_ir | opcode | segment | cells_used |
 | --- | --- | --- | --- | --- | --- | --- |
 | leaf_aggregation | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | true |  | ADD | 0 | <div style='text-align: right'>34,540,290</div>  |
-| leaf_aggregation | AccessAdapter<2> | true |  | ADD | 0 | <span style="color: green">(-286 [-0.1%])</span> <div style='text-align: right'>195,250</div>  |
-| leaf_aggregation | AccessAdapter<4> | true |  | ADD | 0 | <span style="color: green">(-169 [-0.1%])</span> <div style='text-align: right'>115,375</div>  |
+| leaf_aggregation | AccessAdapter<2> | true |  | ADD | 0 | <span style="color: red">(+660 [+0.3%])</span> <div style='text-align: right'>195,910</div>  |
+| leaf_aggregation | AccessAdapter<4> | true |  | ADD | 0 | <span style="color: red">(+390 [+0.3%])</span> <div style='text-align: right'>115,765</div>  |
 | leaf_aggregation | Boundary | true |  | ADD | 0 | <div style='text-align: right'>141,559</div>  |
 | leaf_aggregation | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | true |  | BBE4DIV | 0 | <div style='text-align: right'>250,720</div>  |
 | leaf_aggregation | AccessAdapter<2> | true |  | BBE4DIV | 0 | <div style='text-align: right'>121,022</div>  |
 | leaf_aggregation | AccessAdapter<4> | true |  | BBE4DIV | 0 | <div style='text-align: right'>71,513</div>  |
 | leaf_aggregation | Boundary | true |  | BBE4DIV | 0 | <div style='text-align: right'>704</div>  |
 | leaf_aggregation | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | true |  | BBE4MUL | 0 | <div style='text-align: right'>473,840</div>  |
-| leaf_aggregation | AccessAdapter<2> | true |  | BBE4MUL | 0 | <span style="color: green">(-286 [-0.1%])</span> <div style='text-align: right'>302,412</div>  |
-| leaf_aggregation | AccessAdapter<4> | true |  | BBE4MUL | 0 | <span style="color: green">(-169 [-0.1%])</span> <div style='text-align: right'>178,698</div>  |
+| leaf_aggregation | AccessAdapter<2> | true |  | BBE4MUL | 0 | <span style="color: red">(+660 [+0.2%])</span> <div style='text-align: right'>303,072</div>  |
+| leaf_aggregation | AccessAdapter<4> | true |  | BBE4MUL | 0 | <span style="color: red">(+390 [+0.2%])</span> <div style='text-align: right'>179,088</div>  |
 | leaf_aggregation | Boundary | true |  | BBE4MUL | 0 | <div style='text-align: right'>141,240</div>  |
 | leaf_aggregation | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true |  | BEQ | 0 | <div style='text-align: right'>424,856</div>  |
 | leaf_aggregation | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | true |  | BNE | 0 | <div style='text-align: right'>15,086,436</div>  |
@@ -264,7 +265,7 @@
 | leaf_aggregation | AccessAdapter<2> | true |  | FRI_REDUCED_OPENING | 0 | <div style='text-align: right'>151,580</div>  |
 | leaf_aggregation | AccessAdapter<4> | true |  | FRI_REDUCED_OPENING | 0 | <div style='text-align: right'>89,570</div>  |
 | leaf_aggregation | FriReducedOpeningAir | true |  | FRI_REDUCED_OPENING | 0 | <div style='text-align: right'>9,262,848</div>  |
-| leaf_aggregation | <JalNativeAdapterAir,JalCoreAir> | true |  | JAL | 0 | <span style="color: green">(-9,410 [-1.3%])</span> <div style='text-align: right'>730,580</div>  |
+| leaf_aggregation | <JalNativeAdapterAir,JalCoreAir> | true |  | JAL | 0 | <span style="color: red">(+14,530 [+2.0%])</span> <div style='text-align: right'>745,110</div>  |
 | leaf_aggregation | AccessAdapter<2> | true |  | JAL | 0 | <div style='text-align: right'>407</div>  |
 | leaf_aggregation | AccessAdapter<4> | true |  | JAL | 0 | <div style='text-align: right'>481</div>  |
 | leaf_aggregation | Boundary | true |  | JAL | 0 | <div style='text-align: right'>11</div>  |
@@ -310,21 +311,21 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8369471e3d290690d919f628df9cf79135c36228/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8369471e3d290690d919f628df9cf79135c36228/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8369471e3d290690d919f628df9cf79135c36228/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8369471e3d290690d919f628df9cf79135c36228/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8369471e3d290690d919f628df9cf79135c36228/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8369471e3d290690d919f628df9cf79135c36228/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8369471e3d290690d919f628df9cf79135c36228/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8369471e3d290690d919f628df9cf79135c36228/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.frequency.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8369471e3d290690d919f628df9cf79135c36228/fibonacci-2-2-64cpu-linux-x64-jemalloc-leaf_aggregation.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8369471e3d290690d919f628df9cf79135c36228/fibonacci-2-2-64cpu-linux-x64-jemalloc-leaf_aggregation.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8369471e3d290690d919f628df9cf79135c36228/fibonacci-2-2-64cpu-linux-x64-jemalloc-leaf_aggregation.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8369471e3d290690d919f628df9cf79135c36228/fibonacci-2-2-64cpu-linux-x64-jemalloc-leaf_aggregation.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8369471e3d290690d919f628df9cf79135c36228/fibonacci-2-2-64cpu-linux-x64-jemalloc-leaf_aggregation.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8369471e3d290690d919f628df9cf79135c36228/fibonacci-2-2-64cpu-linux-x64-jemalloc-leaf_aggregation.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8369471e3d290690d919f628df9cf79135c36228/fibonacci-2-2-64cpu-linux-x64-jemalloc-leaf_aggregation.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/8369471e3d290690d919f628df9cf79135c36228/fibonacci-2-2-64cpu-linux-x64-jemalloc-leaf_aggregation.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/76add8b677e4d15e6a87621c861a6fa186c75194/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/76add8b677e4d15e6a87621c861a6fa186c75194/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/76add8b677e4d15e6a87621c861a6fa186c75194/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/76add8b677e4d15e6a87621c861a6fa186c75194/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/76add8b677e4d15e6a87621c861a6fa186c75194/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/76add8b677e4d15e6a87621c861a6fa186c75194/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/76add8b677e4d15e6a87621c861a6fa186c75194/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/76add8b677e4d15e6a87621c861a6fa186c75194/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/76add8b677e4d15e6a87621c861a6fa186c75194/fibonacci-2-2-64cpu-linux-x64-jemalloc-leaf_aggregation.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/76add8b677e4d15e6a87621c861a6fa186c75194/fibonacci-2-2-64cpu-linux-x64-jemalloc-leaf_aggregation.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/76add8b677e4d15e6a87621c861a6fa186c75194/fibonacci-2-2-64cpu-linux-x64-jemalloc-leaf_aggregation.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/76add8b677e4d15e6a87621c861a6fa186c75194/fibonacci-2-2-64cpu-linux-x64-jemalloc-leaf_aggregation.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/76add8b677e4d15e6a87621c861a6fa186c75194/fibonacci-2-2-64cpu-linux-x64-jemalloc-leaf_aggregation.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/76add8b677e4d15e6a87621c861a6fa186c75194/fibonacci-2-2-64cpu-linux-x64-jemalloc-leaf_aggregation.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/76add8b677e4d15e6a87621c861a6fa186c75194/fibonacci-2-2-64cpu-linux-x64-jemalloc-leaf_aggregation.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/76add8b677e4d15e6a87621c861a6fa186c75194/fibonacci-2-2-64cpu-linux-x64-jemalloc-leaf_aggregation.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/8369471e3d290690d919f628df9cf79135c36228
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/76add8b677e4d15e6a87621c861a6fa186c75194
 
 Instance Type: 64cpu-linux-x64
 
 Memory Allocator: jemalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12123901129)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12126134956)
