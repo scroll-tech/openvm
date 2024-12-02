@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| regex_program | <div style='text-align: right'>2</div>  | <span style="color: green">(-94,679 [-0.0%])</span> <div style='text-align: right'>238,718,926</div>  | <span style="color: green">(-19 [-0.0%])</span> <div style='text-align: right'>4,181,195</div>  | <span style="color: green">(-89.0 [-0.3%])</span> <div style='text-align: right'>26,856.0</div>  |
+| regex_program | <div style='text-align: right'>2</div>  | <span style="color: green">(-78,094 [-0.0%])</span> <div style='text-align: right'>238,735,511</div>  | <span style="color: green">(-16 [-0.0%])</span> <div style='text-align: right'>4,181,198</div>  | <span style="color: red">(+179.0 [+0.7%])</span> <div style='text-align: right'>27,124.0</div>  |
 
 
 <details>
@@ -8,17 +8,17 @@
 
 | group | collect_metrics | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| regex_program | true | <span style="color: red">(+1,931.0 [+2.9%])</span> <div style='text-align: right'>68,355.0</div>  | <span style="color: green">(-94,679 [-0.0%])</span> <div style='text-align: right'>238,718,926</div>  | <span style="color: green">(-19 [-0.0%])</span> <div style='text-align: right'>4,181,195</div>  |
+| regex_program | true | <span style="color: red">(+1,797.0 [+2.7%])</span> <div style='text-align: right'>68,221.0</div>  | <span style="color: green">(-78,094 [-0.0%])</span> <div style='text-align: right'>238,735,511</div>  | <span style="color: green">(-16 [-0.0%])</span> <div style='text-align: right'>4,181,198</div>  |
 
 | group | chip_name | collect_metrics | rows_used |
 | --- | --- | --- | --- |
-| regex_program | ProgramChip | true | <span style="color: green">(-90 [-0.1%])</span> <div style='text-align: right'>85,527</div>  |
+| regex_program | ProgramChip | true | <span style="color: green">(-181 [-0.2%])</span> <div style='text-align: right'>85,436</div>  |
 | regex_program | VmConnectorAir | true | <div style='text-align: right'>2</div>  |
-| regex_program | Boundary | true | <span style="color: green">(-102 [-0.1%])</span> <div style='text-align: right'>69,196</div>  |
-| regex_program | Merkle | true | <span style="color: green">(-56 [-0.1%])</span> <div style='text-align: right'>70,498</div>  |
+| regex_program | Boundary | true | <span style="color: green">(-98 [-0.1%])</span> <div style='text-align: right'>69,200</div>  |
+| regex_program | Merkle | true | <span style="color: green">(-32 [-0.0%])</span> <div style='text-align: right'>70,522</div>  |
 | regex_program | AccessAdapter<2> | true | <div style='text-align: right'>42</div>  |
 | regex_program | AccessAdapter<4> | true | <div style='text-align: right'>22</div>  |
-| regex_program | AccessAdapter<8> | true | <span style="color: green">(-102 [-0.1%])</span> <div style='text-align: right'>69,196</div>  |
+| regex_program | AccessAdapter<8> | true | <span style="color: green">(-98 [-0.1%])</span> <div style='text-align: right'>69,200</div>  |
 | regex_program | KeccakVmAir | true | <div style='text-align: right'>24</div>  |
 | regex_program | <Rv32HintStoreAdapterAir,Rv32HintStoreCoreAir> | true | <div style='text-align: right'>12,767</div>  |
 | regex_program | <Rv32MultAdapterAir,DivRemCoreAir<4, 8>> | true | <div style='text-align: right'>114</div>  |
@@ -26,18 +26,18 @@
 | regex_program | <Rv32MultAdapterAir,MultiplicationCoreAir<4, 8>> | true | <div style='text-align: right'>52,087</div>  |
 | regex_program | RangeTupleCheckerAir<2> | true | <div style='text-align: right'>524,288</div>  |
 | regex_program | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | true | <span style="color: green">(-1 [-0.0%])</span> <div style='text-align: right'>39,542</div>  |
-| regex_program | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true | <span style="color: green">(-2 [-0.0%])</span> <div style='text-align: right'>130,414</div>  |
+| regex_program | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true | <span style="color: green">(-1 [-0.0%])</span> <div style='text-align: right'>130,415</div>  |
 | regex_program | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true | <div style='text-align: right'>96,897</div>  |
 | regex_program | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> | true | <div style='text-align: right'>198,079</div>  |
 | regex_program | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> | true | <div style='text-align: right'>282,064</div>  |
 | regex_program | <Rv32LoadStoreAdapterAir,LoadSignExtendCoreAir<4, 8>> | true | <div style='text-align: right'>687</div>  |
-| regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true | <span style="color: green">(-12 [-0.0%])</span> <div style='text-align: right'>1,961,054</div>  |
+| regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true | <span style="color: green">(-10 [-0.0%])</span> <div style='text-align: right'>1,961,056</div>  |
 | regex_program | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | true | <div style='text-align: right'>218,632</div>  |
 | regex_program | <Rv32BaseAluAdapterAir,LessThanCoreAir<4, 8>> | true | <div style='text-align: right'>38,005</div>  |
 | regex_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true | <span style="color: green">(-4 [-0.0%])</span> <div style='text-align: right'>1,150,319</div>  |
 | regex_program | BitwiseOperationLookupAir<8> | true | <div style='text-align: right'>65,536</div>  |
 | regex_program | PhantomAir | true | <div style='text-align: right'>289</div>  |
-| regex_program | Poseidon2VmAir<BabyBearParameters> | true | <span style="color: green">(-158 [-0.1%])</span> <div style='text-align: right'>139,694</div>  |
+| regex_program | Poseidon2VmAir<BabyBearParameters> | true | <span style="color: green">(-130 [-0.1%])</span> <div style='text-align: right'>139,722</div>  |
 | regex_program | VariableRangeCheckerAir | true | <div style='text-align: right'>262,144</div>  |
 
 | group | collect_metrics | dsl_ir | opcode | frequency |
@@ -54,13 +54,13 @@
 | regex_program | true |  | DIVU | <div style='text-align: right'>114</div>  |
 | regex_program | true |  | HINT_STOREW | <div style='text-align: right'>12,767</div>  |
 | regex_program | true |  | JAL | <div style='text-align: right'>52,424</div>  |
-| regex_program | true |  | JALR | <span style="color: green">(-2 [-0.0%])</span> <div style='text-align: right'>130,414</div>  |
+| regex_program | true |  | JALR | <span style="color: green">(-1 [-0.0%])</span> <div style='text-align: right'>130,415</div>  |
 | regex_program | true |  | KECCAK256 | <div style='text-align: right'>1</div>  |
 | regex_program | true |  | LOADB | <div style='text-align: right'>679</div>  |
 | regex_program | true |  | LOADBU | <div style='text-align: right'>27,294</div>  |
 | regex_program | true |  | LOADH | <div style='text-align: right'>8</div>  |
 | regex_program | true |  | LOADHU | <div style='text-align: right'>95</div>  |
-| regex_program | true |  | LOADW | <span style="color: green">(-6 [-0.0%])</span> <div style='text-align: right'>1,142,652</div>  |
+| regex_program | true |  | LOADW | <span style="color: green">(-5 [-0.0%])</span> <div style='text-align: right'>1,142,653</div>  |
 | regex_program | true |  | LUI | <div style='text-align: right'>44,473</div>  |
 | regex_program | true |  | MUL | <div style='text-align: right'>52,087</div>  |
 | regex_program | true |  | MULHU | <div style='text-align: right'>244</div>  |
@@ -73,7 +73,7 @@
 | regex_program | true |  | SRL | <div style='text-align: right'>5,082</div>  |
 | regex_program | true |  | STOREB | <div style='text-align: right'>12,721</div>  |
 | regex_program | true |  | STOREH | <div style='text-align: right'>10,074</div>  |
-| regex_program | true |  | STOREW | <span style="color: green">(-6 [-0.0%])</span> <div style='text-align: right'>768,218</div>  |
+| regex_program | true |  | STOREW | <span style="color: green">(-5 [-0.0%])</span> <div style='text-align: right'>768,219</div>  |
 | regex_program | true |  | SUB | <div style='text-align: right'>42,583</div>  |
 | regex_program | true |  | XOR | <div style='text-align: right'>9,564</div>  |
 
@@ -98,25 +98,23 @@
 | regex_program | <Rv32HintStoreAdapterAir,Rv32HintStoreCoreAir> | true |  | HINT_STOREW | <div style='text-align: right'>331,942</div>  |
 | regex_program | AccessAdapter<8> | true |  | HINT_STOREW | <span style="color: red">(+17 [+0.0%])</span> <div style='text-align: right'>108,528</div>  |
 | regex_program | Boundary | true |  | HINT_STOREW | <span style="color: red">(+40 [+0.0%])</span> <div style='text-align: right'>255,360</div>  |
-| regex_program | Merkle | true |  | HINT_STOREW | <span style="color: green">(-64 [-0.0%])</span> <div style='text-align: right'>408,512</div>  |
+| regex_program | Merkle | true |  | HINT_STOREW | <div style='text-align: right'>408,576</div>  |
 | regex_program | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true |  | JAL | <div style='text-align: right'>943,632</div>  |
-| regex_program | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true |  | JALR | <span style="color: green">(-56 [-0.0%])</span> <div style='text-align: right'>3,651,592</div>  |
+| regex_program | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | true |  | JALR | <span style="color: green">(-28 [-0.0%])</span> <div style='text-align: right'>3,651,620</div>  |
 | regex_program | AccessAdapter<2> | true |  | KECCAK256 | <div style='text-align: right'>231</div>  |
 | regex_program | AccessAdapter<4> | true |  | KECCAK256 | <div style='text-align: right'>143</div>  |
 | regex_program | KeccakVmAir | true |  | KECCAK256 | <div style='text-align: right'>75,936</div>  |
 | regex_program | <Rv32LoadStoreAdapterAir,LoadSignExtendCoreAir<4, 8>> | true |  | LOADB | <div style='text-align: right'>23,765</div>  |
-| regex_program | AccessAdapter<8> | true |  | LOADB | <div style='text-align: right'>17</div>  |
-| regex_program | Boundary | true |  | LOADB | <div style='text-align: right'>40</div>  |
 | regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADBU | <div style='text-align: right'>1,091,760</div>  |
-| regex_program | AccessAdapter<8> | true |  | LOADBU | <span style="color: red">(+34 [+22.2%])</span> <div style='text-align: right'>187</div>  |
-| regex_program | Boundary | true |  | LOADBU | <span style="color: red">(+80 [+22.2%])</span> <div style='text-align: right'>440</div>  |
-| regex_program | Merkle | true |  | LOADBU | <span style="color: red">(+64 [+3.3%])</span> <div style='text-align: right'>1,984</div>  |
+| regex_program | AccessAdapter<8> | true |  | LOADBU | <span style="color: red">(+68 [+44.4%])</span> <div style='text-align: right'>221</div>  |
+| regex_program | Boundary | true |  | LOADBU | <span style="color: red">(+160 [+44.4%])</span> <div style='text-align: right'>520</div>  |
+| regex_program | Merkle | true |  | LOADBU | <span style="color: red">(+384 [+20.0%])</span> <div style='text-align: right'>2,304</div>  |
 | regex_program | <Rv32LoadStoreAdapterAir,LoadSignExtendCoreAir<4, 8>> | true |  | LOADH | <div style='text-align: right'>280</div>  |
 | regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADHU | <div style='text-align: right'>3,800</div>  |
-| regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADW | <span style="color: green">(-240 [-0.0%])</span> <div style='text-align: right'>45,706,080</div>  |
-| regex_program | AccessAdapter<8> | true |  | LOADW | <span style="color: red">(+17 [+0.6%])</span> <div style='text-align: right'>3,026</div>  |
-| regex_program | Boundary | true |  | LOADW | <span style="color: red">(+40 [+0.6%])</span> <div style='text-align: right'>7,120</div>  |
-| regex_program | Merkle | true |  | LOADW | <span style="color: red">(+128 [+0.5%])</span> <div style='text-align: right'>25,408</div>  |
+| regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | LOADW | <span style="color: green">(-200 [-0.0%])</span> <div style='text-align: right'>45,706,120</div>  |
+| regex_program | AccessAdapter<8> | true |  | LOADW | <span style="color: red">(+34 [+1.1%])</span> <div style='text-align: right'>3,043</div>  |
+| regex_program | Boundary | true |  | LOADW | <span style="color: red">(+80 [+1.1%])</span> <div style='text-align: right'>7,160</div>  |
+| regex_program | Merkle | true |  | LOADW | <span style="color: red">(+640 [+2.5%])</span> <div style='text-align: right'>25,920</div>  |
 | regex_program | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | true |  | LUI | <div style='text-align: right'>800,514</div>  |
 | regex_program | AccessAdapter<8> | true |  | LUI | <div style='text-align: right'>17</div>  |
 | regex_program | Boundary | true |  | LUI | <div style='text-align: right'>40</div>  |
@@ -135,21 +133,21 @@
 | regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | STOREB | <div style='text-align: right'>508,840</div>  |
 | regex_program | AccessAdapter<8> | true |  | STOREB | <span style="color: green">(-1,054 [-48.8%])</span> <div style='text-align: right'>1,105</div>  |
 | regex_program | Boundary | true |  | STOREB | <span style="color: green">(-2,480 [-48.8%])</span> <div style='text-align: right'>2,600</div>  |
-| regex_program | Merkle | true |  | STOREB | <span style="color: green">(-1,600 [-14.5%])</span> <div style='text-align: right'>9,408</div>  |
+| regex_program | Merkle | true |  | STOREB | <span style="color: green">(-2,624 [-23.8%])</span> <div style='text-align: right'>8,384</div>  |
 | regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | STOREH | <div style='text-align: right'>402,960</div>  |
 | regex_program | AccessAdapter<8> | true |  | STOREH | <span style="color: green">(-34 [-0.0%])</span> <div style='text-align: right'>85,255</div>  |
 | regex_program | Boundary | true |  | STOREH | <span style="color: green">(-80 [-0.0%])</span> <div style='text-align: right'>200,600</div>  |
-| regex_program | Merkle | true |  | STOREH | <span style="color: red">(+128 [+0.0%])</span> <div style='text-align: right'>321,600</div>  |
-| regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | STOREW | <span style="color: green">(-240 [-0.0%])</span> <div style='text-align: right'>30,728,720</div>  |
+| regex_program | Merkle | true |  | STOREH | <span style="color: green">(-384 [-0.1%])</span> <div style='text-align: right'>321,088</div>  |
+| regex_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | true |  | STOREW | <span style="color: green">(-200 [-0.0%])</span> <div style='text-align: right'>30,728,760</div>  |
 | regex_program | AccessAdapter<8> | true |  | STOREW | <span style="color: red">(+153 [+0.0%])</span> <div style='text-align: right'>389,878</div>  |
 | regex_program | Boundary | true |  | STOREW | <span style="color: red">(+360 [+0.0%])</span> <div style='text-align: right'>917,360</div>  |
-| regex_program | Merkle | true |  | STOREW | <span style="color: green">(-192 [-0.0%])</span> <div style='text-align: right'>1,485,312</div>  |
+| regex_program | Merkle | true |  | STOREW | <span style="color: red">(+1,216 [+0.1%])</span> <div style='text-align: right'>1,486,720</div>  |
 | regex_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | SUB | <div style='text-align: right'>1,532,988</div>  |
 | regex_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | true |  | XOR | <div style='text-align: right'>344,304</div>  |
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| regex_program | <span style="color: green">(-13.0 [-27.7%])</span> <div style='text-align: right'>34.0</div>  | <span style="color: green">(-144.0 [-1.9%])</span> <div style='text-align: right'>7,443.0</div>  | <span style="color: green">(-66.0 [-1.4%])</span> <div style='text-align: right'>4,808.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-4.0 [-1.9%])</span> <div style='text-align: right'>210.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-94,679 [-0.0%])</span> <div style='text-align: right'>238,718,926</div>  | <span style="color: green">(-19 [-0.0%])</span> <div style='text-align: right'>4,181,195</div>  | <span style="color: green">(-89.0 [-0.3%])</span> <div style='text-align: right'>26,856.0</div>  |
+| regex_program | <span style="color: green">(-3.0 [-6.4%])</span> <div style='text-align: right'>44.0</div>  | <span style="color: green">(-114.0 [-1.5%])</span> <div style='text-align: right'>7,473.0</div>  | <span style="color: green">(-53.0 [-1.1%])</span> <div style='text-align: right'>4,821.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-1.0 [-0.5%])</span> <div style='text-align: right'>213.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-78,094 [-0.0%])</span> <div style='text-align: right'>238,735,511</div>  | <span style="color: green">(-16 [-0.0%])</span> <div style='text-align: right'>4,181,198</div>  | <span style="color: red">(+179.0 [+0.7%])</span> <div style='text-align: right'>27,124.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -216,7 +214,7 @@
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| regex_program | 0 | <span style="color: green">(-78.0 [-2.9%])</span> <div style='text-align: right'>2,626.0</div>  | <span style="color: red">(+133.0 [+0.8%])</span> <div style='text-align: right'>16,787.0</div>  | <div style='text-align: right'>791,770,496</div>  |
+| regex_program | 0 | <span style="color: green">(-61.0 [-2.3%])</span> <div style='text-align: right'>2,643.0</div>  | <span style="color: red">(+354.0 [+2.1%])</span> <div style='text-align: right'>17,008.0</div>  | <div style='text-align: right'>791,770,496</div>  |
 
 </details>
 
@@ -225,17 +223,17 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/826843058980525ad82272d307683be21e846c97/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/826843058980525ad82272d307683be21e846c97/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/826843058980525ad82272d307683be21e846c97/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/826843058980525ad82272d307683be21e846c97/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/826843058980525ad82272d307683be21e846c97/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/826843058980525ad82272d307683be21e846c97/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/826843058980525ad82272d307683be21e846c97/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/826843058980525ad82272d307683be21e846c97/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bda464978786b976630286276e8f2f8ff6869fcc/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bda464978786b976630286276e8f2f8ff6869fcc/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bda464978786b976630286276e8f2f8ff6869fcc/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bda464978786b976630286276e8f2f8ff6869fcc/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bda464978786b976630286276e8f2f8ff6869fcc/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bda464978786b976630286276e8f2f8ff6869fcc/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bda464978786b976630286276e8f2f8ff6869fcc/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/bda464978786b976630286276e8f2f8ff6869fcc/regex-2-2-64cpu-linux-arm64-mimalloc-regex_program.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/826843058980525ad82272d307683be21e846c97
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/bda464978786b976630286276e8f2f8ff6869fcc
 
 Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12102615616)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12111595806)
