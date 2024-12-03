@@ -1,6 +1,7 @@
 #![no_std]
 
 extern crate alloc;
+extern crate self as axvm_ecc;
 
 pub use axvm_algebra_guest as algebra;
 #[cfg(feature = "halo2curves")]
@@ -17,6 +18,8 @@ pub mod halo2curves_shims;
 pub mod pairing;
 
 /// Types for BLS12-381 curve with intrinsic functions.
+#[cfg(feature = "bls12_381")]
 pub mod bls12_381;
 /// Types for BN254 curve with intrinsic functions.
+#[cfg(feature = "bn254")]
 pub mod bn254;

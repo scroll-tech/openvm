@@ -15,6 +15,7 @@ pub use final_exp::*;
 pub use line::*;
 pub use miller_loop::*;
 pub use miller_step::*;
+#[allow(unused_imports)]
 pub(crate) use operations::*;
 pub use sextic_ext_field::*;
 

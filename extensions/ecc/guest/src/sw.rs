@@ -1,23 +1,17 @@
 use alloc::vec::Vec;
-use core::ops::{Add, AddAssign, Neg, Sub, SubAssign};
+use core::ops::{Add, AddAssign, Neg};
 
 use axvm_algebra_guest::{IntMod, Reduce};
 use elliptic_curve::{
-    sec1::{Coordinates, EncodedPoint, ModulusSize},
+    sec1::{EncodedPoint, ModulusSize},
     Curve,
 };
 use hex_literal::hex;
-use k256::Secp256k1;
-#[cfg(target_os = "zkvm")]
-use {
-    axvm_platform::constants::{Custom1Funct3, SwBaseFunct7, CUSTOM_1},
-    axvm_platform::custom_insn_r,
-    core::mem::MaybeUninit,
-};
 
 use super::group::{CyclicGroup, Group};
 
 // TODO: consider consolidate with AffineCoords. Also separate encoding and x/y.
+/// Short Weierstrass curve affine point.
 pub trait SwPoint: Group {
     type Coordinate: IntMod;
 
@@ -43,7 +37,7 @@ pub trait IntrinsicCurve {
     type Point: SwPoint + CyclicGroup;
 }
 
-axvm_algebra_moduli_setup::moduli_setup! {
+axvm_algebra_moduli_setup::moduli_declare! {
     Secp256k1Coord { modulus = "0xFFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFE FFFFFC2F" },
     Secp256k1Scalar { modulus = "0xFFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFE BAAEDCE6 AF48A03B BFD25E8C D0364141" },
 }
@@ -69,22 +63,4 @@ impl CyclicGroup for Secp256k1Point {
             "7727EF046F2FB863E6AB7A59B74BE80257F7EEF103045BA29A3B5CD98825C5B7"
         )),
     };
-}
-
-impl IntrinsicCurve for Secp256k1 {
-    type Scalar = Secp256k1Scalar;
-    type Point = Secp256k1Point;
-}
-
-pub fn setup_moduli() {
-    setup_Secp256k1Coord();
-    setup_Secp256k1Scalar();
-}
-
-pub fn setup_fp2() {
-    setup_Secp256k1Coord_fp2();
-}
-
-pub fn setup_curves() {
-    setup_Secp256k1Point();
 }
