@@ -40,7 +40,6 @@ fn assert_vm_pk_eq<SC: StarkGenericConfig, VC>(a: &VmProvingKey<SC, VC>, b: &VmP
     assert_eq!(a.vm_pk.per_air.len(), b.vm_pk.per_air.len());
     for (a_pk, b_pk) in a.vm_pk.per_air.iter().zip(b.vm_pk.per_air.iter()) {
         assert_eq!(a_pk.air_name, b_pk.air_name);
-        assert_eq!(a_pk.interaction_chunk_size, b_pk.interaction_chunk_size);
     }
 }
 

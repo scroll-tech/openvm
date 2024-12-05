@@ -113,7 +113,7 @@ fn negative_castf_overflow_test() {
     disable_debug_builder();
     assert_eq!(
         BabyBearPoseidon2Engine::run_test_fast(vec![chip_input, rc_p_input]).err(),
-        Some(VerificationError::NonZeroCumulativeSum),
+        Some(VerificationError::ChallengePhaseError),
         "Expected verification to fail, but it didn't"
     );
 }
@@ -151,7 +151,7 @@ fn negative_castf_memread_test() {
     disable_debug_builder();
     assert_eq!(
         BabyBearPoseidon2Engine::run_test_fast(vec![chip_input, rc_p_input]).err(),
-        Some(VerificationError::NonZeroCumulativeSum),
+        Some(VerificationError::ChallengePhaseError),
         "Expected verification to fail, but it didn't"
     );
 }
@@ -189,7 +189,7 @@ fn negative_castf_memwrite_test() {
     disable_debug_builder();
     assert_eq!(
         BabyBearPoseidon2Engine::run_test_fast(vec![chip_input, rc_p_input]).err(),
-        Some(VerificationError::NonZeroCumulativeSum),
+        Some(VerificationError::ChallengePhaseError),
         "Expected verification to fail, but it didn't"
     );
 }
@@ -227,7 +227,7 @@ fn negative_castf_as_test() {
     disable_debug_builder();
     assert_eq!(
         BabyBearPoseidon2Engine::run_test_fast(vec![chip_input, rc_p_input]).err(),
-        Some(VerificationError::NonZeroCumulativeSum),
+        Some(VerificationError::ChallengePhaseError),
         "Expected verification to fail, but it didn't"
     );
 }
