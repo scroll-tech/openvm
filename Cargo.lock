@@ -1234,6 +1234,7 @@ dependencies = [
  "eyre",
  "metrics",
  "p3-baby-bear",
+ "p3-field",
  "serde",
  "static_assertions",
  "tracing",
