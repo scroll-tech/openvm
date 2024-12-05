@@ -24,10 +24,12 @@ use snark_verifier_sdk::{
     NativeLoader, PlonkVerifier, Snark, SHPLONK,
 };
 
-static KZG_PARAMS_23: Lazy<ParamsKZG<Bn256>> = Lazy::new(|| {
+static TESTING_KZG_PARAMS_23: Lazy<ParamsKZG<Bn256>> = Lazy::new(|| gen_kzg_params(23));
+
+pub(crate) fn gen_kzg_params(k: u32) -> ParamsKZG<Bn256> {
     let mut rng = StdRng::seed_from_u64(42);
-    ParamsKZG::setup(23, &mut rng)
-});
+    ParamsKZG::setup(k, &mut rng)
+}
 
 lazy_static! {
     // TODO: this should be dynamic. hard code for now.
@@ -81,9 +83,11 @@ pub(crate) fn verify_snark(dk: &KzgDecidingKey<Bn256>, snark: &Snark) {
         .expect("PlonkVerifier failed");
 }
 
+/// When `RANDOM_SRS` is set, this function will return a random params which should only be used
+/// for testing purpose.
 pub(crate) fn read_params(k: u32) -> Arc<ParamsKZG<Bn256>> {
     if std::env::var("RANDOM_SRS").is_ok() {
-        let mut ret = KZG_PARAMS_23.clone();
+        let mut ret = TESTING_KZG_PARAMS_23.clone();
         ret.downsize(k);
         Arc::new(ret)
     } else {
