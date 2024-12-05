@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| base64_json_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>15,111,492</div>  | <div style='text-align: right'>217,347</div>  | <span style="color: green">(-29.0 [-1.1%])</span> <div style='text-align: right'>2,676.0</div>  |
+| base64_json_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>15,111,492</div>  | <div style='text-align: right'>217,347</div>  | <span style="color: green">(-21.0 [-0.8%])</span> <div style='text-align: right'>2,684.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| base64_json_program | <div style='text-align: right'>13.0</div>  | <span style="color: green">(-5.0 [-1.0%])</span> <div style='text-align: right'>504.0</div>  | <span style="color: green">(-9.0 [-2.7%])</span> <div style='text-align: right'>324.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-4.0 [-1.7%])</span> <div style='text-align: right'>236.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>15,111,492</div>  | <div style='text-align: right'>217,347</div>  | <span style="color: green">(-29.0 [-1.1%])</span> <div style='text-align: right'>2,676.0</div>  |
+| base64_json_program | <div style='text-align: right'>13.0</div>  | <span style="color: green">(-4.0 [-0.8%])</span> <div style='text-align: right'>505.0</div>  | <span style="color: green">(-20.0 [-6.0%])</span> <div style='text-align: right'>313.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-2.0 [-0.8%])</span> <div style='text-align: right'>238.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>15,111,492</div>  | <div style='text-align: right'>217,347</div>  | <span style="color: green">(-21.0 [-0.8%])</span> <div style='text-align: right'>2,684.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -193,7 +193,7 @@
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| base64_json_program | 0 | <span style="color: red">(+4.0 [+2.3%])</span> <div style='text-align: right'>175.0</div>  | <span style="color: green">(-28.0 [-1.4%])</span> <div style='text-align: right'>1,997.0</div>  | <div style='text-align: right'>50,533,140</div>  |
+| base64_json_program | 0 | <span style="color: green">(-1.0 [-0.6%])</span> <div style='text-align: right'>170.0</div>  | <span style="color: green">(-16.0 [-0.8%])</span> <div style='text-align: right'>2,009.0</div>  | <div style='text-align: right'>50,533,140</div>  |
 
 </details>
 
@@ -215,4 +215,4 @@ Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12171465459)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12171615074)
