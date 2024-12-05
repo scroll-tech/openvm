@@ -88,17 +88,20 @@ mod tests {
     use ax_circuit_primitives::bitwise_op_lookup::{
         BitwiseOperationLookupBus, BitwiseOperationLookupChip,
     };
-    use ax_ecc_execution::curves::{bls12_381::Bls12_381, bn254::Bn254};
     use ax_mod_circuit_builder::test_utils::{
         biguint_to_limbs, bls12381_fq_to_biguint, bn254_fq_to_biguint,
     };
     use ax_stark_backend::p3_field::AbstractField;
     use ax_stark_sdk::p3_baby_bear::BabyBear;
     use axvm_circuit::arch::{testing::VmChipTestBuilder, BITWISE_OP_LOOKUP_BUS};
-    use axvm_ecc_constants::{BLS12381, BN254};
     use axvm_ecc_guest::AffinePoint;
     use axvm_instructions::{riscv::RV32_CELL_BITS, UsizeOpcode};
-    use axvm_pairing_guest::pairing::MillerStep;
+    use axvm_pairing_guest::{
+        bls12_381::{BLS12_381_LIMB_BITS, BLS12_381_MODULUS, BLS12_381_NUM_LIMBS},
+        bn254::{BN254_LIMB_BITS, BN254_MODULUS, BN254_NUM_LIMBS},
+        halo2curves_shims::{bls12_381::Bls12_381, bn254::Bn254},
+        pairing::MillerStep,
+    };
     use axvm_pairing_transpiler::PairingOpcode;
     use axvm_rv32_adapters::{rv32_write_heap_default, Rv32VecHeapAdapterChip};
     use rand::{rngs::StdRng, SeedableRng};
@@ -117,9 +120,9 @@ mod tests {
 
         let mut tester: VmChipTestBuilder<F> = VmChipTestBuilder::default();
         let config = ExprBuilderConfig {
-            modulus: BN254.MODULUS.clone(),
-            limb_bits: LIMB_BITS,
-            num_limbs: NUM_LIMBS,
+            modulus: BN254_MODULUS.clone(),
+            limb_bits: BN254_LIMB_BITS,
+            num_limbs: BN254_NUM_LIMBS,
         };
         let bitwise_bus = BitwiseOperationLookupBus::new(BITWISE_OP_LOOKUP_BUS);
         let bitwise_chip = Arc::new(BitwiseOperationLookupChip::<RV32_CELL_BITS>::new(
@@ -184,9 +187,9 @@ mod tests {
 
         let mut tester: VmChipTestBuilder<F> = VmChipTestBuilder::default();
         let config = ExprBuilderConfig {
-            modulus: BLS12381.MODULUS.clone(),
-            limb_bits: LIMB_BITS,
-            num_limbs: NUM_LIMBS,
+            modulus: BLS12_381_MODULUS.clone(),
+            limb_bits: BLS12_381_LIMB_BITS,
+            num_limbs: BLS12_381_NUM_LIMBS,
         };
         let bitwise_bus = BitwiseOperationLookupBus::new(BITWISE_OP_LOOKUP_BUS);
         let bitwise_chip = Arc::new(BitwiseOperationLookupChip::<RV32_CELL_BITS>::new(

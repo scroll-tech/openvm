@@ -1,5 +1,5 @@
-use ax_ecc_execution::axvm_ecc_guest::algebra::field::FieldExtension;
 use ax_stark_sdk::utils::create_seeded_rng_with_seed;
+use axvm_pairing_guest::algebra::field::FieldExtension;
 use halo2curves_axiom::{
     bn256::{Fq, Fq12, Fq2},
     ff::Field,

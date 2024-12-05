@@ -1,13 +1,15 @@
+extern crate std;
+
 use std::ops::{Add, Mul, Neg, Sub};
 
 use axvm_ecc_guest::{
     algebra::{field::FieldExtension, Field},
     AffinePoint,
 };
-use axvm_pairing_guest::pairing::{EvaluatedLine, LineMulMType};
 use halo2curves_axiom::bls12_381::{Fq12, Fq2};
 
-use super::{Bls12_381, BLS12381_XI};
+use super::{Bls12_381, BLS12_381_XI};
+use crate::pairing::{EvaluatedLine, LineMulMType};
 
 impl LineMulMType<Fq2, Fq12> for Bls12_381 {
     fn mul_023_by_023(l0: &EvaluatedLine<Fq2>, l1: &EvaluatedLine<Fq2>) -> [Fq2; 5] {
@@ -19,7 +21,7 @@ impl LineMulMType<Fq2, Fq12> for Bls12_381 {
         // where w⁶ = xi
         // l0 * l1 = c0c1 + (c0b1 + c1b0)w² + (c0 + c1)w³ + (b0b1)w⁴ + (b0 +b1)w⁵ + w⁶
         //         = (c0c1 + xi) + (c0b1 + c1b0)w² + (c0 + c1)w³ + (b0b1)w⁴ + (b0 + b1)w⁵
-        let x0 = c0 * c1 + *BLS12381_XI;
+        let x0 = c0 * c1 + *BLS12_381_XI;
         let x2 = c0 * b1 + c1 * b0;
         let x3 = c0 + c1;
         let x4 = b0 * b1;

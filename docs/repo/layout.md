@@ -11,10 +11,10 @@ The main components of the repository are:
   - [Rust Toolchain](#rust-toolchain)
   - [VM Framework](#vm-framework)
   - [Circuit Foundations](#circuit-foundations)
-  - [Proof System](#proof-system)  
+  - [Proof System](#proof-system)
   - [Extensions](#extensions)
     - [RV32IM](#rv32im)
-    - [Recursion](#recursion)
+    - [Native Recursion](#native-recursion)
     - [Keccak256](#keccak256)
     - [Big Integers](#big-integers)
     - [Modular Arithmetic](#modular-arithmetic)
@@ -61,7 +61,7 @@ Command-line binary to compile, execute, and prove guest programs is in [`cargo-
 - [`ax-circuit-primitives`](../../crates/circuits/primitives): Primitive chips and sub-chips for standalone use in any circuit.
 - [`ax-circuit-derive`](../../crates/circuits/derive): Procedural macros for use in circuit to derive traits.
 - [`ax-poseidon2-air`](../../crates/circuits/poseidon2-air): Standalone poseidon2 AIR implementation.
-- [`ax-mod-circuit-builder`](../../crates/circuits/mod-builder): General builder for generating chip for any modular arithmetic expression for a compile-time modulus. 
+- [`ax-mod-circuit-builder`](../../crates/circuits/mod-builder): General builder for generating chip for any modular arithmetic expression for a compile-time modulus.
 
 ### Proof System
 
@@ -107,13 +107,11 @@ The toolchain, ISA, and VM are simultaenously extendable. All non-system functio
 
 - [`axvm-ecc-circuit`](../../extensions/ecc/circuit): VM circuit extension for Weierstrass elliptic curve operations for arbitrary compile-time curve.
 - [`axvm-ecc-transpiler`](../../extensions/ecc/transpiler): Transpiler extension for Weierstrass elliptic curve operations for arbitrary compile-time curve.
-- [`axvm-ecc-guest`](../../extensions/ecc/guest): Guest library with elliptic curve functions using custom intrinsics, including ECDSA.
-- [`axvm-ecc-execution`](../../extensions/ecc/execution): Elliptic curve operations for use in VM runtime execution.
-- [`axvm-ecc-constants`](../../extensions/ecc/constants): Constants for elliptic curves, including BN254, BLS12-381, and Secp256k1.
+- [`axvm-ecc-guest`](../../extensions/ecc/guest): Guest library with elliptic curve constants for Secp256k1 and functions using custom intrinsics, including ECDSA.
 - [`axvm-ecc-sw-setup`](../../extensions/ecc/sw-setup): Procedural macros for use in guest program to generate short Weierstrass curve struct with custom intrinsics for compile-time curve.
 
 #### Pairing
 
 - [`axvm-pairing-circuit`](../../extensions/pairing/circuit): VM circuit extension for optimal Ate pairing on arbitrary compile-time elliptic curves, including BN254 and BLS12-381.
 - [`axvm-pairing-transpiler`](../../extensions/pairing/transpiler): Transpiler extension for optimal Ate pairing on arbitrary compile-time elliptic curves, including BN254 and BLS12-381.
-- [`axvm-pairing-guest`](../../extensions/pairing/guest): Guest library with optimal Ate pairing on elliptic curves, including BN254 and BLS12-381.
+- [`axvm-pairing-guest`](../../extensions/pairing/guest): Guest library with optimal Ate pairing on elliptic curves, including BN254 and BLS12-381 and associated constants. Also includes elliptic curve operations for VM runtime with the `halo2curves` feature gate.

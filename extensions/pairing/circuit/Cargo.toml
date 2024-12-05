@@ -10,9 +10,11 @@ ax-circuit-primitives = { workspace = true }
 axvm-circuit-derive = { workspace = true }
 axvm-circuit = { workspace = true }
 axvm-ecc-guest = { workspace = true }
-axvm-pairing-guest = { workspace = true }
-ax-ecc-execution = { workspace = true }
-axvm-ecc-constants = { workspace = true }
+axvm-pairing-guest = { workspace = true, features = [
+    "halo2curves",
+    "bls12_381",
+    "bn254",
+] }
 axvm-instructions = { workspace = true }
 ax-mod-circuit-builder = { workspace = true }
 ax-stark-backend = { workspace = true }
@@ -32,6 +34,9 @@ rand = { workspace = true }
 itertools = { workspace = true }
 eyre = { workspace = true }
 
+[target.'cfg(not(target_os = "zkvm"))'.dependencies]
+axvm-pairing-guest = { workspace = true }
+
 [dev-dependencies]
 ax-stark-sdk = { workspace = true }
 ax-mod-circuit-builder = { workspace = true, features = ["test-utils"] }
@@ -39,5 +44,8 @@ axvm-circuit = { workspace = true, features = ["test-utils"] }
 axvm-rv32-adapters = { workspace = true, features = ["test-utils"] }
 halo2curves-axiom = { workspace = true }
 axvm-ecc-guest = { workspace = true }
-axvm-pairing-guest = { workspace = true }
-ax-ecc-execution = { workspace = true }
+axvm-pairing-guest = { workspace = true, features = [
+    "halo2curves",
+    "bls12_381",
+    "bn254",
+] }
