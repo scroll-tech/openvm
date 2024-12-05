@@ -221,7 +221,7 @@ where
         }
 
         let Instruction { opcode, .. } = instruction.clone();
-        let local_opcode_index = opcode - self.air.offset;
+        let local_opcode_idx = opcode.local_opcode_idx(self.air.offset);
         let mut flags = vec![];
 
         // If the chip doesn't need setup, (right now) it must be single op chip and thus no flag is needed.
@@ -233,7 +233,7 @@ where
                 .iter()
                 .enumerate()
                 .for_each(|(i, &flag_idx)| {
-                    flags[flag_idx] = local_opcode_index == self.air.local_opcode_idx[i]
+                    flags[flag_idx] = local_opcode_idx == self.air.local_opcode_idx[i]
                 });
         }
 
