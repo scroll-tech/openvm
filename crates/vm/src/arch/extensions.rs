@@ -85,6 +85,14 @@ pub trait VmExtension<F: PrimeField32> {
     ) -> Result<VmInventory<Self::Executor, Self::Periphery>, VmInventoryError>;
 }
 
+/// SystemPort combines system resources needed by most extensions
+#[derive(Clone)]
+pub struct SystemPort<F> {
+    pub execution_bus: ExecutionBus,
+    pub program_bus: ProgramBus,
+    pub memory_controller: MemoryControllerRef<F>,
+}
+
 /// Builder for processing unit. Processing units extend an existing system unit.
 pub struct VmInventoryBuilder<'a, F: PrimeField32> {
     system_config: &'a SystemConfig,
@@ -124,6 +132,14 @@ impl<'a, F: PrimeField32> VmInventoryBuilder<'a, F> {
 
     pub fn system_base(&self) -> &SystemBase<F> {
         self.system
+    }
+
+    pub fn system_port(&self) -> SystemPort<F> {
+        SystemPort {
+            execution_bus: self.system_base().execution_bus(),
+            program_bus: self.system_base().program_bus(),
+            memory_controller: self.memory_controller().clone(),
+        }
     }
 
     pub fn new_bus_idx(&mut self) -> usize {
