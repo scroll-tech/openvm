@@ -258,6 +258,10 @@ impl<
         let memory_controller = RefCell::borrow(&memory_controller);
         let memory_bridge = memory_controller.memory_bridge();
         let address_bits = memory_controller.mem_config().pointer_max_bits;
+        assert!(
+            RV32_CELL_BITS * RV32_REGISTER_NUM_LIMBS - address_bits < RV32_CELL_BITS,
+            "address_bits={address_bits} needs to be large enough for high limb range check"
+        );
         Self {
             air: Rv32IsEqualModAdapterAir {
                 execution_bridge: ExecutionBridge::new(execution_bus, program_bus),
@@ -413,10 +417,10 @@ impl<
                 0
             }
         });
-        let limb_shift = (RV32_CELL_BITS * RV32_REGISTER_NUM_LIMBS - self.air.address_bits) as u32;
+        let limb_shift_bits = RV32_CELL_BITS * RV32_REGISTER_NUM_LIMBS - self.air.address_bits;
         self.bitwise_lookup_chip.request_range(
-            need_range_check[0] * limb_shift,
-            need_range_check[1] * limb_shift,
+            need_range_check[0] << limb_shift_bits,
+            need_range_check[1] << limb_shift_bits,
         );
     }
 
