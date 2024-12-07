@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| ecrecover_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>284,012,683</div>  | <div style='text-align: right'>5,163,177</div>  | <span style="color: red">(+5.0 [+0.0%])</span> <div style='text-align: right'>26,545.0</div>  |
+| ecrecover_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>284,016,617</div>  | <div style='text-align: right'>5,163,177</div>  | <span style="color: green">(-3.0 [-0.0%])</span> <div style='text-align: right'>26,451.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| ecrecover_program | <div style='text-align: right'>7.0</div>  | <span style="color: red">(+30.0 [+0.4%])</span> <div style='text-align: right'>7,465.0</div>  | <span style="color: red">(+29.0 [+0.5%])</span> <div style='text-align: right'>5,710.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-6.0 [-2.3%])</span> <div style='text-align: right'>250.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>284,012,683</div>  | <div style='text-align: right'>5,163,177</div>  | <span style="color: red">(+5.0 [+0.0%])</span> <div style='text-align: right'>26,545.0</div>  |
+| ecrecover_program | <div style='text-align: right'>7.0</div>  | <span style="color: green">(-34.0 [-0.5%])</span> <div style='text-align: right'>7,374.0</div>  | <span style="color: red">(+18.0 [+0.3%])</span> <div style='text-align: right'>5,690.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-4.0 [-1.6%])</span> <div style='text-align: right'>251.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>284,016,617</div>  | <div style='text-align: right'>5,163,177</div>  | <span style="color: green">(-3.0 [-0.0%])</span> <div style='text-align: right'>26,451.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -50,13 +50,13 @@
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
-| ecrecover_program | ProgramChip | <div style='text-align: right'>16,082</div>  |
+| ecrecover_program | ProgramChip | <div style='text-align: right'>15,916</div>  |
 | ecrecover_program | VmConnectorAir | <div style='text-align: right'>2</div>  |
-| ecrecover_program | Boundary | <div style='text-align: right'>63,462</div>  |
-| ecrecover_program | Merkle | <div style='text-align: right'>63,802</div>  |
+| ecrecover_program | Boundary | <div style='text-align: right'>63,464</div>  |
+| ecrecover_program | Merkle | <div style='text-align: right'>63,806</div>  |
 | ecrecover_program | AccessAdapter<2> | <div style='text-align: right'>650</div>  |
 | ecrecover_program | AccessAdapter<4> | <div style='text-align: right'>364</div>  |
-| ecrecover_program | AccessAdapter<8> | <div style='text-align: right'>253,590</div>  |
+| ecrecover_program | AccessAdapter<8> | <div style='text-align: right'>253,624</div>  |
 | ecrecover_program | AccessAdapter<16> | <div style='text-align: right'>95,140</div>  |
 | ecrecover_program | AccessAdapter<32> | <div style='text-align: right'>47,570</div>  |
 | ecrecover_program | <Rv32VecHeapAdapterAir<1, 2, 2, 32, 32>,FieldExpressionCoreAir> | <div style='text-align: right'>2,556</div>  |
@@ -81,7 +81,7 @@
 | ecrecover_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | <div style='text-align: right'>2,032,886</div>  |
 | ecrecover_program | BitwiseOperationLookupAir<8> | <div style='text-align: right'>65,536</div>  |
 | ecrecover_program | PhantomAir | <div style='text-align: right'>2,675</div>  |
-| ecrecover_program | Poseidon2VmAir<BabyBearParameters> | <div style='text-align: right'>127,264</div>  |
+| ecrecover_program | Poseidon2VmAir<BabyBearParameters> | <div style='text-align: right'>127,270</div>  |
 | ecrecover_program | VariableRangeCheckerAir | <div style='text-align: right'>262,144</div>  |
 
 | group | dsl_ir | opcode | frequency |
@@ -160,7 +160,7 @@
 | ecrecover_program | AccessAdapter<32> |  | IS_EQ | <div style='text-align: right'>553,705</div>  |
 | ecrecover_program | AccessAdapter<8> |  | IS_EQ | <div style='text-align: right'>918,272</div>  |
 | ecrecover_program | Boundary |  | IS_EQ | <div style='text-align: right'>160</div>  |
-| ecrecover_program | Merkle |  | IS_EQ | <div style='text-align: right'>576</div>  |
+| ecrecover_program | Merkle |  | IS_EQ | <div style='text-align: right'>448</div>  |
 | ecrecover_program | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> |  | JAL | <div style='text-align: right'>288,450</div>  |
 | ecrecover_program | <Rv32JalrAdapterAir,Rv32JalrCoreAir> |  | JALR | <div style='text-align: right'>1,952,328</div>  |
 | ecrecover_program | AccessAdapter<2> |  | KECCAK256 | <div style='text-align: right'>3,575</div>  |
@@ -170,14 +170,14 @@
 | ecrecover_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> |  | LOADBU | <div style='text-align: right'>529,200</div>  |
 | ecrecover_program | AccessAdapter<8> |  | LOADBU | <div style='text-align: right'>697</div>  |
 | ecrecover_program | Boundary |  | LOADBU | <div style='text-align: right'>1,640</div>  |
-| ecrecover_program | Merkle |  | LOADBU | <div style='text-align: right'>2,880</div>  |
+| ecrecover_program | Merkle |  | LOADBU | <div style='text-align: right'>2,816</div>  |
 | ecrecover_program | <Rv32LoadStoreAdapterAir,LoadSignExtendCoreAir<4, 8>> |  | LOADH | <div style='text-align: right'>175</div>  |
 | ecrecover_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> |  | LOADW | <div style='text-align: right'>21,616,680</div>  |
 | ecrecover_program | AccessAdapter<16> |  | LOADW | <div style='text-align: right'>643,350</div>  |
 | ecrecover_program | AccessAdapter<32> |  | LOADW | <div style='text-align: right'>527,547</div>  |
 | ecrecover_program | AccessAdapter<8> |  | LOADW | <div style='text-align: right'>997,628</div>  |
 | ecrecover_program | Boundary |  | LOADW | <div style='text-align: right'>288,640</div>  |
-| ecrecover_program | Merkle |  | LOADW | <div style='text-align: right'>383,040</div>  |
+| ecrecover_program | Merkle |  | LOADW | <div style='text-align: right'>381,952</div>  |
 | ecrecover_program | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> |  | LUI | <div style='text-align: right'>296,010</div>  |
 | ecrecover_program | AccessAdapter<8> |  | LUI | <div style='text-align: right'>17</div>  |
 | ecrecover_program | Boundary |  | LUI | <div style='text-align: right'>40</div>  |
@@ -189,7 +189,7 @@
 | ecrecover_program | AccessAdapter<4> |  | ModularAddSub | <div style='text-align: right'>221</div>  |
 | ecrecover_program | AccessAdapter<8> |  | ModularAddSub | <div style='text-align: right'>175,746</div>  |
 | ecrecover_program | Boundary |  | ModularAddSub | <div style='text-align: right'>720</div>  |
-| ecrecover_program | Merkle |  | ModularAddSub | <div style='text-align: right'>2,624</div>  |
+| ecrecover_program | Merkle |  | ModularAddSub | <div style='text-align: right'>2,688</div>  |
 | ecrecover_program | <Rv32VecHeapAdapterAir<2, 1, 1, 32, 32>,ModularMulDivCoreAir> |  | ModularMulDiv | <div style='text-align: right'>7,047</div>  |
 | ecrecover_program | AccessAdapter<16> |  | ModularMulDiv | <div style='text-align: right'>1,750</div>  |
 | ecrecover_program | AccessAdapter<32> |  | ModularMulDiv | <div style='text-align: right'>1,435</div>  |
@@ -211,16 +211,16 @@
 | ecrecover_program | AccessAdapter<32> |  | STOREB | <div style='text-align: right'>175,767</div>  |
 | ecrecover_program | AccessAdapter<8> |  | STOREB | <div style='text-align: right'>154,156</div>  |
 | ecrecover_program | Boundary |  | STOREB | <div style='text-align: right'>191,240</div>  |
-| ecrecover_program | Merkle |  | STOREB | <div style='text-align: right'>515,328</div>  |
+| ecrecover_program | Merkle |  | STOREB | <div style='text-align: right'>515,072</div>  |
 | ecrecover_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> |  | STOREH | <div style='text-align: right'>400</div>  |
 | ecrecover_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> |  | STOREW | <div style='text-align: right'>23,342,320</div>  |
 | ecrecover_program | AccessAdapter<16> |  | STOREW | <div style='text-align: right'>437,900</div>  |
 | ecrecover_program | AccessAdapter<2> |  | STOREW | <div style='text-align: right'>2,860</div>  |
 | ecrecover_program | AccessAdapter<32> |  | STOREW | <div style='text-align: right'>271,215</div>  |
 | ecrecover_program | AccessAdapter<4> |  | STOREW | <div style='text-align: right'>1,716</div>  |
-| ecrecover_program | AccessAdapter<8> |  | STOREW | <div style='text-align: right'>1,001,062</div>  |
-| ecrecover_program | Boundary |  | STOREW | <div style='text-align: right'>782,680</div>  |
-| ecrecover_program | Merkle |  | STOREW | <div style='text-align: right'>1,127,104</div>  |
+| ecrecover_program | AccessAdapter<8> |  | STOREW | <div style='text-align: right'>1,001,079</div>  |
+| ecrecover_program | Boundary |  | STOREW | <div style='text-align: right'>782,720</div>  |
+| ecrecover_program | Merkle |  | STOREW | <div style='text-align: right'>1,128,704</div>  |
 | ecrecover_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> |  | SUB | <div style='text-align: right'>627,156</div>  |
 | ecrecover_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> |  | XOR | <div style='text-align: right'>168,480</div>  |
 
@@ -262,7 +262,7 @@
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| ecrecover_program | 0 | <span style="color: red">(+16.0 [+0.9%])</span> <div style='text-align: right'>1,895.0</div>  | <span style="color: green">(-41.0 [-0.2%])</span> <div style='text-align: right'>17,185.0</div>  | <div style='text-align: right'>843,704,289</div>  |
+| ecrecover_program | 0 | <span style="color: red">(+18.0 [+0.9%])</span> <div style='text-align: right'>1,929.0</div>  | <span style="color: red">(+13.0 [+0.1%])</span> <div style='text-align: right'>17,148.0</div>  | <div style='text-align: right'>843,704,289</div>  |
 
 </details>
 
@@ -271,17 +271,17 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/531c906726ec036c58264eb555d89fa9352813ea/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/531c906726ec036c58264eb555d89fa9352813ea/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/531c906726ec036c58264eb555d89fa9352813ea/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/531c906726ec036c58264eb555d89fa9352813ea/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/531c906726ec036c58264eb555d89fa9352813ea/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/531c906726ec036c58264eb555d89fa9352813ea/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/531c906726ec036c58264eb555d89fa9352813ea/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/531c906726ec036c58264eb555d89fa9352813ea/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/74e4175c5c6fb4ddaa87cd31a5f4e63a8ba315ca/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/74e4175c5c6fb4ddaa87cd31a5f4e63a8ba315ca/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/74e4175c5c6fb4ddaa87cd31a5f4e63a8ba315ca/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/74e4175c5c6fb4ddaa87cd31a5f4e63a8ba315ca/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/74e4175c5c6fb4ddaa87cd31a5f4e63a8ba315ca/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/74e4175c5c6fb4ddaa87cd31a5f4e63a8ba315ca/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/74e4175c5c6fb4ddaa87cd31a5f4e63a8ba315ca/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/74e4175c5c6fb4ddaa87cd31a5f4e63a8ba315ca/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/531c906726ec036c58264eb555d89fa9352813ea
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/74e4175c5c6fb4ddaa87cd31a5f4e63a8ba315ca
 
 Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12208428123)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12214653598)
