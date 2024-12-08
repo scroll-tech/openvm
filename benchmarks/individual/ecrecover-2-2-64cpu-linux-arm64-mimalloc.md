@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| ecrecover_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>284,016,617</div>  | <div style='text-align: right'>5,163,177</div>  | <span style="color: green">(-40.0 [-0.2%])</span> <div style='text-align: right'>26,454.0</div>  |
+| ecrecover_program | <div style='text-align: right'>2</div>  | <span style="color: green">(-2,992 [-0.0%])</span> <div style='text-align: right'>284,013,625</div>  | <span style="color: green">(-21 [-0.0%])</span> <div style='text-align: right'>5,163,156</div>  | <span style="color: red">(+37.0 [+0.1%])</span> <div style='text-align: right'>26,491.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| ecrecover_program | <span style="color: green">(-2.0 [-22.2%])</span> <div style='text-align: right'>7.0</div>  | <span style="color: green">(-31.0 [-0.4%])</span> <div style='text-align: right'>7,408.0</div>  | <span style="color: green">(-52.0 [-0.9%])</span> <div style='text-align: right'>5,672.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+1.0 [+0.4%])</span> <div style='text-align: right'>255.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>284,016,617</div>  | <div style='text-align: right'>5,163,177</div>  | <span style="color: green">(-40.0 [-0.2%])</span> <div style='text-align: right'>26,454.0</div>  |
+| ecrecover_program | <div style='text-align: right'>7.0</div>  | <span style="color: green">(-3.0 [-0.0%])</span> <div style='text-align: right'>7,405.0</div>  | <span style="color: red">(+23.0 [+0.4%])</span> <div style='text-align: right'>5,695.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-3.0 [-1.2%])</span> <div style='text-align: right'>252.0</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-2,992 [-0.0%])</span> <div style='text-align: right'>284,013,625</div>  | <span style="color: green">(-21 [-0.0%])</span> <div style='text-align: right'>5,163,156</div>  | <span style="color: red">(+37.0 [+0.1%])</span> <div style='text-align: right'>26,491.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -50,14 +50,14 @@
 
 | group | chip_name | rows_used |
 | --- | --- | --- |
-| ecrecover_program | ProgramChip | <div style='text-align: right'>15,916</div>  |
+| ecrecover_program | ProgramChip | <span style="color: green">(-21 [-0.1%])</span> <div style='text-align: right'>15,895</div>  |
 | ecrecover_program | VmConnectorAir | <div style='text-align: right'>2</div>  |
-| ecrecover_program | Boundary | <div style='text-align: right'>63,464</div>  |
-| ecrecover_program | Merkle | <div style='text-align: right'>63,806</div>  |
+| ecrecover_program | Boundary | <span style="color: green">(-8 [-0.0%])</span> <div style='text-align: right'>63,456</div>  |
+| ecrecover_program | Merkle | <span style="color: red">(+4 [+0.0%])</span> <div style='text-align: right'>63,810</div>  |
 | ecrecover_program | AccessAdapter<2> | <div style='text-align: right'>650</div>  |
 | ecrecover_program | AccessAdapter<4> | <div style='text-align: right'>364</div>  |
-| ecrecover_program | AccessAdapter<8> | <div style='text-align: right'>253,624</div>  |
-| ecrecover_program | AccessAdapter<16> | <div style='text-align: right'>95,140</div>  |
+| ecrecover_program | AccessAdapter<8> | <span style="color: red">(+2 [+0.0%])</span> <div style='text-align: right'>253,626</div>  |
+| ecrecover_program | AccessAdapter<16> | <span style="color: green">(-2 [-0.0%])</span> <div style='text-align: right'>95,138</div>  |
 | ecrecover_program | AccessAdapter<32> | <div style='text-align: right'>47,570</div>  |
 | ecrecover_program | <Rv32VecHeapAdapterAir<1, 2, 2, 32, 32>,FieldExpressionCoreAir> | <div style='text-align: right'>2,556</div>  |
 | ecrecover_program | <Rv32VecHeapAdapterAir<2, 2, 2, 32, 32>,FieldExpressionCoreAir> | <div style='text-align: right'>2,551</div>  |
@@ -69,26 +69,26 @@
 | ecrecover_program | <Rv32MultAdapterAir,MulHCoreAir<4, 8>> | <div style='text-align: right'>184,740</div>  |
 | ecrecover_program | <Rv32MultAdapterAir,MultiplicationCoreAir<4, 8>> | <div style='text-align: right'>195,166</div>  |
 | ecrecover_program | RangeTupleCheckerAir<2> | <div style='text-align: right'>524,288</div>  |
-| ecrecover_program | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | <div style='text-align: right'>34,858</div>  |
-| ecrecover_program | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | <div style='text-align: right'>69,726</div>  |
+| ecrecover_program | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | <span style="color: green">(-3 [-0.0%])</span> <div style='text-align: right'>34,855</div>  |
+| ecrecover_program | <Rv32JalrAdapterAir,Rv32JalrCoreAir> | <span style="color: green">(-6 [-0.0%])</span> <div style='text-align: right'>69,720</div>  |
 | ecrecover_program | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> | <div style='text-align: right'>32,470</div>  |
 | ecrecover_program | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> | <div style='text-align: right'>162,420</div>  |
 | ecrecover_program | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> | <div style='text-align: right'>257,923</div>  |
 | ecrecover_program | <Rv32LoadStoreAdapterAir,LoadSignExtendCoreAir<4, 8>> | <div style='text-align: right'>74,687</div>  |
-| ecrecover_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | <div style='text-align: right'>1,252,746</div>  |
+| ecrecover_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> | <span style="color: green">(-6 [-0.0%])</span> <div style='text-align: right'>1,252,740</div>  |
 | ecrecover_program | <Rv32BaseAluAdapterAir,ShiftCoreAir<4, 8>> | <div style='text-align: right'>516,041</div>  |
 | ecrecover_program | <Rv32BaseAluAdapterAir,LessThanCoreAir<4, 8>> | <div style='text-align: right'>324,183</div>  |
-| ecrecover_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | <div style='text-align: right'>2,032,886</div>  |
+| ecrecover_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | <span style="color: green">(-6 [-0.0%])</span> <div style='text-align: right'>2,032,880</div>  |
 | ecrecover_program | BitwiseOperationLookupAir<8> | <div style='text-align: right'>65,536</div>  |
 | ecrecover_program | PhantomAir | <div style='text-align: right'>2,675</div>  |
-| ecrecover_program | Poseidon2VmAir<BabyBearParameters> | <div style='text-align: right'>127,270</div>  |
+| ecrecover_program | Poseidon2VmAir<BabyBearParameters> | <span style="color: green">(-4 [-0.0%])</span> <div style='text-align: right'>127,266</div>  |
 | ecrecover_program | VariableRangeCheckerAir | <div style='text-align: right'>262,144</div>  |
 
 | group | dsl_ir | opcode | frequency |
 | --- | --- | --- | --- |
-| ecrecover_program |  | ADD | <div style='text-align: right'>1,496,612</div>  |
+| ecrecover_program |  | ADD | <span style="color: green">(-6 [-0.0%])</span> <div style='text-align: right'>1,496,606</div>  |
 | ecrecover_program |  | AND | <div style='text-align: right'>314,883</div>  |
-| ecrecover_program |  | AUIPC | <div style='text-align: right'>34,858</div>  |
+| ecrecover_program |  | AUIPC | <span style="color: green">(-3 [-0.0%])</span> <div style='text-align: right'>34,855</div>  |
 | ecrecover_program |  | BEQ | <div style='text-align: right'>107,196</div>  |
 | ecrecover_program |  | BGE | <div style='text-align: right'>9,005</div>  |
 | ecrecover_program |  | BGEU | <div style='text-align: right'>5,265</div>  |
@@ -100,12 +100,12 @@
 | ecrecover_program |  | HINT_STOREW | <div style='text-align: right'>174</div>  |
 | ecrecover_program |  | IS_EQ | <div style='text-align: right'>16,049</div>  |
 | ecrecover_program |  | JAL | <div style='text-align: right'>16,025</div>  |
-| ecrecover_program |  | JALR | <div style='text-align: right'>69,726</div>  |
+| ecrecover_program |  | JALR | <span style="color: green">(-6 [-0.0%])</span> <div style='text-align: right'>69,720</div>  |
 | ecrecover_program |  | KECCAK256 | <div style='text-align: right'>5</div>  |
 | ecrecover_program |  | LOADB | <div style='text-align: right'>74,682</div>  |
 | ecrecover_program |  | LOADBU | <div style='text-align: right'>13,230</div>  |
 | ecrecover_program |  | LOADH | <div style='text-align: right'>5</div>  |
-| ecrecover_program |  | LOADW | <div style='text-align: right'>540,417</div>  |
+| ecrecover_program |  | LOADW | <span style="color: green">(-3 [-0.0%])</span> <div style='text-align: right'>540,414</div>  |
 | ecrecover_program |  | LUI | <div style='text-align: right'>16,445</div>  |
 | ecrecover_program |  | MUL | <div style='text-align: right'>195,166</div>  |
 | ecrecover_program |  | MULHU | <div style='text-align: right'>184,740</div>  |
@@ -120,18 +120,18 @@
 | ecrecover_program |  | SRL | <div style='text-align: right'>263,910</div>  |
 | ecrecover_program |  | STOREB | <div style='text-align: right'>115,531</div>  |
 | ecrecover_program |  | STOREH | <div style='text-align: right'>10</div>  |
-| ecrecover_program |  | STOREW | <div style='text-align: right'>583,558</div>  |
+| ecrecover_program |  | STOREW | <span style="color: green">(-3 [-0.0%])</span> <div style='text-align: right'>583,555</div>  |
 | ecrecover_program |  | SUB | <div style='text-align: right'>17,421</div>  |
 | ecrecover_program |  | XOR | <div style='text-align: right'>4,680</div>  |
 
 | group | air_name | dsl_ir | opcode | cells_used |
 | --- | --- | --- | --- | --- |
-| ecrecover_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> |  | ADD | <div style='text-align: right'>53,878,032</div>  |
+| ecrecover_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> |  | ADD | <span style="color: green">(-216 [-0.0%])</span> <div style='text-align: right'>53,877,816</div>  |
 | ecrecover_program | AccessAdapter<8> |  | ADD | <div style='text-align: right'>51</div>  |
 | ecrecover_program | Boundary |  | ADD | <div style='text-align: right'>120</div>  |
 | ecrecover_program | Merkle |  | ADD | <div style='text-align: right'>64</div>  |
 | ecrecover_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> |  | AND | <div style='text-align: right'>11,335,788</div>  |
-| ecrecover_program | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> |  | AUIPC | <div style='text-align: right'>732,018</div>  |
+| ecrecover_program | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> |  | AUIPC | <span style="color: green">(-63 [-0.0%])</span> <div style='text-align: right'>731,955</div>  |
 | ecrecover_program | AccessAdapter<8> |  | AUIPC | <div style='text-align: right'>34</div>  |
 | ecrecover_program | Boundary |  | AUIPC | <div style='text-align: right'>80</div>  |
 | ecrecover_program | Merkle |  | AUIPC | <div style='text-align: right'>3,456</div>  |
@@ -142,11 +142,11 @@
 | ecrecover_program | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> |  | BLTU | <div style='text-align: right'>4,738,656</div>  |
 | ecrecover_program | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> |  | BNE | <div style='text-align: right'>3,918,902</div>  |
 | ecrecover_program | <Rv32VecHeapAdapterAir<2, 2, 2, 32, 32>,FieldExpressionCoreAir> |  | EcAddNe | <div style='text-align: right'>1,579,069</div>  |
-| ecrecover_program | AccessAdapter<16> |  | EcAddNe | <div style='text-align: right'>255,300</div>  |
+| ecrecover_program | AccessAdapter<16> |  | EcAddNe | <span style="color: green">(-25 [-0.0%])</span> <div style='text-align: right'>255,275</div>  |
 | ecrecover_program | AccessAdapter<32> |  | EcAddNe | <div style='text-align: right'>209,346</div>  |
 | ecrecover_program | AccessAdapter<8> |  | EcAddNe | <div style='text-align: right'>347,106</div>  |
-| ecrecover_program | Boundary |  | EcAddNe | <div style='text-align: right'>240</div>  |
-| ecrecover_program | Merkle |  | EcAddNe | <div style='text-align: right'>256</div>  |
+| ecrecover_program | Boundary |  | EcAddNe | <span style="color: green">(-80 [-33.3%])</span> <div style='text-align: right'>160</div>  |
+| ecrecover_program | Merkle |  | EcAddNe | <span style="color: green">(-64 [-25.0%])</span> <div style='text-align: right'>192</div>  |
 | ecrecover_program | <Rv32VecHeapAdapterAir<1, 2, 2, 32, 32>,FieldExpressionCoreAir> |  | EcDouble | <div style='text-align: right'>1,387,908</div>  |
 | ecrecover_program | AccessAdapter<16> |  | EcDouble | <div style='text-align: right'>127,750</div>  |
 | ecrecover_program | AccessAdapter<32> |  | EcDouble | <div style='text-align: right'>104,755</div>  |
@@ -154,7 +154,7 @@
 | ecrecover_program | <Rv32HintStoreAdapterAir,Rv32HintStoreCoreAir> |  | HINT_STOREW | <div style='text-align: right'>4,524</div>  |
 | ecrecover_program | AccessAdapter<8> |  | HINT_STOREW | <div style='text-align: right'>1,513</div>  |
 | ecrecover_program | Boundary |  | HINT_STOREW | <div style='text-align: right'>3,560</div>  |
-| ecrecover_program | Merkle |  | HINT_STOREW | <div style='text-align: right'>6,208</div>  |
+| ecrecover_program | Merkle |  | HINT_STOREW | <span style="color: green">(-128 [-2.1%])</span> <div style='text-align: right'>6,080</div>  |
 | ecrecover_program | <Rv32IsEqualModAdapterAir<2, 1, 32, 32>,ModularIsEqualCoreAir<32, 4, 8>> |  | IS_EQ | <div style='text-align: right'>2,664,134</div>  |
 | ecrecover_program | AccessAdapter<16> |  | IS_EQ | <div style='text-align: right'>675,250</div>  |
 | ecrecover_program | AccessAdapter<32> |  | IS_EQ | <div style='text-align: right'>553,705</div>  |
@@ -162,7 +162,7 @@
 | ecrecover_program | Boundary |  | IS_EQ | <div style='text-align: right'>160</div>  |
 | ecrecover_program | Merkle |  | IS_EQ | <div style='text-align: right'>448</div>  |
 | ecrecover_program | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> |  | JAL | <div style='text-align: right'>288,450</div>  |
-| ecrecover_program | <Rv32JalrAdapterAir,Rv32JalrCoreAir> |  | JALR | <div style='text-align: right'>1,952,328</div>  |
+| ecrecover_program | <Rv32JalrAdapterAir,Rv32JalrCoreAir> |  | JALR | <span style="color: green">(-168 [-0.0%])</span> <div style='text-align: right'>1,952,160</div>  |
 | ecrecover_program | AccessAdapter<2> |  | KECCAK256 | <div style='text-align: right'>3,575</div>  |
 | ecrecover_program | AccessAdapter<4> |  | KECCAK256 | <div style='text-align: right'>2,145</div>  |
 | ecrecover_program | KeccakVmAir |  | KECCAK256 | <div style='text-align: right'>379,680</div>  |
@@ -170,14 +170,14 @@
 | ecrecover_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> |  | LOADBU | <div style='text-align: right'>529,200</div>  |
 | ecrecover_program | AccessAdapter<8> |  | LOADBU | <div style='text-align: right'>697</div>  |
 | ecrecover_program | Boundary |  | LOADBU | <div style='text-align: right'>1,640</div>  |
-| ecrecover_program | Merkle |  | LOADBU | <div style='text-align: right'>2,816</div>  |
+| ecrecover_program | Merkle |  | LOADBU | <span style="color: green">(-256 [-9.1%])</span> <div style='text-align: right'>2,560</div>  |
 | ecrecover_program | <Rv32LoadStoreAdapterAir,LoadSignExtendCoreAir<4, 8>> |  | LOADH | <div style='text-align: right'>175</div>  |
-| ecrecover_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> |  | LOADW | <div style='text-align: right'>21,616,680</div>  |
+| ecrecover_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> |  | LOADW | <span style="color: green">(-120 [-0.0%])</span> <div style='text-align: right'>21,616,560</div>  |
 | ecrecover_program | AccessAdapter<16> |  | LOADW | <div style='text-align: right'>643,350</div>  |
 | ecrecover_program | AccessAdapter<32> |  | LOADW | <div style='text-align: right'>527,547</div>  |
 | ecrecover_program | AccessAdapter<8> |  | LOADW | <div style='text-align: right'>997,628</div>  |
 | ecrecover_program | Boundary |  | LOADW | <div style='text-align: right'>288,640</div>  |
-| ecrecover_program | Merkle |  | LOADW | <div style='text-align: right'>381,952</div>  |
+| ecrecover_program | Merkle |  | LOADW | <span style="color: red">(+3,008 [+0.8%])</span> <div style='text-align: right'>384,960</div>  |
 | ecrecover_program | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> |  | LUI | <div style='text-align: right'>296,010</div>  |
 | ecrecover_program | AccessAdapter<8> |  | LUI | <div style='text-align: right'>17</div>  |
 | ecrecover_program | Boundary |  | LUI | <div style='text-align: right'>40</div>  |
@@ -209,18 +209,18 @@
 | ecrecover_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> |  | STOREB | <div style='text-align: right'>4,621,240</div>  |
 | ecrecover_program | AccessAdapter<16> |  | STOREB | <div style='text-align: right'>107,175</div>  |
 | ecrecover_program | AccessAdapter<32> |  | STOREB | <div style='text-align: right'>175,767</div>  |
-| ecrecover_program | AccessAdapter<8> |  | STOREB | <div style='text-align: right'>154,156</div>  |
-| ecrecover_program | Boundary |  | STOREB | <div style='text-align: right'>191,240</div>  |
-| ecrecover_program | Merkle |  | STOREB | <div style='text-align: right'>515,072</div>  |
+| ecrecover_program | AccessAdapter<8> |  | STOREB | <span style="color: red">(+51 [+0.0%])</span> <div style='text-align: right'>154,207</div>  |
+| ecrecover_program | Boundary |  | STOREB | <span style="color: red">(+120 [+0.1%])</span> <div style='text-align: right'>191,360</div>  |
+| ecrecover_program | Merkle |  | STOREB | <span style="color: red">(+1,024 [+0.2%])</span> <div style='text-align: right'>516,096</div>  |
 | ecrecover_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> |  | STOREH | <div style='text-align: right'>400</div>  |
-| ecrecover_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> |  | STOREW | <div style='text-align: right'>23,342,320</div>  |
-| ecrecover_program | AccessAdapter<16> |  | STOREW | <div style='text-align: right'>437,900</div>  |
+| ecrecover_program | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> |  | STOREW | <span style="color: green">(-120 [-0.0%])</span> <div style='text-align: right'>23,342,200</div>  |
+| ecrecover_program | AccessAdapter<16> |  | STOREW | <span style="color: red">(+50 [+0.0%])</span> <div style='text-align: right'>437,950</div>  |
 | ecrecover_program | AccessAdapter<2> |  | STOREW | <div style='text-align: right'>2,860</div>  |
-| ecrecover_program | AccessAdapter<32> |  | STOREW | <div style='text-align: right'>271,215</div>  |
+| ecrecover_program | AccessAdapter<32> |  | STOREW | <span style="color: red">(+41 [+0.0%])</span> <div style='text-align: right'>271,256</div>  |
 | ecrecover_program | AccessAdapter<4> |  | STOREW | <div style='text-align: right'>1,716</div>  |
-| ecrecover_program | AccessAdapter<8> |  | STOREW | <div style='text-align: right'>1,001,079</div>  |
-| ecrecover_program | Boundary |  | STOREW | <div style='text-align: right'>782,720</div>  |
-| ecrecover_program | Merkle |  | STOREW | <div style='text-align: right'>1,128,704</div>  |
+| ecrecover_program | AccessAdapter<8> |  | STOREW | <span style="color: green">(-34 [-0.0%])</span> <div style='text-align: right'>1,001,045</div>  |
+| ecrecover_program | Boundary |  | STOREW | <span style="color: green">(-200 [-0.0%])</span> <div style='text-align: right'>782,520</div>  |
+| ecrecover_program | Merkle |  | STOREW | <span style="color: green">(-3,456 [-0.3%])</span> <div style='text-align: right'>1,125,248</div>  |
 | ecrecover_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> |  | SUB | <div style='text-align: right'>627,156</div>  |
 | ecrecover_program | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> |  | XOR | <div style='text-align: right'>168,480</div>  |
 
@@ -262,7 +262,7 @@
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| ecrecover_program | 0 | <span style="color: green">(-20.0 [-1.0%])</span> <div style='text-align: right'>1,911.0</div>  | <span style="color: red">(+11.0 [+0.1%])</span> <div style='text-align: right'>17,135.0</div>  | <div style='text-align: right'>843,704,289</div>  |
+| ecrecover_program | 0 | <span style="color: green">(-2.0 [-0.1%])</span> <div style='text-align: right'>1,909.0</div>  | <span style="color: red">(+42.0 [+0.2%])</span> <div style='text-align: right'>17,177.0</div>  | <div style='text-align: right'>843,704,289</div>  |
 
 </details>
 
@@ -271,17 +271,17 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/ea912ff7ee9b142f02665346ded56f8d87c62148/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/ea912ff7ee9b142f02665346ded56f8d87c62148/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/ea912ff7ee9b142f02665346ded56f8d87c62148/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/ea912ff7ee9b142f02665346ded56f8d87c62148/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/ea912ff7ee9b142f02665346ded56f8d87c62148/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/ea912ff7ee9b142f02665346ded56f8d87c62148/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/ea912ff7ee9b142f02665346ded56f8d87c62148/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/ea912ff7ee9b142f02665346ded56f8d87c62148/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/7cbba6a88dd0e2a6eaa40b8a33ad225434a39062/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/7cbba6a88dd0e2a6eaa40b8a33ad225434a39062/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/7cbba6a88dd0e2a6eaa40b8a33ad225434a39062/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/7cbba6a88dd0e2a6eaa40b8a33ad225434a39062/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/7cbba6a88dd0e2a6eaa40b8a33ad225434a39062/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/7cbba6a88dd0e2a6eaa40b8a33ad225434a39062/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/7cbba6a88dd0e2a6eaa40b8a33ad225434a39062/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/7cbba6a88dd0e2a6eaa40b8a33ad225434a39062/ecrecover-2-2-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/ea912ff7ee9b142f02665346ded56f8d87c62148
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/7cbba6a88dd0e2a6eaa40b8a33ad225434a39062
 
 Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12211149785)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12217887703)
