@@ -96,6 +96,7 @@ impl<'c, SC: StarkGenericConfig> MultiTraceStarkVerifier<'c, SC> {
                     .collect_vec()
             })
             .collect_vec();
+        // TODO[zach]: ADD EXTRA AFTER CHALLENGE POINTS
 
         assert!(
             proof.commitments.after_challenge.len() <= 1,

@@ -3,6 +3,7 @@ use std::{array, borrow::Borrow, marker::PhantomData};
 use itertools::{izip, Itertools};
 use p3_air::ExtensionBuilder;
 use p3_challenger::{CanObserve, FieldChallenger};
+use p3_commit::PolynomialSpace;
 use p3_field::{AbstractField, ExtensionField, Field};
 use p3_matrix::{dense::RowMajorMatrix, Matrix};
 use p3_maybe_rayon::prelude::*;
@@ -65,7 +66,7 @@ where
     type PartialProof = ();
     type ProvingKey = StarkLogUpProvingKey;
     type Error = StarkLogUpError;
-    const ID: RapPhaseSeqKind = RapPhaseSeqKind::StarkLogUp;
+    const KIND: RapPhaseSeqKind = RapPhaseSeqKind::StarkLogUp;
 
     fn generate_pk_per_air(
         &self,
@@ -136,13 +137,21 @@ where
         ))
     }
 
+    fn extra_opening_points<Domain: PolynomialSpace<Val = F>>(
+        &self,
+        zeta: Challenge,
+        domains_per_air: &[Domain],
+    ) -> Vec<Vec<Vec<Challenge>>> {
+        vec![vec![vec![]; domains_per_air.len()]]
+    }
+
     fn partially_verify<Commitment: Clone>(
         &self,
         challenger: &mut Challenger,
         _partial_proof: Option<&Self::PartialProof>,
         exposed_values_per_phase_per_air: &[Vec<Vec<Challenge>>],
         commitment_per_phase: &[Commitment],
-        _permutation_opened_values: &[Vec<Vec<Vec<Challenge>>>],
+        _after_challenge_opened_values: &[Vec<Vec<Vec<Challenge>>>],
     ) -> (RapPhaseVerifierData<Challenge>, Result<(), Self::Error>)
     where
         Challenger: CanObserve<Commitment>,
@@ -264,7 +273,7 @@ where
     /// ## Panics
     /// - If `partitioned_main` is empty.
     pub fn generate_after_challenge_trace(
-        all_interactions: &[Interaction<SymbolicExpression<F>>],
+        interactions: &[Interaction<SymbolicExpression<F>>],
         trace_view: &PairTraceView<'_, F>,
         permutation_randomness: &[Challenge; STARK_LU_NUM_CHALLENGES],
         interaction_chunk_size: usize,
@@ -273,13 +282,13 @@ where
         F: Field,
         Challenge: ExtensionField<F>,
     {
-        if all_interactions.is_empty() {
+        if interactions.is_empty() {
             return None;
         }
         let &[alpha, beta] = permutation_randomness;
 
-        let alphas = generate_rlc_elements(alpha, all_interactions);
-        let betas = generate_betas(beta, all_interactions);
+        let alphas = generate_rlc_elements(alpha, interactions);
+        let betas = generate_betas(beta, interactions);
 
         // Compute the reciprocal columns
         //
@@ -297,8 +306,8 @@ where
         //
         // Row: | perm_1 | perm_2 | perm_3 | ... | perm_s | phi |, where s
         // is the number of bundles
-        let num_interactions = all_interactions.len();
-        let height = trace_view.partitioned_main[0].height();
+        let num_interactions = interactions.len();
+        let height = trace_view.height();
         // To optimize memory and parallelism, we split the trace rows into chunks
         // based on the number of cpu threads available, and then do all
         // computations necessary for that chunk within a single thread.
@@ -337,7 +346,7 @@ where
                         height,
                         local_index: row_offset + n,
                     };
-                    for (denom, interaction) in denom_row.iter_mut().zip(all_interactions.iter()) {
+                    for (denom, interaction) in denom_row.iter_mut().zip(interactions.iter()) {
                         let alpha = alphas[interaction.bus_index];
                         debug_assert!(interaction.fields.len() <= betas.len());
                         let mut fields = interaction.fields.iter();
@@ -377,7 +386,7 @@ where
                         for (perm_val, reciprocal_chunk, interaction_chunk) in izip!(
                             perm_row.iter_mut(),
                             reciprocal_chunk.chunks(interaction_chunk_size),
-                            all_interactions.chunks(interaction_chunk_size)
+                            interactions.chunks(interaction_chunk_size)
                         ) {
                             for (reciprocal, interaction) in
                                 izip!(reciprocal_chunk, interaction_chunk)
