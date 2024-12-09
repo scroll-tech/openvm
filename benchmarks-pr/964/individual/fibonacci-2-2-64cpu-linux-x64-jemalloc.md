@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| fibonacci_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>51,644,981</div>  | <div style='text-align: right'>1,500,219</div>  | <span style="color: green">(-557.0 [-7.3%])</span> <div style='text-align: right'>7,030.0</div>  |
+| fibonacci_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>51,644,981</div>  | <div style='text-align: right'>1,500,219</div>  | <span style="color: green">(-52.0 [-0.8%])</span> <div style='text-align: right'>6,851.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| fibonacci_program | <span style="color: green">(-3.0 [-33.3%])</span> <div style='text-align: right'>6.0</div>  | <span style="color: green">(-60.0 [-5.7%])</span> <div style='text-align: right'>990.0</div>  | <span style="color: green">(-130.0 [-14.2%])</span> <div style='text-align: right'>786.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-54.0 [-20.2%])</span> <div style='text-align: right'>213.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>51,644,981</div>  | <div style='text-align: right'>1,500,219</div>  | <span style="color: green">(-557.0 [-7.3%])</span> <div style='text-align: right'>7,030.0</div>  |
+| fibonacci_program | <span style="color: green">(-3.0 [-37.5%])</span> <div style='text-align: right'>5.0</div>  | <span style="color: red">(+3.0 [+0.3%])</span> <div style='text-align: right'>951.0</div>  | <span style="color: red">(+11.0 [+1.4%])</span> <div style='text-align: right'>791.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-6.0 [-2.7%])</span> <div style='text-align: right'>213.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>51,644,981</div>  | <div style='text-align: right'>1,500,219</div>  | <span style="color: green">(-52.0 [-0.8%])</span> <div style='text-align: right'>6,851.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -162,7 +162,7 @@
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| fibonacci_program | 0 | <div style='text-align: right'>171.0</div>  | <span style="color: green">(-497.0 [-7.8%])</span> <div style='text-align: right'>5,869.0</div>  | <div style='text-align: right'>197,775,316</div>  |
+| fibonacci_program | 0 | <span style="color: green">(-13.0 [-7.4%])</span> <div style='text-align: right'>163.0</div>  | <span style="color: green">(-42.0 [-0.7%])</span> <div style='text-align: right'>5,737.0</div>  | <div style='text-align: right'>197,775,316</div>  |
 
 </details>
 
@@ -171,17 +171,17 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3f14314cfd909778080a4842d9db5989c6e707a3/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3f14314cfd909778080a4842d9db5989c6e707a3/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3f14314cfd909778080a4842d9db5989c6e707a3/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3f14314cfd909778080a4842d9db5989c6e707a3/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3f14314cfd909778080a4842d9db5989c6e707a3/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3f14314cfd909778080a4842d9db5989c6e707a3/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3f14314cfd909778080a4842d9db5989c6e707a3/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/3f14314cfd909778080a4842d9db5989c6e707a3/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6964314352dcaecd06828d4b6e052fb608658953/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6964314352dcaecd06828d4b6e052fb608658953/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6964314352dcaecd06828d4b6e052fb608658953/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6964314352dcaecd06828d4b6e052fb608658953/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6964314352dcaecd06828d4b6e052fb608658953/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6964314352dcaecd06828d4b6e052fb608658953/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6964314352dcaecd06828d4b6e052fb608658953/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/6964314352dcaecd06828d4b6e052fb608658953/fibonacci-2-2-64cpu-linux-x64-jemalloc-fibonacci_program.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/3f14314cfd909778080a4842d9db5989c6e707a3
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/6964314352dcaecd06828d4b6e052fb608658953
 
 Instance Type: 64cpu-linux-x64
 
 Memory Allocator: jemalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12237587444)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12238851833)
