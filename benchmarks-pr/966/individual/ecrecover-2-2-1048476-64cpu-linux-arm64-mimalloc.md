@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| ecrecover_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>100,539,955</div>  | <div style='text-align: right'>1,502,571</div>  | <span style="color: red">(+126.0 [+1.2%])</span> <div style='text-align: right'>10,526.0</div>  |
+| ecrecover_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>100,539,955</div>  | <div style='text-align: right'>1,502,571</div>  | <span style="color: red">(+38.0 [+0.4%])</span> <div style='text-align: right'>10,516.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| ecrecover_program | <div style='text-align: right'>8.0</div>  | <span style="color: red">(+134.0 [+5.2%])</span> <div style='text-align: right'>2,734.0</div>  | <span style="color: green">(-18.0 [-1.0%])</span> <div style='text-align: right'>1,856.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+76,380.0 [+29719.8%])</span> <div style='text-align: right'>76,637.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>100,539,955</div>  | <div style='text-align: right'>1,502,571</div>  | <span style="color: red">(+126.0 [+1.2%])</span> <div style='text-align: right'>10,526.0</div>  |
+| ecrecover_program | <span style="color: red">(+2.0 [+28.6%])</span> <div style='text-align: right'>9.0</div>  | <span style="color: red">(+112.0 [+4.3%])</span> <div style='text-align: right'>2,732.0</div>  | <div style='text-align: right'>1,870.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+76,303.0 [+29922.7%])</span> <div style='text-align: right'>76,558.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>100,539,955</div>  | <div style='text-align: right'>1,502,571</div>  | <span style="color: red">(+38.0 [+0.4%])</span> <div style='text-align: right'>10,516.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -247,7 +247,7 @@
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| ecrecover_program | 0 | <span style="color: red">(+10.0 [+1.3%])</span> <div style='text-align: right'>792.0</div>  | <span style="color: green">(-18.0 [-0.3%])</span> <div style='text-align: right'>7,000.0</div>  | <div style='text-align: right'>303,080,679</div>  |
+| ecrecover_program | 0 | <span style="color: green">(-32.0 [-3.9%])</span> <div style='text-align: right'>785.0</div>  | <span style="color: green">(-42.0 [-0.6%])</span> <div style='text-align: right'>6,999.0</div>  | <div style='text-align: right'>303,080,679</div>  |
 
 </details>
 
@@ -256,17 +256,19 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/55e2fd5120dcd5f051acbab6b37da409eb5c86a0/ecrecover-2-2-1048476-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/55e2fd5120dcd5f051acbab6b37da409eb5c86a0/ecrecover-2-2-1048476-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/55e2fd5120dcd5f051acbab6b37da409eb5c86a0/ecrecover-2-2-1048476-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/55e2fd5120dcd5f051acbab6b37da409eb5c86a0/ecrecover-2-2-1048476-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/55e2fd5120dcd5f051acbab6b37da409eb5c86a0/ecrecover-2-2-1048476-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/55e2fd5120dcd5f051acbab6b37da409eb5c86a0/ecrecover-2-2-1048476-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/55e2fd5120dcd5f051acbab6b37da409eb5c86a0/ecrecover-2-2-1048476-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/55e2fd5120dcd5f051acbab6b37da409eb5c86a0/ecrecover-2-2-1048476-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/9dd2171a8fd6967c026a39c6cbf4739885809168/ecrecover-2-2-1048476-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/9dd2171a8fd6967c026a39c6cbf4739885809168/ecrecover-2-2-1048476-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/9dd2171a8fd6967c026a39c6cbf4739885809168/ecrecover-2-2-1048476-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/9dd2171a8fd6967c026a39c6cbf4739885809168/ecrecover-2-2-1048476-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/9dd2171a8fd6967c026a39c6cbf4739885809168/ecrecover-2-2-1048476-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/9dd2171a8fd6967c026a39c6cbf4739885809168/ecrecover-2-2-1048476-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/9dd2171a8fd6967c026a39c6cbf4739885809168/ecrecover-2-2-1048476-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/9dd2171a8fd6967c026a39c6cbf4739885809168/ecrecover-2-2-1048476-64cpu-linux-arm64-mimalloc-ecrecover_program.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/55e2fd5120dcd5f051acbab6b37da409eb5c86a0
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/9dd2171a8fd6967c026a39c6cbf4739885809168
+
+Max Segment Length: 1048476
 
 Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12244666122)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12245385584)
