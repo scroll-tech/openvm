@@ -77,7 +77,6 @@ pub fn moduli_declare(input: TokenStream) -> TokenStream {
             .chain(vec![0u8; limbs])
             .take(limbs)
             .collect::<Vec<_>>();
-        let num_bytes = modulus_bytes.len();
 
         let modulus_hex = modulus_bytes
             .iter()
@@ -334,7 +333,7 @@ pub fn moduli_declare(input: TokenStream) -> TokenStream {
 
                     const ZERO: Self = Self([0; #limbs]);
 
-                    const NUM_BYTES: usize = #num_bytes;
+                    const NUM_LIMBS: usize = #limbs;
 
                     const ONE: Self = Self::from_const_u8(1);
 
@@ -345,6 +344,14 @@ pub fn moduli_declare(input: TokenStream) -> TokenStream {
                     fn from_le_bytes(bytes: &[u8]) -> Self {
                         let mut arr = [0u8; #limbs];
                         arr.copy_from_slice(bytes);
+                        Self(arr)
+                    }
+
+                    fn from_be_bytes(bytes: &[u8]) -> Self {
+                        let mut arr = [0u8; #limbs];
+                        for (a, b) in arr.iter_mut().zip(bytes.iter().rev()) {
+                            *a = *b;
+                        }
                         Self(arr)
                     }
 
@@ -366,6 +373,10 @@ pub fn moduli_declare(input: TokenStream) -> TokenStream {
 
                     fn as_le_bytes(&self) -> &[u8] {
                         &(self.0)
+                    }
+
+                    fn to_be_bytes(&self) -> [u8; #limbs] {
+                        core::array::from_fn(|i| self.0[#limbs - 1 - i])
                     }
 
                     #[cfg(not(target_os = "zkvm"))]
@@ -868,6 +879,7 @@ pub fn moduli_init(input: TokenStream) -> TokenStream {
         mod axvm_intrinsics_ffi {
             #(#externs)*
         }
+        #[allow(non_snake_case)]
         pub mod axvm_intrinsics_meta_do_not_type_this_by_yourself {
             pub const two_modular_limbs_list: [u8; #total_limbs_cnt] = [#(#two_modular_limbs_flattened_list),*];
             pub const limb_list_borders: [usize; #cnt_limbs_list_len] = [#(#limb_list_borders),*];
