@@ -38,6 +38,10 @@ eyre.workspace = true
 async-trait.workspace = true
 metrics.workspace = true
 tracing.workspace = true
+itertools.workspace = true
+
+[dev-dependencies]
+axvm-sdk-example-test = { path = "example" }
 
 [features]
 default = ["parallel"]

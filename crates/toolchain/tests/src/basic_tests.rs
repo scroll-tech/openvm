@@ -31,7 +31,7 @@ fn test_rv32i_prove(example_name: &str, min_segments: usize) -> Result<()> {
             .with_extension(Rv32ITranspilerExtension)
             .with_extension(Rv32MTranspilerExtension)
             .with_extension(Rv32IoTranspilerExtension),
-    );
+    )?;
     let config = Rv32IConfig::default();
     new_air_test_with_min_segments(config, exe, vec![], min_segments, true);
     Ok(())
@@ -46,7 +46,7 @@ fn test_rv32im_prove(example_name: &str, min_segments: usize) -> Result<()> {
             .with_extension(Rv32ITranspilerExtension)
             .with_extension(Rv32IoTranspilerExtension)
             .with_extension(Rv32MTranspilerExtension),
-    );
+    )?;
     let config = Rv32ImConfig::default();
     new_air_test_with_min_segments(config, exe, vec![], min_segments, true);
     Ok(())
@@ -62,7 +62,7 @@ fn test_rv32im_std_prove(example_name: &str, min_segments: usize) -> Result<()> 
             .with_extension(Rv32ITranspilerExtension)
             .with_extension(Rv32IoTranspilerExtension)
             .with_extension(Rv32MTranspilerExtension),
-    );
+    )?;
     let config = Rv32ImConfig::default();
     new_air_test_with_min_segments(config, exe, vec![], min_segments, true);
     Ok(())
@@ -77,7 +77,7 @@ fn test_read_vec_runtime() -> Result<()> {
             .with_extension(Rv32ITranspilerExtension)
             .with_extension(Rv32MTranspilerExtension)
             .with_extension(Rv32IoTranspilerExtension),
-    );
+    )?;
     let config = Rv32IConfig::default();
     let executor = VmExecutor::<F, _>::new(config);
     executor.execute(exe, vec![[0, 1, 2, 3].map(F::from_canonical_u8).to_vec()])?;
@@ -93,7 +93,7 @@ fn test_read_runtime() -> Result<()> {
             .with_extension(Rv32ITranspilerExtension)
             .with_extension(Rv32MTranspilerExtension)
             .with_extension(Rv32IoTranspilerExtension),
-    );
+    )?;
     let config = Rv32IConfig::default();
     let executor = VmExecutor::<F, _>::new(config);
 
@@ -129,7 +129,7 @@ fn test_reveal_runtime() -> Result<()> {
             .with_extension(Rv32ITranspilerExtension)
             .with_extension(Rv32MTranspilerExtension)
             .with_extension(Rv32IoTranspilerExtension),
-    );
+    )?;
     let config = Rv32IConfig::default();
     let executor = VmExecutor::<F, _>::new(config.clone());
     let final_memory = executor.execute(exe, vec![])?.unwrap();
@@ -161,7 +161,7 @@ fn test_keccak256_runtime() -> Result<()> {
             .with_extension(Rv32ITranspilerExtension)
             .with_extension(Rv32MTranspilerExtension)
             .with_extension(Rv32IoTranspilerExtension),
-    );
+    )?;
     let executor = VmExecutor::<F, Keccak256Rv32Config>::new(Keccak256Rv32Config::default());
     executor.execute(axvm_exe, vec![])?;
     Ok(())
@@ -176,7 +176,7 @@ fn test_print_runtime() -> Result<()> {
             .with_extension(Rv32ITranspilerExtension)
             .with_extension(Rv32MTranspilerExtension)
             .with_extension(Rv32IoTranspilerExtension),
-    );
+    )?;
     let config = Rv32IConfig::default();
     let executor = VmExecutor::<F, _>::new(config);
     executor.execute(exe, vec![])?;
@@ -193,7 +193,7 @@ fn test_matrix_power_runtime() -> Result<()> {
             .with_extension(Rv32MTranspilerExtension)
             .with_extension(Rv32IoTranspilerExtension)
             .with_extension(Int256TranspilerExtension),
-    );
+    )?;
     let config = Int256Rv32Config::default();
     let executor = VmExecutor::<F, _>::new(config);
     executor.execute(axvm_exe, vec![])?;
@@ -210,7 +210,7 @@ fn test_matrix_power_signed_runtime() -> Result<()> {
             .with_extension(Rv32MTranspilerExtension)
             .with_extension(Rv32IoTranspilerExtension)
             .with_extension(Int256TranspilerExtension),
-    );
+    )?;
     let config = Int256Rv32Config::default();
     let executor = VmExecutor::<F, _>::new(config);
     executor.execute(axvm_exe, vec![])?;
@@ -226,7 +226,7 @@ fn test_tiny_mem_test_runtime() -> Result<()> {
             .with_extension(Rv32ITranspilerExtension)
             .with_extension(Rv32MTranspilerExtension)
             .with_extension(Rv32IoTranspilerExtension),
-    );
+    )?;
     let config = Rv32ImConfig::default();
     let executor = VmExecutor::<F, _>::new(config);
     executor.execute(exe, vec![])?;

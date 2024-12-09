@@ -63,7 +63,7 @@ mod bn254 {
                 .with_extension(PairingTranspilerExtension)
                 .with_extension(ModularTranspilerExtension)
                 .with_extension(Fp2TranspilerExtension),
-        );
+        )?;
 
         let mut rng = rand::rngs::StdRng::seed_from_u64(2);
         let f0 = Fq12::random(&mut rng);
@@ -93,7 +93,7 @@ mod bn254 {
                 .with_extension(PairingTranspilerExtension)
                 .with_extension(ModularTranspilerExtension)
                 .with_extension(Fp2TranspilerExtension),
-        );
+        )?;
 
         let mut rng = rand::rngs::StdRng::seed_from_u64(2);
         let a = G2Affine::random(&mut rng);
@@ -145,7 +145,7 @@ mod bn254 {
                 .with_extension(PairingTranspilerExtension)
                 .with_extension(ModularTranspilerExtension)
                 .with_extension(Fp2TranspilerExtension),
-        );
+        )?;
 
         let mut rng = rand::rngs::StdRng::seed_from_u64(20);
         let S = G2Affine::random(&mut rng);
@@ -188,7 +188,7 @@ mod bn254 {
                 .with_extension(PairingTranspilerExtension)
                 .with_extension(ModularTranspilerExtension)
                 .with_extension(Fp2TranspilerExtension),
-        );
+        )?;
 
         let S = G1Affine::generator();
         let Q = G2Affine::generator();
@@ -235,7 +235,7 @@ mod bn254 {
                 .with_extension(PairingTranspilerExtension)
                 .with_extension(ModularTranspilerExtension)
                 .with_extension(Fp2TranspilerExtension),
-        );
+        )?;
 
         let S = G1Affine::generator();
         let Q = G2Affine::generator();
@@ -323,7 +323,7 @@ mod bls12_381 {
                 .with_extension(PairingTranspilerExtension)
                 .with_extension(ModularTranspilerExtension)
                 .with_extension(Fp2TranspilerExtension),
-        );
+        )?;
 
         let mut rng = rand::rngs::StdRng::seed_from_u64(50);
         let f0 = Fq12::random(&mut rng);
@@ -353,7 +353,7 @@ mod bls12_381 {
                 .with_extension(PairingTranspilerExtension)
                 .with_extension(ModularTranspilerExtension)
                 .with_extension(Fp2TranspilerExtension),
-        );
+        )?;
 
         let mut rng = rand::rngs::StdRng::seed_from_u64(5);
         let a = G2Affine::random(&mut rng);
@@ -406,7 +406,7 @@ mod bls12_381 {
                 .with_extension(PairingTranspilerExtension)
                 .with_extension(ModularTranspilerExtension)
                 .with_extension(Fp2TranspilerExtension),
-        );
+        )?;
 
         let mut rng = rand::rngs::StdRng::seed_from_u64(88);
         let S = G2Affine::random(&mut rng);
@@ -449,7 +449,7 @@ mod bls12_381 {
                 .with_extension(PairingTranspilerExtension)
                 .with_extension(ModularTranspilerExtension)
                 .with_extension(Fp2TranspilerExtension),
-        );
+        )?;
 
         let S = G1Affine::generator();
         let Q = G2Affine::generator();
@@ -502,7 +502,7 @@ mod bls12_381 {
                 .with_extension(PairingTranspilerExtension)
                 .with_extension(ModularTranspilerExtension)
                 .with_extension(Fp2TranspilerExtension),
-        );
+        )?;
 
         let S = G1Affine::generator();
         let Q = G2Affine::generator();
@@ -554,7 +554,7 @@ mod bls12_381 {
                 .with_extension(PairingTranspilerExtension)
                 .with_extension(ModularTranspilerExtension)
                 .with_extension(Fp2TranspilerExtension),
-        );
+        )?;
 
         let P = G1Affine::generator();
         let Q = G2Affine::generator();

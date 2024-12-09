@@ -1226,16 +1226,25 @@ dependencies = [
  "axvm-pairing-transpiler",
  "axvm-rv32im-circuit",
  "axvm-rv32im-transpiler",
+ "axvm-sdk-example-test",
  "axvm-transpiler",
  "bincode 1.3.3",
  "bon",
  "derivative",
  "derive_more 1.0.0",
  "eyre",
+ "itertools 0.13.0",
  "metrics",
  "serde",
  "static_assertions",
  "tracing",
+]
+
+[[package]]
+name = "axvm-sdk-example-test"
+version = "0.1.0"
+dependencies = [
+ "axvm",
 ]
 
 [[package]]
@@ -1294,6 +1303,7 @@ dependencies = [
  "strum",
  "tempfile",
  "test-case",
+ "thiserror",
  "tracing",
 ]
 
