@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| ecrecover_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>100,539,955</div>  | <div style='text-align: right'>1,502,571</div>  | <span style="color: green">(-49.0 [-0.5%])</span> <div style='text-align: right'>10,481.0</div>  |
+| ecrecover_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>100,539,955</div>  | <div style='text-align: right'>1,502,571</div>  | <span style="color: red">(+94.0 [+0.9%])</span> <div style='text-align: right'>10,575.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| ecrecover_program | <span style="color: green">(-1.0 [-14.3%])</span> <div style='text-align: right'>6.0</div>  | <span style="color: green">(-2.0 [-0.1%])</span> <div style='text-align: right'>2,597.0</div>  | <span style="color: green">(-9.0 [-0.5%])</span> <div style='text-align: right'>1,869.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+2.0 [+0.8%])</span> <div style='text-align: right'>259.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>100,539,955</div>  | <div style='text-align: right'>1,502,571</div>  | <span style="color: green">(-49.0 [-0.5%])</span> <div style='text-align: right'>10,481.0</div>  |
+| ecrecover_program | <span style="color: red">(+1.0 [+16.7%])</span> <div style='text-align: right'>7.0</div>  | <span style="color: red">(+17.0 [+0.7%])</span> <div style='text-align: right'>2,614.0</div>  | <span style="color: red">(+6.0 [+0.3%])</span> <div style='text-align: right'>1,875.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-3.0 [-1.2%])</span> <div style='text-align: right'>256.0</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>100,539,955</div>  | <div style='text-align: right'>1,502,571</div>  | <span style="color: red">(+94.0 [+0.9%])</span> <div style='text-align: right'>10,575.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -247,7 +247,7 @@
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| ecrecover_program | 0 | <span style="color: green">(-10.0 [-1.2%])</span> <div style='text-align: right'>793.0</div>  | <span style="color: green">(-37.0 [-0.5%])</span> <div style='text-align: right'>7,091.0</div>  | <div style='text-align: right'>303,080,679</div>  |
+| ecrecover_program | 0 | <span style="color: red">(+2.0 [+0.3%])</span> <div style='text-align: right'>795.0</div>  | <span style="color: red">(+75.0 [+1.1%])</span> <div style='text-align: right'>7,166.0</div>  | <div style='text-align: right'>303,080,679</div>  |
 
 </details>
 
@@ -269,4 +269,4 @@ Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12237937324)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12237946768)
