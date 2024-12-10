@@ -1,7 +1,7 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| app_proof | <div style='text-align: right'>2</div>  | <div style='text-align: right'>881,896,337</div>  | <div style='text-align: right'>6,995,780</div>  | <span style="color: red">(+999.0 [+2.5%])</span> <div style='text-align: right'>40,440.0</div>  |
-| leaf_aggregation | <div style='text-align: right'>2</div>  |  |  | <span style="color: green">(-8.0 [-0.0%])</span> <div style='text-align: right'>23,324.0</div>  |
+| app_proof | <div style='text-align: right'>2</div>  | <div style='text-align: right'>881,896,337</div>  | <div style='text-align: right'>6,995,780</div>  | <span style="color: green">(-320.0 [-0.8%])</span> <div style='text-align: right'>40,120.0</div>  |
+| leaf_aggregation | <div style='text-align: right'>2</div>  |  |  | <span style="color: green">(-10.0 [-0.0%])</span> <div style='text-align: right'>23,314.0</div>  |
 
 
 <details>
@@ -9,7 +9,7 @@
 
 | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms |
 | --- | --- | --- | --- | --- |
-| <span style="color: green">(-1.0 [-6.7%])</span> <div style='text-align: right'>14.0</div>  | <span style="color: red">(+13.0 [+2.7%])</span> <div style='text-align: right'>497.0</div>  | <span style="color: red">(+8.0 [+2.5%])</span> <div style='text-align: right'>324.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-966.0 [-1.3%])</span> <div style='text-align: right'>74,441.0</div>  |
+| <span style="color: red">(+1.0 [+7.1%])</span> <div style='text-align: right'>15.0</div>  | <span style="color: red">(+11.0 [+2.2%])</span> <div style='text-align: right'>508.0</div>  | <span style="color: red">(+9.0 [+2.8%])</span> <div style='text-align: right'>333.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+259.0 [+0.3%])</span> <div style='text-align: right'>74,700.0</div>  |
 
 | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- |
@@ -46,8 +46,8 @@
 
 | group | segment | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_cycles | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| app_proof | 0 |  |  | <span style="color: green">(-20.0 [-0.1%])</span> <div style='text-align: right'>13,879.0</div>  | <div style='text-align: right'>2</div>  |  | <div style='text-align: right'>1</div>  | <span style="color: red">(+999.0 [+2.5%])</span> <div style='text-align: right'>40,440.0</div>  | <div style='text-align: right'>1,465,057,304</div>  | <div style='text-align: right'>881,896,337</div>  | <div style='text-align: right'>6,995,780</div>  | <span style="color: green">(-63.0 [-0.6%])</span> <div style='text-align: right'>9,878.0</div>  |  |
-| leaf_aggregation | 0 | <span style="color: green">(-5.0 [-2.8%])</span> <div style='text-align: right'>171.0</div>  | <span style="color: green">(-8.0 [-0.0%])</span> <div style='text-align: right'>23,324.0</div>  | <span style="color: red">(+73.0 [+0.5%])</span> <div style='text-align: right'>13,591.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+2.0 [+0.6%])</span> <div style='text-align: right'>363.0</div>  |  |  |  |  |  | <span style="color: green">(-81.0 [-0.8%])</span> <div style='text-align: right'>9,718.0</div>  | <span style="color: red">(+22.0 [+0.0%])</span> <div style='text-align: right'>74,466.0</div>  |
+| app_proof | 0 |  |  | <span style="color: green">(-43.0 [-0.3%])</span> <div style='text-align: right'>13,836.0</div>  | <div style='text-align: right'>2</div>  |  | <div style='text-align: right'>1</div>  | <span style="color: green">(-320.0 [-0.8%])</span> <div style='text-align: right'>40,120.0</div>  | <div style='text-align: right'>1,465,057,304</div>  | <div style='text-align: right'>881,896,337</div>  | <div style='text-align: right'>6,995,780</div>  | <span style="color: red">(+92.0 [+0.9%])</span> <div style='text-align: right'>9,970.0</div>  |  |
+| leaf_aggregation | 0 | <span style="color: red">(+6.0 [+3.5%])</span> <div style='text-align: right'>177.0</div>  | <span style="color: green">(-10.0 [-0.0%])</span> <div style='text-align: right'>23,314.0</div>  | <span style="color: red">(+8.0 [+0.1%])</span> <div style='text-align: right'>13,599.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-6.0 [-1.7%])</span> <div style='text-align: right'>357.0</div>  |  |  |  |  |  | <span style="color: green">(-18.0 [-0.2%])</span> <div style='text-align: right'>9,700.0</div>  | <span style="color: green">(-142.0 [-0.2%])</span> <div style='text-align: right'>74,324.0</div>  |
 
 | group | chip_name | segment | rows_used |
 | --- | --- | --- | --- |
@@ -273,8 +273,8 @@
 
 | group | execute_time_ms | fri.log_blowup | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| app_proof | <span style="color: red">(+12.0 [+3.8%])</span> <div style='text-align: right'>325.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>881,896,337</div>  | <div style='text-align: right'>6,995,780</div>  | <span style="color: red">(+999.0 [+2.5%])</span> <div style='text-align: right'>40,440.0</div>  |
-| leaf_aggregation |  | <div style='text-align: right'>2</div>  |  |  |  | <span style="color: green">(-8.0 [-0.0%])</span> <div style='text-align: right'>23,324.0</div>  |
+| app_proof | <span style="color: green">(-6.0 [-1.8%])</span> <div style='text-align: right'>319.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>881,896,337</div>  | <div style='text-align: right'>6,995,780</div>  | <span style="color: green">(-320.0 [-0.8%])</span> <div style='text-align: right'>40,120.0</div>  |
+| leaf_aggregation |  | <div style='text-align: right'>2</div>  |  |  |  | <span style="color: green">(-10.0 [-0.0%])</span> <div style='text-align: right'>23,314.0</div>  |
 
 | group | air_name | segment | cells | constraints | interactions | main_cols | perm_cols | prep_cols | quotient_deg | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -329,7 +329,7 @@
 
 | segment | trace_gen_time_ms |
 | --- | --- |
-| 0 | <span style="color: red">(+6.0 [+3.6%])</span> <div style='text-align: right'>172.0</div>  |
+| 0 | <span style="color: red">(+1.0 [+0.6%])</span> <div style='text-align: right'>173.0</div>  |
 
 </details>
 
@@ -357,4 +357,4 @@ Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12263798777)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12263801923)
