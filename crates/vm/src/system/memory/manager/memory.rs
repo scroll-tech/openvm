@@ -75,17 +75,8 @@ type Address = (usize, usize);
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 struct Block {
-    address_space: usize,
-    pointer: usize,
     size: usize,
     timestamp: u32,
-}
-
-impl Block {
-    pub fn contains(&self, address_space: usize, pointer: usize) -> bool {
-        self.address_space == address_space
-            && (self.pointer..self.pointer + self.size).contains(&pointer)
-    }
 }
 
 /// A partition of data into blocks where each block has size a power of two.
@@ -112,8 +103,6 @@ impl<F: PrimeField32> Memory<F> {
             blocks.insert(
                 (address_space_usize, pointer),
                 Block {
-                    address_space: address_space_usize,
-                    pointer,
                     size: N,
                     timestamp: INITIAL_TIMESTAMP,
                 },
@@ -216,22 +205,19 @@ impl<F: PrimeField32> Memory<F> {
 
         // First make sure the partition we maintain in self.blocks is an equipartition.
         let mut left = Unbounded;
-        while let Some((_, &block)) = self.blocks.range((left, Unbounded)).next() {
-            let aligned_pointer = (block.pointer / N) * N;
-            if aligned_pointer != block.pointer || block.size != N {
-                self.access(
-                    block.address_space,
-                    aligned_pointer,
-                    N,
-                    &mut adapter_records,
-                );
+        while let Some((&(address_space, pointer), &block)) =
+            self.blocks.range((left, Unbounded)).next()
+        {
+            let aligned_pointer = (pointer / N) * N;
+            if aligned_pointer != pointer || block.size != N {
+                self.access(address_space, aligned_pointer, N, &mut adapter_records);
             }
-            left = Included((block.address_space, aligned_pointer + N));
+            left = Included((address_space, aligned_pointer + N));
         }
 
         let mut equipartition = TimestampedEquipartition::<F, N>::new();
         for (&(address_space, pointer), block) in self.blocks.iter() {
-            debug_assert_eq!(block.pointer % N, 0);
+            debug_assert_eq!(pointer % N, 0);
             debug_assert_eq!(block.size, N);
 
             equipartition.insert(
@@ -253,19 +239,20 @@ impl<F: PrimeField32> Memory<F> {
         query: usize,
         records: &mut Vec<AccessAdapterRecord<F>>,
     ) {
-        let original_block = self.block_containing(address_space, query);
-        if original_block.pointer == query {
+        let (original_ptr, original_size, original_timestamp) =
+            self.block_containing_start(address_space, query);
+        if original_ptr == query {
             return;
         }
 
-        self.blocks.remove(&(address_space, original_block.pointer));
+        self.blocks.remove(&(address_space, original_ptr));
 
-        let mut cur_ptr = original_block.pointer;
-        let mut cur_size = original_block.size;
+        let mut cur_ptr = original_ptr;
+        let mut cur_size = original_size;
         while cur_size > 0 {
             // Split.
             records.push(AccessAdapterRecord {
-                timestamp: original_block.timestamp,
+                timestamp: original_timestamp,
                 address_space: F::from_canonical_usize(address_space),
                 start_index: F::from_canonical_usize(cur_ptr),
                 data: self.range_vec(address_space, cur_ptr, cur_size),
@@ -279,10 +266,8 @@ impl<F: PrimeField32> Memory<F> {
                 self.blocks.insert(
                     (address_space, cur_ptr + half_size),
                     Block {
-                        address_space,
-                        pointer: cur_ptr + half_size,
                         size: half_size,
-                        timestamp: original_block.timestamp,
+                        timestamp: original_timestamp,
                     },
                 );
             }
@@ -291,10 +276,8 @@ impl<F: PrimeField32> Memory<F> {
                 self.blocks.insert(
                     (address_space, cur_ptr),
                     Block {
-                        address_space,
-                        pointer: cur_ptr,
                         size: half_size,
-                        timestamp: original_block.timestamp,
+                        timestamp: original_timestamp,
                     },
                 );
             }
@@ -324,12 +307,10 @@ impl<F: PrimeField32> Memory<F> {
             .blocks
             .entry((address_space, pointer))
             .or_insert_with(|| Block {
-                address_space,
-                pointer,
                 size: self.initial_block_size,
                 timestamp: INITIAL_TIMESTAMP,
             });
-        if b.pointer == pointer && b.size == size {
+        if b.size == size {
             return;
         }
         assert!(size > 1);
@@ -355,20 +336,24 @@ impl<F: PrimeField32> Memory<F> {
         let left = self
             .blocks
             .remove(&(address_space, pointer))
-            .unwrap_or(self.initial_block(address_space, pointer));
+            .unwrap_or(Block {
+                size: self.initial_block_size,
+                timestamp: INITIAL_TIMESTAMP,
+            });
         let size = left.size;
         let right = self
             .blocks
             .remove(&(address_space, pointer + size))
-            .unwrap_or(self.initial_block(address_space, pointer + size));
+            .unwrap_or(Block {
+                size: self.initial_block_size,
+                timestamp: INITIAL_TIMESTAMP,
+            });
         assert_eq!(size, right.size);
 
         let timestamp = max(left.timestamp, right.timestamp);
         self.blocks.insert(
             (address_space, pointer),
             Block {
-                address_space,
-                pointer,
                 size: 2 * size,
                 timestamp,
             },
@@ -385,26 +370,25 @@ impl<F: PrimeField32> Memory<F> {
         });
     }
 
-    fn block_containing(&mut self, address_space: usize, pointer: usize) -> Block {
+    // Returns (pointer, size, timestamp) of the block containing the start of the given pointer.
+    fn block_containing_start(
+        &mut self,
+        address_space: usize,
+        pointer: usize,
+    ) -> (usize, usize, u32) {
         // Look for the block with the largest key <= (address_space, pointer)
         let key = (address_space, pointer);
 
-        if let Some((_, block)) = self.blocks.range((Unbounded, Included(key))).next_back() {
-            if block.contains(address_space, pointer) {
-                return *block;
+        if let Some((&(block_as, block_ptr), block)) =
+            self.blocks.range((Unbounded, Included(key))).next_back()
+        {
+            if block_as == address_space && block_ptr <= pointer && pointer < block_ptr + block.size
+            {
+                return (block_ptr, block.size, block.timestamp);
             }
         }
         let aligned_pointer = (pointer / self.initial_block_size) * self.initial_block_size;
-        self.initial_block(address_space, aligned_pointer)
-    }
-
-    fn initial_block(&self, address_space: usize, pointer: usize) -> Block {
-        Block {
-            address_space,
-            pointer,
-            size: self.initial_block_size,
-            timestamp: INITIAL_TIMESTAMP,
-        }
+        (aligned_pointer, self.initial_block_size, INITIAL_TIMESTAMP)
     }
 
     pub fn get(&self, address_space: usize, pointer: usize) -> F {
@@ -427,7 +411,7 @@ mod tests {
     use ax_stark_backend::p3_field::AbstractField;
     use ax_stark_sdk::p3_baby_bear::BabyBear;
 
-    use super::{Block, Memory};
+    use super::Memory;
     use crate::system::memory::{
         manager::memory::{AccessAdapterRecord, AccessAdapterRecordKind},
         Equipartition, MemoryReadRecord, MemoryWriteRecord, TimestampedValues,
@@ -456,45 +440,10 @@ mod tests {
         type F = BabyBear;
 
         let mut partition = Memory::<F>::new(&Equipartition::<F, 8>::new());
-        assert_eq!(
-            partition.block_containing(0, 13),
-            Block {
-                address_space: 0,
-                pointer: 8,
-                size: 8,
-                timestamp: 0,
-            }
-        );
-
-        assert_eq!(
-            partition.block_containing(0, 8),
-            Block {
-                address_space: 0,
-                pointer: 8,
-                size: 8,
-                timestamp: 0,
-            }
-        );
-
-        assert_eq!(
-            partition.block_containing(0, 15),
-            Block {
-                address_space: 0,
-                pointer: 8,
-                size: 8,
-                timestamp: 0,
-            }
-        );
-
-        assert_eq!(
-            partition.block_containing(0, 16),
-            Block {
-                address_space: 0,
-                pointer: 16,
-                size: 8,
-                timestamp: 0,
-            }
-        );
+        assert_eq!(partition.block_containing_start(0, 13), (8, 8, 0));
+        assert_eq!(partition.block_containing_start(0, 8), (8, 8, 0));
+        assert_eq!(partition.block_containing_start(0, 15), (8, 8, 0));
+        assert_eq!(partition.block_containing_start(0, 16), (16, 8, 0));
     }
 
     #[test]
