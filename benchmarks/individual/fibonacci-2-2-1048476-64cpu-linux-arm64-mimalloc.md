@@ -1,7 +1,7 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| app_proof | <div style='text-align: right'>2</div>  | <span style="color: red">(+18,090 [+0.0%])</span> <div style='text-align: right'>461,446,757</div>  | <span style="color: red">(+1,648 [+0.0%])</span> <div style='text-align: right'>5,009,615</div>  | <span style="color: red">(+260.0 [+1.0%])</span> <div style='text-align: right'>27,010.0</div>  |
-| leaf_aggregation | <div style='text-align: right'>2</div>  |  |  | <span style="color: red">(+38.0 [+0.2%])</span> <div style='text-align: right'>16,228.0</div>  |
+| app_proof | <div style='text-align: right'>2</div>  | <span style="color: green">(-18,090 [-0.0%])</span> <div style='text-align: right'>461,428,667</div>  | <span style="color: green">(-1,648 [-0.0%])</span> <div style='text-align: right'>5,007,967</div>  | <span style="color: green">(-246.0 [-0.9%])</span> <div style='text-align: right'>26,764.0</div>  |
+| leaf_aggregation | <div style='text-align: right'>2</div>  |  |  | <span style="color: green">(-68.0 [-0.4%])</span> <div style='text-align: right'>16,160.0</div>  |
 
 
 <details>
@@ -9,7 +9,7 @@
 
 | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms |
 | --- | --- | --- | --- | --- |
-| <span style="color: red">(+1.0 [+20.0%])</span> <div style='text-align: right'>6.0</div>  | <span style="color: red">(+20.0 [+1.7%])</span> <div style='text-align: right'>1,228.0</div>  | <span style="color: red">(+24.0 [+2.5%])</span> <div style='text-align: right'>974.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+8.0 [+1.6%])</span> <div style='text-align: right'>495.0</div>  |
+| <span style="color: green">(-2.0 [-33.3%])</span> <div style='text-align: right'>4.0</div>  | <span style="color: green">(-18.0 [-1.5%])</span> <div style='text-align: right'>1,210.0</div>  | <span style="color: green">(-26.0 [-2.7%])</span> <div style='text-align: right'>948.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-9.0 [-1.8%])</span> <div style='text-align: right'>486.0</div>  |
 
 | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- |
@@ -45,8 +45,8 @@
 
 | group | segment | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_cycles | trace_gen_time_ms | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| app_proof | 0 |  |  | <span style="color: green">(-7.0 [-0.1%])</span> <div style='text-align: right'>7,128.0</div>  | <div style='text-align: right'>2</div>  |  | <div style='text-align: right'>1</div>  | <span style="color: red">(+260.0 [+1.0%])</span> <div style='text-align: right'>27,010.0</div>  | <div style='text-align: right'>1,072,529,432</div>  | <span style="color: red">(+18,090 [+0.0%])</span> <div style='text-align: right'>461,446,757</div>  | <span style="color: red">(+1,648 [+0.0%])</span> <div style='text-align: right'>5,009,615</div>  | <span style="color: red">(+44.0 [+0.5%])</span> <div style='text-align: right'>9,162.0</div>  |  |
-| leaf_aggregation | 0 | <span style="color: red">(+5.0 [+11.6%])</span> <div style='text-align: right'>48.0</div>  | <span style="color: red">(+38.0 [+0.2%])</span> <div style='text-align: right'>16,228.0</div>  | <span style="color: red">(+7.0 [+0.1%])</span> <div style='text-align: right'>6,999.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+17.0 [+5.0%])</span> <div style='text-align: right'>360.0</div>  |  |  |  |  |  | <span style="color: red">(+31.0 [+0.3%])</span> <div style='text-align: right'>9,223.0</div>  | <span style="color: red">(+78.0 [+34.2%])</span> <div style='text-align: right'>306.0</div>  |
+| app_proof | 0 |  |  | <span style="color: red">(+6.0 [+0.1%])</span> <div style='text-align: right'>7,134.0</div>  | <div style='text-align: right'>2</div>  |  | <div style='text-align: right'>1</div>  | <span style="color: green">(-246.0 [-0.9%])</span> <div style='text-align: right'>26,764.0</div>  | <div style='text-align: right'>1,072,529,432</div>  | <span style="color: green">(-18,090 [-0.0%])</span> <div style='text-align: right'>461,428,667</div>  | <span style="color: green">(-1,648 [-0.0%])</span> <div style='text-align: right'>5,007,967</div>  | <span style="color: green">(-37.0 [-0.4%])</span> <div style='text-align: right'>9,125.0</div>  |  |
+| leaf_aggregation | 0 | <span style="color: green">(-10.0 [-20.8%])</span> <div style='text-align: right'>38.0</div>  | <span style="color: green">(-68.0 [-0.4%])</span> <div style='text-align: right'>16,160.0</div>  | <span style="color: green">(-25.0 [-0.4%])</span> <div style='text-align: right'>6,974.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+1.0 [+0.3%])</span> <div style='text-align: right'>361.0</div>  |  |  |  |  |  | <span style="color: green">(-43.0 [-0.5%])</span> <div style='text-align: right'>9,180.0</div>  | <span style="color: green">(-75.0 [-24.5%])</span> <div style='text-align: right'>231.0</div>  |
 
 | group | chip_name | segment | rows_used |
 | --- | --- | --- | --- |
@@ -54,8 +54,8 @@
 | app_proof | VmConnectorAir | 0 | <div style='text-align: right'>2</div>  |
 | app_proof | Boundary | 0 | <div style='text-align: right'>171,048</div>  |
 | app_proof | Merkle | 0 | <div style='text-align: right'>366,286</div>  |
-| app_proof | AccessAdapter<2> | 0 | <span style="color: red">(+92 [+0.0%])</span> <div style='text-align: right'>642,028</div>  |
-| app_proof | AccessAdapter<4> | 0 | <span style="color: red">(+46 [+0.0%])</span> <div style='text-align: right'>354,806</div>  |
+| app_proof | AccessAdapter<2> | 0 | <span style="color: green">(-92 [-0.0%])</span> <div style='text-align: right'>641,936</div>  |
+| app_proof | AccessAdapter<4> | 0 | <span style="color: green">(-46 [-0.0%])</span> <div style='text-align: right'>354,760</div>  |
 | app_proof | AccessAdapter<8> | 0 | <div style='text-align: right'>190,130</div>  |
 | app_proof | <Rv32HintStoreAdapterAir,Rv32HintStoreCoreAir> | 0 | <div style='text-align: right'>3</div>  |
 | app_proof | RangeTupleCheckerAir<2> | 0 | <div style='text-align: right'>524,288</div>  |
@@ -75,7 +75,7 @@
 | app_proof | FriReducedOpeningAir | 0 | <div style='text-align: right'>144,732</div>  |
 | app_proof | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | 0 | <div style='text-align: right'>35,100</div>  |
 | app_proof | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | 0 | <div style='text-align: right'>1,357,596</div>  |
-| app_proof | <JalNativeAdapterAir,JalCoreAir> | 0 | <span style="color: red">(+1,648 [+2.3%])</span> <div style='text-align: right'>74,495</div>  |
+| app_proof | <JalNativeAdapterAir,JalCoreAir> | 0 | <span style="color: green">(-1,648 [-2.2%])</span> <div style='text-align: right'>72,847</div>  |
 | app_proof | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | 0 | <div style='text-align: right'>674,446</div>  |
 | app_proof | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | 0 | <div style='text-align: right'>1,124,581</div>  |
 
@@ -163,8 +163,8 @@
 | app_proof | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> |  | SUB | 0 | <div style='text-align: right'>144</div>  |
 | app_proof | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> |  | XOR | 0 | <div style='text-align: right'>144</div>  |
 | app_proof | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> |  | ADD | 0 | <div style='text-align: right'>34,579,950</div>  |
-| app_proof | AccessAdapter<2> |  | ADD | 0 | <span style="color: red">(+506 [+0.2%])</span> <div style='text-align: right'>277,893</div>  |
-| app_proof | AccessAdapter<4> |  | ADD | 0 | <span style="color: red">(+299 [+0.2%])</span> <div style='text-align: right'>164,372</div>  |
+| app_proof | AccessAdapter<2> |  | ADD | 0 | <span style="color: green">(-506 [-0.2%])</span> <div style='text-align: right'>277,387</div>  |
+| app_proof | AccessAdapter<4> |  | ADD | 0 | <span style="color: green">(-299 [-0.2%])</span> <div style='text-align: right'>164,073</div>  |
 | app_proof | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> |  | BBE4DIV | 0 | <div style='text-align: right'>250,720</div>  |
 | app_proof | AccessAdapter<2> |  | BBE4DIV | 0 | <div style='text-align: right'>120,692</div>  |
 | app_proof | AccessAdapter<4> |  | BBE4DIV | 0 | <div style='text-align: right'>71,318</div>  |
@@ -172,8 +172,8 @@
 | app_proof | Boundary |  | BBE4DIV | 0 | <div style='text-align: right'>80</div>  |
 | app_proof | Merkle |  | BBE4DIV | 0 | <div style='text-align: right'>384</div>  |
 | app_proof | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> |  | BBE4MUL | 0 | <div style='text-align: right'>473,840</div>  |
-| app_proof | AccessAdapter<2> |  | BBE4MUL | 0 | <span style="color: red">(+506 [+0.2%])</span> <div style='text-align: right'>234,630</div>  |
-| app_proof | AccessAdapter<4> |  | BBE4MUL | 0 | <span style="color: red">(+299 [+0.2%])</span> <div style='text-align: right'>138,645</div>  |
+| app_proof | AccessAdapter<2> |  | BBE4MUL | 0 | <span style="color: green">(-506 [-0.2%])</span> <div style='text-align: right'>234,124</div>  |
+| app_proof | AccessAdapter<4> |  | BBE4MUL | 0 | <span style="color: green">(-299 [-0.2%])</span> <div style='text-align: right'>138,346</div>  |
 | app_proof | AccessAdapter<8> |  | BBE4MUL | 0 | <div style='text-align: right'>34,221</div>  |
 | app_proof | Boundary |  | BBE4MUL | 0 | <div style='text-align: right'>80,520</div>  |
 | app_proof | Merkle |  | BBE4MUL | 0 | <div style='text-align: right'>31,424</div>  |
@@ -201,7 +201,7 @@
 | app_proof | AccessAdapter<2> |  | FRI_REDUCED_OPENING | 0 | <div style='text-align: right'>151,580</div>  |
 | app_proof | AccessAdapter<4> |  | FRI_REDUCED_OPENING | 0 | <div style='text-align: right'>89,570</div>  |
 | app_proof | FriReducedOpeningAir |  | FRI_REDUCED_OPENING | 0 | <div style='text-align: right'>9,262,848</div>  |
-| app_proof | <JalNativeAdapterAir,JalCoreAir> |  | JAL | 0 | <span style="color: red">(+16,480 [+2.3%])</span> <div style='text-align: right'>744,950</div>  |
+| app_proof | <JalNativeAdapterAir,JalCoreAir> |  | JAL | 0 | <span style="color: green">(-16,480 [-2.2%])</span> <div style='text-align: right'>728,470</div>  |
 | app_proof | AccessAdapter<2> |  | JAL | 0 | <div style='text-align: right'>418</div>  |
 | app_proof | AccessAdapter<4> |  | JAL | 0 | <div style='text-align: right'>494</div>  |
 | app_proof | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> |  | LOADW | 0 | <div style='text-align: right'>6,278,412</div>  |
@@ -247,8 +247,8 @@
 
 | group | execute_time_ms | fri.log_blowup | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| app_proof | <span style="color: red">(+1.0 [+0.1%])</span> <div style='text-align: right'>970.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <span style="color: red">(+18,090 [+0.0%])</span> <div style='text-align: right'>461,446,757</div>  | <span style="color: red">(+1,648 [+0.0%])</span> <div style='text-align: right'>5,009,615</div>  | <span style="color: red">(+260.0 [+1.0%])</span> <div style='text-align: right'>27,010.0</div>  |
-| leaf_aggregation |  | <div style='text-align: right'>2</div>  |  |  |  | <span style="color: red">(+38.0 [+0.2%])</span> <div style='text-align: right'>16,228.0</div>  |
+| app_proof | <span style="color: green">(-12.0 [-1.2%])</span> <div style='text-align: right'>958.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-18,090 [-0.0%])</span> <div style='text-align: right'>461,428,667</div>  | <span style="color: green">(-1,648 [-0.0%])</span> <div style='text-align: right'>5,007,967</div>  | <span style="color: green">(-246.0 [-0.9%])</span> <div style='text-align: right'>26,764.0</div>  |
+| leaf_aggregation |  | <div style='text-align: right'>2</div>  |  |  |  | <span style="color: green">(-68.0 [-0.4%])</span> <div style='text-align: right'>16,160.0</div>  |
 
 | group | air_name | segment | cells | constraints | interactions | main_cols | perm_cols | prep_cols | quotient_deg | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -299,7 +299,7 @@
 
 | segment | trace_gen_time_ms |
 | --- | --- |
-| 0 | <span style="color: green">(-4.0 [-1.6%])</span> <div style='text-align: right'>253.0</div>  |
+| 0 | <span style="color: red">(+8.0 [+3.2%])</span> <div style='text-align: right'>261.0</div>  |
 
 </details>
 
@@ -327,4 +327,4 @@ Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12263798777)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12263801923)
