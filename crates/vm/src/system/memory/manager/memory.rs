@@ -240,7 +240,7 @@ impl<F: PrimeField32> Memory<F> {
         records: &mut Vec<AccessAdapterRecord<F>>,
     ) {
         let (original_ptr, original_size, original_timestamp) =
-            self.block_containing_start(address_space, query);
+            self.block_containing(address_space, query);
         if original_ptr == query {
             return;
         }
@@ -371,11 +371,7 @@ impl<F: PrimeField32> Memory<F> {
     }
 
     // Returns (pointer, size, timestamp) of the block containing the start of the given pointer.
-    fn block_containing_start(
-        &mut self,
-        address_space: usize,
-        pointer: usize,
-    ) -> (usize, usize, u32) {
+    fn block_containing(&mut self, address_space: usize, pointer: usize) -> (usize, usize, u32) {
         // Look for the block with the largest key <= (address_space, pointer)
         let key = (address_space, pointer);
 
@@ -440,10 +436,10 @@ mod tests {
         type F = BabyBear;
 
         let mut partition = Memory::<F>::new(&Equipartition::<F, 8>::new());
-        assert_eq!(partition.block_containing_start(0, 13), (8, 8, 0));
-        assert_eq!(partition.block_containing_start(0, 8), (8, 8, 0));
-        assert_eq!(partition.block_containing_start(0, 15), (8, 8, 0));
-        assert_eq!(partition.block_containing_start(0, 16), (16, 8, 0));
+        assert_eq!(partition.block_containing(0, 13), (8, 8, 0));
+        assert_eq!(partition.block_containing(0, 8), (8, 8, 0));
+        assert_eq!(partition.block_containing(0, 15), (8, 8, 0));
+        assert_eq!(partition.block_containing(0, 16), (16, 8, 0));
     }
 
     #[test]
