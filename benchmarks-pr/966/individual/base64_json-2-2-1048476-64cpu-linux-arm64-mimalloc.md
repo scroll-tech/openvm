@@ -1,7 +1,7 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| base64_json_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>15,116,803</div>  | <div style='text-align: right'>217,347</div>  | <span style="color: green">(-1,994.0 [-75.0%])</span> <div style='text-align: right'>663.0</div>  |
-| app_proof | <div style='text-align: right'>2</div>  |  |  | <div style='text-align: right'>2,103.0</div>  |
+| base64_json_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>15,116,803</div>  | <div style='text-align: right'>217,347</div>  | <span style="color: green">(-1,990.0 [-74.9%])</span> <div style='text-align: right'>667.0</div>  |
+| app_proof | <div style='text-align: right'>2</div>  |  |  | <div style='text-align: right'>2,090.0</div>  |
 
 
 <details>
@@ -9,8 +9,8 @@
 
 | group | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| base64_json_program | <span style="color: red">(+2.0 [+15.4%])</span> <div style='text-align: right'>15.0</div>  | <span style="color: green">(-6.0 [-1.2%])</span> <div style='text-align: right'>492.0</div>  | <span style="color: red">(+1,152.0 [+360.0%])</span> <div style='text-align: right'>1,472.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+74,534.0 [+31185.8%])</span> <div style='text-align: right'>74,773.0</div>  |  | <div style='text-align: right'>15,116,803</div>  | <div style='text-align: right'>217,347</div>  | <span style="color: green">(-1,994.0 [-75.0%])</span> <div style='text-align: right'>663.0</div>  |
-| app_proof |  |  | <div style='text-align: right'>301.0</div>  | <div style='text-align: right'>2</div>  |  | <div style='text-align: right'>1</div>  |  |  | <div style='text-align: right'>2,103.0</div>  |
+| base64_json_program | <span style="color: red">(+3.0 [+23.1%])</span> <div style='text-align: right'>16.0</div>  | <span style="color: green">(-2.0 [-0.4%])</span> <div style='text-align: right'>496.0</div>  | <span style="color: red">(+1,143.0 [+357.2%])</span> <div style='text-align: right'>1,463.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+74,390.0 [+31125.5%])</span> <div style='text-align: right'>74,629.0</div>  |  | <div style='text-align: right'>15,116,803</div>  | <div style='text-align: right'>217,347</div>  | <span style="color: green">(-1,990.0 [-74.9%])</span> <div style='text-align: right'>667.0</div>  |
+| app_proof |  |  | <div style='text-align: right'>320.0</div>  | <div style='text-align: right'>2</div>  |  | <div style='text-align: right'>1</div>  |  |  | <div style='text-align: right'>2,090.0</div>  |
 
 | group | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- | --- |
@@ -195,7 +195,7 @@
 
 | group | segment | execute_and_trace_gen_time_ms | stark_prove_excluding_trace_time_ms | total_cells |
 | --- | --- | --- | --- | --- |
-| app_proof | 0 | <div style='text-align: right'>171.0</div>  | <div style='text-align: right'>1,932.0</div>  | <div style='text-align: right'>50,533,140</div>  |
+| app_proof | 0 | <div style='text-align: right'>167.0</div>  | <div style='text-align: right'>1,923.0</div>  | <div style='text-align: right'>50,533,140</div>  |
 | base64_json_program | 0 | <span style="color: green">(-2.0 [-1.2%])</span> <div style='text-align: right'>171.0</div>  |  |  |
 
 </details>
@@ -205,18 +205,18 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/44c469030ecc074a5dd998b90d586639c4767436/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/44c469030ecc074a5dd998b90d586639c4767436/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/44c469030ecc074a5dd998b90d586639c4767436/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/44c469030ecc074a5dd998b90d586639c4767436/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/44c469030ecc074a5dd998b90d586639c4767436/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/44c469030ecc074a5dd998b90d586639c4767436/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/44c469030ecc074a5dd998b90d586639c4767436/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/44c469030ecc074a5dd998b90d586639c4767436/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.frequency.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/44c469030ecc074a5dd998b90d586639c4767436/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-base64_json_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/44c469030ecc074a5dd998b90d586639c4767436/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-base64_json_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/44c469030ecc074a5dd998b90d586639c4767436/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-base64_json_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/44c469030ecc074a5dd998b90d586639c4767436/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-base64_json_program.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/44c469030ecc074a5dd998b90d586639c4767436/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-base64_json_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/44c469030ecc074a5dd998b90d586639c4767436/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-base64_json_program.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/44c469030ecc074a5dd998b90d586639c4767436/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-base64_json_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/44c469030ecc074a5dd998b90d586639c4767436/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-base64_json_program.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/77bd1530aedaa557cc065c8ed522aee9188814b0/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/77bd1530aedaa557cc065c8ed522aee9188814b0/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/77bd1530aedaa557cc065c8ed522aee9188814b0/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/77bd1530aedaa557cc065c8ed522aee9188814b0/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/77bd1530aedaa557cc065c8ed522aee9188814b0/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/77bd1530aedaa557cc065c8ed522aee9188814b0/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/77bd1530aedaa557cc065c8ed522aee9188814b0/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/77bd1530aedaa557cc065c8ed522aee9188814b0/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/77bd1530aedaa557cc065c8ed522aee9188814b0/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-base64_json_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/77bd1530aedaa557cc065c8ed522aee9188814b0/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-base64_json_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/77bd1530aedaa557cc065c8ed522aee9188814b0/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-base64_json_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/77bd1530aedaa557cc065c8ed522aee9188814b0/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-base64_json_program.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/77bd1530aedaa557cc065c8ed522aee9188814b0/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-base64_json_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/77bd1530aedaa557cc065c8ed522aee9188814b0/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-base64_json_program.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/77bd1530aedaa557cc065c8ed522aee9188814b0/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-base64_json_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/77bd1530aedaa557cc065c8ed522aee9188814b0/base64_json-2-2-1048476-64cpu-linux-arm64-mimalloc-base64_json_program.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/44c469030ecc074a5dd998b90d586639c4767436
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/77bd1530aedaa557cc065c8ed522aee9188814b0
 
 Max Segment Length: 1048476
 
@@ -224,4 +224,4 @@ Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12246948915)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12247376050)
