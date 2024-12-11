@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| app_proof | <div style='text-align: right'>2</div>  | <div style='text-align: right'>48,127,147</div>  | <div style='text-align: right'>198,582</div>  | <div style='text-align: right'>2,904.0</div>  |
+| app_proof | <div style='text-align: right'>2</div>  | <div style='text-align: right'>48,127,147</div>  | <div style='text-align: right'>198,582</div>  | <div style='text-align: right'>2,899.0</div>  |
 
 
 <details>
@@ -28,11 +28,11 @@
 
 | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms | stark_prove_excluding_trace_time_ms | total_cells | verify_program_compile_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| <div style='text-align: right'>9.0</div>  | <div style='text-align: right'>1,709.0</div>  | <div style='text-align: right'>619.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>349.0</div>  | <div style='text-align: right'>12.0</div>  | <div style='text-align: right'>32</div>  | <div style='text-align: right'>15.0</div>  |
+| <div style='text-align: right'>9.0</div>  | <div style='text-align: right'>1,710.0</div>  | <div style='text-align: right'>616.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>351.0</div>  | <div style='text-align: right'>12.0</div>  | <div style='text-align: right'>32</div>  | <div style='text-align: right'>15.0</div>  |
 
 | group | segment | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_cycles | trace_gen_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| app_proof | 0 | <div style='text-align: right'>2,904.0</div>  | <div style='text-align: right'>107,769,880</div>  | <div style='text-align: right'>48,127,147</div>  | <div style='text-align: right'>198,582</div>  | <div style='text-align: right'>1,081.0</div>  |
+| app_proof | 0 | <div style='text-align: right'>2,899.0</div>  | <div style='text-align: right'>107,769,880</div>  | <div style='text-align: right'>48,127,147</div>  | <div style='text-align: right'>198,582</div>  | <div style='text-align: right'>1,085.0</div>  |
 
 | group | chip_name | segment | rows_used |
 | --- | --- | --- | --- |
@@ -161,7 +161,7 @@
 
 | group | execute_time_ms | fri.log_blowup | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| app_proof | <div style='text-align: right'>595.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>48,127,147</div>  | <div style='text-align: right'>198,582</div>  | <div style='text-align: right'>2,904.0</div>  |
+| app_proof | <div style='text-align: right'>598.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>48,127,147</div>  | <div style='text-align: right'>198,582</div>  | <div style='text-align: right'>2,899.0</div>  |
 
 | group | air_name | segment | cells | main_cols | perm_cols | prep_cols | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -184,7 +184,7 @@
 
 | segment | trace_gen_time_ms |
 | --- | --- |
-| 0 | <div style='text-align: right'>1,089.0</div>  |
+| 0 | <div style='text-align: right'>1,093.0</div>  |
 
 </details>
 
@@ -193,14 +193,14 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0e4b6e101eb7cf6bcaba09cee53b99ad56fc8fc8/verify_fibair-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-app_proof.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0e4b6e101eb7cf6bcaba09cee53b99ad56fc8fc8/verify_fibair-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-app_proof.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0e4b6e101eb7cf6bcaba09cee53b99ad56fc8fc8/verify_fibair-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-app_proof.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0e4b6e101eb7cf6bcaba09cee53b99ad56fc8fc8/verify_fibair-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-app_proof.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0e4b6e101eb7cf6bcaba09cee53b99ad56fc8fc8/verify_fibair-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-app_proof.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0e4b6e101eb7cf6bcaba09cee53b99ad56fc8fc8/verify_fibair-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-app_proof.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0e4b6e101eb7cf6bcaba09cee53b99ad56fc8fc8/verify_fibair-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-app_proof.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/0e4b6e101eb7cf6bcaba09cee53b99ad56fc8fc8/verify_fibair-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-app_proof.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/82fb69edad50b69e71fd0aa982b5854ac7ebddda/verify_fibair-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-app_proof.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/82fb69edad50b69e71fd0aa982b5854ac7ebddda/verify_fibair-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-app_proof.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/82fb69edad50b69e71fd0aa982b5854ac7ebddda/verify_fibair-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-app_proof.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/82fb69edad50b69e71fd0aa982b5854ac7ebddda/verify_fibair-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-app_proof.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/82fb69edad50b69e71fd0aa982b5854ac7ebddda/verify_fibair-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-app_proof.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/82fb69edad50b69e71fd0aa982b5854ac7ebddda/verify_fibair-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-app_proof.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/82fb69edad50b69e71fd0aa982b5854ac7ebddda/verify_fibair-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-app_proof.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/82fb69edad50b69e71fd0aa982b5854ac7ebddda/verify_fibair-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-app_proof.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/0e4b6e101eb7cf6bcaba09cee53b99ad56fc8fc8
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/82fb69edad50b69e71fd0aa982b5854ac7ebddda
 
 Max Segment Length: 1048476
 
@@ -208,4 +208,4 @@ Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12272895954)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12282325795)
