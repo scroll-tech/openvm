@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| app_proof | <div style='text-align: right'>2</div>  | <div style='text-align: right'>51,644,981</div>  | <div style='text-align: right'>1,500,219</div>  | <div style='text-align: right'>5,799.0</div>  |
+| app_proof | <div style='text-align: right'>2</div>  | <div style='text-align: right'>51,647,355</div>  | <div style='text-align: right'>1,500,219</div>  | <div style='text-align: right'>5,162.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms |
 | --- | --- | --- | --- | --- |
-| <div style='text-align: right'>6.0</div>  | <div style='text-align: right'>986.0</div>  | <div style='text-align: right'>812.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>518.0</div>  |
+| <div style='text-align: right'>5.0</div>  | <div style='text-align: right'>1,213.0</div>  | <div style='text-align: right'>957.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>488.0</div>  |
 
 | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- |
@@ -44,15 +44,15 @@
 
 | group | segment | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_cycles | trace_gen_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| app_proof | 0 | <div style='text-align: right'>5,799.0</div>  | <div style='text-align: right'>197,775,316</div>  | <div style='text-align: right'>51,644,981</div>  | <div style='text-align: right'>1,500,219</div>  | <div style='text-align: right'>168.0</div>  |
+| app_proof | 0 | <div style='text-align: right'>5,162.0</div>  | <div style='text-align: right'>197,775,316</div>  | <div style='text-align: right'>51,647,355</div>  | <div style='text-align: right'>1,500,219</div>  | <div style='text-align: right'>233.0</div>  |
 
 | group | chip_name | segment | rows_used |
 | --- | --- | --- | --- |
 | app_proof | ProgramChip | 0 | <div style='text-align: right'>5,874</div>  |
 | app_proof | VmConnectorAir | 0 | <div style='text-align: right'>2</div>  |
-| app_proof | Boundary | 0 | <div style='text-align: right'>54</div>  |
-| app_proof | Merkle | 0 | <div style='text-align: right'>308</div>  |
-| app_proof | AccessAdapter<8> | 0 | <div style='text-align: right'>54</div>  |
+| app_proof | Boundary | 0 | <div style='text-align: right'>56</div>  |
+| app_proof | Merkle | 0 | <div style='text-align: right'>310</div>  |
+| app_proof | AccessAdapter<8> | 0 | <div style='text-align: right'>56</div>  |
 | app_proof | <Rv32HintStoreAdapterAir,Rv32HintStoreCoreAir> | 0 | <div style='text-align: right'>3</div>  |
 | app_proof | RangeTupleCheckerAir<2> | 0 | <div style='text-align: right'>524,288</div>  |
 | app_proof | <Rv32RdWriteAdapterAir,Rv32AuipcCoreAir> | 0 | <div style='text-align: right'>11</div>  |
@@ -66,7 +66,7 @@
 | app_proof | <Rv32BaseAluAdapterAir,BaseAluCoreAir<4, 8>> | 0 | <div style='text-align: right'>900,085</div>  |
 | app_proof | BitwiseOperationLookupAir<8> | 0 | <div style='text-align: right'>65,536</div>  |
 | app_proof | PhantomAir | 0 | <div style='text-align: right'>3</div>  |
-| app_proof | Poseidon2VmAir<BabyBearParameters> | 0 | <div style='text-align: right'>362</div>  |
+| app_proof | Poseidon2VmAir<BabyBearParameters> | 0 | <div style='text-align: right'>366</div>  |
 | app_proof | VariableRangeCheckerAir | 0 | <div style='text-align: right'>262,144</div>  |
 
 | group | dsl_ir | opcode | segment | frequency |
@@ -112,9 +112,9 @@
 | app_proof | <Rv32BranchAdapterAir,BranchLessThanCoreAir<4, 8>> |  | BLTU | 0 | <div style='text-align: right'>224</div>  |
 | app_proof | <Rv32BranchAdapterAir,BranchEqualCoreAir<4>> |  | BNE | 0 | <div style='text-align: right'>2,600,182</div>  |
 | app_proof | <Rv32HintStoreAdapterAir,Rv32HintStoreCoreAir> |  | HINT_STOREW | 0 | <div style='text-align: right'>78</div>  |
-| app_proof | AccessAdapter<8> |  | HINT_STOREW | 0 | <div style='text-align: right'>17</div>  |
-| app_proof | Boundary |  | HINT_STOREW | 0 | <div style='text-align: right'>40</div>  |
-| app_proof | Merkle |  | HINT_STOREW | 0 | <div style='text-align: right'>64</div>  |
+| app_proof | AccessAdapter<8> |  | HINT_STOREW | 0 | <div style='text-align: right'>34</div>  |
+| app_proof | Boundary |  | HINT_STOREW | 0 | <div style='text-align: right'>80</div>  |
+| app_proof | Merkle |  | HINT_STOREW | 0 | <div style='text-align: right'>128</div>  |
 | app_proof | <Rv32CondRdWriteAdapterAir,Rv32JalLuiCoreAir> |  | JAL | 0 | <div style='text-align: right'>1,800,036</div>  |
 | app_proof | <Rv32JalrAdapterAir,Rv32JalrCoreAir> |  | JALR | 0 | <div style='text-align: right'>476</div>  |
 | app_proof | <Rv32LoadStoreAdapterAir,LoadStoreCoreAir<4>> |  | LOADBU | 0 | <div style='text-align: right'>240</div>  |
@@ -143,7 +143,7 @@
 
 | group | execute_time_ms | fri.log_blowup | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| app_proof | <div style='text-align: right'>828.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>51,644,981</div>  | <div style='text-align: right'>1,500,219</div>  | <div style='text-align: right'>5,799.0</div>  |
+| app_proof | <div style='text-align: right'>949.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>51,647,355</div>  | <div style='text-align: right'>1,500,219</div>  | <div style='text-align: right'>5,162.0</div>  |
 
 | group | air_name | segment | cells | main_cols | perm_cols | prep_cols | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -170,7 +170,7 @@
 
 | segment | trace_gen_time_ms |
 | --- | --- |
-| 0 | <div style='text-align: right'>173.0</div>  |
+| 0 | <div style='text-align: right'>255.0</div>  |
 
 </details>
 
@@ -190,8 +190,8 @@ Commit: https://github.com/axiom-crypto/afs-prototype/commit/0e4b6e101eb7cf6bcab
 
 Max Segment Length: 1048476
 
-Instance Type: 64cpu-linux-x64
+Instance Type: 64cpu-linux-arm64
 
-Memory Allocator: jemalloc
+Memory Allocator: mimalloc
 
 [Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12272895954)
