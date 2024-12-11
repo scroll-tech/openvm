@@ -75,7 +75,7 @@ type Address = (usize, usize);
 
 #[derive(Debug)]
 pub struct Memory<F> {
-    ts_map: BTreeMap<Address, (usize, u32)>,
+    pub ts_map: BTreeMap<Address, (usize, u32)>,
     data: FxHashMap<Address, F>,
     initial_block_size: usize,
     timestamp: u32,
@@ -626,8 +626,8 @@ impl<F: PrimeField32> Memory<F> {
         add_right: bool,
     ) -> Vec<(usize, usize, u32)> {
         //println!(
-        //    "SPLIT start_ptr: {:?} split_ptr: {:?} end_ptr: {:?}",
-        //    start_ptr, split_ptr, end_ptr
+        //    "SPLIT start_ptr: {:?} split_ptr: {:?} end_ptr: {:?} add_left: {:?} add_right: {:?}",
+        //    start_ptr, split_ptr, end_ptr, add_left, add_right
         //);
         assert!(start_ptr <= split_ptr && split_ptr <= end_ptr);
         assert!((end_ptr - start_ptr).is_power_of_two());
@@ -652,7 +652,7 @@ impl<F: PrimeField32> Memory<F> {
                     new_entries.push((start_ptr, mid_ptr - start_ptr, start_ts));
                 }
                 start_ptr = mid_ptr;
-            } else {
+            } else if mid_ptr > split_ptr {
                 if add_right {
                     self.ts_map
                         .insert((address_space, mid_ptr), (end_ptr - mid_ptr, start_ts));
@@ -660,9 +660,26 @@ impl<F: PrimeField32> Memory<F> {
                     new_entries.push((mid_ptr, end_ptr - mid_ptr, start_ts));
                 }
                 end_ptr = mid_ptr;
+            } else {
+                // in this case mid_ptr == split_ptr
+                if add_left {
+                    self.ts_map
+                        .insert((address_space, start_ptr), (mid_ptr - start_ptr, start_ts));
+                } else {
+                    new_entries.push((start_ptr, end_ptr - start_ptr, start_ts));
+                }
+                if add_right {
+                    self.ts_map
+                        .insert((address_space, mid_ptr), (end_ptr - mid_ptr, start_ts));
+                } else {
+                    new_entries.push((mid_ptr, end_ptr - mid_ptr, start_ts));
+                }
+                break;
             }
         }
         new_entries.sort_by_key(|&(ptr, _, _)| ptr);
+        //println!("new_entries: {:?}", new_entries);
+        //println!("ts_map: {:?}", self.ts_map);
         new_entries
     }
 
@@ -827,6 +844,22 @@ mod tests {
         assert_eq!(partition.block_containing(0, 16), (16, 8, 0));
     }
     */
+
+    #[test]
+    fn test_misalign() {
+        let initial_memory = Equipartition::<BabyBear, 8>::new();
+        let mut memory = Memory::<BabyBear>::new(&initial_memory);
+        let address_space = 1;
+
+        memory.write(address_space, 0, bba![1, 2, 3, 4]);
+        println!("111 {:?}", memory.ts_map);
+        memory.read::<16>(address_space, 6);
+        println!("222 {:?}", memory.ts_map);
+        memory.read::<8>(address_space, 2);
+        println!("333 {:?}", memory.ts_map);
+
+        let (memory, records) = memory.finalize::<8>();
+    }
 
     #[test]
     fn test_write_read_initial_block_len_1() {
