@@ -1,6 +1,6 @@
 | group | average_cells_used | average_cycles | average_proof_time_ms | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| ecrecover_program | <div style='text-align: right'>10,567,808.0</div>  | <div style='text-align: right'>106,444.0</div>  | <div style='text-align: right'>1,945.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <div style='text-align: right'>1,945.0</div>  |
+| ecrecover_program | <div style='text-align: right'>10,567,808.0</div>  | <div style='text-align: right'>106,444.0</div>  | <div style='text-align: right'>1,790.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <div style='text-align: right'>1,790.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms |
 | --- | --- | --- | --- | --- |
-| <div style='text-align: right'>6.0</div>  | <div style='text-align: right'>347.0</div>  | <div style='text-align: right'>244.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>76,408.0</div>  |
+| <div style='text-align: right'>5.0</div>  | <div style='text-align: right'>346.0</div>  | <div style='text-align: right'>248.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>76,279.0</div>  |
 
 | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- |
@@ -50,7 +50,7 @@
 
 | group | segment | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_cycles | trace_gen_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| ecrecover_program | 0 | <div style='text-align: right'>1,945.0</div>  | <div style='text-align: right'>35,713,167</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <div style='text-align: right'>99.0</div>  |
+| ecrecover_program | 0 | <div style='text-align: right'>1,790.0</div>  | <div style='text-align: right'>35,713,167</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <div style='text-align: right'>101.0</div>  |
 
 | group | chip_name | segment | rows_used |
 | --- | --- | --- | --- |
@@ -218,7 +218,7 @@
 
 | group | average_cells_used | average_cycles | average_proof_time_ms | execute_time_ms | fri.log_blowup | num_segments_or_nodes | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| ecrecover_program | <div style='text-align: right'>10,567,808.0</div>  | <div style='text-align: right'>106,444.0</div>  | <div style='text-align: right'>1,945.0</div>  | <div style='text-align: right'>249.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <div style='text-align: right'>1,945.0</div>  |
+| ecrecover_program | <div style='text-align: right'>10,567,808.0</div>  | <div style='text-align: right'>106,444.0</div>  | <div style='text-align: right'>1,790.0</div>  | <div style='text-align: right'>247.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <div style='text-align: right'>1,790.0</div>  |
 
 | group | air_name | segment | cells | main_cols | perm_cols | prep_cols | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -256,7 +256,7 @@
 
 | segment | trace_gen_time_ms |
 | --- | --- |
-| 0 | <div style='text-align: right'>101.0</div>  |
+| 0 | <div style='text-align: right'>97.0</div>  |
 
 </details>
 
@@ -265,14 +265,14 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/609391c41a5c8e6db8b17622c759831fdce7a792/ecrecover-4ba0e7951fb856f6b7e84dae187866bcec0ba2a5f7a0b7da8183c493bc852cc1-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/609391c41a5c8e6db8b17622c759831fdce7a792/ecrecover-4ba0e7951fb856f6b7e84dae187866bcec0ba2a5f7a0b7da8183c493bc852cc1-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/609391c41a5c8e6db8b17622c759831fdce7a792/ecrecover-4ba0e7951fb856f6b7e84dae187866bcec0ba2a5f7a0b7da8183c493bc852cc1-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/609391c41a5c8e6db8b17622c759831fdce7a792/ecrecover-4ba0e7951fb856f6b7e84dae187866bcec0ba2a5f7a0b7da8183c493bc852cc1-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/609391c41a5c8e6db8b17622c759831fdce7a792/ecrecover-4ba0e7951fb856f6b7e84dae187866bcec0ba2a5f7a0b7da8183c493bc852cc1-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/609391c41a5c8e6db8b17622c759831fdce7a792/ecrecover-4ba0e7951fb856f6b7e84dae187866bcec0ba2a5f7a0b7da8183c493bc852cc1-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/609391c41a5c8e6db8b17622c759831fdce7a792/ecrecover-4ba0e7951fb856f6b7e84dae187866bcec0ba2a5f7a0b7da8183c493bc852cc1-ecrecover_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/609391c41a5c8e6db8b17622c759831fdce7a792/ecrecover-4ba0e7951fb856f6b7e84dae187866bcec0ba2a5f7a0b7da8183c493bc852cc1-ecrecover_program.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/51b31ce3e59cf143caefbde5971d7cf0d958aeab/ecrecover-4ba0e7951fb856f6b7e84dae187866bcec0ba2a5f7a0b7da8183c493bc852cc1-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/51b31ce3e59cf143caefbde5971d7cf0d958aeab/ecrecover-4ba0e7951fb856f6b7e84dae187866bcec0ba2a5f7a0b7da8183c493bc852cc1-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/51b31ce3e59cf143caefbde5971d7cf0d958aeab/ecrecover-4ba0e7951fb856f6b7e84dae187866bcec0ba2a5f7a0b7da8183c493bc852cc1-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/51b31ce3e59cf143caefbde5971d7cf0d958aeab/ecrecover-4ba0e7951fb856f6b7e84dae187866bcec0ba2a5f7a0b7da8183c493bc852cc1-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/51b31ce3e59cf143caefbde5971d7cf0d958aeab/ecrecover-4ba0e7951fb856f6b7e84dae187866bcec0ba2a5f7a0b7da8183c493bc852cc1-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/51b31ce3e59cf143caefbde5971d7cf0d958aeab/ecrecover-4ba0e7951fb856f6b7e84dae187866bcec0ba2a5f7a0b7da8183c493bc852cc1-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/51b31ce3e59cf143caefbde5971d7cf0d958aeab/ecrecover-4ba0e7951fb856f6b7e84dae187866bcec0ba2a5f7a0b7da8183c493bc852cc1-ecrecover_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/51b31ce3e59cf143caefbde5971d7cf0d958aeab/ecrecover-4ba0e7951fb856f6b7e84dae187866bcec0ba2a5f7a0b7da8183c493bc852cc1-ecrecover_program.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/609391c41a5c8e6db8b17622c759831fdce7a792
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/51b31ce3e59cf143caefbde5971d7cf0d958aeab
 
 Max Segment Length: 1048476
 
@@ -280,4 +280,4 @@ Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12285912924)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12286235910)
