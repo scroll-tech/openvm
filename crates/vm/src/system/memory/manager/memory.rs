@@ -75,7 +75,7 @@ type Address = (usize, usize);
 
 #[derive(Debug)]
 pub struct Memory<F> {
-    ts_map: BTreeMap<Address, u32>,
+    ts_map: BTreeMap<Address, (usize, u32)>,
     data: FxHashMap<Address, F>,
     initial_block_size: usize,
     timestamp: u32,
@@ -93,7 +93,7 @@ impl<F: PrimeField32> Memory<F> {
         for (&(address_space, block_idx), values) in initial_memory {
             let address_space_usize = address_space.as_canonical_u32() as usize;
             let pointer = block_idx * N;
-            ts_map.insert((address_space_usize, pointer), INITIAL_TIMESTAMP);
+            ts_map.insert((address_space_usize, pointer), (N, INITIAL_TIMESTAMP));
             for (i, value) in values.iter().enumerate() {
                 data.insert((address_space_usize, pointer + i), *value);
             }
@@ -194,12 +194,14 @@ impl<F: PrimeField32> Memory<F> {
 
         // First make sure the partition we maintain in self.blocks is an equipartition.
         let mut left = Unbounded;
-        let mut range = self.ts_map.range((left, Unbounded)).peekable();
-        while range.peek().is_some() {
-            let (&(address_space, pointer), &ts) = range.next().unwrap();
-            let next = range.peek();
+        let mut range = self.ts_map.range((left, Unbounded));
+        while let Some((&(address_space, pointer), &(size, ts))) = range.next() {
             let aligned_pointer = (pointer / N) * N;
-            if aligned_pointer != pointer || (next.is_some() && next.unwrap().0 .1 - pointer != N) {
+            println!(
+                "FINALIZE left: {:?} aligned_pointer: {:?} address_space: {:?} pointer: {:?} size: {:?} ts: {:?}",
+                left, aligned_pointer, address_space, pointer, size, ts
+            );
+            if aligned_pointer != pointer || size != N {
                 self.access(
                     address_space,
                     aligned_pointer,
@@ -209,11 +211,11 @@ impl<F: PrimeField32> Memory<F> {
                 );
             }
             left = Included((address_space, aligned_pointer + N));
-            range = self.ts_map.range((left, Unbounded)).peekable();
+            range = self.ts_map.range((left, Unbounded));
         }
 
         let mut equipartition = TimestampedEquipartition::<F, N>::new();
-        for (&(address_space, pointer), &ts) in self.ts_map.iter() {
+        for (&(address_space, pointer), &(_, ts)) in self.ts_map.iter() {
             debug_assert_eq!(pointer % N, 0);
 
             equipartition.insert(
@@ -225,6 +227,8 @@ impl<F: PrimeField32> Memory<F> {
             );
         }
 
+        println!("equipartition: {:?}", equipartition);
+        println!("adapter_records: {:?}", adapter_records);
         (equipartition, adapter_records)
     }
 
@@ -237,52 +241,174 @@ impl<F: PrimeField32> Memory<F> {
         records: &mut Vec<AccessAdapterRecord<F>>,
         new_ts: Option<u32>,
     ) -> u32 {
-        let mut rem_ptrs: Vec<(usize, u32)> = vec![];
+        println!(
+            "ACCESS address_space: {:?} pointer: {:?} size: {:?}",
+            address_space, pointer, size
+        );
+        let mut raw_rem_ptrs: Vec<(usize, usize, u32)> = vec![];
 
         // contains all pointers in the range (pointer, pointer + size)
-        let range = self.ts_map.range((
-            Excluded((address_space, pointer)),
-            Excluded((address_space, pointer + size)),
-        ));
+        let range = self
+            .ts_map
+            .range((
+                Excluded((address_space, pointer)),
+                Excluded((address_space, pointer + size)),
+            ))
+            .peekable();
 
+        for (val, &(size, ts)) in range {
+            raw_rem_ptrs.push((val.1, size, ts));
+        }
+        println!("raw_rem_ptrs: {:?}", raw_rem_ptrs);
+
+        // contains the start of the largest block starting <= pointer
         let mut lower_range = self
             .ts_map
             .range((Unbounded, Included((address_space, pointer))));
-        let (prev_ptr, prev_ts) = lower_range.next_back().map_or_else(
-            || {
-                (
-                    (pointer / self.initial_block_size) * self.initial_block_size,
-                    INITIAL_TIMESTAMP,
-                )
-            },
-            |(key, &ts)| (key.1, ts),
-        );
+        let (prev_ptr, prev_ts, prev_size, is_lower_initialized) =
+            lower_range.next_back().map_or_else(
+                || {
+                    (
+                        (pointer / self.initial_block_size) * self.initial_block_size,
+                        INITIAL_TIMESTAMP,
+                        self.initial_block_size,
+                        false,
+                    )
+                },
+                |(key, &(size, ts))| {
+                    println!("KEY LOW {:?}", key);
+                    if key.0 != address_space
+                        || key.1 + size
+                            <= (pointer / self.initial_block_size) * self.initial_block_size
+                    {
+                        (
+                            (pointer / self.initial_block_size) * self.initial_block_size,
+                            INITIAL_TIMESTAMP,
+                            self.initial_block_size,
+                            false,
+                        )
+                    } else {
+                        (key.1, ts, size, true)
+                    }
+                },
+            );
 
+        // contains the start of the smallest block starting >= pointer + size
         let mut upper_range = self
             .ts_map
             .range((Included((address_space, pointer + size)), Unbounded));
-        let (next_ptr, _) = upper_range.next().map_or_else(
+        let next_start = ((pointer + size + self.initial_block_size - 1) / self.initial_block_size)
+            * self.initial_block_size;
+        let initial_start = if let Some((last_ptr, last_size, ts)) = raw_rem_ptrs.last() {
+            println!(
+                "AAAAA last_ptr: {:?} last_size: {:?} next_start: {:?}",
+                last_ptr, last_size, next_start
+            );
+            max(last_ptr + last_size, next_start)
+        } else {
+            println!(
+                "AAAAA prev_ptr: {:?} prev_size: {:?} next_start: {:?}",
+                prev_ptr, prev_size, next_start
+            );
+            max(prev_ptr + prev_size, next_start)
+        };
+        let (next_ptr, _, next_size, is_upper_initialized) = upper_range.next().map_or_else(
             || {
                 (
-                    // round up to the nearest multiple of self.initial_block_size
-                    ((pointer + size + self.initial_block_size - 1) / self.initial_block_size)
-                        * self.initial_block_size,
+                    initial_start,
                     INITIAL_TIMESTAMP,
+                    self.initial_block_size,
+                    false,
                 )
             },
-            |(key, &ts)| (key.1, ts),
+            |(key, &(new_size, new_ts))| {
+                println!(
+                    "BBBBB key: {:?} new_size: {:?} new_ts: {:?}",
+                    key, new_size, new_ts
+                );
+                if key.0 != address_space || key.1 > initial_start {
+                    (
+                        initial_start,
+                        INITIAL_TIMESTAMP,
+                        self.initial_block_size,
+                        true,
+                    )
+                } else {
+                    (key.1, new_ts, new_size, true)
+                }
+            },
         );
 
-        for (val, &ts) in range {
-            rem_ptrs.push((val.1, ts));
+        if is_lower_initialized {
+            self.ts_map.remove(&(address_space, prev_ptr));
         }
-
-        self.ts_map.remove(&(address_space, prev_ptr));
-        for (ptr, _) in &rem_ptrs {
+        for (ptr, _, _) in &raw_rem_ptrs {
             self.ts_map.remove(&(address_space, *ptr));
         }
 
-        let ret_ts = if rem_ptrs.len() == 0 {
+        // at this stage we know all blocks overlapping the range are:
+        //   * [prev_ptr, prev_ptr + prev_size)
+        //   * blocks in raw_rem_ptrs
+        //   * initialized blocks skipped by raw_rem_ptrs
+        // in addition, we know the next block is:
+        //   * [next_ptr, next_ptr + next_size)
+        //
+        // we now iterate over the blocks in raw_rem_ptrs and explicitly list all the blocks
+        // that are not initialized.
+        let mut rem_ptrs = vec![];
+        if prev_ptr == pointer {
+            rem_ptrs.push((prev_ptr, prev_size, prev_ts));
+        }
+        let mut running_ptr = prev_ptr + prev_size;
+        println!(
+            "ACCESS running_ptr: {:?} raw_rem_ptrs: {:?} next_ptr: {:?}",
+            running_ptr, raw_rem_ptrs, next_ptr
+        );
+        for (ptr, size, ts) in raw_rem_ptrs {
+            if running_ptr < ptr {
+                assert!(
+                    (ptr - running_ptr) % self.initial_block_size == 0,
+                    "ptr: {:?} running_ptr: {:?} initial_block_size: {:?}",
+                    ptr,
+                    running_ptr,
+                    self.initial_block_size
+                );
+                for i in 0..(ptr - running_ptr) / self.initial_block_size {
+                    rem_ptrs.push((
+                        running_ptr + i * self.initial_block_size,
+                        self.initial_block_size,
+                        INITIAL_TIMESTAMP,
+                    ));
+                }
+            }
+            rem_ptrs.push((ptr, size, ts));
+            running_ptr = ptr + size;
+        }
+
+        if running_ptr < next_ptr {
+            assert!(
+                (next_ptr - running_ptr) % self.initial_block_size == 0,
+                "next_ptr: {:?} running_ptr: {:?} initial_block_size: {:?}",
+                next_ptr,
+                running_ptr,
+                self.initial_block_size
+            );
+            for i in 0..(next_ptr - running_ptr) / self.initial_block_size {
+                rem_ptrs.push((
+                    running_ptr + i * self.initial_block_size,
+                    self.initial_block_size,
+                    INITIAL_TIMESTAMP,
+                ));
+            }
+        }
+
+        println!(
+            "ACCESS prev_ptr: {:?} prev_size: {:?} next_ptr: {:?} next_size: {:?}",
+            prev_ptr, prev_size, next_ptr, next_size
+        );
+        println!("pointer: {:?} size: {:?}", pointer, size);
+        println!("rem_ptrs: {:?}", rem_ptrs);
+        let ret_ts = if rem_ptrs.len() == 0 || (rem_ptrs.len() == 1 && prev_ptr == pointer) {
             // we need to split up a single block at the boundaries:
             // [prev_ptr, next_ptr) at [pointer, pointer + size)
             // we know that
@@ -299,27 +425,37 @@ impl<F: PrimeField32> Memory<F> {
             );
 
             self.ts_map
-                .insert((address_space, pointer), new_ts.unwrap_or(prev_ts));
+                .insert((address_space, pointer), (size, new_ts.unwrap_or(prev_ts)));
             prev_ts
         } else {
             // we need to split up the blocks at the boundaries:
             // [prev_ptr, rem_ptrs[0]) at pointer
             // [rem_ptrs[-1], next_ptr) at pointer + size
 
-            let mut left_split = self.split(
-                address_space,
-                prev_ptr,
-                prev_ts,
-                rem_ptrs[1].0,
-                pointer,
-                records,
-                true,
-                false,
+            let mut left_split = if prev_ptr < rem_ptrs[0].0 {
+                self.split(
+                    address_space,
+                    prev_ptr,
+                    prev_ts,
+                    rem_ptrs[0].0,
+                    pointer,
+                    records,
+                    true,
+                    false,
+                )
+            } else {
+                vec![]
+            };
+            println!(
+                "right_split rem_ptrs: {:?} next_ptr: {:?} pointer + size: {:?}",
+                rem_ptrs,
+                next_ptr,
+                pointer + size
             );
             let right_split = self.split(
                 address_space,
                 rem_ptrs[rem_ptrs.len() - 1].0,
-                rem_ptrs[rem_ptrs.len() - 1].1,
+                rem_ptrs[rem_ptrs.len() - 1].2,
                 next_ptr,
                 pointer + size,
                 records,
@@ -329,12 +465,27 @@ impl<F: PrimeField32> Memory<F> {
 
             // we need to merge the blocks on the interior:
             // [pointer, rem_ptrs[0], ..., rem_ptrs[-1], pointer + size)
-            left_split.extend(rem_ptrs);
+            println!(
+                "merge left_split: {:?} rem_ptrs: {:?} right_split: {:?}",
+                left_split, rem_ptrs, right_split
+            );
+            left_split.extend(rem_ptrs[..rem_ptrs.len() - 1].to_vec());
+            if rem_ptrs[rem_ptrs.len() - 1].0 + rem_ptrs[rem_ptrs.len() - 1].1 <= pointer + size {
+                left_split.push(rem_ptrs[rem_ptrs.len() - 1]);
+            }
             left_split.extend(right_split);
+            println!(
+                "merge left_split: {:?} pointer: {:?} end_ptr: {:?}",
+                left_split,
+                pointer,
+                pointer + size
+            );
             let merged_ts = self.merge(address_space, left_split, pointer + size, records);
 
-            self.ts_map
-                .insert((address_space, pointer), new_ts.unwrap_or(merged_ts));
+            self.ts_map.insert(
+                (address_space, pointer),
+                (size, new_ts.unwrap_or(merged_ts)),
+            );
             merged_ts
         };
         ret_ts
@@ -346,38 +497,36 @@ impl<F: PrimeField32> Memory<F> {
     fn merge(
         &mut self,
         address_space: usize,
-        entries: Vec<(usize, u32)>,
+        entries: Vec<(usize, usize, u32)>,
         end_ptr: usize,
         records: &mut Vec<AccessAdapterRecord<F>>,
     ) -> u32 {
+        println!("merge entries: {:?} end_ptr: {:?}", entries, end_ptr);
         // we first split only so that all entries are aligned.
         let mut aligned_entries = Vec::with_capacity(2 * entries.len());
-        for window in entries.windows(2) {
-            let (ptr0, ts0) = window[0];
-            let (ptr1, _) = window[1];
-            let aligned_ptrs = self.aligned_split(address_space, ptr0, ts0, ptr1 - ptr0, records);
-            aligned_entries.extend(aligned_ptrs.iter().map(|&ptr| (ptr, ts0)));
+        let align_start = entries[0].0;
+        for (ptr, size, ts) in entries {
+            let (aligned_ptrs, aligned_size) =
+                self.aligned_split(address_space, align_start, ptr, ts, size, records);
+            aligned_entries.extend(aligned_ptrs.iter().map(|&ptr| (ptr, aligned_size, ts)));
         }
-        if let Some(&(ptr, ts)) = entries.last() {
-            let aligned_ptrs = self.aligned_split(address_space, ptr, ts, end_ptr - ptr, records);
-            aligned_entries.extend(aligned_ptrs.iter().map(|&ptr| (ptr, ts)));
-        }
-        // 0 is a dummy timestamp and is never referenced
-        aligned_entries.push((end_ptr, 0));
 
         // we then merge blocks
         let mut merged_entries: Vec<(usize, u32, usize)> =
             Vec::with_capacity(aligned_entries.len());
-        for window in aligned_entries.windows(2) {
-            let (ptr0, ts0) = window[0];
-            let (ptr1, _) = window[1];
-            let mut size = ptr1 - ptr0;
+        println!("MERGE aligned_entries: {:?}", aligned_entries);
+        for (ptr, size, ts) in aligned_entries {
+            println!(
+                "MERGE merged_entries: {:?} ptr: {:?} size: {:?} ts: {:?}",
+                merged_entries, ptr, size, ts
+            );
             if merged_entries.len() == 0 || (*(merged_entries.last().unwrap())).2 > size {
-                merged_entries.push((ptr0, ts0, size));
+                merged_entries.push((ptr, ts, size));
             } else {
                 assert!(merged_entries.last().unwrap().2 == size);
-                let mut ts = ts0;
-                let mut final_ptr = ptr0;
+                let mut size = size;
+                let mut ts = ts;
+                let mut final_ptr = ptr;
                 while let Some((ptr, merged_ts, merged_size)) = merged_entries.pop() {
                     if merged_size == size {
                         let new_ts = max(merged_ts, ts);
@@ -395,6 +544,7 @@ impl<F: PrimeField32> Memory<F> {
                         final_ptr = ptr;
                         ts = new_ts;
                     } else {
+                        merged_entries.push((ptr, merged_ts, merged_size));
                         assert!(merged_size > size);
                         break;
                     }
@@ -410,18 +560,23 @@ impl<F: PrimeField32> Memory<F> {
     fn aligned_split(
         &mut self,
         address_space: usize,
+        align_start: usize,
         start_offset: usize,
         start_ts: u32,
         size: usize,
         records: &mut Vec<AccessAdapterRecord<F>>,
-    ) -> Vec<usize> {
+    ) -> (Vec<usize>, usize) {
+        println!(
+            "ALIGNED SPLIT address_space: {:?} align_start: {:?} start_offset: {:?} size: {:?}",
+            address_space, align_start, start_offset, size
+        );
         assert!(size.is_power_of_two());
-        let start_trailing_bits = start_offset.trailing_zeros();
+        let start_trailing_bits = (start_offset - align_start).trailing_zeros();
         let size_bits = size.trailing_zeros();
 
         if start_trailing_bits >= size_bits {
             // no splitting is needed
-            return vec![start_offset];
+            return (vec![start_offset], size);
         } else {
             for split_bits in start_trailing_bits..size_bits {
                 for idx in 0..(1 << (split_bits - start_trailing_bits)) {
@@ -440,9 +595,12 @@ impl<F: PrimeField32> Memory<F> {
                     });
                 }
             }
-            return (0..(1 << (size_bits - start_trailing_bits)))
-                .map(|i| start_offset + i * (1 << start_trailing_bits))
-                .collect();
+            return (
+                (0..(1 << (size_bits - start_trailing_bits)))
+                    .map(|i| start_offset + i * (1 << start_trailing_bits))
+                    .collect(),
+                1 << start_trailing_bits,
+            );
         }
     }
 
@@ -457,7 +615,11 @@ impl<F: PrimeField32> Memory<F> {
         records: &mut Vec<AccessAdapterRecord<F>>,
         add_left: bool,
         add_right: bool,
-    ) -> Vec<(usize, u32)> {
+    ) -> Vec<(usize, usize, u32)> {
+        println!(
+            "SPLIT start_ptr: {:?} split_ptr: {:?} end_ptr: {:?}",
+            start_ptr, split_ptr, end_ptr
+        );
         assert!(start_ptr <= split_ptr && split_ptr <= end_ptr);
         assert!((end_ptr - start_ptr).is_power_of_two());
 
@@ -475,20 +637,23 @@ impl<F: PrimeField32> Memory<F> {
             let mid_ptr = (start_ptr + end_ptr) / 2;
             if mid_ptr < split_ptr {
                 if add_left {
-                    self.ts_map.insert((address_space, start_ptr), start_ts);
+                    self.ts_map
+                        .insert((address_space, start_ptr), (mid_ptr - start_ptr, start_ts));
                 } else {
-                    new_entries.push((start_ptr, start_ts));
+                    new_entries.push((start_ptr, mid_ptr - start_ptr, start_ts));
                 }
                 start_ptr = mid_ptr;
             } else {
                 if add_right {
-                    self.ts_map.insert((address_space, mid_ptr), start_ts);
+                    self.ts_map
+                        .insert((address_space, mid_ptr), (end_ptr - mid_ptr, start_ts));
                 } else {
-                    new_entries.push((mid_ptr, start_ts));
+                    new_entries.push((mid_ptr, end_ptr - mid_ptr, start_ts));
                 }
                 end_ptr = mid_ptr;
             }
         }
+        new_entries.sort_by_key(|&(ptr, _, _)| ptr);
         new_entries
     }
 
@@ -502,13 +667,27 @@ impl<F: PrimeField32> Memory<F> {
         split_ptr_right: usize,
         records: &mut Vec<AccessAdapterRecord<F>>,
     ) {
+        println!(
+            "SPLIT TWICE start_ptr: {:?} split_ptr_left: {:?} split_ptr_right: {:?} end_ptr: {:?}",
+            start_ptr, split_ptr_left, split_ptr_right, end_ptr
+        );
         assert!(
             start_ptr <= split_ptr_left
                 && split_ptr_right <= end_ptr
                 && split_ptr_left < split_ptr_right
         );
-        assert!((end_ptr - start_ptr).is_power_of_two());
-        assert!((split_ptr_right - split_ptr_left).is_power_of_two());
+        assert!(
+            (end_ptr - start_ptr).is_power_of_two(),
+            "end_ptr: {:?} start_ptr: {:?}",
+            end_ptr,
+            start_ptr
+        );
+        assert!(
+            (split_ptr_right - split_ptr_left).is_power_of_two(),
+            "split_ptr_right: {:?} split_ptr_left: {:?}",
+            split_ptr_right,
+            split_ptr_left
+        );
 
         let mut start_ptr = start_ptr;
         let mut end_ptr = end_ptr;
@@ -523,10 +702,24 @@ impl<F: PrimeField32> Memory<F> {
             });
             let mid_ptr = (start_ptr + end_ptr) / 2;
             if mid_ptr <= split_ptr_left {
-                self.ts_map.insert((address_space, start_ptr), start_ts);
+                println!(
+                    "INSERT as {:?} start_ptr: {:?} size: {:?}",
+                    address_space,
+                    start_ptr,
+                    mid_ptr - start_ptr
+                );
+                self.ts_map
+                    .insert((address_space, start_ptr), (mid_ptr - start_ptr, start_ts));
                 start_ptr = mid_ptr;
             } else if mid_ptr >= split_ptr_right {
-                self.ts_map.insert((address_space, mid_ptr), start_ts);
+                println!(
+                    "INSERT as {:?} start_ptr: {:?} size: {:?}",
+                    address_space,
+                    mid_ptr,
+                    end_ptr - mid_ptr
+                );
+                self.ts_map
+                    .insert((address_space, mid_ptr), (end_ptr - mid_ptr, start_ts));
                 end_ptr = mid_ptr;
             } else {
                 mid_ptr_opt = Some(mid_ptr);
@@ -562,6 +755,10 @@ impl<F: PrimeField32> Memory<F> {
         left_split.extend(right_split);
 
         // merge from [split_ptr_left, mid_ptr) and [mid_ptr, split_ptr_right)
+        println!(
+            "SPLIT_TWICE left_split: {:?} split_ptr_right {:?}",
+            left_split, split_ptr_right
+        );
         self.merge(address_space, left_split, split_ptr_right, records);
     }
 
