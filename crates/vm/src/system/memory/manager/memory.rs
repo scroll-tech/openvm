@@ -575,10 +575,10 @@ impl<F: PrimeField32> Memory<F> {
         size: usize,
         records: &mut Vec<AccessAdapterRecord<F>>,
     ) -> (Vec<usize>, usize) {
-        println!(
-            "ALIGNED SPLIT address_space: {:?} align_start: {:?} start_offset: {:?} size: {:?}",
-            address_space, align_start, start_offset, size
-        );
+        //println!(
+        //    "ALIGNED SPLIT address_space: {:?} align_start: {:?} start_offset: {:?} size: {:?}",
+        //    address_space, align_start, start_offset, size
+        //);
         assert!(size.is_power_of_two());
         let start_trailing_bits = (start_offset - align_start).trailing_zeros();
         let size_bits = size.trailing_zeros();
