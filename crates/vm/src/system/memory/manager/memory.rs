@@ -673,7 +673,7 @@ impl<F: PrimeField32> Memory<F> {
                     self.ts_map
                         .insert((address_space, start_ptr), (mid_ptr - start_ptr, start_ts));
                 } else {
-                    new_entries.push((start_ptr, end_ptr - start_ptr, start_ts));
+                    new_entries.push((start_ptr, mid_ptr - start_ptr, start_ts));
                 }
                 if add_right {
                     self.ts_map
@@ -858,14 +858,42 @@ mod tests {
         let mut memory = Memory::<BabyBear>::new(&initial_memory);
         let address_space = 1;
 
-        memory.write(address_space, 0, bba![1, 2, 3, 4]);
+        let (_, adapter_records) = memory.write(address_space, 0, bba![1, 2, 3, 4]);
         println!("111 {:?}", memory.ts_map);
-        memory.read::<16>(address_space, 6);
+        println!(
+            "adapter_records {:?}",
+            adapter_records
+                .iter()
+                .map(|r| (r.start_index, r.data.len(), r.timestamp, r.kind.clone()))
+                .collect::<Vec<_>>()
+        );
+        let (_, adapter_records) = memory.read::<16>(address_space, 6);
         println!("222 {:?}", memory.ts_map);
-        memory.read::<8>(address_space, 2);
+        println!(
+            "adapter_records {:?}",
+            adapter_records
+                .iter()
+                .map(|r| (r.start_index, r.data.len(), r.timestamp, r.kind.clone()))
+                .collect::<Vec<_>>()
+        );
+        let (_, adapter_records) = memory.read::<8>(address_space, 2);
         println!("333 {:?}", memory.ts_map);
+        println!(
+            "adapter_records {:?}",
+            adapter_records
+                .iter()
+                .map(|r| (r.start_index, r.data.len(), r.timestamp, r.kind.clone()))
+                .collect::<Vec<_>>()
+        );
 
         let (memory, records) = memory.finalize::<8>();
+        println!(
+            "records {:?}",
+            records
+                .iter()
+                .map(|r| (r.start_index, r.data.len(), r.timestamp, r.kind.clone()))
+                .collect::<Vec<_>>()
+        );
     }
 
     #[test]
