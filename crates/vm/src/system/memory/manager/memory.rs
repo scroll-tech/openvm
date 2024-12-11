@@ -195,7 +195,7 @@ impl<F: PrimeField32> Memory<F> {
         // First make sure the partition we maintain in self.blocks is an equipartition.
         let mut left = Unbounded;
         let mut range = self.ts_map.range((left, Unbounded));
-        while let Some((&(address_space, pointer), &(size, ts))) = range.next() {
+        while let Some((&(address_space, pointer), &(size, _))) = range.next() {
             let aligned_pointer = (pointer / N) * N;
             //println!(
             //    "FINALIZE left: {:?} aligned_pointer: {:?} address_space: {:?} pointer: {:?} size: {:?} ts: {:?}",
