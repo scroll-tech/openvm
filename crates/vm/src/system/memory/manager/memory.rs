@@ -536,24 +536,24 @@ impl<F: PrimeField32> Memory<F> {
                 let mut size = size;
                 let mut ts = ts;
                 let mut final_ptr = ptr;
-                while let Some((ptr, merged_ts, merged_size)) = merged_entries.pop() {
+                while let Some((merged_ptr, merged_ts, merged_size)) = merged_entries.pop() {
                     if merged_size == size {
                         let new_ts = max(merged_ts, ts);
                         records.push(AccessAdapterRecord {
                             timestamp: new_ts,
                             address_space: F::from_canonical_usize(address_space),
-                            start_index: F::from_canonical_usize(ptr),
-                            data: self.range_vec(address_space, ptr, 2 * size),
+                            start_index: F::from_canonical_usize(merged_ptr),
+                            data: self.range_vec(address_space, merged_ptr, 2 * size),
                             kind: AccessAdapterRecordKind::Merge {
                                 left_timestamp: merged_ts,
                                 right_timestamp: ts,
                             },
                         });
                         size = 2 * size;
-                        final_ptr = ptr;
+                        final_ptr = merged_ptr;
                         ts = new_ts;
                     } else {
-                        merged_entries.push((ptr, merged_ts, merged_size));
+                        merged_entries.push((merged_ptr, merged_ts, merged_size));
                         assert!(merged_size > size);
                         break;
                     }
@@ -575,10 +575,10 @@ impl<F: PrimeField32> Memory<F> {
         size: usize,
         records: &mut Vec<AccessAdapterRecord<F>>,
     ) -> (Vec<usize>, usize) {
-        //println!(
-        //    "ALIGNED SPLIT address_space: {:?} align_start: {:?} start_offset: {:?} size: {:?}",
-        //    address_space, align_start, start_offset, size
-        //);
+        println!(
+            "ALIGNED SPLIT address_space: {:?} align_start: {:?} start_offset: {:?} size: {:?}",
+            address_space, align_start, start_offset, size
+        );
         assert!(size.is_power_of_two());
         let start_trailing_bits = (start_offset - align_start).trailing_zeros();
         let size_bits = size.trailing_zeros();
@@ -588,7 +588,13 @@ impl<F: PrimeField32> Memory<F> {
             return (vec![start_offset], size);
         } else {
             for split_bits in start_trailing_bits..size_bits {
-                for idx in 0..(1 << (split_bits - start_trailing_bits)) {
+                for idx in 0..(1 << (size_bits - 1 - split_bits)) {
+                    //println!(
+                    //    "add record start {:?} size {:?}",
+                    //    start_offset + idx * (1 << (split_bits + 1)),
+                    //    1 << (split_bits + 1)
+                    //);
+
                     records.push(AccessAdapterRecord {
                         timestamp: start_ts,
                         address_space: F::from_canonical_usize(address_space),
@@ -604,6 +610,7 @@ impl<F: PrimeField32> Memory<F> {
                     });
                 }
             }
+
             return (
                 (0..(1 << (size_bits - start_trailing_bits)))
                     .map(|i| start_offset + i * (1 << start_trailing_bits))
