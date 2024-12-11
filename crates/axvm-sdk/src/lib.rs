@@ -13,7 +13,9 @@ use ax_stark_sdk::{
     engine::StarkFriEngine,
     p3_baby_bear::BabyBear,
 };
-use axvm_build::{build_guest_package, get_package, get_target_dir, GuestOptions};
+use axvm_build::{
+    build_guest_package, find_unique_executable, get_package, GuestOptions, TargetFilter,
+};
 use axvm_circuit::{
     arch::{instructions::exe::AxVmExe, ExecutionError, VmConfig, VmExecutor},
     system::{
@@ -35,8 +37,7 @@ use axvm_transpiler::{
 };
 use commit::commit_app_exe;
 use config::AppConfig;
-use eyre::{bail, Result};
-use itertools::Itertools;
+use eyre::Result;
 use keygen::AppProvingKey;
 use prover::vm::ContinuationVmProof;
 
@@ -67,32 +68,27 @@ pub(crate) type NonRootCommittedExe = AxVmCommittedExe<SC>;
 pub struct Sdk;
 
 impl Sdk {
-    pub fn build<P: AsRef<Path>>(&self, guest_opts: GuestOptions, pkg_dir: P) -> Result<Elf> {
-        if guest_opts.use_docker.is_some() {
-            bail!("docker build is not supported yet");
-        }
+    pub fn build<P: AsRef<Path>>(
+        &self,
+        guest_opts: GuestOptions,
+        pkg_dir: P,
+        target_filter: &TargetFilter,
+    ) -> Result<Elf> {
         let pkg = get_package(pkg_dir.as_ref());
-        let target_dir = get_target_dir(&pkg.manifest_path);
-        if let Err(Some(code)) =
-            build_guest_package(&pkg, target_dir.clone(), &guest_opts.into(), None)
-        {
-            return Err(eyre::eyre!("Failed to build guest: code = {}", code));
-        }
-        eprintln!("target_dir: {:?}", target_dir);
-        eprintln!("targets: {:?}", pkg.targets);
+        let target_dir = match build_guest_package(&pkg, &guest_opts, None) {
+            Ok(target_dir) => target_dir,
+            Err(Some(code)) => {
+                return Err(eyre::eyre!("Failed to build guest: code = {}", code));
+            }
+            Err(None) => {
+                return Err(eyre::eyre!(
+                    "Failed to build guest (AXIOM_SKIP_BUILD is set)"
+                ));
+            }
+        };
 
-        let elf_path = pkg
-            .targets
-            .into_iter()
-            .filter(|target| target.kind.iter().any(|kind| kind == "bin"))
-            .exactly_one()
-            .map(|target| {
-                target_dir
-                    .join("riscv32im-risc0-zkvm-elf")
-                    .join("release")
-                    .join(&target.name)
-            })?;
-        let data = read(elf_path)?;
+        let elf_path = find_unique_executable(pkg_dir, target_dir, target_filter)?;
+        let data = read(&elf_path)?;
         Elf::decode(&data, MEM_SIZE as u32)
     }
 
