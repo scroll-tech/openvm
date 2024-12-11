@@ -3,7 +3,7 @@ Divisor is required for average operation: average_cells_used
 Divisor is required for average operation: average_cycles
 | group | average_cells_used | average_cycles | average_proof_time_ms | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| ecrecover_program | <div style='text-align: right'>10,567,808.0</div>  | <div style='text-align: right'>106,444.0</div>  | <div style='text-align: right'>1,879.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <span style="color: green">(-281.0 [-13.0%])</span> <div style='text-align: right'>1,879.0</div>  |
+| ecrecover_program | <div style='text-align: right'>10,567,808.0</div>  | <div style='text-align: right'>106,444.0</div>  | <div style='text-align: right'>1,758.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <span style="color: green">(-402.0 [-18.6%])</span> <div style='text-align: right'>1,758.0</div>  |
 
 
 <details>
@@ -11,7 +11,7 @@ Divisor is required for average operation: average_cycles
 
 | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms |
 | --- | --- | --- | --- | --- |
-| <div style='text-align: right'>6.0</div>  | <span style="color: green">(-2.0 [-0.6%])</span> <div style='text-align: right'>352.0</div>  | <span style="color: green">(-1.0 [-0.4%])</span> <div style='text-align: right'>251.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+374.0 [+0.5%])</span> <div style='text-align: right'>76,755.0</div>  |
+| <div style='text-align: right'>6.0</div>  | <span style="color: green">(-5.0 [-1.4%])</span> <div style='text-align: right'>349.0</div>  | <span style="color: green">(-2.0 [-0.8%])</span> <div style='text-align: right'>250.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+67.0 [+0.1%])</span> <div style='text-align: right'>76,448.0</div>  |
 
 | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- |
@@ -53,7 +53,7 @@ Divisor is required for average operation: average_cycles
 
 | group | segment | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_cycles | trace_gen_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| ecrecover_program | 0 | <span style="color: green">(-281.0 [-13.0%])</span> <div style='text-align: right'>1,879.0</div>  | <div style='text-align: right'>35,713,167</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <span style="color: green">(-7.0 [-6.7%])</span> <div style='text-align: right'>97.0</div>  |
+| ecrecover_program | 0 | <span style="color: green">(-402.0 [-18.6%])</span> <div style='text-align: right'>1,758.0</div>  | <div style='text-align: right'>35,713,167</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <span style="color: green">(-1.0 [-1.0%])</span> <div style='text-align: right'>103.0</div>  |
 
 | group | chip_name | segment | rows_used |
 | --- | --- | --- | --- |
@@ -221,7 +221,7 @@ Divisor is required for average operation: average_cycles
 
 | group | average_cells_used | average_cycles | average_proof_time_ms | execute_time_ms | fri.log_blowup | num_segments_or_nodes | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| ecrecover_program | <div style='text-align: right'>10,567,808.0</div>  | <div style='text-align: right'>106,444.0</div>  | <div style='text-align: right'>1,879.0</div>  | <span style="color: green">(-7.0 [-2.8%])</span> <div style='text-align: right'>244.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <span style="color: green">(-281.0 [-13.0%])</span> <div style='text-align: right'>1,879.0</div>  |
+| ecrecover_program | <div style='text-align: right'>10,567,808.0</div>  | <div style='text-align: right'>106,444.0</div>  | <div style='text-align: right'>1,758.0</div>  | <span style="color: green">(-7.0 [-2.8%])</span> <div style='text-align: right'>244.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <span style="color: green">(-402.0 [-18.6%])</span> <div style='text-align: right'>1,758.0</div>  |
 
 | group | air_name | segment | cells | main_cols | perm_cols | prep_cols | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -259,7 +259,7 @@ Divisor is required for average operation: average_cycles
 
 | segment | trace_gen_time_ms |
 | --- | --- |
-| 0 | <span style="color: green">(-1.0 [-1.0%])</span> <div style='text-align: right'>100.0</div>  |
+| 0 | <span style="color: green">(-3.0 [-3.0%])</span> <div style='text-align: right'>98.0</div>  |
 
 </details>
 
@@ -268,14 +268,14 @@ Divisor is required for average operation: average_cycles
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e76b7b205d6fcffaa53a624d893fa53f13f13732/ecrecover-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e76b7b205d6fcffaa53a624d893fa53f13f13732/ecrecover-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e76b7b205d6fcffaa53a624d893fa53f13f13732/ecrecover-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e76b7b205d6fcffaa53a624d893fa53f13f13732/ecrecover-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e76b7b205d6fcffaa53a624d893fa53f13f13732/ecrecover-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e76b7b205d6fcffaa53a624d893fa53f13f13732/ecrecover-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e76b7b205d6fcffaa53a624d893fa53f13f13732/ecrecover-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-ecrecover_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/e76b7b205d6fcffaa53a624d893fa53f13f13732/ecrecover-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-ecrecover_program.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/af07f8aff68aef7108f31544c7a4fb377df9104c/ecrecover-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/af07f8aff68aef7108f31544c7a4fb377df9104c/ecrecover-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-ecrecover_program.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/af07f8aff68aef7108f31544c7a4fb377df9104c/ecrecover-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/af07f8aff68aef7108f31544c7a4fb377df9104c/ecrecover-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-ecrecover_program.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/af07f8aff68aef7108f31544c7a4fb377df9104c/ecrecover-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/af07f8aff68aef7108f31544c7a4fb377df9104c/ecrecover-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-ecrecover_program.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/af07f8aff68aef7108f31544c7a4fb377df9104c/ecrecover-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-ecrecover_program.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/af07f8aff68aef7108f31544c7a4fb377df9104c/ecrecover-38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed-ecrecover_program.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/e76b7b205d6fcffaa53a624d893fa53f13f13732
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/af07f8aff68aef7108f31544c7a4fb377df9104c
 
 Max Segment Length: 1048476
 
@@ -283,4 +283,4 @@ Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12283712426)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12284367394)
