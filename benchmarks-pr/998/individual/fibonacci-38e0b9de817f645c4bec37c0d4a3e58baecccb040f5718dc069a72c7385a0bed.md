@@ -3,8 +3,8 @@ Divisor is required for average operation: average_cells_used
 Divisor is required for average operation: average_cycles
 | group | average_cells_used | average_cycles | average_proof_time_ms | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| fibonacci_program | <div style='text-align: right'>51,612,244.0</div>  | <div style='text-align: right'>1,500,137.0</div>  | <div style='text-align: right'>5,869.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>51,612,244</div>  | <div style='text-align: right'>1,500,137</div>  | <span style="color: red">(+751.0 [+14.7%])</span> <div style='text-align: right'>5,869.0</div>  |
-| leaf_verifier | <div style='text-align: right'>144,223,313.0</div>  | <div style='text-align: right'>3,519,222.0</div>  | <div style='text-align: right'>14,791.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-8,900 [-0.0%])</span> <div style='text-align: right'>144,223,313</div>  | <span style="color: green">(-757 [-0.0%])</span> <div style='text-align: right'>3,519,222</div>  | <span style="color: red">(+1,474.0 [+11.1%])</span> <div style='text-align: right'>14,791.0</div>  |
+| fibonacci_program | <div style='text-align: right'>51,612,244.0</div>  | <div style='text-align: right'>1,500,137.0</div>  | <div style='text-align: right'>5,138.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>51,612,244</div>  | <div style='text-align: right'>1,500,137</div>  | <span style="color: red">(+20.0 [+0.4%])</span> <div style='text-align: right'>5,138.0</div>  |
+| leaf_verifier | <div style='text-align: right'>144,221,993.0</div>  | <div style='text-align: right'>3,518,992.0</div>  | <div style='text-align: right'>13,040.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-10,220 [-0.0%])</span> <div style='text-align: right'>144,221,993</div>  | <span style="color: green">(-987 [-0.0%])</span> <div style='text-align: right'>3,518,992</div>  | <span style="color: green">(-277.0 [-2.1%])</span> <div style='text-align: right'>13,040.0</div>  |
 
 
 <details>
@@ -52,7 +52,7 @@ Divisor is required for average operation: average_cycles
 
 | group | segment | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_cycles | trace_gen_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| fibonacci_program | 0 | <span style="color: red">(+751.0 [+14.7%])</span> <div style='text-align: right'>5,869.0</div>  | <div style='text-align: right'>197,696,030</div>  | <div style='text-align: right'>51,612,244</div>  | <div style='text-align: right'>1,500,137</div>  | <span style="color: green">(-85.0 [-36.2%])</span> <div style='text-align: right'>150.0</div>  |
+| fibonacci_program | 0 | <span style="color: red">(+20.0 [+0.4%])</span> <div style='text-align: right'>5,138.0</div>  | <div style='text-align: right'>197,696,030</div>  | <div style='text-align: right'>51,612,244</div>  | <div style='text-align: right'>1,500,137</div>  | <span style="color: red">(+10.0 [+4.3%])</span> <div style='text-align: right'>245.0</div>  |
 
 | group | chip_name | segment | rows_used |
 | --- | --- | --- | --- |
@@ -137,8 +137,8 @@ Divisor is required for average operation: average_cycles
 
 | group | average_cells_used | average_cycles | average_proof_time_ms | execute_time_ms | fri.log_blowup | num_segments_or_nodes | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| fibonacci_program | <div style='text-align: right'>51,612,244.0</div>  | <div style='text-align: right'>1,500,137.0</div>  | <div style='text-align: right'>5,869.0</div>  | <span style="color: green">(-171.0 [-18.1%])</span> <div style='text-align: right'>775.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>51,612,244</div>  | <div style='text-align: right'>1,500,137</div>  | <span style="color: red">(+751.0 [+14.7%])</span> <div style='text-align: right'>5,869.0</div>  |
-| leaf_verifier | <div style='text-align: right'>144,223,313.0</div>  | <div style='text-align: right'>3,519,222.0</div>  | <div style='text-align: right'>14,791.0</div>  |  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-8,900 [-0.0%])</span> <div style='text-align: right'>144,223,313</div>  | <span style="color: green">(-757 [-0.0%])</span> <div style='text-align: right'>3,519,222</div>  | <span style="color: red">(+1,474.0 [+11.1%])</span> <div style='text-align: right'>14,791.0</div>  |
+| fibonacci_program | <div style='text-align: right'>51,612,244.0</div>  | <div style='text-align: right'>1,500,137.0</div>  | <div style='text-align: right'>5,138.0</div>  | <span style="color: green">(-11.0 [-1.2%])</span> <div style='text-align: right'>935.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>51,612,244</div>  | <div style='text-align: right'>1,500,137</div>  | <span style="color: red">(+20.0 [+0.4%])</span> <div style='text-align: right'>5,138.0</div>  |
+| leaf_verifier | <div style='text-align: right'>144,221,993.0</div>  | <div style='text-align: right'>3,518,992.0</div>  | <div style='text-align: right'>13,040.0</div>  |  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-10,220 [-0.0%])</span> <div style='text-align: right'>144,221,993</div>  | <span style="color: green">(-987 [-0.0%])</span> <div style='text-align: right'>3,518,992</div>  | <span style="color: green">(-277.0 [-2.1%])</span> <div style='text-align: right'>13,040.0</div>  |
 
 | group | air_name | segment | cells | main_cols | perm_cols | prep_cols | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -165,7 +165,7 @@ Divisor is required for average operation: average_cycles
 
 | group | index | execute_time_ms | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- |
-| leaf_verifier | 0 | <span style="color: green">(-419.0 [-11.7%])</span> <div style='text-align: right'>3,167.0</div>  | <span style="color: green">(-8,900 [-0.0%])</span> <div style='text-align: right'>144,223,313</div>  | <span style="color: green">(-757 [-0.0%])</span> <div style='text-align: right'>3,519,222</div>  |
+| leaf_verifier | 0 | <span style="color: red">(+23.0 [+0.6%])</span> <div style='text-align: right'>3,609.0</div>  | <span style="color: green">(-10,220 [-0.0%])</span> <div style='text-align: right'>144,221,993</div>  | <span style="color: green">(-987 [-0.0%])</span> <div style='text-align: right'>3,518,992</div>  |
 
 | group | chip_name | index | rows_used |
 | --- | --- | --- | --- |
@@ -173,14 +173,14 @@ Divisor is required for average operation: average_cycles
 | leaf_verifier | VmConnectorAir | 0 | <div style='text-align: right'>2</div>  |
 | leaf_verifier | <NativeAdapterAir<2, 0>,PublicValuesCoreAir> | 0 | <div style='text-align: right'>36</div>  |
 | leaf_verifier | Boundary | 0 | <div style='text-align: right'>424,581</div>  |
-| leaf_verifier | AccessAdapter<2> | 0 | <span style="color: green">(-76 [-0.0%])</span> <div style='text-align: right'>404,768</div>  |
-| leaf_verifier | AccessAdapter<4> | 0 | <span style="color: green">(-38 [-0.0%])</span> <div style='text-align: right'>202,636</div>  |
+| leaf_verifier | AccessAdapter<2> | 0 | <span style="color: green">(-20 [-0.0%])</span> <div style='text-align: right'>404,824</div>  |
+| leaf_verifier | AccessAdapter<4> | 0 | <span style="color: green">(-10 [-0.0%])</span> <div style='text-align: right'>202,664</div>  |
 | leaf_verifier | AccessAdapter<8> | 0 | <div style='text-align: right'>58,714</div>  |
 | leaf_verifier | Poseidon2VmAir<BabyBearParameters> | 0 | <div style='text-align: right'>28,074</div>  |
 | leaf_verifier | FriReducedOpeningAir | 0 | <div style='text-align: right'>144,732</div>  |
 | leaf_verifier | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | 0 | <div style='text-align: right'>35,074</div>  |
 | leaf_verifier | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | 0 | <div style='text-align: right'>1,355,464</div>  |
-| leaf_verifier | <JalNativeAdapterAir,JalCoreAir> | 0 | <span style="color: green">(-757 [-1.0%])</span> <div style='text-align: right'>73,381</div>  |
+| leaf_verifier | <JalNativeAdapterAir,JalCoreAir> | 0 | <span style="color: green">(-987 [-1.3%])</span> <div style='text-align: right'>73,151</div>  |
 | leaf_verifier | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | 0 | <div style='text-align: right'>676,191</div>  |
 | leaf_verifier | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | 0 | <div style='text-align: right'>1,134,653</div>  |
 | leaf_verifier | PhantomAir | 0 | <div style='text-align: right'>211,015</div>  |
@@ -198,7 +198,7 @@ Divisor is required for average operation: average_cycles
 | leaf_verifier |  | 0 | FE4ADD | <div style='text-align: right'>13,429</div>  |
 | leaf_verifier |  | 0 | FE4SUB | <div style='text-align: right'>3,557</div>  |
 | leaf_verifier |  | 0 | FRI_REDUCED_OPENING | <div style='text-align: right'>5,334</div>  |
-| leaf_verifier |  | 0 | JAL | <span style="color: green">(-757 [-1.0%])</span> <div style='text-align: right'>73,381</div>  |
+| leaf_verifier |  | 0 | JAL | <span style="color: green">(-987 [-1.3%])</span> <div style='text-align: right'>73,151</div>  |
 | leaf_verifier |  | 0 | LOADW | <div style='text-align: right'>155,907</div>  |
 | leaf_verifier |  | 0 | LOADW2 | <div style='text-align: right'>360,784</div>  |
 | leaf_verifier |  | 0 | MUL | <div style='text-align: right'>143,987</div>  |
@@ -213,16 +213,16 @@ Divisor is required for average operation: average_cycles
 | group | air_name | dsl_ir | index | opcode | cells_used |
 | --- | --- | --- | --- | --- | --- |
 | leaf_verifier | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> |  | 0 | ADD | <div style='text-align: right'>34,592,280</div>  |
-| leaf_verifier | AccessAdapter<2> |  | 0 | ADD | <span style="color: green">(-418 [-0.2%])</span> <div style='text-align: right'>204,094</div>  |
-| leaf_verifier | AccessAdapter<4> |  | 0 | ADD | <span style="color: green">(-247 [-0.2%])</span> <div style='text-align: right'>120,601</div>  |
+| leaf_verifier | AccessAdapter<2> |  | 0 | ADD | <span style="color: green">(-110 [-0.1%])</span> <div style='text-align: right'>204,402</div>  |
+| leaf_verifier | AccessAdapter<4> |  | 0 | ADD | <span style="color: green">(-65 [-0.1%])</span> <div style='text-align: right'>120,783</div>  |
 | leaf_verifier | Boundary |  | 0 | ADD | <div style='text-align: right'>146,135</div>  |
 | leaf_verifier | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> |  | 0 | BBE4DIV | <div style='text-align: right'>250,720</div>  |
 | leaf_verifier | AccessAdapter<2> |  | 0 | BBE4DIV | <div style='text-align: right'>121,044</div>  |
 | leaf_verifier | AccessAdapter<4> |  | 0 | BBE4DIV | <div style='text-align: right'>71,526</div>  |
 | leaf_verifier | Boundary |  | 0 | BBE4DIV | <div style='text-align: right'>704</div>  |
 | leaf_verifier | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> |  | 0 | BBE4MUL | <div style='text-align: right'>472,800</div>  |
-| leaf_verifier | AccessAdapter<2> |  | 0 | BBE4MUL | <span style="color: green">(-418 [-0.1%])</span> <div style='text-align: right'>303,710</div>  |
-| leaf_verifier | AccessAdapter<4> |  | 0 | BBE4MUL | <span style="color: green">(-247 [-0.1%])</span> <div style='text-align: right'>179,465</div>  |
+| leaf_verifier | AccessAdapter<2> |  | 0 | BBE4MUL | <span style="color: green">(-110 [-0.0%])</span> <div style='text-align: right'>304,018</div>  |
+| leaf_verifier | AccessAdapter<4> |  | 0 | BBE4MUL | <span style="color: green">(-65 [-0.0%])</span> <div style='text-align: right'>179,647</div>  |
 | leaf_verifier | Boundary |  | 0 | BBE4MUL | <div style='text-align: right'>139,304</div>  |
 | leaf_verifier | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> |  | 0 | BEQ | <div style='text-align: right'>426,811</div>  |
 | leaf_verifier | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> |  | 0 | BNE | <div style='text-align: right'>15,125,582</div>  |
@@ -245,7 +245,7 @@ Divisor is required for average operation: average_cycles
 | leaf_verifier | AccessAdapter<2> |  | 0 | FRI_REDUCED_OPENING | <div style='text-align: right'>151,580</div>  |
 | leaf_verifier | AccessAdapter<4> |  | 0 | FRI_REDUCED_OPENING | <div style='text-align: right'>89,570</div>  |
 | leaf_verifier | FriReducedOpeningAir |  | 0 | FRI_REDUCED_OPENING | <div style='text-align: right'>9,262,848</div>  |
-| leaf_verifier | <JalNativeAdapterAir,JalCoreAir> |  | 0 | JAL | <span style="color: green">(-7,570 [-1.0%])</span> <div style='text-align: right'>733,810</div>  |
+| leaf_verifier | <JalNativeAdapterAir,JalCoreAir> |  | 0 | JAL | <span style="color: green">(-9,870 [-1.3%])</span> <div style='text-align: right'>731,510</div>  |
 | leaf_verifier | AccessAdapter<2> |  | 0 | JAL | <div style='text-align: right'>418</div>  |
 | leaf_verifier | AccessAdapter<4> |  | 0 | JAL | <div style='text-align: right'>494</div>  |
 | leaf_verifier | Boundary |  | 0 | JAL | <div style='text-align: right'>11</div>  |
@@ -310,15 +310,15 @@ Divisor is required for average operation: average_cycles
 
 | group | index | segment | stark_prove_excluding_trace_time_ms | total_cells | trace_gen_time_ms |
 | --- | --- | --- | --- | --- | --- |
-| leaf_verifier | 0 | 0 | <span style="color: red">(+1,474.0 [+11.1%])</span> <div style='text-align: right'>14,791.0</div>  | <div style='text-align: right'>399,935,960</div>  | <span style="color: green">(-287.0 [-32.3%])</span> <div style='text-align: right'>602.0</div>  |
+| leaf_verifier | 0 | 0 | <span style="color: green">(-277.0 [-2.1%])</span> <div style='text-align: right'>13,040.0</div>  | <div style='text-align: right'>399,935,960</div>  | <span style="color: green">(-34.0 [-3.8%])</span> <div style='text-align: right'>855.0</div>  |
 
 | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | keygen_time_ms |
 | --- | --- | --- | --- |
-| <span style="color: green">(-1.0 [-20.0%])</span> <div style='text-align: right'>4.0</div>  | <span style="color: green">(-268.0 [-22.5%])</span> <div style='text-align: right'>925.0</div>  | <span style="color: green">(-162.0 [-17.4%])</span> <div style='text-align: right'>767.0</div>  | <span style="color: green">(-14.0 [-2.9%])</span> <div style='text-align: right'>476.0</div>  |
+| <span style="color: green">(-2.0 [-40.0%])</span> <div style='text-align: right'>3.0</div>  | <span style="color: red">(+5.0 [+0.4%])</span> <div style='text-align: right'>1,198.0</div>  | <span style="color: red">(+11.0 [+1.2%])</span> <div style='text-align: right'>940.0</div>  | <div style='text-align: right'>490.0</div>  |
 
 | segment | trace_gen_time_ms |
 | --- | --- |
-| 0 | <span style="color: green">(-106.0 [-40.3%])</span> <div style='text-align: right'>157.0</div>  |
+| 0 | <span style="color: green">(-5.0 [-1.9%])</span> <div style='text-align: right'>258.0</div>  |
 
 </details>
 
@@ -342,8 +342,8 @@ Commit: https://github.com/axiom-crypto/afs-prototype/commit/e76b7b205d6fcffaa53
 
 Max Segment Length: 1048476
 
-Instance Type: 64cpu-linux-x64
+Instance Type: 64cpu-linux-arm64
 
-Memory Allocator: jemalloc
+Memory Allocator: mimalloc
 
 [Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12283712426)
