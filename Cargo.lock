@@ -780,6 +780,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "axvm-custom-insn"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.90",
+]
+
+[[package]]
 name = "axvm-ecc-circuit"
 version = "0.1.0"
 dependencies = [
@@ -1125,6 +1134,7 @@ dependencies = [
 name = "axvm-platform"
 version = "0.1.0"
 dependencies = [
+ "axvm-custom-insn",
  "bytemuck",
  "critical-section",
  "embedded-alloc",

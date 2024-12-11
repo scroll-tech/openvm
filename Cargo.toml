@@ -103,6 +103,7 @@ axvm-instructions = { path = "crates/toolchain/instructions", default-features =
 axvm-instructions-derive = { path = "crates/toolchain/instructions/derive", default-features = false }
 axvm-macros-common = { path = "crates/toolchain/macros", default-features = false }
 axvm-platform = { path = "crates/toolchain/platform", default-features = false }
+axvm-custom-insn = { path = "crates/toolchain/platform/custom_insn", default-features = false }
 axvm-transpiler = { path = "crates/toolchain/transpiler", default-features = false }
 axvm-circuit = { path = "crates/vm", default-features = false }
 axvm-circuit-derive = { path = "crates/vm/derive", default-features = false }

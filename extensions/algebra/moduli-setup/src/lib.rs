@@ -779,12 +779,12 @@ pub fn moduli_init(input: TokenStream) -> TokenStream {
                 #[no_mangle]
                 extern "C" fn #func_name(rd: usize, rs1: usize, rs2: usize) {
                     axvm_platform::custom_insn_r!(
-                        ::axvm_algebra_guest::OPCODE,
-                        ::axvm_algebra_guest::MODULAR_ARITHMETIC_FUNCT3 as usize,
-                        ::axvm_algebra_guest::ModArithBaseFunct7::#local_opcode as usize + #mod_idx * (::axvm_algebra_guest::ModArithBaseFunct7::MODULAR_ARITHMETIC_MAX_KINDS as usize),
-                        rd,
-                        rs1,
-                        rs2
+                        opcode = ::axvm_algebra_guest::OPCODE,
+                        funct3 = ::axvm_algebra_guest::MODULAR_ARITHMETIC_FUNCT3 as usize,
+                        funct7 = ::axvm_algebra_guest::ModArithBaseFunct7::#local_opcode as usize + #mod_idx * (::axvm_algebra_guest::ModArithBaseFunct7::MODULAR_ARITHMETIC_MAX_KINDS as usize),
+                        rd = In rd,
+                        rs1 = In rs1,
+                        rs2 = In rs2
                     )
                 }
             });
@@ -833,24 +833,24 @@ pub fn moduli_init(input: TokenStream) -> TokenStream {
                     // The transpiler will transform this instruction, based on whether `rs2` is `x0`, `x1` or `x2`, into a `SETUP_ADDSUB`, `SETUP_MULDIV` or `SETUP_ISEQ` instruction.
                     let mut uninit: core::mem::MaybeUninit<[u8; #limbs]> = core::mem::MaybeUninit::uninit();
                     axvm_platform::custom_insn_r!(
-                        ::axvm_algebra_guest::OPCODE,
-                        ::axvm_algebra_guest::MODULAR_ARITHMETIC_FUNCT3,
-                        ::axvm_algebra_guest::ModArithBaseFunct7::SetupMod as usize
+                        opcode = ::axvm_algebra_guest::OPCODE,
+                        funct3 = ::axvm_algebra_guest::MODULAR_ARITHMETIC_FUNCT3,
+                        funct7 = ::axvm_algebra_guest::ModArithBaseFunct7::SetupMod as usize
                             + #mod_idx
                                 * (::axvm_algebra_guest::ModArithBaseFunct7::MODULAR_ARITHMETIC_MAX_KINDS as usize),
-                        uninit.as_mut_ptr(),
-                        remaining.as_ptr(),
-                        "x0" // will be parsed as 0 and therefore transpiled to SETUP_ADDMOD
+                        rd = In uninit.as_mut_ptr(),
+                        rs1 = In remaining.as_ptr(),
+                        rs2 = Const "x0" // will be parsed as 0 and therefore transpiled to SETUP_ADDMOD
                     );
                     axvm_platform::custom_insn_r!(
-                        ::axvm_algebra_guest::OPCODE,
-                        ::axvm_algebra_guest::MODULAR_ARITHMETIC_FUNCT3,
-                        ::axvm_algebra_guest::ModArithBaseFunct7::SetupMod as usize
+                        opcode = ::axvm_algebra_guest::OPCODE,
+                        funct3 = ::axvm_algebra_guest::MODULAR_ARITHMETIC_FUNCT3,
+                        funct7 = ::axvm_algebra_guest::ModArithBaseFunct7::SetupMod as usize
                             + #mod_idx
                                 * (::axvm_algebra_guest::ModArithBaseFunct7::MODULAR_ARITHMETIC_MAX_KINDS as usize),
-                        uninit.as_mut_ptr(),
-                        remaining.as_ptr(),
-                        "x1" // will be parsed as 1 and therefore transpiled to SETUP_MULDIV
+                        rd = In uninit.as_mut_ptr(),
+                        rs1 = In remaining.as_ptr(),
+                        rs2 = Const "x1" // will be parsed as 1 and therefore transpiled to SETUP_MULDIV
                     );
                     unsafe {
                         // This should not be x0:

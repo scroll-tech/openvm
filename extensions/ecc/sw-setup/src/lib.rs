@@ -458,26 +458,25 @@ pub fn sw_init(input: TokenStream) -> TokenStream {
             #[no_mangle]
             extern "C" fn #add_ne_extern_func(rd: usize, rs1: usize, rs2: usize) {
                 axvm_platform::custom_insn_r!(
-                    OPCODE,
-                    SW_FUNCT3 as usize,
-                    SwBaseFunct7::SwAddNe as usize + #ec_idx
+                    opcode = OPCODE,
+                    funct3 = SW_FUNCT3 as usize,
+                    funct7 = SwBaseFunct7::SwAddNe as usize + #ec_idx
                         * (SwBaseFunct7::SHORT_WEIERSTRASS_MAX_KINDS as usize),
-                    rd,
-                    rs1,
-                    rs2
+                    rd = In rd,
+                    rs1 = In rs1,
+                    rs2 = In rs2
                 );
             }
 
             #[no_mangle]
             extern "C" fn #double_extern_func(rd: usize, rs1: usize) {
                 axvm_platform::custom_insn_r!(
-                    OPCODE,
-                    SW_FUNCT3 as usize,
-                    SwBaseFunct7::SwDouble as usize + #ec_idx
+                    opcode = OPCODE,
+                    funct3 = SW_FUNCT3 as usize,
+                    funct7 = SwBaseFunct7::SwDouble as usize + #ec_idx
                         * (SwBaseFunct7::SHORT_WEIERSTRASS_MAX_KINDS as usize),
-                    rd,
-                    rs1,
-                    "x0"
+                    rd = In rd,
+                    rs1 = In rs1,
                 );
             }
 
@@ -513,24 +512,24 @@ pub fn sw_init(input: TokenStream) -> TokenStream {
                     let p2 = [one.as_ref(), one.as_ref()].concat();
                     let mut uninit: core::mem::MaybeUninit<[#item; 2]> = core::mem::MaybeUninit::uninit();
                     axvm_platform::custom_insn_r!(
-                        ::axvm_ecc_guest::OPCODE,
-                        ::axvm_ecc_guest::SW_FUNCT3 as usize,
-                        ::axvm_ecc_guest::SwBaseFunct7::SwSetup as usize
+                        opcode = ::axvm_ecc_guest::OPCODE,
+                        funct3 = ::axvm_ecc_guest::SW_FUNCT3 as usize,
+                        funct7 = ::axvm_ecc_guest::SwBaseFunct7::SwSetup as usize
                             + #ec_idx
                                 * (::axvm_ecc_guest::SwBaseFunct7::SHORT_WEIERSTRASS_MAX_KINDS as usize),
-                        uninit.as_mut_ptr(),
-                        p1.as_ptr(),
-                        p2.as_ptr()
+                        rd = In uninit.as_mut_ptr(),
+                        rs1 = In p1.as_ptr(),
+                        rs2 = In p2.as_ptr()
                     );
                     axvm_platform::custom_insn_r!(
-                        ::axvm_ecc_guest::OPCODE,
-                        ::axvm_ecc_guest::SW_FUNCT3 as usize,
-                        ::axvm_ecc_guest::SwBaseFunct7::SwSetup as usize
+                        opcode = ::axvm_ecc_guest::OPCODE,
+                        funct3 = ::axvm_ecc_guest::SW_FUNCT3 as usize,
+                        funct7 = ::axvm_ecc_guest::SwBaseFunct7::SwSetup as usize
                             + #ec_idx
                                 * (::axvm_ecc_guest::SwBaseFunct7::SHORT_WEIERSTRASS_MAX_KINDS as usize),
-                        uninit.as_mut_ptr(),
-                        p1.as_ptr(),
-                        "x0" // will be parsed as 0 and therefore transpiled to SETUP_EC_DOUBLE
+                        rd = In uninit.as_mut_ptr(),
+                        rs1 = In p1.as_ptr(),
+                        rs2 = const "x0" // will be parsed as 0 and therefore transpiled to SETUP_EC_DOUBLE
                     );
                 }
             }
