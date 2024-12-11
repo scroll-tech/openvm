@@ -265,6 +265,10 @@ impl<F: PrimeField32> Memory<F> {
         let mut lower_range = self
             .ts_map
             .range((Unbounded, Included((address_space, pointer))));
+        // if there is no block starting at or before pointer, we use an unmaterialized block starting
+        // <= pointer.
+        // if there is, we use it or an unmaterialized block starting <= pointer, depending on which
+        // has larger starting pointer.
         let (prev_ptr, prev_ts, prev_size, is_lower_initialized) =
             lower_range.next_back().map_or_else(
                 || {
@@ -312,6 +316,11 @@ impl<F: PrimeField32> Memory<F> {
             //);
             max(prev_ptr + prev_size, next_start)
         };
+        // if there is no block starting at or after pointer + size, we use an unmaterialized block starting
+        // >= pointer + size, which is either `pointer + size` rounded up or the endpoint of the last block,
+        // whichever is larger.
+        // if there is a block starting at or after pointer + size, we use it or an unmaterialized block starting
+        // >= pointer + size, depending on which has smaller starting pointer.
         let (next_ptr, _, next_size, is_upper_initialized) = upper_range.next().map_or_else(
             || {
                 (
@@ -361,8 +370,8 @@ impl<F: PrimeField32> Memory<F> {
         }
         let mut running_ptr = prev_ptr + prev_size;
         //println!(
-        //    "ACCESS running_ptr: {:?} raw_rem_ptrs: {:?} next_ptr: {:?}",
-        //    running_ptr, raw_rem_ptrs, next_ptr
+        //    "ACCESS pointer: {:?} size: {:?} running_ptr: {:?} prev_ptr: {:?} prev_size: {:?} raw_rem_ptrs: {:?} next_ptr: {:?}",
+        //    pointer, size, running_ptr, prev_ptr, prev_size, raw_rem_ptrs, next_ptr
         //);
         for (ptr, size, ts) in raw_rem_ptrs {
             if running_ptr < ptr {
