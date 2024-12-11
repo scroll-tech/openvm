@@ -3,7 +3,7 @@ use std::{
     cmp::max,
     collections::{
         BTreeMap,
-        Bound::{Included, Unbounded},
+        Bound::{Excluded, Included, Unbounded},
     },
     fmt::Debug,
 };
@@ -73,16 +73,9 @@ pub const INITIAL_TIMESTAMP: u32 = 0;
 /// (address_space, pointer)
 type Address = (usize, usize);
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
-struct Block {
-    size: usize,
-    timestamp: u32,
-}
-
-/// A partition of data into blocks where each block has size a power of two.
 #[derive(Debug)]
 pub struct Memory<F> {
-    blocks: BTreeMap<Address, Block>,
+    ts_map: BTreeMap<Address, u32>,
     data: FxHashMap<Address, F>,
     initial_block_size: usize,
     timestamp: u32,
@@ -95,24 +88,18 @@ impl<F: PrimeField32> Memory<F> {
     pub fn new<const N: usize>(initial_memory: &Equipartition<F, N>) -> Self {
         assert!(N.is_power_of_two());
 
-        let mut blocks = BTreeMap::new();
+        let mut ts_map = BTreeMap::new();
         let mut data = FxHashMap::default();
         for (&(address_space, block_idx), values) in initial_memory {
             let address_space_usize = address_space.as_canonical_u32() as usize;
             let pointer = block_idx * N;
-            blocks.insert(
-                (address_space_usize, pointer),
-                Block {
-                    size: N,
-                    timestamp: INITIAL_TIMESTAMP,
-                },
-            );
+            ts_map.insert((address_space_usize, pointer), INITIAL_TIMESTAMP);
             for (i, value) in values.iter().enumerate() {
                 data.insert((address_space_usize, pointer + i), *value);
             }
         }
         Self {
-            blocks,
+            ts_map,
             data,
             initial_block_size: N,
             timestamp: INITIAL_TIMESTAMP + 1,
@@ -143,12 +130,13 @@ impl<F: PrimeField32> Memory<F> {
         assert!(N.is_power_of_two());
 
         let mut adapter_records = vec![];
-        self.access(address_space, pointer, N, &mut adapter_records);
-
-        let block = self.blocks.get_mut(&(address_space, pointer)).unwrap();
-        let prev_timestamp = block.timestamp;
-        block.timestamp = self.timestamp;
-
+        let prev_timestamp = self.access(
+            address_space,
+            pointer,
+            N,
+            &mut adapter_records,
+            Some(self.timestamp),
+        );
         debug_assert!(prev_timestamp < self.timestamp);
 
         let prev_data = array::from_fn(|i| {
@@ -178,12 +166,13 @@ impl<F: PrimeField32> Memory<F> {
         assert!(N.is_power_of_two());
 
         let mut adapter_records = vec![];
-        self.access(address_space, pointer, N, &mut adapter_records);
-
-        let block = self.blocks.get_mut(&(address_space, pointer)).unwrap();
-        let prev_timestamp = block.timestamp;
-        block.timestamp = self.timestamp;
-
+        let prev_timestamp = self.access(
+            address_space,
+            pointer,
+            N,
+            &mut adapter_records,
+            Some(self.timestamp),
+        );
         debug_assert!(prev_timestamp < self.timestamp);
 
         let record = MemoryReadRecord {
@@ -205,25 +194,32 @@ impl<F: PrimeField32> Memory<F> {
 
         // First make sure the partition we maintain in self.blocks is an equipartition.
         let mut left = Unbounded;
-        while let Some((&(address_space, pointer), &block)) =
-            self.blocks.range((left, Unbounded)).next()
-        {
+        let mut range = self.ts_map.range((left, Unbounded)).peekable();
+        while range.peek().is_some() {
+            let (&(address_space, pointer), &ts) = range.next().unwrap();
+            let next = range.peek();
             let aligned_pointer = (pointer / N) * N;
-            if aligned_pointer != pointer || block.size != N {
-                self.access(address_space, aligned_pointer, N, &mut adapter_records);
+            if aligned_pointer != pointer || (next.is_some() && next.unwrap().0 .1 - pointer != N) {
+                self.access(
+                    address_space,
+                    aligned_pointer,
+                    N,
+                    &mut adapter_records,
+                    None,
+                );
             }
             left = Included((address_space, aligned_pointer + N));
+            range = self.ts_map.range((left, Unbounded)).peekable();
         }
 
         let mut equipartition = TimestampedEquipartition::<F, N>::new();
-        for (&(address_space, pointer), block) in self.blocks.iter() {
+        for (&(address_space, pointer), &ts) in self.ts_map.iter() {
             debug_assert_eq!(pointer % N, 0);
-            debug_assert_eq!(block.size, N);
 
             equipartition.insert(
                 (F::from_canonical_usize(address_space), pointer / N),
                 TimestampedValues {
-                    timestamp: block.timestamp,
+                    timestamp: ts,
                     values: self.range_array::<N>(address_space, pointer),
                 },
             );
@@ -232,159 +228,341 @@ impl<F: PrimeField32> Memory<F> {
         (equipartition, adapter_records)
     }
 
-    // Modifies the partition to ensure that there is a block starting at (address_space, query).
-    fn split_to_make_boundary(
-        &mut self,
-        address_space: usize,
-        query: usize,
-        records: &mut Vec<AccessAdapterRecord<F>>,
-    ) {
-        let (original_ptr, original_size, original_timestamp) =
-            self.block_containing(address_space, query);
-        if original_ptr == query {
-            return;
-        }
-
-        self.blocks.remove(&(address_space, original_ptr));
-
-        let mut cur_ptr = original_ptr;
-        let mut cur_size = original_size;
-        while cur_size > 0 {
-            // Split.
-            records.push(AccessAdapterRecord {
-                timestamp: original_timestamp,
-                address_space: F::from_canonical_usize(address_space),
-                start_index: F::from_canonical_usize(cur_ptr),
-                data: self.range_vec(address_space, cur_ptr, cur_size),
-                kind: AccessAdapterRecordKind::Split,
-            });
-
-            let half_size = cur_size / 2;
-
-            if query <= cur_ptr + half_size {
-                // The right is finalized; add it to the partition.
-                self.blocks.insert(
-                    (address_space, cur_ptr + half_size),
-                    Block {
-                        size: half_size,
-                        timestamp: original_timestamp,
-                    },
-                );
-            }
-            if query >= cur_ptr + half_size {
-                // The left is finalized; add it to the partition.
-                self.blocks.insert(
-                    (address_space, cur_ptr),
-                    Block {
-                        size: half_size,
-                        timestamp: original_timestamp,
-                    },
-                );
-            }
-
-            if cur_ptr + half_size <= query {
-                cur_ptr += half_size;
-            }
-
-            if cur_ptr == query {
-                break;
-            }
-            cur_size = half_size;
-        }
-    }
-
+    /// Returns the previous timestamp of the block starting at `pointer`
     fn access(
         &mut self,
         address_space: usize,
         pointer: usize,
         size: usize,
         records: &mut Vec<AccessAdapterRecord<F>>,
-    ) {
-        self.split_to_make_boundary(address_space, pointer, records);
-        self.split_to_make_boundary(address_space, pointer + size, records);
+        new_ts: Option<u32>,
+    ) -> u32 {
+        let mut rem_ptrs: Vec<(usize, u32)> = vec![];
 
-        let b = self
-            .blocks
-            .entry((address_space, pointer))
-            .or_insert_with(|| Block {
-                size: self.initial_block_size,
-                timestamp: INITIAL_TIMESTAMP,
-            });
-        if b.size == size {
-            return;
+        // contains all pointers in the range (pointer, pointer + size)
+        let range = self.ts_map.range((
+            Excluded((address_space, pointer)),
+            Excluded((address_space, pointer + size)),
+        ));
+
+        let mut lower_range = self
+            .ts_map
+            .range((Unbounded, Included((address_space, pointer))));
+        let (prev_ptr, prev_ts) = lower_range.next_back().map_or_else(
+            || {
+                (
+                    (pointer / self.initial_block_size) * self.initial_block_size,
+                    INITIAL_TIMESTAMP,
+                )
+            },
+            |(key, &ts)| (key.1, ts),
+        );
+
+        let mut upper_range = self
+            .ts_map
+            .range((Included((address_space, pointer + size)), Unbounded));
+        let (next_ptr, _) = upper_range.next().map_or_else(
+            || {
+                (
+                    // round up to the nearest multiple of self.initial_block_size
+                    ((pointer + size + self.initial_block_size - 1) / self.initial_block_size)
+                        * self.initial_block_size,
+                    INITIAL_TIMESTAMP,
+                )
+            },
+            |(key, &ts)| (key.1, ts),
+        );
+
+        for (val, &ts) in range {
+            rem_ptrs.push((val.1, ts));
         }
-        assert!(size > 1);
 
-        // Now recursively access left and right blocks to ensure they are in the partition.
-        let half_size = size / 2;
-        self.access(address_space, pointer, half_size, records);
-        self.access(address_space, pointer + half_size, half_size, records);
+        self.ts_map.remove(&(address_space, prev_ptr));
+        for (ptr, _) in &rem_ptrs {
+            self.ts_map.remove(&(address_space, *ptr));
+        }
 
-        self.merge_block_with_next(address_space, pointer, records);
+        let ret_ts = if rem_ptrs.len() == 0 {
+            // we need to split up a single block at the boundaries:
+            // [prev_ptr, next_ptr) at [pointer, pointer + size)
+            // we know that
+            //     prev_ptr <= pointer < pointer + size <= next_ptr
+
+            self.split_twice(
+                address_space,
+                prev_ptr,
+                prev_ts,
+                next_ptr,
+                pointer,
+                pointer + size,
+                records,
+            );
+
+            self.ts_map
+                .insert((address_space, pointer), new_ts.unwrap_or(prev_ts));
+            prev_ts
+        } else {
+            // we need to split up the blocks at the boundaries:
+            // [prev_ptr, rem_ptrs[0]) at pointer
+            // [rem_ptrs[-1], next_ptr) at pointer + size
+
+            let mut left_split = self.split(
+                address_space,
+                prev_ptr,
+                prev_ts,
+                rem_ptrs[1].0,
+                pointer,
+                records,
+                true,
+                false,
+            );
+            let right_split = self.split(
+                address_space,
+                rem_ptrs[rem_ptrs.len() - 1].0,
+                rem_ptrs[rem_ptrs.len() - 1].1,
+                next_ptr,
+                pointer + size,
+                records,
+                false,
+                true,
+            );
+
+            // we need to merge the blocks on the interior:
+            // [pointer, rem_ptrs[0], ..., rem_ptrs[-1], pointer + size)
+            left_split.extend(rem_ptrs);
+            left_split.extend(right_split);
+            let merged_ts = self.merge(address_space, left_split, pointer + size, records);
+
+            self.ts_map
+                .insert((address_space, pointer), new_ts.unwrap_or(merged_ts));
+            merged_ts
+        };
+        ret_ts
     }
 
-    /// Merges the two adjacent blocks starting at (address_space, pointer).
-    ///
-    /// Panics if there is no block starting at (address_space, pointer) or if the two blocks
-    /// do not have the same size.
-    fn merge_block_with_next(
+    // Returns the timestamp of the merged block.
+    /// entries is a list of (pointer, timestamp) pairs, sorted by pointer.
+    /// end_ptr must be greater than all pointers in entries.
+    fn merge(
         &mut self,
         address_space: usize,
-        pointer: usize,
+        entries: Vec<(usize, u32)>,
+        end_ptr: usize,
         records: &mut Vec<AccessAdapterRecord<F>>,
-    ) {
-        let left = self
-            .blocks
-            .remove(&(address_space, pointer))
-            .unwrap_or(Block {
-                size: self.initial_block_size,
-                timestamp: INITIAL_TIMESTAMP,
-            });
-        let size = left.size;
-        let right = self
-            .blocks
-            .remove(&(address_space, pointer + size))
-            .unwrap_or(Block {
-                size: self.initial_block_size,
-                timestamp: INITIAL_TIMESTAMP,
-            });
-        assert_eq!(size, right.size);
+    ) -> u32 {
+        // we first split only so that all entries are aligned.
+        let mut aligned_entries = Vec::with_capacity(2 * entries.len());
+        for window in entries.windows(2) {
+            let (ptr0, ts0) = window[0];
+            let (ptr1, _) = window[1];
+            let aligned_ptrs = self.aligned_split(address_space, ptr0, ts0, ptr1 - ptr0, records);
+            aligned_entries.extend(aligned_ptrs.iter().map(|&ptr| (ptr, ts0)));
+        }
+        if let Some(&(ptr, ts)) = entries.last() {
+            let aligned_ptrs = self.aligned_split(address_space, ptr, ts, end_ptr - ptr, records);
+            aligned_entries.extend(aligned_ptrs.iter().map(|&ptr| (ptr, ts)));
+        }
+        // 0 is a dummy timestamp and is never referenced
+        aligned_entries.push((end_ptr, 0));
 
-        let timestamp = max(left.timestamp, right.timestamp);
-        self.blocks.insert(
-            (address_space, pointer),
-            Block {
-                size: 2 * size,
-                timestamp,
-            },
-        );
-        records.push(AccessAdapterRecord {
-            timestamp,
-            address_space: F::from_canonical_usize(address_space),
-            start_index: F::from_canonical_usize(pointer),
-            data: self.range_vec(address_space, pointer, 2 * size),
-            kind: AccessAdapterRecordKind::Merge {
-                left_timestamp: left.timestamp,
-                right_timestamp: right.timestamp,
-            },
-        });
-    }
-
-    // Returns (pointer, size, timestamp) of the block containing the start of the given pointer.
-    fn block_containing(&mut self, address_space: usize, pointer: usize) -> (usize, usize, u32) {
-        // Look for the block with the largest key <= (address_space, pointer)
-        let key = (address_space, pointer);
-
-        if let Some((&(block_as, block_ptr), block)) =
-            self.blocks.range((Unbounded, Included(key))).next_back()
-        {
-            if block_as == address_space && block_ptr <= pointer && pointer < block_ptr + block.size
-            {
-                return (block_ptr, block.size, block.timestamp);
+        // we then merge blocks
+        let mut merged_entries: Vec<(usize, u32, usize)> =
+            Vec::with_capacity(aligned_entries.len());
+        for window in aligned_entries.windows(2) {
+            let (ptr0, ts0) = window[0];
+            let (ptr1, _) = window[1];
+            let mut size = ptr1 - ptr0;
+            if merged_entries.len() == 0 || (*(merged_entries.last().unwrap())).2 > size {
+                merged_entries.push((ptr0, ts0, size));
+            } else {
+                assert!(merged_entries.last().unwrap().2 == size);
+                let mut ts = ts0;
+                let mut final_ptr = ptr0;
+                while let Some((ptr, merged_ts, merged_size)) = merged_entries.pop() {
+                    if merged_size == size {
+                        let new_ts = max(merged_ts, ts);
+                        records.push(AccessAdapterRecord {
+                            timestamp: new_ts,
+                            address_space: F::from_canonical_usize(address_space),
+                            start_index: F::from_canonical_usize(ptr),
+                            data: self.range_vec(address_space, ptr, 2 * size),
+                            kind: AccessAdapterRecordKind::Merge {
+                                left_timestamp: merged_ts,
+                                right_timestamp: ts,
+                            },
+                        });
+                        size = 2 * size;
+                        final_ptr = ptr;
+                        ts = new_ts;
+                    } else {
+                        assert!(merged_size > size);
+                        break;
+                    }
+                }
+                merged_entries.push((final_ptr, ts, size));
             }
         }
-        let aligned_pointer = (pointer / self.initial_block_size) * self.initial_block_size;
-        (aligned_pointer, self.initial_block_size, INITIAL_TIMESTAMP)
+        merged_entries.last().unwrap().1
+    }
+
+    // Returns the new pointers for a split of a block of size `size` starting at `start_offset` which is
+    // split to only have bit-aligned blocks.
+    fn aligned_split(
+        &mut self,
+        address_space: usize,
+        start_offset: usize,
+        start_ts: u32,
+        size: usize,
+        records: &mut Vec<AccessAdapterRecord<F>>,
+    ) -> Vec<usize> {
+        assert!(size.is_power_of_two());
+        let start_trailing_bits = start_offset.trailing_zeros();
+        let size_bits = size.trailing_zeros();
+
+        if start_trailing_bits >= size_bits {
+            // no splitting is needed
+            return vec![start_offset];
+        } else {
+            for split_bits in start_trailing_bits..size_bits {
+                for idx in 0..(1 << (split_bits - start_trailing_bits)) {
+                    records.push(AccessAdapterRecord {
+                        timestamp: start_ts,
+                        address_space: F::from_canonical_usize(address_space),
+                        start_index: F::from_canonical_usize(
+                            start_offset + idx * (1 << (split_bits + 1)),
+                        ),
+                        data: self.range_vec(
+                            address_space,
+                            start_offset + idx * (1 << (split_bits + 1)),
+                            1 << (split_bits + 1),
+                        ),
+                        kind: AccessAdapterRecordKind::Split,
+                    });
+                }
+            }
+            return (0..(1 << (size_bits - start_trailing_bits)))
+                .map(|i| start_offset + i * (1 << start_trailing_bits))
+                .collect();
+        }
+    }
+
+    // Returns new entries which are not inserted into the ts_map, according to the add_left flag.
+    fn split(
+        &mut self,
+        address_space: usize,
+        start_ptr: usize,
+        start_ts: u32,
+        end_ptr: usize,
+        split_ptr: usize,
+        records: &mut Vec<AccessAdapterRecord<F>>,
+        add_left: bool,
+        add_right: bool,
+    ) -> Vec<(usize, u32)> {
+        assert!(start_ptr <= split_ptr && split_ptr <= end_ptr);
+        assert!((end_ptr - start_ptr).is_power_of_two());
+
+        let mut start_ptr = start_ptr;
+        let mut end_ptr = end_ptr;
+        let mut new_entries = vec![];
+        while start_ptr != split_ptr && end_ptr != split_ptr {
+            records.push(AccessAdapterRecord {
+                timestamp: start_ts,
+                address_space: F::from_canonical_usize(address_space),
+                start_index: F::from_canonical_usize(start_ptr),
+                data: self.range_vec(address_space, start_ptr, end_ptr - start_ptr),
+                kind: AccessAdapterRecordKind::Split,
+            });
+            let mid_ptr = (start_ptr + end_ptr) / 2;
+            if mid_ptr < split_ptr {
+                if add_left {
+                    self.ts_map.insert((address_space, start_ptr), start_ts);
+                } else {
+                    new_entries.push((start_ptr, start_ts));
+                }
+                start_ptr = mid_ptr;
+            } else {
+                if add_right {
+                    self.ts_map.insert((address_space, mid_ptr), start_ts);
+                } else {
+                    new_entries.push((mid_ptr, start_ts));
+                }
+                end_ptr = mid_ptr;
+            }
+        }
+        new_entries
+    }
+
+    fn split_twice(
+        &mut self,
+        address_space: usize,
+        start_ptr: usize,
+        start_ts: u32,
+        end_ptr: usize,
+        split_ptr_left: usize,
+        split_ptr_right: usize,
+        records: &mut Vec<AccessAdapterRecord<F>>,
+    ) {
+        assert!(
+            start_ptr <= split_ptr_left
+                && split_ptr_right <= end_ptr
+                && split_ptr_left < split_ptr_right
+        );
+        assert!((end_ptr - start_ptr).is_power_of_two());
+        assert!((split_ptr_right - split_ptr_left).is_power_of_two());
+
+        let mut start_ptr = start_ptr;
+        let mut end_ptr = end_ptr;
+        let mut mid_ptr_opt = None;
+        while start_ptr != split_ptr_left || end_ptr != split_ptr_right {
+            records.push(AccessAdapterRecord {
+                timestamp: start_ts,
+                address_space: F::from_canonical_usize(address_space),
+                start_index: F::from_canonical_usize(start_ptr),
+                data: self.range_vec(address_space, start_ptr, end_ptr - start_ptr),
+                kind: AccessAdapterRecordKind::Split,
+            });
+            let mid_ptr = (start_ptr + end_ptr) / 2;
+            if mid_ptr <= split_ptr_left {
+                self.ts_map.insert((address_space, start_ptr), start_ts);
+                start_ptr = mid_ptr;
+            } else if mid_ptr >= split_ptr_right {
+                self.ts_map.insert((address_space, mid_ptr), start_ts);
+                end_ptr = mid_ptr;
+            } else {
+                mid_ptr_opt = Some(mid_ptr);
+                break;
+            }
+        }
+        if mid_ptr_opt.is_none() {
+            // this means that splitting leaves [split_ptr_left, split_ptr_right)
+            // unchanged, so we can just return.
+            return;
+        }
+
+        let mut left_split = self.split(
+            address_space,
+            start_ptr,
+            start_ts,
+            mid_ptr_opt.unwrap(),
+            split_ptr_left,
+            records,
+            true,
+            false,
+        );
+        let right_split = self.split(
+            address_space,
+            mid_ptr_opt.unwrap(),
+            start_ts,
+            end_ptr,
+            split_ptr_right,
+            records,
+            false,
+            true,
+        );
+        left_split.extend(right_split);
+
+        // merge from [split_ptr_left, mid_ptr) and [mid_ptr, split_ptr_right)
+        self.merge(address_space, left_split, split_ptr_right, records);
     }
 
     pub fn get(&self, address_space: usize, pointer: usize) -> F {
@@ -431,6 +609,7 @@ mod tests {
         }
     }
 
+    /*
     #[test]
     fn test_partition() {
         type F = BabyBear;
@@ -441,6 +620,7 @@ mod tests {
         assert_eq!(partition.block_containing(0, 15), (8, 8, 0));
         assert_eq!(partition.block_containing(0, 16), (16, 8, 0));
     }
+    */
 
     #[test]
     fn test_write_read_initial_block_len_1() {
