@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| app_proof | <div style='text-align: right'>2</div>  | <span style="color: green">(-409,786,912 [-88.8%])</span> <div style='text-align: right'>51,647,355</div>  | <span style="color: green">(-3,508,406 [-70.0%])</span> <div style='text-align: right'>1,500,219</div>  | <span style="color: green">(-21,705.0 [-80.8%])</span> <div style='text-align: right'>5,149.0</div>  |
+| app_proof | <div style='text-align: right'>2</div>  | <span style="color: green">(-409,787,702 [-88.8%])</span> <div style='text-align: right'>51,647,355</div>  | <span style="color: green">(-3,508,317 [-70.0%])</span> <div style='text-align: right'>1,500,219</div>  | <span style="color: green">(-21,657.0 [-80.8%])</span> <div style='text-align: right'>5,142.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms |
 | --- | --- | --- | --- | --- |
-| <span style="color: green">(-1.0 [-16.7%])</span> <div style='text-align: right'>5.0</div>  | <span style="color: green">(-17.0 [-1.4%])</span> <div style='text-align: right'>1,223.0</div>  | <span style="color: green">(-6.0 [-0.6%])</span> <div style='text-align: right'>962.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+8.0 [+1.6%])</span> <div style='text-align: right'>500.0</div>  |
+| <span style="color: green">(-1.0 [-16.7%])</span> <div style='text-align: right'>5.0</div>  | <span style="color: green">(-3.0 [-0.2%])</span> <div style='text-align: right'>1,208.0</div>  | <span style="color: green">(-9.0 [-0.9%])</span> <div style='text-align: right'>947.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-1.0 [-0.2%])</span> <div style='text-align: right'>487.0</div>  |
 
 | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- |
@@ -44,7 +44,7 @@
 
 | group | segment | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_cycles | trace_gen_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| app_proof | 0 | <span style="color: green">(-21,705.0 [-80.8%])</span> <div style='text-align: right'>5,149.0</div>  | <span style="color: green">(-874,754,116 [-81.6%])</span> <div style='text-align: right'>197,775,316</div>  | <span style="color: green">(-409,786,912 [-88.8%])</span> <div style='text-align: right'>51,647,355</div>  | <span style="color: green">(-3,508,406 [-70.0%])</span> <div style='text-align: right'>1,500,219</div>  | <span style="color: green">(-8,903.0 [-97.3%])</span> <div style='text-align: right'>243.0</div>  |
+| app_proof | 0 | <span style="color: green">(-21,657.0 [-80.8%])</span> <div style='text-align: right'>5,142.0</div>  | <span style="color: green">(-874,754,116 [-81.6%])</span> <div style='text-align: right'>197,775,316</div>  | <span style="color: green">(-409,787,702 [-88.8%])</span> <div style='text-align: right'>51,647,355</div>  | <span style="color: green">(-3,508,317 [-70.0%])</span> <div style='text-align: right'>1,500,219</div>  | <span style="color: green">(-8,861.0 [-97.4%])</span> <div style='text-align: right'>237.0</div>  |
 
 | group | chip_name | segment | rows_used |
 | --- | --- | --- | --- |
@@ -143,7 +143,7 @@
 
 | group | execute_time_ms | fri.log_blowup | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| app_proof | <span style="color: red">(+1.0 [+0.1%])</span> <div style='text-align: right'>960.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-409,786,912 [-88.8%])</span> <div style='text-align: right'>51,647,355</div>  | <span style="color: green">(-3,508,406 [-70.0%])</span> <div style='text-align: right'>1,500,219</div>  | <span style="color: green">(-21,705.0 [-80.8%])</span> <div style='text-align: right'>5,149.0</div>  |
+| app_proof | <span style="color: red">(+7.0 [+0.7%])</span> <div style='text-align: right'>964.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <span style="color: green">(-409,787,702 [-88.8%])</span> <div style='text-align: right'>51,647,355</div>  | <span style="color: green">(-3,508,317 [-70.0%])</span> <div style='text-align: right'>1,500,219</div>  | <span style="color: green">(-21,657.0 [-80.8%])</span> <div style='text-align: right'>5,142.0</div>  |
 
 | group | air_name | segment | cells | main_cols | perm_cols | prep_cols | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -170,7 +170,7 @@
 
 | segment | trace_gen_time_ms |
 | --- | --- |
-| 0 | <span style="color: green">(-11.0 [-4.1%])</span> <div style='text-align: right'>260.0</div>  |
+| 0 | <span style="color: red">(+7.0 [+2.8%])</span> <div style='text-align: right'>261.0</div>  |
 
 </details>
 
@@ -179,14 +179,14 @@
 <details>
 <summary>Flamegraphs</summary>
 
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/f89b9415e242b733de17c37ffe6d17c767acb469/fibonacci-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/f89b9415e242b733de17c37ffe6d17c767acb469/fibonacci-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.air_name.cells_used.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/f89b9415e242b733de17c37ffe6d17c767acb469/fibonacci-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/f89b9415e242b733de17c37ffe6d17c767acb469/fibonacci-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.air_name.cells_used.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/f89b9415e242b733de17c37ffe6d17c767acb469/fibonacci-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/f89b9415e242b733de17c37ffe6d17c767acb469/fibonacci-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.frequency.reverse.svg)
-[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/f89b9415e242b733de17c37ffe6d17c767acb469/fibonacci-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/f89b9415e242b733de17c37ffe6d17c767acb469/fibonacci-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.frequency.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/04e9dd42628e73c88dcf0e4c8a540c6982883ed4/fibonacci-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.air_name.cells_used.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/04e9dd42628e73c88dcf0e4c8a540c6982883ed4/fibonacci-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.air_name.cells_used.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/04e9dd42628e73c88dcf0e4c8a540c6982883ed4/fibonacci-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.air_name.cells_used.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/04e9dd42628e73c88dcf0e4c8a540c6982883ed4/fibonacci-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.air_name.cells_used.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/04e9dd42628e73c88dcf0e4c8a540c6982883ed4/fibonacci-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.frequency.reverse.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/04e9dd42628e73c88dcf0e4c8a540c6982883ed4/fibonacci-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.frequency.reverse.svg)
+[![](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/04e9dd42628e73c88dcf0e4c8a540c6982883ed4/fibonacci-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.frequency.svg)](https://axiom-public-data-sandbox-us-east-1.s3.us-east-1.amazonaws.com/benchmark/github/flamegraphs/04e9dd42628e73c88dcf0e4c8a540c6982883ed4/fibonacci-2-2-1048476-64cpu-linux-arm64-mimalloc-app_proof.dsl_ir.opcode.frequency.svg)
 
 </details>
 
-Commit: https://github.com/axiom-crypto/afs-prototype/commit/f89b9415e242b733de17c37ffe6d17c767acb469
+Commit: https://github.com/axiom-crypto/afs-prototype/commit/04e9dd42628e73c88dcf0e4c8a540c6982883ed4
 
 Max Segment Length: 1048476
 
@@ -194,4 +194,4 @@ Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12268035233)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12268943518)
