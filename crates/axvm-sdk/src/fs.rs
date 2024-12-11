@@ -9,7 +9,7 @@ use eyre::Result;
 use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{
-    keygen::{AppProvingKey, FullAggProvingKey},
+    keygen::{AggProvingKey, AppProvingKey, AppVerifyingKey},
     prover::vm::ContinuationVmProof,
     F, SC,
 };
@@ -35,6 +35,14 @@ pub fn write_app_pk_to_file<VC: VmConfig<F>, P: AsRef<Path>>(
     write_to_file_bson(path, app_pk)
 }
 
+pub fn read_app_vk_from_file<P: AsRef<Path>>(path: P) -> Result<AppVerifyingKey> {
+    read_from_file_bson(path)
+}
+
+pub fn write_app_vk_to_file<P: AsRef<Path>>(app_vk: AppVerifyingKey, path: P) -> Result<()> {
+    write_to_file_bson(path, app_vk)
+}
+
 pub fn read_app_proof_from_file<P: AsRef<Path>>(path: P) -> Result<ContinuationVmProof<SC>> {
     read_from_file_bson(path)
 }
@@ -46,11 +54,11 @@ pub fn write_app_proof_to_file<P: AsRef<Path>>(
     write_to_file_bson(path, proof)
 }
 
-pub fn read_agg_pk_from_file<P: AsRef<Path>>(path: P) -> Result<FullAggProvingKey> {
+pub fn read_agg_pk_from_file<P: AsRef<Path>>(path: P) -> Result<AggProvingKey> {
     read_from_file_bson(path)
 }
 
-pub fn write_agg_pk_to_file<P: AsRef<Path>>(agg_pk: FullAggProvingKey, path: P) -> Result<()> {
+pub fn write_agg_pk_to_file<P: AsRef<Path>>(agg_pk: AggProvingKey, path: P) -> Result<()> {
     write_to_file_bson(path, agg_pk)
 }
 

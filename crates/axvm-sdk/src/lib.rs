@@ -38,7 +38,7 @@ use axvm_transpiler::{
 use commit::commit_app_exe;
 use config::AppConfig;
 use eyre::Result;
-use keygen::AppProvingKey;
+use keygen::{AppProvingKey, AppVerifyingKey};
 use prover::vm::ContinuationVmProof;
 
 pub mod commit;
@@ -54,8 +54,8 @@ pub use stdin::*;
 pub mod fs;
 
 use crate::{
-    config::FullAggConfig,
-    keygen::FullAggProvingKey,
+    config::AggConfig,
+    keygen::AggProvingKey,
     prover::{AppProver, ContinuationProver},
 };
 
@@ -63,7 +63,7 @@ pub(crate) type SC = BabyBearPoseidon2Config;
 pub(crate) type C = InnerConfig;
 pub(crate) type F = BabyBear;
 pub(crate) type RootSC = BabyBearPoseidon2RootConfig;
-pub(crate) type NonRootCommittedExe = AxVmCommittedExe<SC>;
+pub type NonRootCommittedExe = AxVmCommittedExe<SC>;
 
 pub struct Sdk;
 
@@ -140,7 +140,7 @@ impl Sdk {
 
     pub fn generate_app_proof<VC: VmConfig<F>>(
         &self,
-        app_vm_pk: AppProvingKey<VC>,
+        app_pk: Arc<AppProvingKey<VC>>,
         app_committed_exe: Arc<NonRootCommittedExe>,
         inputs: StdIn,
     ) -> Result<ContinuationVmProof<SC>>
@@ -148,34 +148,34 @@ impl Sdk {
         VC::Executor: Chip<SC>,
         VC::Periphery: Chip<SC>,
     {
-        let app_prover = AppProver::new(app_vm_pk.app_vm_pk, app_committed_exe);
+        let app_prover = AppProver::new(app_pk.app_vm_pk.clone(), app_committed_exe);
         let proof = app_prover.generate_app_proof(inputs);
         Ok(proof)
     }
 
-    pub fn verify_app_proof<VC: VmConfig<F>>(
+    pub fn verify_app_proof(
         &self,
-        app_pk: &AppProvingKey<VC>,
+        app_vk: &AppVerifyingKey,
         proof: &ContinuationVmProof<SC>,
     ) -> Result<(), VerificationError> {
-        let e = BabyBearPoseidon2Engine::new(app_pk.app_vm_pk.fri_params);
+        let e = BabyBearPoseidon2Engine::new(app_vk.fri_params);
         for seg_proof in &proof.per_segment {
-            e.verify(&app_pk.app_vm_pk.vm_pk.get_vk(), seg_proof)?
+            e.verify(&app_vk.app_vm_vk, seg_proof)?
         }
         // TODO: verify continuation.
         Ok(())
     }
 
-    pub fn agg_keygen(&self, config: FullAggConfig) -> Result<FullAggProvingKey> {
-        let agg_pk = FullAggProvingKey::keygen(config);
+    pub fn agg_keygen(&self, config: AggConfig) -> Result<AggProvingKey> {
+        let agg_pk = AggProvingKey::keygen(config);
         Ok(agg_pk)
     }
 
     pub fn generate_evm_proof<VC: VmConfig<F>>(
         &self,
-        app_pk: AppProvingKey<VC>,
+        app_pk: Arc<AppProvingKey<VC>>,
         app_exe: Arc<NonRootCommittedExe>,
-        agg_pk: FullAggProvingKey,
+        agg_pk: AggProvingKey,
         inputs: StdIn,
     ) -> Result<EvmProof>
     where
@@ -187,14 +187,8 @@ impl Sdk {
         Ok(proof)
     }
 
-    pub fn generate_snark_verifier_contract(
-        &self,
-        full_agg_proving_key: &FullAggProvingKey,
-    ) -> Result<EvmVerifier> {
-        let evm_verifier = full_agg_proving_key
-            .halo2_pk
-            .wrapper
-            .generate_evm_verifier();
+    pub fn generate_snark_verifier_contract(&self, agg_pk: &AggProvingKey) -> Result<EvmVerifier> {
+        let evm_verifier = agg_pk.halo2_pk.wrapper.generate_evm_verifier();
         Ok(evm_verifier)
     }
 
