@@ -5,6 +5,7 @@ on:
     inputs:
       # Default runner is not big enough for this
       # https://aws.amazon.com/ec2/instance-types/
+      # In case we need more inputs, see https://github.com/orgs/community/discussions/8774
       instance_family:
         type: string
         required: false
@@ -35,17 +36,19 @@ on:
         required: false
         description: Root level log blowup (only for e2e)
         default: 3
-      # workflow dispatch has a limit on how many inputs
-      # we always use the default for now
-      # internal_log_blowup:
-      #   type: number
-      #   required: false
-      #   description: Internal level log blowup (only for e2e)
-      #   default: 2
+      internal_log_blowup:
+        type: number
+        required: false
+        description: Internal level log blowup (only for e2e)
+        default: 2
       mode:
-        type: string
+        type: choice
         required: false
         description: Running mode, one of execute, prove, or prove-e2e
+        options:
+          - execute
+          - prove
+          - prove-e2e
         default: prove
       collect_metrics:
         type: boolean
@@ -89,39 +92,16 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
+      - name: Display workflow inputs
+        run: echo "${{ toJSON(github.event.inputs) }}"
       - name: Setup CLI
         working-directory: crates/cargo-axiom
         run: |
           cargo install --force --path .
       - name: Install architecture specific tools
         run: |
-          arch=$(uname -m)
-          case $arch in
-            arm64|aarch64)
-              rustup component add rust-src --toolchain nightly-2024-10-30-aarch64-unknown-linux-gnu
-              S5CMD_BIN="s5cmd_2.2.2_linux_arm64.deb"
-              ;;
-            x86_64|amd64)
-              rustup component add rust-src --toolchain nightly-2024-10-30-x86_64-unknown-linux-gnu
-              S5CMD_BIN="s5cmd_2.2.2_linux_amd64.deb"
-              ;;
-            *)
-              echo "Unsupported architecture: $arch"
-              exit 1
-              ;;
-          esac
-
-          echo "Checking s5cmd"
-          if type s5cmd &>/dev/null; then
-              echo "s5cmd was installed."
-          else
-              TMP_DIR=/tmp/s5cmd
-              rm -rf $TMP_DIR
-              mkdir $TMP_DIR
-              echo "s5cmd was not installed. Installing.."
-              wget "https://github.com/peak/s5cmd/releases/download/v2.2.2/${S5CMD_BIN}" -P $TMP_DIR
-              sudo dpkg -i "${TMP_DIR}/${S5CMD_BIN}"
-          fi
+          source ci/scripts/utils.sh
+          install_s5cmd
 
       - name: Checkout Reth. This is inside afs-prototype dir but it's fine.
         run: |
@@ -131,7 +111,15 @@ jobs:
         if: ${{ github.event.inputs.mode == 'prove-e2e' }}
         run: |
           bash ./extensions/native/recursion/trusted_setup_s3.sh
-          ln -s params rsp/params
+
+      - name: Set metric name
+        run: |
+          input_json_str="${{ toJSON(github.event.inputs) }}"
+          input_hash=$(echo $input_json_str | sha256sum | cut -d' ' -f1)
+          METRIC_NAME=reth-${input_hash}
+          echo "METRIC_NAME=${METRIC_NAME}" >> $GITHUB_ENV
+          METRIC_PATH=".bench_metrics/${METRIC_NAME}.json"
+          echo "METRIC_PATH=${METRIC_PATH}" >> $GITHUB_ENV
 
       - name: Run Reth
         run: |
@@ -139,17 +127,24 @@ jobs:
           cargo axiom build
           mkdir -p ../host/elf
           cp target/riscv32im-risc0-zkvm-elf/release/rsp-client-eth ../host/elf/
+
           cd ../..
+          ln -s ../params
           mkdir -p rpc-cache
+          mkdir -p .bench_metrics # TODO: remove this
           RPC_1=${{ secrets.RPC_URL_1 }}
           MODE=${{ inputs.mode }}
           BLOCK_NUMBER=${{ inputs.block_number }}
           OPTIONAL_ARGS=""
+          PROFILE="release"
+          FEATURES="bench-metrics,${{ inputs.memory_allocator }}"
           if [[ "${{ inputs.collect_metrics }}" == "true" ]]; then
             OPTIONAL_ARGS="--collect-metrics"
+            PROFILE="profiling"
+            FEATURES="${FEATURES},profiling"
           fi
-          cargo build --bin rsp --release
-          OUTPUT_PATH="metrics.json" RUSTFLAGS="-Ctarget-cpu=native" ./target/release/rsp \
+          cargo build --bin rsp --profile=$PROFILE --no-default-features --features=$FEATURES
+          OUTPUT_PATH=${METRIC_PATH} RUSTFLAGS="-Ctarget-cpu=native" ./target/$PROFILE/rsp \
             --$MODE --block-number $BLOCK_NUMBER --rpc-url $RPC_1 --cache-dir rpc-cache \
             --app-log-blowup ${{ inputs.app_log_blowup }} \
             --agg-log-blowup ${{ inputs.agg_log_blowup }} \
@@ -160,5 +155,72 @@ jobs:
         working-directory: rsp
         run: |
           current_sha=$(git rev-parse HEAD)
-          METRIC_NAME="reth"
-          s5cmd cp metrics.json ${{ env.S3_METRICS_PATH }}/${current_sha}-${METRIC_NAME}.json
+          echo "Current SHA: $current_sha"
+          echo "current_sha=${current_sha}" >> $GITHUB_ENV
+          s5cmd cp ${METRIC_PATH} ${{ env.S3_METRICS_PATH }}/${current_sha}-${METRIC_NAME}.json
+
+      - name: Generate markdown # result path is hardcoded results.md
+        working-directory: rsp
+        run: |
+          source ../ci/scripts/utils.sh
+          generate_markdown $METRIC_PATH $METRIC_NAME $current_sha ${{ env.S3_METRICS_PATH }} ".."
+
+      - name: Install inferno-flamegraph
+        run: cargo install inferno
+
+      - name: Generate flamegraphs
+        working-directory: rsp
+        run: |
+          if [[ -f $METRIC_PATH ]]; then
+            python3 ../ci/scripts/metric_unify/flamegraph.py $METRIC_PATH
+            s5cmd cp '.bench_metrics/flamegraphs/*.svg' "${{ env.PUBLIC_S3_PATH }}/${current_sha}/"
+            echo "UPLOAD_FLAMEGRAPHS=1" >> $GITHUB_ENV
+          fi
+
+      - name: Add benchmark metadata to markdown, and upload
+        working-directory: rsp
+        run: |
+          source ../ci/scripts/utils.sh
+          add_metadata results.md ${{ inputs.max_segment_length }} ${{ inputs.instance_family }} ${{ inputs.memory_allocator }} ${{ github.repository }} ${{ github.run_id }}
+          s5cmd cp "${{ env.S3_PATH }}/${{ env.current_sha }}-${METRIC_NAME}.md" "${{ env.S3_PATH }}/main-${METRIC_NAME}.md"
+
+      ### Update gh-pages
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Set up git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Commit to gh-pages branch
+        run: |
+          GH_PAGES_PATH="benchmarks-dispatch/${{ github.head_ref || github.ref }}"
+          echo "GH_PAGES_PATH=${GH_PAGES_PATH}" >> $GITHUB_ENV
+          mkdir -p ${GH_PAGES_PATH}
+          s5cmd cp "${{ env.S3_PATH }}/main-${METRIC_NAME}.md" "${GH_PAGES_PATH}/${METRIC_NAME}.md"
+
+          git add ${GH_PAGES_PATH}/${METRIC_NAME}.md
+          git commit --allow-empty -m "Update benchmark result at ${GH_PAGES_PATH}/${METRIC_NAME}.md"
+          MAX_RETRIES=10
+          RETRY_DELAY=5
+          ATTEMPT=0
+          SUCCESS=false
+          while [ $ATTEMPT -lt $MAX_RETRIES ]; do
+              echo "Attempt $((ATTEMPT + 1)) to push of $MAX_RETRIES..."
+              git fetch origin gh-pages
+              git merge origin/gh-pages --no-edit
+              if git push origin gh-pages; then
+                  SUCCESS=true
+                  break
+              else
+                  echo "Push failed. Retrying in $RETRY_DELAY seconds..."
+                  sleep $RETRY_DELAY
+                  ATTEMPT=$((ATTEMPT + 1))
+              fi
+          done
+          if [ "$SUCCESS" = false ]; then
+              echo "PUSH_FAILED"
+              exit 1
+          fi
