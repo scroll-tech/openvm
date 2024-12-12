@@ -3,11 +3,14 @@ use std::{
     sync::Arc,
 };
 
-use ax_stark_backend::{
+use openvm_instructions::{
+    instruction::Instruction, program::Program, SystemOpcode::TERMINATE, VmOpcode,
+};
+use openvm_stark_backend::{
     config::StarkGenericConfig, engine::StarkEngine, p3_field::AbstractField,
     prover::types::AirProofInput, utils::disable_debug_builder,
 };
-use ax_stark_sdk::{
+use openvm_stark_sdk::{
     config::{
         baby_bear_poseidon2::{BabyBearPoseidon2Config, BabyBearPoseidon2Engine},
         fri_params::standard_fri_params_with_100_bits_conjectured_security,
@@ -15,14 +18,11 @@ use ax_stark_sdk::{
     engine::StarkFriEngine,
     p3_baby_bear::BabyBear,
 };
-use axvm_instructions::{
-    instruction::Instruction, program::Program, AxVmOpcode, SystemOpcode::TERMINATE,
-};
 
 use super::VmConnectorPvs;
 use crate::{
     arch::{SingleSegmentVmExecutor, SystemConfig, VirtualMachine, CONNECTOR_AIR_ID},
-    system::program::trace::AxVmCommittedExe,
+    system::program::trace::VmCommittedExe,
 };
 
 type F = BabyBear;
@@ -75,7 +75,7 @@ fn test_impl(
 
     {
         let instructions = vec![Instruction::from_isize(
-            AxVmOpcode::with_default_offset(TERMINATE),
+            VmOpcode::with_default_offset(TERMINATE),
             0,
             0,
             exit_code as isize,
@@ -84,7 +84,7 @@ fn test_impl(
         )];
 
         let program = Program::from_instructions(&instructions);
-        let committed_exe = Arc::new(AxVmCommittedExe::commit(
+        let committed_exe = Arc::new(VmCommittedExe::commit(
             program.into(),
             vm.engine.config.pcs(),
         ));

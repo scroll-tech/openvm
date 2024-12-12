@@ -1,6 +1,13 @@
 use std::borrow::BorrowMut;
 
-use ax_stark_backend::{
+use openvm_circuit::arch::{testing::VmChipTestBuilder, VmAdapterChip};
+use openvm_instructions::{
+    instruction::Instruction,
+    program::{DEFAULT_PC_STEP, PC_BITS},
+    UsizeOpcode, VmOpcode,
+};
+use openvm_native_compiler::NativeJalOpcode::{self, *};
+use openvm_stark_backend::{
     p3_air::BaseAir,
     p3_field::{AbstractField, PrimeField32},
     p3_matrix::{dense::RowMajorMatrix, Matrix},
@@ -8,14 +15,7 @@ use ax_stark_backend::{
     verifier::VerificationError,
     Chip, ChipUsageGetter,
 };
-use ax_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
-use axvm_circuit::arch::{testing::VmChipTestBuilder, VmAdapterChip};
-use axvm_instructions::{
-    instruction::Instruction,
-    program::{DEFAULT_PC_STEP, PC_BITS},
-    AxVmOpcode, UsizeOpcode,
-};
-use axvm_native_compiler::NativeJalOpcode::{self, *};
+use openvm_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
 use rand::{rngs::StdRng, Rng};
 
 use super::{
@@ -38,7 +38,7 @@ fn set_and_execute(
     tester.execute_with_pc(
         chip,
         Instruction::from_usize(
-            AxVmOpcode::with_default_offset(JAL),
+            VmOpcode::with_default_offset(JAL),
             [a, imm as usize, 0, d, 0, 0, 0],
         ),
         initial_pc.unwrap_or(rng.gen_range(0..(1 << PC_BITS))),

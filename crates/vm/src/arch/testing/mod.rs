@@ -1,7 +1,9 @@
 use std::{cell::RefCell, rc::Rc, sync::Arc};
 
-use ax_circuit_primitives::var_range::{VariableRangeCheckerBus, VariableRangeCheckerChip};
-use ax_stark_backend::{
+use itertools::izip;
+use openvm_circuit_primitives::var_range::{VariableRangeCheckerBus, VariableRangeCheckerChip};
+use openvm_instructions::instruction::Instruction;
+use openvm_stark_backend::{
     config::{StarkGenericConfig, Val},
     engine::VerificationData,
     p3_field::PrimeField32,
@@ -13,7 +15,7 @@ use ax_stark_backend::{
     verifier::VerificationError,
     Chip,
 };
-use ax_stark_sdk::{
+use openvm_stark_sdk::{
     config::{
         baby_bear_blake3::{self, BabyBearBlake3Config},
         baby_bear_poseidon2::{self, BabyBearPoseidon2Config},
@@ -22,8 +24,6 @@ use ax_stark_sdk::{
     engine::StarkEngine,
     p3_baby_bear::BabyBear,
 };
-use axvm_instructions::instruction::Instruction;
-use itertools::izip;
 use program::ProgramTester;
 use rand::{rngs::StdRng, RngCore, SeedableRng};
 use tracing::Level;

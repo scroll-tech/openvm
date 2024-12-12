@@ -1,28 +1,28 @@
 use std::sync::Arc;
 
-use ax_circuit_primitives::bitwise_op_lookup::{
+use num_bigint_dig::BigUint;
+use openvm_circuit::arch::{testing::VmChipTestBuilder, VmChipWrapper, BITWISE_OP_LOOKUP_BUS};
+use openvm_circuit_primitives::bitwise_op_lookup::{
     BitwiseOperationLookupBus, BitwiseOperationLookupChip,
 };
-use ax_mod_circuit_builder::{
+use openvm_instructions::{riscv::RV32_CELL_BITS, UsizeOpcode};
+use openvm_mod_circuit_builder::{
     test_utils::{
         biguint_to_limbs, bls12381_fq12_random, bn254_fq12_random, bn254_fq12_to_biguint_vec,
     },
     ExprBuilderConfig, FieldExpr, FieldExpressionCoreChip,
 };
-use ax_stark_backend::p3_field::AbstractField;
-use ax_stark_sdk::p3_baby_bear::BabyBear;
-use axvm_circuit::arch::{testing::VmChipTestBuilder, VmChipWrapper, BITWISE_OP_LOOKUP_BUS};
-use axvm_instructions::{riscv::RV32_CELL_BITS, UsizeOpcode};
-use axvm_pairing_guest::{
+use openvm_pairing_guest::{
     bls12_381::{
         BLS12_381_BLOCK_SIZE, BLS12_381_LIMB_BITS, BLS12_381_MODULUS, BLS12_381_NUM_LIMBS,
         BLS12_381_XI_ISIZE,
     },
     bn254::{BN254_BLOCK_SIZE, BN254_LIMB_BITS, BN254_MODULUS, BN254_NUM_LIMBS, BN254_XI_ISIZE},
 };
-use axvm_pairing_transpiler::{Bls12381Fp12Opcode, Bn254Fp12Opcode, Fp12Opcode};
-use axvm_rv32_adapters::{rv32_write_heap_default, Rv32VecHeapAdapterChip};
-use num_bigint_dig::BigUint;
+use openvm_pairing_transpiler::{Bls12381Fp12Opcode, Bn254Fp12Opcode, Fp12Opcode};
+use openvm_rv32_adapters::{rv32_write_heap_default, Rv32VecHeapAdapterChip};
+use openvm_stark_backend::p3_field::AbstractField;
+use openvm_stark_sdk::p3_baby_bear::BabyBear;
 
 use super::{fp12_add_expr, fp12_mul_expr, fp12_sub_expr};
 

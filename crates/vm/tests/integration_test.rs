@@ -1,22 +1,7 @@
 use std::{collections::BTreeMap, sync::Arc};
 
-use ax_circuit_derive::{Chip, ChipUsageGetter};
-use ax_stark_backend::{
-    config::StarkGenericConfig,
-    engine::StarkEngine,
-    p3_field::{AbstractField, PrimeField32},
-};
-use ax_stark_sdk::{
-    config::{
-        baby_bear_poseidon2::{BabyBearPoseidon2Config, BabyBearPoseidon2Engine},
-        fri_params::standard_fri_params_with_100_bits_conjectured_security,
-        setup_tracing, FriParameters,
-    },
-    engine::StarkFriEngine,
-    p3_baby_bear::BabyBear,
-    utils::create_seeded_rng,
-};
-use axvm_circuit::{
+use derive_more::derive::From;
+use openvm_circuit::{
     arch::{
         hasher::{poseidon2::vm_poseidon2_hasher, Hasher},
         ChipId, ExitCode, MemoryConfig, SingleSegmentVmExecutor, SystemConfig, SystemExecutor,
@@ -29,29 +14,47 @@ use axvm_circuit::{
             tree::public_values::UserPublicValuesProof, MemoryTraceHeights,
             VolatileMemoryTraceHeights, CHUNK,
         },
-        program::trace::AxVmCommittedExe,
+        program::trace::VmCommittedExe,
     },
     utils::{air_test, air_test_with_min_segments},
 };
-use axvm_instructions::{
-    exe::AxVmExe,
+use openvm_circuit_primitives_derive::{Chip, ChipUsageGetter};
+use openvm_instructions::{
+    exe::VmExe,
     instruction::Instruction,
     program::{Program, DEFAULT_PC_STEP},
-    AxVmOpcode, PhantomDiscriminant,
+    PhantomDiscriminant,
     Poseidon2Opcode::*,
     PublishOpcode::PUBLISH,
     SysPhantom,
     SystemOpcode::*,
+    VmOpcode,
 };
-use axvm_keccak256_circuit::{utils::keccak256, Keccak256, Keccak256Executor, Keccak256Periphery};
-use axvm_keccak256_transpiler::Rv32KeccakOpcode::*;
-use axvm_native_circuit::{Native, NativeConfig, NativeExecutor, NativePeriphery};
-use axvm_native_compiler::{
+use openvm_keccak256_circuit::{
+    utils::keccak256, Keccak256, Keccak256Executor, Keccak256Periphery,
+};
+use openvm_keccak256_transpiler::Rv32KeccakOpcode::*;
+use openvm_native_circuit::{Native, NativeConfig, NativeExecutor, NativePeriphery};
+use openvm_native_compiler::{
     FieldArithmeticOpcode::*, FieldExtensionOpcode::*, NativeBranchEqualOpcode, NativeJalOpcode::*,
     NativeLoadStoreOpcode::*, NativePhantom,
 };
-use axvm_rv32im_transpiler::BranchEqualOpcode::*;
-use derive_more::derive::From;
+use openvm_rv32im_transpiler::BranchEqualOpcode::*;
+use openvm_stark_backend::{
+    config::StarkGenericConfig,
+    engine::StarkEngine,
+    p3_field::{AbstractField, PrimeField32},
+};
+use openvm_stark_sdk::{
+    config::{
+        baby_bear_poseidon2::{BabyBearPoseidon2Config, BabyBearPoseidon2Engine},
+        fri_params::standard_fri_params_with_100_bits_conjectured_security,
+        setup_tracing, FriParameters,
+    },
+    engine::StarkFriEngine,
+    p3_baby_bear::BabyBear,
+    utils::create_seeded_rng,
+};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use test_log::test;
@@ -72,7 +75,7 @@ fn air_test_with_compress_poseidon2(
     program: Program<BabyBear>,
     continuation_enabled: bool,
 ) {
-    let fri_params = if matches!(std::env::var("AXIOM_FAST_TEST"), Ok(x) if &x == "1") {
+    let fri_params = if matches!(std::env::var("OPENVM_FAST_TEST"), Ok(x) if &x == "1") {
         FriParameters {
             log_blowup: 3,
             num_queries: 2,
@@ -112,10 +115,10 @@ fn test_vm_1() {
      */
     let instructions = vec![
         // word[0]_1 <- word[n]_0
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), n, 0, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), n, 0, 0, 0, 1),
         // if word[0]_1 == 0 then pc += 3 * DEFAULT_PC_STEP
         Instruction::from_isize(
-            AxVmOpcode::with_default_offset(NativeBranchEqualOpcode(BEQ)),
+            VmOpcode::with_default_offset(NativeBranchEqualOpcode(BEQ)),
             0,
             0,
             3 * DEFAULT_PC_STEP as isize,
@@ -123,10 +126,10 @@ fn test_vm_1() {
             0,
         ),
         // word[0]_1 <- word[0]_1 - word[1]_0
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(SUB), 0, 0, 1, 1, 1, 0, 0),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(SUB), 0, 0, 1, 1, 1, 0, 0),
         // word[2]_1 <- pc + DEFAULT_PC_STEP, pc -= 2 * DEFAULT_PC_STEP
         Instruction::from_isize(
-            AxVmOpcode::with_default_offset(JAL),
+            VmOpcode::with_default_offset(JAL),
             2,
             -2 * DEFAULT_PC_STEP as isize,
             0,
@@ -134,7 +137,7 @@ fn test_vm_1() {
             0,
         ),
         // terminate
-        Instruction::from_isize(AxVmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
     ];
 
     let program = Program::from_instructions(&instructions);
@@ -147,10 +150,10 @@ fn test_vm_override_executor_height() {
     let fri_params = FriParameters::standard_fast();
     let e = BabyBearPoseidon2Engine::new(fri_params);
     let program = Program::<BabyBear>::from_instructions(&[
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 4, 0, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 4, 0, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
     ]);
-    let committed_exe = Arc::new(AxVmCommittedExe::<BabyBearPoseidon2Config>::commit(
+    let committed_exe = Arc::new(VmCommittedExe::<BabyBearPoseidon2Config>::commit(
         program.into(),
         e.config().pcs(),
     ));
@@ -248,26 +251,17 @@ fn test_vm_1_optional_air() {
     {
         let n = 6;
         let instructions = vec![
-            Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), n, 0, 0, 0, 1),
-            Instruction::large_from_isize(
-                AxVmOpcode::with_default_offset(SUB),
-                0,
-                0,
-                1,
-                1,
-                1,
-                0,
-                0,
-            ),
+            Instruction::from_isize(VmOpcode::with_default_offset(STOREW), n, 0, 0, 0, 1),
+            Instruction::large_from_isize(VmOpcode::with_default_offset(SUB), 0, 0, 1, 1, 1, 0, 0),
             Instruction::from_isize(
-                AxVmOpcode::with_default_offset(NativeBranchEqualOpcode(BNE)),
+                VmOpcode::with_default_offset(NativeBranchEqualOpcode(BNE)),
                 0,
                 0,
                 -(DEFAULT_PC_STEP as isize),
                 1,
                 0,
             ),
-            Instruction::from_isize(AxVmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
+            Instruction::from_isize(VmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
         ];
 
         let program = Program::from_instructions(&instructions);
@@ -300,15 +294,12 @@ fn test_vm_public_values() {
 
     {
         let instructions = vec![
-            Instruction::from_usize(
-                AxVmOpcode::with_default_offset(PUBLISH),
-                [0, 12, 2, 0, 0, 0],
-            ),
-            Instruction::from_isize(AxVmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
+            Instruction::from_usize(VmOpcode::with_default_offset(PUBLISH), [0, 12, 2, 0, 0, 0]),
+            Instruction::from_isize(VmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
         ];
 
         let program = Program::from_instructions(&instructions);
-        let committed_exe = Arc::new(AxVmCommittedExe::commit(
+        let committed_exe = Arc::new(VmCommittedExe::commit(
             program.clone().into(),
             vm.engine.config.pcs(),
         ));
@@ -336,7 +327,7 @@ fn test_vm_initial_memory() {
     // Program that fails if mem[(1, 0)] != 101.
     let program = Program::from_instructions(&[
         Instruction::<BabyBear>::from_isize(
-            AxVmOpcode::with_default_offset(NativeBranchEqualOpcode(BEQ)),
+            VmOpcode::with_default_offset(NativeBranchEqualOpcode(BEQ)),
             7,
             101,
             2 * DEFAULT_PC_STEP as isize,
@@ -344,7 +335,7 @@ fn test_vm_initial_memory() {
             0,
         ),
         Instruction::<BabyBear>::from_isize(
-            AxVmOpcode::with_default_offset(PHANTOM),
+            VmOpcode::with_default_offset(PHANTOM),
             0,
             0,
             SysPhantom::DebugPanic as isize,
@@ -352,7 +343,7 @@ fn test_vm_initial_memory() {
             0,
         ),
         Instruction::<BabyBear>::from_isize(
-            AxVmOpcode::with_default_offset(TERMINATE),
+            VmOpcode::with_default_offset(TERMINATE),
             0,
             0,
             0,
@@ -369,7 +360,7 @@ fn test_vm_initial_memory() {
     .collect();
 
     let config = NativeConfig::aggregation(0, 3).with_continuations();
-    let exe = AxVmExe {
+    let exe = VmExe {
         program,
         pc_start: 0,
         init_memory,
@@ -392,17 +383,17 @@ fn test_vm_1_persistent() {
 
     let n = 6;
     let instructions = vec![
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), n, 0, 0, 0, 1),
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(SUB), 0, 0, 1, 1, 1, 0, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), n, 0, 0, 0, 1),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(SUB), 0, 0, 1, 1, 1, 0, 0),
         Instruction::from_isize(
-            AxVmOpcode::with_default_offset(NativeBranchEqualOpcode(BNE)),
+            VmOpcode::with_default_offset(NativeBranchEqualOpcode(BNE)),
             0,
             0,
             -(DEFAULT_PC_STEP as isize),
             1,
             0,
         ),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
     ];
 
     let program = Program::from_instructions(&instructions);
@@ -454,23 +445,23 @@ fn test_vm_continuations() {
     // Register [3]_1 is used as a temporary register.
     let program = Program::from_instructions(&[
         // [0]_1 <- 0
-        Instruction::from_isize(AxVmOpcode::with_default_offset(ADD), 0, 0, 0, 1, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(ADD), 0, 0, 0, 1, 0),
         // [1]_1 <- 0
-        Instruction::from_isize(AxVmOpcode::with_default_offset(ADD), 1, 0, 0, 1, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(ADD), 1, 0, 0, 1, 0),
         // [2]_1 <- 1
-        Instruction::from_isize(AxVmOpcode::with_default_offset(ADD), 2, 0, 1, 1, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(ADD), 2, 0, 1, 1, 0),
         // loop_start
         // [3]_1 <- [1]_1 + [2]_1
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(ADD), 3, 1, 2, 1, 1, 1, 0),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(ADD), 3, 1, 2, 1, 1, 1, 0),
         // [1]_1 <- [2]_1
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(ADD), 1, 2, 0, 1, 1, 0, 0),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(ADD), 1, 2, 0, 1, 1, 0, 0),
         // [2]_1 <- [3]_1
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(ADD), 2, 3, 0, 1, 1, 0, 0),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(ADD), 2, 3, 0, 1, 1, 0, 0),
         // [0]_1 <- [0]_1 + 1
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(ADD), 0, 0, 1, 1, 1, 0, 0),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(ADD), 0, 0, 1, 1, 1, 0, 0),
         // if [0]_1 != n, pc <- pc - 3
         Instruction::from_isize(
-            AxVmOpcode::with_default_offset(NativeBranchEqualOpcode(BNE)),
+            VmOpcode::with_default_offset(NativeBranchEqualOpcode(BNE)),
             n,
             0,
             -4 * DEFAULT_PC_STEP as isize,
@@ -478,9 +469,9 @@ fn test_vm_continuations() {
             1,
         ),
         // [0]_3 <- [1]_1
-        Instruction::from_isize(AxVmOpcode::with_default_offset(ADD), 0, 1, 0, 3, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(ADD), 0, 1, 0, 3, 1),
         Instruction::from_isize(
-            AxVmOpcode::with_default_offset(TERMINATE),
+            VmOpcode::with_default_offset(TERMINATE),
             0,
             0,
             ExitCode::Success as isize,
@@ -526,10 +517,10 @@ fn test_vm_without_field_arithmetic() {
      */
     let instructions = vec![
         // word[0]_1 <- word[5]_0
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 5, 0, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 5, 0, 0, 0, 1),
         // if word[0]_1 != 4 then pc += 3 * DEFAULT_PC_STEP
         Instruction::from_isize(
-            AxVmOpcode::with_default_offset(NativeBranchEqualOpcode(BNE)),
+            VmOpcode::with_default_offset(NativeBranchEqualOpcode(BNE)),
             0,
             4,
             3 * DEFAULT_PC_STEP as isize,
@@ -538,7 +529,7 @@ fn test_vm_without_field_arithmetic() {
         ),
         // word[2]_1 <- pc + DEFAULT_PC_STEP, pc -= 2 * DEFAULT_PC_STEP
         Instruction::from_isize(
-            AxVmOpcode::with_default_offset(JAL),
+            VmOpcode::with_default_offset(JAL),
             2,
             -2 * DEFAULT_PC_STEP as isize,
             0,
@@ -546,10 +537,10 @@ fn test_vm_without_field_arithmetic() {
             0,
         ),
         // terminate
-        Instruction::from_isize(AxVmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
         // if word[0]_1 == 5 then pc -= 1
         Instruction::from_isize(
-            AxVmOpcode::with_default_offset(NativeBranchEqualOpcode(BEQ)),
+            VmOpcode::with_default_offset(NativeBranchEqualOpcode(BEQ)),
             0,
             5,
             -(DEFAULT_PC_STEP as isize),
@@ -566,33 +557,33 @@ fn test_vm_without_field_arithmetic() {
 #[test]
 fn test_vm_fibonacci_old() {
     let instructions = vec![
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 9, 0, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 0, 2, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 0, 3, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 0, 0, 0, 0, 2),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 0, 1, 0, 2),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 9, 0, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 0, 2, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 0, 3, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 0, 0, 0, 0, 2),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 0, 1, 0, 2),
         Instruction::from_isize(
-            AxVmOpcode::with_default_offset(NativeBranchEqualOpcode(BEQ)),
+            VmOpcode::with_default_offset(NativeBranchEqualOpcode(BEQ)),
             2,
             0,
             7 * DEFAULT_PC_STEP as isize,
             1,
             1,
         ),
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(ADD), 2, 2, 3, 1, 1, 1, 0),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(LOADW), 4, -2, 2, 1, 2),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(LOADW), 5, -1, 2, 1, 2),
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(ADD), 6, 4, 5, 1, 1, 1, 0),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 6, 0, 2, 1, 2),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(ADD), 2, 2, 3, 1, 1, 1, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(LOADW), 4, -2, 2, 1, 2),
+        Instruction::from_isize(VmOpcode::with_default_offset(LOADW), 5, -1, 2, 1, 2),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(ADD), 6, 4, 5, 1, 1, 1, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 6, 0, 2, 1, 2),
         Instruction::from_isize(
-            AxVmOpcode::with_default_offset(JAL),
+            VmOpcode::with_default_offset(JAL),
             7,
             -6 * DEFAULT_PC_STEP as isize,
             0,
             1,
             0,
         ),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
     ];
 
     let program = Program::from_instructions(&instructions);
@@ -606,30 +597,30 @@ fn test_vm_fibonacci_old_cycle_tracker() {
     let instructions = vec![
         Instruction::debug(PhantomDiscriminant(SysPhantom::CtStart as u16)),
         Instruction::debug(PhantomDiscriminant(SysPhantom::CtStart as u16)),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 9, 0, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 0, 2, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 0, 3, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 0, 0, 0, 0, 2),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 0, 1, 0, 2),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 9, 0, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 0, 2, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 0, 3, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 0, 0, 0, 0, 2),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 0, 1, 0, 2),
         Instruction::debug(PhantomDiscriminant(SysPhantom::CtEnd as u16)),
         Instruction::debug(PhantomDiscriminant(SysPhantom::CtStart as u16)),
         Instruction::from_isize(
-            AxVmOpcode::with_default_offset(NativeBranchEqualOpcode(BEQ)),
+            VmOpcode::with_default_offset(NativeBranchEqualOpcode(BEQ)),
             2,
             0,
             9 * DEFAULT_PC_STEP as isize,
             1,
             1,
         ), // Instruction::from_isize(BEQ.with_default_offset(), 2, 0, 7, 1, 1),
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(ADD), 2, 2, 3, 1, 1, 1, 0),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(ADD), 2, 2, 3, 1, 1, 1, 0),
         Instruction::debug(PhantomDiscriminant(SysPhantom::CtStart as u16)),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(LOADW), 4, -2, 2, 1, 2),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(LOADW), 5, -1, 2, 1, 2),
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(ADD), 6, 4, 5, 1, 1, 1, 0),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 6, 0, 2, 1, 2),
+        Instruction::from_isize(VmOpcode::with_default_offset(LOADW), 4, -2, 2, 1, 2),
+        Instruction::from_isize(VmOpcode::with_default_offset(LOADW), 5, -1, 2, 1, 2),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(ADD), 6, 4, 5, 1, 1, 1, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 6, 0, 2, 1, 2),
         Instruction::debug(PhantomDiscriminant(SysPhantom::CtEnd as u16)),
         Instruction::from_isize(
-            AxVmOpcode::with_default_offset(JAL),
+            VmOpcode::with_default_offset(JAL),
             7,
             -8 * DEFAULT_PC_STEP as isize,
             0,
@@ -638,7 +629,7 @@ fn test_vm_fibonacci_old_cycle_tracker() {
         ),
         Instruction::debug(PhantomDiscriminant(SysPhantom::CtEnd as u16)),
         Instruction::debug(PhantomDiscriminant(SysPhantom::CtEnd as u16)),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
     ];
 
     let program = Program::from_instructions(&instructions);
@@ -649,20 +640,20 @@ fn test_vm_fibonacci_old_cycle_tracker() {
 #[test]
 fn test_vm_field_extension_arithmetic() {
     let instructions = vec![
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 0, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 2, 1, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 2, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 2, 3, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 2, 4, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 5, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 6, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 2, 7, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(FE4ADD), 8, 0, 4, 1, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(FE4ADD), 8, 0, 4, 1, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(FE4SUB), 12, 0, 4, 1, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(BBE4MUL), 12, 0, 4, 1, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(BBE4DIV), 12, 0, 4, 1, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 0, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 2, 1, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 2, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 2, 3, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 2, 4, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 5, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 6, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 2, 7, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(FE4ADD), 8, 0, 4, 1, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(FE4ADD), 8, 0, 4, 1, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(FE4SUB), 12, 0, 4, 1, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(BBE4MUL), 12, 0, 4, 1, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(BBE4DIV), 12, 0, 4, 1, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
     ];
 
     let program = Program::from_instructions(&instructions);
@@ -673,20 +664,20 @@ fn test_vm_field_extension_arithmetic() {
 #[test]
 fn test_vm_max_access_adapter_8() {
     let instructions = vec![
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 0, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 2, 1, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 2, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 2, 3, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 2, 4, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 5, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 6, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 2, 7, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(FE4ADD), 8, 0, 4, 1, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(FE4ADD), 8, 0, 4, 1, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(FE4SUB), 12, 0, 4, 1, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(BBE4MUL), 12, 0, 4, 1, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(BBE4DIV), 12, 0, 4, 1, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 0, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 2, 1, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 2, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 2, 3, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 2, 4, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 5, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 6, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 2, 7, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(FE4ADD), 8, 0, 4, 1, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(FE4ADD), 8, 0, 4, 1, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(FE4SUB), 12, 0, 4, 1, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(BBE4MUL), 12, 0, 4, 1, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(BBE4DIV), 12, 0, 4, 1, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
     ];
 
     let program = Program::from_instructions(&instructions);
@@ -715,20 +706,20 @@ fn test_vm_max_access_adapter_8() {
 #[test]
 fn test_vm_field_extension_arithmetic_persistent() {
     let instructions = vec![
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 0, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 2, 1, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 2, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 2, 3, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 2, 4, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 5, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 1, 6, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 2, 7, 0, 0, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(FE4ADD), 8, 0, 4, 1, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(FE4ADD), 8, 0, 4, 1, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(FE4SUB), 12, 0, 4, 1, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(BBE4MUL), 12, 0, 4, 1, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(BBE4DIV), 12, 0, 4, 1, 1),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 0, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 2, 1, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 2, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 2, 3, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 2, 4, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 5, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 1, 6, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 2, 7, 0, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(FE4ADD), 8, 0, 4, 1, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(FE4ADD), 8, 0, 4, 1, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(FE4SUB), 12, 0, 4, 1, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(BBE4MUL), 12, 0, 4, 1, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(BBE4DIV), 12, 0, 4, 1, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
     ];
 
     let program = Program::from_instructions(&instructions);
@@ -743,9 +734,9 @@ fn test_vm_field_extension_arithmetic_persistent() {
 #[test]
 fn test_vm_hint() {
     let instructions = vec![
-        Instruction::from_isize(AxVmOpcode::with_default_offset(STOREW), 0, 0, 16, 0, 1),
+        Instruction::from_isize(VmOpcode::with_default_offset(STOREW), 0, 0, 16, 0, 1),
         Instruction::large_from_isize(
-            AxVmOpcode::with_default_offset(ADD),
+            VmOpcode::with_default_offset(ADD),
             20,
             16,
             16777220,
@@ -754,36 +745,36 @@ fn test_vm_hint() {
             0,
             0,
         ),
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(ADD), 32, 20, 0, 1, 1, 0, 0),
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(ADD), 20, 20, 1, 1, 1, 0, 0),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(ADD), 32, 20, 0, 1, 1, 0, 0),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(ADD), 20, 20, 1, 1, 1, 0, 0),
         Instruction::from_isize(
-            AxVmOpcode::with_default_offset(PHANTOM),
+            VmOpcode::with_default_offset(PHANTOM),
             0,
             0,
             NativePhantom::HintInput as isize,
             0,
             0,
         ),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(SHINTW), 32, 0, 0, 1, 2),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(LOADW), 38, 0, 32, 1, 2),
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(ADD), 44, 20, 0, 1, 1, 0, 0),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(MUL), 24, 38, 1, 1, 0),
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(ADD), 20, 20, 24, 1, 1, 1, 0),
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(ADD), 50, 16, 0, 1, 1, 0, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(SHINTW), 32, 0, 0, 1, 2),
+        Instruction::from_isize(VmOpcode::with_default_offset(LOADW), 38, 0, 32, 1, 2),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(ADD), 44, 20, 0, 1, 1, 0, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(MUL), 24, 38, 1, 1, 0),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(ADD), 20, 20, 24, 1, 1, 1, 0),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(ADD), 50, 16, 0, 1, 1, 0, 0),
         Instruction::from_isize(
-            AxVmOpcode::with_default_offset(JAL),
+            VmOpcode::with_default_offset(JAL),
             24,
             6 * DEFAULT_PC_STEP as isize,
             0,
             1,
             0,
         ),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(MUL), 0, 50, 1, 1, 0),
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(ADD), 0, 44, 0, 1, 1, 1, 0),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(SHINTW), 0, 0, 0, 1, 2),
-        Instruction::large_from_isize(AxVmOpcode::with_default_offset(ADD), 50, 50, 1, 1, 1, 0, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(MUL), 0, 50, 1, 1, 0),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(ADD), 0, 44, 0, 1, 1, 1, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(SHINTW), 0, 0, 0, 1, 2),
+        Instruction::large_from_isize(VmOpcode::with_default_offset(ADD), 50, 50, 1, 1, 1, 0, 0),
         Instruction::from_isize(
-            AxVmOpcode::with_default_offset(NativeBranchEqualOpcode(BNE)),
+            VmOpcode::with_default_offset(NativeBranchEqualOpcode(BNE)),
             50,
             38,
             -4 * (DEFAULT_PC_STEP as isize),
@@ -791,14 +782,14 @@ fn test_vm_hint() {
             1,
         ),
         Instruction::from_isize(
-            AxVmOpcode::with_default_offset(NativeBranchEqualOpcode(BNE)),
+            VmOpcode::with_default_offset(NativeBranchEqualOpcode(BNE)),
             50,
             38,
             -5 * (DEFAULT_PC_STEP as isize),
             1,
             1,
         ),
-        Instruction::from_isize(AxVmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
+        Instruction::from_isize(VmOpcode::with_default_offset(TERMINATE), 0, 0, 0, 0, 0),
     ];
 
     let program = Program::from_instructions(&instructions);
@@ -820,7 +811,7 @@ fn test_vm_compress_poseidon2_as2() {
     for i in 0..CHUNK as isize {
         // [lhs_ptr + i]_2 <- rnd()
         instructions.push(Instruction::from_isize(
-            AxVmOpcode::with_default_offset(STOREW),
+            VmOpcode::with_default_offset(STOREW),
             rng.gen_range(1..1 << 20),
             i,
             lhs_ptr,
@@ -832,7 +823,7 @@ fn test_vm_compress_poseidon2_as2() {
     for i in 0..CHUNK as isize {
         // [rhs_ptr + i]_2 <- rnd()
         instructions.push(Instruction::from_isize(
-            AxVmOpcode::with_default_offset(STOREW),
+            VmOpcode::with_default_offset(STOREW),
             rng.gen_range(1..1 << 20),
             i,
             rhs_ptr,
@@ -844,7 +835,7 @@ fn test_vm_compress_poseidon2_as2() {
 
     // [11]_1 <- lhs_ptr
     instructions.push(Instruction::from_isize(
-        AxVmOpcode::with_default_offset(STOREW),
+        VmOpcode::with_default_offset(STOREW),
         lhs_ptr,
         0,
         11,
@@ -853,7 +844,7 @@ fn test_vm_compress_poseidon2_as2() {
     ));
     // [22]_1 <- rhs_ptr
     instructions.push(Instruction::from_isize(
-        AxVmOpcode::with_default_offset(STOREW),
+        VmOpcode::with_default_offset(STOREW),
         rhs_ptr,
         0,
         22,
@@ -862,7 +853,7 @@ fn test_vm_compress_poseidon2_as2() {
     ));
     // [33]_1 <- rhs_ptr
     instructions.push(Instruction::from_isize(
-        AxVmOpcode::with_default_offset(STOREW),
+        VmOpcode::with_default_offset(STOREW),
         dst_ptr,
         0,
         33,
@@ -871,7 +862,7 @@ fn test_vm_compress_poseidon2_as2() {
     ));
 
     instructions.push(Instruction::from_isize(
-        AxVmOpcode::with_default_offset(COMP_POS2),
+        VmOpcode::with_default_offset(COMP_POS2),
         33,
         11,
         22,
@@ -879,7 +870,7 @@ fn test_vm_compress_poseidon2_as2() {
         2,
     ));
     instructions.push(Instruction::from_isize(
-        AxVmOpcode::with_default_offset(TERMINATE),
+        VmOpcode::with_default_offset(TERMINATE),
         0,
         0,
         0,
@@ -899,7 +890,7 @@ fn test_vm_compress_poseidon2_as2() {
 fn instructions_for_keccak256_test(input: &[u8]) -> Vec<Instruction<BabyBear>> {
     let mut instructions = vec![];
     instructions.push(Instruction::from_isize(
-        AxVmOpcode::with_default_offset(JAL),
+        VmOpcode::with_default_offset(JAL),
         0,
         2 * DEFAULT_PC_STEP as isize,
         0,
@@ -907,7 +898,7 @@ fn instructions_for_keccak256_test(input: &[u8]) -> Vec<Instruction<BabyBear>> {
         0,
     )); // skip fail
     instructions.push(Instruction::from_isize(
-        AxVmOpcode::with_default_offset(PHANTOM),
+        VmOpcode::with_default_offset(PHANTOM),
         0,
         0,
         SysPhantom::DebugPanic as isize,
@@ -920,7 +911,7 @@ fn instructions_for_keccak256_test(input: &[u8]) -> Vec<Instruction<BabyBear>> {
     // src = word[b]_1 <- 0
     let src = 0;
     instructions.push(Instruction::from_isize(
-        AxVmOpcode::with_default_offset(STOREW),
+        VmOpcode::with_default_offset(STOREW),
         src,
         0,
         b,
@@ -930,7 +921,7 @@ fn instructions_for_keccak256_test(input: &[u8]) -> Vec<Instruction<BabyBear>> {
     // dst word[a]_1 <- 3 // use weird offset
     let dst = 8;
     instructions.push(Instruction::from_isize(
-        AxVmOpcode::with_default_offset(STOREW),
+        VmOpcode::with_default_offset(STOREW),
         dst,
         0,
         a,
@@ -939,7 +930,7 @@ fn instructions_for_keccak256_test(input: &[u8]) -> Vec<Instruction<BabyBear>> {
     ));
     // word[c]_1 <- len // emulate stack
     instructions.push(Instruction::from_isize(
-        AxVmOpcode::with_default_offset(STOREW),
+        VmOpcode::with_default_offset(STOREW),
         input.len() as isize,
         0,
         c,
@@ -952,7 +943,7 @@ fn instructions_for_keccak256_test(input: &[u8]) -> Vec<Instruction<BabyBear>> {
 
     for (i, byte) in input.iter().enumerate() {
         instructions.push(Instruction::from_isize(
-            AxVmOpcode::with_default_offset(STOREW),
+            VmOpcode::with_default_offset(STOREW),
             *byte as isize,
             0,
             src + i as isize,
@@ -963,7 +954,7 @@ fn instructions_for_keccak256_test(input: &[u8]) -> Vec<Instruction<BabyBear>> {
     // dst = word[a]_1, src = word[b]_1, len = word[c]_1,
     // read and write io to address space 2
     instructions.push(Instruction::from_isize(
-        AxVmOpcode::with_default_offset(KECCAK256),
+        VmOpcode::with_default_offset(KECCAK256),
         a,
         b,
         c,
@@ -974,7 +965,7 @@ fn instructions_for_keccak256_test(input: &[u8]) -> Vec<Instruction<BabyBear>> {
     // read expected result to check correctness
     for (i, expected_byte) in expected.into_iter().enumerate() {
         instructions.push(Instruction::from_isize(
-            AxVmOpcode::with_default_offset(NativeBranchEqualOpcode(BNE)),
+            VmOpcode::with_default_offset(NativeBranchEqualOpcode(BNE)),
             dst + i as isize,
             expected_byte as isize,
             (-(instructions.len() as isize) + 1) * DEFAULT_PC_STEP as isize, // jump to fail
@@ -1019,7 +1010,7 @@ fn test_vm_keccak() {
         .flat_map(|input| instructions_for_keccak256_test(input))
         .collect::<Vec<_>>();
     instructions.push(Instruction::from_isize(
-        AxVmOpcode::with_default_offset(TERMINATE),
+        VmOpcode::with_default_offset(TERMINATE),
         0,
         0,
         0,
@@ -1041,7 +1032,7 @@ fn test_vm_keccak_non_full_round() {
         .flat_map(|input| instructions_for_keccak256_test(input))
         .collect::<Vec<_>>();
     instructions.push(Instruction::from_isize(
-        AxVmOpcode::with_default_offset(TERMINATE),
+        VmOpcode::with_default_offset(TERMINATE),
         0,
         0,
         0,

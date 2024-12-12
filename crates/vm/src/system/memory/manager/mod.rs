@@ -8,7 +8,10 @@ use std::{
     sync::Arc,
 };
 
-use ax_circuit_primitives::{
+use getset::Getters;
+use itertools::{izip, zip_eq, Itertools};
+pub use memory::{MemoryReadRecord, MemoryWriteRecord};
+use openvm_circuit_primitives::{
     assert_less_than::{AssertLtSubAir, LessThanAuxCols},
     is_less_than::IsLtSubAir,
     is_zero::IsZeroSubAir,
@@ -16,7 +19,8 @@ use ax_circuit_primitives::{
     var_range::{VariableRangeCheckerBus, VariableRangeCheckerChip},
     TraceSubRowGenerator,
 };
-use ax_stark_backend::{
+use openvm_instructions::exe::MemoryImage;
+use openvm_stark_backend::{
     config::{Domain, StarkGenericConfig},
     p3_air::BaseAir,
     p3_commit::PolynomialSpace,
@@ -26,10 +30,6 @@ use ax_stark_backend::{
     prover::types::AirProofInput,
     rap::AnyRap,
 };
-use axvm_instructions::exe::MemoryImage;
-use getset::Getters;
-use itertools::{izip, zip_eq, Itertools};
-pub use memory::{MemoryReadRecord, MemoryWriteRecord};
 use rustc_hash::FxHashMap;
 use serde::{Deserialize, Serialize};
 
@@ -840,9 +840,9 @@ pub fn memory_image_to_equipartition<F: PrimeField32, const N: usize>(
 mod tests {
     use std::sync::Arc;
 
-    use ax_circuit_primitives::var_range::{VariableRangeCheckerBus, VariableRangeCheckerChip};
-    use ax_stark_backend::p3_field::AbstractField;
-    use ax_stark_sdk::p3_baby_bear::BabyBear;
+    use openvm_circuit_primitives::var_range::{VariableRangeCheckerBus, VariableRangeCheckerChip};
+    use openvm_stark_backend::p3_field::AbstractField;
+    use openvm_stark_sdk::p3_baby_bear::BabyBear;
     use rand::{prelude::SliceRandom, thread_rng, Rng};
 
     use super::MemoryController;

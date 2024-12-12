@@ -1,22 +1,22 @@
 use std::borrow::BorrowMut;
 
-use ax_stark_backend::{
+use openvm_circuit::{
+    arch::testing::{memory::gen_pointer, VmChipTestBuilder},
+    system::native_adapter::{NativeAdapterChip, NativeAdapterCols},
+};
+use openvm_instructions::{instruction::Instruction, UsizeOpcode, VmOpcode};
+use openvm_native_compiler::FieldArithmeticOpcode;
+use openvm_stark_backend::{
     p3_field::{AbstractField, Field, PrimeField32},
     prover::USE_DEBUG_BUILDER,
     utils::disable_debug_builder,
     verifier::VerificationError,
     Chip,
 };
-use ax_stark_sdk::{
+use openvm_stark_sdk::{
     config::baby_bear_poseidon2::BabyBearPoseidon2Engine, engine::StarkFriEngine,
     p3_baby_bear::BabyBear, utils::create_seeded_rng,
 };
-use axvm_circuit::{
-    arch::testing::{memory::gen_pointer, VmChipTestBuilder},
-    system::native_adapter::{NativeAdapterChip, NativeAdapterCols},
-};
-use axvm_instructions::{instruction::Instruction, AxVmOpcode, UsizeOpcode};
-use axvm_native_compiler::FieldArithmeticOpcode;
 use rand::Rng;
 use strum::EnumCount;
 
@@ -86,7 +86,7 @@ fn new_field_arithmetic_air_test() {
         tester.execute(
             &mut chip,
             Instruction::from_usize(
-                AxVmOpcode::from_usize(opcode as usize),
+                VmOpcode::from_usize(opcode as usize),
                 [result_address, address1, address2, result_as, as1, as2],
             ),
         );
@@ -136,7 +136,7 @@ fn new_field_arithmetic_air_zero_div_zero() {
     tester.execute(
         &mut chip,
         Instruction::from_usize(
-            AxVmOpcode::from_usize(FieldArithmeticOpcode::DIV as usize),
+            VmOpcode::from_usize(FieldArithmeticOpcode::DIV as usize),
             [5, 6, 7, 1, 1, 1],
         ),
     );
@@ -179,7 +179,7 @@ fn new_field_arithmetic_air_test_panic() {
     tester.execute(
         &mut chip,
         Instruction::from_usize(
-            AxVmOpcode::from_usize(FieldArithmeticOpcode::DIV as usize),
+            VmOpcode::from_usize(FieldArithmeticOpcode::DIV as usize),
             [0, 0, 0, 1, 1, 1],
         ),
     );

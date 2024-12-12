@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
-use ax_stark_backend::{
+use itertools::{izip, Itertools};
+use openvm_stark_backend::{
     keygen::MultiStarkKeygenBuilder,
     p3_matrix::dense::RowMajorMatrix,
     prover::{
@@ -10,7 +11,6 @@ use ax_stark_backend::{
     rap::AnyRap,
     verifier::{MultiTraceStarkVerifier, VerificationError},
 };
-use itertools::{izip, Itertools};
 use p3_baby_bear::BabyBear;
 
 use crate::config::{self, baby_bear_poseidon2::BabyBearPoseidon2Config};

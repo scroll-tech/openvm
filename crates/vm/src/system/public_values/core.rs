@@ -1,14 +1,14 @@
 use std::sync::Mutex;
 
-use ax_circuit_primitives::{encoder::Encoder, SubAir};
-use ax_stark_backend::{
+use openvm_circuit_primitives::{encoder::Encoder, SubAir};
+use openvm_instructions::{
+    instruction::Instruction, PublishOpcode, PublishOpcode::PUBLISH, UsizeOpcode,
+};
+use openvm_stark_backend::{
     interaction::InteractionBuilder,
     p3_air::{AirBuilder, AirBuilderWithPublicValues, BaseAir},
     p3_field::{AbstractField, Field, PrimeField32},
     rap::BaseAirWithPublicValues,
-};
-use axvm_instructions::{
-    instruction::Instruction, PublishOpcode, PublishOpcode::PUBLISH, UsizeOpcode,
 };
 
 use crate::{

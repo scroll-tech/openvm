@@ -1,11 +1,11 @@
-use ax_stark_sdk::{
+use openvm_native_compiler::ir::Witness;
+use openvm_stark_sdk::{
     config::{
         baby_bear_poseidon2_root::{BabyBearPoseidon2RootConfig, BabyBearPoseidon2RootEngine},
         setup_tracing_with_log_level,
     },
     engine::{ProofInputForTest, StarkFriEngine},
 };
-use axvm_native_compiler::ir::Witness;
 use tracing::Level;
 
 use crate::{

@@ -1,24 +1,24 @@
 use std::sync::Arc;
 
-use ax_circuit_derive::{Chip, ChipUsageGetter};
-use ax_circuit_primitives::bitwise_op_lookup::{
-    BitwiseOperationLookupBus, BitwiseOperationLookupChip,
-};
-use ax_mod_circuit_builder::ExprBuilderConfig;
-use ax_stark_backend::p3_field::PrimeField32;
-use axvm_circuit::{
-    arch::{SystemPort, VmExtension, VmInventory, VmInventoryBuilder, VmInventoryError},
-    system::phantom::PhantomChip,
-};
-use axvm_circuit_derive::{AnyEnum, InstructionExecutor};
-use axvm_ecc_guest::k256::{SECP256K1_MODULUS, SECP256K1_ORDER};
-use axvm_ecc_transpiler::{EccPhantom, Rv32WeierstrassOpcode};
-use axvm_instructions::{AxVmOpcode, PhantomDiscriminant, UsizeOpcode};
-use axvm_rv32_adapters::Rv32VecHeapAdapterChip;
 use derive_more::derive::From;
 use num_bigint_dig::BigUint;
 use num_traits::{FromPrimitive, Zero};
 use once_cell::sync::Lazy;
+use openvm_circuit::{
+    arch::{SystemPort, VmExtension, VmInventory, VmInventoryBuilder, VmInventoryError},
+    system::phantom::PhantomChip,
+};
+use openvm_circuit_derive::{AnyEnum, InstructionExecutor};
+use openvm_circuit_primitives::bitwise_op_lookup::{
+    BitwiseOperationLookupBus, BitwiseOperationLookupChip,
+};
+use openvm_circuit_primitives_derive::{Chip, ChipUsageGetter};
+use openvm_ecc_guest::k256::{SECP256K1_MODULUS, SECP256K1_ORDER};
+use openvm_ecc_transpiler::{EccPhantom, Rv32WeierstrassOpcode};
+use openvm_instructions::{PhantomDiscriminant, UsizeOpcode, VmOpcode};
+use openvm_mod_circuit_builder::ExprBuilderConfig;
+use openvm_rv32_adapters::Rv32VecHeapAdapterChip;
+use openvm_stark_backend::p3_field::PrimeField32;
 use serde::{Deserialize, Serialize};
 use strum::EnumCount;
 
@@ -125,7 +125,7 @@ impl<F: PrimeField32> VmExtension<F> for WeierstrassExtension {
                     WeierstrassExtensionExecutor::EcAddNeRv32_32(add_ne_chip),
                     ec_add_ne_opcodes
                         .clone()
-                        .map(|x| AxVmOpcode::from_usize(x + class_offset)),
+                        .map(|x| VmOpcode::from_usize(x + class_offset)),
                 )?;
                 let double_chip = EcDoubleChip::new(
                     Rv32VecHeapAdapterChip::<F, 1, 2, 2, 32, 32>::new(
@@ -143,7 +143,7 @@ impl<F: PrimeField32> VmExtension<F> for WeierstrassExtension {
                     WeierstrassExtensionExecutor::EcDoubleRv32_32(double_chip),
                     ec_double_opcodes
                         .clone()
-                        .map(|x| AxVmOpcode::from_usize(x + class_offset)),
+                        .map(|x| VmOpcode::from_usize(x + class_offset)),
                 )?;
             } else if bytes <= 48 {
                 let add_ne_chip = EcAddNeChip::new(
@@ -161,7 +161,7 @@ impl<F: PrimeField32> VmExtension<F> for WeierstrassExtension {
                     WeierstrassExtensionExecutor::EcAddNeRv32_48(add_ne_chip),
                     ec_add_ne_opcodes
                         .clone()
-                        .map(|x| AxVmOpcode::from_usize(x + class_offset)),
+                        .map(|x| VmOpcode::from_usize(x + class_offset)),
                 )?;
                 let double_chip = EcDoubleChip::new(
                     Rv32VecHeapAdapterChip::<F, 1, 6, 6, 16, 16>::new(
@@ -179,7 +179,7 @@ impl<F: PrimeField32> VmExtension<F> for WeierstrassExtension {
                     WeierstrassExtensionExecutor::EcDoubleRv32_48(double_chip),
                     ec_double_opcodes
                         .clone()
-                        .map(|x| AxVmOpcode::from_usize(x + class_offset)),
+                        .map(|x| VmOpcode::from_usize(x + class_offset)),
                 )?;
             } else {
                 panic!("Modulus too large");
@@ -197,17 +197,17 @@ impl<F: PrimeField32> VmExtension<F> for WeierstrassExtension {
 pub(crate) mod phantom {
     use std::iter::repeat;
 
-    use ax_stark_backend::p3_field::PrimeField32;
-    use axvm_circuit::{
-        arch::{PhantomSubExecutor, Streams},
-        system::memory::MemoryController,
-    };
-    use axvm_instructions::{riscv::RV32_MEMORY_AS, PhantomDiscriminant};
-    use axvm_rv32im_circuit::adapters::unsafe_read_rv32_register;
     use eyre::bail;
     use num_bigint_dig::BigUint;
     use num_integer::Integer;
     use num_traits::One;
+    use openvm_circuit::{
+        arch::{PhantomSubExecutor, Streams},
+        system::memory::MemoryController,
+    };
+    use openvm_instructions::{riscv::RV32_MEMORY_AS, PhantomDiscriminant};
+    use openvm_rv32im_circuit::adapters::unsafe_read_rv32_register;
+    use openvm_stark_backend::p3_field::PrimeField32;
 
     use super::CurveConfig;
 

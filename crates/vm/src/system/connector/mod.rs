@@ -4,8 +4,9 @@ use std::{
     sync::Arc,
 };
 
-use ax_circuit_derive::AlignedBorrow;
-use ax_stark_backend::{
+use openvm_circuit_primitives_derive::AlignedBorrow;
+use openvm_instructions::UsizeOpcode;
+use openvm_stark_backend::{
     config::{StarkGenericConfig, Val},
     interaction::InteractionBuilder,
     p3_air::{Air, AirBuilder, AirBuilderWithPublicValues, BaseAir, PairBuilder},
@@ -15,7 +16,6 @@ use ax_stark_backend::{
     rap::{AnyRap, BaseAirWithPublicValues, PartitionedBaseAir},
     Chip, ChipUsageGetter,
 };
-use axvm_instructions::UsizeOpcode;
 
 use crate::{
     arch::{instructions::SystemOpcode::TERMINATE, ExecutionBus, ExecutionState},

@@ -40,7 +40,7 @@ pub trait BaseAirWithPublicValues<F>: BaseAir<F> {
 impl<F> BaseAirWithPublicValues<F> for MyAir {}
 ```
 
-#### From `ax-stark-backend`
+#### From `openvm-stark-backend`
 
 For cached trace support:
 
@@ -61,7 +61,7 @@ pub trait PartitionedBaseAir<F>: BaseAir<F> {
 impl<F> PartitionedBaseAir<F> for MyAir {}
 ```
 
-The common main trace is the "usual" main trace. All common main trace across all AIRs are committed into one commitment. Cached main are additional sections of main trace that are committed individually. Cached trace is not used in VM **except** by ProgramAir, where the axVM `Program` is committed into a dedicated commitment.
+The common main trace is the "usual" main trace. All common main trace across all AIRs are committed into one commitment. Cached main are additional sections of main trace that are committed individually. Cached trace is not used in VM **except** by ProgramAir, where the OpenVM `Program` is committed into a dedicated commitment.
 
 ```rust
 pub trait Rap<AB>: Sync

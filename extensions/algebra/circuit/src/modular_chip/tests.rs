@@ -1,29 +1,29 @@
 use std::{array::from_fn, sync::Arc};
 
-use ax_circuit_primitives::{
+use num_bigint_dig::BigUint;
+use num_traits::Zero;
+use openvm_algebra_transpiler::Rv32ModularArithmeticOpcode;
+use openvm_circuit::arch::{
+    instructions::UsizeOpcode, testing::VmChipTestBuilder, VmChipWrapper, BITWISE_OP_LOOKUP_BUS,
+};
+use openvm_circuit_primitives::{
     bigint::utils::{
         big_uint_mod_inverse, big_uint_to_limbs, secp256k1_coord_prime, secp256k1_scalar_prime,
     },
     bitwise_op_lookup::{BitwiseOperationLookupBus, BitwiseOperationLookupChip},
 };
-use ax_mod_circuit_builder::{
+use openvm_instructions::{instruction::Instruction, riscv::RV32_CELL_BITS, VmOpcode};
+use openvm_mod_circuit_builder::{
     test_utils::{biguint_to_limbs, generate_field_element},
     ExprBuilderConfig,
 };
-use ax_stark_backend::p3_field::AbstractField;
-use ax_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
-use axvm_algebra_transpiler::Rv32ModularArithmeticOpcode;
-use axvm_circuit::arch::{
-    instructions::UsizeOpcode, testing::VmChipTestBuilder, VmChipWrapper, BITWISE_OP_LOOKUP_BUS,
-};
-use axvm_instructions::{instruction::Instruction, riscv::RV32_CELL_BITS, AxVmOpcode};
-use axvm_pairing_guest::bls12_381::BLS12_381_MODULUS;
-use axvm_rv32_adapters::{
+use openvm_pairing_guest::bls12_381::BLS12_381_MODULUS;
+use openvm_rv32_adapters::{
     rv32_write_heap_default, write_ptr_reg, Rv32IsEqualModAdapterChip, Rv32VecHeapAdapterChip,
 };
-use axvm_rv32im_circuit::adapters::RV32_REGISTER_NUM_LIMBS;
-use num_bigint_dig::BigUint;
-use num_traits::Zero;
+use openvm_rv32im_circuit::adapters::RV32_REGISTER_NUM_LIMBS;
+use openvm_stark_backend::p3_field::AbstractField;
+use openvm_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
 use rand::Rng;
 
 use super::{
@@ -146,7 +146,7 @@ fn test_addsub(opcode_offset: usize, modulus: BigUint) {
         tester.write(data_as, address2 as usize, b_limbs);
 
         let instruction = Instruction::from_isize(
-            AxVmOpcode::from_usize(chip.core.air.offset + op),
+            VmOpcode::from_usize(chip.core.air.offset + op),
             addr_ptr3 as isize,
             addr_ptr1 as isize,
             addr_ptr2 as isize,
@@ -275,7 +275,7 @@ fn test_muldiv(opcode_offset: usize, modulus: BigUint) {
         tester.write(data_as, address2 as usize, b_limbs);
 
         let instruction = Instruction::from_isize(
-            AxVmOpcode::from_usize(chip.core.air.offset + op),
+            VmOpcode::from_usize(chip.core.air.offset + op),
             addr_ptr3 as isize,
             addr_ptr1 as isize,
             addr_ptr2 as isize,

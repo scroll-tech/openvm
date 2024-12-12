@@ -1,8 +1,8 @@
 use std::marker::PhantomData;
 
-use ax_stark_backend::p3_field::PrimeField32;
-use axvm_instructions::{instruction::Instruction, riscv::RV32_REGISTER_NUM_LIMBS, *};
-use axvm_transpiler::util::{
+use openvm_instructions::{instruction::Instruction, riscv::RV32_REGISTER_NUM_LIMBS, *};
+use openvm_stark_backend::p3_field::PrimeField32;
+use openvm_transpiler::util::{
     from_b_type, from_i_type, from_i_type_shamt, from_j_type, from_load, from_r_type, from_s_type,
     from_u_type, nop,
 };
@@ -161,7 +161,7 @@ impl<F: PrimeField32> InstructionProcessor for InstructionTranspiler<F> {
 
     fn process_jalr(&mut self, dec_insn: IType) -> Self::InstructionResult {
         Instruction::new(
-            AxVmOpcode::with_default_offset(Rv32JalrOpcode::JALR),
+            VmOpcode::with_default_offset(Rv32JalrOpcode::JALR),
             F::from_canonical_usize(RV32_REGISTER_NUM_LIMBS * dec_insn.rd),
             F::from_canonical_usize(RV32_REGISTER_NUM_LIMBS * dec_insn.rs1),
             F::from_canonical_u32((dec_insn.imm as u32) & 0xffff),
@@ -187,7 +187,7 @@ impl<F: PrimeField32> InstructionProcessor for InstructionTranspiler<F> {
             return nop();
         }
         Instruction::new(
-            AxVmOpcode::with_default_offset(Rv32AuipcOpcode::AUIPC),
+            VmOpcode::with_default_offset(Rv32AuipcOpcode::AUIPC),
             F::from_canonical_usize(RV32_REGISTER_NUM_LIMBS * dec_insn.rd),
             F::ZERO,
             F::from_canonical_u32(((dec_insn.imm as u32) & 0xfffff000) >> 8),

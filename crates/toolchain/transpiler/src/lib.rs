@@ -1,15 +1,15 @@
-//! A transpiler from custom RISC-V ELFs to axVM executable binaries.
+//! A transpiler from custom RISC-V ELFs to OpenVM executable binaries.
 
-use ax_stark_backend::p3_field::PrimeField32;
-use axvm_instructions::{
-    exe::AxVmExe,
+use elf::Elf;
+use openvm_instructions::{
+    exe::VmExe,
     program::{Program, DEFAULT_PC_STEP},
 };
-pub use axvm_platform;
-use elf::Elf;
+pub use openvm_platform;
+use openvm_stark_backend::p3_field::PrimeField32;
 use transpiler::{Transpiler, TranspilerError};
 
-use crate::util::elf_memory_image_to_axvm_memory_image;
+use crate::util::elf_memory_image_to_openvm_memory_image;
 
 pub mod elf;
 pub mod transpiler;
@@ -25,7 +25,7 @@ pub trait FromElf {
         Self: Sized;
 }
 
-impl<F: PrimeField32> FromElf for AxVmExe<F> {
+impl<F: PrimeField32> FromElf for VmExe<F> {
     type ElfContext = Transpiler<F>;
     fn from_elf(elf: Elf, transpiler: Self::ElfContext) -> Result<Self, TranspilerError> {
         let instructions = transpiler.transpile(&elf.instructions)?;
@@ -35,9 +35,9 @@ impl<F: PrimeField32> FromElf for AxVmExe<F> {
             elf.pc_base,
             elf.max_num_public_values,
         );
-        let init_memory = elf_memory_image_to_axvm_memory_image(elf.memory_image);
+        let init_memory = elf_memory_image_to_openvm_memory_image(elf.memory_image);
 
-        Ok(AxVmExe {
+        Ok(VmExe {
             program,
             pc_start: elf.pc_start,
             init_memory,

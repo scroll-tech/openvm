@@ -1,20 +1,22 @@
 use std::sync::Arc;
 
-use ax_circuit_primitives::{var_range::VariableRangeCheckerChip, SubAir, TraceSubRowGenerator};
-use ax_stark_backend::{
+use itertools::Itertools;
+use num_bigint_dig::BigUint;
+use openvm_circuit::arch::{
+    AdapterAirContext, AdapterRuntimeContext, DynAdapterInterface, DynArray, MinimalInstruction,
+    Result, VmAdapterInterface, VmCoreAir, VmCoreChip,
+};
+use openvm_circuit_primitives::{
+    var_range::VariableRangeCheckerChip, SubAir, TraceSubRowGenerator,
+};
+use openvm_instructions::instruction::Instruction;
+use openvm_stark_backend::{
     interaction::InteractionBuilder,
     p3_air::BaseAir,
     p3_field::{AbstractField, Field, PrimeField32},
     p3_matrix::{dense::RowMajorMatrix, Matrix},
     rap::BaseAirWithPublicValues,
 };
-use axvm_circuit::arch::{
-    AdapterAirContext, AdapterRuntimeContext, DynAdapterInterface, DynArray, MinimalInstruction,
-    Result, VmAdapterInterface, VmCoreAir, VmCoreChip,
-};
-use axvm_instructions::instruction::Instruction;
-use itertools::Itertools;
-use num_bigint_dig::BigUint;
 
 use crate::{
     utils::{biguint_to_limbs_vec, limbs_to_biguint},

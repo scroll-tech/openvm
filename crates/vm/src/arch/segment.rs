@@ -1,14 +1,14 @@
-use ax_stark_backend::{
+use backtrace::Backtrace;
+#[cfg(feature = "function-span")]
+use openvm_instructions::exe::FnBound;
+use openvm_instructions::{exe::FnBounds, instruction::DebugInfo, program::Program};
+use openvm_stark_backend::{
     config::{Domain, StarkGenericConfig},
     p3_commit::PolynomialSpace,
     p3_field::PrimeField32,
     prover::types::{CommittedTraceData, ProofInput},
     Chip,
 };
-#[cfg(feature = "function-span")]
-use axvm_instructions::exe::FnBound;
-use axvm_instructions::{exe::FnBounds, instruction::DebugInfo, program::Program};
-use backtrace::Backtrace;
 
 use super::{
     AnyEnum, ExecutionError, Streams, SystemConfig, VmChipComplex, VmComplexTraceHeights, VmConfig,
@@ -145,7 +145,7 @@ impl<F: PrimeField32, VC: VmConfig<F>> ExecutionSegment<F, VC> {
                 vec![]
             };
 
-            if opcode == AxVmOpcode::with_default_offset(SystemOpcode::TERMINATE) {
+            if opcode == VmOpcode::with_default_offset(SystemOpcode::TERMINATE) {
                 did_terminate = true;
                 self.chip_complex.connector_chip_mut().end(
                     ExecutionState::new(pc, timestamp),
@@ -155,7 +155,7 @@ impl<F: PrimeField32, VC: VmConfig<F>> ExecutionSegment<F, VC> {
             }
 
             // Some phantom instruction handling is more convenient to do here than in PhantomChip.
-            if opcode == AxVmOpcode::with_default_offset(SystemOpcode::PHANTOM) {
+            if opcode == VmOpcode::with_default_offset(SystemOpcode::PHANTOM) {
                 // Note: the discriminant is the lower 16 bits of the c operand.
                 let discriminant = instruction.c.as_canonical_u32() as u16;
                 let phantom = SysPhantom::from_repr(discriminant);
@@ -164,9 +164,9 @@ impl<F: PrimeField32, VC: VmConfig<F>> ExecutionSegment<F, VC> {
                     Some(SysPhantom::DebugPanic) => {
                         if let Some(mut backtrace) = prev_backtrace {
                             backtrace.resolve();
-                            eprintln!("axvm program failure; backtrace:\n{:?}", backtrace);
+                            eprintln!("openvm program failure; backtrace:\n{:?}", backtrace);
                         } else {
-                            eprintln!("axvm program failure; no backtrace");
+                            eprintln!("openvm program failure; no backtrace");
                         }
                         return Err(ExecutionError::Fail { pc });
                     }

@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
-use ax_stark_backend::p3_field::PrimeField32;
-use axvm_instructions::instruction::Instruction;
+use openvm_instructions::instruction::Instruction;
+use openvm_stark_backend::p3_field::PrimeField32;
 use thiserror::Error;
 
 use crate::TranspilerExtension;

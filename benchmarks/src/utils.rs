@@ -1,24 +1,24 @@
 use std::{fs::read, path::PathBuf, time::Instant};
 
-use ax_stark_sdk::{
-    ax_stark_backend::Chip,
-    config::baby_bear_poseidon2::{BabyBearPoseidon2Config, BabyBearPoseidon2Engine},
-    engine::StarkFriEngine,
-    p3_baby_bear::BabyBear,
-};
-use axvm_build::{build_guest_package, get_package, guest_methods, GuestOptions};
-use axvm_circuit::arch::{instructions::exe::AxVmExe, VirtualMachine, VmConfig};
-use axvm_sdk::{
+use clap::{command, Parser};
+use eyre::Result;
+use metrics::{counter, gauge, Gauge};
+use openvm_build::{build_guest_package, get_package, guest_methods, GuestOptions};
+use openvm_circuit::arch::{instructions::exe::VmExe, VirtualMachine, VmConfig};
+use openvm_sdk::{
     commit::commit_app_exe,
     config::AppConfig,
     keygen::{leaf_keygen, AppProvingKey},
     prover::{AppProver, LeafProver},
     StdIn,
 };
-use axvm_transpiler::{axvm_platform::memory::MEM_SIZE, elf::Elf};
-use clap::{command, Parser};
-use eyre::Result;
-use metrics::{counter, gauge, Gauge};
+use openvm_stark_sdk::{
+    config::baby_bear_poseidon2::{BabyBearPoseidon2Config, BabyBearPoseidon2Engine},
+    engine::StarkFriEngine,
+    openvm_stark_backend::Chip,
+    p3_baby_bear::BabyBear,
+};
+use openvm_transpiler::{elf::Elf, openvm_platform::memory::MEM_SIZE};
 use tempfile::tempdir;
 
 type F = BabyBear;
@@ -80,7 +80,7 @@ pub fn build_bench_program(program_name: &str) -> Result<Elf> {
 pub fn bench_from_exe<VC>(
     bench_name: impl ToString,
     app_config: AppConfig<VC>,
-    exe: impl Into<AxVmExe<F>>,
+    exe: impl Into<VmExe<F>>,
     input_stream: StdIn,
     bench_leaf: bool,
 ) -> Result<()>

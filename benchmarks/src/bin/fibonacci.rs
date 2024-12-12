@@ -1,8 +1,30 @@
 #![allow(unused_variables)]
 #![allow(unused_imports)]
 
-use ax_stark_backend::p3_field::AbstractField;
-use ax_stark_sdk::{
+use clap::Parser;
+use eyre::Result;
+use metrics::gauge;
+use openvm_benchmarks::utils::{bench_from_exe, build_bench_program, time, BenchmarkCli};
+use openvm_circuit::arch::{
+    instructions::{exe::VmExe, program::DEFAULT_MAX_NUM_PUBLIC_VALUES},
+    VirtualMachine,
+};
+use openvm_native_circuit::NativeConfig;
+use openvm_native_compiler::conversion::CompilerOptions;
+use openvm_native_recursion::testing_utils::inner::build_verification_program;
+use openvm_rv32im_circuit::Rv32ImConfig;
+use openvm_rv32im_transpiler::{
+    Rv32ITranspilerExtension, Rv32IoTranspilerExtension, Rv32MTranspilerExtension,
+};
+use openvm_sdk::{
+    commit::{commit_app_exe, generate_leaf_committed_exe},
+    config::AppConfig,
+    keygen::{leaf_keygen, AppProvingKey},
+    prover::{AggStarkProver, AppProver, LeafProver},
+    Sdk, StdIn,
+};
+use openvm_stark_backend::p3_field::AbstractField;
+use openvm_stark_sdk::{
     bench::run_with_metric_collection,
     config::{
         baby_bear_poseidon2::BabyBearPoseidon2Engine,
@@ -11,29 +33,7 @@ use ax_stark_sdk::{
     engine::StarkFriEngine,
     p3_baby_bear::BabyBear,
 };
-use axvm_benchmarks::utils::{bench_from_exe, build_bench_program, time, BenchmarkCli};
-use axvm_circuit::arch::{
-    instructions::{exe::AxVmExe, program::DEFAULT_MAX_NUM_PUBLIC_VALUES},
-    VirtualMachine,
-};
-use axvm_native_circuit::NativeConfig;
-use axvm_native_compiler::conversion::CompilerOptions;
-use axvm_native_recursion::testing_utils::inner::build_verification_program;
-use axvm_rv32im_circuit::Rv32ImConfig;
-use axvm_rv32im_transpiler::{
-    Rv32ITranspilerExtension, Rv32IoTranspilerExtension, Rv32MTranspilerExtension,
-};
-use axvm_sdk::{
-    commit::{commit_app_exe, generate_leaf_committed_exe},
-    config::AppConfig,
-    keygen::{leaf_keygen, AppProvingKey},
-    prover::{AggStarkProver, AppProver, LeafProver},
-    Sdk, StdIn,
-};
-use axvm_transpiler::{transpiler::Transpiler, FromElf};
-use clap::Parser;
-use eyre::Result;
-use metrics::gauge;
+use openvm_transpiler::{transpiler::Transpiler, FromElf};
 use tracing::info_span;
 
 fn main() -> Result<()> {
@@ -58,7 +58,7 @@ fn main() -> Result<()> {
     };
 
     let elf = build_bench_program("fibonacci")?;
-    let exe = AxVmExe::from_elf(
+    let exe = VmExe::from_elf(
         elf,
         Transpiler::<BabyBear>::default()
             .with_extension(Rv32ITranspilerExtension)

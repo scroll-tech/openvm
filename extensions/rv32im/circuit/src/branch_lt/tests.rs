@@ -1,9 +1,19 @@
 use std::{borrow::BorrowMut, sync::Arc};
 
-use ax_circuit_primitives::bitwise_op_lookup::{
+use openvm_circuit::{
+    arch::{
+        testing::{memory::gen_pointer, TestAdapterChip, VmChipTestBuilder},
+        BasicAdapterInterface, ExecutionBridge, ImmInstruction, InstructionExecutor, VmAdapterChip,
+        VmChipWrapper, VmCoreChip, BITWISE_OP_LOOKUP_BUS,
+    },
+    utils::{generate_long_number, i32_to_f},
+};
+use openvm_circuit_primitives::bitwise_op_lookup::{
     BitwiseOperationLookupBus, BitwiseOperationLookupChip,
 };
-use ax_stark_backend::{
+use openvm_instructions::{instruction::Instruction, program::PC_BITS, UsizeOpcode, VmOpcode};
+use openvm_rv32im_transpiler::BranchLessThanOpcode;
+use openvm_stark_backend::{
     p3_air::BaseAir,
     p3_field::{AbstractField, PrimeField32},
     p3_matrix::{
@@ -14,17 +24,7 @@ use ax_stark_backend::{
     verifier::VerificationError,
     ChipUsageGetter,
 };
-use ax_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
-use axvm_circuit::{
-    arch::{
-        testing::{memory::gen_pointer, TestAdapterChip, VmChipTestBuilder},
-        BasicAdapterInterface, ExecutionBridge, ImmInstruction, InstructionExecutor, VmAdapterChip,
-        VmChipWrapper, VmCoreChip, BITWISE_OP_LOOKUP_BUS,
-    },
-    utils::{generate_long_number, i32_to_f},
-};
-use axvm_instructions::{instruction::Instruction, program::PC_BITS, AxVmOpcode, UsizeOpcode};
-use axvm_rv32im_transpiler::BranchLessThanOpcode;
+use openvm_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
 use rand::{rngs::StdRng, Rng};
 
 use super::{
@@ -65,7 +65,7 @@ fn run_rv32_branch_lt_rand_execute<E: InstructionExecutor<F>>(
     tester.execute_with_pc(
         chip,
         Instruction::from_isize(
-            AxVmOpcode::from_usize(opcode as usize),
+            VmOpcode::from_usize(opcode as usize),
             rs1 as isize,
             rs2 as isize,
             imm as isize,
@@ -210,7 +210,7 @@ fn run_rv32_blt_negative_test(
     tester.execute(
         &mut chip,
         Instruction::from_usize(
-            AxVmOpcode::from_usize(opcode as usize),
+            VmOpcode::from_usize(opcode as usize),
             [0, 0, imm as usize, 1, 1],
         ),
     );
@@ -504,7 +504,7 @@ fn execute_pc_increment_sanity_test() {
         BranchLessThanCoreChip::<RV32_REGISTER_NUM_LIMBS, RV32_CELL_BITS>::new(bitwise_chip, 0);
 
     let mut instruction = Instruction::<F> {
-        opcode: AxVmOpcode::from_usize(BranchLessThanOpcode::BLT.as_usize()),
+        opcode: VmOpcode::from_usize(BranchLessThanOpcode::BLT.as_usize()),
         c: F::from_canonical_u8(8),
         ..Default::default()
     };
@@ -517,7 +517,7 @@ fn execute_pc_increment_sanity_test() {
     let (output, _) = result.expect("execute_instruction failed");
     assert!(output.to_pc.is_none());
 
-    instruction.opcode = AxVmOpcode::from_usize(BranchLessThanOpcode::BGE.as_usize());
+    instruction.opcode = VmOpcode::from_usize(BranchLessThanOpcode::BGE.as_usize());
     let result = <BranchLessThanCoreChip<RV32_REGISTER_NUM_LIMBS, RV32_CELL_BITS> as VmCoreChip<
         F,
         BasicAdapterInterface<F, ImmInstruction<F>, 2, 0, RV32_REGISTER_NUM_LIMBS, 0>,

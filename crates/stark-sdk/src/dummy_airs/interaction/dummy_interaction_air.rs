@@ -6,7 +6,8 @@
 
 use std::{iter, sync::Arc};
 
-use ax_stark_backend::{
+use itertools::izip;
+use openvm_stark_backend::{
     air_builders::PartitionedAirBuilder,
     config::{StarkGenericConfig, Val},
     interaction::{InteractionBuilder, InteractionType},
@@ -17,7 +18,6 @@ use ax_stark_backend::{
     rap::{AnyRap, BaseAirWithPublicValues, PartitionedBaseAir},
     Chip, ChipUsageGetter,
 };
-use itertools::izip;
 
 pub struct DummyInteractionCols;
 impl DummyInteractionCols {

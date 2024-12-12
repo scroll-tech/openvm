@@ -4,8 +4,12 @@ use std::{
     sync::{Arc, OnceLock},
 };
 
-use ax_circuit_derive::AlignedBorrow;
-use ax_stark_backend::{
+use openvm_circuit_primitives_derive::AlignedBorrow;
+use openvm_instructions::{
+    instruction::Instruction, program::DEFAULT_PC_STEP, PhantomDiscriminant, SysPhantom,
+    SystemOpcode, UsizeOpcode, VmOpcode,
+};
+use openvm_stark_backend::{
     config::{StarkGenericConfig, Val},
     interaction::InteractionBuilder,
     p3_air::{Air, AirBuilder, BaseAir},
@@ -15,10 +19,6 @@ use ax_stark_backend::{
     prover::types::AirProofInput,
     rap::{get_air_name, AnyRap, BaseAirWithPublicValues, PartitionedBaseAir},
     Chip, ChipUsageGetter,
-};
-use axvm_instructions::{
-    instruction::Instruction, program::DEFAULT_PC_STEP, AxVmOpcode, PhantomDiscriminant,
-    SysPhantom, SystemOpcode, UsizeOpcode,
 };
 use parking_lot::Mutex;
 use rustc_hash::FxHashMap;
@@ -42,7 +42,7 @@ const NUM_PHANTOM_OPERANDS: usize = 3;
 pub struct PhantomAir {
     pub execution_bridge: ExecutionBridge,
     /// Global opcode for PhantomOpcode
-    pub phantom_opcode: AxVmOpcode,
+    pub phantom_opcode: VmOpcode,
 }
 
 #[derive(AlignedBorrow, Copy, Clone)]
@@ -102,7 +102,7 @@ impl<F> PhantomChip<F> {
         Self {
             air: PhantomAir {
                 execution_bridge: ExecutionBridge::new(execution_bus, program_bus),
-                phantom_opcode: AxVmOpcode::from_usize(offset + SystemOpcode::PHANTOM.as_usize()),
+                phantom_opcode: VmOpcode::from_usize(offset + SystemOpcode::PHANTOM.as_usize()),
             },
             rows: vec![],
             memory: memory_controller,

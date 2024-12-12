@@ -1,9 +1,18 @@
 use std::{array, borrow::BorrowMut, sync::Arc};
 
-use ax_circuit_primitives::bitwise_op_lookup::{
+use openvm_circuit::{
+    arch::{
+        testing::{memory::gen_pointer, VmChipTestBuilder},
+        Streams, VmAdapterChip, BITWISE_OP_LOOKUP_BUS,
+    },
+    utils::{u32_into_limbs, u32_sign_extend},
+};
+use openvm_circuit_primitives::bitwise_op_lookup::{
     BitwiseOperationLookupBus, BitwiseOperationLookupChip,
 };
-use ax_stark_backend::{
+use openvm_instructions::{instruction::Instruction, UsizeOpcode, VmOpcode};
+use openvm_rv32im_transpiler::Rv32HintStoreOpcode::{self, *};
+use openvm_stark_backend::{
     p3_air::BaseAir,
     p3_field::AbstractField,
     p3_matrix::{
@@ -13,16 +22,7 @@ use ax_stark_backend::{
     utils::disable_debug_builder,
     verifier::VerificationError,
 };
-use ax_stark_sdk::{config::setup_tracing, p3_baby_bear::BabyBear, utils::create_seeded_rng};
-use axvm_circuit::{
-    arch::{
-        testing::{memory::gen_pointer, VmChipTestBuilder},
-        Streams, VmAdapterChip, BITWISE_OP_LOOKUP_BUS,
-    },
-    utils::{u32_into_limbs, u32_sign_extend},
-};
-use axvm_instructions::{instruction::Instruction, AxVmOpcode, UsizeOpcode};
-use axvm_rv32im_transpiler::Rv32HintStoreOpcode::{self, *};
+use openvm_stark_sdk::{config::setup_tracing, p3_baby_bear::BabyBear, utils::create_seeded_rng};
 use parking_lot::Mutex;
 use rand::{rngs::StdRng, Rng};
 
@@ -80,7 +80,7 @@ fn set_and_execute(
     tester.execute(
         chip,
         Instruction::from_usize(
-            AxVmOpcode::with_default_offset(opcode),
+            VmOpcode::with_default_offset(opcode),
             [0, b, imm as usize, 1, 2],
         ),
     );

@@ -4,8 +4,8 @@ use std::{
     sync::{atomic::AtomicU32, Arc},
 };
 
-use ax_circuit_derive::AlignedBorrow;
-use ax_stark_backend::{
+use openvm_circuit_primitives_derive::AlignedBorrow;
+use openvm_stark_backend::{
     config::{StarkGenericConfig, Val},
     interaction::InteractionBuilder,
     p3_air::{Air, BaseAir, PairBuilder},

@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use ax_stark_backend::p3_field::Field;
+use openvm_stark_backend::p3_field::Field;
 use serde::{Deserialize, Serialize};
 
 use crate::program::Program;
@@ -10,13 +10,13 @@ pub type MemoryImage<F> = BTreeMap<(F, F), F>;
 /// Stores the starting address, end address, and name of a set of function.
 pub type FnBounds = BTreeMap<u32, FnBound>;
 
-/// Executable program for AxVM.
+/// Executable program for OpenVM.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(bound(
     serialize = "F: Serialize",
     deserialize = "F: std::cmp::Ord + Deserialize<'de>"
 ))]
-pub struct AxVmExe<F> {
+pub struct VmExe<F> {
     /// Program to execute.
     pub program: Program<F>,
     /// Start address of pc.
@@ -27,7 +27,7 @@ pub struct AxVmExe<F> {
     pub fn_bounds: FnBounds,
 }
 
-impl<F> AxVmExe<F> {
+impl<F> VmExe<F> {
     pub fn new(program: Program<F>) -> Self {
         Self {
             program,
@@ -46,7 +46,7 @@ impl<F> AxVmExe<F> {
     }
 }
 
-impl<F: Field> From<Program<F>> for AxVmExe<F> {
+impl<F: Field> From<Program<F>> for VmExe<F> {
     fn from(program: Program<F>) -> Self {
         Self::new(program)
     }

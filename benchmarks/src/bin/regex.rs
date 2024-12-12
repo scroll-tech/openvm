@@ -1,27 +1,27 @@
 #![allow(unused_variables)]
 #![allow(unused_imports)]
 
-use ax_stark_backend::p3_field::AbstractField;
-use ax_stark_sdk::{
+use clap::Parser;
+use eyre::Result;
+use openvm_benchmarks::utils::{bench_from_exe, build_bench_program, BenchmarkCli};
+use openvm_circuit::arch::instructions::{exe::VmExe, program::DEFAULT_MAX_NUM_PUBLIC_VALUES};
+use openvm_keccak256_circuit::Keccak256Rv32Config;
+use openvm_keccak256_transpiler::Keccak256TranspilerExtension;
+use openvm_native_circuit::NativeConfig;
+use openvm_native_compiler::conversion::CompilerOptions;
+use openvm_native_recursion::testing_utils::inner::build_verification_program;
+use openvm_rv32im_transpiler::{
+    Rv32ITranspilerExtension, Rv32IoTranspilerExtension, Rv32MTranspilerExtension,
+};
+use openvm_sdk::{config::AppConfig, StdIn};
+use openvm_stark_backend::p3_field::AbstractField;
+use openvm_stark_sdk::{
     bench::run_with_metric_collection,
     config::{baby_bear_poseidon2::BabyBearPoseidon2Engine, FriParameters},
     engine::StarkFriEngine,
     p3_baby_bear::BabyBear,
 };
-use axvm_benchmarks::utils::{bench_from_exe, build_bench_program, BenchmarkCli};
-use axvm_circuit::arch::instructions::{exe::AxVmExe, program::DEFAULT_MAX_NUM_PUBLIC_VALUES};
-use axvm_keccak256_circuit::Keccak256Rv32Config;
-use axvm_keccak256_transpiler::Keccak256TranspilerExtension;
-use axvm_native_circuit::NativeConfig;
-use axvm_native_compiler::conversion::CompilerOptions;
-use axvm_native_recursion::testing_utils::inner::build_verification_program;
-use axvm_rv32im_transpiler::{
-    Rv32ITranspilerExtension, Rv32IoTranspilerExtension, Rv32MTranspilerExtension,
-};
-use axvm_sdk::{config::AppConfig, StdIn};
-use axvm_transpiler::{transpiler::Transpiler, FromElf};
-use clap::Parser;
-use eyre::Result;
+use openvm_transpiler::{transpiler::Transpiler, FromElf};
 use tracing::info_span;
 
 fn main() -> Result<()> {
@@ -30,7 +30,7 @@ fn main() -> Result<()> {
     let agg_log_blowup = cli_args.agg_log_blowup.unwrap_or(2);
 
     let elf = build_bench_program("regex")?;
-    let exe = AxVmExe::from_elf(
+    let exe = VmExe::from_elf(
         elf.clone(),
         Transpiler::<BabyBear>::default()
             .with_extension(Rv32ITranspilerExtension)

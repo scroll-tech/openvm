@@ -1,11 +1,11 @@
-use ax_circuit_primitives::{
+use openvm_circuit_primitives::{
     assert_less_than::{AssertLessThanIo, AssertLtSubAir},
     is_zero::{IsZeroIo, IsZeroSubAir},
     utils::not,
     var_range::VariableRangeCheckerBus,
     SubAir,
 };
-use ax_stark_backend::{
+use openvm_stark_backend::{
     interaction::InteractionBuilder, p3_air::AirBuilder, p3_field::AbstractField,
 };
 

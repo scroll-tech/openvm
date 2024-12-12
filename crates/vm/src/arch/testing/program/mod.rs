@@ -1,7 +1,8 @@
 use std::{borrow::BorrowMut, mem::size_of, sync::Arc};
 
 use air::ProgramDummyAir;
-use ax_stark_backend::{
+use openvm_instructions::instruction::Instruction;
+use openvm_stark_backend::{
     config::{StarkGenericConfig, Val},
     p3_field::{AbstractField, Field, PrimeField32},
     p3_matrix::dense::RowMajorMatrix,
@@ -9,7 +10,6 @@ use ax_stark_backend::{
     rap::AnyRap,
     Chip, ChipUsageGetter,
 };
-use axvm_instructions::instruction::Instruction;
 
 use crate::{
     arch::ExecutionState,

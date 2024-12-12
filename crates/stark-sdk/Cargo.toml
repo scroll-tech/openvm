@@ -1,5 +1,5 @@
 [package]
-name = "ax-stark-sdk"
+name = "openvm-stark-sdk"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -21,8 +21,8 @@ zkhash = { workspace = true }
 itertools.workspace = true
 tracing.workspace = true
 
-ax-stark-backend = { workspace = true }
-ax-circuit-derive = { workspace = true }
+openvm-stark-backend = { workspace = true }
+openvm-circuit-primitives-derive = { workspace = true }
 
 serde = { workspace = true, features = ["alloc"] }
 rand.workspace = true
@@ -38,11 +38,11 @@ metrics-tracing-context = "0.16.0"
 metrics-util = "0.17.0"
 
 [dev-dependencies]
-axvm-instructions.workspace = true
+openvm-instructions.workspace = true
 
 [features]
 default = ["parallel"]
-parallel = ["ax-stark-backend/parallel"]
+parallel = ["openvm-stark-backend/parallel"]
 nightly-features = [
     "p3-dft/nightly-features",
     "p3-keccak/nightly-features",

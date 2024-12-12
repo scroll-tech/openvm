@@ -1,9 +1,12 @@
 use std::{borrow::BorrowMut, sync::Arc};
 
-use ax_circuit_primitives::bitwise_op_lookup::{
+use openvm_circuit::arch::{testing::VmChipTestBuilder, VmAdapterChip};
+use openvm_circuit_primitives::bitwise_op_lookup::{
     BitwiseOperationLookupBus, BitwiseOperationLookupChip,
 };
-use ax_stark_backend::{
+use openvm_instructions::{instruction::Instruction, program::PC_BITS, UsizeOpcode, VmOpcode};
+use openvm_rv32im_transpiler::Rv32AuipcOpcode::{self, *};
+use openvm_stark_backend::{
     p3_air::BaseAir,
     p3_field::{AbstractField, PrimeField32},
     p3_matrix::{dense::RowMajorMatrix, Matrix},
@@ -11,10 +14,7 @@ use ax_stark_backend::{
     verifier::VerificationError,
     Chip, ChipUsageGetter,
 };
-use ax_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
-use axvm_circuit::arch::{testing::VmChipTestBuilder, VmAdapterChip};
-use axvm_instructions::{instruction::Instruction, program::PC_BITS, AxVmOpcode, UsizeOpcode};
-use axvm_rv32im_transpiler::Rv32AuipcOpcode::{self, *};
+use openvm_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
 use rand::{rngs::StdRng, Rng};
 
 use super::{run_auipc, Rv32AuipcChip, Rv32AuipcCoreChip, Rv32AuipcCoreCols};
@@ -38,7 +38,7 @@ fn set_and_execute(
 
     tester.execute_with_pc(
         chip,
-        Instruction::from_usize(AxVmOpcode::with_default_offset(opcode), [a, 0, imm, 1, 0]),
+        Instruction::from_usize(VmOpcode::with_default_offset(opcode), [a, 0, imm, 1, 0]),
         initial_pc.unwrap_or(rng.gen_range(0..(1 << PC_BITS))),
     );
     let initial_pc = tester.execution.last_from_pc().as_canonical_u32();

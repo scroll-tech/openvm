@@ -1,20 +1,20 @@
-use ax_circuit_derive::{Chip, ChipUsageGetter};
-use ax_circuit_primitives::bitwise_op_lookup::BitwiseOperationLookupBus;
-use ax_stark_backend::p3_field::PrimeField32;
-use axvm_circuit::{
+use derive_more::derive::From;
+use openvm_circuit::{
     arch::{
         SystemConfig, SystemExecutor, SystemPeriphery, SystemPort, VmChipComplex, VmConfig,
         VmExtension, VmInventory, VmInventoryBuilder, VmInventoryError,
     },
     system::phantom::PhantomChip,
 };
-use axvm_circuit_derive::{AnyEnum, InstructionExecutor, VmConfig};
-use axvm_instructions::*;
-use axvm_rv32im_circuit::{
+use openvm_circuit_derive::{AnyEnum, InstructionExecutor, VmConfig};
+use openvm_circuit_primitives::bitwise_op_lookup::BitwiseOperationLookupBus;
+use openvm_circuit_primitives_derive::{Chip, ChipUsageGetter};
+use openvm_instructions::*;
+use openvm_rv32im_circuit::{
     Rv32I, Rv32IExecutor, Rv32IPeriphery, Rv32Io, Rv32IoExecutor, Rv32IoPeriphery, Rv32M,
     Rv32MExecutor, Rv32MPeriphery,
 };
-use derive_more::derive::From;
+use openvm_stark_backend::p3_field::PrimeField32;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 
@@ -95,7 +95,7 @@ impl<F: PrimeField32> VmExtension<F> for Keccak256 {
         );
         inventory.add_executor(
             keccak_chip,
-            Rv32KeccakOpcode::iter().map(AxVmOpcode::with_default_offset),
+            Rv32KeccakOpcode::iter().map(VmOpcode::with_default_offset),
         )?;
 
         Ok(inventory)

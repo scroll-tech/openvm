@@ -4,19 +4,19 @@ use std::{
     sync::{Arc, OnceLock},
 };
 
-use ax_circuit_derive::AlignedBorrow;
-use ax_stark_backend::{
+use openvm_circuit::arch::{
+    instructions::UsizeOpcode, AdapterAirContext, AdapterRuntimeContext, ExecutionError, Result,
+    Streams, VmAdapterInterface, VmCoreAir, VmCoreChip,
+};
+use openvm_circuit_primitives_derive::AlignedBorrow;
+use openvm_instructions::instruction::Instruction;
+use openvm_native_compiler::NativeLoadStoreOpcode;
+use openvm_stark_backend::{
     interaction::InteractionBuilder,
     p3_air::BaseAir,
     p3_field::{AbstractField, Field, PrimeField32},
     rap::BaseAirWithPublicValues,
 };
-use axvm_circuit::arch::{
-    instructions::UsizeOpcode, AdapterAirContext, AdapterRuntimeContext, ExecutionError, Result,
-    Streams, VmAdapterInterface, VmCoreAir, VmCoreChip,
-};
-use axvm_instructions::instruction::Instruction;
-use axvm_native_compiler::NativeLoadStoreOpcode;
 use parking_lot::Mutex;
 use strum::IntoEnumIterator;
 

@@ -4,8 +4,7 @@ use std::{
     sync::Arc,
 };
 
-use ax_circuit_derive::AlignedBorrow;
-use ax_circuit_primitives::{
+use openvm_circuit_primitives::{
     is_less_than_array::{
         IsLtArrayAuxCols, IsLtArrayIo, IsLtArraySubAir, IsLtArrayWhenTransitionAir,
     },
@@ -13,7 +12,8 @@ use ax_circuit_primitives::{
     var_range::{VariableRangeCheckerBus, VariableRangeCheckerChip},
     SubAir, TraceSubRowGenerator,
 };
-use ax_stark_backend::{
+use openvm_circuit_primitives_derive::AlignedBorrow;
+use openvm_stark_backend::{
     interaction::InteractionBuilder,
     p3_air::{Air, AirBuilder, BaseAir},
     p3_field::{AbstractField, Field, PrimeField32},

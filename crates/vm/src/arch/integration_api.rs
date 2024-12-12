@@ -1,8 +1,9 @@
 use std::{array::from_fn, borrow::Borrow, cell::RefCell, marker::PhantomData, sync::Arc};
 
-use ax_circuit_derive::AlignedBorrow;
-use ax_circuit_primitives::utils::next_power_of_two_or_zero;
-use ax_stark_backend::{
+use openvm_circuit_primitives::utils::next_power_of_two_or_zero;
+use openvm_circuit_primitives_derive::AlignedBorrow;
+use openvm_instructions::instruction::Instruction;
+use openvm_stark_backend::{
     air_builders::{
         debug::DebugConstraintBuilder, prover::ProverConstraintFolder, symbolic::SymbolicRapBuilder,
     },
@@ -15,7 +16,6 @@ use ax_stark_backend::{
     rap::{get_air_name, AnyRap, BaseAirWithPublicValues, PartitionedBaseAir},
     Chip, ChipUsageGetter,
 };
-use axvm_instructions::instruction::Instruction;
 
 use super::{ExecutionState, InstructionExecutor, Result};
 use crate::system::memory::{MemoryAuxColsFactory, MemoryController, MemoryControllerRef};

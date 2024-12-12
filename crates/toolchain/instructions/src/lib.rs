@@ -2,8 +2,8 @@
 
 #![allow(non_camel_case_types)]
 
-use ax_stark_backend::p3_field::Field;
-use axvm_instructions_derive::UsizeOpcode;
+use openvm_instructions_derive::UsizeOpcode;
+use openvm_stark_backend::p3_field::Field;
 use serde::{Deserialize, Serialize};
 use strum_macros::{EnumCount, EnumIter, FromRepr};
 
@@ -11,7 +11,7 @@ pub mod exe;
 pub mod instruction;
 mod phantom;
 pub mod program;
-/// Module with traits and constants for RISC-V instruction definitions for custom axVM instructions.
+/// Module with traits and constants for RISC-V instruction definitions for custom OpenVM instructions.
 pub mod riscv;
 pub mod utils;
 
@@ -30,9 +30,9 @@ pub trait UsizeOpcode {
 }
 
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, derive_new::new, Serialize, Deserialize)]
-pub struct AxVmOpcode(usize);
+pub struct VmOpcode(usize);
 
-impl AxVmOpcode {
+impl VmOpcode {
     /// Returns the corresponding `local_opcode_idx`
     pub fn local_opcode_idx(&self, offset: usize) -> usize {
         self.as_usize() - offset
@@ -43,23 +43,23 @@ impl AxVmOpcode {
         self.0
     }
 
-    /// Create a new [AxVmOpcode] from a usize
+    /// Create a new [VmOpcode] from a usize
     pub fn from_usize(value: usize) -> Self {
         Self(value)
     }
 
-    /// Returns the corresponding [AxVmOpcode] from `local_opcode` with default offset
-    pub fn with_default_offset<Opcode: UsizeOpcode>(local_opcode: Opcode) -> AxVmOpcode {
+    /// Returns the corresponding [VmOpcode] from `local_opcode` with default offset
+    pub fn with_default_offset<Opcode: UsizeOpcode>(local_opcode: Opcode) -> VmOpcode {
         Self(local_opcode.with_default_offset())
     }
 
-    /// Convert the AxVmOpcode into a field element
+    /// Convert the VmOpcode into a field element
     pub fn to_field<F: Field>(&self) -> F {
         F::from_canonical_usize(self.as_usize())
     }
 }
 
-impl std::fmt::Display for AxVmOpcode {
+impl std::fmt::Display for VmOpcode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
     }

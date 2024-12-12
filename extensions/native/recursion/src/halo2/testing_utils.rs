@@ -1,11 +1,11 @@
-use ax_stark_sdk::{
+use openvm_native_compiler::prelude::Witness;
+use openvm_stark_sdk::{
     config::{
         baby_bear_poseidon2_root::{BabyBearPoseidon2RootConfig, BabyBearPoseidon2RootEngine},
         FriParameters,
     },
     engine::{ProofInputForTest, StarkFriEngine},
 };
-use axvm_native_compiler::prelude::Witness;
 use snark_verifier_sdk::Snark;
 
 use crate::{

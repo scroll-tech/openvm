@@ -4,14 +4,7 @@ use std::{
     marker::PhantomData,
 };
 
-use ax_circuit_derive::AlignedBorrow;
-use ax_circuit_primitives::utils;
-use ax_stark_backend::{
-    interaction::InteractionBuilder,
-    p3_air::{AirBuilder, BaseAir},
-    p3_field::{AbstractField, Field, PrimeField32},
-};
-use axvm_circuit::{
+use openvm_circuit::{
     arch::{
         instructions::UsizeOpcode, AdapterAirContext, AdapterRuntimeContext, ExecutionBridge,
         ExecutionBus, ExecutionState, Result, VmAdapterAir, VmAdapterChip, VmAdapterInterface,
@@ -25,8 +18,15 @@ use axvm_circuit::{
         program::ProgramBus,
     },
 };
-use axvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP};
-use axvm_native_compiler::NativeLoadStoreOpcode::{self, *};
+use openvm_circuit_primitives::utils;
+use openvm_circuit_primitives_derive::AlignedBorrow;
+use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP};
+use openvm_native_compiler::NativeLoadStoreOpcode::{self, *};
+use openvm_stark_backend::{
+    interaction::InteractionBuilder,
+    p3_air::{AirBuilder, BaseAir},
+    p3_field::{AbstractField, Field, PrimeField32},
+};
 
 pub struct NativeLoadStoreInstruction<T> {
     pub is_valid: T,

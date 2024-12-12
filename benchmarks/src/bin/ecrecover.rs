@@ -1,51 +1,51 @@
 #![allow(unused_variables)]
 #![allow(unused_imports)]
 
-use ax_circuit_derive::{Chip, ChipUsageGetter};
-use ax_stark_backend::p3_field::{AbstractField, PrimeField32};
-use ax_stark_sdk::{
+use clap::Parser;
+use derive_more::derive::From;
+use eyre::Result;
+use k256::ecdsa::{RecoveryId, Signature, SigningKey, VerifyingKey};
+use num_bigint_dig::BigUint;
+use openvm_algebra_circuit::{
+    ModularExtension, ModularExtensionExecutor, ModularExtensionPeriphery, Rv32ModularConfig,
+    Rv32ModularWithFp2Config,
+};
+use openvm_algebra_transpiler::ModularTranspilerExtension;
+use openvm_benchmarks::utils::{bench_from_exe, build_bench_program, BenchmarkCli};
+use openvm_circuit::{
+    arch::{
+        instructions::exe::VmExe, SystemConfig, SystemExecutor, SystemPeriphery, VmChipComplex,
+        VmConfig, VmInventoryError,
+    },
+    derive::{AnyEnum, InstructionExecutor, VmConfig},
+};
+use openvm_circuit_primitives_derive::{Chip, ChipUsageGetter};
+use openvm_ecc_circuit::{
+    CurveConfig, Rv32WeierstrassConfig, WeierstrassExtension, WeierstrassExtensionExecutor,
+    WeierstrassExtensionPeriphery, SECP256K1_CONFIG,
+};
+use openvm_ecc_transpiler::EccTranspilerExtension;
+use openvm_keccak256_circuit::{Keccak256, Keccak256Executor, Keccak256Periphery};
+use openvm_keccak256_transpiler::Keccak256TranspilerExtension;
+use openvm_native_compiler::conversion::CompilerOptions;
+use openvm_native_recursion::testing_utils::inner::build_verification_program;
+use openvm_rv32im_circuit::{
+    Rv32I, Rv32IExecutor, Rv32IPeriphery, Rv32Io, Rv32IoExecutor, Rv32IoPeriphery, Rv32M,
+    Rv32MExecutor, Rv32MPeriphery,
+};
+use openvm_rv32im_transpiler::{
+    Rv32ITranspilerExtension, Rv32IoTranspilerExtension, Rv32MTranspilerExtension,
+};
+use openvm_sdk::{config::AppConfig, StdIn};
+use openvm_stark_backend::p3_field::{AbstractField, PrimeField32};
+use openvm_stark_sdk::{
     bench::run_with_metric_collection,
     config::{baby_bear_poseidon2::BabyBearPoseidon2Engine, FriParameters},
     engine::StarkFriEngine,
     p3_baby_bear::BabyBear,
     p3_keccak::Keccak256Hash,
 };
-use axvm_algebra_circuit::{
-    ModularExtension, ModularExtensionExecutor, ModularExtensionPeriphery, Rv32ModularConfig,
-    Rv32ModularWithFp2Config,
-};
-use axvm_algebra_transpiler::ModularTranspilerExtension;
-use axvm_benchmarks::utils::{bench_from_exe, build_bench_program, BenchmarkCli};
-use axvm_circuit::{
-    arch::{
-        instructions::exe::AxVmExe, SystemConfig, SystemExecutor, SystemPeriphery, VmChipComplex,
-        VmConfig, VmInventoryError,
-    },
-    derive::{AnyEnum, InstructionExecutor, VmConfig},
-};
-use axvm_ecc_circuit::{
-    CurveConfig, Rv32WeierstrassConfig, WeierstrassExtension, WeierstrassExtensionExecutor,
-    WeierstrassExtensionPeriphery, SECP256K1_CONFIG,
-};
-use axvm_ecc_transpiler::EccTranspilerExtension;
-use axvm_keccak256_circuit::{Keccak256, Keccak256Executor, Keccak256Periphery};
-use axvm_keccak256_transpiler::Keccak256TranspilerExtension;
-use axvm_native_compiler::conversion::CompilerOptions;
-use axvm_native_recursion::testing_utils::inner::build_verification_program;
-use axvm_rv32im_circuit::{
-    Rv32I, Rv32IExecutor, Rv32IPeriphery, Rv32Io, Rv32IoExecutor, Rv32IoPeriphery, Rv32M,
-    Rv32MExecutor, Rv32MPeriphery,
-};
-use axvm_rv32im_transpiler::{
-    Rv32ITranspilerExtension, Rv32IoTranspilerExtension, Rv32MTranspilerExtension,
-};
-use axvm_sdk::{config::AppConfig, StdIn};
-use axvm_transpiler::{transpiler::Transpiler, FromElf};
-use clap::Parser;
-use derive_more::derive::From;
-use eyre::Result;
-use k256::ecdsa::{RecoveryId, Signature, SigningKey, VerifyingKey};
-use num_bigint_dig::BigUint;
+use openvm_transpiler::{transpiler::Transpiler, FromElf};
 use rand_chacha::{rand_core::SeedableRng, ChaCha8Rng};
 use serde::{Deserialize, Serialize};
 use tiny_keccak::{Hasher, Keccak};
@@ -109,7 +109,7 @@ fn main() -> Result<()> {
     let agg_log_blowup = cli_args.agg_log_blowup.unwrap_or(2);
 
     let elf = build_bench_program("ecrecover")?;
-    let exe = AxVmExe::from_elf(
+    let exe = VmExe::from_elf(
         elf,
         Transpiler::<BabyBear>::default()
             .with_extension(Rv32ITranspilerExtension)

@@ -1,10 +1,10 @@
 use std::{borrow::Borrow, mem::size_of};
 
-use ax_circuit_primitives::{
+use openvm_circuit_primitives::{
     is_less_than::{IsLessThanIo, IsLtSubAir},
     SubAir,
 };
-use ax_stark_backend::{
+use openvm_stark_backend::{
     interaction::InteractionBuilder,
     p3_air::{Air, AirBuilder, BaseAir},
     p3_field::AbstractField,
