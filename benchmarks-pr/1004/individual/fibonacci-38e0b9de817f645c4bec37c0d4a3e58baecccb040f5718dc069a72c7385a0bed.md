@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| fibonacci_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>51,612,244</div>  | <div style='text-align: right'>1,500,137</div>  | <span style="color: red">(+783.0 [+15.2%])</span> <div style='text-align: right'>5,947.0</div>  |
+| fibonacci_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>51,612,244</div>  | <div style='text-align: right'>1,500,137</div>  | <span style="color: red">(+26.0 [+0.5%])</span> <div style='text-align: right'>5,190.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms |
 | --- | --- | --- | --- | --- |
-| <span style="color: red">(+3.0 [+75.0%])</span> <div style='text-align: right'>7.0</div>  | <span style="color: green">(-140.0 [-11.9%])</span> <div style='text-align: right'>1,038.0</div>  | <span style="color: green">(-50.0 [-5.4%])</span> <div style='text-align: right'>870.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+44.0 [+8.7%])</span> <div style='text-align: right'>548.0</div>  |
+| <span style="color: green">(-1.0 [-25.0%])</span> <div style='text-align: right'>3.0</div>  | <span style="color: red">(+7.0 [+0.6%])</span> <div style='text-align: right'>1,185.0</div>  | <span style="color: red">(+3.0 [+0.3%])</span> <div style='text-align: right'>923.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-19.0 [-3.8%])</span> <div style='text-align: right'>485.0</div>  |
 
 | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- |
@@ -44,7 +44,7 @@
 
 | group | segment | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_cycles | trace_gen_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| fibonacci_program | 0 | <span style="color: red">(+783.0 [+15.2%])</span> <div style='text-align: right'>5,947.0</div>  | <div style='text-align: right'>197,696,030</div>  | <div style='text-align: right'>51,612,244</div>  | <div style='text-align: right'>1,500,137</div>  | <span style="color: green">(-68.0 [-28.8%])</span> <div style='text-align: right'>168.0</div>  |
+| fibonacci_program | 0 | <span style="color: red">(+26.0 [+0.5%])</span> <div style='text-align: right'>5,190.0</div>  | <div style='text-align: right'>197,696,030</div>  | <div style='text-align: right'>51,612,244</div>  | <div style='text-align: right'>1,500,137</div>  | <span style="color: red">(+3.0 [+1.3%])</span> <div style='text-align: right'>239.0</div>  |
 
 | group | chip_name | segment | rows_used |
 | --- | --- | --- | --- |
@@ -129,7 +129,7 @@
 
 | group | execute_time_ms | fri.log_blowup | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| fibonacci_program | <span style="color: green">(-54.0 [-5.8%])</span> <div style='text-align: right'>876.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>51,612,244</div>  | <div style='text-align: right'>1,500,137</div>  | <span style="color: red">(+783.0 [+15.2%])</span> <div style='text-align: right'>5,947.0</div>  |
+| fibonacci_program | <span style="color: red">(+19.0 [+2.0%])</span> <div style='text-align: right'>949.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>51,612,244</div>  | <div style='text-align: right'>1,500,137</div>  | <span style="color: red">(+26.0 [+0.5%])</span> <div style='text-align: right'>5,190.0</div>  |
 
 | group | air_name | segment | cells | main_cols | perm_cols | prep_cols | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -156,7 +156,7 @@
 
 | segment | trace_gen_time_ms |
 | --- | --- |
-| 0 | <span style="color: green">(-90.0 [-35.0%])</span> <div style='text-align: right'>167.0</div>  |
+| 0 | <span style="color: red">(+5.0 [+1.9%])</span> <div style='text-align: right'>262.0</div>  |
 
 </details>
 
@@ -176,8 +176,8 @@ Commit: https://github.com/axiom-crypto/afs-prototype/commit/ad712c3a1da4cfd7467
 
 Max Segment Length: 1048476
 
-Instance Type: 64cpu-linux-x64
+Instance Type: 64cpu-linux-arm64
 
-Memory Allocator: jemalloc
+Memory Allocator: mimalloc
 
 [Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12287660634)
