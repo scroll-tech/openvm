@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| ecrecover_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <span style="color: red">(+63.0 [+3.5%])</span> <div style='text-align: right'>1,851.0</div>  |
+| ecrecover_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <span style="color: red">(+20.0 [+1.1%])</span> <div style='text-align: right'>1,808.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms |
 | --- | --- | --- | --- | --- |
-| <div style='text-align: right'>5.0</div>  | <span style="color: green">(-21.0 [-6.0%])</span> <div style='text-align: right'>330.0</div>  | <span style="color: green">(-20.0 [-8.0%])</span> <div style='text-align: right'>229.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-266.0 [-0.3%])</span> <div style='text-align: right'>76,083.0</div>  |
+| <span style="color: red">(+1.0 [+20.0%])</span> <div style='text-align: right'>6.0</div>  | <span style="color: green">(-26.0 [-7.4%])</span> <div style='text-align: right'>325.0</div>  | <span style="color: green">(-25.0 [-10.0%])</span> <div style='text-align: right'>224.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+58.0 [+0.1%])</span> <div style='text-align: right'>76,407.0</div>  |
 
 | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- |
@@ -50,7 +50,7 @@
 
 | group | segment | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_cycles | trace_gen_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| ecrecover_program | 0 | <span style="color: red">(+63.0 [+3.5%])</span> <div style='text-align: right'>1,851.0</div>  | <div style='text-align: right'>35,713,167</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <span style="color: red">(+14.0 [+15.7%])</span> <div style='text-align: right'>103.0</div>  |
+| ecrecover_program | 0 | <span style="color: red">(+20.0 [+1.1%])</span> <div style='text-align: right'>1,808.0</div>  | <div style='text-align: right'>35,713,167</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <span style="color: red">(+11.0 [+12.4%])</span> <div style='text-align: right'>100.0</div>  |
 
 | group | chip_name | segment | rows_used |
 | --- | --- | --- | --- |
@@ -218,7 +218,7 @@
 
 | group | execute_time_ms | fri.log_blowup | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| ecrecover_program | <span style="color: green">(-24.0 [-9.8%])</span> <div style='text-align: right'>222.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <span style="color: red">(+63.0 [+3.5%])</span> <div style='text-align: right'>1,851.0</div>  |
+| ecrecover_program | <span style="color: green">(-19.0 [-7.7%])</span> <div style='text-align: right'>227.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>10,567,808</div>  | <div style='text-align: right'>106,444</div>  | <span style="color: red">(+20.0 [+1.1%])</span> <div style='text-align: right'>1,808.0</div>  |
 
 | group | air_name | segment | cells | main_cols | perm_cols | prep_cols | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -256,7 +256,7 @@
 
 | segment | trace_gen_time_ms |
 | --- | --- |
-| 0 | <span style="color: green">(-2.0 [-2.0%])</span> <div style='text-align: right'>99.0</div>  |
+| 0 | <span style="color: green">(-1.0 [-1.0%])</span> <div style='text-align: right'>100.0</div>  |
 
 </details>
 
@@ -280,4 +280,4 @@ Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12288840578)
+[Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12289080541)
