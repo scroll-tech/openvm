@@ -1,7 +1,7 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| fibonacci_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>51,612,244</div>  | <span style="color: red">(+1,500,137 [+100.0%])</span> <div style='text-align: right'>3,000,274</div>  | <span style="color: red">(+692.0 [+13.4%])</span> <div style='text-align: right'>5,858.0</div>  |
-| leaf | <div style='text-align: right'>2</div>  | <span style="color: red">(+1,320 [+0.0%])</span> <div style='text-align: right'>144,223,313</div>  | <span style="color: red">(+3,519,452 [+100.0%])</span> <div style='text-align: right'>7,038,444</div>  | <span style="color: red">(+2,433.0 [+18.5%])</span> <div style='text-align: right'>15,569.0</div>  |
+| fibonacci_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>51,612,244</div>  | <div style='text-align: right'>3,000,274</div>  | <span style="color: green">(-690.0 [-11.8%])</span> <div style='text-align: right'>5,168.0</div>  |
+| leaf | <div style='text-align: right'>2</div>  | <span style="color: green">(-1,320 [-0.0%])</span> <div style='text-align: right'>144,221,993</div>  | <span style="color: green">(-460 [-0.0%])</span> <div style='text-align: right'>7,037,984</div>  | <span style="color: green">(-2,427.0 [-15.6%])</span> <div style='text-align: right'>13,142.0</div>  |
 
 
 <details>
@@ -9,7 +9,7 @@
 
 | commit_exe_time_ms | execute_and_trace_gen_time_ms | execute_time_ms | fri.log_blowup | keygen_time_ms |
 | --- | --- | --- | --- | --- |
-| <span style="color: red">(+1.0 [+25.0%])</span> <div style='text-align: right'>5.0</div>  | <span style="color: red">(+255.0 [+21.5%])</span> <div style='text-align: right'>1,439.0</div>  | <span style="color: red">(+340.0 [+36.7%])</span> <div style='text-align: right'>1,267.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+44.0 [+8.9%])</span> <div style='text-align: right'>536.0</div>  |
+| <span style="color: green">(-1.0 [-20.0%])</span> <div style='text-align: right'>4.0</div>  | <span style="color: red">(+433.0 [+30.1%])</span> <div style='text-align: right'>1,872.0</div>  | <span style="color: red">(+350.0 [+27.6%])</span> <div style='text-align: right'>1,617.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-38.0 [-7.1%])</span> <div style='text-align: right'>498.0</div>  |
 
 | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- |
@@ -53,11 +53,11 @@
 
 | segment | total_cycles | trace_gen_time_ms |
 | --- | --- | --- |
-| 0 | <div style='text-align: right'>1,500,137</div>  | <span style="color: green">(-85.0 [-33.2%])</span> <div style='text-align: right'>171.0</div>  |
+| 0 | <div style='text-align: right'>1,500,137</div>  | <span style="color: red">(+83.0 [+48.5%])</span> <div style='text-align: right'>254.0</div>  |
 
 | group | segment | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_cycles | trace_gen_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| fibonacci_program | 0 | <span style="color: red">(+692.0 [+13.4%])</span> <div style='text-align: right'>5,858.0</div>  | <div style='text-align: right'>197,696,030</div>  | <div style='text-align: right'>51,612,244</div>  | <span style="color: red">(+1,500,137 [+100.0%])</span> <div style='text-align: right'>3,000,274</div>  | <div style='text-align: right'>168.0</div>  |
+| fibonacci_program | 0 | <span style="color: green">(-690.0 [-11.8%])</span> <div style='text-align: right'>5,168.0</div>  | <div style='text-align: right'>197,696,030</div>  | <div style='text-align: right'>51,612,244</div>  | <div style='text-align: right'>3,000,274</div>  | <span style="color: red">(+58.0 [+34.5%])</span> <div style='text-align: right'>226.0</div>  |
 
 | group | chip_name | segment | rows_used |
 | --- | --- | --- | --- |
@@ -142,8 +142,8 @@
 
 | group | execute_time_ms | fri.log_blowup | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| fibonacci_program | <span style="color: red">(+414.0 [+44.7%])</span> <div style='text-align: right'>1,341.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>51,612,244</div>  | <span style="color: red">(+1,500,137 [+100.0%])</span> <div style='text-align: right'>3,000,274</div>  | <span style="color: red">(+692.0 [+13.4%])</span> <div style='text-align: right'>5,858.0</div>  |
-| leaf |  | <div style='text-align: right'>2</div>  |  | <span style="color: red">(+1,320 [+0.0%])</span> <div style='text-align: right'>144,223,313</div>  | <span style="color: red">(+3,519,452 [+100.0%])</span> <div style='text-align: right'>7,038,444</div>  | <span style="color: red">(+2,433.0 [+18.5%])</span> <div style='text-align: right'>15,569.0</div>  |
+| fibonacci_program | <span style="color: red">(+388.0 [+28.9%])</span> <div style='text-align: right'>1,729.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>51,612,244</div>  | <div style='text-align: right'>3,000,274</div>  | <span style="color: green">(-690.0 [-11.8%])</span> <div style='text-align: right'>5,168.0</div>  |
+| leaf |  | <div style='text-align: right'>2</div>  |  | <span style="color: green">(-1,320 [-0.0%])</span> <div style='text-align: right'>144,221,993</div>  | <span style="color: green">(-460 [-0.0%])</span> <div style='text-align: right'>7,037,984</div>  | <span style="color: green">(-2,427.0 [-15.6%])</span> <div style='text-align: right'>13,142.0</div>  |
 
 | group | air_name | segment | cells | main_cols | perm_cols | prep_cols | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -170,7 +170,7 @@
 
 | group | idx | execute_time_ms | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_cycles |
 | --- | --- | --- | --- | --- | --- | --- |
-| leaf | 0 | <span style="color: red">(+1,236.0 [+34.6%])</span> <div style='text-align: right'>4,807.0</div>  | <span style="color: red">(+2,433.0 [+18.5%])</span> <div style='text-align: right'>15,569.0</div>  | <div style='text-align: right'>399,935,960</div>  | <span style="color: red">(+1,320 [+0.0%])</span> <div style='text-align: right'>144,223,313</div>  | <span style="color: red">(+230 [+0.0%])</span> <div style='text-align: right'>3,519,222</div>  |
+| leaf | 0 | <span style="color: red">(+944.0 [+19.6%])</span> <div style='text-align: right'>5,751.0</div>  | <span style="color: green">(-2,427.0 [-15.6%])</span> <div style='text-align: right'>13,142.0</div>  | <div style='text-align: right'>399,935,960</div>  | <span style="color: green">(-1,320 [-0.0%])</span> <div style='text-align: right'>144,221,993</div>  | <span style="color: green">(-230 [-0.0%])</span> <div style='text-align: right'>3,518,992</div>  |
 
 | group | chip_name | idx | rows_used |
 | --- | --- | --- | --- |
@@ -178,14 +178,14 @@
 | leaf | VmConnectorAir | 0 | <div style='text-align: right'>2</div>  |
 | leaf | <NativeAdapterAir<2, 0>,PublicValuesCoreAir> | 0 | <div style='text-align: right'>36</div>  |
 | leaf | Boundary | 0 | <div style='text-align: right'>424,581</div>  |
-| leaf | AccessAdapter<2> | 0 | <span style="color: green">(-56 [-0.0%])</span> <div style='text-align: right'>404,768</div>  |
-| leaf | AccessAdapter<4> | 0 | <span style="color: green">(-28 [-0.0%])</span> <div style='text-align: right'>202,636</div>  |
+| leaf | AccessAdapter<2> | 0 | <span style="color: red">(+56 [+0.0%])</span> <div style='text-align: right'>404,824</div>  |
+| leaf | AccessAdapter<4> | 0 | <span style="color: red">(+28 [+0.0%])</span> <div style='text-align: right'>202,664</div>  |
 | leaf | AccessAdapter<8> | 0 | <div style='text-align: right'>58,714</div>  |
 | leaf | Poseidon2VmAir<BabyBearParameters> | 0 | <div style='text-align: right'>28,074</div>  |
 | leaf | FriReducedOpeningAir | 0 | <div style='text-align: right'>144,732</div>  |
 | leaf | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | 0 | <div style='text-align: right'>35,074</div>  |
 | leaf | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | 0 | <div style='text-align: right'>1,355,464</div>  |
-| leaf | <JalNativeAdapterAir,JalCoreAir> | 0 | <span style="color: red">(+230 [+0.3%])</span> <div style='text-align: right'>73,381</div>  |
+| leaf | <JalNativeAdapterAir,JalCoreAir> | 0 | <span style="color: green">(-230 [-0.3%])</span> <div style='text-align: right'>73,151</div>  |
 | leaf | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | 0 | <div style='text-align: right'>676,191</div>  |
 | leaf | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | 0 | <div style='text-align: right'>1,134,653</div>  |
 | leaf | PhantomAir | 0 | <div style='text-align: right'>211,015</div>  |
@@ -203,7 +203,7 @@
 | leaf |  | 0 | FE4ADD | <div style='text-align: right'>13,429</div>  |
 | leaf |  | 0 | FE4SUB | <div style='text-align: right'>3,557</div>  |
 | leaf |  | 0 | FRI_REDUCED_OPENING | <div style='text-align: right'>5,334</div>  |
-| leaf |  | 0 | JAL | <span style="color: red">(+230 [+0.3%])</span> <div style='text-align: right'>73,381</div>  |
+| leaf |  | 0 | JAL | <span style="color: green">(-230 [-0.3%])</span> <div style='text-align: right'>73,151</div>  |
 | leaf |  | 0 | LOADW | <div style='text-align: right'>155,907</div>  |
 | leaf |  | 0 | LOADW2 | <div style='text-align: right'>360,784</div>  |
 | leaf |  | 0 | MUL | <div style='text-align: right'>143,987</div>  |
@@ -218,16 +218,16 @@
 | group | air_name | dsl_ir | idx | opcode | cells_used |
 | --- | --- | --- | --- | --- | --- |
 | leaf | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> |  | 0 | ADD | <div style='text-align: right'>34,592,280</div>  |
-| leaf | AccessAdapter<2> |  | 0 | ADD | <span style="color: green">(-308 [-0.2%])</span> <div style='text-align: right'>204,094</div>  |
-| leaf | AccessAdapter<4> |  | 0 | ADD | <span style="color: green">(-182 [-0.2%])</span> <div style='text-align: right'>120,601</div>  |
+| leaf | AccessAdapter<2> |  | 0 | ADD | <span style="color: red">(+308 [+0.2%])</span> <div style='text-align: right'>204,402</div>  |
+| leaf | AccessAdapter<4> |  | 0 | ADD | <span style="color: red">(+182 [+0.2%])</span> <div style='text-align: right'>120,783</div>  |
 | leaf | Boundary |  | 0 | ADD | <div style='text-align: right'>146,135</div>  |
 | leaf | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> |  | 0 | BBE4DIV | <div style='text-align: right'>250,720</div>  |
 | leaf | AccessAdapter<2> |  | 0 | BBE4DIV | <div style='text-align: right'>121,044</div>  |
 | leaf | AccessAdapter<4> |  | 0 | BBE4DIV | <div style='text-align: right'>71,526</div>  |
 | leaf | Boundary |  | 0 | BBE4DIV | <div style='text-align: right'>704</div>  |
 | leaf | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> |  | 0 | BBE4MUL | <div style='text-align: right'>472,800</div>  |
-| leaf | AccessAdapter<2> |  | 0 | BBE4MUL | <span style="color: green">(-308 [-0.1%])</span> <div style='text-align: right'>303,710</div>  |
-| leaf | AccessAdapter<4> |  | 0 | BBE4MUL | <span style="color: green">(-182 [-0.1%])</span> <div style='text-align: right'>179,465</div>  |
+| leaf | AccessAdapter<2> |  | 0 | BBE4MUL | <span style="color: red">(+308 [+0.1%])</span> <div style='text-align: right'>304,018</div>  |
+| leaf | AccessAdapter<4> |  | 0 | BBE4MUL | <span style="color: red">(+182 [+0.1%])</span> <div style='text-align: right'>179,647</div>  |
 | leaf | Boundary |  | 0 | BBE4MUL | <div style='text-align: right'>139,304</div>  |
 | leaf | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> |  | 0 | BEQ | <div style='text-align: right'>426,811</div>  |
 | leaf | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> |  | 0 | BNE | <div style='text-align: right'>15,125,582</div>  |
@@ -250,7 +250,7 @@
 | leaf | AccessAdapter<2> |  | 0 | FRI_REDUCED_OPENING | <div style='text-align: right'>151,580</div>  |
 | leaf | AccessAdapter<4> |  | 0 | FRI_REDUCED_OPENING | <div style='text-align: right'>89,570</div>  |
 | leaf | FriReducedOpeningAir |  | 0 | FRI_REDUCED_OPENING | <div style='text-align: right'>9,262,848</div>  |
-| leaf | <JalNativeAdapterAir,JalCoreAir> |  | 0 | JAL | <span style="color: red">(+2,300 [+0.3%])</span> <div style='text-align: right'>733,810</div>  |
+| leaf | <JalNativeAdapterAir,JalCoreAir> |  | 0 | JAL | <span style="color: green">(-2,300 [-0.3%])</span> <div style='text-align: right'>731,510</div>  |
 | leaf | AccessAdapter<2> |  | 0 | JAL | <div style='text-align: right'>418</div>  |
 | leaf | AccessAdapter<4> |  | 0 | JAL | <div style='text-align: right'>494</div>  |
 | leaf | Boundary |  | 0 | JAL | <div style='text-align: right'>11</div>  |
@@ -296,7 +296,7 @@
 
 | group | idx | segment | total_cycles | trace_gen_time_ms |
 | --- | --- | --- | --- | --- |
-| leaf | 0 | 0 | <div style='text-align: right'>3,519,222</div>  | <div style='text-align: right'>603.0</div>  |
+| leaf | 0 | 0 | <span style="color: green">(-230 [-0.0%])</span> <div style='text-align: right'>3,518,992</div>  | <span style="color: red">(+292.0 [+48.4%])</span> <div style='text-align: right'>895.0</div>  |
 
 | group | air_name | idx | cells | main_cols | perm_cols | prep_cols | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -339,8 +339,8 @@ Commit: https://github.com/axiom-crypto/afs-prototype/commit/42d046a314e48c42a6a
 
 Max Segment Length: 1048476
 
-Instance Type: 64cpu-linux-x64
+Instance Type: 64cpu-linux-arm64
 
-Memory Allocator: jemalloc
+Memory Allocator: mimalloc
 
 [Benchmark Workflow](https://github.com/axiom-crypto/afs-prototype/actions/runs/12288853142)
