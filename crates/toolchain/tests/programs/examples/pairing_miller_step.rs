@@ -12,7 +12,7 @@ axvm::entry!(main);
 
 #[cfg(feature = "bn254")]
 mod bn254 {
-    use axvm_pairing_guest::bn254::{Bn254, Fp2};
+    use axvm_pairing_guest::bn254::{Bn254, Fp, Fp2};
 
     use super::*;
 
@@ -23,6 +23,10 @@ mod bn254 {
 
     axvm_algebra_complex_macros::complex_init! {
         Fp2 { mod_idx = 0 },
+    }
+
+    axvm_ecc_sw_setup::sw_init! {
+        Fp,
     }
 
     pub fn test_miller_step(io: &[u8]) {
@@ -90,7 +94,7 @@ mod bn254 {
 
 #[cfg(feature = "bls12_381")]
 mod bls12_381 {
-    use axvm_pairing_guest::bls12_381::{Bls12_381, Fp2};
+    use axvm_pairing_guest::bls12_381::{Bls12_381, Fp, Fp2};
 
     use super::*;
 
@@ -101,6 +105,10 @@ mod bls12_381 {
 
     axvm_algebra_complex_macros::complex_init! {
         Fp2 { mod_idx = 0 },
+    }
+
+    axvm_ecc_sw_setup::sw_init! {
+        Fp,
     }
 
     pub fn test_miller_step(io: &[u8]) {

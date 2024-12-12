@@ -1,5 +1,8 @@
+use core::ops::{Add, AddAssign, Neg};
+
 use axvm_algebra_guest::{Field, IntMod};
 use axvm_algebra_moduli_setup::moduli_declare;
+use axvm_ecc_guest::Group;
 
 mod fp12;
 mod fp2;
@@ -46,8 +49,21 @@ moduli_declare! {
     Bls12_381Scalar { modulus = "0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001" },
 }
 
+const CURVE_B: Bls12_381Fp = Bls12_381Fp::from_const_bytes(hex!(
+    "040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+));
+
+axvm_ecc_sw_setup::sw_declare! {
+    Bls12_381G1Affine { mod_type = Bls12_381Fp, b = CURVE_B },
+}
+
 pub type Fp = Bls12_381Fp;
 pub type Scalar = Bls12_381Scalar;
+/// Affine point representation of `Fp` points of BLS12-381.
+/// **Note**: an instance of this type may be constructed that lies
+/// on the curve but not necessarily in the prime order subgroup
+/// because the group has cofactors.
+pub type G1Affine = Bls12_381G1Affine;
 
 impl Field for Fp {
     type SelfRef<'a> = &'a Self;
