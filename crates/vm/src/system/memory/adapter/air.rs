@@ -16,7 +16,6 @@ use crate::system::memory::{
     adapter::columns::AccessAdapterCols, offline_checker::MemoryBus, MemoryAddress,
 };
 
-#[derive(Clone, Debug)]
 pub struct AccessAdapterAir<const N: usize> {
     pub memory_bus: MemoryBus,
     pub lt_air: IsLtSubAir,
