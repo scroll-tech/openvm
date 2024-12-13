@@ -4,7 +4,7 @@ use eyre::Result;
 use tempfile::tempdir;
 
 #[test]
-fn test_cli_e2e() -> Result<()> {
+fn test_cli_app_e2e() -> Result<()> {
     let temp_dir = tempdir()?;
     let package_dir = env::current_dir()?;
     let prefix = "[test cli e2e]";
@@ -21,7 +21,7 @@ fn test_cli_e2e() -> Result<()> {
         println!("{}", std::str::from_utf8(&output.stderr).unwrap());
     };
     run_cmd("cargo", &["install", "--path", ".", "--force"]);
-    let temp_exe = temp_dir.path().join("example.openvmexe");
+    let temp_exe = temp_dir.path().join("example.vmexe");
     let temp_pk = temp_dir.path().join("example.pk");
     let temp_vk = temp_dir.path().join("example.vk");
     let temp_proof = temp_dir.path().join("example.apppf");
