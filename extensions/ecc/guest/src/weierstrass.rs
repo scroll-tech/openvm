@@ -40,6 +40,17 @@ pub trait WeierstrassPoint: Group {
     where
         for<'a> &'a Self::Coordinate: Mul<&'a Self::Coordinate, Output = Self::Coordinate>,
     {
+        if x == Self::Coordinate::ZERO && y == Self::Coordinate::ZERO {
+            Some(Self::IDENTITY)
+        } else {
+            Self::from_xy_nonidentity(x, y)
+        }
+    }
+
+    fn from_xy_nonidentity(x: Self::Coordinate, y: Self::Coordinate) -> Option<Self>
+    where
+        for<'a> &'a Self::Coordinate: Mul<&'a Self::Coordinate, Output = Self::Coordinate>,
+    {
         let lhs = &y * &y;
         let rhs = &x * &x * &x + &Self::CURVE_B;
         if lhs != rhs {
@@ -68,7 +79,7 @@ pub trait WeierstrassPoint: Group {
         // Must assert unique so we can check the parity
         y.assert_unique();
         assert_eq!(y.as_le_bytes()[0] & 1, *rec_id & 1);
-        Self::from_xy(x, y).expect("decompressed point not on curve")
+        Self::from_xy_nonidentity(x, y).expect("decompressed point not on curve")
     }
 
     /// If it exists, hints the unique `y` coordinate that is less than `Coordinate::MODULUS`
