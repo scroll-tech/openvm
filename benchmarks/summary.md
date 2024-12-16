@@ -7,6 +7,6 @@
 | [ verify_fibair ](https://github.com/openvm-org/openvm/blob/benchmark-results/benchmarks/individual/verify_fibair-979a4087cff579c5425517d70ea8fd93227feef8.md) | <div style='text-align: right'> 2 </div>  | <span style='color: red'>(+1,300 [+0.0%])</span><div style='text-align: right'> 48,128,447 </div>  | <span style='color: red'>(+176 [+0.0%])</span><div style='text-align: right'> 397,340 </div>  | <span style='color: red'>(+37.0 [+1.2%])</span><div style='text-align: right'> 3,174.0 </div>  | <div style='text-align: right'> - </div>  | <div style='text-align: right'> - </div>  | <div style='text-align: right'> - </div>  | <div style='text-align: right'> - </div>  | 1048476 | 64cpu-linux-arm64 | mimalloc |
 
 
-Commit: https://github.com/openvm-org/openvm/commit/979a4087cff579c5425517d70ea8fd93227feef8
+Commit: https://github.com/openvm-org/openvm/commit/c9fc62368d498486a7ead66a444e6bd3e9aaa3e2
 
-[Benchmark Workflow](https://github.com/openvm-org/openvm/actions/runs/12344874684)
+[Benchmark Workflow](https://github.com/openvm-org/openvm/actions/runs/12344862904)
