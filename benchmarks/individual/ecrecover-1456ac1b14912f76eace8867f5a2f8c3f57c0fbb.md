@@ -1,6 +1,6 @@
 | group | fri.log_blowup | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- |
-| ecrecover_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>10,251,804</div>  | <div style='text-align: right'>195,066</div>  | <span style="color: green">(-105.0 [-5.1%])</span> <div style='text-align: right'>1,935.0</div>  |
+| ecrecover_program | <div style='text-align: right'>2</div>  | <div style='text-align: right'>10,251,804</div>  | <div style='text-align: right'>195,066</div>  | <span style="color: green">(-3.0 [-0.2%])</span> <div style='text-align: right'>1,932.0</div>  |
 
 
 <details>
@@ -8,7 +8,7 @@
 
 | commit_exe_time_ms | fri.log_blowup | keygen_time_ms |
 | --- | --- | --- |
-| <span style="color: green">(-1.0 [-12.5%])</span> <div style='text-align: right'>7.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: green">(-402.0 [-0.5%])</span> <div style='text-align: right'>77,390.0</div>  |
+| <span style="color: red">(+1.0 [+14.3%])</span> <div style='text-align: right'>8.0</div>  | <div style='text-align: right'>2</div>  | <span style="color: red">(+37.0 [+0.0%])</span> <div style='text-align: right'>77,427.0</div>  |
 
 | air_name | constraints | interactions | quotient_deg |
 | --- | --- | --- | --- |
@@ -50,7 +50,7 @@
 
 | group | segment | stark_prove_excluding_trace_time_ms | total_cells | total_cells_used | total_cycles | trace_gen_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| ecrecover_program | 0 | <span style="color: green">(-105.0 [-5.1%])</span> <div style='text-align: right'>1,935.0</div>  | <div style='text-align: right'>34,157,871</div>  | <div style='text-align: right'>10,251,804</div>  | <div style='text-align: right'>195,066</div>  | <span style="color: red">(+7.0 [+5.3%])</span> <div style='text-align: right'>139.0</div>  |
+| ecrecover_program | 0 | <span style="color: green">(-3.0 [-0.2%])</span> <div style='text-align: right'>1,932.0</div>  | <div style='text-align: right'>34,157,871</div>  | <div style='text-align: right'>10,251,804</div>  | <div style='text-align: right'>195,066</div>  | <span style="color: green">(-7.0 [-5.0%])</span> <div style='text-align: right'>132.0</div>  |
 
 | group | chip_name | segment | rows_used |
 | --- | --- | --- | --- |
@@ -222,7 +222,7 @@
 
 | group | execute_time_ms | fri.log_blowup | num_segments | total_cells_used | total_cycles | total_proof_time_ms |
 | --- | --- | --- | --- | --- | --- | --- |
-| ecrecover_program | <span style="color: green">(-5.0 [-1.7%])</span> <div style='text-align: right'>297.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>10,251,804</div>  | <div style='text-align: right'>195,066</div>  | <span style="color: green">(-105.0 [-5.1%])</span> <div style='text-align: right'>1,935.0</div>  |
+| ecrecover_program | <span style="color: green">(-2.0 [-0.7%])</span> <div style='text-align: right'>295.0</div>  | <div style='text-align: right'>2</div>  | <div style='text-align: right'>1</div>  | <div style='text-align: right'>10,251,804</div>  | <div style='text-align: right'>195,066</div>  | <span style="color: green">(-3.0 [-0.2%])</span> <div style='text-align: right'>1,932.0</div>  |
 
 | group | air_name | segment | cells | main_cols | perm_cols | prep_cols | rows |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -283,4 +283,4 @@ Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/openvm-org/openvm/actions/runs/12348900246)
+[Benchmark Workflow](https://github.com/openvm-org/openvm/actions/runs/12348912479)
