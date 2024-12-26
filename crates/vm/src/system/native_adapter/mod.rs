@@ -12,7 +12,7 @@ use openvm_circuit::{
     },
     system::{
         memory::{
-            offline_checker::{MemoryBridge, MemoryReadOrImmediateAuxCols, MemoryWriteAuxCols},
+            offline_checker::{MemoryBridge, MemoryReadAuxCols, MemoryWriteAuxCols},
             MemoryAddress, MemoryAuxColsFactory, MemoryController, MemoryControllerRef,
             MemoryReadRecord, MemoryWriteRecord,
         },
@@ -85,7 +85,7 @@ impl<F: Field, const W: usize> NativeWriteRecord<F, W> {
 #[derive(AlignedBorrow)]
 pub struct NativeAdapterReadCols<T> {
     pub address: MemoryAddress<T, T>,
-    pub read_aux: MemoryReadOrImmediateAuxCols<T>,
+    pub read_aux: MemoryReadAuxCols<T, 1>,
 }
 
 #[repr(C)]
@@ -136,9 +136,9 @@ impl<AB: InteractionBuilder, const R: usize, const W: usize> VmAdapterAir<AB>
 
         for (i, r_cols) in cols.reads_aux.iter().enumerate() {
             self.memory_bridge
-                .read_or_immediate(
+                .read(
                     r_cols.address,
-                    ctx.reads[i][0].clone(),
+                    ctx.reads[i].clone(),
                     timestamp_pp(),
                     &r_cols.read_aux,
                 )
@@ -278,7 +278,7 @@ impl<F: PrimeField32, const R: usize, const W: usize> VmAdapterChip<F>
             let address = MemoryAddress::new(x.address_space, x.pointer);
             NativeAdapterReadCols {
                 address,
-                read_aux: aux_cols_factory.make_read_or_immediate_aux_cols(x),
+                read_aux: aux_cols_factory.make_read_aux_cols(x),
             }
         });
         row_slice.writes_aux = write_record.writes.map(|x| {
