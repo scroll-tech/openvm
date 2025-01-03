@@ -19,5 +19,3 @@ lazy_static! {
     // t = -x = 15132376222941642752
     pub static ref SEED_NEG: BigUint = BigUint::from_str_radix("15132376222941642752", 10).unwrap();
 }
-
-pub struct Bls12_381;

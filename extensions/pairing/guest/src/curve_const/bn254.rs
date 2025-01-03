@@ -38,5 +38,3 @@ lazy_static! {
         10
     ).unwrap();
 }
-
-pub struct Bn254;
