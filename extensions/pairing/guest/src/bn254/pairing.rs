@@ -1,8 +1,13 @@
 use alloc::vec::Vec;
 
 use itertools::izip;
-use openvm_algebra_guest::{field::FieldExtension, DivUnsafe, ExpBytes, Field, IntMod};
+use openvm_algebra_guest::{field::FieldExtension, DivUnsafe, Field};
 use openvm_ecc_guest::AffinePoint;
+#[cfg(not(target_os = "zkvm"))]
+use {
+    crate::curve_const::bn254::{EXP1, EXP2, M_INV, R_INV, U27_COEFF_0, U27_COEFF_1},
+    openvm_algebra_guest::{ExpBytes, IntMod},
+};
 #[cfg(target_os = "zkvm")]
 use {
     crate::pairing::shifted_funct7,
@@ -12,14 +17,9 @@ use {
 };
 
 use super::{Bn254, Fp, Fp12, Fp2};
-#[cfg(not(target_os = "zkvm"))]
-use crate::curve_const::bn254::{U27_COEFF_0, U27_COEFF_1};
-use crate::{
-    curve_const::bn254::{EXP1, EXP2, M_INV, R_INV},
-    pairing::{
-        Evaluatable, EvaluatedLine, FromLineDType, LineMulDType, MillerStep, MultiMillerLoop,
-        PairingCheck, PairingCheckError, PairingIntrinsics, UnevaluatedLine,
-    },
+use crate::pairing::{
+    Evaluatable, EvaluatedLine, FromLineDType, LineMulDType, MillerStep, MultiMillerLoop,
+    PairingCheck, PairingCheckError, PairingIntrinsics, UnevaluatedLine,
 };
 
 // TODO[jpw]: make macro
