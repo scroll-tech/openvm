@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{cmp::Ordering, sync::Arc};
 
 use itertools::Itertools;
 use num_bigint::{BigInt, BigUint};
@@ -12,7 +12,10 @@ use snark_verifier_sdk::snark_verifier::{
     halo2_base::{
         gates::{GateChip, GateInstructions, RangeChip, RangeInstructions},
         halo2_proofs::halo2curves::bn256::Fr,
-        utils::{bigint_to_fe, biguint_to_fe, bit_length, fe_to_bigint, BigPrimeField},
+        utils::{
+            bigint_to_fe, biguint_to_fe, bit_length, decompose_fe_to_u64_limbs, fe_to_bigint,
+            log2_ceil, BigPrimeField,
+        },
         AssignedValue, Context, QuantumCell,
     },
     util::arithmetic::{Field as _, PrimeField as _},
@@ -39,11 +42,23 @@ impl AssignedBabyBear {
 
 pub struct BabyBearChip {
     pub range: Arc<RangeChip<Fr>>,
+    pub cached_limbs_r: Vec<QuantumCell<Fr>>,
 }
 
 impl BabyBearChip {
     pub fn new(range_chip: Arc<RangeChip<Fr>>) -> Self {
-        BabyBearChip { range: range_chip }
+        let lookup_bits = range_chip.lookup_bits();
+        let mut v = Fr::ONE;
+        let mult = Fr::from(1 << lookup_bits);
+        let mut r = Vec::new();
+        for _ in 0..range_chip.limb_bases.len() {
+            r.push(QuantumCell::Constant(v));
+            v *= mult;
+        }
+        BabyBearChip {
+            range: range_chip,
+            cached_limbs_r: r,
+        }
     }
 
     pub fn gate(&self) -> &GateChip<Fr> {
@@ -65,13 +80,111 @@ impl BabyBearChip {
         AssignedBabyBear { value, max_bits }
     }
 
-    pub fn reduce(&self, ctx: &mut Context<Fr>, a: AssignedBabyBear) -> AssignedBabyBear {
+    pub fn _reduce(&self, ctx: &mut Context<Fr>, a: AssignedBabyBear) -> AssignedBabyBear {
         let (_, r) = signed_div_mod(&self.range, ctx, a.value, BabyBear::ORDER_U32, a.max_bits);
         let r = AssignedBabyBear {
             value: r,
             max_bits: BABYBEAR_MAX_BITS,
         };
         debug_assert_eq!(a.to_baby_bear(), r.to_baby_bear());
+        r
+    }
+
+    pub fn reduce(&self, ctx: &mut Context<Fr>, a: AssignedBabyBear) -> AssignedBabyBear {
+        // let bits = Vec::with_capacity(256);
+        // let mut bytes = a.value.value().to_bytes();
+        // for i in 0..32 {
+        //     for j in 0..8 {
+        //         bits.push(bytes[i] % 2);
+        //         bytes[i] /= 2;
+        //     }
+        // }
+        // let bits = bits[..a.max_bits]
+        //     .into_iter()
+        //     .map(|b| QuantumCell::Witness(Fr::from(*b as u64)))
+        //     .rev()
+        //     .collect_vec();
+        // let pow2 = self.cached_pow2[0..a.max_bits].to_vec();
+        // let r = self.cached_pow2[0..a.max_bits].to_vec();
+        // let x = self.gate().inner_product(ctx, bits, pow2);
+
+        // let r = AssignedBabyBear {
+        //     value: r,
+        //     max_bits: BABYBEAR_MAX_BITS + 8,
+        // };
+        let b = a;
+        if a.max_bits <= BABYBEAR_MAX_BITS {
+            return a;
+        }
+        let range_bits = a.max_bits;
+        let a = a.value;
+        let lookup_bits = self.range.lookup_bits();
+        if range_bits == 0 {
+            self.gate().assert_is_const(ctx, &a, &Fr::ZERO);
+            return AssignedBabyBear {
+                value: a,
+                max_bits: 0,
+            };
+        }
+        // the number of limbs
+        let num_limbs = range_bits.div_ceil(lookup_bits);
+        // println!("range check {} bits {} len", range_bits, k);
+        let rem_bits = range_bits % lookup_bits;
+
+        debug_assert!(self.range.limb_bases.len() >= num_limbs);
+
+        let (last_limb, r, new_max_bits) = if num_limbs == 1 {
+            self.add_cell_to_lookup(ctx, a);
+            (a, a, range_bits)
+        } else {
+            let limbs = decompose_fe_to_u64_limbs(a.value(), num_limbs, lookup_bits)
+                .into_iter()
+                .map(|x| QuantumCell::Witness(Fr::from(x)));
+            let row_offset = ctx.advice.len() as isize;
+            let acc = self.gate().inner_product(
+                ctx,
+                limbs.clone(),
+                self.range.limb_bases[..num_limbs].to_vec(),
+            );
+            // the inner product above must equal `a`
+            ctx.constrain_equal(&a, &acc);
+            let r =
+                self.gate()
+                    .inner_product(ctx, limbs, self.cached_limbs_r[..num_limbs].to_vec());
+            // we fetch the cells to lookup by getting the indices where `limbs` were assigned in `inner_product`. Because `limb_bases[0]` is 1, the progression of indices is 0,1,4,...,4+3*i
+            self.add_cell_to_lookup(ctx, ctx.get(row_offset));
+            for i in 0..num_limbs - 1 {
+                self.add_cell_to_lookup(ctx, ctx.get(row_offset + 1 + 3 * i as isize));
+            }
+            (
+                ctx.get(row_offset + 1 + 3 * (num_limbs - 2) as isize),
+                r,
+                log2_ceil(num_limbs as u64) + BABYBEAR_MAX_BITS,
+            )
+        };
+
+        // additional constraints for the last limb if rem_bits != 0
+        match rem_bits.cmp(&1) {
+            // we want to check x := limbs[num_limbs-1] is boolean
+            // we constrain x*(x-1) = 0 + x * x - x == 0
+            // | 0 | x | x | x |
+            Ordering::Equal => {
+                self.gate().assert_bit(ctx, last_limb);
+            }
+            Ordering::Greater => {
+                let mult_val = self.gate().pow_of_two[lookup_bits - rem_bits];
+                let check = self
+                    .gate()
+                    .mul(ctx, last_limb, QuantumCell::Constant(mult_val));
+                self.add_cell_to_lookup(ctx, check);
+            }
+            _ => {}
+        }
+        let r = AssignedBabyBear {
+            value: r,
+            max_bits: new_max_bits,
+        };
+        debug_assert_eq!(b.to_baby_bear(), r.to_baby_bear());
         r
     }
 
@@ -229,6 +342,12 @@ impl BabyBearChip {
         debug_assert_eq!(a.to_baby_bear(), b.to_baby_bear());
         let diff = self.sub(ctx, a, b);
         self.assert_zero(ctx, diff);
+    }
+
+    fn add_cell_to_lookup(&self, ctx: &Context<Fr>, a: AssignedValue<Fr>) {
+        let phase = ctx.phase();
+        let manager = &self.range.lookup_manager()[phase];
+        manager.add_lookup(ctx.tag(), [a]);
     }
 }
 
