@@ -43,21 +43,25 @@ impl AssignedBabyBear {
 pub struct BabyBearChip {
     pub range: Arc<RangeChip<Fr>>,
     pub cached_limbs_r: Vec<QuantumCell<Fr>>,
+    pub extra_bits: usize,
 }
 
 impl BabyBearChip {
     pub fn new(range_chip: Arc<RangeChip<Fr>>) -> Self {
         let lookup_bits = range_chip.lookup_bits();
-        let mut v = Fr::ONE;
-        let mult = Fr::from(1 << lookup_bits);
+        let mut v = 1;
+        let mult = 1 << lookup_bits;
+        let mut s = 0;
         let mut r = Vec::new();
         for _ in 0..range_chip.limb_bases.len() {
-            r.push(QuantumCell::Constant(v));
-            v *= mult;
+            r.push(QuantumCell::Constant(Fr::from(v)));
+            s += v;
+            v = (mult * v) % BabyBear::ORDER_U64;
         }
         BabyBearChip {
             range: range_chip,
             cached_limbs_r: r,
+            extra_bits: log2_ceil(s),
         }
     }
 
@@ -159,7 +163,7 @@ impl BabyBearChip {
             (
                 ctx.get(row_offset + 1 + 3 * (num_limbs - 2) as isize),
                 r,
-                log2_ceil(num_limbs as u64) + BABYBEAR_MAX_BITS,
+                self.extra_bits + lookup_bits,
             )
         };
 
