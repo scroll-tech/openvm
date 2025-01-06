@@ -145,6 +145,39 @@ impl BabyBearChip {
         c
     }
 
+    pub fn mul_add(
+        &self,
+        ctx: &mut Context<Fr>,
+        mut a: AssignedBabyBear,
+        mut b: AssignedBabyBear,
+        mut c: AssignedBabyBear,
+    ) -> AssignedBabyBear {
+        if a.max_bits < b.max_bits {
+            std::mem::swap(&mut a, &mut b);
+        }
+        if a.max_bits + b.max_bits + 1 >= Fr::CAPACITY as usize - 1 {
+            a = self.reduce(ctx, a);
+            if a.max_bits + b.max_bits + 1 >= Fr::CAPACITY as usize - 1 {
+                b = self.reduce(ctx, b);
+            }
+        }
+        if c.max_bits + 1 >= Fr::CAPACITY as usize - 1 {
+            c = self.reduce(ctx, c)
+        }
+        let value = self.gate().mul_add(ctx, a.value, b.value, c.value);
+        let max_bits = c.max_bits.max(a.max_bits + b.max_bits) + 1;
+
+        let mut d = AssignedBabyBear { value, max_bits };
+        if d.max_bits >= Fr::CAPACITY as usize - 1 {
+            d = self.reduce(ctx, d);
+        }
+        debug_assert_eq!(
+            d.to_baby_bear(),
+            a.to_baby_bear() * b.to_baby_bear() + c.to_baby_bear()
+        );
+        d
+    }
+
     pub fn div(
         &self,
         ctx: &mut Context<Fr>,
@@ -396,8 +429,7 @@ impl BabyBearExt4Chip {
         for i in 0..4 {
             for j in 0..4 {
                 if i + j < coeffs.len() {
-                    let tmp = self.base.mul(ctx, a.0[i], b.0[j]);
-                    coeffs[i + j] = self.base.add(ctx, coeffs[i + j], tmp);
+                    coeffs[i + j] = self.base.mul_add(ctx, a.0[i], b.0[j], coeffs[i + j]);
                 } else {
                     coeffs.push(self.base.mul(ctx, a.0[i], b.0[j]));
                 }
@@ -407,8 +439,7 @@ impl BabyBearExt4Chip {
             .base
             .load_constant(ctx, <BabyBear as BinomiallyExtendable<4>>::W);
         for i in 4..7 {
-            let tmp = self.base.mul(ctx, coeffs[i], w);
-            coeffs[i - 4] = self.base.add(ctx, coeffs[i - 4], tmp);
+            coeffs[i - 4] = self.base.mul_add(ctx, coeffs[i], w, coeffs[i - 4]);
         }
         coeffs.truncate(4);
         let c = AssignedBabyBearExt4(coeffs.try_into().unwrap());
