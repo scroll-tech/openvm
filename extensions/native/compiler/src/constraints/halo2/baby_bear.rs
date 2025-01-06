@@ -152,11 +152,15 @@ impl BabyBearChip {
             );
             // the inner product above must equal `a`
             ctx.constrain_equal(&a, &acc);
+            let mut limbs = Vec::new();
             // we fetch the cells to lookup by getting the indices where `limbs` were assigned in `inner_product`. Because `limb_bases[0]` is 1, the progression of indices is 0,1,4,...,4+3*i
+            limbs.push(ctx.get(row_offset));
             self.add_cell_to_lookup(ctx, ctx.get(row_offset));
             for i in 0..num_limbs - 1 {
+                limbs.push(ctx.get(row_offset + 1 + 3 * i as isize));
                 self.add_cell_to_lookup(ctx, ctx.get(row_offset + 1 + 3 * i as isize));
             }
+
             let last_limb = ctx.get(row_offset + 1 + 3 * (num_limbs - 2) as isize);
             let r =
                 self.gate()
