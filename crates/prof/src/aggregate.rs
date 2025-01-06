@@ -127,15 +127,16 @@ impl GroupedMetrics {
 
 // A hacky way to order the groups for display.
 pub(crate) fn group_weight(name: &str) -> usize {
-    if name.starts_with("root") {
-        3
-    } else if name.starts_with("internal") {
-        2
-    } else if name.starts_with("leaf") {
-        1
-    } else {
-        0
+    let label_prefix = ["leaf", "internal", "root", "halo2_outer", "halo2_wrapper"];
+    if name.contains("keygen") {
+        return label_prefix.len() + 1;
     }
+    for (i, prefix) in label_prefix.iter().enumerate().rev() {
+        if name.starts_with(prefix) {
+            return i + 1;
+        }
+    }
+    0
 }
 
 impl AggregateMetrics {
@@ -173,6 +174,9 @@ impl AggregateMetrics {
     }
 
     pub fn write_markdown(&self, writer: &mut impl Write, metric_names: &[&str]) -> Result<()> {
+        self.write_summary_markdown(writer)?;
+        writeln!(writer)?;
+
         let metric_names = metric_names.to_vec();
         for (group_name, summaries) in self.to_vec() {
             writeln!(writer, "| {} |||||", group_name)?;
@@ -199,10 +203,56 @@ impl AggregateMetrics {
 
         Ok(())
     }
+
+    pub fn write_summary_markdown(&self, writer: &mut impl Write) -> Result<()> {
+        writeln!(
+            writer,
+            "| Summary | Proof Time (s) | Parallel Proof Time (s) |"
+        )?;
+        writeln!(writer, "|:---|---:|---:|")?;
+        let mut rows = Vec::new();
+        let mut total_proof_time = MdTableCell::new(0.0, Some(0.0));
+        let mut total_par_proof_time = MdTableCell::new(0.0, Some(0.0));
+        for (group_name, summaries) in self.to_vec() {
+            let stats = summaries.get(PROOF_TIME_LABEL);
+            if stats.is_none() {
+                continue;
+            }
+            let stats = stats.unwrap();
+            let mut sum = stats.sum;
+            let mut max = stats.max;
+            // convert ms to s
+            sum.val /= 1000.0;
+            max.val /= 1000.0;
+            if let Some(diff) = &mut sum.diff {
+                *diff /= 1000.0;
+            }
+            if let Some(diff) = &mut max.diff {
+                *diff /= 1000.0;
+            }
+            if !group_name.contains("keygen") {
+                // Proving time in keygen group is dummy and not part of total.
+                total_proof_time.val += sum.val;
+                *total_proof_time.diff.as_mut().unwrap() += sum.diff.unwrap_or(0.0);
+                total_par_proof_time.val += max.val;
+                *total_par_proof_time.diff.as_mut().unwrap() += max.diff.unwrap_or(0.0);
+            }
+            rows.push((group_name, sum, max));
+        }
+        writeln!(
+            writer,
+            "| Total | {total_proof_time} | {total_par_proof_time} |"
+        )?;
+        for (group_name, proof_time, par_proof_time) in rows {
+            writeln!(writer, "| {group_name} | {proof_time} | {par_proof_time} |")?;
+        }
+        writeln!(writer)?;
+        Ok(())
+    }
 }
 
 pub const PROOF_TIME_LABEL: &str = "total_proof_time_ms";
-pub const CELLS_USED_LABEL: &str = "total_cells_used";
+pub const CELLS_USED_LABEL: &str = "main_cells_used";
 pub const CYCLES_LABEL: &str = "total_cycles";
 pub const EXECUTE_TIME_LABEL: &str = "execute_time_ms";
 pub const TRACE_GEN_TIME_LABEL: &str = "trace_gen_time_ms";
