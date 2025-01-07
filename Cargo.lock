@@ -1090,7 +1090,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-openvm"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "anstyle",
  "aws-config",
@@ -2305,9 +2305,9 @@ dependencies = [
 
 [[package]]
 name = "halo2curves"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d380afeef3f1d4d3245b76895172018cfb087d9976a7cabcd5597775b2933e07"
+checksum = "b756596082144af6e57105a20403b7b80fe9dccd085700b74fae3af523b74dba"
 dependencies = [
  "blake2",
  "digest 0.10.7",
@@ -2320,7 +2320,6 @@ dependencies = [
  "num-integer",
  "num-traits",
  "pairing 0.23.0",
- "pasta_curves 0.5.1",
  "paste",
  "rand",
  "rand_core",
@@ -3371,7 +3370,7 @@ checksum = "ff011a302c396a5197692431fc1948019154afc178baf7d8e37367442a4601cf"
 
 [[package]]
 name = "openvm"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "bytemuck",
  "chrono",
@@ -3385,7 +3384,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-algebra-circuit"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "derive-new",
  "derive_more 1.0.0",
@@ -3423,7 +3422,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-algebra-guest"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "halo2curves-axiom",
  "num-bigint-dig",
@@ -3438,7 +3437,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-algebra-moduli-setup"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "openvm-macros-common",
  "quote",
@@ -3447,7 +3446,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-algebra-tests"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "eyre",
  "num-bigint-dig",
@@ -3468,7 +3467,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-algebra-transpiler"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "openvm-algebra-guest",
  "openvm-instructions",
@@ -3482,7 +3481,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-benchmarks"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "bincode 2.0.0-rc.3",
  "clap",
@@ -3524,7 +3523,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-bigint-circuit"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "derive-new",
  "derive_more 1.0.0",
@@ -3549,7 +3548,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-bigint-guest"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "num-bigint-dig",
  "num-traits",
@@ -3561,7 +3560,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-bigint-integration-tests"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "eyre",
  "num-bigint-dig",
@@ -3581,7 +3580,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-bigint-transpiler"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "openvm-bigint-guest",
  "openvm-instructions",
@@ -3595,7 +3594,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-build"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "cargo_metadata",
  "dirs",
@@ -3609,7 +3608,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-circuit"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "ark-ff 0.4.2",
  "async-trait",
@@ -3645,7 +3644,6 @@ dependencies = [
  "p3-fri",
  "p3-merkle-tree",
  "p3-symmetric",
- "parking_lot",
  "rand",
  "rand_xoshiro",
  "rayon",
@@ -3662,7 +3660,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-circuit-derive"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "itertools 0.13.0",
  "proc-macro2",
@@ -3672,7 +3670,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-circuit-primitives"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "derive-new",
  "itertools 0.13.0",
@@ -3694,7 +3692,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-circuit-primitives-derive"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "itertools 0.13.0",
  "proc-macro2",
@@ -3704,7 +3702,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-ecc-circuit"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "derive-new",
  "derive_more 1.0.0",
@@ -3734,7 +3732,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-ecc-guest"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "ecdsa 0.16.9",
  "elliptic-curve 0.13.8",
@@ -3760,7 +3758,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-ecc-integration-tests"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "eyre",
  "openvm-algebra-circuit",
@@ -3781,7 +3779,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-ecc-sw-setup"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "openvm-macros-common",
  "quote",
@@ -3790,7 +3788,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-ecc-transpiler"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "openvm-ecc-guest",
  "openvm-instructions",
@@ -3803,7 +3801,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-instructions"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "backtrace",
  "derive-new",
@@ -3820,7 +3818,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-instructions-derive"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "openvm-instructions",
  "proc-macro2",
@@ -3832,7 +3830,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-keccak256-circuit"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "derive-new",
  "derive_more 1.0.0",
@@ -3862,7 +3860,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-keccak256-guest"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "openvm-platform",
  "serde",
@@ -3871,7 +3869,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-keccak256-integration-tests"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "eyre",
  "openvm",
@@ -3890,7 +3888,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-keccak256-transpiler"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "openvm-instructions",
  "openvm-instructions-derive",
@@ -3903,14 +3901,14 @@ dependencies = [
 
 [[package]]
 name = "openvm-macros-common"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "syn 2.0.90",
 ]
 
 [[package]]
 name = "openvm-mod-circuit-builder"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "halo2curves-axiom",
  "hex-literal",
@@ -3931,7 +3929,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-native-circuit"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "derive-new",
  "derive_more 1.0.0",
@@ -3949,7 +3947,6 @@ dependencies = [
  "openvm-rv32im-circuit",
  "openvm-stark-backend",
  "openvm-stark-sdk",
- "parking_lot",
  "rand",
  "rayon",
  "serde",
@@ -3961,7 +3958,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-native-compiler"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "backtrace",
  "cfg-if",
@@ -3999,7 +3996,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-native-compiler-derive"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "openvm-native-compiler",
  "openvm-native-recursion",
@@ -4011,7 +4008,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-native-recursion"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "bitcode",
  "cfg-if",
@@ -4039,7 +4036,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-pairing-circuit"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "derive-new",
  "derive_more 1.0.0",
@@ -4071,7 +4068,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-pairing-guest"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "group 0.13.0",
  "halo2curves-axiom",
@@ -4097,7 +4094,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-pairing-integration-tests"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "eyre",
  "num-bigint-dig",
@@ -4123,7 +4120,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-pairing-transpiler"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "openvm-instructions",
  "openvm-instructions-derive",
@@ -4136,7 +4133,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-platform"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "bytemuck",
  "critical-section",
@@ -4149,7 +4146,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-poseidon2-air"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "ark-ff 0.4.2",
  "derivative",
@@ -4170,7 +4167,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-prof"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "clap",
  "eyre",
@@ -4182,7 +4179,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-rv32-adapters"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "derive-new",
  "hex",
@@ -4203,7 +4200,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-rv32im-circuit"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "derive-new",
  "derive_more 1.0.0",
@@ -4220,7 +4217,6 @@ dependencies = [
  "openvm-rv32im-transpiler",
  "openvm-stark-backend",
  "openvm-stark-sdk",
- "parking_lot",
  "rand",
  "serde",
  "strum",
@@ -4231,7 +4227,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-rv32im-guest"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "openvm-platform",
  "strum_macros",
@@ -4239,7 +4235,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-rv32im-integration-tests"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "eyre",
  "openvm",
@@ -4259,7 +4255,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-rv32im-transpiler"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "openvm-instructions",
  "openvm-instructions-derive",
@@ -4273,7 +4269,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-sdk"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "async-trait",
  "bitcode",
@@ -4314,7 +4310,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-sha256-air"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "hex",
  "lazy_static",
@@ -4330,7 +4326,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-sha256-circuit"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "derive-new",
  "derive_more 1.0.0",
@@ -4356,7 +4352,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-sha256-guest"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "openvm",
  "openvm-platform",
@@ -4365,7 +4361,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-sha256-integration-tests"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "eyre",
  "openvm",
@@ -4384,7 +4380,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-sha256-transpiler"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "openvm-instructions",
  "openvm-instructions-derive",
@@ -4397,7 +4393,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-snark-verifier"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "eyre",
  "ff 0.13.0",
@@ -4423,8 +4419,8 @@ dependencies = [
 
 [[package]]
 name = "openvm-stark-backend"
-version = "0.1.3-alpha"
-source = "git+https://github.com/openvm-org/stark-backend.git?tag=v0.1.3-alpha#d36c660fb4b05b3697ab0672b2fc1e979d77ba84"
+version = "0.2.0-alpha"
+source = "git+https://github.com/openvm-org/stark-backend.git?rev=c785515#c7855151341eee8b721b465ae088fc123839b2c6"
 dependencies = [
  "async-trait",
  "cfg-if",
@@ -4450,8 +4446,8 @@ dependencies = [
 
 [[package]]
 name = "openvm-stark-sdk"
-version = "0.1.3-alpha"
-source = "git+https://github.com/openvm-org/stark-backend.git?tag=v0.1.3-alpha#d36c660fb4b05b3697ab0672b2fc1e979d77ba84"
+version = "0.2.0-alpha"
+source = "git+https://github.com/openvm-org/stark-backend.git?rev=c785515#c7855151341eee8b721b465ae088fc123839b2c6"
 dependencies = [
  "derive_more 0.99.18",
  "ff 0.13.0",
@@ -4484,7 +4480,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-toolchain-tests"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "derive_more 1.0.0",
  "eyre",
@@ -4522,7 +4518,7 @@ dependencies = [
 
 [[package]]
 name = "openvm-transpiler"
-version = "0.1.1-alpha"
+version = "0.2.0-alpha"
 dependencies = [
  "derive_more 1.0.0",
  "elf",
@@ -4586,7 +4582,7 @@ dependencies = [
 [[package]]
 name = "p3-air"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "p3-field",
  "p3-matrix",
@@ -4595,7 +4591,7 @@ dependencies = [
 [[package]]
 name = "p3-baby-bear"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "p3-field",
  "p3-mds",
@@ -4609,7 +4605,7 @@ dependencies = [
 [[package]]
 name = "p3-blake3"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "blake3",
  "p3-symmetric",
@@ -4619,7 +4615,7 @@ dependencies = [
 [[package]]
 name = "p3-bn254-fr"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "ff 0.13.0",
  "halo2curves",
@@ -4634,7 +4630,7 @@ dependencies = [
 [[package]]
 name = "p3-challenger"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "p3-field",
  "p3-maybe-rayon",
@@ -4646,10 +4642,11 @@ dependencies = [
 [[package]]
 name = "p3-commit"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "itertools 0.13.0",
  "p3-challenger",
+ "p3-dft",
  "p3-field",
  "p3-matrix",
  "p3-util",
@@ -4659,7 +4656,7 @@ dependencies = [
 [[package]]
 name = "p3-dft"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "itertools 0.13.0",
  "p3-field",
@@ -4672,7 +4669,7 @@ dependencies = [
 [[package]]
 name = "p3-field"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "itertools 0.13.0",
  "num-bigint 0.4.6",
@@ -4689,7 +4686,7 @@ dependencies = [
 [[package]]
 name = "p3-fri"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "itertools 0.13.0",
  "p3-challenger",
@@ -4700,6 +4697,7 @@ dependencies = [
  "p3-matrix",
  "p3-maybe-rayon",
  "p3-util",
+ "rand",
  "serde",
  "tracing",
 ]
@@ -4707,12 +4705,13 @@ dependencies = [
 [[package]]
 name = "p3-goldilocks"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "num-bigint 0.4.6",
  "p3-dft",
  "p3-field",
  "p3-mds",
+ "p3-poseidon",
  "p3-poseidon2",
  "p3-symmetric",
  "p3-util",
@@ -4723,17 +4722,18 @@ dependencies = [
 [[package]]
 name = "p3-interpolation"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "p3-field",
  "p3-matrix",
+ "p3-maybe-rayon",
  "p3-util",
 ]
 
 [[package]]
 name = "p3-keccak"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "itertools 0.13.0",
  "p3-field",
@@ -4745,20 +4745,21 @@ dependencies = [
 [[package]]
 name = "p3-keccak-air"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "p3-air",
  "p3-field",
  "p3-matrix",
  "p3-maybe-rayon",
  "p3-util",
+ "rand",
  "tracing",
 ]
 
 [[package]]
 name = "p3-matrix"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "itertools 0.13.0",
  "p3-field",
@@ -4773,7 +4774,7 @@ dependencies = [
 [[package]]
 name = "p3-maybe-rayon"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "rayon",
 ]
@@ -4781,7 +4782,7 @@ dependencies = [
 [[package]]
 name = "p3-mds"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "itertools 0.13.0",
  "p3-dft",
@@ -4795,7 +4796,7 @@ dependencies = [
 [[package]]
 name = "p3-merkle-tree"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "itertools 0.13.0",
  "p3-commit",
@@ -4812,7 +4813,7 @@ dependencies = [
 [[package]]
 name = "p3-monty-31"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "itertools 0.13.0",
  "num-bigint 0.4.6",
@@ -4833,7 +4834,7 @@ dependencies = [
 [[package]]
 name = "p3-poseidon"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "p3-field",
  "p3-mds",
@@ -4844,7 +4845,7 @@ dependencies = [
 [[package]]
 name = "p3-poseidon2"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "gcd",
  "p3-field",
@@ -4856,7 +4857,7 @@ dependencies = [
 [[package]]
 name = "p3-poseidon2-air"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "p3-air",
  "p3-field",
@@ -4872,7 +4873,7 @@ dependencies = [
 [[package]]
 name = "p3-symmetric"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "itertools 0.13.0",
  "p3-field",
@@ -4882,7 +4883,7 @@ dependencies = [
 [[package]]
 name = "p3-uni-stark"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "itertools 0.13.0",
  "p3-air",
@@ -4900,7 +4901,7 @@ dependencies = [
 [[package]]
 name = "p3-util"
 version = "0.1.0"
-source = "git+https://github.com/Plonky3/Plonky3.git?rev=9b267c4#9b267c411cc8965c709b27d7b0ef81e225603c59"
+source = "git+https://github.com/Plonky3/Plonky3.git?rev=b0591e9#b0591e9b82d58d10f86359875b5d5fa96433b4cf"
 dependencies = [
  "serde",
 ]
@@ -4996,10 +4997,8 @@ dependencies = [
  "blake2b_simd",
  "ff 0.13.0",
  "group 0.13.0",
- "hex",
  "lazy_static",
  "rand",
- "serde",
  "static_assertions",
  "subtle",
 ]
@@ -6113,7 +6112,7 @@ checksum = "b7c388c1b5e93756d0c740965c41e8822f866621d41acbdf6336a6a168f8840c"
 [[package]]
 name = "snark-verifier"
 version = "0.1.8"
-source = "git+https://github.com/axiom-crypto/snark-verifier?branch=zkvm-v0.1#001b25ef0b387c54ed342de2ff6f423fca6db0f6"
+source = "git+https://github.com/axiom-crypto/snark-verifier?branch=zkvm-v0.1#9b617fc0539a5f5e009f8d907cf74040f90d4f85"
 dependencies = [
  "halo2-base",
  "halo2-ecc",
@@ -6134,7 +6133,7 @@ dependencies = [
 [[package]]
 name = "snark-verifier-sdk"
 version = "0.1.8"
-source = "git+https://github.com/axiom-crypto/snark-verifier?branch=zkvm-v0.1#001b25ef0b387c54ed342de2ff6f423fca6db0f6"
+source = "git+https://github.com/axiom-crypto/snark-verifier?branch=zkvm-v0.1#9b617fc0539a5f5e009f8d907cf74040f90d4f85"
 dependencies = [
  "ark-std 0.3.0",
  "bincode 1.3.3",
