@@ -127,14 +127,22 @@ impl BabyBearChip {
                 v = -v;
             }
             let sign = if negative {
-                ctx.load_witness(-Fr::ONE)
+                QuantumCell::Witness(-Fr::ONE)
             } else {
-                ctx.load_witness(Fr::ONE)
+                QuantumCell::Witness(Fr::ONE)
             };
-            let zero = self
-                .gate()
-                .mul_add(ctx, sign, sign, QuantumCell::Constant(-Fr::ONE));
-            self.gate().assert_is_const(ctx, &zero, &Fr::ZERO);
+            ctx.assign_region(
+                [
+                    sign,
+                    sign,
+                    QuantumCell::Constant(-Fr::ONE),
+                    QuantumCell::Constant(Fr::ZERO),
+                ],
+                [0],
+            );
+            let (s1, s2) = (ctx.get(-4), ctx.get(-3));
+            ctx.constrain_equal(&s1, &s2);
+            let sign = s1;
             let limbs = decompose_fe_to_u64_limbs(&v, num_limbs, lookup_bits)
                 .into_iter()
                 .map(|x| QuantumCell::Witness(Fr::from(x)));
