@@ -393,8 +393,8 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
             let label_key = labels
                 .iter()
                 .find(|&(_, v)| v == label)
-                .map(|(k, _)| k.clone())
-                .unwrap_or_else(|| parse_f_strict(label.trim_start_matches(".L")).expect(&label));
+                .map(|(k, _)| *k)
+                .unwrap_or_else(|| parse_f_strict(label.trim_start_matches(".L")).expect(label));
             Some(label_key)
         };
 

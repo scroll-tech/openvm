@@ -69,7 +69,7 @@ impl<F: PrimeField32, EF: ExtensionField<F>> Display for AssemblyCode<F, EF> {
 }
 
 impl<F: PrimeField32, EF: ExtensionField<F>> AssemblyCode<F, EF> {
-    pub fn from_str(s: &str) -> Result<Self, String> {
+    pub fn parse_asm(s: &str) -> Result<Self, String> {
         let mut blocks = Vec::new();
         let mut labels = BTreeMap::new();
         let mut current_block = BasicBlock::new();
@@ -88,12 +88,10 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AssemblyCode<F, EF> {
                     current_block = BasicBlock::new();
                 }
                 current_label = Some(line.trim_end_matches(':').to_string());
+            } else if let Some(instruction) = AsmInstruction::parse_instruction(line, &labels) {
+                current_block.push(instruction, None);
             } else {
-                if let Some(instruction) = AsmInstruction::parse_instruction(line, &labels) {
-                    current_block.push(instruction, None);
-                } else {
-                    return Err(format!("Failed to parse instruction: {}", line));
-                }
+                return Err(format!("Failed to parse instruction: {}", line));
             }
         }
 
