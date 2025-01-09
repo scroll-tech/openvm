@@ -31,6 +31,11 @@ impl Halo2Prover {
         let mut witness = Witness::default();
         root_proof.write(&mut witness);
         let snark = info_span!("prove", group = "halo2_outer").in_scope(|| {
+            if self.halo2_pk.profiling {
+                println!("stephenh: profiling");
+            } else {
+                println!("stephenh: not profiling");
+            }
             self.halo2_pk
                 .verifier
                 .prove(&self.verifier_srs, witness, self.halo2_pk.profiling)

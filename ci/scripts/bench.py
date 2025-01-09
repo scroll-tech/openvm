@@ -53,6 +53,7 @@ def run_cargo_command(
     env["RUSTFLAGS"] = "-Ctarget-cpu=native"
 
     # Run the subprocess with the updated environment
+    print(f"running command: {' '.join(command)}")
     subprocess.run(command, check=True, env=env)
 
     print(f"Output metrics written to {output_path}")
