@@ -178,6 +178,7 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
                 )
             }
             AsmInstruction::ImmF(dst, src) => {
+                // TODO: why "()" here?
                 write!(f, "imm   ({})fp, ({})", dst, src)
             }
             AsmInstruction::CopyF(dst, src) => {
@@ -211,7 +212,7 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
                 write!(f, "divi  ({})fp, ({})fp, {}", dst, lhs, rhs)
             }
             AsmInstruction::DivFIN(dst, lhs, rhs) => {
-                write!(f, "divi  ({})fp, {}, ({})fp", dst, lhs, rhs)
+                write!(f, "divin  ({})fp, {}, ({})fp", dst, lhs, rhs)
             }
             AsmInstruction::AddE(dst, lhs, rhs) => {
                 write!(f, "eadd ({})fp, ({})fp, ({})fp", dst, lhs, rhs)
@@ -347,6 +348,270 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
                     a, b, res, len, alpha, alpha_pow
                 )
             }
+        }
+    }
+}
+
+impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
+    pub fn parse_instruction(line: &str, labels: &BTreeMap<F, String>) -> Option<Self> {
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        if parts.is_empty() {
+            return None;
+        }
+
+        // Helper function to parse i32 from formatted string
+        let parse_i32 = |s: &str| -> Option<i32> {
+            s.trim_end_matches(',')
+                .trim_end_matches("fp")
+                .trim_end_matches(')')
+                .trim_start_matches('(')
+                .parse()
+                .ok()
+        };
+
+        // Helper function to parse field element F
+        let parse_f_strict = |s: &str| -> Option<F> { s.parse().ok().map(F::from_canonical_u32) };
+        let parse_f = |s: &str| -> Option<F> {
+            parse_f_strict(
+                s.trim_end_matches(',')
+                    .trim_end_matches(')')
+                    .trim_start_matches('('),
+            )
+        };
+
+        // Helper function to parse extension field element EF
+        let parse_ef = |s: &str| -> Option<EF> {
+            // TODO: is it enough?
+            s.trim_end_matches(',')
+                .parse()
+                .ok()
+                .map(EF::from_canonical_u64)
+        };
+
+        let parse_label = |label: &str| -> Option<F> {
+            let label = label.trim_end_matches(',');
+            let label_key = labels
+                .iter()
+                .find(|&(_, v)| v == label)
+                .map(|(k, _)| k.clone())
+                .unwrap_or_else(|| parse_f_strict(label.trim_start_matches(".L")).expect(&label));
+            Some(label_key)
+        };
+
+        match parts[0] {
+            "lw" => Some(AsmInstruction::LoadF(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_i32(parts[3])?,
+                parse_f(parts[4])?,
+                parse_f(parts[5])?,
+            )),
+            "lwi" => Some(AsmInstruction::LoadFI(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_f(parts[3])?,
+                parse_f(parts[4])?,
+                parse_f(parts[5])?,
+            )),
+            "sw" => Some(AsmInstruction::StoreF(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_i32(parts[3])?,
+                parse_f(parts[4])?,
+                parse_f(parts[5])?,
+            )),
+            "swi" => Some(AsmInstruction::StoreFI(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_f(parts[3])?,
+                parse_f(parts[4])?,
+                parse_f(parts[5])?,
+            )),
+            "imm" => Some(AsmInstruction::ImmF(
+                parse_i32(parts[1])?,
+                parse_f(parts[2])?,
+            )),
+            "copy" => Some(AsmInstruction::CopyF(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+            )),
+            "add" => Some(AsmInstruction::AddF(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_i32(parts[3])?,
+            )),
+            "addi" => Some(AsmInstruction::AddFI(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_f(parts[3])?,
+            )),
+            "sub" => Some(AsmInstruction::SubF(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_i32(parts[3])?,
+            )),
+            "subi" => Some(AsmInstruction::SubFI(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_f(parts[3])?,
+            )),
+            "subin" => Some(AsmInstruction::SubFIN(
+                parse_i32(parts[1])?,
+                parse_f(parts[2])?,
+                parse_i32(parts[3])?,
+            )),
+            "mul" => Some(AsmInstruction::MulF(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_i32(parts[3])?,
+            )),
+            "muli" => Some(AsmInstruction::MulFI(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_f(parts[3])?,
+            )),
+            "div" => Some(AsmInstruction::DivF(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_i32(parts[3])?,
+            )),
+            "divi" => Some(AsmInstruction::DivFI(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_f(parts[3])?,
+            )),
+            "divin" => Some(AsmInstruction::DivFIN(
+                parse_i32(parts[1])?,
+                parse_f(parts[2])?,
+                parse_i32(parts[3])?,
+            )),
+            "eadd" => Some(AsmInstruction::AddE(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_i32(parts[3])?,
+            )),
+            "esub" => Some(AsmInstruction::SubE(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_i32(parts[3])?,
+            )),
+            "emul" => Some(AsmInstruction::MulE(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_i32(parts[3])?,
+            )),
+            "ediv" => Some(AsmInstruction::DivE(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_i32(parts[3])?,
+            )),
+            "j" => {
+                let dst = parse_i32(parts[1])?;
+                let label_key = parse_label(parts[2])?;
+                Some(AsmInstruction::Jump(dst, label_key))
+            }
+            "bne" => {
+                let label_key = parse_label(parts[1])?;
+                Some(AsmInstruction::Bne(
+                    label_key,
+                    parse_i32(parts[2])?,
+                    parse_i32(parts[3])?,
+                ))
+            }
+            "bnei" => {
+                let label_key = parse_label(parts[1])?;
+                Some(AsmInstruction::BneI(
+                    label_key,
+                    parse_i32(parts[2])?,
+                    parse_f(parts[3])?,
+                ))
+            }
+            "beq" => {
+                let label_key = parse_label(parts[1])?;
+                Some(AsmInstruction::Beq(
+                    label_key,
+                    parse_i32(parts[2])?,
+                    parse_i32(parts[3])?,
+                ))
+            }
+            "beqi" => {
+                let label_key = parse_label(parts[1])?;
+                Some(AsmInstruction::BeqI(
+                    label_key,
+                    parse_i32(parts[2])?,
+                    parse_f(parts[3])?,
+                ))
+            }
+            "ebne" => {
+                let label_key = parse_label(parts[1])?;
+                Some(AsmInstruction::BneE(
+                    label_key,
+                    parse_i32(parts[2])?,
+                    parse_i32(parts[3])?,
+                ))
+            }
+            "ebnei" => {
+                let label_key = parse_label(parts[1])?;
+                Some(AsmInstruction::BneEI(
+                    label_key,
+                    parse_i32(parts[2])?,
+                    parse_ef(parts[3])?,
+                ))
+            }
+            "ebeq" => {
+                let label_key = parse_label(parts[1])?;
+                Some(AsmInstruction::BeqE(
+                    label_key,
+                    parse_i32(parts[2])?,
+                    parse_i32(parts[3])?,
+                ))
+            }
+            "ebeqi" => {
+                let label_key = parse_label(parts[1])?;
+                Some(AsmInstruction::BeqEI(
+                    label_key,
+                    parse_i32(parts[2])?,
+                    parse_ef(parts[3])?,
+                ))
+            }
+            "trap" => Some(AsmInstruction::Trap),
+            "halt" => Some(AsmInstruction::Halt),
+            "hint_bits" => Some(AsmInstruction::HintBits(
+                parse_i32(parts[1])?,
+                parts[2].parse().ok()?,
+            )),
+            "poseidon2_permute" => Some(AsmInstruction::Poseidon2Permute(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+            )),
+            "poseidon2_compress" => Some(AsmInstruction::Poseidon2Compress(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_i32(parts[3])?,
+            )),
+            "print_f" => Some(AsmInstruction::PrintF(parse_i32(parts[1])?)),
+            "print_v" => Some(AsmInstruction::PrintV(parse_i32(parts[1])?)),
+            "print_e" => Some(AsmInstruction::PrintE(parse_i32(parts[1])?)),
+            "hint_vec" => Some(AsmInstruction::HintInputVec()),
+            "shintw" => Some(AsmInstruction::StoreHintWordI(
+                parse_i32(parts[1])?,
+                parse_f(parts[2])?,
+            )),
+            "commit" => Some(AsmInstruction::Publish(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+            )),
+            "cycle_tracker_start" => Some(AsmInstruction::CycleTrackerStart()),
+            "cycle_tracker_end" => Some(AsmInstruction::CycleTrackerEnd()),
+            "fri_mat_opening" => Some(AsmInstruction::FriReducedOpening(
+                parse_i32(parts[1])?,
+                parse_i32(parts[2])?,
+                parse_i32(parts[3])?,
+                parse_i32(parts[4])?,
+                parse_i32(parts[5])?,
+                parse_i32(parts[6])?,
+            )),
+            _ => None,
         }
     }
 }

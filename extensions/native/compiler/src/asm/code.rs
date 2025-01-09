@@ -50,6 +50,7 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AssemblyCode<F, EF> {
 impl<F: PrimeField32, EF: ExtensionField<F>> Display for AssemblyCode<F, EF> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for (i, block) in self.blocks.iter().enumerate() {
+            // TODO: should we skip empty blocks?
             writeln!(
                 f,
                 "{}:",
@@ -64,5 +65,47 @@ impl<F: PrimeField32, EF: ExtensionField<F>> Display for AssemblyCode<F, EF> {
             }
         }
         Ok(())
+    }
+}
+
+impl<F: PrimeField32, EF: ExtensionField<F>> AssemblyCode<F, EF> {
+    pub fn from_str(s: &str) -> Result<Self, String> {
+        let mut blocks = Vec::new();
+        let mut labels = BTreeMap::new();
+        let mut current_block = BasicBlock::new();
+        let mut current_label = None;
+
+        for line in s.lines() {
+            let line = line.trim();
+            if line.is_empty() {
+                continue;
+            }
+
+            if line.ends_with(':') {
+                if let Some(label) = current_label.take() {
+                    labels.insert(F::from_canonical_u32(blocks.len() as u32), label);
+                    blocks.push(current_block);
+                    current_block = BasicBlock::new();
+                }
+                current_label = Some(line.trim_end_matches(':').to_string());
+            } else {
+                if let Some(instruction) = AsmInstruction::parse_instruction(line, &labels) {
+                    current_block.push(instruction, None);
+                } else {
+                    return Err(format!("Failed to parse instruction: {}", line));
+                }
+            }
+        }
+
+        if let Some(label) = current_label {
+            labels.insert(F::from_canonical_u32(blocks.len() as u32), label);
+        }
+        if !current_block.0.is_empty() {
+            blocks.push(current_block);
+        }
+
+        let code = AssemblyCode { blocks, labels };
+        //debug_assert_eq!(s, code.to_string());
+        Ok(code)
     }
 }
