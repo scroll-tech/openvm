@@ -46,7 +46,7 @@ async fn main() -> Result<()> {
     )?;
     let app_committed_exe = commit_app_exe(app_pk.app_fri_params(), exe);
 
-    let n = 800_000u64;
+    let n = 1u64;
     let mut stdin = StdIn::default();
     stdin.write(&n);
     run_with_metric_collection("OUTPUT_PATH", || {
