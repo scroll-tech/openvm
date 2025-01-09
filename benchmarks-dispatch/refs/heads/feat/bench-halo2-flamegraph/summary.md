@@ -1,12 +1,12 @@
 | group | app.proof_time_ms | app.cycles | app.cells_used | leaf.proof_time_ms | leaf.cycles | leaf.cells_used |
 | -- | -- | -- | -- | -- | -- | -- |
-| [verify_fibair](https://github.com/openvm-org/openvm/blob/benchmark-results/benchmarks-dispatch/refs/heads/feat/bench-halo2-flamegraph/verify_fibair-73410debbc22bc340af6bc20cf6d2262c0eb19a4.md) |<span style='color: red'>(+2120 [+55.9%])</span> 5,914 |  746,376 |  30,012,414 |- | - | - |
-| [fibonacci_program](https://github.com/openvm-org/openvm/blob/benchmark-results/benchmarks-dispatch/refs/heads/feat/bench-halo2-flamegraph/fibonacci-73410debbc22bc340af6bc20cf6d2262c0eb19a4.md) |<span style='color: red'>(+4514 [+74.0%])</span> 10,617 |  1,500,137 |  51,503,940 |- | - | - |
-| [regex_program](https://github.com/openvm-org/openvm/blob/benchmark-results/benchmarks-dispatch/refs/heads/feat/bench-halo2-flamegraph/regex-73410debbc22bc340af6bc20cf6d2262c0eb19a4.md) |<span style='color: red'>(+59118 [+318.9%])</span> 77,654 | <span style='color: red'>(+9385 [+0.2%])</span> 4,200,289 | <span style='color: red'>(+169837 [+0.1%])</span> 165,198,010 |- | - | - |
-| [fib_e2e](https://github.com/openvm-org/openvm/blob/benchmark-results/benchmarks-dispatch/refs/heads/feat/bench-halo2-flamegraph/fib_e2e-73410debbc22bc340af6bc20cf6d2262c0eb19a4.md) | 79,063 |  12,000,137 |  410,818,908 | 158,236 |  19,905,513 |  775,754,832 |
-| [ecrecover_program](https://github.com/openvm-org/openvm/blob/benchmark-results/benchmarks-dispatch/refs/heads/feat/bench-halo2-flamegraph/ecrecover-73410debbc22bc340af6bc20cf6d2262c0eb19a4.md) |<span style='color: red'>(+1919 [+73.7%])</span> 4,522 | <span style='color: red'>(+4847 [+1.7%])</span> 290,248 | <span style='color: red'>(+155632 [+1.0%])</span> 15,247,929 |- | - | - |
+| [verify_fibair](https://github.com/openvm-org/openvm/blob/benchmark-results/benchmarks-dispatch/refs/heads/feat/bench-halo2-flamegraph/verify_fibair-3e49510d4968eba05c6d34a098153cba8a73a56f.md) |<span style='color: red'>(+2104 [+55.5%])</span> 5,898 |  746,229 |  30,011,714 |- | - | - |
+| [fibonacci_program](https://github.com/openvm-org/openvm/blob/benchmark-results/benchmarks-dispatch/refs/heads/feat/bench-halo2-flamegraph/fibonacci-3e49510d4968eba05c6d34a098153cba8a73a56f.md) |<span style='color: red'>(+4452 [+72.9%])</span> 10,555 |  1,500,137 |  51,503,940 |- | - | - |
+| [regex_program](https://github.com/openvm-org/openvm/blob/benchmark-results/benchmarks-dispatch/refs/heads/feat/bench-halo2-flamegraph/regex-3e49510d4968eba05c6d34a098153cba8a73a56f.md) |<span style='color: red'>(+58949 [+318.0%])</span> 77,485 | <span style='color: red'>(+9385 [+0.2%])</span> 4,200,289 | <span style='color: red'>(+169837 [+0.1%])</span> 165,198,010 |- | - | - |
+| [fib_e2e](https://github.com/openvm-org/openvm/blob/benchmark-results/benchmarks-dispatch/refs/heads/feat/bench-halo2-flamegraph/fib_e2e-3e49510d4968eba05c6d34a098153cba8a73a56f.md) | 1,276 |  152 |  1,003,845 | 23,320 |  3,143,866 |  123,287,809 |
+| [ecrecover_program](https://github.com/openvm-org/openvm/blob/benchmark-results/benchmarks-dispatch/refs/heads/feat/bench-halo2-flamegraph/ecrecover-3e49510d4968eba05c6d34a098153cba8a73a56f.md) |<span style='color: red'>(+1995 [+76.6%])</span> 4,598 | <span style='color: red'>(+4847 [+1.7%])</span> 290,248 | <span style='color: red'>(+155632 [+1.0%])</span> 15,247,929 |- | - | - |
 
 
-Commit: https://github.com/openvm-org/openvm/commit/73410debbc22bc340af6bc20cf6d2262c0eb19a4
+Commit: https://github.com/openvm-org/openvm/commit/3e49510d4968eba05c6d34a098153cba8a73a56f
 
-[Benchmark Workflow](https://github.com/openvm-org/openvm/actions/runs/12699465684)
+[Benchmark Workflow](https://github.com/openvm-org/openvm/actions/runs/12700116799)
