@@ -135,7 +135,6 @@ impl<F: PrimeField32> OfflineMemory<F> {
         pointer: u32,
         values: Vec<F>,
     ) -> Vec<AccessAdapterRecord<F>> {
-        let address_space = address_space - self.as_offset;
         let len = values.len();
         assert!(len.is_power_of_two());
         assert_ne!(address_space, 0);
@@ -147,7 +146,8 @@ impl<F: PrimeField32> OfflineMemory<F> {
         debug_assert!(prev_timestamp < self.timestamp);
 
         let pointer = pointer as usize;
-        let prev_data = self.data[address_space as usize].get_range(pointer..pointer + len);
+        let prev_data =
+            self.data[(address_space - self.as_offset) as usize].get_range(pointer..pointer + len);
 
         let record = MemoryRecord {
             address_space: F::from_canonical_u32(address_space),
@@ -170,7 +170,6 @@ impl<F: PrimeField32> OfflineMemory<F> {
         len: usize,
     ) -> Vec<AccessAdapterRecord<F>> {
         assert!(len.is_power_of_two());
-        let address_space = address_space - self.as_offset;
         if address_space == 0 {
             let pointer = F::from_canonical_u32(pointer);
             self.log.push(Some(MemoryRecord {
@@ -194,7 +193,7 @@ impl<F: PrimeField32> OfflineMemory<F> {
         let values = self.range_vec(address_space, pointer, len);
 
         self.log.push(Some(MemoryRecord {
-            address_space: F::from_canonical_u32(address_space + self.as_offset),
+            address_space: F::from_canonical_u32(address_space),
             pointer: F::from_canonical_u32(pointer),
             timestamp: self.timestamp,
             prev_timestamp,
