@@ -31,8 +31,8 @@ use rustc_hash::FxHashMap;
 use serde::{Deserialize, Serialize};
 
 use super::{
-    vm_poseidon2_config, ExecutionBus, InstructionExecutor, PhantomSubExecutor, Streams,
-    SystemConfig, SystemTraceHeights,
+    vm_poseidon2_config, ExecutionBus, InstructionExecutor, MemoryConfig, PhantomSubExecutor,
+    Streams, SystemConfig, SystemTraceHeights,
 };
 #[cfg(feature = "bench-metrics")]
 use crate::metrics::VmMetrics;
@@ -743,8 +743,10 @@ impl<F: PrimeField32, E, P> VmChipComplex<F, E, P> {
         self.base.program_chip.set_program(program);
     }
 
-    pub(crate) fn set_initial_memory(&mut self, memory: MemoryImage<F>) {
-        self.base.memory_controller.set_initial_memory(memory);
+    pub(crate) fn set_initial_memory(&mut self, memory: MemoryImage<F>, config: MemoryConfig) {
+        self.base
+            .memory_controller
+            .set_initial_memory(memory, config);
     }
 
     /// Warning: this sets the stream in all chips which have a shared mutable reference to the streams.

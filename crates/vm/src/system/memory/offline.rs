@@ -6,14 +6,20 @@ use openvm_circuit_primitives::{
 use openvm_stark_backend::p3_field::PrimeField32;
 use rustc_hash::{FxHashMap, FxHashSet};
 
-use crate::system::memory::{
-    adapter::{AccessAdapterRecord, AccessAdapterRecordKind},
-    offline_checker::{MemoryBridge, MemoryBus},
-    online::Address,
-    MemoryAuxColsFactory, MemoryImage, RecordId, TimestampedEquipartition, TimestampedValues,
+use super::paged_vec::PagedVec;
+use crate::{
+    arch::MemoryConfig,
+    system::memory::{
+        adapter::{AccessAdapterRecord, AccessAdapterRecordKind},
+        offline_checker::{MemoryBridge, MemoryBus},
+        online::Address,
+        MemoryAuxColsFactory, MemoryImage, RecordId, TimestampedEquipartition, TimestampedValues,
+    },
 };
 
 pub const INITIAL_TIMESTAMP: u32 = 0;
+
+const PAGE_SIZE: usize = 1 << 16;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 struct BlockData {
@@ -35,7 +41,8 @@ pub struct MemoryRecord<T> {
 
 pub struct OfflineMemory<F> {
     block_data: FxHashMap<Address, BlockData>,
-    data: FxHashMap<Address, F>,
+    data: Vec<PagedVec<F>>,
+    as_offset: u32,
     initial_block_size: usize,
     timestamp: u32,
     timestamp_max_bits: usize,
@@ -56,12 +63,14 @@ impl<F: PrimeField32> OfflineMemory<F> {
         memory_bus: MemoryBus,
         range_checker: Arc<VariableRangeCheckerChip>,
         timestamp_max_bits: usize,
+        config: MemoryConfig,
     ) -> Self {
         assert!(initial_block_size.is_power_of_two());
 
         Self {
             block_data: FxHashMap::default(),
-            data: initial_memory,
+            data: Self::memory_image_to_paged_vec(initial_memory, config),
+            as_offset: config.as_offset,
             initial_block_size,
             timestamp: INITIAL_TIMESTAMP + 1,
             timestamp_max_bits,
@@ -71,9 +80,24 @@ impl<F: PrimeField32> OfflineMemory<F> {
         }
     }
 
-    pub fn set_initial_memory(&mut self, initial_memory: MemoryImage<F>) {
+    pub fn set_initial_memory(&mut self, initial_memory: MemoryImage<F>, config: MemoryConfig) {
         assert_eq!(self.timestamp, INITIAL_TIMESTAMP + 1);
-        self.data = initial_memory;
+        self.data = Self::memory_image_to_paged_vec(initial_memory, config);
+    }
+
+    fn memory_image_to_paged_vec(
+        memory_image: MemoryImage<F>,
+        config: MemoryConfig,
+    ) -> Vec<PagedVec<F>> {
+        let mut paged_vec =
+            vec![
+                PagedVec::new(PAGE_SIZE, (1 << config.pointer_max_bits) / PAGE_SIZE);
+                1 << config.as_height
+            ];
+        for ((addr_space, pointer), value) in memory_image {
+            paged_vec[(addr_space - config.as_offset) as usize].set(pointer as usize, value);
+        }
+        paged_vec
     }
 
     pub(super) fn set_log_capacity(&mut self, access_capacity: usize) {
@@ -111,6 +135,7 @@ impl<F: PrimeField32> OfflineMemory<F> {
         pointer: u32,
         values: Vec<F>,
     ) -> Vec<AccessAdapterRecord<F>> {
+        let address_space = address_space - self.as_offset;
         let len = values.len();
         assert!(len.is_power_of_two());
         assert_ne!(address_space, 0);
@@ -121,17 +146,12 @@ impl<F: PrimeField32> OfflineMemory<F> {
 
         debug_assert!(prev_timestamp < self.timestamp);
 
-        let prev_data = (0..len)
-            .map(|i| {
-                self.data
-                    .insert((address_space, pointer + i as u32), values[i])
-                    .unwrap_or(F::ZERO)
-            })
-            .collect();
+        let pointer = pointer as usize;
+        let prev_data = self.data[address_space as usize].get_range(pointer..pointer + len);
 
         let record = MemoryRecord {
             address_space: F::from_canonical_u32(address_space),
-            pointer: F::from_canonical_u32(pointer),
+            pointer: F::from_canonical_usize(pointer),
             timestamp: self.timestamp,
             prev_timestamp,
             data: values,
@@ -150,7 +170,7 @@ impl<F: PrimeField32> OfflineMemory<F> {
         len: usize,
     ) -> Vec<AccessAdapterRecord<F>> {
         assert!(len.is_power_of_two());
-
+        let address_space = address_space - self.as_offset;
         if address_space == 0 {
             let pointer = F::from_canonical_u32(pointer);
             self.log.push(Some(MemoryRecord {
@@ -174,7 +194,7 @@ impl<F: PrimeField32> OfflineMemory<F> {
         let values = self.range_vec(address_space, pointer, len);
 
         self.log.push(Some(MemoryRecord {
-            address_space: F::from_canonical_u32(address_space),
+            address_space: F::from_canonical_u32(address_space + self.as_offset),
             pointer: F::from_canonical_u32(pointer),
             timestamp: self.timestamp,
             prev_timestamp,
@@ -415,7 +435,7 @@ impl<F: PrimeField32> OfflineMemory<F> {
     }
 
     pub fn get(&self, address_space: u32, pointer: u32) -> F {
-        *self.data.get(&(address_space, pointer)).unwrap_or(&F::ZERO)
+        self.data[(address_space - self.as_offset) as usize].get(pointer as usize)
     }
 
     fn range_array<const N: usize>(&self, address_space: u32, pointer: u32) -> [F; N] {
@@ -490,6 +510,7 @@ mod tests {
                 1, 29,
             ))),
             29,
+            Default::default(),
         );
         assert_eq!(
             partition.block_containing(0, 13),
@@ -539,6 +560,7 @@ mod tests {
                 1, 29,
             ))),
             29,
+            Default::default(),
         );
         let address_space = 1;
 
@@ -567,6 +589,7 @@ mod tests {
                 1, 29,
             ))),
             29,
+            Default::default(),
         );
 
         let adapter_records = memory.write(1, 0, bbvec![1, 2, 3, 4]);
@@ -714,6 +737,7 @@ mod tests {
                 1, 29,
             ))),
             29,
+            Default::default(),
         );
 
         let adapter_records = memory.write(1, 0, bbvec![1, 2, 3, 4]);
@@ -831,6 +855,7 @@ mod tests {
                 1, 29,
             ))),
             29,
+            Default::default(),
         );
 
         memory.write(1, 0, bbvec![4, 3, 2, 1]);
@@ -855,6 +880,7 @@ mod tests {
                 1, 29,
             ))),
             29,
+            Default::default(),
         );
 
         memory.write(1, 0, bbvec![4, 3, 2, 1]);
@@ -879,6 +905,7 @@ mod tests {
                 1, 29,
             ))),
             29,
+            Default::default(),
         );
 
         let (memory, records) = memory.finalize::<4>();
@@ -897,6 +924,7 @@ mod tests {
                 1, 29,
             ))),
             29,
+            Default::default(),
         );
         // Make block 0:4 in address space 1 active.
         memory.write(1, 0, bbvec![1, 2, 3, 4]);
@@ -969,6 +997,7 @@ mod tests {
                 1, 29,
             ))),
             29,
+            Default::default(),
         );
 
         // Verify initial state of block 0 (pointers 0–8)

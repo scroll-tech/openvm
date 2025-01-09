@@ -25,7 +25,7 @@ use openvm_stark_backend::{
     rap::AnyRap,
     Chip, ChipUsageGetter,
 };
-use rustc_hash::{FxHashMap, FxHashSet};
+use rustc_hash::FxHashMap;
 use serde::{Deserialize, Serialize};
 
 use self::interface::MemoryInterface;
@@ -248,6 +248,7 @@ impl<F: PrimeField32> MemoryController<F> {
                 memory_bus,
                 range_checker.clone(),
                 mem_config.clk_max_bits,
+                mem_config,
             ))),
             access_adapters: AccessAdapterInventory::new(
                 range_checker.clone(),
@@ -298,6 +299,7 @@ impl<F: PrimeField32> MemoryController<F> {
                 memory_bus,
                 range_checker.clone(),
                 mem_config.clk_max_bits,
+                mem_config,
             ))),
             access_adapters: AccessAdapterInventory::new(
                 range_checker.clone(),
@@ -342,12 +344,12 @@ impl<F: PrimeField32> MemoryController<F> {
         }
     }
 
-    pub fn set_initial_memory(&mut self, memory: MemoryImage<F>) {
+    pub fn set_initial_memory(&mut self, memory: MemoryImage<F>, config: MemoryConfig) {
         if self.timestamp() > INITIAL_TIMESTAMP + 1 {
             panic!("Cannot set initial memory after first timestamp");
         }
         let mut offline_memory = self.offline_memory.lock().unwrap();
-        offline_memory.set_initial_memory(memory.clone());
+        offline_memory.set_initial_memory(memory.clone(), config);
 
         self.memory = Memory::from_image(memory.clone(), self.mem_config.access_capacity);
 

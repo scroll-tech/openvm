@@ -68,7 +68,7 @@ impl<F: PrimeField32, VC: VmConfig<F>> ExecutionSegment<F, VC> {
         chip_complex.set_program(program);
 
         if let Some(initial_memory) = initial_memory {
-            chip_complex.set_initial_memory(initial_memory);
+            chip_complex.set_initial_memory(initial_memory, config.system().memory_config);
         }
         let air_names = chip_complex.air_names();
 
