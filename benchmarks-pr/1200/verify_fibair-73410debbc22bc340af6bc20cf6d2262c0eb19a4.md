@@ -1,0 +1,255 @@
+| Summary | Proof Time (s) | Parallel Proof Time (s) |
+|:---|---:|---:|
+| Total | <span style='color: red'>(+2 [+55.9%])</span> 5.91 | <span style='color: red'>(+2 [+55.9%])</span> 5.91 |
+| verify_fibair | <span style='color: red'>(+2 [+55.9%])</span> 5.91 | <span style='color: red'>(+2 [+55.9%])</span> 5.91 |
+
+
+| verify_fibair |||||
+|:---|---:|---:|---:|---:|
+|metric|avg|sum|max|min|
+| `total_proof_time_ms ` | <span style='color: red'>(+2120 [+55.9%])</span> 5,914 | <span style='color: red'>(+2120 [+55.9%])</span> 5,914 | <span style='color: red'>(+2120 [+55.9%])</span> 5,914 | <span style='color: red'>(+2120 [+55.9%])</span> 5,914 |
+| `main_cells_used     ` |  30,012,414 |  30,012,414 |  30,012,414 |  30,012,414 |
+| `total_cycles        ` |  746,376 |  746,376 |  746,376 |  746,376 |
+| `execute_time_ms     ` | <span style='color: red'>(+2125 [+1353.5%])</span> 2,282 | <span style='color: red'>(+2125 [+1353.5%])</span> 2,282 | <span style='color: red'>(+2125 [+1353.5%])</span> 2,282 | <span style='color: red'>(+2125 [+1353.5%])</span> 2,282 |
+| `trace_gen_time_ms   ` | <span style='color: green'>(-17 [-3.8%])</span> 428 | <span style='color: green'>(-17 [-3.8%])</span> 428 | <span style='color: green'>(-17 [-3.8%])</span> 428 | <span style='color: green'>(-17 [-3.8%])</span> 428 |
+| `stark_prove_excluding_trace_time_ms` | <span style='color: red'>(+12 [+0.4%])</span> 3,204 | <span style='color: red'>(+12 [+0.4%])</span> 3,204 | <span style='color: red'>(+12 [+0.4%])</span> 3,204 | <span style='color: red'>(+12 [+0.4%])</span> 3,204 |
+| `main_trace_commit_time_ms` | <span style='color: red'>(+11 [+1.8%])</span> 628 | <span style='color: red'>(+11 [+1.8%])</span> 628 | <span style='color: red'>(+11 [+1.8%])</span> 628 | <span style='color: red'>(+11 [+1.8%])</span> 628 |
+| `generate_perm_trace_time_ms` | <span style='color: red'>(+5 [+5.7%])</span> 93 | <span style='color: red'>(+5 [+5.7%])</span> 93 | <span style='color: red'>(+5 [+5.7%])</span> 93 | <span style='color: red'>(+5 [+5.7%])</span> 93 |
+| `perm_trace_commit_time_ms` |  536 |  536 |  536 |  536 |
+| `quotient_poly_compute_time_ms` | <span style='color: green'>(-6 [-0.9%])</span> 633 | <span style='color: green'>(-6 [-0.9%])</span> 633 | <span style='color: green'>(-6 [-0.9%])</span> 633 | <span style='color: green'>(-6 [-0.9%])</span> 633 |
+| `quotient_poly_commit_time_ms` | <span style='color: red'>(+3 [+0.5%])</span> 576 | <span style='color: red'>(+3 [+0.5%])</span> 576 | <span style='color: red'>(+3 [+0.5%])</span> 576 | <span style='color: red'>(+3 [+0.5%])</span> 576 |
+| `pcs_opening_time_ms ` |  736 |  736 |  736 |  736 |
+
+
+
+<details>
+<summary>Detailed Metrics</summary>
+
+|  | verify_program_compile_ms | total_cells | stark_prove_excluding_trace_time_ms | quotient_poly_compute_time_ms | quotient_poly_commit_time_ms | perm_trace_commit_time_ms | pcs_opening_time_ms | main_trace_commit_time_ms |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+|  | 3 | 65,536 | 70 | 3 | 14 | 0 | 35 | 16 | 
+
+| air_name | rows | quotient_deg | main_cols | interactions | constraints | cells |
+| --- | --- | --- | --- | --- | --- | --- |
+| AccessAdapterAir<2> |  | 4 |  | 5 | 12 |  | 
+| AccessAdapterAir<4> |  | 4 |  | 5 | 12 |  | 
+| AccessAdapterAir<8> |  | 4 |  | 5 | 12 |  | 
+| FibonacciAir | 32,768 | 1 | 2 |  | 5 | 65,536 | 
+| FriReducedOpeningAir |  | 4 |  | 35 | 59 |  | 
+| NativePoseidon2Air<BabyBearParameters>, 1> |  | 4 |  | 31 | 302 |  | 
+| PhantomAir |  | 4 |  | 3 | 4 |  | 
+| ProgramAir |  | 1 |  | 1 | 4 |  | 
+| VariableRangeCheckerAir |  | 1 |  | 1 | 4 |  | 
+| VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1> |  | 2 |  | 11 | 23 |  | 
+| VmAirWrapper<JalNativeAdapterAir, JalCoreAir> |  | 4 |  | 7 | 6 |  | 
+| VmAirWrapper<NativeAdapterAir<2, 0>, PublicValuesCoreAir> |  | 4 |  | 11 | 22 |  | 
+| VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir> |  | 4 |  | 15 | 23 |  | 
+| VmAirWrapper<NativeLoadStoreAdapterAir<1>, NativeLoadStoreCoreAir<1> |  | 4 |  | 19 | 31 |  | 
+| VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir> |  | 4 |  | 15 | 23 |  | 
+| VmConnectorAir |  | 4 |  | 3 | 8 |  | 
+| VolatileBoundaryAir |  | 4 |  | 4 | 16 |  | 
+
+| group | trace_gen_time_ms | total_proof_time_ms | total_cycles | total_cells | stark_prove_excluding_trace_time_ms | quotient_poly_compute_time_ms | quotient_poly_commit_time_ms | perm_trace_commit_time_ms | pcs_opening_time_ms | main_trace_commit_time_ms | main_cells_used | generate_perm_trace_time_ms | execute_time_ms |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| verify_fibair | 428 | 5,914 | 746,376 | 89,839,640 | 3,204 | 633 | 576 | 536 | 736 | 628 | 30,012,414 | 93 | 2,282 | 
+
+| group | air_name | rows | prep_cols | perm_cols | main_cols | cells |
+| --- | --- | --- | --- | --- | --- | --- |
+| verify_fibair | AccessAdapterAir<2> | 131,072 |  | 16 | 11 | 3,538,944 | 
+| verify_fibair | AccessAdapterAir<4> | 65,536 |  | 16 | 13 | 1,900,544 | 
+| verify_fibair | AccessAdapterAir<8> | 32,768 |  | 16 | 17 | 1,081,344 | 
+| verify_fibair | FriReducedOpeningAir | 512 |  | 76 | 64 | 71,680 | 
+| verify_fibair | NativePoseidon2Air<BabyBearParameters>, 1> | 8,192 |  | 36 | 348 | 3,145,728 | 
+| verify_fibair | PhantomAir | 16,384 |  | 8 | 6 | 229,376 | 
+| verify_fibair | ProgramAir | 8,192 |  | 8 | 10 | 147,456 | 
+| verify_fibair | VariableRangeCheckerAir | 262,144 | 2 | 8 | 1 | 2,359,296 | 
+| verify_fibair | VmAirWrapper<BranchNativeAdapterAir, BranchEqualCoreAir<1> | 262,144 |  | 28 | 23 | 13,369,344 | 
+| verify_fibair | VmAirWrapper<JalNativeAdapterAir, JalCoreAir> | 32,768 |  | 12 | 10 | 720,896 | 
+| verify_fibair | VmAirWrapper<NativeAdapterAir<2, 1>, FieldArithmeticCoreAir> | 524,288 |  | 20 | 30 | 26,214,400 | 
+| verify_fibair | VmAirWrapper<NativeLoadStoreAdapterAir<1>, NativeLoadStoreCoreAir<1> | 524,288 |  | 24 | 41 | 34,078,720 | 
+| verify_fibair | VmAirWrapper<NativeVectorizedAdapterAir<4>, FieldExtensionCoreAir> | 8,192 |  | 20 | 40 | 491,520 | 
+| verify_fibair | VmConnectorAir | 2 | 1 | 8 | 4 | 24 | 
+| verify_fibair | VolatileBoundaryAir | 131,072 |  | 8 | 11 | 2,490,368 | 
+
+| group | air_name | dsl_ir | opcode | cells_used |
+| --- | --- | --- | --- | --- |
+| verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | AssertEqE | BNE | 3,956 | 
+| verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | AssertEqEI | BNE | 92 | 
+| verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | AssertEqF | BNE | 163,024 | 
+| verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | AssertEqV | BNE | 14,697 | 
+| verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | AssertEqVI | BNE | 460 | 
+| verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | For | BNE | 2,371,944 | 
+| verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | IfEq | BNE | 19,021 | 
+| verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | IfEqI | BNE | 356,339 | 
+| verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | IfNe | BEQ | 165,899 | 
+| verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | IfNeI | BEQ | 16,491 | 
+| verify_fibair | <JalNativeAdapterAir,JalCoreAir> |  | JAL | 10 | 
+| verify_fibair | <JalNativeAdapterAir,JalCoreAir> | For | JAL | 142,800 | 
+| verify_fibair | <JalNativeAdapterAir,JalCoreAir> | IfEqI | JAL | 49,770 | 
+| verify_fibair | <JalNativeAdapterAir,JalCoreAir> | IfNe | JAL | 20 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | AddEI | ADD | 246,360 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | AddF | ADD | 39,990 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | AddFI | ADD | 50,160 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | AddV | ADD | 195,150 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | AddVI | ADD | 2,053,740 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | Alloc | ADD | 735,960 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | Alloc | MUL | 454,980 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | DivFIN | DIV | 90 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | For | ADD | 2,665,440 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | LoadHeapPtr | ADD | 30 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | MulEF | MUL | 75,840 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | MulF | MUL | 128,310 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | MulFI | MUL | 40,020 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | MulVI | MUL | 234,480 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | StoreHeapPtr | ADD | 30 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | StoreHintWord | ADD | 1,838,250 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | SubEF | SUB | 3,930 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | SubEI | ADD | 240 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | SubFI | SUB | 39,990 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | SubV | SUB | 112,170 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | SubVI | SUB | 22,350 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | SubVIN | SUB | 18,900 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | UnsafeCastVF | ADD | 30 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> |  | STOREW | 41 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | AddEFFI | LOADW | 4,674 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | AddEFFI | STOREW | 14,022 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | Alloc | LOADW | 1,005,812 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | DivEIN | STOREW | 164 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | For | LOADW | 30,996 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | For | STOREW | 554,484 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | ImmE | STOREW | 34,768 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | ImmF | STOREW | 329,271 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | ImmV | STOREW | 403,686 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | LoadE | LOADW | 318,160 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | LoadE | LOADW2 | 565,472 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | LoadF | LOADW | 761,247 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | LoadF | LOADW2 | 42,148 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | LoadV | LOADW | 450,918 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | LoadV | LOADW2 | 1,112,863 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | MulEI | STOREW | 12,628 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | StoreE | STOREW | 855,260 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | StoreE | STOREW2 | 236,652 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | StoreF | STOREW | 265,188 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | StoreF | STOREW2 | 224,475 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | StoreHintWord | SHINTW | 2,950,934 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | StoreV | STOREW | 80,032 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | StoreV | STOREW2 | 758,951 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | SubEF | LOADW | 16,113 | 
+| verify_fibair | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | AddE | FE4ADD | 57,960 | 
+| verify_fibair | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | DivE | BBE4DIV | 30,320 | 
+| verify_fibair | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | DivEIN | BBE4DIV | 40 | 
+| verify_fibair | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | MulE | BBE4MUL | 108,680 | 
+| verify_fibair | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | MulEI | BBE4MUL | 3,080 | 
+| verify_fibair | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | SubE | FE4SUB | 75,680 | 
+| verify_fibair | Arc<BabyBearParameters>, 1> | Poseidon2CompressBabyBear | COMP_POS2 | 2,470,104 | 
+| verify_fibair | Arc<BabyBearParameters>, 1> | Poseidon2PermuteBabyBear | PERM_POS2 | 257,520 | 
+| verify_fibair | FriReducedOpeningAir | FriReducedOpening | FRI_REDUCED_OPENING | 21,504 | 
+| verify_fibair | PhantomAir | HintBitsF | PHANTOM | 258 | 
+| verify_fibair | PhantomAir | HintInputVec | PHANTOM | 56,196 | 
+
+| group | chip_name | rows_used |
+| --- | --- | --- |
+| verify_fibair | <BranchNativeAdapterAir,BranchEqualCoreAir<1>> | 135,301 | 
+| verify_fibair | <JalNativeAdapterAir,JalCoreAir> | 19,260 | 
+| verify_fibair | <NativeAdapterAir<2, 1>,FieldArithmeticCoreAir> | 298,548 | 
+| verify_fibair | <NativeLoadStoreAdapterAir<1>,NativeLoadStoreCoreAir<1>> | 269,000 | 
+| verify_fibair | <NativeVectorizedAdapterAir<4>,FieldExtensionCoreAir> | 6,894 | 
+| verify_fibair | AccessAdapter<2> | 95,698 | 
+| verify_fibair | AccessAdapter<4> | 47,850 | 
+| verify_fibair | AccessAdapter<8> | 17,106 | 
+| verify_fibair | Arc<BabyBearParameters>, 1> | 7,838 | 
+| verify_fibair | Boundary | 128,046 | 
+| verify_fibair | FriReducedOpeningAir | 336 | 
+| verify_fibair | PhantomAir | 9,409 | 
+| verify_fibair | ProgramChip | 4,921 | 
+| verify_fibair | VariableRangeCheckerAir | 262,144 | 
+| verify_fibair | VmConnectorAir | 2 | 
+
+| group | dsl_ir | opcode | frequency |
+| --- | --- | --- | --- |
+| verify_fibair |  | JAL | 1 | 
+| verify_fibair |  | STOREW | 2 | 
+| verify_fibair | AddE | FE4ADD | 1,449 | 
+| verify_fibair | AddEFFI | LOADW | 114 | 
+| verify_fibair | AddEFFI | STOREW | 342 | 
+| verify_fibair | AddEI | ADD | 8,212 | 
+| verify_fibair | AddF | ADD | 1,333 | 
+| verify_fibair | AddFI | ADD | 1,672 | 
+| verify_fibair | AddV | ADD | 6,505 | 
+| verify_fibair | AddVI | ADD | 68,458 | 
+| verify_fibair | Alloc | ADD | 24,532 | 
+| verify_fibair | Alloc | LOADW | 24,532 | 
+| verify_fibair | Alloc | MUL | 15,166 | 
+| verify_fibair | AssertEqE | BNE | 172 | 
+| verify_fibair | AssertEqEI | BNE | 4 | 
+| verify_fibair | AssertEqF | BNE | 7,088 | 
+| verify_fibair | AssertEqV | BNE | 639 | 
+| verify_fibair | AssertEqVI | BNE | 20 | 
+| verify_fibair | DivE | BBE4DIV | 758 | 
+| verify_fibair | DivEIN | BBE4DIV | 1 | 
+| verify_fibair | DivEIN | STOREW | 4 | 
+| verify_fibair | DivFIN | DIV | 3 | 
+| verify_fibair | For | ADD | 88,848 | 
+| verify_fibair | For | BNE | 103,128 | 
+| verify_fibair | For | JAL | 14,280 | 
+| verify_fibair | For | LOADW | 756 | 
+| verify_fibair | For | STOREW | 13,524 | 
+| verify_fibair | FriReducedOpening | FRI_REDUCED_OPENING | 126 | 
+| verify_fibair | HintBitsF | PHANTOM | 43 | 
+| verify_fibair | HintInputVec | PHANTOM | 9,366 | 
+| verify_fibair | IfEq | BNE | 827 | 
+| verify_fibair | IfEqI | BNE | 15,493 | 
+| verify_fibair | IfEqI | JAL | 4,977 | 
+| verify_fibair | IfNe | BEQ | 7,213 | 
+| verify_fibair | IfNe | JAL | 2 | 
+| verify_fibair | IfNeI | BEQ | 717 | 
+| verify_fibair | ImmE | STOREW | 848 | 
+| verify_fibair | ImmF | STOREW | 8,031 | 
+| verify_fibair | ImmV | STOREW | 9,846 | 
+| verify_fibair | LoadE | LOADW | 7,760 | 
+| verify_fibair | LoadE | LOADW2 | 13,792 | 
+| verify_fibair | LoadF | LOADW | 18,567 | 
+| verify_fibair | LoadF | LOADW2 | 1,028 | 
+| verify_fibair | LoadHeapPtr | ADD | 1 | 
+| verify_fibair | LoadV | LOADW | 10,998 | 
+| verify_fibair | LoadV | LOADW2 | 27,143 | 
+| verify_fibair | MulE | BBE4MUL | 2,717 | 
+| verify_fibair | MulEF | MUL | 2,528 | 
+| verify_fibair | MulEI | BBE4MUL | 77 | 
+| verify_fibair | MulEI | STOREW | 308 | 
+| verify_fibair | MulF | MUL | 4,277 | 
+| verify_fibair | MulFI | MUL | 1,334 | 
+| verify_fibair | MulVI | MUL | 7,816 | 
+| verify_fibair | Poseidon2CompressBabyBear | COMP_POS2 | 7,098 | 
+| verify_fibair | Poseidon2PermuteBabyBear | PERM_POS2 | 740 | 
+| verify_fibair | StoreE | STOREW | 20,860 | 
+| verify_fibair | StoreE | STOREW2 | 5,772 | 
+| verify_fibair | StoreF | STOREW | 6,468 | 
+| verify_fibair | StoreF | STOREW2 | 5,475 | 
+| verify_fibair | StoreHeapPtr | ADD | 1 | 
+| verify_fibair | StoreHintWord | ADD | 61,275 | 
+| verify_fibair | StoreHintWord | SHINTW | 71,974 | 
+| verify_fibair | StoreV | STOREW | 1,952 | 
+| verify_fibair | StoreV | STOREW2 | 18,511 | 
+| verify_fibair | SubE | FE4SUB | 1,892 | 
+| verify_fibair | SubEF | LOADW | 393 | 
+| verify_fibair | SubEF | SUB | 131 | 
+| verify_fibair | SubEI | ADD | 8 | 
+| verify_fibair | SubFI | SUB | 1,333 | 
+| verify_fibair | SubV | SUB | 3,739 | 
+| verify_fibair | SubVI | SUB | 745 | 
+| verify_fibair | SubVIN | SUB | 630 | 
+| verify_fibair | UnsafeCastVF | ADD | 1 | 
+
+</details>
+
+
+Commit: https://github.com/openvm-org/openvm/commit/73410debbc22bc340af6bc20cf6d2262c0eb19a4
+
+Max Segment Length: 1048476
+
+Instance Type: 64cpu-linux-arm64
+
+Memory Allocator: mimalloc
+
+[Benchmark Workflow](https://github.com/openvm-org/openvm/actions/runs/12699357020)
