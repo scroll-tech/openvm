@@ -1,24 +1,24 @@
 | Summary | Proof Time (s) | Parallel Proof Time (s) |
 |:---|---:|---:|
-| Total | <span style='color: green'>(-0 [-0.5%])</span> 3.82 | <span style='color: green'>(-0 [-0.5%])</span> 3.82 |
-| verify_fibair | <span style='color: green'>(-0 [-0.5%])</span> 3.82 | <span style='color: green'>(-0 [-0.5%])</span> 3.82 |
+| Total | <span style='color: green'>(-0 [-1.0%])</span> 3.80 | <span style='color: green'>(-0 [-1.0%])</span> 3.80 |
+| verify_fibair | <span style='color: green'>(-0 [-1.0%])</span> 3.80 | <span style='color: green'>(-0 [-1.0%])</span> 3.80 |
 
 
 | verify_fibair |||||
 |:---|---:|---:|---:|---:|
 |metric|avg|sum|max|min|
-| `total_proof_time_ms ` | <span style='color: green'>(-19 [-0.5%])</span> 3,818 | <span style='color: green'>(-19 [-0.5%])</span> 3,818 | <span style='color: green'>(-19 [-0.5%])</span> 3,818 | <span style='color: green'>(-19 [-0.5%])</span> 3,818 |
-| `main_cells_used     ` |  30,011,454 |  30,011,454 |  30,011,454 |  30,011,454 |
-| `total_cycles        ` |  746,301 |  746,301 |  746,301 |  746,301 |
-| `execute_time_ms     ` | <span style='color: red'>(+1 [+0.6%])</span> 156 | <span style='color: red'>(+1 [+0.6%])</span> 156 | <span style='color: red'>(+1 [+0.6%])</span> 156 | <span style='color: red'>(+1 [+0.6%])</span> 156 |
-| `trace_gen_time_ms   ` | <span style='color: green'>(-3 [-0.7%])</span> 447 | <span style='color: green'>(-3 [-0.7%])</span> 447 | <span style='color: green'>(-3 [-0.7%])</span> 447 | <span style='color: green'>(-3 [-0.7%])</span> 447 |
-| `stark_prove_excluding_trace_time_ms` | <span style='color: green'>(-17 [-0.5%])</span> 3,215 | <span style='color: green'>(-17 [-0.5%])</span> 3,215 | <span style='color: green'>(-17 [-0.5%])</span> 3,215 | <span style='color: green'>(-17 [-0.5%])</span> 3,215 |
-| `main_trace_commit_time_ms` | <span style='color: red'>(+3 [+0.5%])</span> 621 | <span style='color: red'>(+3 [+0.5%])</span> 621 | <span style='color: red'>(+3 [+0.5%])</span> 621 | <span style='color: red'>(+3 [+0.5%])</span> 621 |
-| `generate_perm_trace_time_ms` | <span style='color: red'>(+5 [+5.6%])</span> 94 | <span style='color: red'>(+5 [+5.6%])</span> 94 | <span style='color: red'>(+5 [+5.6%])</span> 94 | <span style='color: red'>(+5 [+5.6%])</span> 94 |
-| `perm_trace_commit_time_ms` | <span style='color: red'>(+26 [+4.9%])</span> 555 | <span style='color: red'>(+26 [+4.9%])</span> 555 | <span style='color: red'>(+26 [+4.9%])</span> 555 | <span style='color: red'>(+26 [+4.9%])</span> 555 |
-| `quotient_poly_compute_time_ms` | <span style='color: green'>(-30 [-4.6%])</span> 629 | <span style='color: green'>(-30 [-4.6%])</span> 629 | <span style='color: green'>(-30 [-4.6%])</span> 629 | <span style='color: green'>(-30 [-4.6%])</span> 629 |
-| `quotient_poly_commit_time_ms` | <span style='color: green'>(-20 [-3.4%])</span> 575 | <span style='color: green'>(-20 [-3.4%])</span> 575 | <span style='color: green'>(-20 [-3.4%])</span> 575 | <span style='color: green'>(-20 [-3.4%])</span> 575 |
-| `pcs_opening_time_ms ` | <span style='color: green'>(-2 [-0.3%])</span> 737 | <span style='color: green'>(-2 [-0.3%])</span> 737 | <span style='color: green'>(-2 [-0.3%])</span> 737 | <span style='color: green'>(-2 [-0.3%])</span> 737 |
+| `total_proof_time_ms ` | <span style='color: green'>(-39 [-1.0%])</span> 3,798 | <span style='color: green'>(-39 [-1.0%])</span> 3,798 | <span style='color: green'>(-39 [-1.0%])</span> 3,798 | <span style='color: green'>(-39 [-1.0%])</span> 3,798 |
+| `main_cells_used     ` |  30,013,314 |  30,013,314 |  30,013,314 |  30,013,314 |
+| `total_cycles        ` |  746,333 |  746,333 |  746,333 |  746,333 |
+| `execute_time_ms     ` | <span style='color: red'>(+3 [+1.9%])</span> 158 | <span style='color: red'>(+3 [+1.9%])</span> 158 | <span style='color: red'>(+3 [+1.9%])</span> 158 | <span style='color: red'>(+3 [+1.9%])</span> 158 |
+| `trace_gen_time_ms   ` | <span style='color: green'>(-24 [-5.3%])</span> 426 | <span style='color: green'>(-24 [-5.3%])</span> 426 | <span style='color: green'>(-24 [-5.3%])</span> 426 | <span style='color: green'>(-24 [-5.3%])</span> 426 |
+| `stark_prove_excluding_trace_time_ms` | <span style='color: green'>(-18 [-0.6%])</span> 3,214 | <span style='color: green'>(-18 [-0.6%])</span> 3,214 | <span style='color: green'>(-18 [-0.6%])</span> 3,214 | <span style='color: green'>(-18 [-0.6%])</span> 3,214 |
+| `main_trace_commit_time_ms` | <span style='color: red'>(+5 [+0.8%])</span> 623 | <span style='color: red'>(+5 [+0.8%])</span> 623 | <span style='color: red'>(+5 [+0.8%])</span> 623 | <span style='color: red'>(+5 [+0.8%])</span> 623 |
+| `generate_perm_trace_time_ms` | <span style='color: red'>(+2 [+2.2%])</span> 91 | <span style='color: red'>(+2 [+2.2%])</span> 91 | <span style='color: red'>(+2 [+2.2%])</span> 91 | <span style='color: red'>(+2 [+2.2%])</span> 91 |
+| `perm_trace_commit_time_ms` | <span style='color: red'>(+2 [+0.4%])</span> 531 | <span style='color: red'>(+2 [+0.4%])</span> 531 | <span style='color: red'>(+2 [+0.4%])</span> 531 | <span style='color: red'>(+2 [+0.4%])</span> 531 |
+| `quotient_poly_compute_time_ms` | <span style='color: red'>(+6 [+0.9%])</span> 665 | <span style='color: red'>(+6 [+0.9%])</span> 665 | <span style='color: red'>(+6 [+0.9%])</span> 665 | <span style='color: red'>(+6 [+0.9%])</span> 665 |
+| `quotient_poly_commit_time_ms` | <span style='color: green'>(-21 [-3.5%])</span> 574 | <span style='color: green'>(-21 [-3.5%])</span> 574 | <span style='color: green'>(-21 [-3.5%])</span> 574 | <span style='color: green'>(-21 [-3.5%])</span> 574 |
+| `pcs_opening_time_ms ` | <span style='color: green'>(-10 [-1.4%])</span> 729 | <span style='color: green'>(-10 [-1.4%])</span> 729 | <span style='color: green'>(-10 [-1.4%])</span> 729 | <span style='color: green'>(-10 [-1.4%])</span> 729 |
 
 
 
@@ -27,7 +27,7 @@
 
 |  | verify_program_compile_ms | total_cells | stark_prove_excluding_trace_time_ms | quotient_poly_compute_time_ms | quotient_poly_commit_time_ms | perm_trace_commit_time_ms | pcs_opening_time_ms | main_trace_commit_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-|  | 3 | 65,536 | 69 | 3 | 13 | 0 | 34 | 16 | 
+|  | 3 | 65,536 | 65 | 3 | 13 | 0 | 31 | 17 | 
 
 | air_name | rows | quotient_deg | main_cols | interactions | constraints | cells |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -51,7 +51,7 @@
 
 | group | trace_gen_time_ms | total_proof_time_ms | total_cycles | total_cells | stark_prove_excluding_trace_time_ms | quotient_poly_compute_time_ms | quotient_poly_commit_time_ms | perm_trace_commit_time_ms | pcs_opening_time_ms | main_trace_commit_time_ms | main_cells_used | generate_perm_trace_time_ms | execute_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| verify_fibair | 447 | 3,818 | 746,301 | 89,839,640 | 3,215 | 629 | 575 | 555 | 737 | 621 | 30,011,454 | 94 | 156 | 
+| verify_fibair | 426 | 3,798 | 746,333 | 89,839,640 | 3,214 | 665 | 574 | 531 | 729 | 623 | 30,013,314 | 91 | 158 | 
 
 | group | air_name | rows | prep_cols | perm_cols | main_cols | cells |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -82,4 +82,4 @@ Instance Type: 64cpu-linux-arm64
 
 Memory Allocator: mimalloc
 
-[Benchmark Workflow](https://github.com/openvm-org/openvm/actions/runs/12685184300)
+[Benchmark Workflow](https://github.com/openvm-org/openvm/actions/runs/12685713138)
