@@ -59,6 +59,7 @@ pub struct VmExecutor<F, VC> {
     pub config: VC,
     pub overridden_heights: Option<VmComplexTraceHeights>,
     _marker: PhantomData<F>,
+    pub use_parallel_proving: bool,
 }
 
 #[repr(i32)]
@@ -98,6 +99,7 @@ where
             config,
             overridden_heights,
             _marker: Default::default(),
+            use_parallel_proving: false,
         }
     }
 
@@ -244,6 +246,10 @@ where
                 .collect(),
             final_memory,
         })
+    }
+
+    pub fn set_parallel_proving(&mut self, enabled: bool) {
+        self.use_parallel_proving = enabled;
     }
 }
 

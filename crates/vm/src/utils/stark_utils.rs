@@ -15,15 +15,24 @@ use openvm_stark_sdk::{
 };
 
 use crate::arch::{
-    vm::{VirtualMachine, VmExecutor},
-    Streams, VmConfig, VmMemoryState,
+    vm::{VirtualMachine, VmExecutor}, ExecutionSegment, Streams, VmConfig, VmMemoryState
 };
+use rayon::prelude::*;
+use openvm_stark_sdk::engine::StarkEngine;  
+
+// Wrapper type for ExecutionSegment that implements Send + Sync
+struct ThreadSafeSegment<F: PrimeField32, VC: VmConfig<F>>(ExecutionSegment<F, VC>);
+
+// SAFETY: ExecutionSegment is safe to send between threads in this context
+// because we only use it for proof generation where no shared mutable state exists
+unsafe impl<F: PrimeField32, VC: VmConfig<F>> Send for ThreadSafeSegment<F, VC> {}
+unsafe impl<F: PrimeField32, VC: VmConfig<F>> Sync for ThreadSafeSegment<F, VC> {}
 
 pub fn air_test<VC>(config: VC, exe: impl Into<VmExe<BabyBear>>)
 where
     VC: VmConfig<BabyBear>,
-    VC::Executor: Chip<BabyBearPoseidon2Config>,
-    VC::Periphery: Chip<BabyBearPoseidon2Config>,
+    VC::Executor: Chip<BabyBearPoseidon2Config> + Send + Sync,
+    VC::Periphery: Chip<BabyBearPoseidon2Config> + Send + Sync,
 {
     air_test_with_min_segments(config, exe, Streams::default(), 1);
 }
@@ -37,16 +46,53 @@ pub fn air_test_with_min_segments<VC>(
 ) -> Option<VmMemoryState<BabyBear>>
 where
     VC: VmConfig<BabyBear>,
-    VC::Executor: Chip<BabyBearPoseidon2Config>,
-    VC::Periphery: Chip<BabyBearPoseidon2Config>,
+    VC::Executor: Chip<BabyBearPoseidon2Config> + Send + Sync,
+    VC::Periphery: Chip<BabyBearPoseidon2Config> + Send + Sync,
 {
     setup_tracing();
-    let engine = BabyBearPoseidon2Engine::new(FriParameters::standard_fast());
+    let create_engine = || BabyBearPoseidon2Engine::new(FriParameters::standard_fast());
+    let engine = create_engine();
     let vm = VirtualMachine::new(engine, config);
     let pk = vm.keygen();
-    let mut result = vm.execute_and_generate(exe, input).unwrap();
-    let final_memory = result.final_memory.take();
-    let proofs = vm.prove(&pk, result);
+    
+    // Execute segments sequentially first
+    let mut segments = vm.executor.execute_segments(exe, input).expect("VM execution failed");
+    let final_memory = std::mem::take(&mut segments.last_mut().unwrap().final_memory);
+
+    let proofs: Vec<_> = if vm.executor.use_parallel_proving {
+        // Parallel implementation
+        let safe_segments: Vec<_> = segments
+            .into_iter()
+            .map(ThreadSafeSegment)
+            .collect();
+
+        safe_segments
+            .into_par_iter()
+            .enumerate()
+            .map(|(seg_idx, safe_seg)| {
+                let thread_engine = create_engine();
+                
+                let proof_input = tracing::info_span!("trace_gen", segment = seg_idx)
+                    .in_scope(|| safe_seg.0.generate_proof_input(None));
+                
+                tracing::info_span!("prove_segment", segment = seg_idx)
+                    .in_scope(|| thread_engine.prove(&pk, proof_input))
+            })
+            .collect()
+    } else {
+        // Sequential implementation
+        segments
+            .into_iter()
+            .enumerate()
+            .map(|(seg_idx, seg)| {
+                let proof_input = tracing::info_span!("trace_gen", segment = seg_idx)
+                    .in_scope(|| seg.generate_proof_input(None));
+                
+                tracing::info_span!("prove_segment", segment = seg_idx)
+                    .in_scope(|| create_engine().prove(&pk, proof_input))
+            })
+            .collect()
+    };
 
     assert!(proofs.len() >= min_segments);
     vm.verify(&pk.get_vk(), proofs)
@@ -73,13 +119,13 @@ where
     cfg_if::cfg_if! {
         if #[cfg(feature = "bench-metrics")] {
             // Run once with metrics collection enabled, which can improve runtime performance
-            config.system_mut().profiling = true;
+            config.system_mut().collect_metrics = true;
             {
                 let executor = VmExecutor::<Val<SC>, VC>::new(config.clone());
                 executor.execute(program.clone(), input_stream.clone()).unwrap();
             }
             // Run again with metrics collection disabled and measure trace generation time
-            config.system_mut().profiling = false;
+            config.system_mut().collect_metrics = false;
             let start = std::time::Instant::now();
         }
     }
