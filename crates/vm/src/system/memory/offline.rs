@@ -442,9 +442,8 @@ impl<F: PrimeField32> OfflineMemory<F> {
     }
 
     fn range_vec(&self, address_space: u32, pointer: u32, len: usize) -> Vec<F> {
-        (0..len)
-            .map(|i| self.get(address_space, pointer + i as u32))
-            .collect()
+        let pointer = pointer as usize;
+        self.data[(address_space - self.as_offset) as usize].get_range(pointer..pointer + len)
     }
 
     pub fn aux_cols_factory(&self) -> MemoryAuxColsFactory<F> {
