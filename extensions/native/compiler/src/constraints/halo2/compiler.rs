@@ -149,10 +149,9 @@ impl<C: Config + Debug> Halo2ConstraintCompiler<C> {
         let mut vkey_hash = None;
         let mut committed_values_digest = None;
         #[cfg(feature = "bench-metrics")]
-        {
-            let mut old_stats = stats_snapshot(ctx, range.clone());
-            println!("stephenh: hello");
-        }
+        let mut old_stats = stats_snapshot(ctx, range.clone());
+        #[cfg(feature = "bench-metrics")]
+        println!("stephenh: ahhh");
         println!("stephenh: start {}", self.profiling);
         for (instruction, backtrace) in operations {
             #[cfg(feature = "bench-metrics")]
