@@ -9,6 +9,8 @@ mod jal;
 mod loadstore;
 mod poseidon2;
 
+mod verify_batch;
+
 pub use branch_eq::*;
 pub use castf::*;
 pub use field_arithmetic::*;
