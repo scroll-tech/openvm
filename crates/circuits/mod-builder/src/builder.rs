@@ -289,7 +289,6 @@ impl<AB: InteractionBuilder> SubAir<AB> for FieldExpr {
         if self.builder.needs_setup() {
             let is_setup = flags.iter().fold(is_valid.into(), |acc, &x| acc - x);
             builder.assert_bool(is_setup.clone());
-            // TODO: turn back on once we also support this in ecc and everywhere
             builder.when_first_row().assert_one(is_setup.clone());
             for i in 0..inputs[0].len().max(self.builder.prime_limbs.len()) {
                 let lhs = if i < inputs[0].len() {
