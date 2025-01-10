@@ -44,6 +44,16 @@ pub struct AggStarkConfig {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+pub struct MinimalConfig {
+    pub app_fri_params: FriParameters,
+    pub app_vm_config: SdkVmConfig,
+    pub halo2_config: Halo2Config,
+    /// Only for AggVM debugging. App VM users should not need this in regular flow.
+    #[serde(default)]
+    pub compiler_options: CompilerOptions,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Halo2Config {
     /// Log degree for the outer recursion verifier circuit.
     pub verifier_k: usize,

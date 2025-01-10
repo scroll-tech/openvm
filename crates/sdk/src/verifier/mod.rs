@@ -7,6 +7,7 @@ use crate::{config::AggStarkConfig, verifier::common::types::VmVerifierPvs};
 pub mod common;
 pub mod internal;
 pub mod leaf;
+pub mod minimal;
 pub mod root;
 pub(crate) mod utils;
 

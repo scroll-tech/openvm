@@ -279,6 +279,32 @@ fn test_e2e_proof_generation_and_verification() {
 }
 
 #[test]
+
+fn test_e2e_minimal_proof_generation_and_verification() {
+    let app_log_blowup = 1;
+    let app_config = small_test_app_config(app_log_blowup);
+    let app_pk = Sdk.app_keygen(app_config).unwrap();
+    let params_reader = CacheHalo2ParamsReader::new_with_default_params_dir();
+    let minimal_pk = Sdk
+        .minimal_keygen(agg_config_for_test(), &params_reader)
+        .unwrap();
+    let evm_verifier = Sdk
+        .generate_snark_verifier_contract(&params_reader, &minimal_pk)
+        .unwrap();
+
+    let evm_proof = Sdk
+        .generate_evm_proof(
+            &params_reader,
+            Arc::new(app_pk),
+            app_committed_exe_for_test(app_log_blowup),
+            minimal_pk,
+            StdIn::default(),
+        )
+        .unwrap();
+    assert!(Sdk.verify_evm_proof(&evm_verifier, &evm_proof));
+}
+
+#[test]
 fn test_sdk_guest_build_and_transpile() {
     let sdk = Sdk;
     let guest_opts = GuestOptions::default()

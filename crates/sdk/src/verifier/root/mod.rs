@@ -34,6 +34,7 @@ pub struct RootVmVerifierConfig {
     pub internal_vm_verifier_commit: [F; DIGEST_SIZE],
     pub compiler_options: CompilerOptions,
 }
+
 impl RootVmVerifierConfig {
     pub fn build_program(
         &self,
@@ -110,7 +111,7 @@ impl RootVmVerifierConfig {
     }
 }
 
-fn compute_exe_commit<C: Config>(
+pub(crate) fn compute_exe_commit<C: Config>(
     builder: &mut Builder<C>,
     hasher: &VariableP2Hasher<C>,
     app_commit: [Felt<C::F>; DIGEST_SIZE],

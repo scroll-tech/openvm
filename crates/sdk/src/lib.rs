@@ -3,9 +3,9 @@ extern crate core;
 use std::{fs::read, panic::catch_unwind, path::Path, sync::Arc};
 
 use commit::commit_app_exe;
-use config::AppConfig;
+use config::{AppConfig, MinimalConfig};
 use eyre::Result;
-use keygen::{AppProvingKey, AppVerifyingKey};
+use keygen::{AppProvingKey, AppVerifyingKey, MinimalProvingKey};
 use openvm_build::{
     build_guest_package, find_unique_executable, get_package, GuestOptions, TargetFilter,
 };
