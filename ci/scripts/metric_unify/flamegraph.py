@@ -15,6 +15,7 @@ def get_stack_lines(metrics_dict, group_by_kvs, stack_keys, metric_name):
     It will write a file with one line each for flamegraph.pl or inferno-flamegraph to consume.
     """
     lines = []
+    non_zero = False
 
     # Process counters
     for counter in metrics_dict.get('counter', []):
@@ -42,10 +43,13 @@ def get_stack_lines(metrics_dict, group_by_kvs, stack_keys, metric_name):
         stack = ';'.join(stack_values)
         value = int(counter['value'])
 
+        if value != 0:
+            non_zero = True
+
         lines.append(f"{stack} {value}")
 
     # Currently cycle tracker does not use gauge
-    return lines
+    return lines if non_zero else []
 
 
 def create_flamegraph(fname, metrics_dict, group_by_kvs, stack_keys, metric_name, reverse=False):
