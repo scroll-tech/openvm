@@ -50,6 +50,8 @@ def get_stack_lines(metrics_dict, group_by_kvs, stack_keys, metric_name):
 
 def create_flamegraph(fname, metrics_dict, group_by_kvs, stack_keys, metric_name, reverse=False):
     lines = get_stack_lines(metrics_dict, group_by_kvs, stack_keys, metric_name)
+    if not lines:
+        return
 
     suffixes = [key for key in stack_keys if key != "cycle_tracker_span"]
 
@@ -100,6 +102,12 @@ def create_custom_flamegraphs(metrics_file, group_by=["group"]):
         create_flamegraphs(metrics_file, group_by, ["cycle_tracker_span", "dsl_ir", "opcode"], "frequency",
                            reverse=reverse)
         create_flamegraphs(metrics_file, group_by, ["cycle_tracker_span", "dsl_ir", "opcode", "air_name"], "cells_used",
+                           reverse=reverse)
+        create_flamegraphs(metrics_file, group_by, ["cell_tracker_span"], "simple_advice_cells",
+                           reverse=reverse)
+        create_flamegraphs(metrics_file, group_by, ["cell_tracker_span"], "fixed_cells",
+                           reverse=reverse)
+        create_flamegraphs(metrics_file, group_by, ["cell_tracker_span"], "lookup_advice_cells",
                            reverse=reverse)
 
 
