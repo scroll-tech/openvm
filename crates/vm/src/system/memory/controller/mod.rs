@@ -455,6 +455,7 @@ impl<F: PrimeField32> MemoryController<F> {
     }
 
     fn replay_access_log(&mut self) {
+        let start = std::time::Instant::now();
         let log = mem::take(&mut self.memory.log);
 
         let mut offline_memory = self.offline_memory.lock().unwrap();
@@ -468,6 +469,10 @@ impl<F: PrimeField32> MemoryController<F> {
                 &mut self.access_adapters,
             );
         }
+        eprintln!(
+            "- - - - - - - - - - - - - - - replay_access_log time: {:?}",
+            start.elapsed()
+        );
     }
 
     fn replay_access(
