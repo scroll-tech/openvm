@@ -16,13 +16,9 @@ impl Halo2Stats {
 
 #[cfg(feature = "bench-metrics")]
 mod emit {
-    use std::sync::atomic::AtomicUsize;
-
     use metrics::counter;
 
     use super::Halo2Stats;
-
-    static PRINT_COUNT: AtomicUsize = AtomicUsize::new(0);
 
     impl Halo2Stats {
         pub fn diff(&mut self, another: &Self) {
@@ -37,10 +33,6 @@ mod emit {
             counter!("simple_advice_cells", &labels).increment(self.total_gate_cell as u64);
             counter!("fixed_cells", &labels).increment(self.total_fixed as u64);
             counter!("lookup_advice_cells", &labels).increment(self.total_lookup_cell as u64);
-            if PRINT_COUNT.load(std::sync::atomic::Ordering::Relaxed) < 100 {
-                tracing::info!("stephenh: total_gate_cell: {}", self.total_gate_cell);
-                PRINT_COUNT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-            }
         }
     }
 }
