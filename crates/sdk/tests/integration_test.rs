@@ -13,7 +13,7 @@ use openvm_native_compiler::{conversion::CompilerOptions, prelude::*};
 use openvm_native_recursion::{halo2::utils::CacheHalo2ParamsReader, types::InnerConfig};
 use openvm_rv32im_transpiler::{Rv32ITranspilerExtension, Rv32MTranspilerExtension};
 use openvm_sdk::{
-    config::{AggConfig, AggStarkConfig, AppConfig, Halo2Config},
+    config::{AggConfig, AggStarkConfig, AppConfig, Halo2Config, MinimalConfig},
     keygen::AppProvingKey,
     verifier::{
         common::types::VmVerifierPvs,
@@ -103,6 +103,29 @@ fn agg_stark_config_for_test() -> AggStarkConfig {
         ),
         root_fri_params: standard_fri_params_with_100_bits_conjectured_security(ROOT_LOG_BLOWUP),
         profiling: false,
+        compiler_options: CompilerOptions {
+            enable_cycle_tracker: true,
+            compile_prints: true,
+            ..Default::default()
+        },
+    }
+}
+
+fn minimal_config_for_test() -> MinimalConfig {
+    MinimalConfig {
+        app_fri_params: standard_fri_params_with_100_bits_conjectured_security(app_log_blowup)
+            .into(),
+        app_vm_config: NativeConfig::new(
+            SystemConfig::default()
+                .with_max_segment_len(200)
+                .with_continuations()
+                .with_public_values(NUM_PUB_VALUES),
+            Native,
+        ),
+        halo2_config: Halo2Config {
+            verifier_k: 24,
+            wrapper_k: None,
+        },
         compiler_options: CompilerOptions {
             enable_cycle_tracker: true,
             compile_prints: true,
@@ -279,25 +302,23 @@ fn test_e2e_proof_generation_and_verification() {
 }
 
 #[test]
-
 fn test_e2e_minimal_proof_generation_and_verification() {
     let app_log_blowup = 1;
     let app_config = small_test_app_config(app_log_blowup);
     let app_pk = Sdk.app_keygen(app_config).unwrap();
     let params_reader = CacheHalo2ParamsReader::new_with_default_params_dir();
     let minimal_pk = Sdk
-        .minimal_keygen(agg_config_for_test(), &params_reader)
+        .minimal_keygen(minimal_config_for_test(), &params_reader)
         .unwrap();
     let evm_verifier = Sdk
-        .generate_snark_verifier_contract(&params_reader, &minimal_pk)
+        .generate_minimal_snark_verifier_contract(&params_reader, &minimal_pk)
         .unwrap();
 
     let evm_proof = Sdk
-        .generate_evm_proof(
+        .generate_minimal_evm_proof(
             &params_reader,
             Arc::new(app_pk),
             app_committed_exe_for_test(app_log_blowup),
-            minimal_pk,
             StdIn::default(),
         )
         .unwrap();

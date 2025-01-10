@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{marker::PhantomData, sync::Arc};
 
 use derivative::Derivative;
 use dummy::{compute_root_proof_heights, dummy_internal_proof_riscv_app_vm};
@@ -72,9 +72,10 @@ pub struct AggStarkProvingKey {
 
 /// Minimal proving key for App->Root->Static Verifier->Wrapper
 #[derive(Clone, Serialize, Deserialize)]
-pub struct MinimalProvingKey {
+pub struct MinimalProvingKey<VC> {
     pub root_verifier_pk: RootVerifierProvingKey,
     pub halo2_pk: Halo2ProvingKey,
+    _phantom: PhantomData<VC>,
 }
 
 /// Attention: the size of this struct is VERY large, usually >10GB.
@@ -297,12 +298,16 @@ impl RootVerifierProvingKey {
     }
 }
 
-impl MinimalProvingKey {
+impl<VC: VmConfig<F>> MinimalProvingKey<VC>
+where
+    VC::Executor: Chip<SC>,
+    VC::Periphery: Chip<SC>,
+{
     /// Attention:
     /// - This function is very expensive.
     /// - Please make sure SRS(KZG parameters) is already downloaded.
     #[tracing::instrument(level = "info", fields(group = "minimal_keygen"), skip_all)]
-    pub fn keygen(config: MinimalConfig, reader: &impl Halo2ParamsReader) -> Self {
+    pub fn keygen(config: MinimalConfig<VC>, reader: &impl Halo2ParamsReader) -> Self {
         let app_engine = BabyBearPoseidon2Engine::new(config.app_fri_params);
         let app_vm_pk = {
             let vm = VirtualMachine::new(app_engine, config.app_vm_config.clone());
