@@ -112,7 +112,7 @@ impl ExprBuilder {
 
     pub fn finalize(&mut self, needs_setup: bool) {
         self.finalized = true;
-        self.needs_setup = needs_setup;
+        self.needs_setup = true;
 
         // We don't support multi-op chip that doesn't need setup right now.
         assert!(needs_setup || self.num_flags == 0);
