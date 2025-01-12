@@ -24,7 +24,7 @@ use crate::{
 };
 
 pub mod types;
-mod vars;
+pub(crate) mod vars;
 
 /// Config to generate Root VM verifier program.
 pub struct RootVmVerifierConfig {

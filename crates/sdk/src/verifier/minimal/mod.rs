@@ -19,7 +19,11 @@ use super::{
         assert_required_air_for_app_vm_present, get_connector_pvs, get_memory_pvs,
         get_program_commit, types::VmVerifierPvs,
     },
-    root::{compute_exe_commit, types::RootVmVerifierPvs},
+    root::{
+        compute_exe_commit,
+        types::{RootVmVerifierInput, RootVmVerifierPvs},
+        vars::RootVmVerifierInputVariable,
+    },
     utils::VariableP2Hasher,
 };
 use crate::{C, F, SC};
@@ -45,8 +49,12 @@ impl MinimalVmVerifierConfig {
             };
             builder.cycle_tracker_end("InitializePcsConst");
             builder.cycle_tracker_start("ReadProofsFromInput");
-            let proofs: Array<C, StarkProofVariable<_>> =
-                <Vec<Proof<BabyBearPoseidon2Config>> as Hintable<C>>::read(&mut builder);
+            // let proofs: Array<C, StarkProofVariable<_>> =
+            //     <Vec<Proof<BabyBearPoseidon2Config>> as Hintable<C>>::read(&mut builder);
+            let RootVmVerifierInputVariable {
+                proofs,
+                public_values, // This is an Array<C, Felt<C::F>>
+            } = RootVmVerifierInput::<SC>::read(&mut builder);
             // At least 1 proof should be provided.
             builder.assert_ne::<Usize<_>>(proofs.len(), RVar::zero());
             builder.cycle_tracker_end("ReadProofsFromInput");
@@ -83,7 +91,7 @@ impl MinimalVmVerifierConfig {
             builder.assert_felt_eq(pvs.connector.exit_code, F::ZERO);
 
             builder.cycle_tracker_start("ExtractPublicValues");
-            let public_values_vec: Vec<Felt<F>> = (0..self.num_public_values)
+            let public_values_vec: Vec<Felt<F>> = (0..self.app_system_config.num_public_values)
                 .map(|i| builder.get(&public_values, i))
                 .collect();
             let hasher = VariableP2Hasher::new(&mut builder);
@@ -98,7 +106,7 @@ impl MinimalVmVerifierConfig {
                     pvs.memory.initial_root,
                     pvs.connector.initial_pc,
                 ),
-                leaf_verifier_commit: expected_leaf_commit,
+                leaf_verifier_commit: pvs.app_commit,
                 public_values: public_values_vec,
             };
             root_pvs

@@ -10,13 +10,13 @@ use openvm_stark_sdk::{
 use super::{vm::SingleSegmentVmProver, F, SC};
 use crate::{keygen::MinimalProvingKey, verifier::root::types::RootVmVerifierInput, RootSC};
 
-pub struct MinimalProver {
-    pub minimal_verifier_pk: MinimalProvingKey,
+pub struct MinimalProver<VC> {
+    pub minimal_verifier_pk: MinimalProvingKey<VC>,
     executor_for_heights: SingleSegmentVmExecutor<F, NativeConfig>,
 }
 
-impl MinimalProver {
-    pub fn new(minimal_verifier_pk: MinimalProvingKey) -> Self {
+impl<VC> MinimalProver<VC> {
+    pub fn new(minimal_verifier_pk: MinimalProvingKey<VC>) -> Self {
         let executor_for_heights = SingleSegmentVmExecutor::<F, _>::new(
             minimal_verifier_pk.root_verifier_pk.vm_pk.vm_config.clone(),
         );
@@ -50,7 +50,7 @@ impl MinimalProver {
     }
 }
 
-impl SingleSegmentVmProver<RootSC> for MinimalProver {
+impl<VC> SingleSegmentVmProver<RootSC> for MinimalProver<VC> {
     fn prove(&self, input: impl Into<Streams<F>>) -> Proof<RootSC> {
         let input = input.into();
         let vm = SingleSegmentVmExecutor::new(self.vm_config().clone());

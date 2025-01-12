@@ -77,7 +77,7 @@ impl<VC> ContinuationProver<VC> {
 }
 
 pub struct SingleSegmentProver<VC> {
-    minimal_prover: MinimalProver,
+    minimal_prover: MinimalProver<VC>,
     halo2_prover: Halo2Prover,
     _phantom: PhantomData<VC>,
 }
@@ -87,7 +87,7 @@ impl<VC> SingleSegmentProver<VC> {
         reader: &impl Halo2ParamsReader,
         app_pk: Arc<AppProvingKey<VC>>,
         // app_committed_exe: Arc<NonRootCommittedExe>,
-        minimal_pk: MinimalProvingKey,
+        minimal_pk: MinimalProvingKey<VC>,
     ) -> Self
     where
         VC: VmConfig<F>,

@@ -210,11 +210,15 @@ impl Sdk {
         Ok(evm_verifier)
     }
 
-    pub fn minimal_keygen(
+    pub fn minimal_keygen<VC: VmConfig<F>>(
         &self,
-        config: MinimalConfig,
+        config: MinimalConfig<VC>,
         reader: &impl Halo2ParamsReader,
-    ) -> Result<MinimalProvingKey> {
+    ) -> Result<MinimalProvingKey<VC>>
+    where
+        VC::Executor: Chip<SC>,
+        VC::Periphery: Chip<SC>,
+    {
         let minimal_pk = MinimalProvingKey::keygen(config, reader);
         Ok(minimal_pk)
     }
@@ -223,7 +227,7 @@ impl Sdk {
         &self,
         reader: &impl Halo2ParamsReader,
         app_pk: Arc<AppProvingKey<VC>>,
-        minimal_pk: MinimalProvingKey,
+        minimal_pk: MinimalProvingKey<VC>,
         inputs: StdIn,
     ) -> Result<EvmProof>
     where
@@ -235,10 +239,10 @@ impl Sdk {
         Ok(proof)
     }
 
-    pub fn generate_minimal_snark_verifier_contract(
+    pub fn generate_minimal_snark_verifier_contract<VC: VmConfig<F>>(
         &self,
         reader: &impl Halo2ParamsReader,
-        minimal_pk: &MinimalProvingKey,
+        minimal_pk: &MinimalProvingKey<VC>,
     ) -> Result<EvmVerifier> {
         let params =
             reader.read_params(minimal_pk.halo2_pk.wrapper.pinning.metadata.config_params.k);

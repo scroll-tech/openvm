@@ -334,31 +334,35 @@ where
             ))
         };
 
-        let MinimalConfig {
-            app_fri_params,
-            app_vm_config,
-            halo2_config,
-        } = config;
-        let (agg_stark_pk, dummy_internal_proof) =
-            AggStarkProvingKey::dummy_proof_and_keygen(agg_stark_config);
-        let dummy_root_proof = agg_stark_pk
+        let (minimal_stark_pk, dummy_leaf_proof) =
+            MinimalProvingKey::dummy_proof_and_keygen(config);
+        let dummy_root_proof = minimal_stark_pk
             .root_verifier_pk
-            .generate_dummy_root_proof(dummy_internal_proof);
-        let verifier = agg_stark_pk.root_verifier_pk.keygen_static_verifier(
-            &reader.read_params(halo2_config.verifier_k),
+            .generate_dummy_root_proof(dummy_leaf_proof);
+        let verifier = minimal_stark_pk.root_verifier_pk.keygen_static_verifier(
+            &reader.read_params(config.halo2_config.verifier_k),
             dummy_root_proof,
         );
         let dummy_snark = verifier.generate_dummy_snark(reader);
-        let wrapper = if let Some(wrapper_k) = halo2_config.wrapper_k {
+        let wrapper = if let Some(wrapper_k) = config.halo2_config.wrapper_k {
             Halo2WrapperProvingKey::keygen(&reader.read_params(wrapper_k), dummy_snark)
         } else {
             Halo2WrapperProvingKey::keygen_auto_tune(reader, dummy_snark)
         };
         let halo2_pk = Halo2ProvingKey { verifier, wrapper };
         Self {
-            root_verifier_pk,
+            root_verifier_pk: minimal_stark_pk.root_verifier_pk,
             halo2_pk,
+            _phantom: PhantomData,
         }
+    }
+
+    fn dummy_proof_and_keygen(config: MinimalConfig<VC>) -> (Self, Proof<SC>) {
+        let (minimal_stark_pk, dummy_leaf_proof) =
+            MinimalProvingKey::dummy_proof_and_keygen(config);
+        let dummy_root_proof = minimal_stark_pk
+            .root_verifier_pk
+            .generate_dummy_root_proof(dummy_leaf_proof);
     }
 }
 
