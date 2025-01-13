@@ -9,10 +9,10 @@ use openvm_stark_backend::{
 };
 use openvm_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
 use rand::Rng;
-
+use crate::verify_batch::chip::VerifyBatchChip;
+use crate::verify_batch::columns::VerifyBatchCols;
 use super::{
-    super::field_extension::FieldExtension, elem_to_ext, FriReducedOpeningChip, VerifyBatchCols,
-    EXT_DEG,
+    elem_to_ext, EXT_DEG, super::field_extension::FieldExtension,
 };
 
 fn compute_fri_mat_opening<F: Field>(
@@ -42,7 +42,7 @@ fn fri_mat_opening_air_test() {
     let offset = FriOpcode::default_offset();
 
     let mut tester = VmChipTestBuilder::default();
-    let mut chip = FriReducedOpeningChip::new(
+    let mut chip = VerifyBatchChip::new(
         tester.execution_bus(),
         tester.program_bus(),
         tester.memory_bridge(),
