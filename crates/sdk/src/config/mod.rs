@@ -52,7 +52,8 @@ pub struct MinimalConfig {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct MinimalStarkConfig {
     pub max_num_user_public_values: usize,
-    pub fri_params: FriParameters,
+    pub leaf_fri_params: FriParameters,
+    pub root_fri_params: FriParameters,
     /// Sets the profiling mode of all aggregation VMs
     pub profiling: bool,
     /// Only for AggVM debugging.

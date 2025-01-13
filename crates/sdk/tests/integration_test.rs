@@ -116,8 +116,13 @@ fn agg_stark_config_for_test() -> AggStarkConfig {
 fn minimal_config_for_test() -> MinimalConfig {
     MinimalConfig {
         minimal_stark_config: MinimalStarkConfig {
-            fri_params: standard_fri_params_with_100_bits_conjectured_security(ROOT_LOG_BLOWUP),
             max_num_user_public_values: NUM_PUB_VALUES,
+            leaf_fri_params: standard_fri_params_with_100_bits_conjectured_security(
+                LEAF_LOG_BLOWUP,
+            ),
+            root_fri_params: standard_fri_params_with_100_bits_conjectured_security(
+                ROOT_LOG_BLOWUP,
+            ),
             profiling: false,
             compiler_options: CompilerOptions {
                 enable_cycle_tracker: true,
@@ -323,6 +328,31 @@ fn test_e2e_minimal_proof_generation_and_verification() {
         .unwrap();
     assert!(Sdk.verify_evm_proof(&evm_verifier, &evm_proof));
 }
+
+// #[test]
+// fn test_e2e_minimal_proof_generation_and_verification() {
+//     let app_log_blowup = 1;
+//     let app_config = small_test_app_config(app_log_blowup);
+//     let params_reader = CacheHalo2ParamsReader::new_with_default_params_dir();
+//     let min_pk = Sdk.minimal_keygen(app_config, minimal_agg_config, &params_reader).unwrap();
+
+//     // let minimal_pk = Sdk
+//     //     .minimal_keygen(minimal_config_for_test(), &params_reader)
+//     //     .unwrap();
+//     let evm_verifier = Sdk
+//         .generate_minimal_snark_verifier_contract(&params_reader, &minimal_pk)
+//         .unwrap();
+
+//     let evm_proof = Sdk
+//         .generate_minimal_evm_proof(
+//             &params_reader,
+//             app_committed_exe_for_test(app_log_blowup),
+//             min_pk,
+//             StdIn::default(),
+//         )
+//         .unwrap();
+//     assert!(Sdk.verify_evm_proof(&evm_verifier, &evm_proof));
+// }
 
 #[test]
 fn test_sdk_guest_build_and_transpile() {

@@ -316,13 +316,13 @@ impl MinimalStarkProvingKey {
         let leaf_vm_config = config.leaf_vm_config();
         let root_vm_config = config.root_verifier_vm_config();
 
-        let leaf_engine = BabyBearPoseidon2Engine::new(config.fri_params);
+        let leaf_engine = BabyBearPoseidon2Engine::new(config.leaf_fri_params);
         let leaf_vm_pk = Arc::new({
             let vm = VirtualMachine::new(leaf_engine, leaf_vm_config.clone());
             let vm_pk = vm.keygen();
-            assert!(vm_pk.max_constraint_degree <= config.fri_params.max_constraint_degree());
+            assert!(vm_pk.max_constraint_degree <= config.leaf_fri_params.max_constraint_degree());
             VmProvingKey {
-                fri_params: config.fri_params,
+                fri_params: config.leaf_fri_params,
                 vm_config: leaf_vm_config,
                 vm_pk,
             }
@@ -333,7 +333,7 @@ impl MinimalStarkProvingKey {
         let dummy_leaf_proof = dummy_leaf_proof_riscv_app_vm(
             leaf_vm_pk.clone(),
             config.max_num_user_public_values,
-            config.fri_params,
+            config.leaf_fri_params,
         );
 
         // let app_proof = dummy_leaf_proof_riscv_app_vm(
@@ -343,9 +343,9 @@ impl MinimalStarkProvingKey {
         // );
 
         let root_verifier_pk = {
-            let root_engine = BabyBearPoseidon2RootEngine::new(config.fri_params);
+            let root_engine = BabyBearPoseidon2RootEngine::new(config.root_fri_params);
             let root_program = MinimalVmVerifierConfig {
-                leaf_fri_params: config.fri_params,
+                leaf_fri_params: config.leaf_fri_params,
                 num_public_values: config.max_num_user_public_values,
                 compiler_options: config.compiler_options,
             }
@@ -357,7 +357,7 @@ impl MinimalStarkProvingKey {
 
             let vm = VirtualMachine::new(root_engine, root_vm_config.clone());
             let mut vm_pk = vm.keygen();
-            assert!(vm_pk.max_constraint_degree <= config.fri_params.max_constraint_degree());
+            assert!(vm_pk.max_constraint_degree <= config.root_fri_params.max_constraint_degree());
 
             let (air_heights, _internal_heights) = compute_root_proof_heights(
                 root_vm_config.clone(),
@@ -369,7 +369,7 @@ impl MinimalStarkProvingKey {
 
             RootVerifierProvingKey {
                 vm_pk: Arc::new(VmProvingKey {
-                    fri_params: config.fri_params,
+                    fri_params: config.root_fri_params,
                     vm_config: root_vm_config,
                     vm_pk,
                 }),

@@ -40,12 +40,12 @@ impl AggStarkConfig {
 
 impl MinimalStarkConfig {
     pub fn leaf_vm_config(&self) -> NativeConfig {
-        leaf_vm_config(&self.fri_params, self.profiling)
+        leaf_vm_config(&self.leaf_fri_params, self.profiling)
     }
 
     pub fn root_verifier_vm_config(&self) -> NativeConfig {
         root_verifier_vm_config(
-            &self.fri_params,
+            &self.root_fri_params,
             self.max_num_user_public_values,
             self.profiling,
         )
