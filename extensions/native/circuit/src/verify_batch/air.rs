@@ -1,12 +1,5 @@
 use std::{borrow::Borrow, sync::Arc};
 
-use openvm_circuit::{
-    arch::{ExecutionBridge, ExecutionState},
-    system::memory::{offline_checker::MemoryBridge, MemoryAddress},
-};
-use openvm_circuit_primitives::utils::not;
-use openvm_native_compiler::FriOpcode::FRI_REDUCED_OPENING;
-use openvm_poseidon2_air::{Poseidon2SubAir, BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS};
 use openvm_stark_backend::{
     interaction::InteractionBuilder,
     p3_air::{Air, AirBuilder, BaseAir},
@@ -15,7 +8,15 @@ use openvm_stark_backend::{
     rap::{BaseAirWithPublicValues, PartitionedBaseAir},
 };
 
-use crate::verify_batch::{columns::VerifyBatchCols, CHUNK};
+use openvm_circuit::{
+    arch::{ExecutionBridge, ExecutionState},
+    system::memory::{MemoryAddress, offline_checker::MemoryBridge},
+};
+use openvm_circuit_primitives::utils::not;
+use openvm_native_compiler::VerifyBatchOpcode::VERIFY_BATCH;
+use openvm_poseidon2_air::{BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS, Poseidon2SubAir};
+
+use crate::verify_batch::{CHUNK, columns::VerifyBatchCols};
 
 #[derive(Clone, Debug)]
 pub struct VerifyBatchAir<F: Field, const SBOX_REGISTERS: usize> {
@@ -265,7 +266,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .assert_eq(next.initial_opened_index, AB::F::ZERO);
         self.execution_bridge
             .execute_and_increment_pc(
-                AB::Expr::from_canonical_usize(FRI_REDUCED_OPENING as usize + self.offset),
+                AB::Expr::from_canonical_usize(VERIFY_BATCH as usize + self.offset),
                 [
                     dim_register,
                     opened_register,
@@ -283,7 +284,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .read(
                 MemoryAddress::new(address_space, dim_register),
                 [dim_base_pointer],
-                start_timestamp,
+                very_first_timestamp,
                 &dim_base_pointer_read,
             )
             .eval(builder, end_top_level);
@@ -291,7 +292,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .read(
                 MemoryAddress::new(address_space, opened_register),
                 [opened_base_pointer, opened_length],
-                start_timestamp + AB::F::ONE,
+                very_first_timestamp+ AB::F::ONE,
                 &opened_base_pointer_and_length_read,
             )
             .eval(builder, end_top_level);
@@ -299,7 +300,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .read(
                 MemoryAddress::new(address_space, sibling_register),
                 [sibling_base_pointer],
-                start_timestamp + AB::F::TWO,
+                very_first_timestamp + AB::F::TWO,
                 &sibling_base_pointer_read,
             )
             .eval(builder, end_top_level);
@@ -307,7 +308,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .read(
                 MemoryAddress::new(address_space, index_register),
                 [index_base_pointer],
-                start_timestamp + AB::F::from_canonical_usize(3),
+                very_first_timestamp + AB::F::from_canonical_usize(3),
                 &index_base_pointer_read,
             )
             .eval(builder, end_top_level);
@@ -315,7 +316,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .read(
                 MemoryAddress::new(address_space, commit_register),
                 [commit_pointer],
-                start_timestamp + AB::F::from_canonical_usize(4),
+                very_first_timestamp+ AB::F::from_canonical_usize(4),
                 &commit_pointer_read,
             )
             .eval(builder, end_top_level);
@@ -324,7 +325,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .read(
                 MemoryAddress::new(address_space, commit_pointer),
                 left_output,
-                start_timestamp + AB::F::from_canonical_usize(5),
+                very_first_timestamp + AB::F::from_canonical_usize(5),
                 &commit_read,
             )
             .eval(builder, end_top_level);

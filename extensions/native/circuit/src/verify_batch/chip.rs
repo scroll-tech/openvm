@@ -1,27 +1,25 @@
 use std::sync::{Arc, Mutex};
 
+use openvm_stark_backend::p3_field::{Field, FieldAlgebra, PrimeField32};
+
 use openvm_circuit::{
     arch::{ExecutionBridge, ExecutionBus, ExecutionError, ExecutionState, InstructionExecutor},
     system::{
-        memory::{offline_checker::MemoryBridge, MemoryController, OfflineMemory, RecordId},
+        memory::{MemoryController, offline_checker::MemoryBridge, OfflineMemory, RecordId},
         program::ProgramBus,
     },
 };
 use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP};
-use openvm_native_compiler::FriOpcode::FRI_REDUCED_OPENING;
+use openvm_native_compiler::VerifyBatchOpcode::VERIFY_BATCH;
 use openvm_poseidon2_air::{Poseidon2Config, Poseidon2SubAir, Poseidon2SubChip};
-use openvm_stark_backend::p3_field::{Field, FieldAlgebra, PrimeField32};
 
-use crate::{
-    verify_batch::{
-        air::{VerifyBatchAir, VerifyBatchBus},
-        CHUNK,
-    },
-    FieldExtension, EXT_DEG,
+use crate::verify_batch::{
+    air::{VerifyBatchAir, VerifyBatchBus},
+    CHUNK,
 };
 
 pub struct VerifyBatchRecord<F: Field> {
-    initial_state: ExecutionState<u32>,
+    from_state: ExecutionState<u32>,
     instruction: Instruction<F>,
     dim_base_pointer: F,
     opened_base_pointer: F,
@@ -29,10 +27,11 @@ pub struct VerifyBatchRecord<F: Field> {
     sibling_base_pointer: F,
     index_base_pointer: F,
     commit_pointer: F,
-    dim_read: RecordId,
-    opened_read: RecordId,
-    sibling_read: RecordId,
-    index_read: RecordId,
+    dim_base_pointer_read: RecordId,
+    opened_base_pointer_and_length_read: RecordId,
+    sibling_base_pointer_read: RecordId,
+    index_base_pointer_read: RecordId,
+    commit_pointer_read: RecordId,
     commit_read: RecordId,
     initial_height: usize,
     top_level: Vec<TopLevelRecord<F>>,
@@ -42,7 +41,7 @@ struct TopLevelRecord<F: Field> {
     // must be present in first record
     incorporate_row: Option<IncorporateRowRecord<F>>,
     // must be present in all bust last record
-    incorporate_sibling_record: Option<IncorporateSiblingRecord<F>>,
+    incorporate_sibling: Option<IncorporateSiblingRecord<F>>,
 }
 
 struct IncorporateSiblingRecord<F: Field> {
@@ -132,15 +131,16 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
             ..
         } = instruction;
 
-        let (dim_read, dim_base_pointer) = memory.read_cell(address_space, dim_register);
-        let (opened_read, [opened_base_pointer, opened_len]) =
+        let (dim_base_pointer_read, dim_base_pointer) = memory.read_cell(address_space, dim_register);
+        let (opened_base_pointer_and_length_read, [opened_base_pointer, opened_length]) =
             memory.read(address_space, opened_register);
-        let (sibling_read, sibling_base_pointer) =
+        let (sibling_base_pointer_read, sibling_base_pointer) =
             memory.read_cell(address_space, sibling_register);
-        let (index_read, index_base_pointer) = memory.read_cell(address_space, index_register);
-        let (commit_read, commit_pointer) = memory.read_cell(address_space, commit_register);
+        let (index_base_pointer_read, index_base_pointer) = memory.read_cell(address_space, index_register);
+        let (commit_pointer_read, commit_pointer) = memory.read_cell(address_space, commit_register);
+        let (commit_read, commit) = memory.read(address_space, commit_pointer);
 
-        let opened_len = opened_len.as_canonical_usize();
+        let opened_length = opened_length.as_canonical_usize();
 
         let initial_height = memory.unsafe_read_cell(address_space, dim_base_pointer).as_canonical_u32();
         let mut height = initial_height;
@@ -151,7 +151,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
         let mut root = [F::ZERO; CHUNK];
 
         while height >= 1 {
-            let incorporate_row = if opened_index < opened_len
+            let incorporate_row = if opened_index < opened_length
                 && memory.unsafe_read_cell(
                     address_space,
                     dim_base_pointer + F::from_canonical_usize(opened_index),
@@ -169,7 +169,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                 
                 let mut rolling_hash = [F::ZERO; 2 * CHUNK];
                 
-                while opened_index < opened_len
+                while opened_index < opened_length
                     && memory.unsafe_read_cell(
                     address_space,
                     dim_base_pointer + F::from_canonical_usize(opened_index),
@@ -179,7 +179,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     for i in 0..CHUNK {
                         let read_row_pointer_and_length = if row_pointer == row_end {
                             opened_index += 1;
-                            if opened_index == opened_len || memory.unsafe_read_cell(
+                            if opened_index == opened_length || memory.unsafe_read_cell(
                                 address_space,
                                 dim_base_pointer + F::from_canonical_u32(opened_index),
                             ) != F::from_canonical_u32(height) {
@@ -239,62 +239,69 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                 None
             };
 
+            let incorporate_sibling = if height == 0 {
+                None
+            } else {
+                for _ in 0..6 {
+                    memory.increment_timestamp();
+                }
+
+                let (read_root_is_on_right, root_is_on_right) = memory.read_cell(address_space, index_base_pointer + F::from_canonical_usize(proof_index));
+                let root_is_on_right = root_is_on_right == F::ONE;
+
+                let (read_sibling_array_start, sibling_array_start) = memory.unsafe_read_cell(address_space, sibling_base_pointer + F::from_canonical_usize(proof_index));
+                let sibling_array_start = sibling_array_start.as_canonical_u32() as usize;
+
+                let mut sibling = [F::ZERO; CHUNK];
+                let mut reads = vec![];
+                for i in 0..CHUNK {
+                    let (read, value) = memory.read_cell(address_space, sibling_base_pointer + F::from_canonical_usize(sibling_array_start + i));
+                    sibling[i] = value;
+                    reads.push(read);
+                }
+
+                root = if root_is_on_right {
+                    self.compress(sibling, root)
+                } else {
+                    self.compress(root, sibling)
+                };
+
+                Some(IncorporateSiblingRecord {
+                    read_sibling_array_start,
+                    read_root_is_on_right,
+                    sibling,
+                    reads,
+                })
+            };
+            
+            top_level.push(TopLevelRecord {
+                incorporate_row,
+                incorporate_sibling,
+            });
+
             height /= 2;
             proof_index += 1;
         }
-
-        let alpha_read = memory.read(addr_space, alpha_ptr);
-        let length_read = memory.read_cell(addr_space, length_ptr);
-        let a_ptr_read = memory.read_cell(addr_space, a_ptr_ptr);
-        let b_ptr_read = memory.read_cell(addr_space, b_ptr_ptr);
-
-        let alpha = alpha_read.1;
-        let alpha_pow_original = from_fn(|i| {
-            memory.unsafe_read_cell(addr_space, alpha_pow_ptr + F::from_canonical_usize(i))
-        });
-        let mut alpha_pow = alpha_pow_original;
-        let length = length_read.1.as_canonical_u32() as usize;
-        let a_ptr = a_ptr_read.1;
-        let b_ptr = b_ptr_read.1;
-
-        let mut a_reads = Vec::with_capacity(length);
-        let mut b_reads = Vec::with_capacity(length);
-        let mut result = [F::ZERO; EXT_DEG];
-
-        for i in 0..length {
-            let a_read = memory.read_cell(addr_space, a_ptr + F::from_canonical_usize(i));
-            let b_read = memory.read(addr_space, b_ptr + F::from_canonical_usize(4 * i));
-            a_reads.push(a_read);
-            b_reads.push(b_read);
-            let a = a_read.1;
-            let b = b_read.1;
-            result = FieldExtension::add(
-                result,
-                FieldExtension::multiply(FieldExtension::subtract(b, elem_to_ext(a)), alpha_pow),
-            );
-            alpha_pow = FieldExtension::multiply(alpha, alpha_pow);
-        }
-
-        let (alpha_pow_write, prev_data) = memory.write(addr_space, alpha_pow_ptr, alpha_pow);
-        debug_assert_eq!(prev_data, alpha_pow_original);
-        let (result_write, _) = memory.write(addr_space, result_ptr, result);
-
+        
+        assert_eq!(commit, root);
         self.records.push(VerifyBatchRecord {
-            pc: F::from_canonical_u32(from_state.pc),
-            start_timestamp: F::from_canonical_u32(from_state.timestamp),
-            instruction: instruction.clone(),
-            alpha_read: alpha_read.0,
-            length_read: length_read.0,
-            a_ptr_read: a_ptr_read.0,
-            b_ptr_read: b_ptr_read.0,
-            a_reads: a_reads.into_iter().map(|r| r.0).collect(),
-            b_reads: b_reads.into_iter().map(|r| r.0).collect(),
-            alpha_pow_original,
-            alpha_pow_write,
-            result_write,
+            from_state,
+            instruction,
+            dim_base_pointer,
+            opened_base_pointer,
+            opened_length,
+            sibling_base_pointer,
+            index_base_pointer,
+            commit_pointer,
+            dim_base_pointer_read,
+            opened_base_pointer_and_length_read,
+            sibling_base_pointer_read,
+            index_base_pointer_read,
+            commit_pointer_read,
+            commit_read,
+            initial_height,
+            top_level,
         });
-
-        self.height += length;
 
         Ok(ExecutionState {
             pc: from_state.pc + DEFAULT_PC_STEP,
@@ -303,7 +310,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
     }
 
     fn get_opcode_name(&self, opcode: usize) -> String {
-        assert_eq!(opcode, (FRI_REDUCED_OPENING as usize) + self.air.offset);
-        String::from("FRI_REDUCED_OPENING")
+        assert_eq!(opcode, (VERIFY_BATCH as usize) + self.air.offset);
+        String::from("VERIFY_BATCH")
     }
 }

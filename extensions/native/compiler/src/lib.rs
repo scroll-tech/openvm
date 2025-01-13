@@ -150,3 +150,16 @@ pub enum FriOpcode {
     /// per column polynomial, per opening point
     FRI_REDUCED_OPENING,
 }
+
+/// Opcodes for verify batch.
+#[derive(
+    Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, EnumCount, EnumIter, FromRepr, UsizeOpcode,
+)]
+#[opcode_offset = 0x170]
+#[repr(usize)]
+#[allow(non_camel_case_types)]
+pub enum VerifyBatchOpcode {
+    /// In FRI pcs opening verification, the reduced opening polynomial is computed one evaluation
+    /// per column polynomial, per opening point
+    VERIFY_BATCH,
+}
