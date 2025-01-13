@@ -19,65 +19,75 @@ use crate::verify_batch::{
 };
 
 pub struct VerifyBatchRecord<F: Field> {
-    from_state: ExecutionState<u32>,
-    instruction: Instruction<F>,
-    dim_base_pointer: F,
-    opened_base_pointer: F,
-    opened_length: usize,
-    sibling_base_pointer: F,
-    index_base_pointer: F,
-    commit_pointer: F,
-    dim_base_pointer_read: RecordId,
-    opened_base_pointer_and_length_read: RecordId,
-    sibling_base_pointer_read: RecordId,
-    index_base_pointer_read: RecordId,
-    commit_pointer_read: RecordId,
-    commit_read: RecordId,
-    initial_height: usize,
-    top_level: Vec<TopLevelRecord<F>>,
+    pub from_state: ExecutionState<u32>,
+    pub instruction: Instruction<F>,
+    
+    pub dim_base_pointer: F,
+    pub opened_base_pointer: F,
+    pub opened_length: usize,
+    pub sibling_base_pointer: F,
+    pub index_base_pointer: F,
+    pub commit_pointer: F,
+    
+    pub dim_base_pointer_read: RecordId,
+    pub opened_base_pointer_and_length_read: RecordId,
+    pub sibling_base_pointer_read: RecordId,
+    pub index_base_pointer_read: RecordId,
+    pub commit_pointer_read: RecordId,
+    
+    pub commit_read: RecordId,
+    pub initial_height: usize,
+    pub top_level: Vec<TopLevelRecord<F>>,
 }
 
-struct TopLevelRecord<F: Field> {
+impl <F: Field> VerifyBatchRecord<F> {
+    pub fn address_space(&self) -> usize {
+        self.instruction.f.as_canonical_u32() as usize
+    }
+}
+
+pub(super) struct TopLevelRecord<F: Field> {
     // must be present in first record
-    incorporate_row: Option<IncorporateRowRecord<F>>,
+    pub incorporate_row: Option<IncorporateRowRecord<F>>,
     // must be present in all bust last record
-    incorporate_sibling: Option<IncorporateSiblingRecord<F>>,
+    pub incorporate_sibling: Option<IncorporateSiblingRecord<F>>,
 }
 
-struct IncorporateSiblingRecord<F: Field> {
-    read_sibling_array_start: RecordId,
-    read_root_is_on_right: RecordId,
-    sibling: [F; CHUNK],
-    reads: [RecordId; CHUNK],
+pub(super) struct IncorporateSiblingRecord<F: Field> {
+    pub read_sibling_array_start: RecordId,
+    pub read_root_is_on_right: RecordId,
+    pub root_is_on_right: bool,
+    pub sibling: [F; CHUNK],
+    pub reads: [RecordId; CHUNK],
 }
 
-struct IncorporateRowRecord<F: Field> {
-    chunks: Vec<InsideRowRecord<F>>,
-    initial_opened_index: usize,
-    final_opened_index: usize,
-    initial_height_read: RecordId,
-    final_height_read: RecordId,
+pub(super) struct IncorporateRowRecord<F: Field> {
+    pub chunks: Vec<InsideRowRecord<F>>,
+    pub initial_opened_index: usize,
+    pub final_opened_index: usize,
+    pub initial_height_read: RecordId,
+    pub final_height_read: RecordId,
 }
 
-struct InsideRowRecord<F: Field> {
-    cells: Vec<CellRecord>,
-    chunk: [F; CHUNK],
+pub(super) struct InsideRowRecord<F: Field> {
+    pub cells: Vec<CellRecord>,
+    pub chunk: [F; CHUNK],
 }
 
-struct CellRecord {
-    read: RecordId,
-    opened_index: usize,
-    read_row_pointer_and_length: Option<RecordId>,
-    row_pointer: usize,
-    row_end: usize,
+pub(super) struct CellRecord {
+    pub read: RecordId,
+    pub opened_index: usize,
+    pub read_row_pointer_and_length: Option<RecordId>,
+    pub row_pointer: usize,
+    pub row_end: usize,
 }
 
 pub struct VerifyBatchChip<F: Field, const SBOX_REGISTERS: usize> {
     air: VerifyBatchAir<F, SBOX_REGISTERS>,
-    records: Vec<VerifyBatchRecord<F>>,
-    height: usize,
+    pub(super) records: Vec<VerifyBatchRecord<F>>,
+    pub(super) height: usize,
     offline_memory: Arc<Mutex<OfflineMemory<F>>>,
-    subchip: Poseidon2SubChip<F, SBOX_REGISTERS>
+    pub(super) subchip: Poseidon2SubChip<F, SBOX_REGISTERS>,
 }
 
 impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGISTERS> {
@@ -209,6 +219,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                         cells,
                         chunk,
                     });
+                    self.height += 1;
                     for i in 0..CHUNK {
                         rolling_hash[i] = chunk[i];
                     }
@@ -228,6 +239,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     self.compress(root, hash)
                 };
                 
+                self.height += 1;
                 Some(IncorporateRowRecord {
                     chunks,
                     initial_opened_index,
@@ -266,9 +278,11 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     self.compress(root, sibling)
                 };
 
+                self.height += 1;
                 Some(IncorporateSiblingRecord {
                     read_sibling_array_start,
                     read_root_is_on_right,
+                    root_is_on_right,
                     sibling,
                     reads,
                 })

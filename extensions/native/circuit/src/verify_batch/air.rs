@@ -142,6 +142,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             opened_base_pointer,
             initial_opened_index,
             cells[CHUNK - 1].opened_index,
+            address_space,
             left_output,
         );
 
@@ -339,6 +340,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         when_top_level_not_end.assert_eq(next.index_base_pointer, index_base_pointer);
         when_top_level_not_end.assert_eq(next.start_timestamp, end_timestamp);
         when_top_level_not_end.assert_eq(next.opened_length, opened_length);
+        when_top_level_not_end.assert_eq(next.address_space, address_space);
         when_top_level_not_end
             .assert_eq(next.initial_opened_index, final_opened_index + AB::F::ONE);
 
@@ -383,6 +385,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             opened_base_pointer,
             initial_opened_index,
             final_opened_index,
+            address_space,
             row_hash,
         );
 
@@ -485,6 +488,7 @@ impl VerifyBatchBus {
         opened_base_pointer: impl Into<AB::Expr>,
         initial_opened_index: impl Into<AB::Expr>,
         final_opened_index: impl Into<AB::Expr>,
+        address_space: impl Into<AB::Expr>,
         hash: [impl Into<AB::Expr>; CHUNK],
     ) {
         let mut fields = vec![
@@ -493,6 +497,7 @@ impl VerifyBatchBus {
             opened_base_pointer.into(),
             initial_opened_index.into(),
             final_opened_index.into(),
+            address_space.into(),
         ];
         fields.extend(hash.into_iter().map(Into::into));
         builder.push_interaction(
