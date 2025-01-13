@@ -7,7 +7,7 @@ use openvm_stark_backend::{
     p3_matrix::Matrix,
     rap::{BaseAirWithPublicValues, PartitionedBaseAir},
 };
-
+use openvm_stark_backend::interaction::InteractionType;
 use openvm_circuit::{
     arch::{ExecutionBridge, ExecutionState},
     system::memory::{MemoryAddress, offline_checker::MemoryBridge},
@@ -487,6 +487,20 @@ impl VerifyBatchBus {
         final_opened_index: impl Into<AB::Expr>,
         hash: [impl Into<AB::Expr>; CHUNK],
     ) {
+        let mut fields = vec![
+            start_timestamp.into(),
+            end_timestamp.into(),
+            opened_base_pointer.into(),
+            initial_opened_index.into(),
+            final_opened_index.into(),
+        ];
+        fields.extend(hash.into_iter().map(Into::into));
+        builder.push_interaction(
+            self.0,
+            fields,
+            multiplicity.into(),
+            if send { InteractionType::Send } else { InteractionType::Receive },
+        );
     }
 }
 
