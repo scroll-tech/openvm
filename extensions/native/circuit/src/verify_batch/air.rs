@@ -1,18 +1,21 @@
-use openvm_stark_backend::p3_field::{Field, FieldAlgebra};
-use openvm_circuit::arch::{ExecutionBridge, ExecutionState};
-use openvm_circuit::system::memory::offline_checker::MemoryBridge;
-use std::sync::Arc;
-use openvm_poseidon2_air::{BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS, Poseidon2SubAir};
-use openvm_stark_backend::rap::{BaseAirWithPublicValues, PartitionedBaseAir};
-use openvm_stark_backend::p3_air::{Air, AirBuilder, BaseAir};
-use openvm_stark_backend::interaction::InteractionBuilder;
-use openvm_circuit::system::memory::MemoryAddress;
+use std::{borrow::Borrow, sync::Arc};
+
+use openvm_circuit::{
+    arch::{ExecutionBridge, ExecutionState},
+    system::memory::{offline_checker::MemoryBridge, MemoryAddress},
+};
 use openvm_circuit_primitives::utils::not;
 use openvm_native_compiler::FriOpcode::FRI_REDUCED_OPENING;
-use openvm_stark_backend::p3_matrix::Matrix;
-use std::borrow::Borrow;
-use crate::verify_batch::CHUNK;
-use crate::verify_batch::columns::VerifyBatchCols;
+use openvm_poseidon2_air::{Poseidon2SubAir, BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS};
+use openvm_stark_backend::{
+    interaction::InteractionBuilder,
+    p3_air::{Air, AirBuilder, BaseAir},
+    p3_field::{Field, FieldAlgebra},
+    p3_matrix::Matrix,
+    rap::{BaseAirWithPublicValues, PartitionedBaseAir},
+};
+
+use crate::verify_batch::{columns::VerifyBatchCols, CHUNK};
 
 #[derive(Clone, Debug)]
 pub struct VerifyBatchAir<F: Field, const SBOX_REGISTERS: usize> {
@@ -92,10 +95,12 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
         let left_input = std::array::from_fn::<_, CHUNK, _>(|i| inner.inputs[i]);
         let right_input = std::array::from_fn::<_, CHUNK, _>(|i| inner.inputs[i + CHUNK]);
-        let left_output =
-            std::array::from_fn::<_, CHUNK, _>(|i| inner.ending_full_rounds[BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS - 1].post[i]);
-        let right_output =
-            std::array::from_fn::<_, CHUNK, _>(|i| inner.ending_full_rounds[BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS - 1].post[i + CHUNK]);
+        let left_output = std::array::from_fn::<_, CHUNK, _>(|i| {
+            inner.ending_full_rounds[BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS - 1].post[i]
+        });
+        let right_output = std::array::from_fn::<_, CHUNK, _>(|i| {
+            inner.ending_full_rounds[BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS - 1].post[i + CHUNK]
+        });
         let next_left_input = std::array::from_fn::<_, CHUNK, _>(|i| next.inner.inputs[i]);
         let next_right_input = std::array::from_fn::<_, CHUNK, _>(|i| next.inner.inputs[i + CHUNK]);
 
@@ -247,7 +252,10 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
         //// top level constraints
 
-        builder.when(end.clone()).when(next.incorporate_row + next.incorporate_sibling).assert_eq(next.proof_index, AB::F::ZERO);
+        builder
+            .when(end.clone())
+            .when(next.incorporate_row + next.incorporate_sibling)
+            .assert_eq(next.proof_index, AB::F::ZERO);
 
         let timestamp_after_end_operations = start_timestamp + AB::F::from_canonical_usize(5 + 1);
 
@@ -255,19 +263,25 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .when(end.clone())
             .when(next.incorporate_row)
             .assert_eq(next.initial_opened_index, AB::F::ZERO);
-        self.execution_bridge.execute_and_increment_pc(
-            AB::Expr::from_canonical_usize(FRI_REDUCED_OPENING as usize + self.offset),
-            [dim_register, opened_register, sibling_register, index_register, commit_register, address_space],
-            ExecutionState::new(pc, very_first_timestamp),
-            end_timestamp - very_first_timestamp,
-        ).eval(builder, end_top_level);
+        self.execution_bridge
+            .execute_and_increment_pc(
+                AB::Expr::from_canonical_usize(FRI_REDUCED_OPENING as usize + self.offset),
+                [
+                    dim_register,
+                    opened_register,
+                    sibling_register,
+                    index_register,
+                    commit_register,
+                    address_space,
+                ],
+                ExecutionState::new(pc, very_first_timestamp),
+                end_timestamp - very_first_timestamp,
+            )
+            .eval(builder, end_top_level);
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(
-                    address_space,
-                    dim_register,
-                ),
+                MemoryAddress::new(address_space, dim_register),
                 [dim_base_pointer],
                 start_timestamp,
                 &dim_base_pointer_read,
@@ -275,10 +289,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .eval(builder, end_top_level);
         self.memory_bridge
             .read(
-                MemoryAddress::new(
-                    address_space,
-                    opened_register,
-                ),
+                MemoryAddress::new(address_space, opened_register),
                 [opened_base_pointer, opened_length],
                 start_timestamp + AB::F::ONE,
                 &opened_base_pointer_and_length_read,
@@ -286,10 +297,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .eval(builder, end_top_level);
         self.memory_bridge
             .read(
-                MemoryAddress::new(
-                    address_space,
-                    sibling_register,
-                ),
+                MemoryAddress::new(address_space, sibling_register),
                 [sibling_base_pointer],
                 start_timestamp + AB::F::TWO,
                 &sibling_base_pointer_read,
@@ -297,10 +305,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .eval(builder, end_top_level);
         self.memory_bridge
             .read(
-                MemoryAddress::new(
-                    address_space,
-                    index_register,
-                ),
+                MemoryAddress::new(address_space, index_register),
                 [index_base_pointer],
                 start_timestamp + AB::F::from_canonical_usize(3),
                 &index_base_pointer_read,
@@ -308,59 +313,65 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .eval(builder, end_top_level);
         self.memory_bridge
             .read(
-                MemoryAddress::new(
-                    address_space,
-                    commit_register,
-                ),
+                MemoryAddress::new(address_space, commit_register),
                 [commit_pointer],
                 start_timestamp + AB::F::from_canonical_usize(4),
-                &commit_pointer_read
+                &commit_pointer_read,
             )
             .eval(builder, end_top_level);
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(
-                    address_space,
-                    commit_pointer,
-                ),
+                MemoryAddress::new(address_space, commit_pointer),
                 left_output,
                 start_timestamp + AB::F::from_canonical_usize(5),
                 &commit_read,
             )
             .eval(builder, end_top_level);
 
-        let mut when_top_level_not_end = builder
-            .when(incorporate_row + incorporate_sibling - end_top_level);
+        let mut when_top_level_not_end =
+            builder.when(incorporate_row + incorporate_sibling - end_top_level);
 
-        when_top_level_not_end
-            .assert_eq(next.dim_base_pointer, dim_base_pointer);
-        when_top_level_not_end
-            .assert_eq(next.opened_base_pointer, opened_base_pointer);
-        when_top_level_not_end
-            .assert_eq(next.sibling_base_pointer, sibling_base_pointer);
-        when_top_level_not_end
-            .assert_eq(next.index_base_pointer, index_base_pointer);
-        when_top_level_not_end
-            .assert_eq(next.start_timestamp, end_timestamp);
-        when_top_level_not_end
-            .assert_eq(next.opened_length, opened_length);
+        when_top_level_not_end.assert_eq(next.dim_base_pointer, dim_base_pointer);
+        when_top_level_not_end.assert_eq(next.opened_base_pointer, opened_base_pointer);
+        when_top_level_not_end.assert_eq(next.sibling_base_pointer, sibling_base_pointer);
+        when_top_level_not_end.assert_eq(next.index_base_pointer, index_base_pointer);
+        when_top_level_not_end.assert_eq(next.start_timestamp, end_timestamp);
+        when_top_level_not_end.assert_eq(next.opened_length, opened_length);
         when_top_level_not_end
             .assert_eq(next.initial_opened_index, final_opened_index + AB::F::ONE);
 
-        builder.when(incorporate_sibling - end_top_level).assert_eq(next.height * AB::F::TWO, height);
-        builder.when(incorporate_row - end_top_level).assert_eq(next.height, height);
-        builder.when(incorporate_sibling - end_top_level).assert_eq(next.proof_index, proof_index + AB::F::ONE);
-        builder.when(incorporate_row - end_top_level).assert_eq(next.proof_index, proof_index);
+        builder
+            .when(incorporate_sibling - end_top_level)
+            .assert_eq(next.height * AB::F::TWO, height);
+        builder
+            .when(incorporate_row - end_top_level)
+            .assert_eq(next.height, height);
+        builder
+            .when(incorporate_sibling - end_top_level)
+            .assert_eq(next.proof_index, proof_index + AB::F::ONE);
+        builder
+            .when(incorporate_row - end_top_level)
+            .assert_eq(next.proof_index, proof_index);
 
-        builder.when(end_top_level).when(incorporate_row).assert_eq(height, AB::F::ONE);
-        builder.when(end_top_level).when(incorporate_sibling).assert_eq(height, AB::F::TWO);
+        builder
+            .when(end_top_level)
+            .when(incorporate_row)
+            .assert_eq(height, AB::F::ONE);
+        builder
+            .when(end_top_level)
+            .when(incorporate_sibling)
+            .assert_eq(height, AB::F::TWO);
 
         // incorporate row
 
-        builder.when(incorporate_row - end_top_level).assert_one(next.incorporate_sibling);
+        builder
+            .when(incorporate_row - end_top_level)
+            .assert_one(next.incorporate_sibling);
 
-        let row_hash = std::array::from_fn(|i| (start * left_output[i]) + ((AB::Expr::ONE - start) * right_input[i]));
+        let row_hash = std::array::from_fn(|i| {
+            (start * left_output[i]) + ((AB::Expr::ONE - start) * right_input[i])
+        });
 
         self.internal_bus.interact(
             builder,
@@ -375,17 +386,20 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         );
 
         for i in 0..CHUNK {
-            builder.when(AB::Expr::ONE - end.clone()).when(next.incorporate_row).assert_eq(next_left_input[i], left_output[i]);
+            builder
+                .when(AB::Expr::ONE - end.clone())
+                .when(next.incorporate_row)
+                .assert_eq(next_left_input[i], left_output[i]);
         }
 
-        builder.when(end_top_level).when(incorporate_row).assert_eq(final_opened_index, opened_length - AB::F::ONE);
+        builder
+            .when(end_top_level)
+            .when(incorporate_row)
+            .assert_eq(final_opened_index, opened_length - AB::F::ONE);
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(
-                    address_space,
-                    dim_base_pointer + initial_opened_index,
-                ),
+                MemoryAddress::new(address_space, dim_base_pointer + initial_opened_index),
                 [height],
                 end_timestamp - AB::F::TWO,
                 &read_initial_height_or_root_is_on_right,
@@ -393,10 +407,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .eval(builder, incorporate_row);
         self.memory_bridge
             .read(
-                MemoryAddress::new(
-                    address_space,
-                    dim_base_pointer + final_opened_index,
-                ),
+                MemoryAddress::new(address_space, dim_base_pointer + final_opened_index),
                 [height],
                 end_timestamp - AB::F::ONE,
                 &read_initial_height_or_root_is_on_right,
@@ -405,17 +416,21 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
         // incorporate sibling
 
-        builder.when(incorporate_sibling - end_top_level).assert_one(next.incorporate_row + next.incorporate_sibling);
-        builder.when(end_top_level).when(incorporate_sibling).assert_eq(initial_opened_index, opened_length);
+        builder
+            .when(incorporate_sibling - end_top_level)
+            .assert_one(next.incorporate_row + next.incorporate_sibling);
+        builder
+            .when(end_top_level)
+            .when(incorporate_sibling)
+            .assert_eq(initial_opened_index, opened_length);
 
-        builder.when(incorporate_sibling).assert_eq(final_opened_index + AB::F::ONE, initial_opened_index);
+        builder
+            .when(incorporate_sibling)
+            .assert_eq(final_opened_index + AB::F::ONE, initial_opened_index);
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(
-                    address_space,
-                    index_base_pointer + proof_index,
-                ),
+                MemoryAddress::new(address_space, index_base_pointer + proof_index),
                 [root_is_on_right],
                 timestamp_after_end_operations.clone(),
                 &read_initial_height_or_root_is_on_right,
@@ -423,34 +438,38 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .eval(builder, incorporate_row);
         self.memory_bridge
             .read(
-                MemoryAddress::new(
-                    address_space,
-                    sibling_base_pointer + proof_index,
-                ),
+                MemoryAddress::new(address_space, sibling_base_pointer + proof_index),
                 [sibling_array_start],
                 timestamp_after_end_operations.clone() + AB::F::ONE,
-                &read_final_height_or_sibling_array_start
+                &read_final_height_or_sibling_array_start,
             )
             .eval(builder, incorporate_row);
 
         for i in 0..CHUNK {
-            builder.when(next.incorporate_sibling).when(next.root_is_on_right).assert_eq(next_right_input[i], left_output[i]);
-            builder.when(next.incorporate_sibling).when(AB::Expr::ONE - next.root_is_on_right).assert_eq(next_left_input[i], left_output[i]);
+            builder
+                .when(next.incorporate_sibling)
+                .when(next.root_is_on_right)
+                .assert_eq(next_right_input[i], left_output[i]);
+            builder
+                .when(next.incorporate_sibling)
+                .when(AB::Expr::ONE - next.root_is_on_right)
+                .assert_eq(next_left_input[i], left_output[i]);
 
             self.memory_bridge
                 .read(
-                    MemoryAddress::new(
-                        address_space,
-                        sibling_array_start + proof_index,
-                    ),
-                    [(root_is_on_right * left_input[i]) + ((AB::Expr::ONE - root_is_on_right) * right_input[i])],
+                    MemoryAddress::new(address_space, sibling_array_start + proof_index),
+                    [(root_is_on_right * left_input[i])
+                        + ((AB::Expr::ONE - root_is_on_right) * right_input[i])],
                     timestamp_after_end_operations.clone() + AB::F::from_canonical_usize(2 + i),
                     &read_initial_height_or_root_is_on_right,
                 )
                 .eval(builder, incorporate_row);
         }
 
-        builder.assert_eq(end_timestamp, timestamp_after_end_operations + AB::F::from_canonical_usize(2 + CHUNK));
+        builder.assert_eq(
+            end_timestamp,
+            timestamp_after_end_operations + AB::F::from_canonical_usize(2 + CHUNK),
+        );
     }
 }
 

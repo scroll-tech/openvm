@@ -3,43 +3,40 @@ use std::{
     sync::Arc,
 };
 
+use chip::{VerifyBatchChip, VerifyBatchRecord};
+use columns::VerifyBatchCols;
 use openvm_circuit::{
     arch::InstructionExecutor,
-    system::memory::{
-        MemoryAuxColsFactory, OfflineMemory,
-    },
+    system::memory::{MemoryAuxColsFactory, OfflineMemory},
 };
 use openvm_circuit_primitives::{
-    is_zero::IsZeroSubAir,
-    SubAir,
-    TraceSubRowGenerator, utils::next_power_of_two_or_zero,
+    is_zero::IsZeroSubAir, utils::next_power_of_two_or_zero, SubAir, TraceSubRowGenerator,
 };
 use openvm_instructions::instruction::Instruction;
 use openvm_stark_backend::{
-    Chip,
-    ChipUsageGetter,
     config::{StarkGenericConfig, Val},
     interaction::InteractionBuilder,
     p3_air::{Air, AirBuilder, BaseAir},
     p3_field::{Field, FieldAlgebra, PrimeField32},
     p3_matrix::{dense::RowMajorMatrix, Matrix},
     p3_maybe_rayon::prelude::*,
-    prover::types::AirProofInput, rap::{AnyRap, BaseAirWithPublicValues, PartitionedBaseAir},
+    prover::types::AirProofInput,
+    rap::{AnyRap, BaseAirWithPublicValues, PartitionedBaseAir},
+    Chip, ChipUsageGetter,
 };
-use chip::{VerifyBatchChip, VerifyBatchRecord};
-use columns::VerifyBatchCols;
-use super::field_extension::{EXT_DEG, FieldExtension};
+
+use super::field_extension::{FieldExtension, EXT_DEG};
 use crate::NATIVE_POSEIDON2_CHUNK_SIZE;
 
+mod air;
+mod chip;
+mod columns;
 #[cfg(test)]
 mod tests;
-mod air;
-mod columns;
-mod chip;
 
 const CHUNK: usize = NATIVE_POSEIDON2_CHUNK_SIZE;
 
-impl<F: Field> ChipUsageGetter for VerifyBatchChip<F> {
+impl<F: Field, const SBO> ChipUsageGetter for VerifyBatchChip<F> {
     fn air_name(&self) -> String {
         "FriReducedOpeningAir".to_string()
     }

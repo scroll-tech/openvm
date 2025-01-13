@@ -9,11 +9,9 @@ use openvm_stark_backend::{
 };
 use openvm_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
 use rand::Rng;
-use crate::verify_batch::chip::VerifyBatchChip;
-use crate::verify_batch::columns::VerifyBatchCols;
-use super::{
-    elem_to_ext, EXT_DEG, super::field_extension::FieldExtension,
-};
+
+use super::{super::field_extension::FieldExtension, elem_to_ext, EXT_DEG};
+use crate::verify_batch::{chip::VerifyBatchChip, columns::VerifyBatchCols};
 
 fn compute_fri_mat_opening<F: Field>(
     alpha: [F; EXT_DEG],

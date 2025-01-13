@@ -1,6 +1,7 @@
 use openvm_circuit::system::memory::offline_checker::MemoryReadAuxCols;
 use openvm_circuit_primitives_derive::AlignedBorrow;
 use openvm_poseidon2_air::Poseidon2SubCols;
+
 use crate::verify_batch::CHUNK;
 
 #[repr(C)]
@@ -51,12 +52,12 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
     pub sibling_base_pointer_read: MemoryReadAuxCols<T, 1>,
     pub index_base_pointer_read: MemoryReadAuxCols<T, 1>,
     pub commit_pointer_read: MemoryReadAuxCols<T, 1>,
-    
+
     pub proof_index: T,
-    
+
     pub read_initial_height_or_root_is_on_right: MemoryReadAuxCols<T, 1>,
     pub read_final_height_or_sibling_array_start: MemoryReadAuxCols<T, 1>,
-    
+
     pub root_is_on_right: T,
     pub sibling_array_start: T,
 
