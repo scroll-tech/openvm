@@ -29,7 +29,7 @@ struct BlockData {
 }
 
 struct BlockStructure {
-    block_data: Vec<PagedVec<Option<BlockData>>>,
+    block_data: Vec<PagedVec<BlockData>>,
     as_offset: u32,
 }
 
@@ -46,33 +46,22 @@ impl BlockStructure {
             .iter()
             .enumerate()
             .flat_map(move |(as_idx, page)| {
-                page.iter()
-                    .filter(|&(_, x)| x.is_some())
-                    .map(move |(ptr_idx, block)| {
-                        (
-                            (as_idx as u32 + self.as_offset, ptr_idx as u32),
-                            block.unwrap(),
-                        )
-                    })
+                page.iter().map(move |(ptr_idx, block)| {
+                    ((as_idx as u32 + self.as_offset, ptr_idx as u32), block)
+                })
             })
     }
 
-    pub fn get(&self, address: &Address) -> Option<BlockData> {
+    pub fn get(&self, address: &Address) -> Option<&BlockData> {
         self.block_data[(address.0 - self.as_offset) as usize].get(address.1 as usize)
     }
 
     pub fn get_mut(&mut self, address: &Address) -> Option<&mut BlockData> {
-        if let Some(block) =
-            self.block_data[(address.0 - self.as_offset) as usize].get_mut(address.1 as usize)
-        {
-            block.as_mut()
-        } else {
-            None
-        }
+        self.block_data[(address.0 - self.as_offset) as usize].get_mut(address.1 as usize)
     }
 
     pub fn insert(&mut self, address: Address, data: BlockData) {
-        self.block_data[(address.0 - self.as_offset) as usize].set(address.1 as usize, Some(data));
+        self.block_data[(address.0 - self.as_offset) as usize].insert(address.1 as usize, data);
     }
 }
 
@@ -114,6 +103,7 @@ impl<F: PrimeField32> OfflineMemory<F> {
         config: MemoryConfig,
     ) -> Self {
         assert!(initial_block_size.is_power_of_two());
+        eprintln!("initial_block_size: {}", initial_block_size);
 
         Self {
             block_data: BlockStructure::new(
@@ -148,7 +138,7 @@ impl<F: PrimeField32> OfflineMemory<F> {
                 1 << config.as_height
             ];
         for ((addr_space, pointer), value) in memory_image {
-            paged_vec[(addr_space - config.as_offset) as usize].set(pointer as usize, value);
+            paged_vec[(addr_space - config.as_offset) as usize].insert(pointer as usize, value);
         }
         eprintln!(
             "- - - - - - - - - - - - - - - memory_image_to_paged_vec time: {:?}",
@@ -270,6 +260,7 @@ impl<F: PrimeField32> OfflineMemory<F> {
     ) -> (TimestampedEquipartition<F, N>, Vec<AccessAdapterRecord<F>>) {
         let start = std::time::Instant::now();
         let mut adapter_records = vec![];
+        eprintln!("- - - - - - - - - - - - - - - finalize start");
 
         // First make sure the partition we maintain in self.block_data is an equipartition.
         // Grab all aligned pointers that need to be re-accessed.
@@ -278,6 +269,17 @@ impl<F: PrimeField32> OfflineMemory<F> {
             .items()
             .map(|((address_space, pointer), _)| (address_space, (pointer / N as u32) * N as u32))
             .collect();
+        eprintln!(
+            "- - - - - - - - - - - - - - - to_access len: {}",
+            to_access.len()
+        );
+        eprintln!(
+            "- - - - - - - - - - - - - - - total data len: {:?}",
+            self.log
+                .iter()
+                .map(|x| x.as_ref().map_or(0, |y| y.data.len()))
+                .sum::<usize>()
+        );
 
         for &(address_space, pointer) in to_access.iter() {
             let block = self.block_data.get(&(address_space, pointer)).unwrap();
@@ -415,10 +417,13 @@ impl<F: PrimeField32> OfflineMemory<F> {
         self.split_to_make_boundary(address_space, pointer, records);
         self.split_to_make_boundary(address_space, pointer + size as u32, records);
 
-        let block_data = self
-            .block_data
-            .get(&(address_space, pointer))
-            .unwrap_or_else(|| Self::initial_block_data(pointer, self.initial_block_size));
+        if self.block_data.get(&(address_space, pointer)).is_none() {
+            self.block_data.insert(
+                (address_space, pointer),
+                Self::initial_block_data(pointer, self.initial_block_size),
+            );
+        }
+        let block_data = self.block_data.get(&(address_space, pointer)).unwrap();
 
         if block_data.pointer == pointer && block_data.size == size {
             return;
@@ -486,7 +491,7 @@ impl<F: PrimeField32> OfflineMemory<F> {
 
     fn block_containing(&mut self, address_space: u32, pointer: u32) -> BlockData {
         if let Some(block_data) = self.block_data.get(&(address_space, pointer)) {
-            block_data
+            *block_data
         } else {
             Self::initial_block_data(pointer, self.initial_block_size)
         }
@@ -502,7 +507,12 @@ impl<F: PrimeField32> OfflineMemory<F> {
     }
 
     pub fn get(&self, address_space: u32, pointer: u32) -> F {
-        self.data[(address_space - self.as_offset) as usize].get(pointer as usize)
+        if let Some(x) = self.data[(address_space - self.as_offset) as usize].get(pointer as usize)
+        {
+            *x
+        } else {
+            F::ZERO
+        }
     }
 
     fn range_array<const N: usize>(&self, address_space: u32, pointer: u32) -> [F; N] {

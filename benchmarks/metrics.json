@@ -1,0 +1,2331 @@
+{
+  "counter": [
+    {
+      "labels": [
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "9"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "3"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "PersistentBoundaryAir<8>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "PersistentBoundaryAir<8>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "6"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "PersistentBoundaryAir<8>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "3"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "MemoryMerkleAir<8>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "MemoryMerkleAir<8>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "40"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "MemoryMerkleAir<8>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "14"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "5"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "14"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "5"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "14"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "5"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<16>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<16>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "14"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<16>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "5"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<32>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<32>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "14"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<32>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "5"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<64>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<64>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "14"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<64>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "5"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "KeccakVmAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "KeccakVmAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "4571"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "KeccakVmAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "321"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32HintStoreAdapterAir, Rv32HintStoreCoreAir>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32HintStoreAdapterAir, Rv32HintStoreCoreAir>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "17"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32HintStoreAdapterAir, Rv32HintStoreCoreAir>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "15"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, DivRemCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, DivRemCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "88"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, DivRemCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "25"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, MulHCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, MulHCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "38"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, MulHCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "24"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, MultiplicationCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, MultiplicationCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "26"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, MultiplicationCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "19"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "RangeTupleCheckerAir<2>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "RangeTupleCheckerAir<2>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "RangeTupleCheckerAir<2>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32RdWriteAdapterAir, Rv32AuipcCoreAir>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32RdWriteAdapterAir, Rv32AuipcCoreAir>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "15"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32RdWriteAdapterAir, Rv32AuipcCoreAir>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32JalrAdapterAir, Rv32JalrCoreAir>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32JalrAdapterAir, Rv32JalrCoreAir>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "20"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32JalrAdapterAir, Rv32JalrCoreAir>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "16"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32CondRdWriteAdapterAir, Rv32JalLuiCoreAir>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32CondRdWriteAdapterAir, Rv32JalLuiCoreAir>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "22"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32CondRdWriteAdapterAir, Rv32JalLuiCoreAir>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "10"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BranchAdapterAir, BranchLessThanCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BranchAdapterAir, BranchLessThanCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "41"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BranchAdapterAir, BranchLessThanCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "13"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BranchAdapterAir, BranchEqualCoreAir<4>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BranchAdapterAir, BranchEqualCoreAir<4>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "25"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BranchAdapterAir, BranchEqualCoreAir<4>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32LoadStoreAdapterAir, LoadSignExtendCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32LoadStoreAdapterAir, LoadSignExtendCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "33"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32LoadStoreAdapterAir, LoadSignExtendCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "18"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32LoadStoreAdapterAir, LoadStoreCoreAir<4>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32LoadStoreAdapterAir, LoadStoreCoreAir<4>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "38"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32LoadStoreAdapterAir, LoadStoreCoreAir<4>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "17"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, ShiftCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, ShiftCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "90"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, ShiftCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "23"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, LessThanCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, LessThanCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "39"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, LessThanCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "17"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, BaseAluCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, BaseAluCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "43"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, BaseAluCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "19"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "BitwiseOperationLookupAir<8>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "BitwiseOperationLookupAir<8>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "BitwiseOperationLookupAir<8>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "5"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "3"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "Poseidon2PeripheryAir<BabyBearParameters>, 1>"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "Poseidon2PeripheryAir<BabyBearParameters>, 1>"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "286"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "Poseidon2PeripheryAir<BabyBearParameters>, 1>"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "quotient_deg",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "constraints",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "interactions",
+      "value": "1"
+    },
+    {
+      "labels": [],
+      "metric": "total_cycles",
+      "value": "4191033"
+    },
+    {
+      "labels": [],
+      "metric": "main_cells_used",
+      "value": "165014123"
+    },
+    {
+      "labels": [],
+      "metric": "num_segments",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "131072"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "2359296"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "10"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "ProgramAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "32"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "4"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmConnectorAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "PersistentBoundaryAir<8>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "131072"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "PersistentBoundaryAir<8>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "4194304"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "PersistentBoundaryAir<8>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "PersistentBoundaryAir<8>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "20"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "PersistentBoundaryAir<8>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "MemoryMerkleAir<8>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "131072"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "MemoryMerkleAir<8>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "6815744"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "MemoryMerkleAir<8>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "MemoryMerkleAir<8>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "32"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "MemoryMerkleAir<8>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "20"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "64"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "2240"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "11"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<2>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "24"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "32"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "1184"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "13"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<4>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "24"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "131072"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "5373952"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "17"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "AccessAdapterAir<8>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "24"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "KeccakVmAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "32"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "KeccakVmAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "142464"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "KeccakVmAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "KeccakVmAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "3164"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "KeccakVmAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "1288"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32HintStoreAdapterAir, Rv32HintStoreCoreAir>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "16384"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32HintStoreAdapterAir, Rv32HintStoreCoreAir>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "1015808"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32HintStoreAdapterAir, Rv32HintStoreCoreAir>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32HintStoreAdapterAir, Rv32HintStoreCoreAir>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "26"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32HintStoreAdapterAir, Rv32HintStoreCoreAir>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "36"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, DivRemCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "128"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, DivRemCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "20608"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, DivRemCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, DivRemCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "57"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, DivRemCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "104"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, MulHCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "256"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, MulHCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "35584"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, MulHCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, MulHCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "39"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, MulHCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "100"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, MultiplicationCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "65536"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, MultiplicationCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "7274496"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, MultiplicationCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, MultiplicationCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "31"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32MultAdapterAir, MultiplicationCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "80"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "RangeTupleCheckerAir<2>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "524288"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "RangeTupleCheckerAir<2>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "4718592"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "RangeTupleCheckerAir<2>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "RangeTupleCheckerAir<2>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "RangeTupleCheckerAir<2>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32RdWriteAdapterAir, Rv32AuipcCoreAir>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "65536"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32RdWriteAdapterAir, Rv32AuipcCoreAir>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "3211264"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32RdWriteAdapterAir, Rv32AuipcCoreAir>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32RdWriteAdapterAir, Rv32AuipcCoreAir>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "21"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32RdWriteAdapterAir, Rv32AuipcCoreAir>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "28"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32JalrAdapterAir, Rv32JalrCoreAir>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "131072"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32JalrAdapterAir, Rv32JalrCoreAir>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "8388608"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32JalrAdapterAir, Rv32JalrCoreAir>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32JalrAdapterAir, Rv32JalrCoreAir>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "28"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32JalrAdapterAir, Rv32JalrCoreAir>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "36"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32CondRdWriteAdapterAir, Rv32JalLuiCoreAir>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "131072"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32CondRdWriteAdapterAir, Rv32JalLuiCoreAir>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "8126464"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32CondRdWriteAdapterAir, Rv32JalLuiCoreAir>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32CondRdWriteAdapterAir, Rv32JalLuiCoreAir>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "18"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32CondRdWriteAdapterAir, Rv32JalLuiCoreAir>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "44"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BranchAdapterAir, BranchLessThanCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "262144"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BranchAdapterAir, BranchLessThanCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "23068672"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BranchAdapterAir, BranchLessThanCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BranchAdapterAir, BranchLessThanCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "32"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BranchAdapterAir, BranchLessThanCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "56"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BranchAdapterAir, BranchEqualCoreAir<4>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "524288"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BranchAdapterAir, BranchEqualCoreAir<4>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "38797312"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BranchAdapterAir, BranchEqualCoreAir<4>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BranchAdapterAir, BranchEqualCoreAir<4>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "26"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BranchAdapterAir, BranchEqualCoreAir<4>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "48"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32LoadStoreAdapterAir, LoadSignExtendCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "1024"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32LoadStoreAdapterAir, LoadSignExtendCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "113664"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32LoadStoreAdapterAir, LoadSignExtendCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32LoadStoreAdapterAir, LoadSignExtendCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "35"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32LoadStoreAdapterAir, LoadSignExtendCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "76"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32LoadStoreAdapterAir, LoadStoreCoreAir<4>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "2097152"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32LoadStoreAdapterAir, LoadStoreCoreAir<4>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "234881024"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32LoadStoreAdapterAir, LoadStoreCoreAir<4>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32LoadStoreAdapterAir, LoadStoreCoreAir<4>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "40"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32LoadStoreAdapterAir, LoadStoreCoreAir<4>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "72"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, ShiftCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "262144"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, ShiftCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "27525120"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, ShiftCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, ShiftCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "53"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, ShiftCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "52"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, LessThanCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "65536"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, LessThanCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "5046272"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, LessThanCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, LessThanCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "37"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, LessThanCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "40"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, BaseAluCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "2097152"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, BaseAluCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "243269632"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, BaseAluCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, BaseAluCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "36"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VmAirWrapper<Rv32BaseAluAdapterAir, BaseAluCoreAir<4, 8>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "80"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "BitwiseOperationLookupAir<8>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "65536"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "BitwiseOperationLookupAir<8>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "655360"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "BitwiseOperationLookupAir<8>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "3"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "BitwiseOperationLookupAir<8>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "BitwiseOperationLookupAir<8>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "512"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "9216"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "6"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "PhantomAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "12"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "Poseidon2PeripheryAir<BabyBearParameters>, 1>"
+        ]
+      ],
+      "metric": "rows",
+      "value": "16384"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "Poseidon2PeripheryAir<BabyBearParameters>, 1>"
+        ]
+      ],
+      "metric": "cells",
+      "value": "5046272"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "Poseidon2PeripheryAir<BabyBearParameters>, 1>"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "0"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "Poseidon2PeripheryAir<BabyBearParameters>, 1>"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "300"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "Poseidon2PeripheryAir<BabyBearParameters>, 1>"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "8"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "rows",
+      "value": "262144"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "cells",
+      "value": "2359296"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "prep_cols",
+      "value": "2"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "main_cols",
+      "value": "1"
+    },
+    {
+      "labels": [
+        [
+          "air_name",
+          "VariableRangeCheckerAir"
+        ]
+      ],
+      "metric": "perm_cols",
+      "value": "8"
+    },
+    {
+      "labels": [],
+      "metric": "total_cells",
+      "value": "632452480"
+    }
+  ],
+  "gauge": [
+    {
+      "labels": [],
+      "metric": "keygen_time_ms",
+      "value": "841"
+    },
+    {
+      "labels": [],
+      "metric": "commit_exe_time_ms",
+      "value": "79"
+    },
+    {
+      "labels": [],
+      "metric": "execute_time_ms",
+      "value": "398"
+    },
+    {
+      "labels": [],
+      "metric": "trace_gen_time_ms",
+      "value": "1834"
+    },
+    {
+      "labels": [],
+      "metric": "main_trace_commit_time_ms",
+      "value": "6602"
+    },
+    {
+      "labels": [],
+      "metric": "generate_perm_trace_time_ms",
+      "value": "2847"
+    },
+    {
+      "labels": [],
+      "metric": "perm_trace_commit_time_ms",
+      "value": "14315"
+    },
+    {
+      "labels": [],
+      "metric": "quotient_poly_compute_time_ms",
+      "value": "6407"
+    },
+    {
+      "labels": [],
+      "metric": "quotient_poly_commit_time_ms",
+      "value": "2563"
+    },
+    {
+      "labels": [],
+      "metric": "pcs_opening_time_ms",
+      "value": "8456"
+    },
+    {
+      "labels": [],
+      "metric": "stark_prove_excluding_trace_time_ms",
+      "value": "41195"
+    }
+  ]
+}

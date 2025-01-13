@@ -461,6 +461,7 @@ impl<F: PrimeField32> MemoryController<F> {
         let mut offline_memory = self.offline_memory.lock().unwrap();
         offline_memory.set_log_capacity(log.len());
 
+        eprintln!("- - - - - - - - - - - - - - - log len: {}", log.len());
         for entry in log {
             Self::replay_access(
                 entry,
@@ -519,6 +520,7 @@ impl<F: PrimeField32> MemoryController<F> {
         self.replay_access_log();
         let mut offline_memory = self.offline_memory.lock().unwrap();
 
+        let start = std::time::Instant::now();
         match &mut self.interface_chip {
             MemoryInterface::Volatile { boundary_chip } => {
                 let (final_memory, records) = offline_memory.finalize::<1>();
@@ -553,6 +555,10 @@ impl<F: PrimeField32> MemoryController<F> {
                 }));
             }
         };
+        eprintln!(
+            "- - - - - - - - - - - - - - - finalize and stuff: {:?}",
+            start.elapsed()
+        );
     }
 
     pub fn generate_air_proof_inputs<SC: StarkGenericConfig>(self) -> Vec<AirProofInput<SC>>

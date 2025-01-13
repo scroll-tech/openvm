@@ -3,10 +3,10 @@ use std::ops::Range;
 #[derive(Debug, Clone)]
 pub(crate) struct PagedVec<T> {
     page_size: usize,
-    pages: Vec<Option<Vec<T>>>,
+    pages: Vec<Option<Vec<Option<T>>>>,
 }
 
-impl<T: Default + Copy> PagedVec<T> {
+impl<T: Copy> PagedVec<T> {
     pub fn new(page_size: usize, num_pages: usize) -> Self {
         Self {
             page_size,
@@ -14,49 +14,54 @@ impl<T: Default + Copy> PagedVec<T> {
         }
     }
 
-    pub fn get(&self, index: usize) -> T {
+    pub fn get(&self, index: usize) -> Option<&T> {
         let page_idx = index / self.page_size;
         if let Some(page) = &self.pages[page_idx] {
-            page[index % self.page_size]
+            page[index % self.page_size].as_ref()
         } else {
-            T::default()
+            None
         }
     }
 
     pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
         let page_idx = index / self.page_size;
-        self.pages[page_idx]
-            .as_mut()
-            .map(|page| &mut page[index % self.page_size])
-    }
-
-    pub fn set(&mut self, index: usize, value: T) {
-        let page_idx = index / self.page_size;
         if let Some(page) = self.pages[page_idx].as_mut() {
-            page[index % self.page_size] = value;
+            page[index % self.page_size].as_mut()
         } else {
-            let page =
-                self.pages[page_idx].get_or_insert_with(|| vec![T::default(); self.page_size]);
-            page[index % self.page_size] = value;
+            None
         }
     }
 
-    pub fn get_range(&self, range: Range<usize>) -> Vec<T> {
-        let start_page_idx = range.start / self.page_size;
-        let end_page_idx = range.end / self.page_size;
-
-        if start_page_idx == end_page_idx {
-            if let Some(start_page) = &self.pages[start_page_idx] {
-                let i = range.start % self.page_size;
-                start_page[i..i + range.len()].to_vec()
-            } else {
-                vec![T::default(); range.len()]
-            }
-        } else {
-            // TODO: This can be more efficient by copying from two slices (but most queries should
-            // not be cross-page).
-            range.map(|i| self.get(i)).collect()
+    pub fn insert(&mut self, index: usize, value: T) -> Option<T> {
+        let page_idx = index / self.page_size;
+        if self.pages[page_idx].is_none() {
+            self.pages[page_idx] = Some(vec![None; self.page_size]);
         }
+        match self.pages[page_idx].as_mut() {
+            Some(page) => page[index % self.page_size].replace(value),
+            None => unreachable!(),
+        }
+    }
+}
+
+impl<T: Default + Copy> PagedVec<T> {
+    pub fn get_range(&self, range: Range<usize>) -> Vec<T> {
+        let mut result = Vec::with_capacity(range.len());
+        for page_idx in (range.start / self.page_size)..range.end.div_ceil(self.page_size) {
+            let in_page_start = (range.start - page_idx * self.page_size).max(0);
+            let in_page_end = (range.end - page_idx * self.page_size).min(self.page_size);
+            if let Some(page) = self.pages[page_idx].as_ref() {
+                result.extend(
+                    page[in_page_start..in_page_end]
+                        .iter()
+                        .map(|&x| x.unwrap_or_default())
+                        .collect::<Vec<_>>(),
+                );
+            } else {
+                result.extend(vec![T::default(); in_page_end - in_page_start]);
+            }
+        }
+        result
     }
 
     pub fn set_range<'a>(
@@ -67,27 +72,20 @@ impl<T: Default + Copy> PagedVec<T> {
     where
         T: 'a,
     {
-        let start_page_idx = range.start / self.page_size;
-        let end_page_idx = range.end / self.page_size;
-
-        if start_page_idx == end_page_idx {
-            let page = self.pages[start_page_idx]
-                .get_or_insert_with(|| vec![T::default(); self.page_size]);
-            let page_start = range.start - range.start % self.page_size;
-            let result = page[range.start - page_start..range.end - page_start].to_vec();
-            for (j, value) in range.zip(values.into_iter()) {
-                page[j - page_start] = *value;
-            }
-            result
-        } else {
-            // TODO: This can be more efficient by copying into two slices (but most queries should
-            // not be cross-page).
-            let result = self.get_range(range.clone());
-            for (i, value) in range.zip(values.into_iter()) {
-                self.set(i, *value);
-            }
-            result
+        let mut result = Vec::with_capacity(range.len());
+        let mut values = values.into_iter();
+        for page_idx in (range.start / self.page_size)..range.end.div_ceil(self.page_size) {
+            let in_page_start = (range.start - page_idx * self.page_size).max(0);
+            let in_page_end = (range.end - page_idx * self.page_size).min(self.page_size);
+            let page = self.pages[page_idx].get_or_insert_with(|| vec![None; self.page_size]);
+            result.extend(
+                page[in_page_start..in_page_end]
+                    .iter_mut()
+                    .map(|x| x.replace(*values.next().unwrap()).unwrap_or_default())
+                    .collect::<Vec<_>>(),
+            );
         }
+        result
     }
 }
 
@@ -111,27 +109,30 @@ impl<T: Copy> Iterator for PagedVecIter<'_, T> {
     type Item = (usize, T);
 
     fn next(&mut self) -> Option<Self::Item> {
-        while self.current_page < self.vec.pages.len()
-            && self.vec.pages[self.current_page].is_none()
-        {
+        while self.current_page < self.vec.pages.len() {
+            if let Some(page) = self.vec.pages[self.current_page].as_ref() {
+                while self.current_index_in_page < page.len()
+                    && page[self.current_index_in_page].is_none()
+                {
+                    self.current_index_in_page += 1;
+                }
+                if self.current_index_in_page < page.len() {
+                    break;
+                }
+            }
             self.current_page += 1;
-            debug_assert_eq!(self.current_index_in_page, 0);
             self.current_index_in_page = 0;
         }
+
         if self.current_page >= self.vec.pages.len() {
-            return None;
+            None
+        } else {
+            let global_index = self.current_page * self.vec.page_size + self.current_index_in_page;
+            let page = self.vec.pages[self.current_page].as_ref().unwrap();
+            let value = page[self.current_index_in_page].unwrap();
+            self.current_index_in_page += 1;
+            Some((global_index, value))
         }
-        let global_index = self.current_page * self.vec.page_size + self.current_index_in_page;
-
-        let page = self.vec.pages[self.current_page].as_ref()?;
-        let value = page[self.current_index_in_page];
-
-        self.current_index_in_page += 1;
-        if self.current_index_in_page == self.vec.page_size {
-            self.current_page += 1;
-            self.current_index_in_page = 0;
-        }
-        Some((global_index, value))
     }
 }
 
@@ -142,33 +143,33 @@ mod tests {
     #[test]
     fn test_basic_get_set() {
         let mut v = PagedVec::new(4, 3);
-        assert_eq!(v.get(0), 0);
-        v.set(0, 42);
-        assert_eq!(v.get(0), 42);
+        assert_eq!(v.get(0), None);
+        v.insert(0, 42);
+        assert_eq!(v.get(0), Some(&42));
     }
 
     #[test]
     fn test_cross_page_operations() {
         let mut v = PagedVec::new(4, 3);
-        v.set(3, 10); // Last element of first page
-        v.set(4, 20); // First element of second page
-        assert_eq!(v.get(3), 10);
-        assert_eq!(v.get(4), 20);
+        v.insert(3, 10); // Last element of first page
+        v.insert(4, 20); // First element of second page
+        assert_eq!(v.get(3), Some(&10));
+        assert_eq!(v.get(4), Some(&20));
     }
 
     #[test]
     fn test_page_boundaries() {
         let mut v = PagedVec::new(4, 2);
         // Fill first page
-        v.set(0, 1);
-        v.set(1, 2);
-        v.set(2, 3);
-        v.set(3, 4);
+        v.insert(0, 1);
+        v.insert(1, 2);
+        v.insert(2, 3);
+        v.insert(3, 4);
         // Fill second page
-        v.set(4, 5);
-        v.set(5, 6);
-        v.set(6, 7);
-        v.set(7, 8);
+        v.insert(4, 5);
+        v.insert(5, 6);
+        v.insert(6, 7);
+        v.insert(7, 8);
 
         // Verify all values
         assert_eq!(v.get_range(0..8), [1, 2, 3, 4, 5, 6, 7, 8]);
@@ -185,27 +186,27 @@ mod tests {
     fn test_large_indices() {
         let mut v = PagedVec::new(4, 100);
         let large_index = 399;
-        v.set(large_index, 42);
-        assert_eq!(v.get(large_index), 42);
+        v.insert(large_index, 42);
+        assert_eq!(v.get(large_index), Some(&42));
     }
 
     #[test]
     fn test_range_operations_with_defaults() {
         let mut v = PagedVec::new(4, 3);
-        v.set(2, 5);
-        v.set(5, 10);
+        v.insert(2, 5);
+        v.insert(5, 10);
 
-        // Should include both set values and defaults
+        // Should include both insert values and defaults
         assert_eq!(v.get_range(1..7), [0, 5, 0, 0, 10, 0]);
     }
 
     #[test]
     fn test_non_zero_default_type() {
         let mut v: PagedVec<bool> = PagedVec::new(4, 2);
-        assert!(!v.get(0)); // bool's default
-        v.set(0, true);
-        assert!(v.get(0));
-        assert!(!v.get(1));
+        assert_eq!(v.get(0), None); // bool's default
+        v.insert(0, true);
+        assert_eq!(v.get(0), Some(&true));
+        assert_eq!(v.get(1), None);
     }
 
     #[test]
@@ -215,14 +216,14 @@ mod tests {
         v.set_range(2..8, &test_data);
 
         // Verify first page
-        assert_eq!(v.get(2), 1);
-        assert_eq!(v.get(3), 2);
+        assert_eq!(v.get(2), Some(&1));
+        assert_eq!(v.get(3), Some(&2));
 
         // Verify second page
-        assert_eq!(v.get(4), 3);
-        assert_eq!(v.get(5), 4);
-        assert_eq!(v.get(6), 5);
-        assert_eq!(v.get(7), 6);
+        assert_eq!(v.get(4), Some(&3));
+        assert_eq!(v.get(5), Some(&4));
+        assert_eq!(v.get(6), Some(&5));
+        assert_eq!(v.get(7), Some(&6));
     }
 
     #[test]
