@@ -15,23 +15,26 @@ use crate::verify_batch::CHUNK;
 pub struct VerifyBatchRecord<F: Field> {
     initial_state: ExecutionState<u32>,
     instruction: Instruction<F>,
-    dim_base_pointer: usize,
-    opened_base_pointer: usize,
+    dim_base_pointer: F,
+    opened_base_pointer: F,
     opened_length: usize,
-    sibling_base_pointer: usize,
-    index_base_pointer: usize,
-    commit_pointer: usize,
+    sibling_base_pointer: F,
+    index_base_pointer: F,
+    commit_pointer: F,
     dim_read: RecordId,
     opened_read: RecordId,
     sibling_read: RecordId,
     index_read: RecordId,
     commit_read: RecordId,
+    initial_height: usize,
     top_level: Vec<TopLevelRecord<F>>,
 }
 
 struct TopLevelRecord<F: Field> {
+    // must be present in first record
     incorporate_row: Option<IncorporateRowRecord<F>>,
-    incorporate_sibling_record: IncorporateSiblingRecord<F>,
+    // must be present in all bust last record
+    incorporate_sibling_record: Option<IncorporateSiblingRecord<F>>,
 }
 
 struct IncorporateSiblingRecord<F: Field> {
@@ -110,6 +113,23 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F> for Ve
             f: address_space,
             ..
         } = instruction;
+        
+        let (dim_read, dim_base_pointer) = memory.read_cell(address_space, dim_register);
+        let (opened_read, [opened_base_pointer, opened_len]) = memory.read(address_space, opened_register);
+        let (sibling_read, sibling_base_pointer) = memory.read_cell(address_space, sibling_register);
+        let (index_read, index_base_pointer) = memory.read_cell(address_space, index_register);
+        let (commit_read, commit_pointer) = memory.read_cell(address_space, commit_register);
+        
+        let initial_height = memory.unsafe_read_cell(address_space, dim_base_pointer);
+        let mut height = initial_height.as_canonical_u32();
+        let mut proof_index = 0;
+        let mut top_level = vec![];
+        
+        while height >= 1 {
+            
+            height /= 2;
+            proof_index += 1;
+        }
 
         let alpha_read = memory.read(addr_space, alpha_ptr);
         let length_read = memory.read_cell(addr_space, length_ptr);
