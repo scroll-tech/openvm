@@ -4,6 +4,7 @@
 use openvm_instructions::UsizeOpcode;
 use openvm_instructions_derive::UsizeOpcode;
 use openvm_rv32im_transpiler::BranchEqualOpcode;
+use serde::{Deserialize, Serialize};
 use strum::{EnumCount, EnumIter, FromRepr, IntoEnumIterator};
 
 extern crate alloc;
@@ -25,18 +26,46 @@ pub mod prelude {
 // =================================================================================================
 
 #[derive(
-    Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, EnumCount, EnumIter, FromRepr, UsizeOpcode,
+    Copy,
+    Clone,
+    Debug,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    EnumCount,
+    EnumIter,
+    FromRepr,
+    UsizeOpcode,
+    Serialize,
+    Deserialize,
 )]
 #[opcode_offset = 0x100]
 #[repr(usize)]
+#[allow(non_camel_case_types)]
 pub enum NativeLoadStoreOpcode {
     LOADW,
     STOREW,
-    LOADW2,
-    STOREW2,
     /// Instruction to write the next hint word into memory.
-    SHINTW,
+    HINT_STOREW,
+    LOADW4,
+    STOREW4,
+    HINT_STOREW4,
 }
+
+pub const SINGLE_LOAD_STORE_OPCODES: [NativeLoadStoreOpcode; 3] = [
+    NativeLoadStoreOpcode::LOADW,
+    NativeLoadStoreOpcode::STOREW,
+    NativeLoadStoreOpcode::HINT_STOREW,
+];
+
+pub const BLOCK_LOAD_STORE_OPCODES: [NativeLoadStoreOpcode; 3] = [
+    NativeLoadStoreOpcode::LOADW4,
+    NativeLoadStoreOpcode::STOREW4,
+    NativeLoadStoreOpcode::HINT_STOREW4,
+];
+
+pub const BLOCK_LOAD_STORE_SIZE: usize = 4;
 
 #[derive(Copy, Clone, Debug, UsizeOpcode)]
 #[opcode_offset = 0x110]
@@ -67,7 +96,19 @@ pub enum CastfOpcode {
 }
 
 #[derive(
-    Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, EnumCount, EnumIter, FromRepr, UsizeOpcode,
+    Copy,
+    Clone,
+    Debug,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    EnumCount,
+    EnumIter,
+    FromRepr,
+    UsizeOpcode,
+    Serialize,
+    Deserialize,
 )]
 #[opcode_offset = 0x130]
 #[repr(usize)]
@@ -79,7 +120,19 @@ pub enum FieldArithmeticOpcode {
 }
 
 #[derive(
-    Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, EnumCount, EnumIter, FromRepr, UsizeOpcode,
+    Copy,
+    Clone,
+    Debug,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    EnumCount,
+    EnumIter,
+    FromRepr,
+    UsizeOpcode,
+    Serialize,
+    Deserialize,
 )]
 #[opcode_offset = 0x140]
 #[repr(usize)]

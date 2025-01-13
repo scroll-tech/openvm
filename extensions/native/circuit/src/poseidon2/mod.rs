@@ -2,10 +2,7 @@ use std::sync::Arc;
 
 use openvm_circuit::{
     arch::{ExecutionBus, ExecutionError, ExecutionState, InstructionExecutor},
-    system::{
-        memory::{MemoryController, OfflineMemory},
-        program::ProgramBus,
-    },
+    system::{memory::MemoryController, program::ProgramBus},
 };
 use openvm_instructions::instruction::Instruction;
 use openvm_poseidon2_air::Poseidon2Config;
@@ -25,7 +22,7 @@ mod columns;
 use std::sync::Mutex;
 
 pub use columns::*;
-use openvm_circuit::system::memory::offline_checker::MemoryBridge;
+use openvm_circuit::system::memory::{offline_checker::MemoryBridge, OfflineMemory};
 
 mod trace;
 
@@ -76,7 +73,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativePoseidon2Chip<F> {
     fn execute(
         &mut self,
         memory: &mut MemoryController<F>,
-        instruction: Instruction<F>,
+        instruction: &Instruction<F>,
         from_state: ExecutionState<u32>,
     ) -> Result<ExecutionState<u32>, ExecutionError> {
         match self {

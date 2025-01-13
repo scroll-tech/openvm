@@ -1,6 +1,6 @@
 use openvm_stark_backend::p3_field::FieldAlgebra;
 
-use super::{Array, Builder, Config, DslIr, Ext, Felt, Usize, Var};
+use super::{Array, Builder, Config, DslIr, Ext, Felt, MemIndex, Ptr, Usize, Var};
 
 pub const DIGEST_SIZE: usize = 8;
 pub const HASH_RATE: usize = 8;
@@ -9,7 +9,7 @@ pub const PERMUTATION_WIDTH: usize = 16;
 impl<C: Config> Builder<C> {
     /// Applies the Poseidon2 permutation to the given array.
     ///
-    /// Reference: [p3_poseidon2::Poseidon2]
+    /// [Reference](https://docs.rs/p3-poseidon2/latest/p3_poseidon2/struct.Poseidon2.html)
     pub fn poseidon2_permute(&mut self, array: &Array<C, Felt<C::F>>) -> Array<C, Felt<C::F>> {
         let output = match array {
             Array::Fixed(values) => {
@@ -27,7 +27,7 @@ impl<C: Config> Builder<C> {
 
     /// Applies the Poseidon2 permutation to the given array.
     ///
-    /// Reference: [p3_poseidon2::Poseidon2]
+    /// [Reference](https://docs.rs/p3-poseidon2/latest/p3_poseidon2/struct.Poseidon2.html)
     pub fn poseidon2_permute_mut(&mut self, array: &Array<C, Felt<C::F>>) {
         if let Array::Fixed(_) = array {
             panic!("Poseidon2 permutation is not allowed on fixed arrays");
@@ -40,7 +40,7 @@ impl<C: Config> Builder<C> {
 
     /// Applies the Poseidon2 compression function to the given array.
     ///
-    /// Reference: [p3_symmetric::TruncatedPermutation]
+    /// [Reference](https://docs.rs/p3-symmetric/latest/p3_symmetric/struct.TruncatedPermutation.html)
     pub fn poseidon2_compress(
         &mut self,
         left: &Array<C, Felt<C::F>>,
@@ -60,7 +60,7 @@ impl<C: Config> Builder<C> {
 
     /// Applies the Poseidon2 compression to the given array.
     ///
-    /// Reference: [p3_symmetric::TruncatedPermutation]
+    /// [Reference](https://docs.rs/p3-symmetric/latest/p3_symmetric/struct.TruncatedPermutation.html)
     pub fn poseidon2_compress_x(
         &mut self,
         result: &Array<C, Felt<C::F>>,
@@ -76,7 +76,7 @@ impl<C: Config> Builder<C> {
 
     /// Applies the Poseidon2 permutation to the given array.
     ///
-    /// Reference: [p3_symmetric::PaddingFreeSponge]
+    /// [Reference](https://docs.rs/p3-symmetric/latest/p3_symmetric/struct.PaddingFreeSponge.html)
     pub fn poseidon2_hash(&mut self, array: &Array<C, Felt<C::F>>) -> Array<C, Felt<C::F>> {
         let perm_width = PERMUTATION_WIDTH;
         let state: Array<C, Felt<C::F>> = self.dyn_array(perm_width);
@@ -130,25 +130,31 @@ impl<C: Config> Builder<C> {
             builder.set(&state, i, C::F::ZERO);
         });
 
-        let idx: Var<_> = self.eval(C::N::ZERO);
-        self.range(0, array.len()).for_each(|i, builder| {
-            let subarray = builder.get(array, i);
-            builder.range(0, subarray.len()).for_each(|j, builder| {
+        let address = self.eval(state.ptr().address);
+        let start: Var<_> = self.eval(address);
+        let end: Var<_> = self.eval(address + C::N::from_canonical_usize(HASH_RATE));
+        self.iter(array).for_each(|subarray, builder| {
+            builder.iter(&subarray).for_each(|element, builder| {
                 builder.cycle_tracker_start("poseidon2-hash-setup");
-                let element = builder.get(&subarray, j);
-                builder.set_value(&state, idx, element);
-                builder.assign(&idx, idx + C::N::ONE);
+                builder.store(
+                    Ptr { address },
+                    MemIndex {
+                        index: 0.into(),
+                        offset: 0,
+                        size: 1,
+                    },
+                    element,
+                );
+                builder.assign(&address, address + C::N::ONE);
                 builder.cycle_tracker_end("poseidon2-hash-setup");
-                builder
-                    .if_eq(idx, C::N::from_canonical_usize(HASH_RATE))
-                    .then(|builder| {
-                        builder.poseidon2_permute_mut(&state);
-                        builder.assign(&idx, C::N::ZERO);
-                    });
+                builder.if_eq(address, end).then(|builder| {
+                    builder.poseidon2_permute_mut(&state);
+                    builder.assign(&address, start);
+                });
             });
         });
 
-        self.if_ne(idx, C::N::ZERO).then(|builder| {
+        self.if_ne(address, start).then(|builder| {
             builder.poseidon2_permute_mut(&state);
         });
 

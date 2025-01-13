@@ -166,13 +166,16 @@ impl ExprBuilder {
         )
     }
 
+    /// Creates a new constant (compile-time known) FieldVariable from `value` where
+    /// the big integer `value` is decomposed into `num_limbs` limbs of `limb_bits` bits,
+    /// with `num_limbs, limb_bits` specified by the builder config.
     pub fn new_const(builder: Rc<RefCell<ExprBuilder>>, value: BigUint) -> FieldVariable {
         let mut borrowed = builder.borrow_mut();
         let index = borrowed.constants.len();
-        let limbs = big_uint_to_limbs(&value, borrowed.limb_bits);
-        let num_limbs = limbs.len();
-        let range_checker_bits = borrowed.range_checker_bits;
         let limb_bits = borrowed.limb_bits;
+        let num_limbs = borrowed.num_limbs;
+        let limbs = big_uint_to_num_limbs(&value, limb_bits, num_limbs);
+        let range_checker_bits = borrowed.range_checker_bits;
         borrowed.constants.push((value.clone(), limbs));
         drop(borrowed);
 
@@ -286,6 +289,7 @@ impl<AB: InteractionBuilder> SubAir<AB> for FieldExpr {
         if self.builder.needs_setup() {
             let is_setup = flags.iter().fold(is_valid.into(), |acc, &x| acc - x);
             builder.assert_bool(is_setup.clone());
+            builder.when_first_row().assert_one(is_setup.clone());
             for i in 0..inputs[0].len().max(self.builder.prime_limbs.len()) {
                 let lhs = if i < inputs[0].len() {
                     inputs[0][i].into()
@@ -314,9 +318,6 @@ impl<AB: InteractionBuilder> SubAir<AB> for FieldExpr {
                 OverflowInt::from_canonical_unsigned_limbs(limbs_expr, self.limb_bits)
             })
             .collect();
-
-        // TODO: turn back on once we also support this in ecc and everywhere
-        // builder.when_first_row().assert_one(is_setup);
 
         for flag in flags.iter() {
             builder.assert_bool(*flag);

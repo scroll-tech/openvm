@@ -25,9 +25,8 @@ use super::merkle::DirectCompressionBus;
 use crate::{
     arch::hasher::HasherChip,
     system::memory::{
-        controller::memory::INITIAL_TIMESTAMP, dimensions::MemoryDimensions,
-        merkle::MemoryMerkleBus, offline_checker::MemoryBus, MemoryAddress, MemoryImage,
-        TimestampedEquipartition,
+        dimensions::MemoryDimensions, merkle::MemoryMerkleBus, offline_checker::MemoryBus,
+        MemoryAddress, MemoryImage, TimestampedEquipartition, INITIAL_TIMESTAMP,
     },
 };
 
@@ -121,7 +120,6 @@ impl<const CHUNK: usize, AB: InteractionBuilder> Air<AB> for PersistentBoundaryA
     }
 }
 
-#[derive(Debug)]
 pub struct PersistentBoundaryChip<F, const CHUNK: usize> {
     pub air: PersistentBoundaryAir<CHUNK>,
     touched_labels: TouchedLabels<F, CHUNK>,

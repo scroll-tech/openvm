@@ -44,8 +44,10 @@ impl<F: PrimeField64> ProgramChip<F> {
 
     pub fn set_program(&mut self, mut program: Program<F>) {
         let true_program_length = program.len();
-        while !program.len().is_power_of_two() {
+        let mut number_actual_instructions = program.num_defined_instructions();
+        while !number_actual_instructions.is_power_of_two() {
             program.push_instruction(padding_instruction());
+            number_actual_instructions += 1;
         }
         self.true_program_length = true_program_length;
         self.execution_frequencies = vec![0; program.len()];
@@ -70,7 +72,7 @@ impl<F: PrimeField64> ProgramChip<F> {
     pub fn get_instruction(
         &mut self,
         pc: u32,
-    ) -> Result<(Instruction<F>, Option<DebugInfo>), ExecutionError> {
+    ) -> Result<&(Instruction<F>, Option<DebugInfo>), ExecutionError> {
         let pc_index = self.get_pc_index(pc)?;
         self.execution_frequencies[pc_index] += 1;
         self.program

@@ -8,7 +8,6 @@ use std::{
 };
 
 use getset::Getters;
-use memory::MemoryRecord;
 use openvm_circuit_primitives::{
     assert_less_than::{AssertLtSubAir, LessThanAuxCols},
     is_zero::IsZeroSubAir,
@@ -26,6 +25,7 @@ use openvm_stark_backend::{
     rap::AnyRap,
     Chip, ChipUsageGetter,
 };
+use rustc_hash::FxHashMap;
 use serde::{Deserialize, Serialize};
 
 use self::interface::MemoryInterface;
@@ -34,13 +34,14 @@ use crate::{
     arch::{hasher::HasherChip, MemoryConfig},
     system::memory::{
         adapter::AccessAdapterInventory,
-        controller::memory::{MemoryLogEntry, INITIAL_TIMESTAMP},
         dimensions::MemoryDimensions,
         merkle::{MemoryMerkleBus, MemoryMerkleChip},
+        offline::{MemoryRecord, OfflineMemory, INITIAL_TIMESTAMP},
         offline_checker::{
             MemoryBridge, MemoryBus, MemoryReadAuxCols, MemoryReadOrImmediateAuxCols,
             MemoryWriteAuxCols, AUX_LEN,
         },
+        online::{Address, Memory, MemoryLogEntry},
         persistent::PersistentBoundaryChip,
         tree::MemoryNode,
     },
@@ -48,16 +49,17 @@ use crate::{
 
 pub mod dimensions;
 mod interface;
-pub(super) mod memory;
-pub use memory::{MemoryImage, MemoryReadRecord, MemoryWriteRecord, OfflineMemory, RecordId};
-
-pub(crate) use crate::system::memory::controller::memory::Memory;
 
 pub const CHUNK: usize = 8;
 /// The offset of the Merkle AIR in AIRs of MemoryController.
 pub const MERKLE_AIR_OFFSET: usize = 1;
 /// The offset of the boundary AIR in AIRs of MemoryController.
 pub const BOUNDARY_AIR_OFFSET: usize = 0;
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct RecordId(pub usize);
+
+pub type MemoryImage<F> = FxHashMap<Address, F>;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct TimestampedValues<T, const N: usize> {
@@ -82,7 +84,7 @@ pub type TimestampedEquipartition<F, const N: usize> =
 /// If a key is not present in the map, then the block is uninitialized (and therefore zero).
 pub type Equipartition<F, const N: usize> = BTreeMap<(u32, u32), [F; N]>;
 
-#[derive(Debug, Getters)]
+#[derive(Getters)]
 pub struct MemoryController<F> {
     pub memory_bus: MemoryBus,
     pub interface_chip: MemoryInterface<F>,
@@ -239,7 +241,7 @@ impl<F: PrimeField32> MemoryController<F> {
                     range_checker.clone(),
                 ),
             },
-            memory: Memory::new(),
+            memory: Memory::new(mem_config.access_capacity),
             offline_memory: Arc::new(Mutex::new(OfflineMemory::new(
                 initial_memory,
                 1,
@@ -259,20 +261,21 @@ impl<F: PrimeField32> MemoryController<F> {
         }
     }
 
+    /// Creates a new memory controller for persistent memory.
+    ///
+    /// Call `set_initial_memory` to set the initial memory state after construction.
     pub fn with_persistent_memory(
         memory_bus: MemoryBus,
         mem_config: MemoryConfig,
         range_checker: Arc<VariableRangeCheckerChip>,
         merkle_bus: MemoryMerkleBus,
         compression_bus: DirectCompressionBus,
-        initial_memory: MemoryImage<F>,
     ) -> Self {
         let memory_dims = MemoryDimensions {
             as_height: mem_config.as_height,
             address_height: mem_config.pointer_max_bits - log2_strict_usize(CHUNK),
             as_offset: 1,
         };
-        let memory = Memory::from_image(initial_memory.clone());
         let range_checker_bus = range_checker.bus();
         let interface_chip = MemoryInterface::Persistent {
             boundary_chip: PersistentBoundaryChip::new(
@@ -282,15 +285,15 @@ impl<F: PrimeField32> MemoryController<F> {
                 compression_bus,
             ),
             merkle_chip: MemoryMerkleChip::new(memory_dims, merkle_bus, compression_bus),
-            initial_memory: initial_memory.clone(),
+            initial_memory: MemoryImage::default(),
         };
         Self {
             memory_bus,
             mem_config,
             interface_chip,
-            memory,
+            memory: Memory::new(0), // it is expected that the memory will be set later
             offline_memory: Arc::new(Mutex::new(OfflineMemory::new(
-                initial_memory,
+                MemoryImage::default(),
                 CHUNK,
                 memory_bus,
                 range_checker.clone(),
@@ -345,15 +348,17 @@ impl<F: PrimeField32> MemoryController<F> {
         let mut offline_memory = self.offline_memory.lock().unwrap();
         offline_memory.set_initial_memory(memory.clone());
 
+        self.memory = Memory::from_image(memory.clone(), self.mem_config.access_capacity);
+
         match &mut self.interface_chip {
             MemoryInterface::Volatile { .. } => {
-                if !memory.is_empty() {
-                    panic!("Cannot set initial memory for volatile memory");
-                }
+                assert!(
+                    memory.is_empty(),
+                    "Cannot set initial memory for volatile memory"
+                );
             }
             MemoryInterface::Persistent { initial_memory, .. } => {
                 *initial_memory = memory;
-                self.memory = Memory::from_image(initial_memory.clone());
             }
         }
     }
@@ -447,8 +452,10 @@ impl<F: PrimeField32> MemoryController<F> {
     }
 
     fn replay_access_log(&mut self) {
-        let mut offline_memory = self.offline_memory.lock().unwrap();
         let log = mem::take(&mut self.memory.log);
+
+        let mut offline_memory = self.offline_memory.lock().unwrap();
+        offline_memory.set_log_capacity(log.len());
 
         for entry in log {
             Self::replay_access(
@@ -689,11 +696,10 @@ impl<F: PrimeField32> MemoryController<F> {
     }
 }
 
-#[derive(Clone, Debug)]
 pub struct MemoryAuxColsFactory<T> {
-    range_checker: Arc<VariableRangeCheckerChip>,
-    timestamp_lt_air: AssertLtSubAir,
-    _marker: PhantomData<T>,
+    pub(crate) range_checker: Arc<VariableRangeCheckerChip>,
+    pub(crate) timestamp_lt_air: AssertLtSubAir,
+    pub(crate) _marker: PhantomData<T>,
 }
 
 // NOTE[jpw]: The `make_*_aux_cols` functions should be thread-safe so they can be used in parallelized trace generation.

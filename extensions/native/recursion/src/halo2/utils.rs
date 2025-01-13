@@ -125,9 +125,10 @@ impl CacheHalo2ParamsReader {
         }
     }
     fn read_params_from_folder(&self, k: usize) -> Halo2Params {
+        let file_path = self.params_dir.as_path().join(format!("kzg_bn254_{k}.srs"));
         ParamsKZG::<Bn256>::read(&mut BufReader::new(
-            std::fs::File::open(self.params_dir.as_path().join(format!("kzg_bn254_{k}.srs")))
-                .expect("Params file does not exist"),
+            std::fs::File::open(&file_path)
+                .unwrap_or_else(|e| panic!("Params file {:?} does not exist: {e:?}", file_path)),
         ))
         .unwrap()
     }
@@ -148,7 +149,7 @@ fn read_params(k: u32) -> Arc<Halo2Params> {
 /// Sort AIRs by their trace height in descending order. This should not be used outside
 /// static-verifier because a dynamic verifier should support any AIR order.
 /// This is related to an implementation detail of FieldMerkleTreeMMCS which is used in most configs.
-/// Reference: https://github.com/Plonky3/Plonky3/blob/27b3127dab047e07145c38143379edec2960b3e1/merkle-tree/src/merkle_tree.rs#L53
+/// Reference: <https://github.com/Plonky3/Plonky3/blob/27b3127dab047e07145c38143379edec2960b3e1/merkle-tree/src/merkle_tree.rs#L53>
 pub fn sort_chips<SC: StarkGenericConfig>(
     mut air_proof_inputs: Vec<AirProofInput<SC>>,
 ) -> Vec<AirProofInput<SC>> {
