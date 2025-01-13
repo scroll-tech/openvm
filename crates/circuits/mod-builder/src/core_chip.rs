@@ -63,6 +63,8 @@ impl FieldExpressionCoreAir {
             // multi ops chip or no-setup chip, use as is.
             opcode_flag_idx
         };
+        println!("opcode_flag_idx: {:?}", opcode_flag_idx);
+        println!("local_opcode_idx: {:?}", local_opcode_idx);
         assert_eq!(opcode_flag_idx.len(), local_opcode_idx.len() - 1);
         Self {
             expr,

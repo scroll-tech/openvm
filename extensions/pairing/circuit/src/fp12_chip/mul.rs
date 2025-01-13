@@ -42,7 +42,7 @@ impl<F: PrimeField32, const BLOCKS: usize, const BLOCK_SIZE: usize>
         let core = FieldExpressionCoreChip::new(
             expr,
             offset,
-            vec![Fp12Opcode::MUL as usize],
+            vec![Fp12Opcode::MUL as usize, Fp12Opcode::DUMMY_SETUP as usize],
             vec![],
             range_checker,
             "Fp12Mul",

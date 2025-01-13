@@ -22,6 +22,7 @@ pub enum PairingOpcode {
     MUL_BY_01234,
     MUL_023_BY_023,
     MUL_BY_02345,
+    DUMMY_SETUP, // this won't really be used (no risc-v opcode will be transpiled to this)
 }
 
 #[derive(
@@ -34,6 +35,7 @@ pub enum Fp12Opcode {
     ADD,
     SUB,
     MUL,
+    DUMMY_SETUP, // this won't really be used (no risc-v opcode will be transpiled to this)
 }
 const FP12_OPS: usize = 4;
 

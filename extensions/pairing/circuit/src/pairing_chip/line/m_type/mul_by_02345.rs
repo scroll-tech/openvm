@@ -77,7 +77,10 @@ impl<
         let core = FieldExpressionCoreChip::new(
             expr,
             offset,
-            vec![PairingOpcode::MUL_BY_02345 as usize],
+            vec![
+                PairingOpcode::MUL_BY_02345 as usize,
+                PairingOpcode::DUMMY_SETUP as usize,
+            ],
             vec![],
             range_checker,
             "MulBy02345",

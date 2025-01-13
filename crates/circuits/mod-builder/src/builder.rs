@@ -111,6 +111,7 @@ impl ExprBuilder {
     }
 
     pub fn finalize(&mut self, needs_setup: bool) {
+        let needs_setup = true;
         self.finalized = true;
         self.needs_setup = needs_setup;
 
@@ -286,24 +287,25 @@ impl<AB: InteractionBuilder> SubAir<AB> for FieldExpr {
             flags,
         } = self.load_vars(local);
 
-        if self.builder.needs_setup() {
-            let is_setup = flags.iter().fold(is_valid.into(), |acc, &x| acc - x);
-            builder.assert_bool(is_setup.clone());
-            builder.when_first_row().assert_one(is_setup.clone());
-            for i in 0..inputs[0].len().max(self.builder.prime_limbs.len()) {
-                let lhs = if i < inputs[0].len() {
-                    inputs[0][i].into()
-                } else {
-                    AB::Expr::ZERO
-                };
-                let rhs = if i < self.builder.prime_limbs.len() {
-                    AB::Expr::from_canonical_usize(self.builder.prime_limbs[i])
-                } else {
-                    AB::Expr::ZERO
-                };
-                builder.when(is_setup.clone()).assert_eq(lhs, rhs);
-            }
+        // if self.builder.needs_setup() {
+        let is_setup = flags.iter().fold(is_valid.into(), |acc, &x| acc - x);
+        builder.assert_bool(is_setup.clone());
+        println!("is_setup: {:?}", is_setup);
+        // builder.when_first_row().assert_one(is_setup.clone());
+        for i in 0..inputs[0].len().max(self.builder.prime_limbs.len()) {
+            let lhs = if i < inputs[0].len() {
+                inputs[0][i].into()
+            } else {
+                AB::Expr::ZERO
+            };
+            let rhs = if i < self.builder.prime_limbs.len() {
+                AB::Expr::from_canonical_usize(self.builder.prime_limbs[i])
+            } else {
+                AB::Expr::ZERO
+            };
+            builder.when(is_setup.clone()).assert_eq(lhs, rhs);
         }
+        // }
 
         let inputs = load_overflow::<AB>(inputs, self.limb_bits);
         let vars = load_overflow::<AB>(vars, self.limb_bits);

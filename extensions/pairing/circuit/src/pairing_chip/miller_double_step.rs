@@ -50,7 +50,10 @@ impl<
         let core = FieldExpressionCoreChip::new(
             expr,
             offset,
-            vec![PairingOpcode::MILLER_DOUBLE_STEP as usize],
+            vec![
+                PairingOpcode::MILLER_DOUBLE_STEP as usize,
+                PairingOpcode::DUMMY_SETUP as usize,
+            ],
             vec![],
             range_checker,
             "MillerDoubleStep",

@@ -45,7 +45,7 @@ fn test_fp12_fn<
     let core = FieldExpressionCoreChip::new(
         expr,
         offset,
-        vec![local_opcode_idx],
+        vec![local_opcode_idx, Fp12Opcode::DUMMY_SETUP as usize],
         vec![],
         tester.memory_controller().borrow().range_checker.clone(),
         name,

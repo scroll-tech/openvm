@@ -66,7 +66,10 @@ impl<
         let core = FieldExpressionCoreChip::new(
             expr,
             offset,
-            vec![PairingOpcode::EVALUATE_LINE as usize],
+            vec![
+                PairingOpcode::EVALUATE_LINE as usize,
+                PairingOpcode::DUMMY_SETUP as usize,
+            ],
             vec![],
             range_checker,
             "EvaluateLine",
