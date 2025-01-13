@@ -96,110 +96,111 @@ impl BabyBearChip {
     }
 
     pub fn reduce(&self, ctx: &mut Context<Fr>, b: AssignedBabyBear) -> AssignedBabyBear {
-        if b.max_bits <= BABYBEAR_MAX_BITS {
-            return b;
-        }
-        let range_bits = b.max_bits;
-        let a = b.value;
-        let lookup_bits = self.range.lookup_bits();
-        if range_bits == 0 {
-            self.gate().assert_is_const(ctx, &a, &Fr::ZERO);
-            return AssignedBabyBear {
-                value: a,
-                max_bits: 0,
-            };
-        }
-        // the number of limbs
-        let num_limbs = range_bits.div_ceil(lookup_bits);
-        // println!("range check {} bits {} len", range_bits, k);
-        let rem_bits = range_bits % lookup_bits;
+        self.full_reduce(ctx, b)
+        // if b.max_bits <= BABYBEAR_MAX_BITS {
+        //     return b;
+        // }
+        // let range_bits = b.max_bits;
+        // let a = b.value;
+        // let lookup_bits = self.range.lookup_bits();
+        // if range_bits == 0 {
+        //     self.gate().assert_is_const(ctx, &a, &Fr::ZERO);
+        //     return AssignedBabyBear {
+        //         value: a,
+        //         max_bits: 0,
+        //     };
+        // }
+        // // the number of limbs
+        // let num_limbs = range_bits.div_ceil(lookup_bits);
+        // // println!("range check {} bits {} len", range_bits, k);
+        // let rem_bits = range_bits % lookup_bits;
 
-        debug_assert!(self.range.limb_bases.len() >= num_limbs);
+        // debug_assert!(self.range.limb_bases.len() >= num_limbs);
 
-        let (last_limb, r, new_max_bits) = if num_limbs == 1 {
-            self.add_cell_to_lookup(ctx, a);
-            (a, a, range_bits)
-        } else {
-            let mut negative = false;
-            let mut v = *a.value();
-            if fe_to_bigint(&v) < 0.into() {
-                negative = true;
-                v = -v;
-            }
-            let sign = if negative {
-                QuantumCell::Witness(-Fr::ONE)
-            } else {
-                QuantumCell::Witness(Fr::ONE)
-            };
-            ctx.assign_region(
-                [
-                    sign,
-                    sign,
-                    QuantumCell::Constant(-Fr::ONE),
-                    QuantumCell::Constant(Fr::ZERO),
-                ],
-                [0],
-            );
-            let (s1, s2) = (ctx.get(-4), ctx.get(-3));
-            ctx.constrain_equal(&s1, &s2);
-            let sign = s1;
-            let limbs = decompose_fe_to_u64_limbs(&v, num_limbs, lookup_bits)
-                .into_iter()
-                .map(|x| QuantumCell::Witness(Fr::from(x)));
-            let row_offset = ctx.advice.len() as isize;
-            let acc = self.gate().inner_product(
-                ctx,
-                limbs.clone(),
-                self.range.limb_bases[..num_limbs].to_vec(),
-            );
-            // the inner product above must equal `a`
+        // let (last_limb, r, new_max_bits) = if num_limbs == 1 {
+        //     self.add_cell_to_lookup(ctx, a);
+        //     (a, a, range_bits)
+        // } else {
+        //     let mut negative = false;
+        //     let mut v = *a.value();
+        //     if fe_to_bigint(&v) < 0.into() {
+        //         negative = true;
+        //         v = -v;
+        //     }
+        //     let sign = if negative {
+        //         QuantumCell::Witness(-Fr::ONE)
+        //     } else {
+        //         QuantumCell::Witness(Fr::ONE)
+        //     };
+        //     ctx.assign_region(
+        //         [
+        //             sign,
+        //             sign,
+        //             QuantumCell::Constant(-Fr::ONE),
+        //             QuantumCell::Constant(Fr::ZERO),
+        //         ],
+        //         [0],
+        //     );
+        //     let (s1, s2) = (ctx.get(-4), ctx.get(-3));
+        //     ctx.constrain_equal(&s1, &s2);
+        //     let sign = s1;
+        //     let limbs = decompose_fe_to_u64_limbs(&v, num_limbs, lookup_bits)
+        //         .into_iter()
+        //         .map(|x| QuantumCell::Witness(Fr::from(x)));
+        //     let row_offset = ctx.advice.len() as isize;
+        //     let acc = self.gate().inner_product(
+        //         ctx,
+        //         limbs.clone(),
+        //         self.range.limb_bases[..num_limbs].to_vec(),
+        //     );
+        //     // the inner product above must equal `a`
 
-            let mut limbs = Vec::new();
-            // we fetch the cells to lookup by getting the indices where `limbs` were assigned in `inner_product`. Because `limb_bases[0]` is 1, the progression of indices is 0,1,4,...,4+3*i
-            limbs.push(ctx.get(row_offset));
-            self.add_cell_to_lookup(ctx, ctx.get(row_offset));
-            for i in 0..num_limbs - 1 {
-                limbs.push(ctx.get(row_offset + 1 + 3 * i as isize));
-                self.add_cell_to_lookup(ctx, ctx.get(row_offset + 1 + 3 * i as isize));
-            }
-            let acc = self.gate().mul(ctx, acc, sign);
-            ctx.constrain_equal(&a, &acc);
+        //     let mut limbs = Vec::new();
+        //     // we fetch the cells to lookup by getting the indices where `limbs` were assigned in `inner_product`. Because `limb_bases[0]` is 1, the progression of indices is 0,1,4,...,4+3*i
+        //     limbs.push(ctx.get(row_offset));
+        //     self.add_cell_to_lookup(ctx, ctx.get(row_offset));
+        //     for i in 0..num_limbs - 1 {
+        //         limbs.push(ctx.get(row_offset + 1 + 3 * i as isize));
+        //         self.add_cell_to_lookup(ctx, ctx.get(row_offset + 1 + 3 * i as isize));
+        //     }
+        //     let acc = self.gate().mul(ctx, acc, sign);
+        //     ctx.constrain_equal(&a, &acc);
 
-            let last_limb = *limbs.last().unwrap();
-            let r =
-                self.gate()
-                    .inner_product(ctx, limbs, self.cached_limbs_r[..num_limbs].to_vec());
-            // let (_, r) =
-            //     self.range
-            //         .div_mod(ctx, r, BabyBear::ORDER_U32, self.extra_bits + lookup_bits);
-            let r = self.gate().mul(ctx, r, sign);
-            // debug_assert!(fe_to_bigint(r.value()).bits() as usize <= self.extra_bits + lookup_bits);
-            (last_limb, r, self.extra_bits + lookup_bits)
-        };
+        //     let last_limb = *limbs.last().unwrap();
+        //     let r =
+        //         self.gate()
+        //             .inner_product(ctx, limbs, self.cached_limbs_r[..num_limbs].to_vec());
+        //     // let (_, r) =
+        //     //     self.range
+        //     //         .div_mod(ctx, r, BabyBear::ORDER_U32, self.extra_bits + lookup_bits);
+        //     let r = self.gate().mul(ctx, r, sign);
+        //     // debug_assert!(fe_to_bigint(r.value()).bits() as usize <= self.extra_bits + lookup_bits);
+        //     (last_limb, r, self.extra_bits + lookup_bits)
+        // };
 
-        // additional constraints for the last limb if rem_bits != 0
-        match rem_bits.cmp(&1) {
-            // we want to check x := limbs[num_limbs-1] is boolean
-            // we constrain x*(x-1) = 0 + x * x - x == 0
-            // | 0 | x | x | x |
-            Ordering::Equal => {
-                self.gate().assert_bit(ctx, last_limb);
-            }
-            Ordering::Greater => {
-                let mult_val = self.gate().pow_of_two[lookup_bits - rem_bits];
-                let check = self
-                    .gate()
-                    .mul(ctx, last_limb, QuantumCell::Constant(mult_val));
-                self.add_cell_to_lookup(ctx, check);
-            }
-            _ => {}
-        }
-        let r = AssignedBabyBear {
-            value: r,
-            max_bits: new_max_bits,
-        };
-        debug_assert_eq!(b.to_baby_bear(), r.to_baby_bear());
-        r
+        // // additional constraints for the last limb if rem_bits != 0
+        // match rem_bits.cmp(&1) {
+        //     // we want to check x := limbs[num_limbs-1] is boolean
+        //     // we constrain x*(x-1) = 0 + x * x - x == 0
+        //     // | 0 | x | x | x |
+        //     Ordering::Equal => {
+        //         self.gate().assert_bit(ctx, last_limb);
+        //     }
+        //     Ordering::Greater => {
+        //         let mult_val = self.gate().pow_of_two[lookup_bits - rem_bits];
+        //         let check = self
+        //             .gate()
+        //             .mul(ctx, last_limb, QuantumCell::Constant(mult_val));
+        //         self.add_cell_to_lookup(ctx, check);
+        //     }
+        //     _ => {}
+        // }
+        // let r = AssignedBabyBear {
+        //     value: r,
+        //     max_bits: new_max_bits,
+        // };
+        // debug_assert_eq!(b.to_baby_bear(), r.to_baby_bear());
+        // r
     }
 
     pub fn add(
