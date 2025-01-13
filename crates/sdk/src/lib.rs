@@ -38,7 +38,7 @@ use openvm_transpiler::{
     transpiler::{Transpiler, TranspilerError},
     FromElf,
 };
-use prover::{vm::ContinuationVmProof, SingleSegmentProver};
+use prover::{vm::ContinuationVmProof, SingleSegmentContinuationProver};
 
 pub mod commit;
 pub mod config;
@@ -210,15 +210,11 @@ impl Sdk {
         Ok(evm_verifier)
     }
 
-    pub fn minimal_keygen<VC: VmConfig<F>>(
+    pub fn minimal_keygen(
         &self,
-        config: MinimalConfig<VC>,
+        config: MinimalConfig,
         reader: &impl Halo2ParamsReader,
-    ) -> Result<MinimalProvingKey<VC>>
-    where
-        VC::Executor: Chip<SC>,
-        VC::Periphery: Chip<SC>,
-    {
+    ) -> Result<MinimalProvingKey> {
         let minimal_pk = MinimalProvingKey::keygen(config, reader);
         Ok(minimal_pk)
     }
@@ -227,22 +223,23 @@ impl Sdk {
         &self,
         reader: &impl Halo2ParamsReader,
         app_pk: Arc<AppProvingKey<VC>>,
-        minimal_pk: MinimalProvingKey<VC>,
+        app_exe: Arc<NonRootCommittedExe>,
+        minimal_pk: MinimalProvingKey,
         inputs: StdIn,
     ) -> Result<EvmProof>
     where
         VC::Executor: Chip<SC>,
         VC::Periphery: Chip<SC>,
     {
-        let e2e_prover = SingleSegmentProver::new(reader, app_pk, minimal_pk);
+        let e2e_prover = SingleSegmentContinuationProver::new(reader, app_pk, app_exe, minimal_pk);
         let proof = e2e_prover.generate_proof_for_evm(inputs);
         Ok(proof)
     }
 
-    pub fn generate_minimal_snark_verifier_contract<VC: VmConfig<F>>(
+    pub fn generate_minimal_snark_verifier_contract(
         &self,
         reader: &impl Halo2ParamsReader,
-        minimal_pk: &MinimalProvingKey<VC>,
+        minimal_pk: &MinimalProvingKey,
     ) -> Result<EvmVerifier> {
         let params =
             reader.read_params(minimal_pk.halo2_pk.wrapper.pinning.metadata.config_params.k);

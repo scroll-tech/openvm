@@ -1,9 +1,8 @@
-use std::{marker::PhantomData, sync::Arc};
+use std::sync::Arc;
 
 use openvm_circuit::arch::VmConfig;
 use openvm_native_recursion::halo2::EvmProof;
 use openvm_stark_sdk::openvm_stark_backend::Chip;
-use vm::{types::VmProvingKey, SingleSegmentVmProver};
 
 use crate::{
     keygen::{AppProvingKey, MinimalProvingKey},
@@ -76,31 +75,29 @@ impl<VC> ContinuationProver<VC> {
     }
 }
 
-pub struct SingleSegmentProver<VC> {
+pub struct SingleSegmentContinuationProver<VC> {
     minimal_prover: MinimalProver<VC>,
     halo2_prover: Halo2Prover,
-    _phantom: PhantomData<VC>,
 }
 
-impl<VC> SingleSegmentProver<VC> {
+impl<VC> SingleSegmentContinuationProver<VC> {
     pub fn new(
         reader: &impl Halo2ParamsReader,
         app_pk: Arc<AppProvingKey<VC>>,
-        // app_committed_exe: Arc<NonRootCommittedExe>,
-        minimal_pk: MinimalProvingKey<VC>,
+        app_committed_exe: Arc<NonRootCommittedExe>,
+        minimal_pk: MinimalProvingKey,
     ) -> Self
     where
         VC: VmConfig<F>,
     {
-        // let app_vm_pk = VmProvingKey {
-        //     fri_params: app_pk.leaf_fri_params,
-        //     vm_config: app_pk.app_vm_pk.vm_config.clone(),
-        //     vm_pk: app_pk.app_vm_pk.vm_pk.clone(),
-        // };
+        let MinimalProvingKey {
+            minimal_stark_pk,
+            halo2_pk,
+        } = minimal_pk;
+        let minimal_prover = MinimalProver::new(app_pk, app_committed_exe, minimal_stark_pk);
         Self {
-            minimal_prover: MinimalProver::new(minimal_pk.clone()),
-            halo2_prover: Halo2Prover::new(reader, minimal_pk.halo2_pk),
-            _phantom: PhantomData,
+            minimal_prover,
+            halo2_prover: Halo2Prover::new(reader, halo2_pk),
         }
     }
 
@@ -110,7 +107,7 @@ impl<VC> SingleSegmentProver<VC> {
         VC::Executor: Chip<SC>,
         VC::Periphery: Chip<SC>,
     {
-        let proof = self.minimal_prover.prove(input);
+        let proof = self.minimal_prover.generate_proof(input);
         self.halo2_prover.prove_for_evm(&proof)
     }
 }

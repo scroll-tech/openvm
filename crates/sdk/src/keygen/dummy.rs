@@ -97,6 +97,29 @@ pub(super) fn dummy_internal_proof_riscv_app_vm(
     dummy_internal_proof(internal_vm_pk, internal_exe, leaf_proof)
 }
 
+// pub(super) fn dummy_minimal_proof(
+//     leaf_vm_pk: Arc<VmProvingKey<SC, NativeConfig>>,
+//     leaf_exe: Arc<NonRootCommittedExe>,
+//     leaf_proof: Proof<SC>,
+// ) -> Proof<SC> {
+//     let mut leaf_inputs = LeafVmVerifierInput::chunk_continuation_vm_proof(leaf_proof, 1); //InternalVmVerifierInput::chunk_leaf_or_internal_proofs(
+//     let leaf_input = leaf_inputs.pop().unwrap();
+//     let leaf_prover =
+//         VmLocalProver::<SC, NativeConfig, BabyBearPoseidon2Engine>::new(leaf_vm_pk, leaf_exe);
+//     SingleSegmentVmProver::prove(&leaf_prover, leaf_input.write_to_stream())
+// }
+
+// pub(super) fn dummy_minimal_proof_riscv_app_vm(
+//     leaf_vm_pk: Arc<VmProvingKey<SC, NativeConfig>>,
+//     leaf_exe: Arc<NonRootCommittedExe>,
+//     num_public_values: usize,
+// ) -> Proof<SC> {
+//     let fri_params = standard_fri_params_with_100_bits_conjectured_security(1);
+//     let leaf_proof =
+//         dummy_leaf_proof_riscv_app_vm(leaf_vm_pk.clone(), num_public_values, fri_params);
+//     dummy_minimal_proof(leaf_vm_pk, leaf_exe, leaf_proof)
+// }
+
 #[allow(dead_code)]
 pub fn dummy_leaf_proof<VC: VmConfig<F>>(
     leaf_vm_pk: Arc<VmProvingKey<SC, NativeConfig>>,

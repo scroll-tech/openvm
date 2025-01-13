@@ -13,6 +13,7 @@ pub struct StarkProver<VC> {
     app_prover: AppProver<VC>,
     agg_prover: AggStarkProver,
 }
+
 impl<VC> StarkProver<VC> {
     pub fn new(
         app_pk: Arc<AppProvingKey<VC>>,

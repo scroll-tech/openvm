@@ -1,17 +1,14 @@
-use openvm_circuit::arch::{instructions::program::Program, SystemConfig};
+use openvm_circuit::arch::instructions::program::Program;
 use openvm_native_compiler::{
     conversion::CompilerOptions,
-    ir::{Array, Builder, Felt, RVar, Usize, DIGEST_SIZE},
+    ir::{Builder, Felt, RVar, Usize, DIGEST_SIZE},
 };
 use openvm_native_recursion::{
     challenger::duplex::DuplexChallengerVariable, fri::TwoAdicFriPcsVariable, hints::Hintable,
     stark::StarkVerifier, types::new_from_inner_multi_vk, utils::const_fri_config,
-    vars::StarkProofVariable,
 };
-use openvm_stark_backend::{
-    keygen::types::MultiStarkVerifyingKey, p3_field::FieldAlgebra, prover::types::Proof,
-};
-use openvm_stark_sdk::config::{baby_bear_poseidon2::BabyBearPoseidon2Config, FriParameters};
+use openvm_stark_backend::{keygen::types::MultiStarkVerifyingKey, p3_field::FieldAlgebra};
+use openvm_stark_sdk::config::FriParameters;
 
 use super::{
     common::{
@@ -32,8 +29,9 @@ pub mod types;
 mod vars;
 
 pub struct MinimalVmVerifierConfig {
-    pub app_fri_params: FriParameters,
-    pub app_system_config: SystemConfig,
+    pub leaf_fri_params: FriParameters,
+    // pub app_system_config: SystemConfig,
+    pub num_public_values: usize,
     pub compiler_options: CompilerOptions,
 }
 
@@ -45,7 +43,7 @@ impl MinimalVmVerifierConfig {
         {
             builder.cycle_tracker_start("InitializePcsConst");
             let pcs = TwoAdicFriPcsVariable {
-                config: const_fri_config(&mut builder, &self.app_fri_params),
+                config: const_fri_config(&mut builder, &self.leaf_fri_params),
             };
             builder.cycle_tracker_end("InitializePcsConst");
             builder.cycle_tracker_start("ReadProofsFromInput");
@@ -91,7 +89,7 @@ impl MinimalVmVerifierConfig {
             builder.assert_felt_eq(pvs.connector.exit_code, F::ZERO);
 
             builder.cycle_tracker_start("ExtractPublicValues");
-            let public_values_vec: Vec<Felt<F>> = (0..self.app_system_config.num_public_values)
+            let public_values_vec: Vec<Felt<F>> = (0..self.num_public_values)
                 .map(|i| builder.get(&public_values, i))
                 .collect();
             let hasher = VariableP2Hasher::new(&mut builder);
