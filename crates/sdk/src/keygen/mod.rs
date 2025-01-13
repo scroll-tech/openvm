@@ -1,7 +1,9 @@
 use std::{marker::PhantomData, sync::Arc};
 
 use derivative::Derivative;
-use dummy::{compute_root_proof_heights, dummy_internal_proof_riscv_app_vm};
+use dummy::{
+    compute_root_proof_heights, dummy_internal_proof_riscv_app_vm, dummy_leaf_proof_riscv_app_vm,
+};
 use openvm_circuit::{
     arch::{VirtualMachine, VmConfig},
     system::program::trace::VmCommittedExe,
@@ -34,8 +36,8 @@ use crate::{
     keygen::perm::AirIdPermutation,
     prover::vm::types::VmProvingKey,
     verifier::{
-        internal::InternalVmVerifierConfig, leaf::LeafVmVerifierConfig,
-        minimal::MinimalVmVerifierConfig, root::RootVmVerifierConfig,
+        common::types::VmVerifierPvs, internal::InternalVmVerifierConfig,
+        leaf::LeafVmVerifierConfig, minimal::MinimalVmVerifierConfig, root::RootVmVerifierConfig,
     },
     NonRootCommittedExe, RootSC, F, SC,
 };
@@ -73,6 +75,7 @@ pub struct AggStarkProvingKey {
 /// Minimal proving key for App->Root->Static Verifier->Wrapper
 #[derive(Clone, Serialize, Deserialize)]
 pub struct MinimalProvingKey<VC> {
+    pub app_vm_pk: Arc<VmProvingKey<SC, VC>>,
     pub root_verifier_pk: RootVerifierProvingKey,
     pub halo2_pk: Halo2ProvingKey,
     _phantom: PhantomData<VC>,
@@ -298,6 +301,8 @@ impl RootVerifierProvingKey {
     }
 }
 
+const SBOX_SIZE: usize = 7;
+
 impl<VC: VmConfig<F>> MinimalProvingKey<VC>
 where
     VC::Executor: Chip<SC>,
@@ -309,7 +314,7 @@ where
     #[tracing::instrument(level = "info", fields(group = "minimal_keygen"), skip_all)]
     pub fn keygen(config: MinimalConfig<VC>, reader: &impl Halo2ParamsReader) -> Self {
         let app_engine = BabyBearPoseidon2Engine::new(config.app_fri_params);
-        let app_vm_pk = {
+        let app_vm_pk = Arc::new({
             let vm = VirtualMachine::new(app_engine, config.app_vm_config.clone());
             let vm_pk = vm.keygen();
             assert!(vm_pk.max_constraint_degree <= config.app_fri_params.max_constraint_degree());
@@ -318,29 +323,66 @@ where
                 vm_config: config.app_vm_config.clone(),
                 vm_pk,
             }
-        };
+        });
 
-        let root_committed_exe = {
-            let engine_root = BabyBearPoseidon2Engine::new(config.app_fri_params);
+        // Generate dummy app proof for root verifier setup
+        let dummy_app_proof = dummy_leaf_proof_riscv_app_vm(
+            app_vm_pk.clone(),
+            app_vm_pk.vm_config.system().num_public_values,
+            config.app_fri_params,
+        );
+
+        let root_vm_config = NativeConfig::aggregation(
+            DIGEST_SIZE * 2 + VmVerifierPvs::<u8>::width(),
+            SBOX_SIZE.min(config.app_fri_params.max_constraint_degree()),
+        );
+        // let app_proof = dummy_leaf_proof_riscv_app_vm(
+        //     Arc::new(app_vm_pk.vm_pk.get_vk()),
+        //     config.app_vm_config.system().num_public_values,
+        //     config.app_fri_params,
+        // );
+
+        let root_verifier_pk = {
+            let root_engine = BabyBearPoseidon2RootEngine::new(config.app_fri_params);
             let root_program = MinimalVmVerifierConfig {
                 app_fri_params: config.app_fri_params,
                 app_system_config: config.app_vm_config.system().clone(),
                 compiler_options: config.compiler_options,
             }
             .build_program(&app_vm_pk.vm_pk.get_vk());
-            Arc::new(VmCommittedExe::commit(
+            let root_committed_exe = Arc::new(VmCommittedExe::<RootSC>::commit(
                 root_program.into(),
-                engine_root.config.pcs(),
-            ))
-        };
+                root_engine.config.pcs(),
+            ));
 
-        let (minimal_stark_pk, dummy_leaf_proof) =
-            MinimalProvingKey::dummy_proof_and_keygen(config);
-        let dummy_root_proof = minimal_stark_pk
-            .root_verifier_pk
-            .generate_dummy_root_proof(dummy_leaf_proof);
-        let verifier = minimal_stark_pk.root_verifier_pk.keygen_static_verifier(
-            &reader.read_params(config.halo2_config.verifier_k),
+            let vm = VirtualMachine::new(root_engine, root_vm_config.clone());
+            let mut vm_pk = vm.keygen();
+            assert!(vm_pk.max_constraint_degree <= config.app_fri_params.max_constraint_degree());
+
+            let (air_heights, _internal_heights) = compute_root_proof_heights(
+                root_vm_config.clone(),
+                root_committed_exe.exe.clone(),
+                &dummy_app_proof,
+            );
+            let root_air_perm = AirIdPermutation::compute(&air_heights);
+            root_air_perm.permute(&mut vm_pk.per_air);
+
+            RootVerifierProvingKey {
+                vm_pk: Arc::new(VmProvingKey {
+                    fri_params: config.app_fri_params,
+                    vm_config: root_vm_config,
+                    vm_pk,
+                }),
+                root_committed_exe,
+                air_heights,
+            }
+        };
+        // This section returns the minimal_stark_pk and dummy_app_proof
+
+        // Generate wrapper proving key
+        let dummy_root_proof = root_verifier_pk.generate_dummy_root_proof(dummy_app_proof);
+        let verifier = root_verifier_pk.keygen_static_verifier(
+            &reader.read_params(config.halo2_config.verifier_k.clone()),
             dummy_root_proof,
         );
         let dummy_snark = verifier.generate_dummy_snark(reader);
@@ -350,19 +392,13 @@ where
             Halo2WrapperProvingKey::keygen_auto_tune(reader, dummy_snark)
         };
         let halo2_pk = Halo2ProvingKey { verifier, wrapper };
+
         Self {
-            root_verifier_pk: minimal_stark_pk.root_verifier_pk,
+            app_vm_pk,
+            root_verifier_pk,
             halo2_pk,
             _phantom: PhantomData,
         }
-    }
-
-    fn dummy_proof_and_keygen(config: MinimalConfig<VC>) -> (Self, Proof<SC>) {
-        let (minimal_stark_pk, dummy_leaf_proof) =
-            MinimalProvingKey::dummy_proof_and_keygen(config);
-        let dummy_root_proof = minimal_stark_pk
-            .root_verifier_pk
-            .generate_dummy_root_proof(dummy_leaf_proof);
     }
 }
 
