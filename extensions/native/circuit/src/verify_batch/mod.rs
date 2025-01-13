@@ -70,6 +70,7 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
     pub inner: Poseidon2SubCols<T, SBOX_REGISTERS>,
 
     pub cells: [VerifyBatchCellCols<T, SBOX_REGISTERS>; CHUNK],
+    // inside row: this is the initial opened index for the entire row hash
     pub initial_opened_index: T,
 
     pub height: T,
@@ -79,8 +80,10 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
     pub dim_base_pointer: T,
     pub sibling_pointer: T,
 
-    pub dim_read: MemoryReadAuxCols<T, 1>,
-    pub opened_or_sibling_read: MemoryReadAuxCols<T, 1>,
+    // can optimize some (9) columns away by merging these with the MemoryReadAuxCols in cells
+    pub height_read_initial: MemoryReadAuxCols<T, 1>,
+    pub height_read_final: MemoryReadAuxCols<T, 1>,
+    pub sibling_read: MemoryReadAuxCols<T, 1>,
 
     pub commit_pointer: T,
     pub commit_read: MemoryReadAuxCols<T, CHUNK>,
@@ -91,13 +94,11 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
 pub struct VerifyBatchCellCols<T, const SBOX_REGISTERS: usize> {
     pub read: MemoryReadAuxCols<T, 1>,
     pub opened_index: T,
-    pub read_row_pointer: MemoryReadAuxCols<T, 1>,
-    pub read_row_length: MemoryReadAuxCols<T, 1>,
+    pub read_row_pointer_and_length: MemoryReadAuxCols<T, 2>,
     pub row_pointer: T,
     pub row_end: T,
     pub is_first_in_row: T,
     pub is_exhausted: T,
-    pub read_height: MemoryReadAuxCols<T, 1>,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -110,7 +111,6 @@ impl VerifyBatchBus {
         send: bool,
         multiplicity: impl Into<AB::Expr>,
         timestamp: impl Into<AB::Expr>,
-        height: impl Into<AB::Expr>,
         opened_base_pointer: impl Into<AB::Expr>,
         dim_base_pointer: impl Into<AB::Expr>,
         initial_opened_index: impl Into<AB::Expr>,
@@ -175,8 +175,9 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             dim_base_pointer,
             opened_base_pointer,
             sibling_pointer,
-            dim_read,
-            opened_or_sibling_read,
+            height_read_initial,
+            height_read_final,
+            sibling_read,
             commit_pointer,
             commit_read,
         } = local;
@@ -218,11 +219,10 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             false,
             end_inside_row,
             start_timestamp + AB::F::from_canonical_usize(4 * CHUNK),
-            height,
             opened_base_pointer,
             dim_base_pointer,
             initial_opened_index,
-            cells[CHUNK - 1].opened_index + AB::F::ONE,
+            cells[CHUNK - 1].opened_index,
             left_output,
         );
 
@@ -279,7 +279,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 .read(
                     MemoryAddress::new(address_space, cell.row_pointer),
                     [left_input[i]],
-                    start_timestamp + AB::F::from_canonical_usize((4 * i) + 2),
+                    start_timestamp + AB::F::from_canonical_usize((2 * i) + 1),
                     &cell.read,
                 )
                 .eval(builder, inside_row * not(cell.is_exhausted));
@@ -307,20 +307,9 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                         address_space,
                         opened_base_pointer + (cell.opened_index * AB::F::TWO),
                     ),
-                    [cell.row_pointer - AB::F::ONE],
-                    start_timestamp + AB::F::from_canonical_usize(4 * i),
-                    &cell.read_row_pointer,
-                )
-                .eval(builder, inside_row * cell.is_first_in_row);
-            self.memory_bridge
-                .read(
-                    MemoryAddress::new(
-                        address_space,
-                        opened_base_pointer + (cell.opened_index * AB::F::TWO) + AB::F::ONE,
-                    ),
-                    [cell.row_end - cell.row_pointer],
-                    start_timestamp + AB::F::from_canonical_usize((4 * i) + 1),
-                    &cell.read_row_length,
+                    [cell.row_pointer.into(), cell.row_end - cell.row_pointer],
+                    start_timestamp + AB::F::from_canonical_usize(2 * i),
+                    &cell.read_row_pointer_and_length,
                 )
                 .eval(builder, inside_row * cell.is_first_in_row);
             let mut when_inside_row_not_last = builder.when(inside_row - end_inside_row);
@@ -341,16 +330,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 .when(inside_row)
                 .when(is_last_in_row)
                 .assert_eq(cell.row_pointer, cell.row_end);
-
-            // ensure that height matches
-            self.memory_bridge
-                .read(
-                    MemoryAddress::new(address_space, dim_base_pointer + cell.opened_index),
-                    [height],
-                    start_timestamp + AB::F::from_canonical_usize((4 * i) + 3),
-                    &cell.read_height,
-                )
-                .eval(builder, inside_row * cell.is_first_in_row);
         }
     }
 }
