@@ -7,6 +7,9 @@ use crate::verify_batch::CHUNK;
 #[repr(C)]
 #[derive(AlignedBorrow)]
 pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
+    // poseidon2
+    pub inner: Poseidon2SubCols<T, SBOX_REGISTERS>,
+
     // flags - at most 1 is true, if none is true then row is disabled
     pub incorporate_row: T,
     pub incorporate_sibling: T,
@@ -29,9 +32,6 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
     pub index_register: T,
     pub commit_register: T,
     pub address_space: T,
-
-    // poseidon2
-    pub inner: Poseidon2SubCols<T, SBOX_REGISTERS>,
 
     pub cells: [VerifyBatchCellCols<T, SBOX_REGISTERS>; CHUNK],
     // initial/final opened index for a subsegment with same height

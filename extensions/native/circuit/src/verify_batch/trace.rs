@@ -1,16 +1,19 @@
 use std::sync::Arc;
 
-use openvm_stark_backend::ChipUsageGetter;
-use openvm_stark_backend::p3_air::BaseAir;
-use openvm_stark_backend::p3_field::{Field, PrimeField32};
-
+use itertools::Itertools;
 use openvm_circuit::system::memory::{MemoryAuxColsFactory, OfflineMemory};
-use openvm_poseidon2_air::p3_poseidon2_air::Poseidon2Cols;
-use openvm_poseidon2_air::Poseidon2SubCols;
+use openvm_poseidon2_air::{p3_poseidon2_air::Poseidon2Cols, Poseidon2SubCols};
+use openvm_stark_backend::{
+    p3_air::BaseAir,
+    p3_field::{Field, PrimeField32},
+    ChipUsageGetter,
+};
 
-use crate::verify_batch::chip::{IncorporateSiblingRecord, VerifyBatchChip, VerifyBatchRecord};
-use crate::verify_batch::CHUNK;
-use crate::verify_batch::columns::{VerifyBatchCellCols, VerifyBatchCols};
+use crate::verify_batch::{
+    chip::{IncorporateRowRecord, IncorporateSiblingRecord, VerifyBatchChip, VerifyBatchRecord},
+    columns::{VerifyBatchCellCols, VerifyBatchCols},
+    CHUNK,
+};
 
 impl<F: Field, const SBOX_REGISTERS: usize> ChipUsageGetter for VerifyBatchChip<F, SBOX_REGISTERS> {
     fn air_name(&self) -> String {
@@ -27,14 +30,10 @@ impl<F: Field, const SBOX_REGISTERS: usize> ChipUsageGetter for VerifyBatchChip<
 }
 
 impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGISTERS> {
-    fn generate_subair_cols(&self, input: [F; 2 * CHUNK]) -> Poseidon2SubCols<F, SBOX_REGISTERS> {
+    fn generate_subair_cols(&self, input: [F; 2 * CHUNK], cols: &mut [F]) {
         let inner_trace = self.subchip.generate_trace(vec![input]);
         let inner_width = self.air.subair.width();
-        
-        let mut v = vec![F::ZERO; inner_width];
-        v.copy_from_slice(&inner_trace.values.as_slice());
-        let cols: &Poseidon2SubCols<F, SBOX_REGISTERS> = inner_trace.values.as_slice().borrow();
-        cols.clone()
+        cols[..inner_width].copy_from_slice(&inner_trace.values.as_slice());
     }
     fn incorporate_sibling_record_to_rows(
         &self,
@@ -44,13 +43,9 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         memory: &OfflineMemory<F>,
         parent: &VerifyBatchRecord<F>,
         proof_index: usize,
-        is_last: bool,
         opened_index: usize,
         height: usize,
     ) {
-        let width = VerifyBatchCols::<F, SBOX_REGISTERS>::width();
-        let arbitrary = F::ZERO;
-
         let &IncorporateSiblingRecord {
             read_sibling_array_start,
             read_root_is_on_right,
@@ -59,61 +54,132 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
             reads,
             p2_input,
         } = record;
-        
-        self.air.subair.
-        
+
         let read_root_is_on_right = memory.record_by_id(read_root_is_on_right);
         let read_sibling_array_start = memory.record_by_id(read_sibling_array_start);
-        
-        let cols: &mut VerifyBatchCols<F, SBOX_REGISTERS> = slice[0..width].borrow_mut();
-        *cols = VerifyBatchCols {
-            incorporate_row: F::ZERO,
-            incorporate_sibling: F::ONE,
-            inside_row: F::ZERO,
-            end_inside_row: F::ZERO,
-            end_top_level: F::from_bool(is_last),
-            start: F::ZERO,
-            pc: arbitrary,
-            very_first_timestamp: parent.from_state.timestamp,
-            start_timestamp: read_root_is_on_right.timestamp,
-            end_timestamp:  F::from_canonical_usize(read_root_is_on_right.timestamp as usize + (2 + CHUNK)),
-            dim_register: arbitrary,
-            opened_register: arbitrary,
-            sibling_register: arbitrary,
-            index_register: arbitrary,
-            commit_register: arbitrary,
-            address_space: parent.address_space(),
-            inner: Poseidon2Cols {},
-            cells: reads.map(|read| VerifyBatchCellCols {
-                read: aux_cols_factory.make_read_aux_cols(memory.record_by_id(read)),
-                opened_index: arbitrary,
-                read_row_pointer_and_length: arbitrary,
-                row_pointer: arbitrary,
-                row_end: arbitrary,
-                is_first_in_row: arbitrary,
-                is_exhausted: arbitrary,
-            }),
-            initial_opened_index: F::from_canonical_usize(opened_index),
-            final_opened_index: F::from_canonical_usize(opened_index - 1),
-            height: F::from_canonical_usize(height),
-            opened_length: F::from_canonical_usize(parent.opened_length),
-            dim_base_pointer: F::from_canonical_u32(parent.dim_base_pointer),
-            opened_base_pointer: F::from_canonical_u32(parent.opened_base_pointer),
-            sibling_base_pointer: F::from_canonical_u32(parent.sibling_base_pointer),
-            index_base_pointer: F::from_canonical_u32(parent.index_base_pointer),
-            dim_base_pointer_read: aux_cols_factory.make_read_aux_cols(memory.record_by_id(parent.dim_base_pointer_read)),
-            opened_base_pointer_and_length_read: aux_cols_factory.make_read_aux_cols(memory.record_by_id(parent.opened_base_pointer_and_length_read)),
-            sibling_base_pointer_read: aux_cols_factory.make_read_aux_cols(memory.record_by_id(parent.sibling_base_pointer_read)),
-            index_base_pointer_read: aux_cols_factory.make_read_aux_cols(memory.record_by_id(parent.index_base_pointer_read)),
-            commit_pointer_read: aux_cols_factory.make_read_aux_cols(memory.record_by_id(parent.commit_pointer_read)),
-            commit_read: aux_cols_factory.make_read_aux_cols(memory.record_by_id(parent.commit_read)),
-            proof_index: F::from_canonical_usize(proof_index),
-            read_initial_height_or_root_is_on_right: aux_cols_factory.make_read_aux_cols(read_root_is_on_right),
-            read_final_height_or_sibling_array_start: aux_cols_factory.make_read_aux_cols(read_sibling_array_start),
-            root_is_on_right: F::from_bool(root_is_on_right),
-            sibling_array_start: read_sibling_array_start.data[0],
-            commit_pointer: arbitrary,
-        };
+
+        self.generate_subair_cols(p2_input, slice);
+        let cols: &mut VerifyBatchCols<F, SBOX_REGISTERS> = slice.borrow_mut();
+        cols.incorporate_row = F::ZERO;
+        cols.incorporate_sibling = F::ONE;
+        cols.inside_row = F::ZERO;
+        cols.end_inside_row = F::ZERO;
+        cols.end_top_level = F::ZERO;
+        cols.start = F::ZERO;
+        cols.very_first_timestamp = parent.from_state.timestamp;
+        cols.start_timestamp = F::from_canonical_u32(read_root_is_on_right.timestamp - 6);
+        cols.end_timestamp =
+            F::from_canonical_usize(read_root_is_on_right.timestamp as usize + (2 + CHUNK));
+        cols.address_space = parent.address_space();
+        for (read, cell) in reads.into_iter().zip_eq(cols.cells.iter_mut()) {
+            cell.read = aux_cols_factory.make_read_aux_cols(memory.record_by_id(read));
+        }
+        cols.initial_opened_index = F::from_canonical_usize(opened_index);
+        cols.final_opened_index = F::from_canonical_usize(opened_index - 1);
+        cols.height = F::from_canonical_usize(height);
+        cols.opened_length = F::from_canonical_usize(parent.opened_length);
+        cols.dim_base_pointer = F::from_canonical_u32(parent.dim_base_pointer);
+        cols.opened_base_pointer = F::from_canonical_u32(parent.opened_base_pointer);
+        cols.sibling_base_pointer = F::from_canonical_u32(parent.sibling_base_pointer);
+        cols.index_base_pointer = F::from_canonical_u32(parent.index_base_pointer);
+
+        cols.proof_index = F::from_canonical_usize(proof_index);
+        cols.read_initial_height_or_root_is_on_right =
+            aux_cols_factory.make_read_aux_cols(read_root_is_on_right);
+        cols.read_final_height_or_sibling_array_start =
+            aux_cols_factory.make_read_aux_cols(read_sibling_array_start);
+        cols.root_is_on_right = F::from_bool(root_is_on_right);
+        cols.sibling_array_start = read_sibling_array_start.data[0];
+    }
+    fn correct_last_top_level_row(
+        &self,
+        record: &VerifyBatchRecord<F>,
+        aux_cols_factory: &MemoryAuxColsFactory<F>,
+        slice: &mut [F],
+        memory: &OfflineMemory<F>,
+    ) {
+        let &VerifyBatchRecord {
+            from_state,
+            instruction,
+            commit_pointer,
+            dim_base_pointer_read,
+            opened_base_pointer_and_length_read,
+            sibling_base_pointer_read,
+            index_base_pointer_read,
+            commit_pointer_read,
+            commit_read,
+            ..
+        } = record;
+        let cols: &mut VerifyBatchCols<F, SBOX_REGISTERS> = slice.borrow_mut();
+        cols.pc = F::from_canonical_u32(from_state.pc);
+        cols.dim_register = instruction.a;
+        cols.opened_register = instruction.b;
+        cols.sibling_register = instruction.c;
+        cols.index_register = instruction.d;
+        cols.commit_register = instruction.e;
+        cols.commit_pointer = F::from_canonical_u32(commit_pointer);
+        cols.dim_base_pointer_read = aux_cols_factory.make_read_aux_cols(memory.record_by_id(dim_base_pointer_read));
+        cols.opened_base_pointer_and_length_read = aux_cols_factory.make_read_aux_cols(memory.record_by_id(opened_base_pointer_and_length_read));
+        cols.sibling_base_pointer_read = aux_cols_factory.make_read_aux_cols(memory.record_by_id(sibling_base_pointer_read));
+        cols.index_base_pointer_read = aux_cols_factory.make_read_aux_cols(memory.record_by_id(index_base_pointer_read));
+        cols.commit_pointer_read = aux_cols_factory.make_read_aux_cols(memory.record_by_id(commit_pointer_read));
+        cols.commit_read = aux_cols_factory.make_read_aux_cols(memory.record_by_id(commit_read));
+    }
+    fn incorporate_row_record_to_rows(
+        &self,
+        record: &IncorporateRowRecord<F>,
+        aux_cols_factory: &MemoryAuxColsFactory<F>,
+        slice: &mut [F],
+        memory: &OfflineMemory<F>,
+        parent: &VerifyBatchRecord<F>,
+        proof_index: usize,
+        is_first: bool,
+        height: usize,
+    ) {
+        let &IncorporateRowRecord {
+            chunks,
+            initial_opened_index,
+            final_opened_index,
+            initial_height_read,
+            final_height_read,
+            p2_input,
+        } = record;
+
+        let initial_height_read = memory.record_by_id(initial_height_read);
+        let final_height_read = memory.record_by_id(final_height_read);
+
+        self.generate_subair_cols(p2_input, slice);
+        let cols: &mut VerifyBatchCols<F, SBOX_REGISTERS> = slice.borrow_mut();
+        cols.incorporate_row = F::ONE;
+        cols.incorporate_sibling = F::ZERO;
+        cols.inside_row = F::ZERO;
+        cols.end_inside_row = F::ZERO;
+        cols.end_top_level = F::ZERO;
+        cols.start = F::from_bool(is_first);
+        cols.very_first_timestamp = parent.from_state.timestamp;
+        cols.start_timestamp = F::from_canonical_u32(
+            memory
+                .record_by_id(chunks[0].cells[0].read_row_pointer_and_length.unwrap())
+                .timestamp
+                - 6,
+        );
+        cols.end_timestamp = F::from_canonical_u32(final_height_read.timestamp + 1);
+        cols.address_space = parent.address_space();
+
+        cols.initial_opened_index = F::from_canonical_usize(initial_opened_index);
+        cols.final_opened_index = F::from_canonical_usize(final_opened_index);
+        cols.height = F::from_canonical_usize(height);
+        cols.opened_length = F::from_canonical_usize(parent.opened_length);
+        cols.dim_base_pointer = F::from_canonical_u32(parent.dim_base_pointer);
+        cols.opened_base_pointer = F::from_canonical_u32(parent.opened_base_pointer);
+        cols.sibling_base_pointer = F::from_canonical_u32(parent.sibling_base_pointer);
+        cols.index_base_pointer = F::from_canonical_u32(parent.index_base_pointer);
+
+        cols.proof_index = F::from_canonical_usize(proof_index);
+        cols.read_initial_height_or_root_is_on_right =
+            aux_cols_factory.make_read_aux_cols(initial_height_read);
+        cols.read_final_height_or_sibling_array_start =
+            aux_cols_factory.make_read_aux_cols(final_height_read);
     }
     fn record_to_rows(
         record: VerifyBatchRecord<F>,
@@ -122,8 +188,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         memory: &OfflineMemory<F>,
     ) {
         let width = VerifyBatchCols::<F, SBOX_REGISTERS>::width();
-        
-        
 
         let Instruction {
             a: a_ptr_ptr,

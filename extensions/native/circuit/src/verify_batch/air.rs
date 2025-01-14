@@ -1,22 +1,21 @@
 use std::{borrow::Borrow, sync::Arc};
 
+use openvm_circuit::{
+    arch::{ExecutionBridge, ExecutionState},
+    system::memory::{offline_checker::MemoryBridge, MemoryAddress},
+};
+use openvm_circuit_primitives::utils::not;
+use openvm_native_compiler::VerifyBatchOpcode::VERIFY_BATCH;
+use openvm_poseidon2_air::{Poseidon2SubAir, BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS};
 use openvm_stark_backend::{
-    interaction::InteractionBuilder,
+    interaction::{InteractionBuilder, InteractionType},
     p3_air::{Air, AirBuilder, BaseAir},
     p3_field::{Field, FieldAlgebra},
     p3_matrix::Matrix,
     rap::{BaseAirWithPublicValues, PartitionedBaseAir},
 };
-use openvm_stark_backend::interaction::InteractionType;
-use openvm_circuit::{
-    arch::{ExecutionBridge, ExecutionState},
-    system::memory::{MemoryAddress, offline_checker::MemoryBridge},
-};
-use openvm_circuit_primitives::utils::not;
-use openvm_native_compiler::VerifyBatchOpcode::VERIFY_BATCH;
-use openvm_poseidon2_air::{BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS, Poseidon2SubAir};
 
-use crate::verify_batch::{CHUNK, columns::VerifyBatchCols};
+use crate::verify_batch::{columns::VerifyBatchCols, CHUNK};
 
 #[derive(Clone, Debug)]
 pub struct VerifyBatchAir<F: Field, const SBOX_REGISTERS: usize> {
@@ -293,7 +292,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .read(
                 MemoryAddress::new(address_space, opened_register),
                 [opened_base_pointer, opened_length],
-                very_first_timestamp+ AB::F::ONE,
+                very_first_timestamp + AB::F::ONE,
                 &opened_base_pointer_and_length_read,
             )
             .eval(builder, end_top_level);
@@ -317,7 +316,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .read(
                 MemoryAddress::new(address_space, commit_register),
                 [commit_pointer],
-                very_first_timestamp+ AB::F::from_canonical_usize(4),
+                very_first_timestamp + AB::F::from_canonical_usize(4),
                 &commit_pointer_read,
             )
             .eval(builder, end_top_level);
@@ -504,7 +503,11 @@ impl VerifyBatchBus {
             self.0,
             fields,
             multiplicity.into(),
-            if send { InteractionType::Send } else { InteractionType::Receive },
+            if send {
+                InteractionType::Send
+            } else {
+                InteractionType::Receive
+            },
         );
     }
 }
