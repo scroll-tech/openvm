@@ -59,6 +59,7 @@ pub(super) struct IncorporateSiblingRecord<F: Field> {
     pub root_is_on_right: bool,
     pub sibling: [F; CHUNK],
     pub reads: [RecordId; CHUNK],
+    pub p2_input: [RecordId; 2 * CHUNK],
 }
 
 pub(super) struct IncorporateRowRecord<F: Field> {
@@ -67,11 +68,12 @@ pub(super) struct IncorporateRowRecord<F: Field> {
     pub final_opened_index: usize,
     pub initial_height_read: RecordId,
     pub final_height_read: RecordId,
+    pub p2_input: [RecordId; 2 * CHUNK],
 }
 
 pub(super) struct InsideRowRecord<F: Field> {
     pub cells: Vec<CellRecord>,
-    pub chunk: [F; CHUNK],
+    pub p2_input: [RecordId; 2 * CHUNK],
 }
 
 pub(super) struct CellRecord {
@@ -83,10 +85,10 @@ pub(super) struct CellRecord {
 }
 
 pub struct VerifyBatchChip<F: Field, const SBOX_REGISTERS: usize> {
-    air: VerifyBatchAir<F, SBOX_REGISTERS>,
+    pub(super) air: VerifyBatchAir<F, SBOX_REGISTERS>,
     pub(super) records: Vec<VerifyBatchRecord<F>>,
     pub(super) height: usize,
-    offline_memory: Arc<Mutex<OfflineMemory<F>>>,
+    pub(super) offline_memory: Arc<Mutex<OfflineMemory<F>>>,
     pub(super) subchip: Poseidon2SubChip<F, SBOX_REGISTERS>,
 }
 
@@ -115,10 +117,10 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         }
     }
     
-    fn compress(&self, left: [F; CHUNK], right: [F; CHUNK]) -> [F; CHUNK] {
+    fn compress(&self, left: [F; CHUNK], right: [F; CHUNK]) -> ([F; 2 * CHUNK], [F; CHUNK]) {
         let concatenated = std::array::from_fn(|i| if i < CHUNK { left[i] } else { right[i - CHUNK] });
         let permuted = self.subchip.permute(concatenated);
-        std::array::from_fn(|i| permuted[i])
+        (concatenated, std::array::from_fn(|i| permuted[i]))
     }
 }
 
@@ -177,6 +179,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                 let mut row_pointer = 0;
                 let mut row_end = 0;
                 
+                let mut prev_rolling_hash: Option<[F; 2 * CHUNK]> = None;
                 let mut rolling_hash = [F::ZERO; 2 * CHUNK];
                 
                 while opened_index < opened_length
@@ -217,12 +220,13 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     }
                     chunks.push(InsideRowRecord {
                         cells,
-                        chunk,
+                        p2_input: rolling_hash,
                     });
                     self.height += 1;
                     for i in 0..CHUNK {
                         rolling_hash[i] = chunk[i];
                     }
+                    prev_rolling_hash = Some(rolling_hash);
                     self.subchip.permute_mut(rolling_hash);
                 }
                 let final_opened_index = opened_index - 1;
@@ -232,12 +236,13 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                 assert_eq!(height_check, F::from_canonical_u32(height));
                 
                 let hash: [F; CHUNK] = std::array::from_fn(|i| rolling_hash[i]);
-                
-                root = if height == initial_height {
-                    hash
+
+                let (p2_input, new_root) = if height == initial_height {
+                    (prev_rolling_hash.unwrap(), hash)
                 } else {
                     self.compress(root, hash)
                 };
+                root = new_root;
                 
                 self.height += 1;
                 Some(IncorporateRowRecord {
@@ -246,6 +251,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     final_opened_index,
                     initial_height_read,
                     final_height_read,
+                    p2_input,
                 })
             } else {
                 None
@@ -272,11 +278,12 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     reads.push(read);
                 }
 
-                root = if root_is_on_right {
+                let (p2_input, new_root) = if root_is_on_right {
                     self.compress(sibling, root)
                 } else {
                     self.compress(root, sibling)
                 };
+                root = new_root;
 
                 self.height += 1;
                 Some(IncorporateSiblingRecord {
@@ -285,6 +292,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     root_is_on_right,
                     sibling,
                     reads,
+                    p2_input,
                 })
             };
             

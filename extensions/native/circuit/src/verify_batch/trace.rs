@@ -1,10 +1,16 @@
 use std::sync::Arc;
+
 use openvm_stark_backend::ChipUsageGetter;
+use openvm_stark_backend::p3_air::BaseAir;
 use openvm_stark_backend::p3_field::{Field, PrimeField32};
+
 use openvm_circuit::system::memory::{MemoryAuxColsFactory, OfflineMemory};
+use openvm_poseidon2_air::p3_poseidon2_air::Poseidon2Cols;
+use openvm_poseidon2_air::Poseidon2SubCols;
+
 use crate::verify_batch::chip::{IncorporateSiblingRecord, VerifyBatchChip, VerifyBatchRecord};
 use crate::verify_batch::CHUNK;
-use crate::verify_batch::columns::VerifyBatchCols;
+use crate::verify_batch::columns::{VerifyBatchCellCols, VerifyBatchCols};
 
 impl<F: Field, const SBOX_REGISTERS: usize> ChipUsageGetter for VerifyBatchChip<F, SBOX_REGISTERS> {
     fn air_name(&self) -> String {
@@ -21,7 +27,17 @@ impl<F: Field, const SBOX_REGISTERS: usize> ChipUsageGetter for VerifyBatchChip<
 }
 
 impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGISTERS> {
+    fn generate_subair_cols(&self, input: [F; 2 * CHUNK]) -> Poseidon2SubCols<F, SBOX_REGISTERS> {
+        let inner_trace = self.subchip.generate_trace(vec![input]);
+        let inner_width = self.air.subair.width();
+        
+        let mut v = vec![F::ZERO; inner_width];
+        v.copy_from_slice(&inner_trace.values.as_slice());
+        let cols: &Poseidon2SubCols<F, SBOX_REGISTERS> = inner_trace.values.as_slice().borrow();
+        cols.clone()
+    }
     fn incorporate_sibling_record_to_rows(
+        &self,
         record: &IncorporateSiblingRecord<F>,
         aux_cols_factory: &MemoryAuxColsFactory<F>,
         slice: &mut [F],
@@ -41,7 +57,10 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
             root_is_on_right,
             sibling,
             reads,
+            p2_input,
         } = record;
+        
+        self.air.subair.
         
         let read_root_is_on_right = memory.record_by_id(read_root_is_on_right);
         let read_sibling_array_start = memory.record_by_id(read_sibling_array_start);
@@ -65,7 +84,15 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
             commit_register: arbitrary,
             address_space: parent.address_space(),
             inner: Poseidon2Cols {},
-            cells: [],
+            cells: reads.map(|read| VerifyBatchCellCols {
+                read: aux_cols_factory.make_read_aux_cols(memory.record_by_id(read)),
+                opened_index: arbitrary,
+                read_row_pointer_and_length: arbitrary,
+                row_pointer: arbitrary,
+                row_end: arbitrary,
+                is_first_in_row: arbitrary,
+                is_exhausted: arbitrary,
+            }),
             initial_opened_index: F::from_canonical_usize(opened_index),
             final_opened_index: F::from_canonical_usize(opened_index - 1),
             height: F::from_canonical_usize(height),
