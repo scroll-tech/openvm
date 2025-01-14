@@ -58,7 +58,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
             read_sibling_array_start,
             read_root_is_on_right,
             root_is_on_right,
-            sibling,
             reads,
             p2_input,
         } = record;

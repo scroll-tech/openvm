@@ -22,7 +22,7 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
     // execution state (pc can be shared (saves 1 col), very_first_timestamp is used in a different way inside row)
     pub pc: T,
     pub very_first_timestamp: T,
-    
+
     pub start_timestamp: T,
     pub end_timestamp: T, // only used for top level (so can be shared (saves 1 col)
 

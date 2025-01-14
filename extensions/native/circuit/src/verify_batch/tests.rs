@@ -1,24 +1,15 @@
-use itertools::Itertools;
-use openvm_stark_backend::{
-    p3_field::{Field, FieldAlgebra},
-    utils::disable_debug_builder,
-    verifier::VerificationError,
+use openvm_circuit::{
+    arch::testing::{memory::gen_pointer, VmChipTestBuilder},
+    system::memory::CHUNK,
 };
-use openvm_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
-use rand::Rng;
-use rand::rngs::StdRng;
-
-use openvm_circuit::arch::testing::{memory::gen_pointer, VmChipTestBuilder};
-use openvm_circuit::system::memory::CHUNK;
 use openvm_instructions::{instruction::Instruction, UsizeOpcode, VmOpcode};
-use openvm_native_compiler::FriOpcode::FRI_REDUCED_OPENING;
-use openvm_native_compiler::VerifyBatchOpcode;
-use openvm_native_compiler::VerifyBatchOpcode::VERIFY_BATCH;
+use openvm_native_compiler::{VerifyBatchOpcode, VerifyBatchOpcode::VERIFY_BATCH};
 use openvm_poseidon2_air::Poseidon2Config;
+use openvm_stark_backend::p3_field::{Field, FieldAlgebra};
+use openvm_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
+use rand::{rngs::StdRng, Rng};
 
-use crate::verify_batch::{chip::VerifyBatchChip, columns::VerifyBatchCols};
-
-use super::EXT_DEG;
+use crate::verify_batch::chip::VerifyBatchChip;
 
 fn compute_commit<F: Field>(
     dim: &Vec<usize>,
@@ -80,7 +71,11 @@ struct VerifyBatchInstance {
     commit: [F; CHUNK],
 }
 
-fn random_instance(rng: &mut StdRng, row_lengths: Vec<Vec<usize>>, hash_function: impl Fn([F; CHUNK], [F; CHUNK]) -> ([F; CHUNK], [F; CHUNK])) -> VerifyBatchInstance {
+fn random_instance(
+    rng: &mut StdRng,
+    row_lengths: Vec<Vec<usize>>,
+    hash_function: impl Fn([F; CHUNK], [F; CHUNK]) -> ([F; CHUNK], [F; CHUNK]),
+) -> VerifyBatchInstance {
     let mut dims = vec![];
     let mut opened = vec![];
     let mut proof = vec![];
@@ -100,14 +95,14 @@ fn random_instance(rng: &mut StdRng, row_lengths: Vec<Vec<usize>>, hash_function
             root_is_on_right.push(rng.gen());
         }
     }
-    
+
     dims.reverse();
     opened.reverse();
     proof.reverse();
     root_is_on_right.reverse();
-    
+
     let commit = compute_commit(&dims, &opened, &proof, &root_is_on_right, hash_function);
-    
+
     VerifyBatchInstance {
         dim: dims,
         opened,
@@ -122,7 +117,7 @@ fn verify_batch_air_test() {
     // single op
     let address_space = 5;
     let row_lengths = vec![vec![3], vec![], vec![9, 2, 1, 13, 4], vec![16]];
-    
+
     let offset = VerifyBatchOpcode::default_offset();
 
     let mut tester = VmChipTestBuilder::default();
@@ -140,34 +135,59 @@ fn verify_batch_air_test() {
         let concatenated =
             std::array::from_fn(|i| if i < CHUNK { left[i] } else { right[i - CHUNK] });
         let permuted = chip.subchip.permute(concatenated);
-        (std::array::from_fn(|i| permuted[i]), std::array::from_fn(|i| permuted[i + CHUNK]))
+        (
+            std::array::from_fn(|i| permuted[i]),
+            std::array::from_fn(|i| permuted[i + CHUNK]),
+        )
     });
-    let VerifyBatchInstance { dim, opened, proof, root_is_on_right, commit } = instance;
-    
+    let VerifyBatchInstance {
+        dim,
+        opened,
+        proof,
+        root_is_on_right,
+        commit,
+    } = instance;
+
     let dim_register = gen_pointer(&mut rng, 2);
     let opened_register = gen_pointer(&mut rng, 2);
     let sibling_register = gen_pointer(&mut rng, 2);
     let index_register = gen_pointer(&mut rng, 2);
     let commit_register = gen_pointer(&mut rng, 2);
-    
+
     let dim_base_pointer = gen_pointer(&mut rng, 1);
     let opened_base_pointer = gen_pointer(&mut rng, 2);
     let sibling_base_pointer = gen_pointer(&mut rng, 1);
     let index_base_pointer = gen_pointer(&mut rng, 1);
     let commit_pointer = gen_pointer(&mut rng, 1);
-    
+
     tester.write_usize(address_space, dim_register, [dim_base_pointer, dim.len()]);
-    tester.write_usize(address_space, opened_register, [opened_base_pointer, opened.len()]);
-    tester.write_usize(address_space, sibling_register, [sibling_base_pointer, proof.len()]);
-    tester.write_usize(address_space, index_register, [index_base_pointer, root_is_on_right.len()]);
+    tester.write_usize(
+        address_space,
+        opened_register,
+        [opened_base_pointer, opened.len()],
+    );
+    tester.write_usize(
+        address_space,
+        sibling_register,
+        [sibling_base_pointer, proof.len()],
+    );
+    tester.write_usize(
+        address_space,
+        index_register,
+        [index_base_pointer, root_is_on_right.len()],
+    );
     tester.write_usize(address_space, commit_register, [commit_pointer, CHUNK]);
-    
+
     for (i, &dim_value) in dim.iter().enumerate() {
         tester.write_usize(address_space, dim_base_pointer + i, [dim_value]);
     }
     for (i, opened_row) in opened.iter().enumerate() {
         let row_pointer = gen_pointer(&mut rng, 1);
-        tester.write_usize(address_space, opened_base_pointer + (2 * i), [row_pointer, opened_row.len()]);
+        tester.write_usize(
+            address_space,
+            opened_base_pointer + (2 * i),
+            [row_pointer, opened_row.len()],
+        );
         for (j, &opened_value) in opened_row.iter().enumerate() {
             tester.write_cell(address_space, row_pointer + j, opened_value);
         }
@@ -197,7 +217,7 @@ fn verify_batch_air_test() {
         ),
     );
 
-    let mut tester = tester.build().load(chip).finalize();
+    let tester = tester.build().load(chip).finalize();
     tester.simple_test().expect("Verification failed");
 
     /*disable_debug_builder();

@@ -10,7 +10,7 @@ use openvm_circuit::{
 use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP};
 use openvm_native_compiler::VerifyBatchOpcode::VERIFY_BATCH;
 use openvm_poseidon2_air::{Poseidon2Config, Poseidon2SubAir, Poseidon2SubChip};
-use openvm_stark_backend::p3_field::{Field, FieldAlgebra, PrimeField32};
+use openvm_stark_backend::p3_field::{Field, PrimeField32};
 
 use crate::verify_batch::{
     air::{VerifyBatchAir, VerifyBatchBus},
@@ -56,7 +56,6 @@ pub(super) struct IncorporateSiblingRecord<F: Field> {
     pub read_sibling_array_start: RecordId,
     pub read_root_is_on_right: RecordId,
     pub root_is_on_right: bool,
-    pub sibling: [F; CHUNK],
     pub reads: [RecordId; CHUNK],
     pub p2_input: [F; 2 * CHUNK],
 }
@@ -315,7 +314,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     read_sibling_array_start,
                     read_root_is_on_right,
                     root_is_on_right,
-                    sibling,
                     reads: std::array::from_fn(|i| reads[i]),
                     p2_input,
                 })
