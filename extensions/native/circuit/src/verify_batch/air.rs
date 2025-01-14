@@ -14,7 +14,7 @@ use openvm_stark_backend::{
     p3_matrix::Matrix,
     rap::{BaseAirWithPublicValues, PartitionedBaseAir},
 };
-
+use openvm_stark_backend::air_builders::sub::SubAirBuilder;
 use crate::verify_batch::{columns::VerifyBatchCols, CHUNK};
 
 #[derive(Clone, Debug)]
@@ -120,7 +120,12 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .when(next.incorporate_row)
             .assert_one(next.start_top_level);
 
-        self.subair.eval(builder);
+        let mut sub_builder =
+            SubAirBuilder::<AB, Poseidon2SubAir<AB::F, SBOX_REGISTERS>, AB::F>::new(
+                builder,
+                0..self.subair.width(),
+            );
+        self.subair.eval(&mut sub_builder);
 
         //// inside row constraints
 
@@ -248,7 +253,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             builder
                 .when(inside_row)
                 .when(is_last_in_row)
-                .assert_eq(cell.row_pointer, cell.row_end);
+                .assert_eq(cell.row_pointer + AB::F::ONE, cell.row_end);
         }
 
         //// top level constraints

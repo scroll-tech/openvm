@@ -17,6 +17,7 @@ use crate::verify_batch::{
     CHUNK,
 };
 
+#[derive(Debug, Clone)]
 pub struct VerifyBatchRecord<F: Field> {
     pub from_state: ExecutionState<u32>,
     pub instruction: Instruction<F>,
@@ -45,6 +46,7 @@ impl<F: PrimeField32> VerifyBatchRecord<F> {
     }
 }
 
+#[derive(Debug, Clone)]
 pub(super) struct TopLevelRecord<F: Field> {
     // must be present in first record
     pub incorporate_row: Option<IncorporateRowRecord<F>>,
@@ -52,6 +54,7 @@ pub(super) struct TopLevelRecord<F: Field> {
     pub incorporate_sibling: Option<IncorporateSiblingRecord<F>>,
 }
 
+#[derive(Debug, Clone)]
 pub(super) struct IncorporateSiblingRecord<F: Field> {
     pub read_sibling_array_start: RecordId,
     pub read_root_is_on_right: RecordId,
@@ -60,6 +63,7 @@ pub(super) struct IncorporateSiblingRecord<F: Field> {
     pub p2_input: [F; 2 * CHUNK],
 }
 
+#[derive(Debug, Clone)]
 pub(super) struct IncorporateRowRecord<F: Field> {
     pub chunks: Vec<InsideRowRecord<F>>,
     pub initial_opened_index: usize,
@@ -69,11 +73,13 @@ pub(super) struct IncorporateRowRecord<F: Field> {
     pub p2_input: [F; 2 * CHUNK],
 }
 
+#[derive(Debug, Clone)]
 pub(super) struct InsideRowRecord<F: Field> {
     pub cells: Vec<CellRecord>,
     pub p2_input: [F; 2 * CHUNK],
 }
 
+#[derive(Debug, Clone)]
 pub(super) struct CellRecord {
     pub read: RecordId,
     pub opened_index: usize,
@@ -119,6 +125,10 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         let concatenated =
             std::array::from_fn(|i| if i < CHUNK { left[i] } else { right[i - CHUNK] });
         let permuted = self.subchip.permute(concatenated);
+        println!("compress:");
+        println!("\tleft = {:?}", left);
+        println!("\tright = {:?}", right);
+        println!("\tpermuted = {:?}", permuted);
         (concatenated, std::array::from_fn(|i| permuted[i]))
     }
 }
@@ -184,28 +194,25 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
 
                 let mut prev_rolling_hash: Option<[F; 2 * CHUNK]> = None;
                 let mut rolling_hash = [F::ZERO; 2 * CHUNK];
-                
+
                 let mut is_first_in_segment = true;
 
-                while opened_index < opened_length
-                    && memory.unsafe_read_cell(
-                        address_space,
-                        dim_base_pointer + F::from_canonical_usize(opened_index),
-                    ) == F::from_canonical_u32(height)
-                {
+                loop {
                     let mut cells = vec![];
                     let mut chunk = [F::ZERO; CHUNK];
                     for i in 0..CHUNK {
-                        let read_row_pointer_and_length = if is_first_in_segment || row_pointer == row_end {
+                        let read_row_pointer_and_length = if is_first_in_segment
+                            || row_pointer == row_end
+                        {
                             if is_first_in_segment {
                                 is_first_in_segment = false;
                             } else {
                                 opened_index += 1;
                                 if opened_index == opened_length
                                     || memory.unsafe_read_cell(
-                                    address_space,
-                                    dim_base_pointer + F::from_canonical_usize(opened_index),
-                                ) != F::from_canonical_u32(height)
+                                        address_space,
+                                        dim_base_pointer + F::from_canonical_usize(opened_index),
+                                    ) != F::from_canonical_u32(height)
                                 {
                                     break;
                                 }
@@ -223,6 +230,8 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                         };
                         let (read, value) =
                             memory.read_cell(address_space, F::from_canonical_usize(row_pointer));
+                        println!("\topened_index = {opened_index}, row_pointer = {row_pointer}, row_end = {row_end}");
+
 
                         cells.push(CellRecord {
                             read,
@@ -234,14 +243,24 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                         chunk[i] = value;
                         row_pointer += 1;
                     }
+                    println!("opened_index = {opened_index}, row_pointer = {row_pointer}, row_end = {row_end}");
+                    if cells.is_empty() {
+                        break;
+                    }
+                    let cells_len = cells.len();
+                    rolling_hash[..CHUNK].copy_from_slice(&chunk[..CHUNK]);
                     chunks.push(InsideRowRecord {
                         cells,
                         p2_input: rolling_hash,
                     });
                     self.height += 1;
-                    rolling_hash[..CHUNK].copy_from_slice(&chunk[..CHUNK]);
                     prev_rolling_hash = Some(rolling_hash);
                     self.subchip.permute_mut(&mut rolling_hash);
+                    println!("rolling_hash was {:?}", prev_rolling_hash);
+                    println!("\tnow = {:?}", rolling_hash);
+                    if cells_len < CHUNK {
+                        break;
+                    }
                 }
                 let final_opened_index = opened_index - 1;
                 let (initial_height_read, height_check) = memory.read_cell(
@@ -277,7 +296,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                 None
             };
 
-            let incorporate_sibling = if height == 0 {
+            let incorporate_sibling = if height == 1 {
                 None
             } else {
                 for _ in 0..6 {
@@ -295,13 +314,13 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     sibling_base_pointer + F::from_canonical_usize(proof_index),
                 );
                 let sibling_array_start = sibling_array_start.as_canonical_u32() as usize;
-
+                
                 let mut sibling = [F::ZERO; CHUNK];
                 let mut reads = vec![];
                 for i in 0..CHUNK {
                     let (read, value) = memory.read_cell(
                         address_space,
-                        sibling_base_pointer + F::from_canonical_usize(sibling_array_start + i),
+                        F::from_canonical_usize(sibling_array_start + i),
                     );
                     sibling[i] = value;
                     reads.push(read);
