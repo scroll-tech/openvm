@@ -153,6 +153,29 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             left_output,
         );
 
+        let row_hash = std::array::from_fn(|i| {
+            (start_top_level * left_output[i])
+                + ((AB::Expr::ONE - start_top_level) * right_input[i])
+        });
+
+        self.internal_bus.interact(
+            builder,
+            true,
+            incorporate_row,
+            start_timestamp + AB::F::from_canonical_usize(6),
+            end_timestamp - AB::F::TWO,
+            opened_base_pointer,
+            initial_opened_index,
+            final_opened_index,
+            address_space,
+            row_hash,
+        );
+        
+        return;
+        
+        
+        // everything abov here is ok
+
         // things that stay the same (roughly)
 
         builder.when(inside_row - end_inside_row).assert_eq(
@@ -211,7 +234,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 .when(cell.is_exhausted)
                 .assert_eq(left_input[i], AB::F::ZERO);
 
-            let mut when_inside_row_not_last = builder.when(inside_row - end_inside_row);
+            let mut when_inside_row_not_last = if i == CHUNK - 1 { builder.when(inside_row - end_inside_row) } else { builder.when(inside_row) };
 
             // update state for normal cell
             when_inside_row_not_last
@@ -236,14 +259,19 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     &cell.read_row_pointer_and_length,
                 )
                 .eval(builder, inside_row * cell.is_first_in_row);
-            let mut when_inside_row_not_last = builder.when(inside_row - end_inside_row);
+            let mut when_inside_row_not_last = if i == CHUNK - 1 { builder.when(inside_row - end_inside_row) } else { builder.when(inside_row) };
             when_inside_row_not_last
                 .when(next_cell.is_first_in_row)
                 .assert_eq(next_cell.opened_index, cell.opened_index + AB::F::ONE);
 
             when_inside_row_not_last
+                .when(next_cell.is_exhausted)
+                .assert_eq(next_cell.opened_index, cell.opened_index);
+
+            when_inside_row_not_last
                 .when(cell.is_exhausted)
                 .assert_eq(next_cell.is_exhausted, AB::F::ONE);
+            
 
             let is_last_in_row = if i == CHUNK - 1 {
                 end_inside_row.into()

@@ -259,6 +259,10 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     println!("rolling_hash was {:?}", prev_rolling_hash);
                     println!("\tnow = {:?}", rolling_hash);
                     if cells_len < CHUNK {
+                        for _ in 0..CHUNK - cells_len {
+                            memory.increment_timestamp();
+                            memory.increment_timestamp();
+                        }
                         break;
                     }
                 }

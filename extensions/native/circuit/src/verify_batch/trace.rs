@@ -252,6 +252,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         }
         for cell in cols.cells.iter_mut().skip(cells.len()) {
             cell.is_exhausted = F::ONE;
+            cell.opened_index = F::from_canonical_usize(parent.final_opened_index);
         }
 
         cols.initial_opened_index = F::from_canonical_usize(parent.initial_opened_index);
