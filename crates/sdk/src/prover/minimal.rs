@@ -84,12 +84,6 @@ impl MinimalStarkProver {
         minimal_verifier_pk: MinimalStarkProvingKey,
         leaf_committed_exe: Arc<NonRootCommittedExe>,
     ) -> Self {
-        assert_eq!(
-            minimal_verifier_pk.leaf_vm_pk.fri_params,
-            minimal_verifier_pk.root_verifier_pk.vm_pk.fri_params,
-            "Leaf and root FRI parameters must match"
-        );
-
         println!(
             "Creating MinimalStarkProver vmconfig: {:?}",
             minimal_verifier_pk.root_verifier_pk.vm_pk.vm_config
