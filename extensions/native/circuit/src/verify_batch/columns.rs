@@ -47,6 +47,7 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
     pub sibling_base_pointer: T,
     pub index_base_pointer: T,
 
+    // these can be optimized to be shared with cells[i].read_row_pointer_and_length (saves 15 cols)
     pub dim_base_pointer_read: MemoryReadAuxCols<T, 1>,
     pub opened_base_pointer_and_length_read: MemoryReadAuxCols<T, 2>,
     pub sibling_base_pointer_read: MemoryReadAuxCols<T, 1>,
@@ -55,6 +56,7 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
 
     pub proof_index: T,
 
+    // these as well (saves 6 cols)
     pub read_initial_height_or_root_is_on_right: MemoryReadAuxCols<T, 1>,
     pub read_final_height_or_sibling_array_start: MemoryReadAuxCols<T, 1>,
 
@@ -62,6 +64,7 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
     pub sibling_array_start: T,
 
     pub commit_pointer: T,
+    // this as well (saves 3 cols)
     pub commit_read: MemoryReadAuxCols<T, CHUNK>,
 }
 

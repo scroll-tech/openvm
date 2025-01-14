@@ -69,7 +69,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             index_register,
             commit_register,
             address_space,
-            inner,
             cells,
             initial_opened_index,
             final_opened_index,
@@ -91,15 +90,16 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             commit_read,
             proof_index,
             sibling_array_start,
+            ..
         } = local;
 
-        let left_input = std::array::from_fn::<_, CHUNK, _>(|i| inner.inputs[i]);
-        let right_input = std::array::from_fn::<_, CHUNK, _>(|i| inner.inputs[i + CHUNK]);
+        let left_input = std::array::from_fn::<_, CHUNK, _>(|i| local.inner.inputs[i]);
+        let right_input = std::array::from_fn::<_, CHUNK, _>(|i| local.inner.inputs[i + CHUNK]);
         let left_output = std::array::from_fn::<_, CHUNK, _>(|i| {
-            inner.ending_full_rounds[BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS - 1].post[i]
+            local.inner.ending_full_rounds[BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS - 1].post[i]
         });
         let right_output = std::array::from_fn::<_, CHUNK, _>(|i| {
-            inner.ending_full_rounds[BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS - 1].post[i + CHUNK]
+            local.inner.ending_full_rounds[BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS - 1].post[i + CHUNK]
         });
         let next_left_input = std::array::from_fn::<_, CHUNK, _>(|i| next.inner.inputs[i]);
         let next_right_input = std::array::from_fn::<_, CHUNK, _>(|i| next.inner.inputs[i + CHUNK]);
@@ -115,7 +115,10 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         builder.when(end_top_level).assert_one(incorporate_sibling);
 
         let end = end_inside_row + end_top_level + (AB::Expr::ONE - enabled.clone());
-        builder.when(end.clone()).when(next.incorporate_row).assert_one(next.start_top_level);
+        builder
+            .when(end.clone())
+            .when(next.incorporate_row)
+            .assert_one(next.start_top_level);
 
         self.subair.eval(builder);
 
@@ -369,7 +372,8 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .assert_one(next.incorporate_sibling);
 
         let row_hash = std::array::from_fn(|i| {
-            (start_top_level * left_output[i]) + ((AB::Expr::ONE - start_top_level) * right_input[i])
+            (start_top_level * left_output[i])
+                + ((AB::Expr::ONE - start_top_level) * right_input[i])
         });
 
         self.internal_bus.interact(
