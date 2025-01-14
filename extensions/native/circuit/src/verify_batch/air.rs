@@ -58,7 +58,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             inside_row,
             end_inside_row,
             end_top_level,
-            start,
+            start_top_level,
             pc,
             very_first_timestamp,
             start_timestamp,
@@ -115,7 +115,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         builder.when(end_top_level).assert_one(incorporate_sibling);
 
         let end = end_inside_row + end_top_level + (AB::Expr::ONE - enabled.clone());
-        builder.assert_eq(next.start, end.clone());
+        builder.when(end.clone()).when(next.incorporate_row).assert_one(next.start_top_level);
 
         self.subair.eval(builder);
 
@@ -154,9 +154,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         builder
             .when(inside_row - end_inside_row)
             .assert_eq(next.opened_base_pointer, opened_base_pointer);
-        builder
-            .when(inside_row - end_inside_row)
-            .assert_eq(next.dim_base_pointer, dim_base_pointer);
         builder
             .when(inside_row - end_inside_row)
             .assert_eq(next.initial_opened_index, initial_opened_index);
@@ -372,7 +369,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .assert_one(next.incorporate_sibling);
 
         let row_hash = std::array::from_fn(|i| {
-            (start * left_output[i]) + ((AB::Expr::ONE - start) * right_input[i])
+            (start_top_level * left_output[i]) + ((AB::Expr::ONE - start_top_level) * right_input[i])
         });
 
         self.internal_bus.interact(

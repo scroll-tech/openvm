@@ -17,13 +17,13 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
 
     pub end_inside_row: T,
     pub end_top_level: T,
-    pub start: T,
+    pub start_top_level: T,
 
     // execution state
     pub pc: T,
     pub very_first_timestamp: T,
     pub start_timestamp: T,
-    pub end_timestamp: T,
+    pub end_timestamp: T, // only used for top level
 
     // instruction (a, b, c, d, e)
     pub dim_register: T,

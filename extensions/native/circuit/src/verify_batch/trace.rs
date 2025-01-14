@@ -14,6 +14,7 @@ use crate::verify_batch::{
     columns::{VerifyBatchCellCols, VerifyBatchCols},
     CHUNK,
 };
+use crate::verify_batch::chip::{CellRecord, InsideRowRecord};
 
 impl<F: Field, const SBOX_REGISTERS: usize> ChipUsageGetter for VerifyBatchChip<F, SBOX_REGISTERS> {
     fn air_name(&self) -> String {
@@ -35,7 +36,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         let inner_width = self.air.subair.width();
         cols[..inner_width].copy_from_slice(&inner_trace.values.as_slice());
     }
-    fn incorporate_sibling_record_to_rows(
+    fn incorporate_sibling_record_to_row(
         &self,
         record: &IncorporateSiblingRecord<F>,
         aux_cols_factory: &MemoryAuxColsFactory<F>,
@@ -65,7 +66,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         cols.inside_row = F::ZERO;
         cols.end_inside_row = F::ZERO;
         cols.end_top_level = F::ZERO;
-        cols.start = F::ZERO;
+        cols.start_top_level = F::ZERO;
         cols.very_first_timestamp = parent.from_state.timestamp;
         cols.start_timestamp = F::from_canonical_u32(read_root_is_on_right.timestamp - 6);
         cols.end_timestamp =
@@ -125,7 +126,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         cols.commit_pointer_read = aux_cols_factory.make_read_aux_cols(memory.record_by_id(commit_pointer_read));
         cols.commit_read = aux_cols_factory.make_read_aux_cols(memory.record_by_id(commit_read));
     }
-    fn incorporate_row_record_to_rows(
+    fn incorporate_row_record_to_row(
         &self,
         record: &IncorporateRowRecord<F>,
         aux_cols_factory: &MemoryAuxColsFactory<F>,
@@ -155,7 +156,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         cols.inside_row = F::ZERO;
         cols.end_inside_row = F::ZERO;
         cols.end_top_level = F::ZERO;
-        cols.start = F::from_bool(is_first);
+        cols.start_top_level = F::from_bool(is_first);
         cols.very_first_timestamp = parent.from_state.timestamp;
         cols.start_timestamp = F::from_canonical_u32(
             memory
@@ -180,6 +181,50 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
             aux_cols_factory.make_read_aux_cols(initial_height_read);
         cols.read_final_height_or_sibling_array_start =
             aux_cols_factory.make_read_aux_cols(final_height_read);
+    }
+    fn inside_row_record_to_row(
+        &self,
+        record: &InsideRowRecord<F>,
+        aux_cols_factory: &MemoryAuxColsFactory<F>,
+        slice: &mut [F],
+        memory: &OfflineMemory<F>,
+        parent: &IncorporateRowRecord<F>,
+        grandparent: &VerifyBatchRecord<F>,
+        is_last: bool,
+    ) {
+        let &InsideRowRecord {
+            cells, p2_input
+        } = record;
+
+        self.generate_subair_cols(p2_input, slice);
+        let cols: &mut VerifyBatchCols<F, SBOX_REGISTERS> = slice.borrow_mut();
+        cols.incorporate_row = F::ZERO;
+        cols.incorporate_sibling = F::ZERO;
+        cols.inside_row = F::ONE;
+        cols.end_inside_row = F::from_bool(is_last);
+        cols.end_top_level = F::ZERO;
+        cols.very_first_timestamp = F::from_canonical_u32(memory.record_by_id(parent.chunks[0].cells[0].read_row_pointer_and_length.unwrap()).timestamp);
+        cols.start_timestamp = F::from_canonical_u32(memory.record_by_id(cells[0].read_row_pointer_and_length.unwrap()).timestamp);
+        cols.address_space = grandparent.address_space();
+        
+        for (record, cell) in cells.into_iter().zip(cols.cells.iter_mut()) {
+            let CellRecord { read, opened_index, read_row_pointer_and_length, row_pointer, row_end } = record;
+            cell.read = aux_cols_factory.make_read_aux_cols(memory.record_by_id(read));
+            cell.opened_index = F::from_canonical_usize(opened_index);
+            if let Some(read_row_pointer_and_length) = read_row_pointer_and_length {
+                cell.read_row_pointer_and_length = aux_cols_factory.make_read_aux_cols(memory.record_by_id(read_row_pointer_and_length));
+            }
+            cell.row_pointer = F::from_canonical_usize(row_pointer);
+            cell.row_end = F::from_canonical_usize(row_end);
+            cell.is_first_in_row = F::from_bool(read_row_pointer_and_length.is_some());
+            cell.is_exhausted = F::ZERO;
+        }
+        for cell in cols.cells.iter_mut().skip(cells.len()) {
+            cell.is_exhausted = F::ONE;
+        }
+
+        cols.initial_opened_index = F::from_canonical_usize(parent.initial_opened_index);
+        cols.opened_base_pointer = F::from_canonical_u32(grandparent.opened_base_pointer);
     }
     fn record_to_rows(
         record: VerifyBatchRecord<F>,
