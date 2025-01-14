@@ -142,6 +142,10 @@ impl<F: PrimeField32> VmChipTestBuilder<F> {
         self.memory.write(address_space, pointer, value);
     }
 
+    pub fn write_usize<const N: usize>(&mut self, address_space: usize, pointer: usize, value: [usize; N]) {
+        self.memory.write(address_space, pointer, value.map(F::from_canonical_usize));
+    }
+
     pub fn write_heap<const NUM_LIMBS: usize>(
         &mut self,
         register: usize,

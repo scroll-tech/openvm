@@ -19,13 +19,15 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
     pub end_top_level: T,
     pub start_top_level: T,
 
-    // execution state
+    // execution state (pc can be shared (saves 1 col), very_first_timestamp is used in a different way inside row)
     pub pc: T,
     pub very_first_timestamp: T,
+    
     pub start_timestamp: T,
-    pub end_timestamp: T, // only used for top level
+    pub end_timestamp: T, // only used for top level (so can be shared (saves 1 col)
 
     // instruction (a, b, c, d, e)
+    // all other than address_space can be shared (saves 5 cols)
     pub dim_register: T,
     pub opened_register: T,
     pub sibling_register: T,
@@ -37,8 +39,10 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
     // initial/final opened index for a subsegment with same height
     // initial is used in both, final is used only in top level
     pub initial_opened_index: T,
+    // so then this one can be shared as well (saves 1 col)
     pub final_opened_index: T,
 
+    // these two ig? (saves 2 cols)
     pub height: T,
     pub opened_length: T,
 
@@ -54,15 +58,18 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
     pub index_base_pointer_read: MemoryReadAuxCols<T, 1>,
     pub commit_pointer_read: MemoryReadAuxCols<T, 1>,
 
+    // this with the other ones (saves 1 col)
     pub proof_index: T,
 
     // these as well (saves 6 cols)
     pub read_initial_height_or_root_is_on_right: MemoryReadAuxCols<T, 1>,
     pub read_final_height_or_sibling_array_start: MemoryReadAuxCols<T, 1>,
 
+    // i guess these can be shared with like the other ones (saves 2 cols)
     pub root_is_on_right: T,
     pub sibling_array_start: T,
 
+    // plus this (saves 1 col)
     pub commit_pointer: T,
     // this as well (saves 3 cols)
     pub commit_read: MemoryReadAuxCols<T, CHUNK>,

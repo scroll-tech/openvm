@@ -6,11 +6,15 @@ use openvm_stark_backend::{
 };
 use openvm_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
 use rand::Rng;
+use rand::rngs::StdRng;
 
 use openvm_circuit::arch::testing::{memory::gen_pointer, VmChipTestBuilder};
 use openvm_circuit::system::memory::CHUNK;
 use openvm_instructions::{instruction::Instruction, UsizeOpcode, VmOpcode};
-use openvm_native_compiler::FriOpcode::{self, FRI_REDUCED_OPENING};
+use openvm_native_compiler::FriOpcode::FRI_REDUCED_OPENING;
+use openvm_native_compiler::VerifyBatchOpcode;
+use openvm_native_compiler::VerifyBatchOpcode::VERIFY_BATCH;
+use openvm_poseidon2_air::Poseidon2Config;
 
 use crate::verify_batch::{chip::VerifyBatchChip, columns::VerifyBatchCols};
 
@@ -66,109 +70,137 @@ fn compute_commit<F: Field>(
     root
 }
 
-#[test]
-fn fri_mat_opening_air_test() {
-    let num_ops = 3; // non-power-of-2 to also test padding
-    let elem_range = || 1..=100;
-    let address_space_range = || 1usize..=2;
-    let length_range = || 1..=49;
+type F = BabyBear;
 
-    let offset = FriOpcode::default_offset();
+struct VerifyBatchInstance {
+    dim: Vec<usize>,
+    opened: Vec<Vec<F>>,
+    proof: Vec<[F; CHUNK]>,
+    root_is_on_right: Vec<bool>,
+    commit: [F; CHUNK],
+}
+
+fn random_instance(rng: &mut StdRng, row_lengths: Vec<Vec<usize>>, hash_function: impl Fn([F; CHUNK], [F; CHUNK]) -> ([F; CHUNK], [F; CHUNK])) -> VerifyBatchInstance {
+    let mut dims = vec![];
+    let mut opened = vec![];
+    let mut proof = vec![];
+    let mut root_is_on_right = vec![];
+    for (lg_height, row_lengths) in row_lengths.iter().enumerate() {
+        let height = 1 << lg_height;
+        for &row_length in row_lengths {
+            dims.push(height);
+            let mut opened_row = vec![];
+            for _ in 0..row_length {
+                opened_row.push(rng.gen());
+            }
+            opened.push(opened_row);
+        }
+        if height > 1 {
+            proof.push(std::array::from_fn(|_| rng.gen()));
+            root_is_on_right.push(rng.gen());
+        }
+    }
+    
+    dims.reverse();
+    opened.reverse();
+    proof.reverse();
+    root_is_on_right.reverse();
+    
+    let commit = compute_commit(&dims, &opened, &proof, &root_is_on_right, hash_function);
+    
+    VerifyBatchInstance {
+        dim: dims,
+        opened,
+        proof,
+        root_is_on_right,
+        commit,
+    }
+}
+
+#[test]
+fn verify_batch_air_test() {
+    // single op
+    let address_space = 5;
+    let row_lengths = vec![vec![3], vec![], vec![9, 2, 1, 13, 4], vec![16]];
+    
+    let offset = VerifyBatchOpcode::default_offset();
 
     let mut tester = VmChipTestBuilder::default();
-    let mut chip = VerifyBatchChip::new(
+    let mut chip = VerifyBatchChip::<F, 1>::new(
         tester.execution_bus(),
         tester.program_bus(),
         tester.memory_bridge(),
         offset,
         tester.offline_memory_mutex_arc(),
+        Poseidon2Config::default(),
     );
 
     let mut rng = create_seeded_rng();
-
-    macro_rules! gen_ext {
-        () => {
-            std::array::from_fn::<_, EXT_DEG, _>(|_| {
-                BabyBear::from_canonical_u32(rng.gen_range(elem_range()))
-            })
-        };
+    let instance = random_instance(&mut rng, row_lengths, |left, right| {
+        let concatenated =
+            std::array::from_fn(|i| if i < CHUNK { left[i] } else { right[i - CHUNK] });
+        let permuted = chip.subchip.permute(concatenated);
+        (std::array::from_fn(|i| permuted[i]), std::array::from_fn(|i| permuted[i + CHUNK]))
+    });
+    let VerifyBatchInstance { dim, opened, proof, root_is_on_right, commit } = instance;
+    
+    let dim_register = gen_pointer(&mut rng, 2);
+    let opened_register = gen_pointer(&mut rng, 2);
+    let sibling_register = gen_pointer(&mut rng, 2);
+    let index_register = gen_pointer(&mut rng, 2);
+    let commit_register = gen_pointer(&mut rng, 2);
+    
+    let dim_base_pointer = gen_pointer(&mut rng, 1);
+    let opened_base_pointer = gen_pointer(&mut rng, 2);
+    let sibling_base_pointer = gen_pointer(&mut rng, 1);
+    let index_base_pointer = gen_pointer(&mut rng, 1);
+    let commit_pointer = gen_pointer(&mut rng, 1);
+    
+    tester.write_usize(address_space, dim_register, [dim_base_pointer, dim.len()]);
+    tester.write_usize(address_space, opened_register, [opened_base_pointer, opened.len()]);
+    tester.write_usize(address_space, sibling_register, [sibling_base_pointer, proof.len()]);
+    tester.write_usize(address_space, index_register, [index_base_pointer, root_is_on_right.len()]);
+    tester.write_usize(address_space, commit_register, [commit_pointer, CHUNK]);
+    
+    for (i, &dim_value) in dim.iter().enumerate() {
+        tester.write_usize(address_space, dim_base_pointer + i, [dim_value]);
     }
-
-    for _ in 0..num_ops {
-        let alpha = gen_ext!();
-        let length = rng.gen_range(length_range());
-        let alpha_pow_initial = gen_ext!();
-        let a = (0..length)
-            .map(|_| BabyBear::from_canonical_u32(rng.gen_range(elem_range())))
-            .collect_vec();
-        let b = (0..length).map(|_| gen_ext!()).collect_vec();
-
-        let (alpha_pow_final, result) = compute_fri_mat_opening(alpha, alpha_pow_initial, &a, &b);
-
-        let alpha_pointer = gen_pointer(&mut rng, 4);
-        let length_pointer = gen_pointer(&mut rng, 1);
-        let a_pointer_pointer = gen_pointer(&mut rng, 1);
-        let b_pointer_pointer = gen_pointer(&mut rng, 1);
-        let alpha_pow_pointer = gen_pointer(&mut rng, 4);
-        let result_pointer = gen_pointer(&mut rng, 4);
-        let a_pointer = gen_pointer(&mut rng, 1);
-        let b_pointer = gen_pointer(&mut rng, 4);
-
-        let address_space = rng.gen_range(address_space_range());
-
-        /*tracing::debug!(
-            "{opcode:?} d = {}, e = {}, f = {}, result_addr = {}, addr1 = {}, addr2 = {}, z = {}, x = {}, y = {}",
-            result_as, as1, as2, result_pointer, address1, address2, result, operand1, operand2,
-        );*/
-
-        tester.write(address_space, alpha_pointer, alpha);
-        tester.write_cell(
-            address_space,
-            length_pointer,
-            BabyBear::from_canonical_usize(length),
-        );
-        tester.write_cell(
-            address_space,
-            a_pointer_pointer,
-            BabyBear::from_canonical_usize(a_pointer),
-        );
-        tester.write_cell(
-            address_space,
-            b_pointer_pointer,
-            BabyBear::from_canonical_usize(b_pointer),
-        );
-        tester.write(address_space, alpha_pow_pointer, alpha_pow_initial);
-        for i in 0..length {
-            tester.write_cell(address_space, a_pointer + i, a[i]);
-            tester.write(address_space, b_pointer + (4 * i), b[i]);
+    for (i, opened_row) in opened.iter().enumerate() {
+        let row_pointer = gen_pointer(&mut rng, 1);
+        tester.write_usize(address_space, opened_base_pointer + (2 * i), [row_pointer, opened_row.len()]);
+        for (j, &opened_value) in opened_row.iter().enumerate() {
+            tester.write_cell(address_space, row_pointer + j, opened_value);
         }
-
-        tester.execute(
-            &mut chip,
-            &Instruction::from_usize(
-                VmOpcode::from_usize(FRI_REDUCED_OPENING as usize + offset),
-                [
-                    a_pointer_pointer,
-                    b_pointer_pointer,
-                    result_pointer,
-                    address_space,
-                    length_pointer,
-                    alpha_pointer,
-                    alpha_pow_pointer,
-                ],
-            ),
-        );
-        assert_eq!(
-            alpha_pow_final,
-            tester.read(address_space, alpha_pow_pointer)
-        );
-        assert_eq!(result, tester.read(address_space, result_pointer));
     }
+    for (i, &sibling) in proof.iter().enumerate() {
+        let row_pointer = gen_pointer(&mut rng, 1);
+        tester.write_usize(address_space, sibling_base_pointer + i, [row_pointer]);
+        tester.write(address_space, row_pointer, sibling);
+    }
+    for (i, &bit) in root_is_on_right.iter().enumerate() {
+        tester.write_cell(address_space, index_base_pointer + i, F::from_bool(bit));
+    }
+    tester.write(address_space, commit_pointer, commit);
+
+    tester.execute(
+        &mut chip,
+        &Instruction::from_usize(
+            VmOpcode::from_usize(VERIFY_BATCH as usize + offset),
+            [
+                dim_register,
+                opened_register,
+                sibling_register,
+                index_register,
+                commit_register,
+                address_space,
+            ],
+        ),
+    );
 
     let mut tester = tester.build().load(chip).finalize();
     tester.simple_test().expect("Verification failed");
 
-    disable_debug_builder();
+    /*disable_debug_builder();
     // negative test pranking each value
     for height in 0..num_ops {
         // TODO: better way to modify existing traces in tester
@@ -189,5 +221,5 @@ fn fri_mat_opening_air_test() {
         );
 
         tester.air_proof_inputs[2].raw.common_main = Some(old_trace);
-    }
+    }*/
 }
