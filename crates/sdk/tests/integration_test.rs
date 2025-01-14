@@ -334,11 +334,7 @@ fn test_e2e_minimal_proof_generation_and_verification() {
 //     let app_log_blowup = 1;
 //     let app_config = small_test_app_config(app_log_blowup);
 //     let params_reader = CacheHalo2ParamsReader::new_with_default_params_dir();
-//     let min_pk = Sdk.minimal_keygen(app_config, minimal_agg_config, &params_reader).unwrap();
-
-//     // let minimal_pk = Sdk
-//     //     .minimal_keygen(minimal_config_for_test(), &params_reader)
-//     //     .unwrap();
+//     let minimal_pk = Sdk.minimal_keygen(app_config, minimal_agg_config, &params_reader).unwrap();
 //     let evm_verifier = Sdk
 //         .generate_minimal_snark_verifier_contract(&params_reader, &minimal_pk)
 //         .unwrap();
@@ -347,7 +343,7 @@ fn test_e2e_minimal_proof_generation_and_verification() {
 //         .generate_minimal_evm_proof(
 //             &params_reader,
 //             app_committed_exe_for_test(app_log_blowup),
-//             min_pk,
+//             minimal_pk,
 //             StdIn::default(),
 //         )
 //         .unwrap();

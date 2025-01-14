@@ -157,3 +157,8 @@ impl<C: Config> VariableP2Hasher<C> {
         array::from_fn(|i| builder.get(&leaves[0], i))
     }
 }
+
+pub(crate) fn heights_le(a: &[usize], b: &[usize]) -> bool {
+    assert_eq!(a.len(), b.len());
+    a.iter().zip(b.iter()).all(|(a, b)| a <= b)
+}

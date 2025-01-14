@@ -18,7 +18,7 @@ use crate::{
     },
     verifier::{
         internal::types::InternalVmVerifierInput, leaf::types::LeafVmVerifierInput,
-        root::types::RootVmVerifierInput,
+        root::types::RootVmVerifierInput, utils::heights_le,
     },
     NonRootCommittedExe, RootSC, F, SC,
 };
@@ -206,9 +206,4 @@ impl LeafProver {
     pub(crate) fn fri_params(&self) -> &FriParameters {
         &self.prover.pk.fri_params
     }
-}
-
-fn heights_le(a: &[usize], b: &[usize]) -> bool {
-    assert_eq!(a.len(), b.len());
-    a.iter().zip(b.iter()).all(|(a, b)| a <= b)
 }

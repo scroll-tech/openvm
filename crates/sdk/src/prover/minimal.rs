@@ -17,7 +17,7 @@ use super::{
 };
 use crate::{
     keygen::{AppProvingKey, MinimalStarkProvingKey},
-    verifier::root::types::RootVmVerifierInput,
+    verifier::{root::types::RootVmVerifierInput, utils::heights_le},
     NonRootCommittedExe, RootSC, StdIn,
 };
 
@@ -84,6 +84,17 @@ impl MinimalStarkProver {
         minimal_verifier_pk: MinimalStarkProvingKey,
         leaf_committed_exe: Arc<NonRootCommittedExe>,
     ) -> Self {
+        assert_eq!(
+            minimal_verifier_pk.leaf_vm_pk.fri_params,
+            minimal_verifier_pk.root_verifier_pk.vm_pk.fri_params,
+            "Leaf and root FRI parameters must match"
+        );
+
+        println!(
+            "Creating MinimalStarkProver vmconfig: {:?}",
+            minimal_verifier_pk.root_verifier_pk.vm_pk.vm_config
+        );
+
         let leaf_prover = LeafProver::new(minimal_verifier_pk.leaf_vm_pk, leaf_committed_exe);
         let root_prover = RootVerifierLocalProver::new(minimal_verifier_pk.root_verifier_pk);
         Self {
@@ -95,6 +106,22 @@ impl MinimalStarkProver {
     pub fn generate_proof(&self, app_proofs: ContinuationVmProof<SC>) -> Proof<RootSC> {
         let leaf_proof = self.leaf_prover.generate_proof(&app_proofs);
         let public_values = app_proofs.user_public_values.public_values;
+
+        // Validate proof heights before root proof generation
+        let root_input = RootVmVerifierInput {
+            proofs: leaf_proof.clone(),
+            public_values: public_values.clone(),
+        };
+
+        let actual_air_heights = self.root_prover.execute_for_air_heights(root_input.clone());
+        assert!(
+            heights_le(
+                &actual_air_heights,
+                &self.root_prover.root_verifier_pk.air_heights
+            ),
+            "Proof heights exceed root verifier capacity"
+        );
+
         self.generate_root_proof_impl(RootVmVerifierInput {
             proofs: leaf_proof,
             public_values,

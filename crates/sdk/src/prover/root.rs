@@ -55,10 +55,6 @@ impl SingleSegmentVmProver<RootSC> for RootVerifierLocalProver {
         let vm = SingleSegmentVmExecutor::new(self.vm_config().clone());
         let mut proof_input = vm
             .execute_and_generate(self.root_verifier_pk.root_committed_exe.clone(), input)
-            .map_err(|e| {
-                println!("Root verifier execution failed: {:?}", e);
-                e
-            })
             .unwrap();
         assert_eq!(
             proof_input.per_air.len(),
