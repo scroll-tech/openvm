@@ -1,7 +1,4 @@
 use itertools::Itertools;
-use openvm_circuit::arch::testing::{memory::gen_pointer, VmChipTestBuilder};
-use openvm_instructions::{instruction::Instruction, UsizeOpcode, VmOpcode};
-use openvm_native_compiler::FriOpcode::{self, FRI_REDUCED_OPENING};
 use openvm_stark_backend::{
     p3_field::{Field, FieldAlgebra},
     utils::disable_debug_builder,
@@ -10,24 +7,63 @@ use openvm_stark_backend::{
 use openvm_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
 use rand::Rng;
 
-use super::{super::field_extension::FieldExtension, elem_to_ext, EXT_DEG};
+use openvm_circuit::arch::testing::{memory::gen_pointer, VmChipTestBuilder};
+use openvm_circuit::system::memory::CHUNK;
+use openvm_instructions::{instruction::Instruction, UsizeOpcode, VmOpcode};
+use openvm_native_compiler::FriOpcode::{self, FRI_REDUCED_OPENING};
+
 use crate::verify_batch::{chip::VerifyBatchChip, columns::VerifyBatchCols};
 
-fn compute_fri_mat_opening<F: Field>(
-    alpha: [F; EXT_DEG],
-    mut alpha_pow: [F; EXT_DEG],
-    a: &[F],
-    b: &[[F; EXT_DEG]],
-) -> ([F; EXT_DEG], [F; EXT_DEG]) {
-    let mut result = [F::ZERO; EXT_DEG];
-    for (&a, &b) in a.iter().zip_eq(b) {
-        result = FieldExtension::add(
-            result,
-            FieldExtension::multiply(FieldExtension::subtract(b, elem_to_ext(a)), alpha_pow),
-        );
-        alpha_pow = FieldExtension::multiply(alpha, alpha_pow);
+use super::EXT_DEG;
+
+fn compute_commit<F: Field>(
+    dim: &Vec<usize>,
+    opened: &Vec<Vec<F>>,
+    proof: &Vec<[F; CHUNK]>,
+    root_is_on_right: &Vec<bool>,
+    hash_function: impl Fn([F; CHUNK], [F; CHUNK]) -> ([F; CHUNK], [F; CHUNK]),
+) -> [F; CHUNK] {
+    let mut height = dim[0];
+    let mut proof_index = 0;
+    let mut opened_index = 0;
+    let mut root = [F::ZERO; CHUNK];
+    while height >= 1 {
+        let mut concat = vec![];
+        while opened_index < opened.len() && dim[opened_index] == height {
+            concat.extend(opened[opened_index].clone());
+            opened_index += 1;
+        }
+        while concat.len() % CHUNK != 0 {
+            concat.push(F::ZERO);
+        }
+        if !concat.is_empty() {
+            let mut left = [F::ZERO; CHUNK];
+            let mut right = [F::ZERO; CHUNK];
+            for i in (0..concat.len()).step_by(CHUNK) {
+                let chunk = std::array::from_fn(|j| concat[i + j]);
+                let (new_left, new_right) = hash_function(chunk, right);
+                left = new_left;
+                right = new_right;
+            }
+            root = if height == dim[0] {
+                left
+            } else {
+                hash_function(root, left).0
+            }
+        }
+        if height > 1 {
+            let sibling = proof[proof_index];
+            let (left, right) = if root_is_on_right[proof_index] {
+                (sibling, root)
+            } else {
+                (root, sibling)
+            };
+            root = hash_function(left, right).0;
+        }
+        height /= 2;
+        proof_index += 1;
     }
-    (alpha_pow, result)
+    root
 }
 
 #[test]
