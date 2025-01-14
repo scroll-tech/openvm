@@ -331,12 +331,16 @@ impl MinimalStarkProvingKey {
         // let leaf_vm_vk = leaf_vm_pk.vm_pk.get_vk();
 
         // Generate dummy app proof for root verifier setup
-        // let dummy_leaf_proof = dummy_leaf_proof_riscv_app_vm(
-        //     leaf_vm_pk.clone(),
+        let leaf_proof = dummy_leaf_proof_riscv_app_vm(
+            leaf_vm_pk.clone(),
+            config.max_num_user_public_values,
+            config.leaf_fri_params,
+        );
+        // let leaf_proof = dummy_minimal_proof(
+        //     &leaf_vm_pk,
         //     config.max_num_user_public_values,
         //     config.leaf_fri_params,
         // );
-        let leaf_proof = dummy_minimal_proof(&leaf_vm_pk, config.max_num_user_public_values);
 
         // let app_proof = dummy_leaf_proof_riscv_app_vm(
         //     Arc::new(app_vm_pk.vm_pk.get_vk()),
@@ -409,11 +413,11 @@ impl MinimalProvingKey {
             minimal_stark_config,
             halo2_config,
         } = config;
-        let (minimal_stark_pk, dummy_internal_proof) =
+        let (minimal_stark_pk, leaf_internal_proof) =
             MinimalStarkProvingKey::dummy_proof_and_keygen(minimal_stark_config);
         let dummy_root_proof = minimal_stark_pk
             .root_verifier_pk
-            .generate_dummy_root_proof(dummy_internal_proof);
+            .generate_dummy_root_proof(leaf_internal_proof);
         let verifier = minimal_stark_pk.root_verifier_pk.keygen_static_verifier(
             &reader.read_params(halo2_config.verifier_k),
             dummy_root_proof,
