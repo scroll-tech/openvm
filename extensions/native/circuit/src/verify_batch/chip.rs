@@ -179,12 +179,13 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                 }
                 let mut chunks = vec![];
 
-                opened_index -= 1;
                 let mut row_pointer = 0;
                 let mut row_end = 0;
 
                 let mut prev_rolling_hash: Option<[F; 2 * CHUNK]> = None;
                 let mut rolling_hash = [F::ZERO; 2 * CHUNK];
+                
+                let mut is_first_in_segment = true;
 
                 while opened_index < opened_length
                     && memory.unsafe_read_cell(
@@ -195,15 +196,19 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     let mut cells = vec![];
                     let mut chunk = [F::ZERO; CHUNK];
                     for i in 0..CHUNK {
-                        let read_row_pointer_and_length = if row_pointer == row_end {
-                            opened_index += 1;
-                            if opened_index == opened_length
-                                || memory.unsafe_read_cell(
+                        let read_row_pointer_and_length = if is_first_in_segment || row_pointer == row_end {
+                            if is_first_in_segment {
+                                is_first_in_segment = false;
+                            } else {
+                                opened_index += 1;
+                                if opened_index == opened_length
+                                    || memory.unsafe_read_cell(
                                     address_space,
                                     dim_base_pointer + F::from_canonical_usize(opened_index),
                                 ) != F::from_canonical_u32(height)
-                            {
-                                break;
+                                {
+                                    break;
+                                }
                             }
                             let (result, [new_row_pointer, row_len]) = memory.read(
                                 address_space,
