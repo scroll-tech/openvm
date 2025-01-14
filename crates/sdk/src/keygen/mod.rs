@@ -3,6 +3,7 @@ use std::sync::Arc;
 use derivative::Derivative;
 use dummy::{
     compute_root_proof_heights, dummy_internal_proof_riscv_app_vm, dummy_leaf_proof_riscv_app_vm,
+    dummy_minimal_proof,
 };
 use openvm_circuit::{
     arch::{VirtualMachine, VmConfig},
@@ -330,11 +331,12 @@ impl MinimalStarkProvingKey {
         // let leaf_vm_vk = leaf_vm_pk.vm_pk.get_vk();
 
         // Generate dummy app proof for root verifier setup
-        let dummy_leaf_proof = dummy_leaf_proof_riscv_app_vm(
-            leaf_vm_pk.clone(),
-            config.max_num_user_public_values,
-            config.leaf_fri_params,
-        );
+        // let dummy_leaf_proof = dummy_leaf_proof_riscv_app_vm(
+        //     leaf_vm_pk.clone(),
+        //     config.max_num_user_public_values,
+        //     config.leaf_fri_params,
+        // );
+        let leaf_proof = dummy_minimal_proof(&leaf_vm_pk, config.max_num_user_public_values);
 
         // let app_proof = dummy_leaf_proof_riscv_app_vm(
         //     Arc::new(app_vm_pk.vm_pk.get_vk()),
@@ -362,7 +364,7 @@ impl MinimalStarkProvingKey {
             let (air_heights, _internal_heights) = compute_root_proof_heights(
                 root_vm_config.clone(),
                 root_committed_exe.exe.clone(),
-                &dummy_leaf_proof,
+                &leaf_proof,
             );
             let root_air_perm = AirIdPermutation::compute(&air_heights);
             root_air_perm.permute(&mut vm_pk.per_air);
@@ -383,7 +385,7 @@ impl MinimalStarkProvingKey {
                 leaf_vm_pk,
                 root_verifier_pk,
             },
-            dummy_leaf_proof,
+            leaf_proof,
         )
     }
 
