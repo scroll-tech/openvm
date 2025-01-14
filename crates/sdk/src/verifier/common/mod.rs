@@ -55,17 +55,18 @@ pub fn assert_or_assign_connector_pvs<C: Config>(
     println!("proof_idx: {:?}", proof_idx);
     builder.if_eq(proof_idx, RVar::zero()).then_or_else(
         |builder| {
-            println!("assigning");
+            println!("assigning: {:?}", proof_idx);
             builder.assign(&dst.initial_pc, proof_pvs.initial_pc);
         },
         |builder| {
-            println!("asserting");
+            println!("asserting: {:?}", proof_idx);
             // assert prev.final_pc == curr.initial_pc
             builder.assert_felt_eq(dst.final_pc, proof_pvs.initial_pc);
             // assert prev.is_terminate == 0
             builder.assert_felt_eq(dst.is_terminate, C::F::ZERO);
         },
     );
+    println!("Updating other fields");
     // Update final_pc
     builder.assign(&dst.final_pc, proof_pvs.final_pc);
     // Update is_terminate
