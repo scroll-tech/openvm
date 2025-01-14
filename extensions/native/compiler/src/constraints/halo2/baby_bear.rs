@@ -1,4 +1,4 @@
-use std::{cmp::Ordering, sync::Arc};
+use std::sync::Arc;
 
 use itertools::Itertools;
 use num_bigint::{BigInt, BigUint};
@@ -12,10 +12,7 @@ use snark_verifier_sdk::snark_verifier::{
     halo2_base::{
         gates::{GateChip, GateInstructions, RangeChip, RangeInstructions},
         halo2_proofs::halo2curves::bn256::Fr,
-        utils::{
-            bigint_to_fe, biguint_to_fe, bit_length, decompose_fe_to_u64_limbs, fe_to_bigint,
-            log2_ceil, BigPrimeField,
-        },
+        utils::{bigint_to_fe, biguint_to_fe, bit_length, fe_to_bigint, log2_ceil, BigPrimeField},
         AssignedValue, Context, QuantumCell,
     },
     util::arithmetic::{Field as _, PrimeField as _},
@@ -400,6 +397,7 @@ impl BabyBearChip {
         self.assert_zero(ctx, diff);
     }
 
+    #[allow(dead_code)]
     fn add_cell_to_lookup(&self, ctx: &Context<Fr>, a: AssignedValue<Fr>) {
         let phase = ctx.phase();
         let manager = &self.range.lookup_manager()[phase];
