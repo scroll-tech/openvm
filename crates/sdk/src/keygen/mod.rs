@@ -431,6 +431,7 @@ impl MinimalProvingKey {
             };
             let halo2_pk = Halo2ProvingKey { verifier, wrapper };
             let bytes = bitcode::serialize(&halo2_pk).unwrap();
+            std::fs::create_dir_all(halo2_pk_path.parent().unwrap()).unwrap();
             std::fs::write(halo2_pk_path, bytes).unwrap();
             halo2_pk
         } else {
