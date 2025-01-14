@@ -52,11 +52,14 @@ pub fn assert_or_assign_connector_pvs<C: Config>(
     proof_idx: RVar<C::N>,
     proof_pvs: &VmConnectorPvs<Felt<C::F>>,
 ) {
+    println!("proof_idx: {:?}", proof_idx);
     builder.if_eq(proof_idx, RVar::zero()).then_or_else(
         |builder| {
+            println!("assigning");
             builder.assign(&dst.initial_pc, proof_pvs.initial_pc);
         },
         |builder| {
+            println!("asserting");
             // assert prev.final_pc == curr.initial_pc
             builder.assert_felt_eq(dst.final_pc, proof_pvs.initial_pc);
             // assert prev.is_terminate == 0

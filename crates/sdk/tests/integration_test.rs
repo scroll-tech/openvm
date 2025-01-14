@@ -123,7 +123,7 @@ fn minimal_config_for_test() -> MinimalConfig {
             root_fri_params: standard_fri_params_with_100_bits_conjectured_security(
                 ROOT_LOG_BLOWUP,
             ),
-            profiling: false,
+            profiling: true,
             compiler_options: CompilerOptions {
                 enable_cycle_tracker: true,
                 compile_prints: true,

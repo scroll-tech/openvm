@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 #[serde(bound = "")]
 #[derivative(Clone(bound = "Com<SC>: Clone"))]
 pub struct MinimalVmVerifierInput<SC: StarkGenericConfig> {
-    pub proofs: Proof<SC>,
+    /// Leaf verifier proof
+    pub proof: Proof<SC>,
     pub public_values: Vec<Val<SC>>,
 }
