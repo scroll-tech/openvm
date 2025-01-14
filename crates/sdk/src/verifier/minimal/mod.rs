@@ -45,6 +45,7 @@ impl MinimalVmVerifierConfig {
             let pcs = TwoAdicFriPcsVariable {
                 config: const_fri_config(&mut builder, &self.leaf_fri_params),
             };
+            // builder.print_debug();
             builder.cycle_tracker_end("InitializePcsConst");
             builder.cycle_tracker_start("ReadProofsFromInput");
             // let proofs: Array<C, StarkProofVariable<_>> =

@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{path::PathBuf, sync::Arc};
 
 use derivative::Derivative;
 use dummy::{
@@ -344,12 +344,6 @@ impl MinimalStarkProvingKey {
         //     config.leaf_fri_params,
         // );
 
-        // let app_proof = dummy_leaf_proof_riscv_app_vm(
-        //     Arc::new(app_vm_pk.vm_pk.get_vk()),
-        //     config.app_vm_config.system().num_public_values,
-        //     config.app_fri_params,
-        // );
-
         let root_verifier_pk = {
             let root_engine = BabyBearPoseidon2RootEngine::new(config.root_fri_params);
             let minimal_root_program = MinimalVmVerifierConfig {
@@ -424,13 +418,26 @@ impl MinimalProvingKey {
             &reader.read_params(halo2_config.verifier_k),
             dummy_root_proof,
         );
-        let dummy_snark = verifier.generate_dummy_snark(reader);
-        let wrapper = if let Some(wrapper_k) = halo2_config.wrapper_k {
-            Halo2WrapperProvingKey::keygen(&reader.read_params(wrapper_k), dummy_snark)
+        let halo2_pk_path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("target")
+            .join("halo2_pk.bin");
+        let halo2_pk = if !halo2_pk_path.exists() {
+            println!("Generating Halo2 proving key");
+            let dummy_snark = verifier.generate_dummy_snark(reader);
+            let wrapper = if let Some(wrapper_k) = halo2_config.wrapper_k {
+                Halo2WrapperProvingKey::keygen(&reader.read_params(wrapper_k), dummy_snark)
+            } else {
+                Halo2WrapperProvingKey::keygen_auto_tune(reader, dummy_snark)
+            };
+            let halo2_pk = Halo2ProvingKey { verifier, wrapper };
+            let bytes = bitcode::serialize(&halo2_pk).unwrap();
+            std::fs::write(halo2_pk_path, bytes).unwrap();
+            halo2_pk
         } else {
-            Halo2WrapperProvingKey::keygen_auto_tune(reader, dummy_snark)
+            println!("Loading Halo2 proving key from disk");
+            let bytes = std::fs::read(halo2_pk_path).unwrap();
+            bitcode::deserialize(&bytes).unwrap()
         };
-        let halo2_pk = Halo2ProvingKey { verifier, wrapper };
         Self {
             minimal_stark_pk,
             halo2_pk,

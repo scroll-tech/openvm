@@ -158,6 +158,7 @@ impl AggStarkProver {
             #[cfg(feature = "bench-metrics")]
             metrics::counter!("fri.log_blowup")
                 .absolute(self.root_prover.fri_params().log_blowup as u64);
+            println!("Generating root proof: {:?}", input);
             SingleSegmentVmProver::prove(&self.root_prover, input)
         })
     }

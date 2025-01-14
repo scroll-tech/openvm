@@ -57,7 +57,8 @@ fn leaf_vm_config(fri_params: &FriParameters, profiling: bool) -> NativeConfig {
         VmVerifierPvs::<u8>::width(),
         SBOX_SIZE.min(fri_params.max_constraint_degree()),
     );
-    config.system.profiling = profiling;
+    // config.system.profiling = profiling;
+    config.system.profiling = true;
     config
 }
 
@@ -70,6 +71,7 @@ fn root_verifier_vm_config(
         DIGEST_SIZE * 2 + max_num_user_public_values,
         SBOX_SIZE.min(fri_params.max_constraint_degree()),
     );
-    config.system.profiling = profiling;
+    // config.system.profiling = profiling;
+    config.system.profiling = true;
     config
 }
