@@ -317,6 +317,8 @@ impl MinimalStarkProvingKey {
         let leaf_vm_config = config.leaf_vm_config();
         let root_vm_config = config.root_verifier_vm_config();
 
+        println!("MinimalStarkConfig: {:?}", config);
+
         let leaf_engine = BabyBearPoseidon2Engine::new(config.leaf_fri_params);
         let leaf_vm_pk = Arc::new({
             let vm = VirtualMachine::new(leaf_engine, leaf_vm_config.clone());
@@ -350,14 +352,14 @@ impl MinimalStarkProvingKey {
 
         let root_verifier_pk = {
             let root_engine = BabyBearPoseidon2RootEngine::new(config.root_fri_params);
-            let root_program = MinimalVmVerifierConfig {
+            let minimal_root_program = MinimalVmVerifierConfig {
                 leaf_fri_params: config.leaf_fri_params,
                 num_public_values: config.max_num_user_public_values,
                 compiler_options: config.compiler_options,
             }
             .build_program(&leaf_vm_pk.vm_pk.get_vk());
             let root_committed_exe = Arc::new(VmCommittedExe::<RootSC>::commit(
-                root_program.into(),
+                minimal_root_program.into(),
                 root_engine.config.pcs(),
             ));
 

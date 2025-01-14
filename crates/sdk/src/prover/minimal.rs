@@ -59,14 +59,14 @@ impl<VC> MinimalProver<VC> {
         self
     }
 
-    pub fn generate_proof(&self, input: StdIn) -> Proof<RootSC>
+    pub fn generate_proof_for_outer_recursion(&self, input: StdIn) -> Proof<RootSC>
     where
         VC: VmConfig<F>,
         VC::Executor: Chip<SC>,
         VC::Periphery: Chip<SC>,
     {
         let app_proof = self.app_prover.generate_app_proof(input);
-        self.minimal_stark_prover.generate_proof(app_proof)
+        self.minimal_stark_prover.generate_agg_proof(app_proof)
     }
 
     pub fn vm_config(&self) -> &NativeConfig {
@@ -97,7 +97,7 @@ impl MinimalStarkProver {
         }
     }
 
-    pub fn generate_proof(&self, app_proofs: ContinuationVmProof<SC>) -> Proof<RootSC> {
+    pub fn generate_agg_proof(&self, app_proofs: ContinuationVmProof<SC>) -> Proof<RootSC> {
         let leaf_proof = self.leaf_prover.generate_proof(&app_proofs);
         let public_values = app_proofs.user_public_values.public_values;
 
@@ -128,6 +128,7 @@ impl MinimalStarkProver {
             #[cfg(feature = "bench-metrics")]
             metrics::counter!("fri.log_blowup")
                 .absolute(self.root_prover.fri_params().log_blowup as u64);
+            println!("Generating root proof: {:?}", input);
             SingleSegmentVmProver::prove(&self.root_prover, input)
         })
     }

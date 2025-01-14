@@ -31,6 +31,7 @@ impl RootVerifierLocalProver {
         }
     }
     pub fn execute_for_air_heights(&self, input: RootVmVerifierInput<SC>) -> Vec<usize> {
+        println!("Executing for air heights: {:?}", input.public_values);
         let result = self
             .executor_for_heights
             .execute_and_compute_heights(

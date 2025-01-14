@@ -107,7 +107,9 @@ impl<VC> SingleSegmentContinuationProver<VC> {
         VC::Executor: Chip<SC>,
         VC::Periphery: Chip<SC>,
     {
-        let proof = self.minimal_prover.generate_proof(input);
+        let proof = self
+            .minimal_prover
+            .generate_proof_for_outer_recursion(input);
         self.halo2_prover.prove_for_evm(&proof)
     }
 }
