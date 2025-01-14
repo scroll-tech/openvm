@@ -10,7 +10,7 @@
 
 |  | trace_gen_time_ms | total_proof_time_ms | total_cycles | total_cells | stark_prove_excluding_trace_time_ms | quotient_poly_compute_time_ms | quotient_poly_commit_time_ms | perm_trace_commit_time_ms | pcs_opening_time_ms | num_segments | main_trace_commit_time_ms | main_cells_used | keygen_time_ms | generate_perm_trace_time_ms | execute_time_ms | commit_exe_time_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-|  | 1,740 | 42,133 | 4,191,033 | 632,452,480 | 39,996 | 4,353 | 2,664 | 14,816 | 9,287 | 1 | 6,563 | 165,014,123 | 821 | 2,310 | 397 | 77 | 
+|  | 1,862 | 45,688 | 4,191,033 | 632,452,480 | 43,422 | 8,332 | 2,632 | 14,262 | 8,183 | 1 | 6,815 | 165,014,123 | 845 | 3,196 | 404 | 79 | 
 
 | air_name | rows | quotient_deg | prep_cols | perm_cols | main_cols | interactions | constraints | cells |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |

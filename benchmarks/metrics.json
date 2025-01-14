@@ -2275,57 +2275,57 @@
     {
       "labels": [],
       "metric": "keygen_time_ms",
-      "value": "841"
+      "value": "818"
     },
     {
       "labels": [],
       "metric": "commit_exe_time_ms",
-      "value": "79"
+      "value": "77"
     },
     {
       "labels": [],
       "metric": "execute_time_ms",
-      "value": "398"
+      "value": "385"
     },
     {
       "labels": [],
       "metric": "trace_gen_time_ms",
-      "value": "1834"
+      "value": "1808"
     },
     {
       "labels": [],
       "metric": "main_trace_commit_time_ms",
-      "value": "6602"
+      "value": "6447"
     },
     {
       "labels": [],
       "metric": "generate_perm_trace_time_ms",
-      "value": "2847"
+      "value": "2246"
     },
     {
       "labels": [],
       "metric": "perm_trace_commit_time_ms",
-      "value": "14315"
+      "value": "14403"
     },
     {
       "labels": [],
       "metric": "quotient_poly_compute_time_ms",
-      "value": "6407"
+      "value": "4899"
     },
     {
       "labels": [],
       "metric": "quotient_poly_commit_time_ms",
-      "value": "2563"
+      "value": "2717"
     },
     {
       "labels": [],
       "metric": "pcs_opening_time_ms",
-      "value": "8456"
+      "value": "7915"
     },
     {
       "labels": [],
       "metric": "stark_prove_excluding_trace_time_ms",
-      "value": "41195"
+      "value": "38630"
     }
   ]
 }

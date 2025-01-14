@@ -6,63 +6,24 @@ use openvm_circuit_primitives::{
 use openvm_stark_backend::p3_field::PrimeField32;
 use rustc_hash::FxHashSet;
 
-use super::paged_vec::PagedVec;
+use super::paged_vec::{AddressMap, PagedVec};
 use crate::{
     arch::MemoryConfig,
     system::memory::{
         adapter::{AccessAdapterRecord, AccessAdapterRecordKind},
         offline_checker::{MemoryBridge, MemoryBus},
-        online::Address,
+        paged_vec::PAGE_SIZE,
         MemoryAuxColsFactory, MemoryImage, RecordId, TimestampedEquipartition, TimestampedValues,
     },
 };
 
 pub const INITIAL_TIMESTAMP: u32 = 0;
 
-const PAGE_SIZE: usize = 1 << 13;
-
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 struct BlockData {
     pointer: u32,
     size: usize,
     timestamp: u32,
-}
-
-struct BlockStructure {
-    block_data: Vec<PagedVec<BlockData>>,
-    as_offset: u32,
-}
-
-impl BlockStructure {
-    pub fn new(as_offset: u32, as_height: usize, mem_size: usize) -> Self {
-        Self {
-            block_data: vec![PagedVec::new(PAGE_SIZE, mem_size / PAGE_SIZE); 1 << as_height],
-            as_offset,
-        }
-    }
-
-    pub fn items(&self) -> impl Iterator<Item = (Address, BlockData)> + '_ {
-        self.block_data
-            .iter()
-            .enumerate()
-            .flat_map(move |(as_idx, page)| {
-                page.iter().map(move |(ptr_idx, block)| {
-                    ((as_idx as u32 + self.as_offset, ptr_idx as u32), block)
-                })
-            })
-    }
-
-    pub fn get(&self, address: &Address) -> Option<&BlockData> {
-        self.block_data[(address.0 - self.as_offset) as usize].get(address.1 as usize)
-    }
-
-    pub fn get_mut(&mut self, address: &Address) -> Option<&mut BlockData> {
-        self.block_data[(address.0 - self.as_offset) as usize].get_mut(address.1 as usize)
-    }
-
-    pub fn insert(&mut self, address: Address, data: BlockData) {
-        self.block_data[(address.0 - self.as_offset) as usize].insert(address.1 as usize, data);
-    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -77,7 +38,7 @@ pub struct MemoryRecord<T> {
 }
 
 pub struct OfflineMemory<F> {
-    block_data: BlockStructure,
+    block_data: AddressMap<BlockData>,
     data: Vec<PagedVec<F>>,
     as_offset: u32,
     initial_block_size: usize,
@@ -106,9 +67,9 @@ impl<F: PrimeField32> OfflineMemory<F> {
         eprintln!("initial_block_size: {}", initial_block_size);
 
         Self {
-            block_data: BlockStructure::new(
+            block_data: AddressMap::new(
                 config.as_offset,
-                config.as_height,
+                1 << config.as_height,
                 1 << config.pointer_max_bits,
             ),
             data: Self::memory_image_to_paged_vec(initial_memory, config),
@@ -137,7 +98,7 @@ impl<F: PrimeField32> OfflineMemory<F> {
                 PagedVec::new(PAGE_SIZE, (1 << config.pointer_max_bits) / PAGE_SIZE);
                 1 << config.as_height
             ];
-        for ((addr_space, pointer), value) in memory_image {
+        for ((addr_space, pointer), value) in memory_image.items() {
             paged_vec[(addr_space - config.as_offset) as usize].insert(pointer as usize, value);
         }
         eprintln!(
@@ -549,10 +510,13 @@ mod tests {
     use openvm_stark_sdk::p3_baby_bear::BabyBear;
 
     use super::{BlockData, MemoryRecord, OfflineMemory};
-    use crate::system::memory::{
-        adapter::{AccessAdapterRecord, AccessAdapterRecordKind},
-        offline_checker::MemoryBus,
-        MemoryImage, TimestampedValues,
+    use crate::{
+        arch::MemoryConfig,
+        system::memory::{
+            adapter::{AccessAdapterRecord, AccessAdapterRecordKind},
+            offline_checker::MemoryBus,
+            MemoryImage, TimestampedValues,
+        },
     };
 
     macro_rules! bb {
@@ -577,7 +541,7 @@ mod tests {
     fn test_partition() {
         type F = BabyBear;
 
-        let initial_memory = MemoryImage::default();
+        let initial_memory = MemoryImage::new(0, 1, 1 << 29);
         let mut partition = OfflineMemory::<F>::new(
             initial_memory,
             8,
@@ -586,7 +550,10 @@ mod tests {
                 1, 29,
             ))),
             29,
-            Default::default(),
+            MemoryConfig {
+                as_offset: 0,
+                ..Default::default()
+            },
         );
         assert_eq!(
             partition.block_containing(0, 13),
@@ -627,7 +594,7 @@ mod tests {
 
     #[test]
     fn test_write_read_initial_block_len_1() {
-        let initial_memory = MemoryImage::default();
+        let initial_memory = MemoryImage::new(1, 1, 1 << 29);
         let mut memory = OfflineMemory::<BabyBear>::new(
             initial_memory,
             1,
@@ -655,7 +622,7 @@ mod tests {
 
     #[test]
     fn test_records_initial_block_len_1() {
-        let initial_memory = MemoryImage::default();
+        let initial_memory = MemoryImage::new(1, 1, 1 << 29);
         // TODO: Ideally we don't need to instantiate all this stuff since we are just testing the data structure.
         let mut memory = OfflineMemory::<BabyBear>::new(
             initial_memory,
@@ -804,7 +771,7 @@ mod tests {
 
     #[test]
     fn test_records_initial_block_len_8() {
-        let initial_memory = MemoryImage::default();
+        let initial_memory = MemoryImage::new(1, 1, 1 << 29);
         let mut memory = OfflineMemory::<BabyBear>::new(
             initial_memory,
             8,
@@ -922,7 +889,7 @@ mod tests {
 
     #[test]
     fn test_get_initial_block_len_1() {
-        let initial_memory = MemoryImage::default();
+        let initial_memory = MemoryImage::new(0, 2, 16);
         let mut memory = OfflineMemory::<BabyBear>::new(
             initial_memory,
             1,
@@ -931,7 +898,10 @@ mod tests {
                 1, 29,
             ))),
             29,
-            Default::default(),
+            MemoryConfig {
+                as_offset: 0,
+                ..Default::default()
+            },
         );
 
         memory.write(1, 0, bbvec![4, 3, 2, 1]);
@@ -947,7 +917,7 @@ mod tests {
 
     #[test]
     fn test_get_initial_block_len_8() {
-        let initial_memory = MemoryImage::default();
+        let initial_memory = MemoryImage::new(0, 2, 16);
         let mut memory = OfflineMemory::<BabyBear>::new(
             initial_memory,
             8,
@@ -956,7 +926,10 @@ mod tests {
                 1, 29,
             ))),
             29,
-            Default::default(),
+            MemoryConfig {
+                as_offset: 0,
+                ..Default::default()
+            },
         );
 
         memory.write(1, 0, bbvec![4, 3, 2, 1]);
@@ -972,7 +945,7 @@ mod tests {
 
     #[test]
     fn test_finalize_empty() {
-        let initial_memory = MemoryImage::default();
+        let initial_memory = MemoryImage::new(1, 1, 1 << 29);
         let mut memory = OfflineMemory::<BabyBear>::new(
             initial_memory,
             4,
@@ -991,7 +964,7 @@ mod tests {
 
     #[test]
     fn test_finalize_block_len_8() {
-        let initial_memory = MemoryImage::default();
+        let initial_memory = MemoryImage::new(1, 1, 1 << 29);
         let mut memory = OfflineMemory::<BabyBear>::new(
             initial_memory,
             8,
@@ -1059,7 +1032,7 @@ mod tests {
         type F = BabyBear;
 
         // Initialize initial memory with blocks at indices 0 and 2
-        let mut initial_memory = MemoryImage::default();
+        let mut initial_memory = MemoryImage::new(1, 1, 1 << 29);
         for i in 0..8 {
             initial_memory.insert((1, i), F::from_canonical_u32(i + 1));
             initial_memory.insert((1, 16 + i), F::from_canonical_u32(i + 1));

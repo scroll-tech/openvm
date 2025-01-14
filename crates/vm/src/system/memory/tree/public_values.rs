@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     arch::hasher::Hasher,
     system::memory::{
-        dimensions::MemoryDimensions, online::Address, tree::MemoryNode, MemoryImage,
+        dimensions::MemoryDimensions, paged_vec::Address, tree::MemoryNode, MemoryImage,
     },
 };
 
@@ -118,7 +118,7 @@ pub fn extract_public_values<F: PrimeField32>(
 
     // TODO: This clones the entire memory. Ideally this should run in time proportional to
     // the size of the PV address space, not entire memory.
-    let final_memory: BTreeMap<Address, F> = final_memory.clone().into_iter().collect();
+    let final_memory: BTreeMap<Address, F> = final_memory.items().collect();
 
     let used_pvs: Vec<_> = final_memory
         .range((f_as_start, 0)..(f_as_end, 0))
@@ -148,7 +148,7 @@ mod tests {
             hasher::{poseidon2::vm_poseidon2_hasher, Hasher},
             SystemConfig,
         },
-        system::memory::{tree::MemoryNode, MemoryImage, CHUNK},
+        system::memory::{paged_vec::PAGE_SIZE, tree::MemoryNode, MemoryImage, CHUNK},
     };
 
     type F = BabyBear;
@@ -160,7 +160,12 @@ mod tests {
         let memory_dimensions = vm_config.memory_config.memory_dimensions();
         let pv_as = PUBLIC_VALUES_ADDRESS_SPACE_OFFSET + memory_dimensions.as_offset;
         let num_public_values = 16;
-        let memory: MemoryImage<F> = [((pv_as, 15), F::ONE)].into_iter().collect();
+        let mut memory = MemoryImage::new(
+            memory_dimensions.as_offset,
+            memory_dimensions.as_height,
+            PAGE_SIZE,
+        );
+        memory.insert((pv_as, 15), F::ONE);
         let mut expected_pvs = F::zero_vec(num_public_values);
         expected_pvs[15] = F::ONE;
 

@@ -6,7 +6,10 @@ use openvm_circuit::{
         instructions::exe::VmExe,
         VmConfig,
     },
-    system::{memory::tree::MemoryNode, program::trace::VmCommittedExe},
+    system::{
+        memory::{tree::MemoryNode, MemoryImage},
+        program::trace::VmCommittedExe,
+    },
 };
 use openvm_native_compiler::{conversion::CompilerOptions, ir::DIGEST_SIZE};
 use openvm_stark_backend::{config::StarkGenericConfig, p3_field::PrimeField32};
@@ -60,12 +63,16 @@ impl AppExecutionCommit<F> {
             .commit
             .into();
 
-        let init_memory_commit = MemoryNode::tree_from_memory(
-            memory_dimensions,
-            &app_exe.exe.init_memory.clone().into_iter().collect(),
-            &hasher,
-        )
-        .hash();
+        let mut memory = MemoryImage::new(
+            app_vm_config.system().memory_config.as_offset,
+            1 << app_vm_config.system().memory_config.as_height,
+            1 << app_vm_config.system().memory_config.pointer_max_bits,
+        );
+        for ((addr_space, pointer), value) in app_exe.exe.init_memory.clone() {
+            memory.insert((addr_space, pointer), value);
+        }
+        let init_memory_commit =
+            MemoryNode::tree_from_memory(memory_dimensions, &memory, &hasher).hash();
         let mut padded_pc_start = [F::ZERO; DIGEST_SIZE];
         padded_pc_start[0] = F::from_canonical_u32(app_exe.exe.pc_start);
         let app_hash = hasher.hash(&app_program_commit);

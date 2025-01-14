@@ -113,11 +113,20 @@ where
         let exe = exe.into();
         let streams = input.into();
         let mut segments = vec![];
+        let config = &self.config.system().memory_config;
+        let mut memory_image = MemoryImage::new(
+            config.as_offset,
+            1 << config.as_height,
+            1 << config.pointer_max_bits,
+        );
+        for (&(addr_space, pointer), &value) in exe.init_memory.iter() {
+            memory_image.insert((addr_space, pointer), value);
+        }
         let mut segment = ExecutionSegment::new(
             &self.config,
             exe.program.clone(),
             streams,
-            Some(exe.init_memory.into_iter().collect()),
+            Some(memory_image),
             exe.fn_bounds.clone(),
         );
         if let Some(overridden_heights) = self.overridden_heights.as_ref() {

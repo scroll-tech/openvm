@@ -1,7 +1,6 @@
 use std::{array, fmt::Debug};
 
 use openvm_stark_backend::p3_field::PrimeField32;
-use rustc_hash::FxHashMap;
 
 use crate::system::memory::{offline::INITIAL_TIMESTAMP, MemoryImage, RecordId};
 
@@ -20,23 +19,20 @@ pub enum MemoryLogEntry<T> {
     IncrementTimestampBy(u32),
 }
 
-/// (address_space, pointer)
-pub(crate) type Address = (u32, u32);
-
 /// A simple data structure to read to/write from memory.
 ///
 /// Stores a log of memory accesses to reconstruct aspects of memory state for trace generation.
 #[derive(Debug)]
 pub struct Memory<F> {
-    pub(super) data: FxHashMap<Address, F>,
+    pub(super) data: MemoryImage<F>,
     pub(super) log: Vec<MemoryLogEntry<F>>,
     timestamp: u32,
 }
 
 impl<F: PrimeField32> Memory<F> {
-    pub fn new(access_capacity: usize) -> Self {
+    pub fn new(access_capacity: usize, as_offset: u32, as_cnt: usize, mem_size: usize) -> Self {
         Self {
-            data: MemoryImage::default(),
+            data: MemoryImage::new(as_offset, as_cnt, mem_size),
             timestamp: INITIAL_TIMESTAMP + 1,
             log: Vec::with_capacity(access_capacity),
         }
@@ -126,6 +122,7 @@ mod tests {
     use openvm_stark_sdk::p3_baby_bear::BabyBear;
 
     use super::Memory;
+    use crate::system::memory::paged_vec::PAGE_SIZE;
 
     macro_rules! bba {
         [$($x:expr),*] => {
@@ -135,7 +132,7 @@ mod tests {
 
     #[test]
     fn test_write_read() {
-        let mut memory = Memory::new(0);
+        let mut memory = Memory::new(0, 1, 1, PAGE_SIZE);
         let address_space = 1;
 
         memory.write(address_space, 0, bba![1, 2, 3, 4]);

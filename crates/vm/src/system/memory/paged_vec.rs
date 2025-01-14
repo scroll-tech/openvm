@@ -1,5 +1,7 @@
 use std::ops::Range;
 
+pub(crate) const PAGE_SIZE: usize = 1 << 14;
+
 #[derive(Debug, Clone)]
 pub(crate) struct PagedVec<T> {
     page_size: usize,
@@ -48,7 +50,7 @@ impl<T: Default + Copy> PagedVec<T> {
     pub fn get_range(&self, range: Range<usize>) -> Vec<T> {
         let mut result = Vec::with_capacity(range.len());
         for page_idx in (range.start / self.page_size)..range.end.div_ceil(self.page_size) {
-            let in_page_start = (range.start - page_idx * self.page_size).max(0);
+            let in_page_start = range.start.saturating_sub(page_idx * self.page_size);
             let in_page_end = (range.end - page_idx * self.page_size).min(self.page_size);
             if let Some(page) = self.pages[page_idx].as_ref() {
                 result.extend(
@@ -75,7 +77,7 @@ impl<T: Default + Copy> PagedVec<T> {
         let mut result = Vec::with_capacity(range.len());
         let mut values = values.into_iter();
         for page_idx in (range.start / self.page_size)..range.end.div_ceil(self.page_size) {
-            let in_page_start = (range.start - page_idx * self.page_size).max(0);
+            let in_page_start = range.start.saturating_sub(page_idx * self.page_size);
             let in_page_end = (range.end - page_idx * self.page_size).min(self.page_size);
             let page = self.pages[page_idx].get_or_insert_with(|| vec![None; self.page_size]);
             result.extend(
@@ -133,6 +135,47 @@ impl<T: Copy> Iterator for PagedVecIter<'_, T> {
             self.current_index_in_page += 1;
             Some((global_index, value))
         }
+    }
+}
+
+/// (address_space, pointer)
+pub(crate) type Address = (u32, u32);
+
+#[derive(Debug, Clone)]
+pub struct AddressMap<T> {
+    paged_vecs: Vec<PagedVec<T>>,
+    as_offset: u32,
+}
+
+impl<T: Copy> AddressMap<T> {
+    pub fn new(as_offset: u32, as_cnt: usize, mem_size: usize) -> Self {
+        let mem_size = mem_size.div_ceil(PAGE_SIZE) * PAGE_SIZE;
+        Self {
+            paged_vecs: vec![PagedVec::new(PAGE_SIZE, mem_size / PAGE_SIZE); as_cnt],
+            as_offset,
+        }
+    }
+
+    pub fn items(&self) -> impl Iterator<Item = (Address, T)> + '_ {
+        self.paged_vecs
+            .iter()
+            .enumerate()
+            .flat_map(move |(as_idx, page)| {
+                page.iter()
+                    .map(move |(ptr_idx, x)| ((as_idx as u32 + self.as_offset, ptr_idx as u32), x))
+            })
+    }
+
+    pub fn get(&self, address: &Address) -> Option<&T> {
+        self.paged_vecs[(address.0 - self.as_offset) as usize].get(address.1 as usize)
+    }
+
+    pub fn get_mut(&mut self, address: &Address) -> Option<&mut T> {
+        self.paged_vecs[(address.0 - self.as_offset) as usize].get_mut(address.1 as usize)
+    }
+
+    pub fn insert(&mut self, address: Address, data: T) -> Option<T> {
+        self.paged_vecs[(address.0 - self.as_offset) as usize].insert(address.1 as usize, data)
     }
 }
 
@@ -269,7 +312,7 @@ mod tests {
 
         v.set_range(4..10, &[1, 2, 3, 4, 5, 6]);
         let contents: Vec<_> = v.iter().collect();
-        assert_eq!(contents.len(), 8); // two pages
+        assert_eq!(contents.len(), 6);
 
         contents
             .iter()
@@ -278,7 +321,5 @@ mod tests {
             .for_each(|(i, &(idx, val))| {
                 assert_eq!((idx, val), (4 + i, 1 + i));
             });
-        assert_eq!(contents[6], (10, 0));
-        assert_eq!(contents[7], (11, 0));
     }
 }
