@@ -11,6 +11,7 @@ mod persistent;
 #[cfg(test)]
 mod tests;
 pub mod tree;
+mod van_emde_boas;
 mod volatile;
 
 pub use controller::*;
