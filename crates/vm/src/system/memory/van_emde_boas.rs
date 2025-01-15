@@ -99,7 +99,7 @@ impl<T: Clone> VanEmdeBoas<T> for VebLeaf<T> {
         while key > 0 && self.values[key].is_none() {
             key -= 1;
         }
-        if key > 0 {
+        if self.values[key].is_some() {
             Some(key as u32)
         } else {
             None
@@ -221,6 +221,7 @@ where
             .empty()
         {
             self.existing_children.erase(Self::high(key));
+            self.subtrees[Self::high(key) as usize] = None;
         }
         if let Some(min_key) = self.min {
             if key == min_key {
@@ -293,13 +294,20 @@ where
                 return Some(Self::high(key) << LOW_BITS | low);
             }
         }
-        if let Some(high) = self.existing_children.max_not_exceeding(Self::high(key)) {
-            let low = self.subtrees[high as usize]
-                .as_ref()
-                .unwrap()
-                .max()
-                .unwrap();
-            Some(high << LOW_BITS | low)
+        if Self::high(key) > 0 {
+            if let Some(high) = self
+                .existing_children
+                .max_not_exceeding(Self::high(key) - 1)
+            {
+                let low = self.subtrees[high as usize]
+                    .as_ref()
+                    .unwrap()
+                    .max()
+                    .unwrap();
+                Some(high << LOW_BITS | low)
+            } else {
+                None
+            }
         } else {
             None
         }
@@ -374,8 +382,17 @@ mod tests {
             assert_eq!(key, (i * i) as u32);
             assert_eq!(*value, i as u32);
         }
-
-        for i in 0..100 {
+        assert_eq!(tree.min(), Some(0));
+        assert_eq!(tree.max(), Some(99 * 99));
+        assert_eq!(tree.max_not_exceeding(99 * 99 - 1), Some(98 * 98));
+        assert_eq!(tree.max_not_exceeding(99 * 99), Some(99 * 99));
+        assert_eq!(tree.max_not_exceeding(99 * 99 + 1), Some(99 * 99));
+        assert_eq!(tree.max_not_exceeding(u32::MAX), Some(99 * 99));
+        tree.erase(0);
+        assert_eq!(tree.min(), Some(1));
+        assert_eq!(tree.max(), Some(99 * 99));
+        assert_eq!(tree.max_not_exceeding(0), None);
+        for i in 1..100 {
             tree.erase(i * i);
         }
         for i in 0..100 {
