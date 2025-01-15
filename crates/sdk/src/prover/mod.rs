@@ -29,8 +29,8 @@ use crate::{
 };
 
 pub struct ContinuationProver<VC> {
-    stark_prover: StarkProver<VC>,
-    halo2_prover: Halo2Prover,
+    pub stark_prover: StarkProver<VC>,
+    pub halo2_prover: Halo2Prover,
 }
 
 impl<VC> ContinuationProver<VC> {
