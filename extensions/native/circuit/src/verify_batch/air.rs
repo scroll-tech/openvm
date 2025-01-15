@@ -119,6 +119,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .when(next.incorporate_row)
             .assert_one(next.start_top_level);
 
+        // poseidon2 constraints are always checked
         let mut sub_builder =
             SubAirBuilder::<AB, Poseidon2SubAir<AB::F, SBOX_REGISTERS>, AB::F>::new(
                 builder,
@@ -337,7 +338,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 &commit_read,
             )
             .eval(builder, end_top_level);
-
 
         let mut when_top_level_not_end =
             builder.when(incorporate_row + incorporate_sibling - end_top_level);

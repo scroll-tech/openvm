@@ -1,4 +1,7 @@
+use openvm_stark_backend::p3_air::BaseAir;
 use openvm_stark_backend::p3_field::{Field, FieldAlgebra};
+use openvm_stark_backend::utils::disable_debug_builder;
+use openvm_stark_backend::verifier::VerificationError;
 use openvm_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
 use rand::{Rng, rngs::StdRng};
 
@@ -8,7 +11,7 @@ use openvm_circuit::{
 };
 use openvm_instructions::{instruction::Instruction, UsizeOpcode, VmOpcode};
 use openvm_native_compiler::{VerifyBatchOpcode, VerifyBatchOpcode::VERIFY_BATCH};
-use openvm_poseidon2_air::Poseidon2Config;
+use openvm_poseidon2_air::{Poseidon2Config, Poseidon2SubChip};
 
 use crate::verify_batch::chip::VerifyBatchChip;
 
@@ -225,6 +228,23 @@ fn verify_batch_air_test() {
         ),
     );
 
-    let tester = tester.build().load(chip).finalize();
+    let mut tester = tester.build().load(chip).finalize();
     tester.simple_test().expect("Verification failed");
+
+    disable_debug_builder();
+    let trace = tester.air_proof_inputs[2].raw.common_main.as_mut().unwrap();
+    let row_index = 0;
+    trace.row_mut(row_index);
+    
+    let p2_chip = Poseidon2SubChip::<F, SBOX_REGISTERS>::new(Poseidon2Config::default().constants);
+    let inner_trace = p2_chip.generate_trace(vec![[F::ZERO; 2 * CHUNK]]);
+    let inner_width = p2_chip.air.width();
+
+    trace.row_mut(row_index)[..inner_width].copy_from_slice(&inner_trace.values);
+    // Run a test after pranking the poseidon2 stuff
+    assert_eq!(
+        tester.simple_test().err(),
+        Some(VerificationError::OodEvaluationMismatch),
+        "Expected constraint to fail"
+    );
 }
