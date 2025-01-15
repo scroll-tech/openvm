@@ -322,10 +322,12 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                 let mut sibling = [F::ZERO; CHUNK];
                 let mut reads = vec![];
                 for i in 0..CHUNK {
+                    println!("[timestamp = {}] reading {sibling_array_start} + {i} -> ", memory.timestamp());
                     let (read, value) = memory.read_cell(
                         address_space,
                         F::from_canonical_usize(sibling_array_start + i),
                     );
+                    println!("\t-> {:?}", value);
                     sibling[i] = value;
                     reads.push(read);
                 }

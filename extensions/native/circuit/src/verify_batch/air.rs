@@ -476,7 +476,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
             self.memory_bridge
                 .read(
-                    MemoryAddress::new(address_space, sibling_array_start + proof_index),
+                    MemoryAddress::new(address_space, sibling_array_start + AB::F::from_canonical_usize(i)),
                     [(root_is_on_right * left_input[i])
                         + ((AB::Expr::ONE - root_is_on_right) * right_input[i])],
                     timestamp_after_end_operations.clone() + AB::F::from_canonical_usize(2 + i),
