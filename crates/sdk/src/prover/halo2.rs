@@ -10,9 +10,9 @@ use tracing::info_span;
 
 use crate::{keygen::Halo2ProvingKey, RootSC};
 pub struct Halo2Prover {
-    halo2_pk: Halo2ProvingKey,
-    verifier_srs: Arc<Halo2Params>,
-    wrapper_srs: Arc<Halo2Params>,
+    pub halo2_pk: Halo2ProvingKey,
+    pub verifier_srs: Arc<Halo2Params>,
+    pub wrapper_srs: Arc<Halo2Params>,
 }
 
 impl Halo2Prover {
