@@ -18,30 +18,38 @@ impl<T: Copy> PagedVec<T> {
 
     pub fn get(&self, index: usize) -> Option<&T> {
         let page_idx = index / self.page_size;
-        if let Some(page) = &self.pages[page_idx] {
-            page[index % self.page_size].as_ref()
-        } else {
-            None
+        unsafe {
+            if let Some(page) = self.pages.get_unchecked(page_idx) {
+                page.get_unchecked(index % self.page_size).as_ref()
+            } else {
+                None
+            }
         }
     }
 
     pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
         let page_idx = index / self.page_size;
-        if let Some(page) = self.pages[page_idx].as_mut() {
-            page[index % self.page_size].as_mut()
-        } else {
-            None
+        unsafe {
+            if let Some(page) = self.pages.get_unchecked_mut(page_idx).as_mut() {
+                page.get_unchecked_mut(index % self.page_size).as_mut()
+            } else {
+                None
+            }
         }
     }
 
     pub fn insert(&mut self, index: usize, value: T) -> Option<T> {
         let page_idx = index / self.page_size;
-        if self.pages[page_idx].is_none() {
-            self.pages[page_idx] = Some(vec![None; self.page_size]);
-        }
-        match self.pages[page_idx].as_mut() {
-            Some(page) => page[index % self.page_size].replace(value),
-            None => unreachable!(),
+        unsafe {
+            if self.pages.get_unchecked(page_idx).is_none() {
+                *self.pages.get_unchecked_mut(page_idx) = Some(vec![None; self.page_size]);
+            }
+            match self.pages.get_unchecked_mut(page_idx).as_mut() {
+                Some(page) => page
+                    .get_unchecked_mut(index % self.page_size)
+                    .replace(value),
+                None => unreachable!(),
+            }
         }
     }
 }
@@ -52,15 +60,17 @@ impl<T: Default + Copy> PagedVec<T> {
         for page_idx in (range.start / self.page_size)..range.end.div_ceil(self.page_size) {
             let in_page_start = range.start.saturating_sub(page_idx * self.page_size);
             let in_page_end = (range.end - page_idx * self.page_size).min(self.page_size);
-            if let Some(page) = self.pages[page_idx].as_ref() {
-                result.extend(
-                    page[in_page_start..in_page_end]
-                        .iter()
-                        .map(|&x| x.unwrap_or_default())
-                        .collect::<Vec<_>>(),
-                );
-            } else {
-                result.extend(vec![T::default(); in_page_end - in_page_start]);
+            unsafe {
+                if let Some(page) = self.pages.get_unchecked(page_idx).as_ref() {
+                    result.extend(
+                        page[in_page_start..in_page_end]
+                            .iter()
+                            .map(|&x| x.unwrap_or_default())
+                            .collect::<Vec<_>>(),
+                    );
+                } else {
+                    result.extend(vec![T::default(); in_page_end - in_page_start]);
+                }
             }
         }
         result
@@ -167,7 +177,11 @@ impl<T: Copy> AddressMap<T> {
     }
 
     pub fn get(&self, address: &Address) -> Option<&T> {
-        self.paged_vecs[(address.0 - self.as_offset) as usize].get(address.1 as usize)
+        unsafe {
+            self.paged_vecs
+                .get_unchecked((address.0 - self.as_offset) as usize)
+                .get(address.1 as usize)
+        }
     }
 
     pub fn get_mut(&mut self, address: &Address) -> Option<&mut T> {
