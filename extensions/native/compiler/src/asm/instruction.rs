@@ -10,14 +10,22 @@ pub enum AsmInstruction<F, EF> {
     /// Load word (dst, src, var_index, size, offset).
     ///
     /// Load a value from the address stored at src(fp) into dst(fp) with given index and offset.
-    LoadF(i32, i32, i32, F, F),
     LoadFI(i32, i32, F, F, F),
+
+    /// Load extension word (dst, src, var_index, size, offset).
+    ///
+    /// Load an extension from the address stored at src(fp) into dst(fp) with given index and offset.
+    LoadEI(i32, i32, F, F, F),
 
     /// Store word (val, addr, var_index, size, offset)
     ///
     /// Store a value from val(fp) into the address stored at addr(fp) with given index and offset.
-    StoreF(i32, i32, i32, F, F),
     StoreFI(i32, i32, F, F, F),
+
+    /// Store extension word (val, addr, var_index, size, offset)
+    ///
+    /// Store an extension from val(fp) into the address stored at addr(fp) with given index and offset.
+    StoreEI(i32, i32, F, F, F),
 
     /// Set dst = imm.
     ImmF(i32, F),
@@ -142,6 +150,9 @@ pub enum AsmInstruction<F, EF> {
     /// Stores the next hint stream word into value stored at addr + value.
     StoreHintWordI(i32, F),
 
+    /// Stores the next hint stream ext into value stored at addr + value.
+    StoreHintExtI(i32, F),
+
     /// Publish(val, index).
     Publish(i32, i32),
 
@@ -157,13 +168,6 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
     pub fn fmt(&self, labels: &BTreeMap<F, String>, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             AsmInstruction::Break(_) => panic!("Unresolved break instruction"),
-            AsmInstruction::LoadF(dst, src, var_index, size, offset) => {
-                write!(
-                    f,
-                    "lw    ({})fp, ({})fp, ({})fp, {}, {}",
-                    dst, src, var_index, size, offset
-                )
-            }
             AsmInstruction::LoadFI(dst, src, var_index, size, offset) => {
                 write!(
                     f,
@@ -171,10 +175,10 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
                     dst, src, var_index, size, offset
                 )
             }
-            AsmInstruction::StoreF(dst, src, var_index, size, offset) => {
+            AsmInstruction::LoadEI(dst, src, var_index, size, offset) => {
                 write!(
                     f,
-                    "sw    ({})fp, ({})fp, ({})fp, {}, {}",
+                    "lei   ({})fp, ({})fp, {}, {}, {}",
                     dst, src, var_index, size, offset
                 )
             }
@@ -182,6 +186,13 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
                 write!(
                     f,
                     "swi   ({})fp, ({})fp, {}, {}, {}",
+                    dst, src, var_index, size, offset
+                )
+            }
+            AsmInstruction::StoreEI(dst, src, var_index, size, offset) => {
+                write!(
+                    f,
+                    "sei   ({})fp, ({})fp, {}, {}, {}",
                     dst, src, var_index, size, offset
                 )
             }
@@ -338,6 +349,9 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
             AsmInstruction::HintInputVec() => write!(f, "hint_vec"),
             AsmInstruction::StoreHintWordI(dst, offset) => {
                 write!(f, "shintw ({})fp {}", dst, offset)
+            }
+            AsmInstruction::StoreHintExtI(dst, offset) => {
+                write!(f, "shinte ({})fp {}", dst, offset)
             }
             AsmInstruction::Publish(val, index) => {
                 write!(f, "commit ({})fp ({})fp", val, index)
