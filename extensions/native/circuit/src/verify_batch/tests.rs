@@ -1,3 +1,7 @@
+use openvm_stark_backend::p3_field::{Field, FieldAlgebra};
+use openvm_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
+use rand::{Rng, rngs::StdRng};
+
 use openvm_circuit::{
     arch::testing::{memory::gen_pointer, VmChipTestBuilder},
     system::memory::CHUNK,
@@ -5,9 +9,6 @@ use openvm_circuit::{
 use openvm_instructions::{instruction::Instruction, UsizeOpcode, VmOpcode};
 use openvm_native_compiler::{VerifyBatchOpcode, VerifyBatchOpcode::VERIFY_BATCH};
 use openvm_poseidon2_air::Poseidon2Config;
-use openvm_stark_backend::p3_field::{Field, FieldAlgebra};
-use openvm_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
-use rand::{rngs::StdRng, Rng};
 
 use crate::verify_batch::chip::VerifyBatchChip;
 
@@ -113,6 +114,8 @@ fn random_instance(
     }
 }
 
+const SBOX_REGISTERS: usize = 1;
+
 #[test]
 fn verify_batch_air_test() {
     unsafe {
@@ -126,7 +129,7 @@ fn verify_batch_air_test() {
     let offset = VerifyBatchOpcode::default_offset();
 
     let mut tester = VmChipTestBuilder::default();
-    let mut chip = VerifyBatchChip::<F, 1>::new(
+    let mut chip = VerifyBatchChip::<F, SBOX_REGISTERS>::new(
         tester.execution_bus(),
         tester.program_bus(),
         tester.memory_bridge(),
@@ -224,27 +227,4 @@ fn verify_batch_air_test() {
 
     let tester = tester.build().load(chip).finalize();
     tester.simple_test().expect("Verification failed");
-
-    /*disable_debug_builder();
-    // negative test pranking each value
-    for height in 0..num_ops {
-        // TODO: better way to modify existing traces in tester
-        let trace = tester.air_proof_inputs[2].raw.common_main.as_mut().unwrap();
-        let old_trace = trace.clone();
-        for width in 0..VerifyBatchCols::<BabyBear>::width()
-        /* num operands */
-        {
-            let prank_value = BabyBear::from_canonical_u32(rng.gen_range(1..=100));
-            trace.row_mut(height)[width] = prank_value;
-        }
-
-        // Run a test after pranking each row
-        assert_eq!(
-            tester.simple_test().err(),
-            Some(VerificationError::OodEvaluationMismatch),
-            "Expected constraint to fail"
-        );
-
-        tester.air_proof_inputs[2].raw.common_main = Some(old_trace);
-    }*/
 }
