@@ -125,10 +125,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         let concatenated =
             std::array::from_fn(|i| if i < CHUNK { left[i] } else { right[i - CHUNK] });
         let permuted = self.subchip.permute(concatenated);
-        println!("compress:");
-        println!("\tleft = {:?}", left);
-        println!("\tright = {:?}", right);
-        println!("\tpermuted = {:?}", permuted);
         (concatenated, std::array::from_fn(|i| permuted[i]))
     }
 }
@@ -230,9 +226,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                         };
                         let (read, value) =
                             memory.read_cell(address_space, F::from_canonical_usize(row_pointer));
-                        println!("\topened_index = {opened_index}, row_pointer = {row_pointer}, row_end = {row_end}");
-
-
                         cells.push(CellRecord {
                             read,
                             opened_index,
@@ -243,7 +236,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                         chunk[i] = value;
                         row_pointer += 1;
                     }
-                    println!("opened_index = {opened_index}, row_pointer = {row_pointer}, row_end = {row_end}");
                     if cells.is_empty() {
                         break;
                     }
@@ -256,8 +248,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     self.height += 1;
                     prev_rolling_hash = Some(rolling_hash);
                     self.subchip.permute_mut(&mut rolling_hash);
-                    println!("rolling_hash was {:?}", prev_rolling_hash);
-                    println!("\tnow = {:?}", rolling_hash);
                     if cells_len < CHUNK {
                         for _ in 0..CHUNK - cells_len {
                             memory.increment_timestamp();
@@ -322,12 +312,10 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                 let mut sibling = [F::ZERO; CHUNK];
                 let mut reads = vec![];
                 for i in 0..CHUNK {
-                    println!("[timestamp = {}] reading {sibling_array_start} + {i} -> ", memory.timestamp());
                     let (read, value) = memory.read_cell(
                         address_space,
                         F::from_canonical_usize(sibling_array_start + i),
                     );
-                    println!("\t-> {:?}", value);
                     sibling[i] = value;
                     reads.push(read);
                 }

@@ -84,7 +84,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         cols.initial_opened_index = F::from_canonical_usize(opened_index);
         cols.final_opened_index = F::from_canonical_usize(opened_index - 1);
         cols.height = F::from_canonical_usize(height);
-        println!("[sibling] initial_opened_index = {}, final_opened_index = {}, height = {}", cols.initial_opened_index, cols.final_opened_index, cols.height);
         cols.opened_length = F::from_canonical_usize(parent.opened_length);
         cols.dim_base_pointer = parent.dim_base_pointer;
         cols.opened_base_pointer = parent.opened_base_pointer;
@@ -186,7 +185,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         cols.initial_opened_index = F::from_canonical_usize(initial_opened_index);
         cols.final_opened_index = F::from_canonical_usize(final_opened_index);
         cols.height = F::from_canonical_usize(height);
-        println!("[row] initial_opened_index = {}, final_opened_index = {}, height = {}", cols.initial_opened_index, cols.final_opened_index, cols.height);
         cols.opened_length = F::from_canonical_usize(parent.opened_length);
         cols.dim_base_pointer = parent.dim_base_pointer;
         cols.opened_base_pointer = parent.opened_base_pointer;

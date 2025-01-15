@@ -139,15 +139,12 @@ fn verify_batch_air_test() {
     let instance = random_instance(&mut rng, row_lengths, |left, right| {
         let concatenated =
             std::array::from_fn(|i| if i < CHUNK { left[i] } else { right[i - CHUNK] });
-        println!("concatenated = {:?}", concatenated);
         let permuted = chip.subchip.permute(concatenated);
-        println!("\t-> {:?}", permuted);
         (
             std::array::from_fn(|i| permuted[i]),
             std::array::from_fn(|i| permuted[i + CHUNK]),
         )
     });
-    println!("instance = {:?}", instance);
     let VerifyBatchInstance {
         dim,
         opened,
@@ -161,14 +158,12 @@ fn verify_batch_air_test() {
     let sibling_register = gen_pointer(&mut rng, 2);
     let index_register = gen_pointer(&mut rng, 2);
     let commit_register = gen_pointer(&mut rng, 2);
-    println!("dim_register = {dim_register}, opened_register = {opened_register}, sibling_register = {sibling_register}, index_register = {index_register}, commit_register = {commit_register}");
 
     let dim_base_pointer = gen_pointer(&mut rng, 1);
     let opened_base_pointer = gen_pointer(&mut rng, 2);
     let sibling_base_pointer = gen_pointer(&mut rng, 1);
     let index_base_pointer = gen_pointer(&mut rng, 1);
     let commit_pointer = gen_pointer(&mut rng, 1);
-    println!("dim_base_pointer = {dim_base_pointer}, opened_base_pointer = {opened_base_pointer}, sibling_base_pointer = {sibling_base_pointer}, index_base_pointer = {index_base_pointer}, commit_pointer = {commit_pointer}");
 
     tester.write_usize(address_space, dim_register, [dim_base_pointer, dim.len()]);
     tester.write_usize(
@@ -193,7 +188,6 @@ fn verify_batch_air_test() {
     }
     for (i, opened_row) in opened.iter().enumerate() {
         let row_pointer = gen_pointer(&mut rng, 1);
-        println!("opened_row_pointer[{i}] = {row_pointer}");
         tester.write_usize(
             address_space,
             opened_base_pointer + (2 * i),
@@ -205,7 +199,6 @@ fn verify_batch_air_test() {
     }
     for (i, &sibling) in proof.iter().enumerate() {
         let row_pointer = gen_pointer(&mut rng, 1);
-        println!("sibling_row_pointer[{i}] = {row_pointer}");
         tester.write_usize(address_space, sibling_base_pointer + i, [row_pointer]);
         tester.write(address_space, row_pointer, sibling);
     }
