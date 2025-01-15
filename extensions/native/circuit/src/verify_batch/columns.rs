@@ -26,15 +26,14 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
     pub start_timestamp: T,
     pub end_timestamp: T, // only used for top level (so can be shared (saves 1 col)
 
-    // instruction (a, b, c, d, e)
-    // all other than address_space can be shared (saves 5 cols)
+    // instruction (a, b, c, d, e, f)
+    // all can be shared (saves 6 cols)
     pub dim_register: T,
     pub opened_register: T,
     pub opened_length_register: T,
     pub sibling_register: T,
     pub index_register: T,
     pub commit_register: T,
-    pub address_space: T,
 
     pub cells: [VerifyBatchCellCols<T, SBOX_REGISTERS>; CHUNK],
     // initial/final opened index for a subsegment with same height
@@ -52,7 +51,7 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
     pub sibling_base_pointer: T,
     pub index_base_pointer: T,
 
-    // these can be optimized to be shared with cells[i].read_row_pointer_and_length (saves 15 cols)
+    // these can be optimized to be shared with cells[i].read_row_pointer_and_length (saves 18 cols)
     pub dim_base_pointer_read: MemoryReadAuxCols<T, 1>,
     pub opened_base_pointer_read: MemoryReadAuxCols<T, 1>,
     pub opened_length_read: MemoryReadAuxCols<T, 1>,

@@ -28,6 +28,7 @@ pub struct VerifyBatchAir<F: Field, const SBOX_REGISTERS: usize> {
     pub internal_bus: VerifyBatchBus,
     pub(crate) subair: Arc<Poseidon2SubAir<F, SBOX_REGISTERS>>,
     pub(super) offset: usize,
+    pub(crate) address_space: F,
 }
 
 impl<F: Field, const SBOX_REGISTERS: usize> BaseAir<F> for VerifyBatchAir<F, SBOX_REGISTERS> {
@@ -73,7 +74,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             sibling_register,
             index_register,
             commit_register,
-            address_space,
             cells,
             initial_opened_index,
             final_opened_index,
@@ -155,7 +155,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             opened_base_pointer,
             initial_opened_index,
             cells[CHUNK - 1].opened_index,
-            address_space,
             left_output,
         );
 
@@ -207,7 +206,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             let next_is_normal = AB::Expr::ONE - next_cell.is_first_in_row - next_cell.is_exhausted;
             self.memory_bridge
                 .read(
-                    MemoryAddress::new(address_space, cell.row_pointer),
+                    MemoryAddress::new(self.address_space, cell.row_pointer),
                     [left_input[i]],
                     start_timestamp + AB::F::from_canonical_usize((2 * i) + 1),
                     &cell.read,
@@ -238,7 +237,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             self.memory_bridge
                 .read(
                     MemoryAddress::new(
-                        address_space,
+                        self.address_space,
                         opened_base_pointer + (cell.opened_index * AB::F::TWO),
                     ),
                     [cell.row_pointer.into(), cell.row_end - cell.row_pointer],
@@ -298,7 +297,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     sibling_register,
                     index_register,
                     commit_register,
-                    address_space,
                 ],
                 ExecutionState::new(pc, very_first_timestamp),
                 end_timestamp - very_first_timestamp,
@@ -307,7 +305,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(address_space, dim_register),
+                MemoryAddress::new(self.address_space, dim_register),
                 [dim_base_pointer],
                 very_first_timestamp,
                 &dim_base_pointer_read,
@@ -315,7 +313,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .eval(builder, end_top_level);
         self.memory_bridge
             .read(
-                MemoryAddress::new(address_space, opened_register),
+                MemoryAddress::new(self.address_space, opened_register),
                 [opened_base_pointer],
                 very_first_timestamp + AB::F::ONE,
                 &opened_base_pointer_read,
@@ -323,7 +321,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .eval(builder, end_top_level);
         self.memory_bridge
             .read(
-                MemoryAddress::new(address_space, opened_length_register),
+                MemoryAddress::new(self.address_space, opened_length_register),
                 [opened_length],
                 very_first_timestamp + AB::F::TWO,
                 &opened_length_read,
@@ -331,7 +329,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .eval(builder, end_top_level);
         self.memory_bridge
             .read(
-                MemoryAddress::new(address_space, sibling_register),
+                MemoryAddress::new(self.address_space, sibling_register),
                 [sibling_base_pointer],
                 very_first_timestamp + AB::F::from_canonical_usize(3),
                 &sibling_base_pointer_read,
@@ -339,7 +337,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .eval(builder, end_top_level);
         self.memory_bridge
             .read(
-                MemoryAddress::new(address_space, index_register),
+                MemoryAddress::new(self.address_space, index_register),
                 [index_base_pointer],
                 very_first_timestamp + AB::F::from_canonical_usize(4),
                 &index_base_pointer_read,
@@ -347,7 +345,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .eval(builder, end_top_level);
         self.memory_bridge
             .read(
-                MemoryAddress::new(address_space, commit_register),
+                MemoryAddress::new(self.address_space, commit_register),
                 [commit_pointer],
                 very_first_timestamp + AB::F::from_canonical_usize(5),
                 &commit_pointer_read,
@@ -356,7 +354,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(address_space, commit_pointer),
+                MemoryAddress::new(self.address_space, commit_pointer),
                 left_output,
                 very_first_timestamp + AB::F::from_canonical_usize(6),
                 &commit_read,
@@ -373,7 +371,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         when_top_level_not_end.assert_eq(next.index_base_pointer, index_base_pointer);
         when_top_level_not_end.assert_eq(next.start_timestamp, end_timestamp);
         when_top_level_not_end.assert_eq(next.opened_length, opened_length);
-        when_top_level_not_end.assert_eq(next.address_space, address_space);
         when_top_level_not_end
             .assert_eq(next.initial_opened_index, final_opened_index + AB::F::ONE);
 
@@ -424,7 +421,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             opened_base_pointer,
             initial_opened_index,
             final_opened_index,
-            address_space,
             row_hash,
         );
 
@@ -442,7 +438,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(address_space, dim_base_pointer + initial_opened_index),
+                MemoryAddress::new(self.address_space, dim_base_pointer + initial_opened_index),
                 [height],
                 end_timestamp - AB::F::TWO,
                 &read_initial_height_or_root_is_on_right,
@@ -450,7 +446,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .eval(builder, incorporate_row);
         self.memory_bridge
             .read(
-                MemoryAddress::new(address_space, dim_base_pointer + final_opened_index),
+                MemoryAddress::new(self.address_space, dim_base_pointer + final_opened_index),
                 [height],
                 end_timestamp - AB::F::ONE,
                 &read_final_height_or_sibling_array_start,
@@ -474,7 +470,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(address_space, index_base_pointer + proof_index),
+                MemoryAddress::new(self.address_space, index_base_pointer + proof_index),
                 [root_is_on_right],
                 timestamp_after_initial_reads.clone(),
                 &read_initial_height_or_root_is_on_right,
@@ -483,7 +479,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         self.memory_bridge
             .read(
                 MemoryAddress::new(
-                    address_space,
+                    self.address_space,
                     sibling_base_pointer + (proof_index * AB::F::TWO),
                 ),
                 [sibling_array_start],
@@ -505,7 +501,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             self.memory_bridge
                 .read(
                     MemoryAddress::new(
-                        address_space,
+                        self.address_space,
                         sibling_array_start + AB::F::from_canonical_usize(i),
                     ),
                     [(root_is_on_right * left_input[i])
@@ -534,7 +530,6 @@ impl VerifyBatchBus {
         opened_base_pointer: impl Into<AB::Expr>,
         initial_opened_index: impl Into<AB::Expr>,
         final_opened_index: impl Into<AB::Expr>,
-        address_space: impl Into<AB::Expr>,
         hash: [impl Into<AB::Expr>; CHUNK],
     ) {
         let mut fields = vec![
@@ -543,7 +538,6 @@ impl VerifyBatchBus {
             opened_base_pointer.into(),
             initial_opened_index.into(),
             final_opened_index.into(),
-            address_space.into(),
         ];
         fields.extend(hash.into_iter().map(Into::into));
         builder.push_interaction(

@@ -81,7 +81,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
             F::from_canonical_u32(read_root_is_on_right.timestamp - NUM_INITIAL_READS as u32);
         cols.end_timestamp =
             F::from_canonical_usize(read_root_is_on_right.timestamp as usize + (2 + CHUNK));
-        cols.address_space = F::from_canonical_usize(parent.address_space());
         for (read, cell) in reads.into_iter().zip_eq(cols.cells.iter_mut()) {
             cell.read = aux_cols_factory.make_read_aux_cols(memory.record_by_id(read));
         }
@@ -188,7 +187,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
                 - NUM_INITIAL_READS as u32,
         );
         cols.end_timestamp = F::from_canonical_u32(final_height_read.timestamp + 1);
-        cols.address_space = F::from_canonical_usize(parent.address_space());
 
         cols.initial_opened_index = F::from_canonical_usize(initial_opened_index);
         cols.final_opened_index = F::from_canonical_usize(final_opened_index);
@@ -235,7 +233,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         );
         cols.start_timestamp =
             F::from_canonical_u32(memory.record_by_id(cells[0].read).timestamp - 1);
-        cols.address_space = F::from_canonical_usize(grandparent.address_space());
 
         for (record, cell) in cells.iter().zip(cols.cells.iter_mut()) {
             let &CellRecord {

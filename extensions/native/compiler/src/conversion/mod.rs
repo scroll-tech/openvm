@@ -657,7 +657,7 @@ fn convert_instruction<F: PrimeField32, EF: ExtensionField<F>>(
             d: i32_f(sibling),
             e: i32_f(index),
             f: i32_f(commit),
-            g: AS::Native.to_field(),
+            g: F::ZERO,
         }],
     };
 

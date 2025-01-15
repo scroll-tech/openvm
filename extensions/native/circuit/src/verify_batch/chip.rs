@@ -41,12 +41,6 @@ pub struct VerifyBatchRecord<F: Field> {
     pub top_level: Vec<TopLevelRecord<F>>,
 }
 
-impl<F: PrimeField32> VerifyBatchRecord<F> {
-    pub fn address_space(&self) -> usize {
-        self.instruction.g.as_canonical_u32() as usize
-    }
-}
-
 #[derive(Debug, Clone)]
 pub(super) struct TopLevelRecord<F: Field> {
     // must be present in first record
@@ -112,6 +106,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
             internal_bus: VerifyBatchBus(7),
             subair: Arc::new(Poseidon2SubAir::new(poseidon2_config.constants.into())),
             offset,
+            address_space: F::from_canonical_u32(5),
         };
         Self {
             records: vec![],
@@ -148,9 +143,9 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
             d: sibling_register,
             e: index_register,
             f: commit_register,
-            g: address_space,
             ..
         } = instruction;
+        let address_space = self.air.address_space;
 
         let (dim_base_pointer_read, dim_base_pointer) =
             memory.read_cell(address_space, dim_register);
