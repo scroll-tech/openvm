@@ -581,9 +581,9 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
                         debug_info,
                     );
                 }
-                DslIr::VerifyBatch(dim, opened, sibling, index, commit) => {
+                DslIr::VerifyBatchFelt(dim, opened, sibling, index, commit) => {
                     self.push(
-                        AsmInstruction::VerifyBatch(
+                        AsmInstruction::VerifyBatchFelt(
                             dim.ptr().fp(),
                             opened.ptr().fp(),
                             opened.len().get_var().fp(),

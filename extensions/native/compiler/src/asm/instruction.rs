@@ -114,8 +114,9 @@ pub enum AsmInstruction<F, EF> {
     /// (a, b, res, len, alpha, alpha_pow)
     FriReducedOpening(i32, i32, i32, i32, i32, i32),
 
-    // (dim, opened, opened_length, sibling, index, commit)
-    VerifyBatch(i32, i32, i32, i32, i32, i32),
+    /// (dim, opened, opened_length, sibling, index, commit)
+    /// opened values are field elements
+    VerifyBatchFelt(i32, i32, i32, i32, i32, i32),
 
     /// Print a variable.
     PrintV(i32),
@@ -350,7 +351,7 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
                     a, b, res, len, alpha, alpha_pow
                 )
             }
-            AsmInstruction::VerifyBatch(dim, opened, opened_length, sibling, index, commit) => {
+            AsmInstruction::VerifyBatchFelt(dim, opened, opened_length, sibling, index, commit) => {
                 write!(
                     f,
                     "verify_batch ({})fp, ({})fp, ({})fp, ({})fp, ({})fp, ({})fp",

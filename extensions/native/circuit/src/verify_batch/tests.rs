@@ -220,6 +220,7 @@ fn test<const N: usize>(cases: [Case; N]) {
                     sibling_register,
                     index_register,
                     commit_register,
+                    1,
                 ],
             ),
         );

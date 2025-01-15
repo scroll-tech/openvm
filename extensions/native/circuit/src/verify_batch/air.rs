@@ -74,6 +74,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             sibling_register,
             index_register,
             commit_register,
+            opened_element_size_inv,
             cells,
             initial_opened_index,
             final_opened_index,
@@ -153,6 +154,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             very_first_timestamp,
             start_timestamp + AB::F::from_canonical_usize(2 * CHUNK),
             opened_base_pointer,
+            opened_element_size_inv,
             initial_opened_index,
             cells[CHUNK - 1].opened_index,
             left_output,
@@ -167,6 +169,9 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         builder
             .when(inside_row - end_inside_row)
             .assert_eq(next.opened_base_pointer, opened_base_pointer);
+        builder
+            .when(inside_row - end_inside_row)
+            .assert_eq(next.opened_element_size_inv, opened_element_size_inv);
         builder
             .when(inside_row - end_inside_row)
             .assert_eq(next.initial_opened_index, initial_opened_index);
@@ -240,7 +245,10 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                         self.address_space,
                         opened_base_pointer + (cell.opened_index * AB::F::TWO),
                     ),
-                    [cell.row_pointer.into(), cell.row_end - cell.row_pointer],
+                    [
+                        cell.row_pointer.into(),
+                        opened_element_size_inv * (cell.row_end - cell.row_pointer),
+                    ],
                     start_timestamp + AB::F::from_canonical_usize(2 * i),
                     &cell.read_row_pointer_and_length,
                 )
@@ -297,6 +305,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     sibling_register,
                     index_register,
                     commit_register,
+                    opened_element_size_inv,
                 ],
                 ExecutionState::new(pc, very_first_timestamp),
                 end_timestamp - very_first_timestamp,
@@ -371,6 +380,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         when_top_level_not_end.assert_eq(next.index_base_pointer, index_base_pointer);
         when_top_level_not_end.assert_eq(next.start_timestamp, end_timestamp);
         when_top_level_not_end.assert_eq(next.opened_length, opened_length);
+        when_top_level_not_end.assert_eq(next.opened_element_size_inv, opened_element_size_inv);
         when_top_level_not_end
             .assert_eq(next.initial_opened_index, final_opened_index + AB::F::ONE);
 
@@ -419,6 +429,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             timestamp_after_initial_reads.clone(),
             end_timestamp - AB::F::TWO,
             opened_base_pointer,
+            opened_element_size_inv,
             initial_opened_index,
             final_opened_index,
             row_hash,
@@ -528,6 +539,7 @@ impl VerifyBatchBus {
         start_timestamp: impl Into<AB::Expr>,
         end_timestamp: impl Into<AB::Expr>,
         opened_base_pointer: impl Into<AB::Expr>,
+        opened_element_size_inv: impl Into<AB::Expr>,
         initial_opened_index: impl Into<AB::Expr>,
         final_opened_index: impl Into<AB::Expr>,
         hash: [impl Into<AB::Expr>; CHUNK],
@@ -536,6 +548,7 @@ impl VerifyBatchBus {
             start_timestamp.into(),
             end_timestamp.into(),
             opened_base_pointer.into(),
+            opened_element_size_inv.into(),
             initial_opened_index.into(),
             final_opened_index.into(),
         ];

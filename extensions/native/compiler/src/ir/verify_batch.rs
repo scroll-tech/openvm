@@ -9,7 +9,7 @@ impl<C: Config> Builder<C> {
         index_bits: &Array<C, Var<C::N>>,
         commit: &Array<C, Felt<C::F>>,
     ) {
-        self.push(DslIr::VerifyBatch(
+        self.push(DslIr::VerifyBatchFelt(
             dimensions.clone(),
             opened_values.clone(),
             proof.clone(),

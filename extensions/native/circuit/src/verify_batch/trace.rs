@@ -76,6 +76,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         cols.end_inside_row = F::ZERO;
         cols.end_top_level = F::ZERO;
         cols.start_top_level = F::ZERO;
+        cols.opened_element_size_inv = parent.opened_element_size_inv();
         cols.very_first_timestamp = F::from_canonical_u32(parent.from_state.timestamp);
         cols.start_timestamp =
             F::from_canonical_u32(read_root_is_on_right.timestamp - NUM_INITIAL_READS as u32);
@@ -175,6 +176,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         cols.end_inside_row = F::ZERO;
         cols.end_top_level = F::ZERO;
         cols.start_top_level = F::from_bool(proof_index == 0);
+        cols.opened_element_size_inv = parent.opened_element_size_inv();
         cols.very_first_timestamp = F::from_canonical_u32(parent.from_state.timestamp);
         cols.start_timestamp = F::from_canonical_u32(
             memory
@@ -222,6 +224,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         cols.inside_row = F::ONE;
         cols.end_inside_row = F::from_bool(is_last);
         cols.end_top_level = F::ZERO;
+        cols.opened_element_size_inv = grandparent.opened_element_size_inv();
         cols.very_first_timestamp = F::from_canonical_u32(
             memory
                 .record_by_id(

@@ -41,6 +41,12 @@ pub struct VerifyBatchRecord<F: Field> {
     pub top_level: Vec<TopLevelRecord<F>>,
 }
 
+impl<F: PrimeField32> VerifyBatchRecord<F> {
+    pub fn opened_element_size_inv(&self) -> F {
+        self.instruction.g
+    }
+}
+
 #[derive(Debug, Clone)]
 pub(super) struct TopLevelRecord<F: Field> {
     // must be present in first record
@@ -143,9 +149,15 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
             d: sibling_register,
             e: index_register,
             f: commit_register,
+            g: opened_element_size_inv,
             ..
         } = instruction;
         let address_space = self.air.address_space;
+        // calc inverse fast assuming opened_element_size in {1, 4}
+        let mut opened_element_size = F::ONE;
+        while opened_element_size * opened_element_size_inv != F::ONE {
+            opened_element_size += F::ONE;
+        }
 
         let (dim_base_pointer_read, dim_base_pointer) =
             memory.read_cell(address_space, dim_register);
@@ -219,7 +231,8 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                                 opened_base_pointer + F::from_canonical_usize(2 * opened_index),
                             );
                             row_pointer = new_row_pointer.as_canonical_u32() as usize;
-                            row_end = row_pointer + row_len.as_canonical_u32() as usize;
+                            row_end = row_pointer
+                                + (opened_element_size * row_len).as_canonical_u32() as usize;
                             Some(result)
                         } else {
                             memory.increment_timestamp();

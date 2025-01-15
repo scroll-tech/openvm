@@ -278,7 +278,8 @@ pub enum DslIr<C: Config> {
         Ext<C::F, C::EF>,
     ),
     /// VerifyBatch(dim, opened, sibling, index, commit)
-    VerifyBatch(
+    /// opened values are Felts
+    VerifyBatchFelt(
         Array<C, Usize<C::F>>,
         Array<C, Array<C, Felt<C::F>>>,
         Array<C, Array<C, Felt<C::F>>>,
