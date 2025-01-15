@@ -13,7 +13,7 @@ use openvm_stark_backend::{
     Chip, ChipUsageGetter,
 };
 use rayon::{iter::ParallelIterator, slice::ParallelSliceMut};
-
+use crate::chip::NUM_INITIAL_READS;
 use crate::verify_batch::{
     chip::{
         CellRecord, IncorporateRowRecord, IncorporateSiblingRecord, InsideRowRecord,
@@ -74,7 +74,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         cols.end_top_level = F::ZERO;
         cols.start_top_level = F::ZERO;
         cols.very_first_timestamp = F::from_canonical_u32(parent.from_state.timestamp);
-        cols.start_timestamp = F::from_canonical_u32(read_root_is_on_right.timestamp - 6);
+        cols.start_timestamp = F::from_canonical_u32(read_root_is_on_right.timestamp - NUM_INITIAL_READS as u32);
         cols.end_timestamp =
             F::from_canonical_usize(read_root_is_on_right.timestamp as usize + (2 + CHUNK));
         cols.address_space = F::from_canonical_usize(parent.address_space());
@@ -109,7 +109,8 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
             from_state,
             commit_pointer,
             dim_base_pointer_read,
-            opened_base_pointer_and_length_read,
+            opened_base_pointer_read,
+            opened_length_read,
             sibling_base_pointer_read,
             index_base_pointer_read,
             commit_pointer_read,
@@ -122,14 +123,17 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         cols.pc = F::from_canonical_u32(from_state.pc);
         cols.dim_register = instruction.a;
         cols.opened_register = instruction.b;
-        cols.sibling_register = instruction.c;
-        cols.index_register = instruction.d;
-        cols.commit_register = instruction.e;
+        cols.opened_length_register = instruction.c;
+        cols.sibling_register = instruction.d;
+        cols.index_register = instruction.e;
+        cols.commit_register = instruction.f;
         cols.commit_pointer = commit_pointer;
         cols.dim_base_pointer_read =
             aux_cols_factory.make_read_aux_cols(memory.record_by_id(dim_base_pointer_read));
-        cols.opened_base_pointer_and_length_read = aux_cols_factory
-            .make_read_aux_cols(memory.record_by_id(opened_base_pointer_and_length_read));
+        cols.opened_base_pointer_read =
+            aux_cols_factory.make_read_aux_cols(memory.record_by_id(opened_base_pointer_read));
+        cols.opened_length_read =
+            aux_cols_factory.make_read_aux_cols(memory.record_by_id(opened_length_read));
         cols.sibling_base_pointer_read =
             aux_cols_factory.make_read_aux_cols(memory.record_by_id(sibling_base_pointer_read));
         cols.index_base_pointer_read =
@@ -177,7 +181,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
                         .unwrap(),
                 )
                 .timestamp
-                - 6,
+                - NUM_INITIAL_READS as u32,
         );
         cols.end_timestamp = F::from_canonical_u32(final_height_read.timestamp + 1);
         cols.address_space = F::from_canonical_usize(parent.address_space());

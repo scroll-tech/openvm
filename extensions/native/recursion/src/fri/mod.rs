@@ -101,14 +101,14 @@ where
             let opened_values = builder.array(1);
             builder.set_value(&opened_values, 0, evals);
             builder.cycle_tracker_start("verify-batch-ext");
-            verify_batch::<C>(
+            /*verify_batch::<C>(
                 builder,
                 &commit,
                 dims_slice,
                 index_pair,
                 &NestedOpenedValues::Ext(opened_values),
                 &step.opening_proof,
-            );
+            );*/
             builder.cycle_tracker_end("verify-batch-ext");
 
             let two_adic_generator_one = config.get_two_adic_generator(builder, Usize::from(1));
@@ -149,6 +149,8 @@ pub fn verify_batch<C: Config>(
     opened_values: &NestedOpenedValues<C>,
     proof: &Array<C, DigestVariable<C>>,
 ) {
+    //println!("verify_batch");
+    //panic!();
     if builder.flags.static_only {
         verify_batch_static(
             builder,
@@ -160,95 +162,24 @@ pub fn verify_batch<C: Config>(
         );
         return;
     }
-    let reducer = opened_values.create_reducer(builder);
 
-    let commit = if let DigestVariable::Felt(commit) = commit {
-        commit
-    } else {
-        panic!("Expected a Felt commitment");
+    let dimensions = match dimensions {
+        Array::Dyn(ptr, len) => Array::Dyn(ptr, len.clone()),
+        _ => panic!("Expected a dynamic array of felts"),
     };
-    // Cast DigestVariable into the concrete type.
-    let proof: Array<C, Array<C, Felt<C::F>>> = if let Array::Dyn(ptr, len) = proof {
-        Array::Dyn(*ptr, len.clone())
-    } else {
-        panic!("Expected a dynamic array of Felt commitments");
+    let opened_values = match opened_values {
+        NestedOpenedValues::Felt(arr) => arr,
+        _ => panic!("Expected a dynamic array of felts"),
     };
-
-    // The index of which table to process next.
-    let index: Usize<C::N> = builder.eval(C::N::ZERO);
-    // The height of the current layer (padded).
-    let current_height = builder.get(&dimensions, index.clone()).height;
-    // Reduce all the tables that have the same height to a single root.
-    let root = reducer
-        .reduce_fast(
-            builder,
-            index.clone(),
-            &dimensions,
-            current_height.clone(),
-            opened_values,
-        )
-        .into_inner_digest();
-    let root_ptr = root.ptr();
-
-    // For each sibling in the proof, reconstruct the root.
-    let left: Ptr<C::N> = builder.uninit();
-    let right: Ptr<C::N> = builder.uninit();
-    builder.range(0, proof.len()).for_each(|i, builder| {
-        let sibling = builder.get_ptr(&proof, i);
-        let bit = builder.get(&index_bits, i);
-
-        builder.if_eq(bit, C::N::ONE).then_or_else(
-            |builder| {
-                builder.assign(&left, sibling);
-                builder.assign(&right, root_ptr);
-            },
-            |builder| {
-                builder.assign(&left, root_ptr);
-                builder.assign(&right, sibling);
-            },
-        );
-
-        builder.poseidon2_compress_x(
-            &Array::Dyn(root_ptr, Usize::from(0)),
-            &Array::Dyn(left, Usize::from(0)),
-            &Array::Dyn(right, Usize::from(0)),
-        );
-        builder.assign(
-            &current_height,
-            current_height.clone() * (C::N::TWO.inverse()),
-        );
-
-        builder
-            .if_ne(index.clone(), dimensions.len())
-            .then(|builder| {
-                let next_height = builder.get(&dimensions, index.clone()).height;
-                builder
-                    .if_eq(next_height, current_height.clone())
-                    .then(|builder| {
-                        let next_height_openings_digest = reducer
-                            .reduce_fast(
-                                builder,
-                                index.clone(),
-                                &dimensions,
-                                current_height.clone(),
-                                opened_values,
-                            )
-                            .into_inner_digest();
-                        builder.poseidon2_compress_x(
-                            &root.clone(),
-                            &root.clone(),
-                            &next_height_openings_digest,
-                        );
-                    });
-            })
-    });
-
-    // Assert that the commitments match.
-    for i in 0..DIGEST_SIZE {
-        let e1 = builder.get(commit, i);
-        let e2 = builder.get(&root, i);
-        builder.assert_felt_eq(e1, e2);
-    }
+    let proof = match proof {
+        Array::Dyn(ptr, len) => Array::Dyn(*ptr, len.clone()),
+        _ => panic!("Expected a dynamic array of felts"),
+    };
+    let commit = match commit {
+        DigestVariable::Felt(arr) => arr,
+        _ => panic!("Expected a dynamic array of felts"),
+    };
+    builder.verify_batch(&dimensions, opened_values, &proof, &index_bits, commit);
 }
 
 /// [static version] Verifies a batch opening.

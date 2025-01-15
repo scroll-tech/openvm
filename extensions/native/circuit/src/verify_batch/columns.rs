@@ -30,6 +30,7 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
     // all other than address_space can be shared (saves 5 cols)
     pub dim_register: T,
     pub opened_register: T,
+    pub opened_length_register: T,
     pub sibling_register: T,
     pub index_register: T,
     pub commit_register: T,
@@ -53,7 +54,8 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
 
     // these can be optimized to be shared with cells[i].read_row_pointer_and_length (saves 15 cols)
     pub dim_base_pointer_read: MemoryReadAuxCols<T, 1>,
-    pub opened_base_pointer_and_length_read: MemoryReadAuxCols<T, 2>,
+    pub opened_base_pointer_read: MemoryReadAuxCols<T, 1>,
+    pub opened_length_read: MemoryReadAuxCols<T, 1>,
     pub sibling_base_pointer_read: MemoryReadAuxCols<T, 1>,
     pub index_base_pointer_read: MemoryReadAuxCols<T, 1>,
     pub commit_pointer_read: MemoryReadAuxCols<T, 1>,

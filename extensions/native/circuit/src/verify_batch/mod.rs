@@ -1,7 +1,7 @@
 use crate::NATIVE_POSEIDON2_CHUNK_SIZE;
 
 mod air;
-mod chip;
+pub mod chip;
 mod columns;
 #[cfg(test)]
 mod tests;

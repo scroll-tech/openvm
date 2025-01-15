@@ -17,7 +17,7 @@ use openvm_instructions::{
 };
 use openvm_native_compiler::{
     FieldArithmeticOpcode, FieldExtensionOpcode, FriOpcode, NativeBranchEqualOpcode,
-    NativeJalOpcode, NativeLoadStoreOpcode, NativePhantom,
+    NativeJalOpcode, NativeLoadStoreOpcode, NativePhantom, VerifyBatchOpcode,
 };
 use openvm_poseidon2_air::Poseidon2Config;
 use openvm_rv32im_circuit::BranchEqualCoreChip;
@@ -25,7 +25,7 @@ use openvm_stark_backend::p3_field::PrimeField32;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 
-use crate::{adapters::*, phantom::*, *};
+use crate::{adapters::*, chip::VerifyBatchChip, phantom::*, *};
 
 #[derive(Clone, Debug, Serialize, Deserialize, VmConfig, derive_new::new)]
 pub struct NativeConfig {
@@ -78,6 +78,7 @@ pub enum NativeExecutor<F: PrimeField32> {
     FieldExtension(FieldExtensionChip<F>),
     Poseidon2(NativePoseidon2Chip<F>),
     FriReducedOpening(FriReducedOpeningChip<F>),
+    VerifyBatch(VerifyBatchChip<F, 1>),
 }
 
 #[derive(From, ChipUsageGetter, Chip, AnyEnum)]
@@ -168,6 +169,19 @@ impl<F: PrimeField32> VmExtension<F> for Native {
         inventory.add_executor(
             fri_reduced_opening_chip,
             FriOpcode::iter().map(VmOpcode::with_default_offset),
+        )?;
+
+        let verify_batch_chip = VerifyBatchChip::new(
+            execution_bus,
+            program_bus,
+            memory_bridge,
+            VerifyBatchOpcode::default_offset(),
+            offline_memory.clone(),
+            Poseidon2Config::default(),
+        );
+        inventory.add_executor(
+            verify_batch_chip,
+            VerifyBatchOpcode::iter().map(VmOpcode::with_default_offset),
         )?;
 
         let poseidon2_chip = NativePoseidon2Chip::new(

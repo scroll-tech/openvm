@@ -15,7 +15,7 @@ use openvm_stark_backend::{
     p3_matrix::Matrix,
     rap::{BaseAirWithPublicValues, PartitionedBaseAir},
 };
-
+use crate::chip::NUM_INITIAL_READS;
 use crate::verify_batch::{columns::VerifyBatchCols, CHUNK};
 
 #[derive(Clone, Debug)]
@@ -66,6 +66,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             end_timestamp,
             dim_register,
             opened_register,
+            opened_length_register,
             sibling_register,
             index_register,
             commit_register,
@@ -82,7 +83,8 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             read_initial_height_or_root_is_on_right,
             read_final_height_or_sibling_array_start,
             dim_base_pointer_read,
-            opened_base_pointer_and_length_read,
+            opened_base_pointer_read,
+            opened_length_read,
             sibling_base_pointer_read,
             index_base_pointer_read,
             commit_pointer_read,
@@ -276,7 +278,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .when(next.incorporate_row + next.incorporate_sibling)
             .assert_eq(next.proof_index, AB::F::ZERO);
 
-        let timestamp_after_end_operations = start_timestamp + AB::F::from_canonical_usize(5 + 1);
+        let timestamp_after_initial_reads = start_timestamp + AB::F::from_canonical_usize(NUM_INITIAL_READS);
 
         builder
             .when(end.clone())
@@ -288,6 +290,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 [
                     dim_register,
                     opened_register,
+                    opened_length_register,
                     sibling_register,
                     index_register,
                     commit_register,
@@ -309,16 +312,24 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         self.memory_bridge
             .read(
                 MemoryAddress::new(address_space, opened_register),
-                [opened_base_pointer, opened_length],
+                [opened_base_pointer],
                 very_first_timestamp + AB::F::ONE,
-                &opened_base_pointer_and_length_read,
+                &opened_base_pointer_read,
+            )
+            .eval(builder, end_top_level);
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(address_space, opened_length_register),
+                [opened_length],
+                very_first_timestamp + AB::F::TWO,
+                &opened_length_read,
             )
             .eval(builder, end_top_level);
         self.memory_bridge
             .read(
                 MemoryAddress::new(address_space, sibling_register),
                 [sibling_base_pointer],
-                very_first_timestamp + AB::F::TWO,
+                very_first_timestamp + AB::F::from_canonical_usize(3),
                 &sibling_base_pointer_read,
             )
             .eval(builder, end_top_level);
@@ -326,7 +337,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .read(
                 MemoryAddress::new(address_space, index_register),
                 [index_base_pointer],
-                very_first_timestamp + AB::F::from_canonical_usize(3),
+                very_first_timestamp + AB::F::from_canonical_usize(4),
                 &index_base_pointer_read,
             )
             .eval(builder, end_top_level);
@@ -334,7 +345,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .read(
                 MemoryAddress::new(address_space, commit_register),
                 [commit_pointer],
-                very_first_timestamp + AB::F::from_canonical_usize(4),
+                very_first_timestamp + AB::F::from_canonical_usize(5),
                 &commit_pointer_read,
             )
             .eval(builder, end_top_level);
@@ -343,7 +354,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .read(
                 MemoryAddress::new(address_space, commit_pointer),
                 left_output,
-                very_first_timestamp + AB::F::from_canonical_usize(5),
+                very_first_timestamp + AB::F::from_canonical_usize(6),
                 &commit_read,
             )
             .eval(builder, end_top_level);
@@ -404,7 +415,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             builder,
             true,
             incorporate_row,
-            timestamp_after_end_operations.clone(),
+            timestamp_after_initial_reads.clone(),
             end_timestamp - AB::F::TWO,
             opened_base_pointer,
             initial_opened_index,
@@ -461,15 +472,15 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .read(
                 MemoryAddress::new(address_space, index_base_pointer + proof_index),
                 [root_is_on_right],
-                timestamp_after_end_operations.clone(),
+                timestamp_after_initial_reads.clone(),
                 &read_initial_height_or_root_is_on_right,
             )
             .eval(builder, incorporate_sibling);
         self.memory_bridge
             .read(
-                MemoryAddress::new(address_space, sibling_base_pointer + proof_index),
+                MemoryAddress::new(address_space, sibling_base_pointer + (proof_index * AB::F::TWO)),
                 [sibling_array_start],
-                timestamp_after_end_operations.clone() + AB::F::ONE,
+                timestamp_after_initial_reads.clone() + AB::F::ONE,
                 &read_final_height_or_sibling_array_start,
             )
             .eval(builder, incorporate_sibling);
@@ -492,7 +503,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     ),
                     [(root_is_on_right * left_input[i])
                         + ((AB::Expr::ONE - root_is_on_right) * right_input[i])],
-                    timestamp_after_end_operations.clone() + AB::F::from_canonical_usize(2 + i),
+                    timestamp_after_initial_reads.clone() + AB::F::from_canonical_usize(2 + i),
                     &cells[i].read,
                 )
                 .eval(builder, incorporate_sibling);
@@ -500,7 +511,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
         builder.when(incorporate_sibling).assert_eq(
             end_timestamp,
-            timestamp_after_end_operations + AB::F::from_canonical_usize(2 + CHUNK),
+            timestamp_after_initial_reads + AB::F::from_canonical_usize(2 + CHUNK),
         );
     }
 }

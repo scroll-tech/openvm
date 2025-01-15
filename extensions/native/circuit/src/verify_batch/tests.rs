@@ -161,11 +161,12 @@ fn test<const N: usize>(cases: [Case; N]) {
             commit,
         } = instance;
 
-        let dim_register = gen_pointer(&mut rng, 2);
-        let opened_register = gen_pointer(&mut rng, 2);
-        let sibling_register = gen_pointer(&mut rng, 2);
-        let index_register = gen_pointer(&mut rng, 2);
-        let commit_register = gen_pointer(&mut rng, 2);
+        let dim_register = gen_pointer(&mut rng, 1);
+        let opened_register = gen_pointer(&mut rng, 1);
+        let opened_length_register = gen_pointer(&mut rng, 1);
+        let sibling_register = gen_pointer(&mut rng, 1);
+        let index_register = gen_pointer(&mut rng, 1);
+        let commit_register = gen_pointer(&mut rng, 1);
 
         let dim_base_pointer = gen_pointer(&mut rng, 1);
         let opened_base_pointer = gen_pointer(&mut rng, 2);
@@ -173,23 +174,24 @@ fn test<const N: usize>(cases: [Case; N]) {
         let index_base_pointer = gen_pointer(&mut rng, 1);
         let commit_pointer = gen_pointer(&mut rng, 1);
 
-        tester.write_usize(address_space, dim_register, [dim_base_pointer, dim.len()]);
+        tester.write_usize(address_space, dim_register, [dim_base_pointer]);
         tester.write_usize(
             address_space,
             opened_register,
-            [opened_base_pointer, opened.len()],
+            [opened_base_pointer],
         );
+        tester.write_usize(address_space, opened_length_register, [opened.len()]);
         tester.write_usize(
             address_space,
             sibling_register,
-            [sibling_base_pointer, proof.len()],
+            [sibling_base_pointer],
         );
         tester.write_usize(
             address_space,
             index_register,
-            [index_base_pointer, root_is_on_right.len()],
+            [index_base_pointer],
         );
-        tester.write_usize(address_space, commit_register, [commit_pointer, CHUNK]);
+        tester.write_usize(address_space, commit_register, [commit_pointer]);
 
         for (i, &dim_value) in dim.iter().enumerate() {
             tester.write_usize(address_space, dim_base_pointer + i, [dim_value]);
@@ -207,7 +209,7 @@ fn test<const N: usize>(cases: [Case; N]) {
         }
         for (i, &sibling) in proof.iter().enumerate() {
             let row_pointer = gen_pointer(&mut rng, 1);
-            tester.write_usize(address_space, sibling_base_pointer + i, [row_pointer]);
+            tester.write_usize(address_space, sibling_base_pointer + (2 * i), [row_pointer, CHUNK]);
             tester.write(address_space, row_pointer, sibling);
         }
         for (i, &bit) in root_is_on_right.iter().enumerate() {
@@ -222,6 +224,7 @@ fn test<const N: usize>(cases: [Case; N]) {
                 [
                     dim_register,
                     opened_register,
+                    opened_length_register,
                     sibling_register,
                     index_register,
                     commit_register,

@@ -8,7 +8,6 @@ mod fri;
 mod jal;
 mod loadstore;
 mod poseidon2;
-
 mod verify_batch;
 
 pub use branch_eq::*;
@@ -19,6 +18,7 @@ pub use fri::*;
 pub use jal::*;
 pub use loadstore::*;
 pub use poseidon2::*;
+pub use verify_batch::*;
 
 mod extension;
 pub use extension::*;
