@@ -659,6 +659,16 @@ fn convert_instruction<F: PrimeField32, EF: ExtensionField<F>>(
             f: i32_f(commit),
             g: F::ONE,
         }],
+        AsmInstruction::VerifyBatchExt(dim, opened, opened_length, sibling, index, commit) => vec![Instruction {
+            opcode: options.opcode_with_offset(VerifyBatchOpcode::VERIFY_BATCH),
+            a: i32_f(dim),
+            b: i32_f(opened),
+            c: i32_f(opened_length),
+            d: i32_f(sibling),
+            e: i32_f(index),
+            f: i32_f(commit),
+            g: F::from_canonical_usize(4).inverse(),
+        }],
     };
 
     let debug_infos = vec![debug_info; instructions.len()];

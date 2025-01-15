@@ -101,14 +101,14 @@ where
             let opened_values = builder.array(1);
             builder.set_value(&opened_values, 0, evals);
             builder.cycle_tracker_start("verify-batch-ext");
-            /*verify_batch::<C>(
+            verify_batch::<C>(
                 builder,
                 &commit,
                 dims_slice,
                 index_pair,
                 &NestedOpenedValues::Ext(opened_values),
                 &step.opening_proof,
-            );*/
+            );
             builder.cycle_tracker_end("verify-batch-ext");
 
             let two_adic_generator_one = config.get_two_adic_generator(builder, Usize::from(1));
@@ -167,10 +167,6 @@ pub fn verify_batch<C: Config>(
         Array::Dyn(ptr, len) => Array::Dyn(ptr, len.clone()),
         _ => panic!("Expected a dynamic array of felts"),
     };
-    let opened_values = match opened_values {
-        NestedOpenedValues::Felt(arr) => arr,
-        _ => panic!("Expected a dynamic array of felts"),
-    };
     let proof = match proof {
         Array::Dyn(ptr, len) => Array::Dyn(*ptr, len.clone()),
         _ => panic!("Expected a dynamic array of felts"),
@@ -179,7 +175,11 @@ pub fn verify_batch<C: Config>(
         DigestVariable::Felt(arr) => arr,
         _ => panic!("Expected a dynamic array of felts"),
     };
-    builder.verify_batch(&dimensions, opened_values, &proof, &index_bits, commit);
+    match opened_values {
+        NestedOpenedValues::Felt(opened_values) => builder.verify_batch_felt(&dimensions, opened_values, &proof, &index_bits, commit),
+        NestedOpenedValues::Ext(opened_values) => builder.verify_batch_ext(&dimensions, opened_values, &proof, &index_bits, commit),
+        _ => panic!("Expected a dynamic array of felts"),
+    };
 }
 
 /// [static version] Verifies a batch opening.

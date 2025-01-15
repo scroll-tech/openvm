@@ -118,6 +118,10 @@ pub enum AsmInstruction<F, EF> {
     /// opened values are field elements
     VerifyBatchFelt(i32, i32, i32, i32, i32, i32),
 
+    /// (dim, opened, opened_length, sibling, index, commit)
+    /// opened values are extension field elements
+    VerifyBatchExt(i32, i32, i32, i32, i32, i32),
+
     /// Print a variable.
     PrintV(i32),
 
@@ -354,7 +358,14 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
             AsmInstruction::VerifyBatchFelt(dim, opened, opened_length, sibling, index, commit) => {
                 write!(
                     f,
-                    "verify_batch ({})fp, ({})fp, ({})fp, ({})fp, ({})fp, ({})fp",
+                    "verify_batch_felt ({})fp, ({})fp, ({})fp, ({})fp, ({})fp, ({})fp",
+                    dim, opened, opened_length, sibling, index, commit
+                )
+            }
+            AsmInstruction::VerifyBatchExt(dim, opened, opened_length, sibling, index, commit) => {
+                write!(
+                    f,
+                    "verify_batch_ext ({})fp, ({})fp, ({})fp, ({})fp, ({})fp, ({})fp",
                     dim, opened, opened_length, sibling, index, commit
                 )
             }

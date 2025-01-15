@@ -11,6 +11,7 @@ use openvm_stark_backend::{
     utils::disable_debug_builder,
     verifier::VerificationError,
 };
+use openvm_stark_backend::p3_field::PrimeField32;
 use openvm_stark_sdk::{p3_baby_bear::BabyBear, utils::create_seeded_rng};
 use rand::{rngs::StdRng, Rng};
 
@@ -80,6 +81,7 @@ struct VerifyBatchInstance {
 fn random_instance(
     rng: &mut StdRng,
     row_lengths: Vec<Vec<usize>>,
+    opened_element_size: usize,
     hash_function: impl Fn([F; CHUNK], [F; CHUNK]) -> ([F; CHUNK], [F; CHUNK]),
 ) -> VerifyBatchInstance {
     let mut dims = vec![];
@@ -91,7 +93,7 @@ fn random_instance(
         for &row_length in row_lengths {
             dims.push(height);
             let mut opened_row = vec![];
-            for _ in 0..row_length {
+            for _ in 0..opened_element_size * row_length {
                 opened_row.push(rng.gen());
             }
             opened.push(opened_row);
@@ -120,7 +122,10 @@ fn random_instance(
 
 const SBOX_REGISTERS: usize = 1;
 
-type Case = Vec<Vec<usize>>;
+struct Case {
+    row_lengths: Vec<Vec<usize>>,
+    opened_element_size: usize,
+}
 
 fn test<const N: usize>(cases: [Case; N]) {
     unsafe {
@@ -143,8 +148,8 @@ fn test<const N: usize>(cases: [Case; N]) {
     );
 
     let mut rng = create_seeded_rng();
-    for case in cases {
-        let instance = random_instance(&mut rng, case, |left, right| {
+    for Case { row_lengths, opened_element_size } in cases {
+        let instance = random_instance(&mut rng, row_lengths, opened_element_size,|left, right| {
             let concatenated =
                 std::array::from_fn(|i| if i < CHUNK { left[i] } else { right[i - CHUNK] });
             let permuted = chip.subchip.permute(concatenated);
@@ -189,7 +194,7 @@ fn test<const N: usize>(cases: [Case; N]) {
             tester.write_usize(
                 address_space,
                 opened_base_pointer + (2 * i),
-                [row_pointer, opened_row.len()],
+                [row_pointer, opened_row.len() / opened_element_size],
             );
             for (j, &opened_value) in opened_row.iter().enumerate() {
                 tester.write_cell(address_space, row_pointer + j, opened_value);
@@ -209,6 +214,7 @@ fn test<const N: usize>(cases: [Case; N]) {
         }
         tester.write(address_space, commit_pointer, commit);
 
+        let opened_element_size_inv = F::from_canonical_usize(opened_element_size).inverse().as_canonical_u32() as usize;
         tester.execute(
             &mut chip,
             &Instruction::from_usize(
@@ -220,7 +226,7 @@ fn test<const N: usize>(cases: [Case; N]) {
                     sibling_register,
                     index_register,
                     commit_register,
-                    1,
+                    opened_element_size_inv
                 ],
             ),
         );
@@ -248,15 +254,40 @@ fn test<const N: usize>(cases: [Case; N]) {
 }
 
 #[test]
-fn verify_batch_test_1() {
-    test([vec![vec![3], vec![], vec![9, 2, 1, 13, 4], vec![16]]]);
+fn verify_batch_test_felt() {
+    test([Case { row_lengths: vec![vec![3], vec![], vec![9, 2, 1, 13, 4], vec![16]], opened_element_size: 1 }]);
 }
 
 #[test]
-fn verify_batch_test_multiple() {
+fn verify_batch_test_felt_multiple() {
     test([
-        vec![vec![1, 1, 1, 2, 3], vec![9], vec![8]],
-        vec![vec![], vec![], vec![], vec![1]],
-        vec![vec![8], vec![7], vec![6]],
+        Case { row_lengths: vec![vec![1, 1, 1, 2, 3], vec![9], vec![8]], opened_element_size: 1 },
+        Case { row_lengths: vec![vec![], vec![], vec![], vec![1]], opened_element_size: 1 },
+        Case { row_lengths: vec![vec![8], vec![7], vec![6]], opened_element_size: 1 },
+    ])
+}
+
+#[test]
+fn verify_batch_test_ext() {
+    test([Case { row_lengths: vec![vec![3], vec![], vec![1, 2, 1], vec![4]], opened_element_size: 4 }]);
+}
+
+#[test]
+fn verify_batch_test_ext_multiple() {
+    test([
+        Case { row_lengths: vec![vec![1, 1, 1], vec![3], vec![2]], opened_element_size: 4 },
+        Case { row_lengths: vec![vec![], vec![], vec![], vec![1]], opened_element_size: 4 },
+        Case { row_lengths: vec![vec![4], vec![3], vec![2]], opened_element_size: 4 },
+    ])
+}
+
+#[test]
+fn verify_batch_test_felt_and_ext() {
+    test([
+        Case { row_lengths: vec![vec![3], vec![], vec![9, 2, 1, 13, 4], vec![16]], opened_element_size: 1 },
+        Case { row_lengths: vec![vec![1, 1, 1], vec![3], vec![2]], opened_element_size: 4 },
+        Case { row_lengths: vec![vec![8], vec![7], vec![6]], opened_element_size: 1 },
+        Case { row_lengths: vec![vec![], vec![], vec![], vec![1]], opened_element_size: 4 },
+        Case { row_lengths: vec![vec![4], vec![3], vec![2]], opened_element_size: 4 },
     ])
 }

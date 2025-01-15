@@ -286,6 +286,15 @@ pub enum DslIr<C: Config> {
         Array<C, Var<C::N>>,
         Array<C, Felt<C::F>>,
     ),
+    /// VerifyBatch(dim, opened, sibling, index, commit)
+    /// opened values are Exts
+    VerifyBatchExt(
+        Array<C, Usize<C::F>>,
+        Array<C, Array<C, Ext<C::F, C::EF>>>,
+        Array<C, Array<C, Felt<C::F>>>,
+        Array<C, Var<C::N>>,
+        Array<C, Felt<C::F>>,
+    ),
 
     // Debugging instructions.
     /// Executes less than (var = var < var).  This operation is NOT constrained.
