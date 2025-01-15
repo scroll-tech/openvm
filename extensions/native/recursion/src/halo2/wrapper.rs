@@ -115,7 +115,7 @@ impl Halo2WrapperProvingKey {
             proof,
         }
     }
-    fn generate_circuit_object_for_proving(
+    pub fn generate_circuit_object_for_proving(
         &self,
         k: usize,
         snark_to_verify: Snark,
