@@ -10,14 +10,19 @@ use openvm_circuit::{
 use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP};
 use openvm_native_compiler::VerifyBatchOpcode::VERIFY_BATCH;
 use openvm_poseidon2_air::{Poseidon2Config, Poseidon2SubAir, Poseidon2SubChip};
-use openvm_stark_backend::p3_field::{Field, PrimeField32};
+use openvm_stark_backend::{
+    p3_field::{Field, PrimeField32},
+    Stateful,
+};
+use serde::{Deserialize, Serialize};
 
 use crate::verify_batch::{
     air::{VerifyBatchAir, VerifyBatchBus},
     CHUNK,
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(bound = "F: Field")]
 pub struct VerifyBatchRecord<F: Field> {
     pub from_state: ExecutionState<u32>,
     pub instruction: Instruction<F>,
@@ -47,7 +52,8 @@ impl<F: PrimeField32> VerifyBatchRecord<F> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(bound = "F: Field")]
 pub(super) struct TopLevelRecord<F: Field> {
     // must be present in first record
     pub incorporate_row: Option<IncorporateRowRecord<F>>,
@@ -55,7 +61,8 @@ pub(super) struct TopLevelRecord<F: Field> {
     pub incorporate_sibling: Option<IncorporateSiblingRecord<F>>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(bound = "F: Field")]
 pub(super) struct IncorporateSiblingRecord<F: Field> {
     pub read_sibling_array_start: RecordId,
     pub read_root_is_on_right: RecordId,
@@ -64,7 +71,8 @@ pub(super) struct IncorporateSiblingRecord<F: Field> {
     pub p2_input: [F; 2 * CHUNK],
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(bound = "F: Field")]
 pub(super) struct IncorporateRowRecord<F: Field> {
     pub chunks: Vec<InsideRowRecord<F>>,
     pub initial_opened_index: usize,
@@ -74,13 +82,14 @@ pub(super) struct IncorporateRowRecord<F: Field> {
     pub p2_input: [F; 2 * CHUNK],
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(bound = "F: Field")]
 pub(super) struct InsideRowRecord<F: Field> {
     pub cells: Vec<CellRecord>,
     pub p2_input: [F; 2 * CHUNK],
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub(super) struct CellRecord {
     pub read: RecordId,
     pub opened_index: usize,
@@ -95,6 +104,29 @@ pub struct VerifyBatchChip<F: Field, const SBOX_REGISTERS: usize> {
     pub(super) height: usize,
     pub(super) offline_memory: Arc<Mutex<OfflineMemory<F>>>,
     pub(super) subchip: Poseidon2SubChip<F, SBOX_REGISTERS>,
+}
+
+impl<F: PrimeField32, const SBOX_REGISTERS: usize> Stateful<Vec<u8>>
+    for VerifyBatchChip<F, SBOX_REGISTERS>
+{
+    fn load_state(&mut self, state: Vec<u8>) {
+        self.records = bitcode::deserialize(&state).unwrap();
+        self.height = 0;
+        for record in self.records.iter() {
+            for top_level in record.top_level.iter() {
+                if let Some(incorporate_row) = &top_level.incorporate_row {
+                    self.height += 1 + incorporate_row.chunks.len();
+                }
+                if let Some(_) = &top_level.incorporate_sibling {
+                    self.height += 1;
+                }
+            }
+        }
+    }
+
+    fn store_state(&self) -> Vec<u8> {
+        bitcode::serialize(&self.records).unwrap()
+    }
 }
 
 impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGISTERS> {

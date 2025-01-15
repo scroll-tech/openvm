@@ -53,19 +53,19 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
     pub index_base_pointer: T,
 
     // these can be optimized to be shared with cells[i].read_row_pointer_and_length (saves 18 cols)
-    pub dim_base_pointer_read: MemoryReadAuxCols<T, 1>,
-    pub opened_base_pointer_read: MemoryReadAuxCols<T, 1>,
-    pub opened_length_read: MemoryReadAuxCols<T, 1>,
-    pub sibling_base_pointer_read: MemoryReadAuxCols<T, 1>,
-    pub index_base_pointer_read: MemoryReadAuxCols<T, 1>,
-    pub commit_pointer_read: MemoryReadAuxCols<T, 1>,
+    pub dim_base_pointer_read: MemoryReadAuxCols<T>,
+    pub opened_base_pointer_read: MemoryReadAuxCols<T>,
+    pub opened_length_read: MemoryReadAuxCols<T>,
+    pub sibling_base_pointer_read: MemoryReadAuxCols<T>,
+    pub index_base_pointer_read: MemoryReadAuxCols<T>,
+    pub commit_pointer_read: MemoryReadAuxCols<T>,
 
     // this with the other ones (saves 1 col)
     pub proof_index: T,
 
     // these as well (saves 6 cols)
-    pub read_initial_height_or_root_is_on_right: MemoryReadAuxCols<T, 1>,
-    pub read_final_height_or_sibling_array_start: MemoryReadAuxCols<T, 1>,
+    pub read_initial_height_or_root_is_on_right: MemoryReadAuxCols<T>,
+    pub read_final_height_or_sibling_array_start: MemoryReadAuxCols<T>,
 
     // i guess these can be shared with like the other ones (saves 2 cols)
     pub root_is_on_right: T,
@@ -74,15 +74,15 @@ pub struct VerifyBatchCols<T, const SBOX_REGISTERS: usize> {
     // plus this (saves 1 col)
     pub commit_pointer: T,
     // this as well (saves 3 cols)
-    pub commit_read: MemoryReadAuxCols<T, CHUNK>,
+    pub commit_read: MemoryReadAuxCols<T>,
 }
 
 #[repr(C)]
 #[derive(AlignedBorrow, Copy, Clone)]
 pub struct VerifyBatchCellCols<T, const SBOX_REGISTERS: usize> {
-    pub read: MemoryReadAuxCols<T, 1>,
+    pub read: MemoryReadAuxCols<T>,
     pub opened_index: T,
-    pub read_row_pointer_and_length: MemoryReadAuxCols<T, 2>,
+    pub read_row_pointer_and_length: MemoryReadAuxCols<T>,
     pub row_pointer: T,
     pub row_end: T,
     pub is_first_in_row: T,

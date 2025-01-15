@@ -178,9 +178,12 @@ pub fn verify_batch<C: Config>(
         _ => panic!("Expected a dynamic array of felts"),
     };
     match opened_values {
-        NestedOpenedValues::Felt(opened_values) => builder.verify_batch_felt(&dimensions, opened_values, &proof, &index_bits, commit),
-        NestedOpenedValues::Ext(opened_values) => builder.verify_batch_ext(&dimensions, opened_values, &proof, &index_bits, commit),
-        _ => panic!("Expected a dynamic array of felts"),
+        NestedOpenedValues::Felt(opened_values) => {
+            builder.verify_batch_felt(&dimensions, opened_values, &proof, &index_bits, commit)
+        }
+        NestedOpenedValues::Ext(opened_values) => {
+            builder.verify_batch_ext(&dimensions, opened_values, &proof, &index_bits, commit)
+        }
     };
 }
 

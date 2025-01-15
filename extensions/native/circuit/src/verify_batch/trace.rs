@@ -8,11 +8,11 @@ use openvm_stark_backend::{
     p3_air::BaseAir,
     p3_field::{Field, PrimeField32},
     p3_matrix::dense::RowMajorMatrix,
+    p3_maybe_rayon::prelude::*,
     prover::types::AirProofInput,
     rap::AnyRap,
     Chip, ChipUsageGetter,
 };
-use rayon::{iter::ParallelIterator, slice::ParallelSliceMut};
 
 use crate::{
     chip::NUM_INITIAL_READS,
