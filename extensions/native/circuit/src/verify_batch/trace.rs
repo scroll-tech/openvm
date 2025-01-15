@@ -84,6 +84,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         cols.initial_opened_index = F::from_canonical_usize(opened_index);
         cols.final_opened_index = F::from_canonical_usize(opened_index - 1);
         cols.height = F::from_canonical_usize(height);
+        println!("[sibling] initial_opened_index = {}, final_opened_index = {}, height = {}", cols.initial_opened_index, cols.final_opened_index, cols.height);
         cols.opened_length = F::from_canonical_usize(parent.opened_length);
         cols.dim_base_pointer = parent.dim_base_pointer;
         cols.opened_base_pointer = parent.opened_base_pointer;
@@ -118,6 +119,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         } = record;
         let instruction = &record.instruction;
         let cols: &mut VerifyBatchCols<F, SBOX_REGISTERS> = slice.borrow_mut();
+        cols.end_top_level = F::ONE;
         cols.pc = F::from_canonical_u32(from_state.pc);
         cols.dim_register = instruction.a;
         cols.opened_register = instruction.b;
@@ -184,6 +186,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         cols.initial_opened_index = F::from_canonical_usize(initial_opened_index);
         cols.final_opened_index = F::from_canonical_usize(final_opened_index);
         cols.height = F::from_canonical_usize(height);
+        println!("[row] initial_opened_index = {}, final_opened_index = {}, height = {}", cols.initial_opened_index, cols.final_opened_index, cols.height);
         cols.opened_length = F::from_canonical_usize(parent.opened_length);
         cols.dim_base_pointer = parent.dim_base_pointer;
         cols.opened_base_pointer = parent.opened_base_pointer;
@@ -294,8 +297,8 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
                     memory,
                     &record,
                     proof_index,
-                    height,
                     opened_index,
+                    height,
                 );
                 used_cells += width;
             }

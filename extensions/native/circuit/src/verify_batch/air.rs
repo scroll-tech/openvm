@@ -112,7 +112,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         builder.assert_bool(end_inside_row);
         builder.when(end_inside_row).assert_one(inside_row);
         builder.assert_bool(end_top_level);
-        builder.when(end_top_level).assert_one(incorporate_sibling);
 
         let end = end_inside_row + end_top_level + (AB::Expr::ONE - enabled.clone());
         builder
@@ -152,29 +151,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             address_space,
             left_output,
         );
-
-        let row_hash = std::array::from_fn(|i| {
-            (start_top_level * left_output[i])
-                + ((AB::Expr::ONE - start_top_level) * right_input[i])
-        });
-
-        self.internal_bus.interact(
-            builder,
-            true,
-            incorporate_row,
-            start_timestamp + AB::F::from_canonical_usize(6),
-            end_timestamp - AB::F::TWO,
-            opened_base_pointer,
-            initial_opened_index,
-            final_opened_index,
-            address_space,
-            row_hash,
-        );
-        
-        return;
-        
-        
-        // everything abov here is ok
 
         // things that stay the same (roughly)
 
@@ -233,7 +209,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             builder
                 .when(cell.is_exhausted)
                 .assert_eq(left_input[i], AB::F::ZERO);
-
+            
             let mut when_inside_row_not_last = if i == CHUNK - 1 { builder.when(inside_row - end_inside_row) } else { builder.when(inside_row) };
 
             // update state for normal cell
@@ -271,13 +247,12 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             when_inside_row_not_last
                 .when(cell.is_exhausted)
                 .assert_eq(next_cell.is_exhausted, AB::F::ONE);
-            
 
             let is_last_in_row = if i == CHUNK - 1 {
                 end_inside_row.into()
             } else {
                 next_cell.is_first_in_row + next_cell.is_exhausted
-            };
+            } - cell.is_exhausted;
             builder
                 .when(inside_row)
                 .when(is_last_in_row)
@@ -363,10 +338,12 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             )
             .eval(builder, end_top_level);
 
+
         let mut when_top_level_not_end =
             builder.when(incorporate_row + incorporate_sibling - end_top_level);
 
         when_top_level_not_end.assert_eq(next.dim_base_pointer, dim_base_pointer);
+
         when_top_level_not_end.assert_eq(next.opened_base_pointer, opened_base_pointer);
         when_top_level_not_end.assert_eq(next.sibling_base_pointer, sibling_base_pointer);
         when_top_level_not_end.assert_eq(next.index_base_pointer, index_base_pointer);
@@ -377,16 +354,20 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .assert_eq(next.initial_opened_index, final_opened_index + AB::F::ONE);
 
         builder
-            .when(incorporate_sibling - end_top_level)
+            .when(incorporate_sibling)
+            .when(AB::Expr::ONE - end_top_level)
             .assert_eq(next.height * AB::F::TWO, height);
         builder
-            .when(incorporate_row - end_top_level)
+            .when(incorporate_row)
+            .when(AB::Expr::ONE - end_top_level)
             .assert_eq(next.height, height);
         builder
-            .when(incorporate_sibling - end_top_level)
+            .when(incorporate_sibling)
+            .when(AB::Expr::ONE - end_top_level)
             .assert_eq(next.proof_index, proof_index + AB::F::ONE);
         builder
-            .when(incorporate_row - end_top_level)
+            .when(incorporate_row)
+            .when(AB::Expr::ONE - end_top_level)
             .assert_eq(next.proof_index, proof_index);
 
         builder
@@ -447,14 +428,15 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 MemoryAddress::new(address_space, dim_base_pointer + final_opened_index),
                 [height],
                 end_timestamp - AB::F::ONE,
-                &read_initial_height_or_root_is_on_right,
+                &read_final_height_or_sibling_array_start,
             )
             .eval(builder, incorporate_row);
 
         // incorporate sibling
 
         builder
-            .when(incorporate_sibling - end_top_level)
+            .when(incorporate_sibling)
+            .when(AB::Expr::ONE - end_top_level)
             .assert_one(next.incorporate_row + next.incorporate_sibling);
         builder
             .when(end_top_level)
@@ -472,7 +454,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 timestamp_after_end_operations.clone(),
                 &read_initial_height_or_root_is_on_right,
             )
-            .eval(builder, incorporate_row);
+            .eval(builder, incorporate_sibling);
         self.memory_bridge
             .read(
                 MemoryAddress::new(address_space, sibling_base_pointer + proof_index),
@@ -480,8 +462,8 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 timestamp_after_end_operations.clone() + AB::F::ONE,
                 &read_final_height_or_sibling_array_start,
             )
-            .eval(builder, incorporate_row);
-
+            .eval(builder, incorporate_sibling);
+        
         for i in 0..CHUNK {
             builder
                 .when(next.incorporate_sibling)
@@ -498,12 +480,12 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     [(root_is_on_right * left_input[i])
                         + ((AB::Expr::ONE - root_is_on_right) * right_input[i])],
                     timestamp_after_end_operations.clone() + AB::F::from_canonical_usize(2 + i),
-                    &read_initial_height_or_root_is_on_right,
+                    &cells[i].read,
                 )
-                .eval(builder, incorporate_row);
+                .eval(builder, incorporate_sibling);
         }
 
-        builder.assert_eq(
+        builder.when(incorporate_sibling).assert_eq(
             end_timestamp,
             timestamp_after_end_operations + AB::F::from_canonical_usize(2 + CHUNK),
         );
