@@ -15,8 +15,11 @@ use openvm_stark_backend::{
     p3_matrix::Matrix,
     rap::{BaseAirWithPublicValues, PartitionedBaseAir},
 };
-use crate::chip::NUM_INITIAL_READS;
-use crate::verify_batch::{columns::VerifyBatchCols, CHUNK};
+
+use crate::{
+    chip::NUM_INITIAL_READS,
+    verify_batch::{columns::VerifyBatchCols, CHUNK},
+};
 
 #[derive(Clone, Debug)]
 pub struct VerifyBatchAir<F: Field, const SBOX_REGISTERS: usize> {
@@ -278,7 +281,8 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .when(next.incorporate_row + next.incorporate_sibling)
             .assert_eq(next.proof_index, AB::F::ZERO);
 
-        let timestamp_after_initial_reads = start_timestamp + AB::F::from_canonical_usize(NUM_INITIAL_READS);
+        let timestamp_after_initial_reads =
+            start_timestamp + AB::F::from_canonical_usize(NUM_INITIAL_READS);
 
         builder
             .when(end.clone())
@@ -478,7 +482,10 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .eval(builder, incorporate_sibling);
         self.memory_bridge
             .read(
-                MemoryAddress::new(address_space, sibling_base_pointer + (proof_index * AB::F::TWO)),
+                MemoryAddress::new(
+                    address_space,
+                    sibling_base_pointer + (proof_index * AB::F::TWO),
+                ),
                 [sibling_array_start],
                 timestamp_after_initial_reads.clone() + AB::F::ONE,
                 &read_final_height_or_sibling_array_start,

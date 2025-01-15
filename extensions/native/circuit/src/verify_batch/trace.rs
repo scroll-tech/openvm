@@ -13,14 +13,17 @@ use openvm_stark_backend::{
     Chip, ChipUsageGetter,
 };
 use rayon::{iter::ParallelIterator, slice::ParallelSliceMut};
-use crate::chip::NUM_INITIAL_READS;
-use crate::verify_batch::{
-    chip::{
-        CellRecord, IncorporateRowRecord, IncorporateSiblingRecord, InsideRowRecord,
-        VerifyBatchChip, VerifyBatchRecord,
+
+use crate::{
+    chip::NUM_INITIAL_READS,
+    verify_batch::{
+        chip::{
+            CellRecord, IncorporateRowRecord, IncorporateSiblingRecord, InsideRowRecord,
+            VerifyBatchChip, VerifyBatchRecord,
+        },
+        columns::VerifyBatchCols,
+        CHUNK,
     },
-    columns::VerifyBatchCols,
-    CHUNK,
 };
 
 impl<F: Field, const SBOX_REGISTERS: usize> ChipUsageGetter for VerifyBatchChip<F, SBOX_REGISTERS> {
@@ -74,7 +77,8 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
         cols.end_top_level = F::ZERO;
         cols.start_top_level = F::ZERO;
         cols.very_first_timestamp = F::from_canonical_u32(parent.from_state.timestamp);
-        cols.start_timestamp = F::from_canonical_u32(read_root_is_on_right.timestamp - NUM_INITIAL_READS as u32);
+        cols.start_timestamp =
+            F::from_canonical_u32(read_root_is_on_right.timestamp - NUM_INITIAL_READS as u32);
         cols.end_timestamp =
             F::from_canonical_usize(read_root_is_on_right.timestamp as usize + (2 + CHUNK));
         cols.address_space = F::from_canonical_usize(parent.address_space());
