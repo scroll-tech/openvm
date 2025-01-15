@@ -114,6 +114,9 @@ pub enum AsmInstruction<F, EF> {
     /// (a, b, res, len, alpha, alpha_pow)
     FriReducedOpening(i32, i32, i32, i32, i32, i32),
 
+    // (dim, opened, sibling, index, commit)
+    VerifyBatch(i32, i32, i32, i32, i32),
+
     /// Print a variable.
     PrintV(i32),
 

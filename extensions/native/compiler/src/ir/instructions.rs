@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::{Array, Config, Ext, Felt, MemIndex, Ptr, RVar, TracedVec, Var};
+use super::{Array, Config, Ext, Felt, MemIndex, Ptr, RVar, TracedVec, Usize, Var};
 
 /// An intermeddiate instruction set for implementing programs.
 ///
@@ -276,6 +276,14 @@ pub enum DslIr<C: Config> {
         Array<C, Felt<C::F>>,
         Array<C, Ext<C::F, C::EF>>,
         Ext<C::F, C::EF>,
+    ),
+    /// VerifyBatch(dim, opened, sibling, index, commit)
+    VerifyBatch(
+        Array<C, Usize<C::F>>,
+        Array<C, Array<C, Felt<C::F>>>,
+        Array<C, Array<C, Felt<C::F>>>,
+        Array<C, Var<C::N>>,
+        Array<C, Felt<C::F>>,
     ),
 
     // Debugging instructions.

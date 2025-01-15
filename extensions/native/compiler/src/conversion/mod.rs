@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     asm::{AsmInstruction, AssemblyCode},
     FieldArithmeticOpcode, FieldExtensionOpcode, FriOpcode, NativeBranchEqualOpcode,
-    NativeJalOpcode, NativeLoadStoreOpcode, NativePhantom,
+    NativeJalOpcode, NativeLoadStoreOpcode, NativePhantom, VerifyBatchOpcode,
 };
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
@@ -648,6 +648,16 @@ fn convert_instruction<F: PrimeField32, EF: ExtensionField<F>>(
             e: i32_f(len),
             f: i32_f(alpha),
             g: i32_f(alpha_pow),
+        }],
+        AsmInstruction::VerifyBatch(dim, opened, sibling, index, commit) => vec![Instruction {
+            opcode: options.opcode_with_offset(VerifyBatchOpcode::VERIFY_BATCH),
+            a: i32_f(dim),
+            b: i32_f(opened),
+            c: i32_f(sibling),
+            d: i32_f(index),
+            e: i32_f(commit),
+            f: AS::Native.to_field(),
+            g: F::ZERO,
         }],
     };
 
