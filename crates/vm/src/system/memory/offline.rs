@@ -1,27 +1,26 @@
-use std::{array, cmp::max, sync::Arc};
+use std::{array, sync::Arc};
 
 use openvm_circuit_primitives::{
     assert_less_than::AssertLtSubAir, var_range::VariableRangeCheckerChip,
 };
 use openvm_stark_backend::p3_field::PrimeField32;
-use rustc_hash::FxHashSet;
 
-use super::paged_vec::{AddressMap, PagedVec};
+use super::{paged_vec::PagedVec, van_emde_boas::VebTree};
 use crate::{
     arch::MemoryConfig,
     system::memory::{
         adapter::{AccessAdapterRecord, AccessAdapterRecordKind},
         offline_checker::{MemoryBridge, MemoryBus},
         paged_vec::PAGE_SIZE,
+        van_emde_boas::VanEmdeBoas,
         MemoryAuxColsFactory, MemoryImage, RecordId, TimestampedEquipartition, TimestampedValues,
     },
 };
 
 pub const INITIAL_TIMESTAMP: u32 = 0;
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 struct BlockData {
-    pointer: u32,
     size: usize,
     timestamp: u32,
 }
@@ -38,7 +37,7 @@ pub struct MemoryRecord<T> {
 }
 
 pub struct OfflineMemory<F> {
-    block_data: AddressMap<BlockData>,
+    block_data: Vec<VebTree<BlockData>>,
     data: Vec<PagedVec<F>>,
     as_offset: u32,
     initial_block_size: usize,
@@ -67,11 +66,7 @@ impl<F: PrimeField32> OfflineMemory<F> {
         eprintln!("initial_block_size: {}", initial_block_size);
 
         Self {
-            block_data: AddressMap::new(
-                config.as_offset,
-                1 << config.as_height,
-                1 << config.pointer_max_bits,
-            ),
+            block_data: vec![VanEmdeBoas::new(); 1 << config.as_height],
             data: Self::memory_image_to_paged_vec(initial_memory, config),
             as_offset: config.as_offset,
             initial_block_size,
@@ -225,11 +220,19 @@ impl<F: PrimeField32> OfflineMemory<F> {
 
         // First make sure the partition we maintain in self.block_data is an equipartition.
         // Grab all aligned pointers that need to be re-accessed.
-        let to_access: FxHashSet<_> = self
+        let as_offset = self.as_offset;
+        let to_access: Vec<_> = self
             .block_data
-            .items()
-            .map(|((address_space, pointer), _)| (address_space, (pointer / N as u32) * N as u32))
-            .collect();
+            .iter()
+            .enumerate()
+            .flat_map(|(address_space, tree)| {
+                tree.iter().flat_map(move |(pointer, block_data)| {
+                    (pointer..pointer + block_data.size as u32)
+                        .filter(move |&p| p % N as u32 == 0)
+                        .map(move |ptr| (address_space as u32 + as_offset, ptr))
+                })
+            })
+            .collect::<Vec<_>>();
         eprintln!(
             "- - - - - - - - - - - - - - - to_access len: {}",
             to_access.len()
@@ -243,17 +246,16 @@ impl<F: PrimeField32> OfflineMemory<F> {
         );
 
         for &(address_space, pointer) in to_access.iter() {
-            let block = self.block_data.get(&(address_space, pointer)).unwrap();
-            if block.pointer != pointer || block.size != N {
-                self.access(address_space, pointer, N, &mut adapter_records);
-            }
+            self.access(address_space, pointer, N, &mut adapter_records);
         }
 
         let mut equipartition = TimestampedEquipartition::<F, N>::new();
         for (address_space, pointer) in to_access {
-            let block = self.block_data.get(&(address_space, pointer)).unwrap();
+            let block = self.block_data[(address_space - self.as_offset) as usize]
+                .get(pointer)
+                .unwrap();
 
-            debug_assert_eq!(block.pointer % N as u32, 0);
+            debug_assert_eq!(pointer % N as u32, 0);
             debug_assert_eq!(block.size, N);
 
             equipartition.insert(
@@ -273,72 +275,6 @@ impl<F: PrimeField32> OfflineMemory<F> {
         (equipartition, adapter_records)
     }
 
-    // Modifies the partition to ensure that there is a block starting at (address_space, query).
-    fn split_to_make_boundary(
-        &mut self,
-        address_space: u32,
-        query: u32,
-        records: &mut Vec<AccessAdapterRecord<F>>,
-    ) {
-        let original_block = self.block_containing(address_space, query);
-        if original_block.pointer == query {
-            return;
-        }
-
-        let data = self.range_vec(address_space, original_block.pointer, original_block.size);
-
-        let timestamp = original_block.timestamp;
-
-        let mut cur_ptr = original_block.pointer;
-        let mut cur_size = original_block.size;
-        while cur_size > 0 {
-            // Split.
-            records.push(AccessAdapterRecord {
-                timestamp,
-                address_space: F::from_canonical_u32(address_space),
-                start_index: F::from_canonical_u32(cur_ptr),
-                data: data[(cur_ptr - original_block.pointer) as usize
-                    ..(cur_ptr - original_block.pointer) as usize + cur_size]
-                    .to_vec(),
-                kind: AccessAdapterRecordKind::Split,
-            });
-
-            let half_size = cur_size / 2;
-            let half_size_u32 = half_size as u32;
-            let mid_ptr = cur_ptr + half_size_u32;
-
-            if query <= mid_ptr {
-                // The right is finalized; add it to the partition.
-                let block = BlockData {
-                    pointer: mid_ptr,
-                    size: half_size,
-                    timestamp,
-                };
-                for i in 0..half_size_u32 {
-                    self.block_data.insert((address_space, mid_ptr + i), block);
-                }
-            }
-            if query >= cur_ptr + half_size_u32 {
-                // The left is finalized; add it to the partition.
-                let block = BlockData {
-                    pointer: cur_ptr,
-                    size: half_size,
-                    timestamp,
-                };
-                for i in 0..half_size_u32 {
-                    self.block_data.insert((address_space, cur_ptr + i), block);
-                }
-            }
-            if mid_ptr <= query {
-                cur_ptr = mid_ptr;
-            }
-            if cur_ptr == query {
-                break;
-            }
-            cur_size = half_size;
-        }
-    }
-
     fn access_updating_timestamp(
         &mut self,
         address_space: u32,
@@ -347,25 +283,72 @@ impl<F: PrimeField32> OfflineMemory<F> {
         records: &mut Vec<AccessAdapterRecord<F>>,
     ) -> u32 {
         self.access(address_space, pointer, size, records);
+        let tree = &mut self.block_data[(address_space - self.as_offset) as usize];
+        let key = tree.max_not_exceeding(pointer).unwrap();
+        tree.insert(
+            key,
+            BlockData {
+                size,
+                timestamp: self.timestamp,
+            },
+        )
+        .unwrap()
+        .timestamp
+    }
 
-        let mut prev_timestamp = None;
-
-        for i in 0..size as u32 {
-            if self.block_data.get(&(address_space, pointer + i)).is_none() {
-                self.block_data.insert(
-                    (address_space, pointer + i),
-                    Self::initial_block_data(pointer + i, self.initial_block_size),
-                );
-            }
-            let block = self
-                .block_data
-                .get_mut(&(address_space, pointer + i))
-                .unwrap();
-            debug_assert!(i == 0 || prev_timestamp == Some(block.timestamp));
-            prev_timestamp = Some(block.timestamp);
-            block.timestamp = self.timestamp;
+    #[allow(clippy::too_many_arguments)]
+    fn split_into_aligned(
+        address_space: u32,
+        left: u32,
+        len: u32,
+        target_left: u32,
+        target_right: u32,
+        timestamp: u32,
+        data: &[F],
+        records: &mut Vec<AccessAdapterRecord<F>>,
+        blocks_to_merge: &mut Vec<(u32, u32, u32)>,
+    ) {
+        if left >= target_right || left + len <= target_left {
+            blocks_to_merge.push((left, len, timestamp));
+            return;
         }
-        prev_timestamp.unwrap()
+        if left.wrapping_sub(target_left) & (len - 1) == 0
+            && left >= target_left
+            && left + len <= target_right
+        {
+            blocks_to_merge.push((left, len, timestamp));
+            return;
+        }
+        records.push(AccessAdapterRecord {
+            timestamp,
+            address_space: F::from_canonical_u32(address_space),
+            start_index: F::from_canonical_u32(left),
+            data: data.to_vec(),
+            kind: AccessAdapterRecordKind::Split,
+        });
+        let len = len / 2;
+        Self::split_into_aligned(
+            address_space,
+            left,
+            len,
+            target_left,
+            target_right,
+            timestamp,
+            &data[..len as usize],
+            records,
+            blocks_to_merge,
+        );
+        Self::split_into_aligned(
+            address_space,
+            left + len,
+            len,
+            target_left,
+            target_right,
+            timestamp,
+            &data[len as usize..],
+            records,
+            blocks_to_merge,
+        );
     }
 
     fn access(
@@ -375,96 +358,104 @@ impl<F: PrimeField32> OfflineMemory<F> {
         size: usize,
         records: &mut Vec<AccessAdapterRecord<F>>,
     ) {
-        self.split_to_make_boundary(address_space, pointer, records);
-        self.split_to_make_boundary(address_space, pointer + size as u32, records);
+        let left = pointer;
+        let right = pointer + size as u32;
+        let data = self.range_vec(address_space, left, size);
+        let tree = &mut self.block_data[(address_space - self.as_offset) as usize];
+        let mut done_left = right;
+        // Maintain the following invariant: the half-interval [done_left, right) is splitted into aligned initialized blocks.
+        let mut blocks_to_split = vec![];
+        while done_left > left {
+            if let Some(key) = tree.max_not_exceeding(done_left - 1) {
+                let block_data = tree.get(key).unwrap().clone();
+                let new_right = key + block_data.size as u32;
+                while done_left > new_right && done_left > left {
+                    done_left -= 1 + (done_left - 1) % self.initial_block_size as u32;
+                    blocks_to_split.push((
+                        done_left,
+                        self.initial_block_size as u32,
+                        INITIAL_TIMESTAMP,
+                    ));
+                }
+                if key + block_data.size as u32 <= left {
+                    break;
+                }
+                tree.erase(key);
+                debug_assert!(block_data.size.is_power_of_two());
+                debug_assert!(done_left <= key + block_data.size as u32);
+                blocks_to_split.push((key, block_data.size as u32, block_data.timestamp));
+                done_left = key;
+            } else {
+                while done_left > left {
+                    done_left -= 1 + (done_left - 1) % self.initial_block_size as u32;
+                    blocks_to_split.push((
+                        done_left,
+                        self.initial_block_size as u32,
+                        INITIAL_TIMESTAMP,
+                    ));
+                }
+                break;
+            }
+        }
 
-        if self.block_data.get(&(address_space, pointer)).is_none() {
-            self.block_data.insert(
-                (address_space, pointer),
-                Self::initial_block_data(pointer, self.initial_block_size),
+        let mut blocks_to_merge = vec![];
+        for (left, len, timestamp) in blocks_to_split {
+            let data = self.data[(address_space - self.as_offset) as usize]
+                .get_range(left as usize..(left + len) as usize);
+            Self::split_into_aligned(
+                address_space,
+                left,
+                len,
+                pointer,
+                pointer + size as u32,
+                timestamp,
+                &data,
+                records,
+                &mut blocks_to_merge,
             );
         }
-        let block_data = self.block_data.get(&(address_space, pointer)).unwrap();
 
-        if block_data.pointer == pointer && block_data.size == size {
-            return;
-        }
-        assert!(size > 1);
+        blocks_to_merge.sort_by(|a, b| a.0.cmp(&b.0));
 
-        // Now recursively access left and right blocks to ensure they are in the partition.
-        let half_size = size / 2;
-        self.access(address_space, pointer, half_size, records);
-        self.access(
-            address_space,
-            pointer + half_size as u32,
-            half_size,
-            records,
-        );
-
-        self.merge_block_with_next(address_space, pointer, records);
-    }
-
-    /// Merges the two adjacent blocks starting at (address_space, pointer).
-    ///
-    /// Panics if there is no block starting at (address_space, pointer) or if the two blocks
-    /// do not have the same size.
-    fn merge_block_with_next(
-        &mut self,
-        address_space: u32,
-        pointer: u32,
-        records: &mut Vec<AccessAdapterRecord<F>>,
-    ) {
-        let left_block = self.block_data.get(&(address_space, pointer));
-
-        let left_timestamp = left_block.map(|b| b.timestamp).unwrap_or(INITIAL_TIMESTAMP);
-        let size = left_block
-            .map(|b| b.size)
-            .unwrap_or(self.initial_block_size);
-
-        let right_timestamp = self
-            .block_data
-            .get(&(address_space, pointer + size as u32))
-            .map(|b| b.timestamp)
-            .unwrap_or(INITIAL_TIMESTAMP);
-
-        let timestamp = max(left_timestamp, right_timestamp);
-        for i in 0..2 * size as u32 {
-            self.block_data.insert(
-                (address_space, pointer + i),
-                BlockData {
-                    pointer,
-                    size: 2 * size,
+        let mut stack = vec![];
+        for (left, len, timestamp) in blocks_to_merge {
+            if left + len <= pointer || left >= pointer + size as u32 {
+                tree.insert(
+                    left,
+                    BlockData {
+                        size: len as usize,
+                        timestamp,
+                    },
+                );
+                continue;
+            }
+            stack.push((left, len, timestamp));
+            while stack.len() > 1 && stack[stack.len() - 1].1 == stack[stack.len() - 2].1 {
+                let rhs = stack.pop().unwrap();
+                let lhs = stack.pop().unwrap();
+                let timestamp = lhs.2.max(rhs.2);
+                records.push(AccessAdapterRecord {
                     timestamp,
-                },
-            );
+                    address_space: F::from_canonical_u32(address_space),
+                    start_index: F::from_canonical_u32(lhs.0),
+                    data: data
+                        [(lhs.0 - pointer) as usize..(lhs.0 + lhs.1 + rhs.1 - pointer) as usize]
+                        .to_vec(),
+                    kind: AccessAdapterRecordKind::Merge {
+                        left_timestamp: lhs.2,
+                        right_timestamp: rhs.2,
+                    },
+                });
+                stack.push((lhs.0, lhs.1 + rhs.1, timestamp));
+            }
         }
-        records.push(AccessAdapterRecord {
-            timestamp,
-            address_space: F::from_canonical_u32(address_space),
-            start_index: F::from_canonical_u32(pointer),
-            data: self.range_vec(address_space, pointer, 2 * size),
-            kind: AccessAdapterRecordKind::Merge {
-                left_timestamp,
-                right_timestamp,
+        tree.insert(
+            pointer,
+            BlockData {
+                size,
+                timestamp: stack.last().unwrap().2,
             },
-        });
-    }
-
-    fn block_containing(&mut self, address_space: u32, pointer: u32) -> BlockData {
-        if let Some(block_data) = self.block_data.get(&(address_space, pointer)) {
-            *block_data
-        } else {
-            Self::initial_block_data(pointer, self.initial_block_size)
-        }
-    }
-
-    fn initial_block_data(pointer: u32, initial_block_size: usize) -> BlockData {
-        let aligned_pointer = (pointer / initial_block_size as u32) * initial_block_size as u32;
-        BlockData {
-            pointer: aligned_pointer,
-            size: initial_block_size,
-            timestamp: INITIAL_TIMESTAMP,
-        }
+        );
     }
 
     pub fn get(&self, address_space: u32, pointer: u32) -> F {
@@ -509,7 +500,7 @@ mod tests {
     use openvm_stark_backend::p3_field::FieldAlgebra;
     use openvm_stark_sdk::p3_baby_bear::BabyBear;
 
-    use super::{BlockData, MemoryRecord, OfflineMemory};
+    use super::{MemoryRecord, OfflineMemory};
     use crate::{
         arch::MemoryConfig,
         system::memory::{
@@ -535,61 +526,6 @@ mod tests {
         [$($x:expr),*] => {
             vec![$(BabyBear::from_canonical_u32($x)),*]
         }
-    }
-
-    #[test]
-    fn test_partition() {
-        type F = BabyBear;
-
-        let initial_memory = MemoryImage::new(0, 1, 1 << 29);
-        let mut partition = OfflineMemory::<F>::new(
-            initial_memory,
-            8,
-            MemoryBus(0),
-            Arc::new(VariableRangeCheckerChip::new(VariableRangeCheckerBus::new(
-                1, 29,
-            ))),
-            29,
-            MemoryConfig {
-                as_offset: 0,
-                ..Default::default()
-            },
-        );
-        assert_eq!(
-            partition.block_containing(0, 13),
-            BlockData {
-                pointer: 8,
-                size: 8,
-                timestamp: 0,
-            }
-        );
-
-        assert_eq!(
-            partition.block_containing(0, 8),
-            BlockData {
-                pointer: 8,
-                size: 8,
-                timestamp: 0,
-            }
-        );
-
-        assert_eq!(
-            partition.block_containing(0, 15),
-            BlockData {
-                pointer: 8,
-                size: 8,
-                timestamp: 0,
-            }
-        );
-
-        assert_eq!(
-            partition.block_containing(0, 16),
-            BlockData {
-                pointer: 16,
-                size: 8,
-                timestamp: 0,
-            }
-        );
     }
 
     #[test]

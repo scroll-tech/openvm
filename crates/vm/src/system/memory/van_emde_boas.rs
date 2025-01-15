@@ -223,34 +223,27 @@ where
             self.existing_children.erase(Self::high(key));
             self.subtrees[Self::high(key) as usize] = None;
         }
-        if let Some(min_key) = self.min {
-            if key == min_key {
-                if let Some(max_key) = self.max {
-                    if key == max_key {
-                        self.min = None;
-                        self.max = None;
-                    } else {
-                        let high =
-                            <HighKeys as VanEmdeBoas<()>>::min(&self.existing_children).unwrap();
-                        let low = self.subtrees[high as usize]
-                            .as_ref()
-                            .unwrap()
-                            .min()
-                            .unwrap();
-                        self.min = Some(high << LOW_BITS | low);
-                    }
-                }
-            }
-        } else if let Some(max_key) = self.max {
-            if key == max_key {
-                let high = <HighKeys as VanEmdeBoas<()>>::max(&self.existing_children).unwrap();
+        if key == self.min.unwrap() {
+            if key == self.max.unwrap() {
+                self.min = None;
+                self.max = None;
+            } else {
+                let high = <HighKeys as VanEmdeBoas<()>>::min(&self.existing_children).unwrap();
                 let low = self.subtrees[high as usize]
                     .as_ref()
                     .unwrap()
-                    .max()
+                    .min()
                     .unwrap();
-                self.max = Some(high << LOW_BITS | low);
+                self.min = Some(high << LOW_BITS | low);
             }
+        } else if key == self.max.unwrap() {
+            let high = <HighKeys as VanEmdeBoas<()>>::max(&self.existing_children).unwrap();
+            let low = self.subtrees[high as usize]
+                .as_ref()
+                .unwrap()
+                .max()
+                .unwrap();
+            self.max = Some(high << LOW_BITS | low);
         }
     }
 
