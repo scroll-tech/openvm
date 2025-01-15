@@ -225,11 +225,8 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> VerifyBatchChip<F, SBOX_REGIS
                 )
                 .timestamp,
         );
-        cols.start_timestamp = F::from_canonical_u32(
-            memory
-                .record_by_id(cells[0].read)
-                .timestamp - 1,
-        );
+        cols.start_timestamp =
+            F::from_canonical_u32(memory.record_by_id(cells[0].read).timestamp - 1);
         cols.address_space = F::from_canonical_usize(grandparent.address_space());
 
         for (record, cell) in cells.iter().zip(cols.cells.iter_mut()) {

@@ -308,7 +308,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     sibling_base_pointer + F::from_canonical_usize(proof_index),
                 );
                 let sibling_array_start = sibling_array_start.as_canonical_u32() as usize;
-                
+
                 let mut sibling = [F::ZERO; CHUNK];
                 let mut reads = vec![];
                 for i in 0..CHUNK {

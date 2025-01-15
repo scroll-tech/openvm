@@ -8,13 +8,14 @@ use openvm_circuit_primitives::utils::not;
 use openvm_native_compiler::VerifyBatchOpcode::VERIFY_BATCH;
 use openvm_poseidon2_air::{Poseidon2SubAir, BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS};
 use openvm_stark_backend::{
+    air_builders::sub::SubAirBuilder,
     interaction::{InteractionBuilder, InteractionType},
     p3_air::{Air, AirBuilder, BaseAir},
     p3_field::{Field, FieldAlgebra},
     p3_matrix::Matrix,
     rap::{BaseAirWithPublicValues, PartitionedBaseAir},
 };
-use openvm_stark_backend::air_builders::sub::SubAirBuilder;
+
 use crate::verify_batch::{columns::VerifyBatchCols, CHUNK};
 
 #[derive(Clone, Debug)]
@@ -210,8 +211,12 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             builder
                 .when(cell.is_exhausted)
                 .assert_eq(left_input[i], AB::F::ZERO);
-            
-            let mut when_inside_row_not_last = if i == CHUNK - 1 { builder.when(inside_row - end_inside_row) } else { builder.when(inside_row) };
+
+            let mut when_inside_row_not_last = if i == CHUNK - 1 {
+                builder.when(inside_row - end_inside_row)
+            } else {
+                builder.when(inside_row)
+            };
 
             // update state for normal cell
             when_inside_row_not_last
@@ -236,7 +241,11 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     &cell.read_row_pointer_and_length,
                 )
                 .eval(builder, inside_row * cell.is_first_in_row);
-            let mut when_inside_row_not_last = if i == CHUNK - 1 { builder.when(inside_row - end_inside_row) } else { builder.when(inside_row) };
+            let mut when_inside_row_not_last = if i == CHUNK - 1 {
+                builder.when(inside_row - end_inside_row)
+            } else {
+                builder.when(inside_row)
+            };
             when_inside_row_not_last
                 .when(next_cell.is_first_in_row)
                 .assert_eq(next_cell.opened_index, cell.opened_index + AB::F::ONE);
@@ -463,7 +472,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 &read_final_height_or_sibling_array_start,
             )
             .eval(builder, incorporate_sibling);
-        
+
         for i in 0..CHUNK {
             builder
                 .when(next.incorporate_sibling)
@@ -476,7 +485,10 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
             self.memory_bridge
                 .read(
-                    MemoryAddress::new(address_space, sibling_array_start + AB::F::from_canonical_usize(i)),
+                    MemoryAddress::new(
+                        address_space,
+                        sibling_array_start + AB::F::from_canonical_usize(i),
+                    ),
                     [(root_is_on_right * left_input[i])
                         + ((AB::Expr::ONE - root_is_on_right) * right_input[i])],
                     timestamp_after_end_operations.clone() + AB::F::from_canonical_usize(2 + i),
