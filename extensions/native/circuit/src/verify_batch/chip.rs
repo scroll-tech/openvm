@@ -54,7 +54,7 @@ impl<F: PrimeField32> VerifyBatchRecord<F> {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(bound = "F: Field")]
-pub(super) struct TopLevelRecord<F: Field> {
+pub struct TopLevelRecord<F: Field> {
     // must be present in first record
     pub incorporate_row: Option<IncorporateRowRecord<F>>,
     // must be present in all bust last record
@@ -63,7 +63,7 @@ pub(super) struct TopLevelRecord<F: Field> {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(bound = "F: Field")]
-pub(super) struct IncorporateSiblingRecord<F: Field> {
+pub struct IncorporateSiblingRecord<F: Field> {
     pub read_sibling_array_start: RecordId,
     pub read_root_is_on_right: RecordId,
     pub root_is_on_right: bool,
@@ -73,7 +73,7 @@ pub(super) struct IncorporateSiblingRecord<F: Field> {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(bound = "F: Field")]
-pub(super) struct IncorporateRowRecord<F: Field> {
+pub struct IncorporateRowRecord<F: Field> {
     pub chunks: Vec<InsideRowRecord<F>>,
     pub initial_opened_index: usize,
     pub final_opened_index: usize,
@@ -84,13 +84,13 @@ pub(super) struct IncorporateRowRecord<F: Field> {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(bound = "F: Field")]
-pub(super) struct InsideRowRecord<F: Field> {
+pub struct InsideRowRecord<F: Field> {
     pub cells: Vec<CellRecord>,
     pub p2_input: [F; 2 * CHUNK],
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub(super) struct CellRecord {
+pub struct CellRecord {
     pub read: RecordId,
     pub opened_index: usize,
     pub read_row_pointer_and_length: Option<RecordId>,
@@ -240,7 +240,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
 
                 loop {
                     let mut cells = vec![];
-                    let mut chunk = [F::ZERO; CHUNK];
                     for i in 0..CHUNK {
                         let read_row_pointer_and_length = if is_first_in_segment
                             || row_pointer == row_end
@@ -279,14 +278,13 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                             row_pointer,
                             row_end,
                         });
-                        chunk[i] = value;
+                        rolling_hash[i] = value;
                         row_pointer += 1;
                     }
                     if cells.is_empty() {
                         break;
                     }
                     let cells_len = cells.len();
-                    rolling_hash[..CHUNK].copy_from_slice(&chunk[..CHUNK]);
                     chunks.push(InsideRowRecord {
                         cells,
                         p2_input: rolling_hash,

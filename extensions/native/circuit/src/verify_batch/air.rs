@@ -196,6 +196,19 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
         // left input
 
+        // handle exhausted cells on next row
+
+        for i in 0..CHUNK {
+            builder
+                .when(inside_row - end_inside_row)
+                .when(next.cells[i].is_exhausted)
+                .assert_eq(next_left_input[i], left_output[i]);
+            builder
+                .when(end.clone())
+                .when(next.cells[i].is_exhausted)
+                .assert_zero(next_left_input[i]);
+        }
+
         for i in 0..CHUNK {
             let cell = cells[i];
             let next_cell = if i + 1 == CHUNK {
@@ -217,9 +230,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     &cell.read,
                 )
                 .eval(builder, inside_row * not(cell.is_exhausted));
-            builder
-                .when(cell.is_exhausted)
-                .assert_eq(left_input[i], AB::F::ZERO);
 
             let mut when_inside_row_not_last = if i == CHUNK - 1 {
                 builder.when(inside_row - end_inside_row)

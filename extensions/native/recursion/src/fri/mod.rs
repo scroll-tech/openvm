@@ -1,8 +1,8 @@
 pub use domain::*;
 use openvm_native_compiler::{
     ir::{
-        Array, ArrayLike, Builder, Config, Ext, ExtensionOperand, Felt, Ptr, RVar, SymbolicVar,
-        Usize, Var, DIGEST_SIZE,
+        Array, ArrayLike, Builder, Config, Ext, ExtensionOperand, Felt, RVar, SymbolicVar, Usize,
+        Var,
     },
     prelude::MemVariable,
 };

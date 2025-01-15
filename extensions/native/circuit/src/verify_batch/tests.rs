@@ -1,3 +1,5 @@
+use std::cmp::min;
+
 use openvm_circuit::{
     arch::testing::{memory::gen_pointer, VmChipTestBuilder},
     system::memory::CHUNK,
@@ -33,17 +35,13 @@ fn compute_commit<F: Field>(
             concat.extend(opened[opened_index].clone());
             opened_index += 1;
         }
-        while concat.len() % CHUNK != 0 {
-            concat.push(F::ZERO);
-        }
         if !concat.is_empty() {
             let mut left = [F::ZERO; CHUNK];
             let mut right = [F::ZERO; CHUNK];
             for i in (0..concat.len()).step_by(CHUNK) {
-                let chunk = std::array::from_fn(|j| concat[i + j]);
-                let (new_left, new_right) = hash_function(chunk, right);
-                left = new_left;
-                right = new_right;
+                left[..(min(i + CHUNK, concat.len()) - i)]
+                    .copy_from_slice(&concat[i..min(i + CHUNK, concat.len())]);
+                (left, right) = hash_function(left, right);
             }
             root = if height == dim[0] {
                 left

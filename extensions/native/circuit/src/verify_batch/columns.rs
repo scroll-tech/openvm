@@ -85,6 +85,7 @@ pub struct VerifyBatchCellCols<T, const SBOX_REGISTERS: usize> {
     pub read_row_pointer_and_length: MemoryReadAuxCols<T>,
     pub row_pointer: T,
     pub row_end: T,
+    // flags cannot be shared
     pub is_first_in_row: T,
     pub is_exhausted: T,
 }
