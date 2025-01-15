@@ -191,6 +191,7 @@ fn test_vm_override_executor_height() {
                 (ChipId::Executor(7), 0),
                 (ChipId::Executor(8), 0),
                 (ChipId::Executor(9), 0),
+                (ChipId::Executor(10), 0),
             ]
             .into_iter()
             .collect(),
@@ -216,6 +217,7 @@ fn test_vm_override_executor_height() {
             (ChipId::Executor(7), 2048),
             (ChipId::Executor(8), 4096),
             (ChipId::Executor(9), 8192),
+            (ChipId::Executor(10), 16384),
         ]
         .into_iter()
         .collect(),
@@ -240,7 +242,7 @@ fn test_vm_override_executor_height() {
     // heights by hands whenever something changes.
     assert_eq!(
         air_heights,
-        vec![2, 2, 16, 1, 8, 4, 2, 8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 262144]
+        vec![2, 2, 16, 1, 8, 4, 2, 16384, 8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 262144]
     );
 }
 
