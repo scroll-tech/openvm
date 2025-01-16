@@ -18,7 +18,10 @@ use openvm_stark_backend::{
 
 use crate::{
     chip::NUM_INITIAL_READS,
-    verify_batch::{columns::VerifyBatchCols, CHUNK},
+    verify_batch::{
+        columns::{InsideRowSpecificCols, TopLevelSpecificCols, VerifyBatchCols},
+        CHUNK,
+    },
 };
 
 #[derive(Clone, Debug)]
@@ -58,46 +61,20 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         let next: &VerifyBatchCols<AB::Var, SBOX_REGISTERS> = (*next).borrow();
 
         let &VerifyBatchCols {
+            inner: _,
             incorporate_row,
             incorporate_sibling,
             inside_row,
             end_inside_row,
             end_top_level,
             start_top_level,
-            pc,
             very_first_timestamp,
             start_timestamp,
-            end_timestamp,
-            dim_register,
-            opened_register,
-            opened_length_register,
-            sibling_register,
-            index_register,
-            commit_register,
             opened_element_size_inv,
-            cells,
             initial_opened_index,
-            final_opened_index,
-            height,
-            opened_length,
-            dim_base_pointer,
             opened_base_pointer,
-            sibling_base_pointer,
-            index_base_pointer,
-            read_initial_height_or_root_is_on_right,
-            read_final_height_or_sibling_array_start,
-            dim_base_pointer_read,
-            opened_base_pointer_read,
-            opened_length_read,
-            sibling_base_pointer_read,
-            index_base_pointer_read,
-            commit_pointer_read,
-            root_is_on_right,
-            commit_pointer,
-            commit_read,
-            proof_index,
-            sibling_array_start,
-            ..
+            is_exhausted,
+            specific,
         } = local;
 
         let left_input = std::array::from_fn::<_, CHUNK, _>(|i| local.inner.inputs[i]);
@@ -136,11 +113,18 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
         //// inside row constraints
 
+        let inside_row_specific: &InsideRowSpecificCols<AB::Var> =
+            specific[..InsideRowSpecificCols::<AB::Var>::width()].borrow();
+        let cells = inside_row_specific.cells;
+        let next_inside_row_specific: &InsideRowSpecificCols<AB::Var> =
+            next.specific[..InsideRowSpecificCols::<AB::Var>::width()].borrow();
+        let next_cells = next_inside_row_specific.cells;
+
         // start
         builder
             .when(end.clone())
             .when(next.inside_row)
-            .assert_eq(next.initial_opened_index, next.cells[0].opened_index);
+            .assert_eq(next.initial_opened_index, next_cells[0].opened_index);
         builder
             .when(end.clone())
             .when(next.inside_row)
@@ -201,27 +185,35 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         for i in 0..CHUNK {
             builder
                 .when(inside_row - end_inside_row)
-                .when(next.cells[i].is_exhausted)
+                .when(next.is_exhausted[i])
                 .assert_eq(next_left_input[i], left_output[i]);
             builder
                 .when(end.clone())
-                .when(next.cells[i].is_exhausted)
+                .when(next.is_exhausted[i])
                 .assert_zero(next_left_input[i]);
         }
 
         for i in 0..CHUNK {
             let cell = cells[i];
             let next_cell = if i + 1 == CHUNK {
-                next.cells[0]
+                next_cells[0]
             } else {
                 cells[i + 1]
             };
+            let next_is_exhausted = if i + 1 == CHUNK {
+                next.is_exhausted[0]
+            } else {
+                is_exhausted[i + 1]
+            };
+            let is_exhausted = is_exhausted[i];
 
-            builder.assert_bool(cell.is_first_in_row);
-            builder.assert_bool(cell.is_exhausted);
-            builder.assert_bool(cell.is_first_in_row + cell.is_exhausted);
+            builder.when(inside_row).assert_bool(cell.is_first_in_row);
+            builder.assert_bool(is_exhausted);
+            builder
+                .when(inside_row)
+                .assert_bool(cell.is_first_in_row + is_exhausted);
 
-            let next_is_normal = AB::Expr::ONE - next_cell.is_first_in_row - next_cell.is_exhausted;
+            let next_is_normal = AB::Expr::ONE - next_cell.is_first_in_row - next_is_exhausted;
             self.memory_bridge
                 .read(
                     MemoryAddress::new(self.address_space, cell.row_pointer),
@@ -229,13 +221,14 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     start_timestamp + AB::F::from_canonical_usize((2 * i) + 1),
                     &cell.read,
                 )
-                .eval(builder, inside_row * not(cell.is_exhausted));
+                .eval(builder, inside_row * not(is_exhausted));
 
             let mut when_inside_row_not_last = if i == CHUNK - 1 {
                 builder.when(inside_row - end_inside_row)
             } else {
                 builder.when(inside_row)
             };
+            // everthing above oks
 
             // update state for normal cell
             when_inside_row_not_last
@@ -273,18 +266,18 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 .assert_eq(next_cell.opened_index, cell.opened_index + AB::F::ONE);
 
             when_inside_row_not_last
-                .when(next_cell.is_exhausted)
+                .when(next_is_exhausted)
                 .assert_eq(next_cell.opened_index, cell.opened_index);
 
             when_inside_row_not_last
-                .when(cell.is_exhausted)
-                .assert_eq(next_cell.is_exhausted, AB::F::ONE);
+                .when(is_exhausted)
+                .assert_eq(next_is_exhausted, AB::F::ONE);
 
             let is_last_in_row = if i == CHUNK - 1 {
                 end_inside_row.into()
             } else {
-                next_cell.is_first_in_row + next_cell.is_exhausted
-            } - cell.is_exhausted;
+                next_cell.is_first_in_row + next_is_exhausted
+            } - is_exhausted;
             builder
                 .when(inside_row)
                 .when(is_last_in_row)
@@ -293,10 +286,45 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
         //// top level constraints
 
+        let top_level_specific: &TopLevelSpecificCols<AB::Var> =
+            specific[..TopLevelSpecificCols::<AB::Var>::width()].borrow();
+        let &TopLevelSpecificCols {
+            pc,
+            end_timestamp,
+            dim_register,
+            opened_register,
+            opened_length_register,
+            sibling_register,
+            index_register,
+            commit_register,
+            final_opened_index,
+            height,
+            opened_length,
+            dim_base_pointer,
+            sibling_base_pointer,
+            index_base_pointer,
+            dim_base_pointer_read,
+            opened_base_pointer_read,
+            opened_length_read,
+            sibling_base_pointer_read,
+            index_base_pointer_read,
+            commit_pointer_read,
+            proof_index,
+            read_initial_height_or_root_is_on_right,
+            read_final_height_or_sibling_array_start,
+            root_is_on_right,
+            sibling_array_start,
+            reads,
+            commit_pointer,
+            commit_read,
+        } = top_level_specific;
+        let next_top_level_specific: &TopLevelSpecificCols<AB::Var> =
+            next.specific[..TopLevelSpecificCols::<AB::Var>::width()].borrow();
+
         builder
             .when(end.clone())
             .when(next.incorporate_row + next.incorporate_sibling)
-            .assert_eq(next.proof_index, AB::F::ZERO);
+            .assert_eq(next_top_level_specific.proof_index, AB::F::ZERO);
 
         let timestamp_after_initial_reads =
             start_timestamp + AB::F::from_canonical_usize(NUM_INITIAL_READS);
@@ -383,13 +411,20 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         let mut when_top_level_not_end =
             builder.when(incorporate_row + incorporate_sibling - end_top_level);
 
-        when_top_level_not_end.assert_eq(next.dim_base_pointer, dim_base_pointer);
+        when_top_level_not_end
+            .assert_eq(next_top_level_specific.dim_base_pointer, dim_base_pointer);
 
         when_top_level_not_end.assert_eq(next.opened_base_pointer, opened_base_pointer);
-        when_top_level_not_end.assert_eq(next.sibling_base_pointer, sibling_base_pointer);
-        when_top_level_not_end.assert_eq(next.index_base_pointer, index_base_pointer);
+        when_top_level_not_end.assert_eq(
+            next_top_level_specific.sibling_base_pointer,
+            sibling_base_pointer,
+        );
+        when_top_level_not_end.assert_eq(
+            next_top_level_specific.index_base_pointer,
+            index_base_pointer,
+        );
         when_top_level_not_end.assert_eq(next.start_timestamp, end_timestamp);
-        when_top_level_not_end.assert_eq(next.opened_length, opened_length);
+        when_top_level_not_end.assert_eq(next_top_level_specific.opened_length, opened_length);
         when_top_level_not_end.assert_eq(next.opened_element_size_inv, opened_element_size_inv);
         when_top_level_not_end
             .assert_eq(next.initial_opened_index, final_opened_index + AB::F::ONE);
@@ -397,19 +432,22 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         builder
             .when(incorporate_sibling)
             .when(AB::Expr::ONE - end_top_level)
-            .assert_eq(next.height * AB::F::TWO, height);
+            .assert_eq(next_top_level_specific.height * AB::F::TWO, height);
         builder
             .when(incorporate_row)
             .when(AB::Expr::ONE - end_top_level)
-            .assert_eq(next.height, height);
+            .assert_eq(next_top_level_specific.height, height);
         builder
             .when(incorporate_sibling)
             .when(AB::Expr::ONE - end_top_level)
-            .assert_eq(next.proof_index, proof_index + AB::F::ONE);
+            .assert_eq(
+                next_top_level_specific.proof_index,
+                proof_index + AB::F::ONE,
+            );
         builder
             .when(incorporate_row)
             .when(AB::Expr::ONE - end_top_level)
-            .assert_eq(next.proof_index, proof_index);
+            .assert_eq(next_top_level_specific.proof_index, proof_index);
 
         builder
             .when(end_top_level)
@@ -512,11 +550,11 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         for i in 0..CHUNK {
             builder
                 .when(next.incorporate_sibling)
-                .when(next.root_is_on_right)
+                .when(next_top_level_specific.root_is_on_right)
                 .assert_eq(next_right_input[i], left_output[i]);
             builder
                 .when(next.incorporate_sibling)
-                .when(AB::Expr::ONE - next.root_is_on_right)
+                .when(AB::Expr::ONE - next_top_level_specific.root_is_on_right)
                 .assert_eq(next_left_input[i], left_output[i]);
 
             self.memory_bridge
@@ -528,7 +566,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     [(root_is_on_right * left_input[i])
                         + ((AB::Expr::ONE - root_is_on_right) * right_input[i])],
                     timestamp_after_initial_reads.clone() + AB::F::from_canonical_usize(2 + i),
-                    &cells[i].read,
+                    &reads[i],
                 )
                 .eval(builder, incorporate_sibling);
         }
