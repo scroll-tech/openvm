@@ -12,7 +12,7 @@ openvm-algebra-circuit = { workspace = true }
 openvm-algebra-transpiler = { workspace = true }
 openvm-bigint-circuit = { workspace = true }
 openvm-bigint-transpiler = { workspace = true }
-openvm-build = { workspace = true, optional = true }
+openvm-build = { workspace = true }
 openvm-ecc-circuit = { workspace = true }
 openvm-ecc-transpiler = { workspace = true }
 openvm-keccak256-circuit = { workspace = true }
@@ -46,13 +46,8 @@ tracing.workspace = true
 itertools.workspace = true
 getset.workspace = true
 
-
-[dev-dependencies]
-openvm-build = { workspace = true }
-
 [features]
-default = ["parallel", "build"]
-build = ["dep:openvm-build"]
+default = ["parallel"]
 bench-metrics = [
     "openvm-circuit/bench-metrics",
     "openvm-native-recursion/bench-metrics",
