@@ -3,6 +3,7 @@ use openvm_stark_sdk::config::FriParameters;
 
 pub const DEFAULT_MANIFEST_DIR: &str = ".";
 
+pub const DEFAULT_ROOT_PK_PATH: &str = concat!(env!("HOME"), "/.openvm/root.pk");
 pub const DEFAULT_AGG_PK_PATH: &str = concat!(env!("HOME"), "/.openvm/agg.pk");
 pub const DEFAULT_VERIFIER_PATH: &str = concat!(env!("HOME"), "/.openvm/verifier.sol");
 pub const DEFAULT_PARAMS_DIR: &str = concat!(env!("HOME"), "/.openvm/params/");
@@ -12,6 +13,7 @@ pub const DEFAULT_APP_EXE_PATH: &str = "./openvm/app.vmexe";
 pub const DEFAULT_APP_PK_PATH: &str = "./openvm/app.pk";
 pub const DEFAULT_APP_VK_PATH: &str = "./openvm/app.vk";
 pub const DEFAULT_APP_PROOF_PATH: &str = "./openvm/app.proof";
+pub const DEFAULT_ROOT_PROOF_PATH: &str = "./openvm/root.proof";
 pub const DEFAULT_EVM_PROOF_PATH: &str = "./openvm/evm.proof";
 
 pub fn default_app_config() -> AppConfig<SdkVmConfig> {

@@ -24,6 +24,7 @@ use openvm_native_circuit::{
     CastFExtension, CastFExtensionExecutor, CastFExtensionPeriphery, Native, NativeExecutor,
     NativePeriphery,
 };
+use openvm_native_transpiler::LongFormTranspilerExtension;
 use openvm_pairing_circuit::{
     PairingExtension, PairingExtensionExecutor, PairingExtensionPeriphery,
 };
@@ -156,7 +157,7 @@ impl SdkVmConfig {
         if self.ecc.is_some() {
             transpiler = transpiler.with_extension(EccTranspilerExtension);
         }
-        transpiler
+        transpiler.with_extension(LongFormTranspilerExtension)
     }
 }
 

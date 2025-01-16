@@ -10,11 +10,13 @@ use eyre::{eyre, Result};
 use openvm_native_recursion::halo2::utils::CacheHalo2ParamsReader;
 use openvm_sdk::{
     config::AggConfig,
-    fs::{write_agg_pk_to_file, write_evm_verifier_to_file},
+    fs::{write_agg_pk_to_file, write_evm_verifier_to_file, write_root_pk_to_file},
     Sdk,
 };
 
-use crate::default::{DEFAULT_AGG_PK_PATH, DEFAULT_PARAMS_DIR, DEFAULT_VERIFIER_PATH};
+use crate::default::{
+    DEFAULT_AGG_PK_PATH, DEFAULT_PARAMS_DIR, DEFAULT_ROOT_PK_PATH, DEFAULT_VERIFIER_PATH,
+};
 
 #[derive(Parser)]
 #[command(
@@ -45,6 +47,9 @@ impl EvmProvingSetupCmd {
 
         println!("Generating verifier contract...");
         let verifier = Sdk.generate_snark_verifier_contract(&params_reader, &agg_pk)?;
+
+        println!("Writing stark proving key to file...");
+        write_root_pk_to_file(agg_pk.agg_stark_pk.clone(), DEFAULT_ROOT_PK_PATH)?;
 
         println!("Writing proving key to file...");
         write_agg_pk_to_file(agg_pk, DEFAULT_AGG_PK_PATH)?;
