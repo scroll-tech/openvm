@@ -6,6 +6,7 @@ use commit::commit_app_exe;
 use config::AppConfig;
 use eyre::Result;
 use keygen::{AggStarkProvingKey, AppProvingKey, AppVerifyingKey};
+#[cfg(feature = "build")]
 use openvm_build::{
     build_guest_package, find_unique_executable, get_package, GuestOptions, TargetFilter,
 };
@@ -68,6 +69,7 @@ pub type NonRootCommittedExe = VmCommittedExe<SC>;
 pub struct Sdk;
 
 impl Sdk {
+    #[cfg(feature = "build")]
     pub fn build<P: AsRef<Path>>(
         &self,
         guest_opts: GuestOptions,
