@@ -17,8 +17,8 @@ use openvm_instructions::{
 };
 use openvm_native_compiler::{
     CastfOpcode, FieldArithmeticOpcode, FieldExtensionOpcode, FriOpcode, NativeBranchEqualOpcode,
-    NativeJalOpcode, NativeLoadStoreOpcode, NativePhantom, BLOCK_LOAD_STORE_OPCODES,
-    BLOCK_LOAD_STORE_SIZE, SINGLE_LOAD_STORE_OPCODES,
+    NativeJalOpcode, NativeLoadStore4Opcode, NativeLoadStoreOpcode, NativePhantom,
+    BLOCK_LOAD_STORE_SIZE,
 };
 use openvm_poseidon2_air::Poseidon2Config;
 use openvm_rv32im_circuit::{
@@ -124,9 +124,7 @@ impl<F: PrimeField32> VmExtension<F> for Native {
 
         inventory.add_executor(
             load_store_chip,
-            SINGLE_LOAD_STORE_OPCODES
-                .iter()
-                .map(|&opcode| VmOpcode::with_default_offset(opcode)),
+            NativeLoadStoreOpcode::iter().map(VmOpcode::with_default_offset),
         )?;
 
         let mut block_load_store_chip = NativeLoadStoreChip::<F, BLOCK_LOAD_STORE_SIZE>::new(
@@ -134,9 +132,9 @@ impl<F: PrimeField32> VmExtension<F> for Native {
                 execution_bus,
                 program_bus,
                 memory_bridge,
-                NativeLoadStoreOpcode::default_offset(),
+                NativeLoadStore4Opcode::default_offset(),
             ),
-            NativeLoadStoreCoreChip::new(NativeLoadStoreOpcode::default_offset()),
+            NativeLoadStoreCoreChip::new(NativeLoadStore4Opcode::default_offset()),
             offline_memory.clone(),
         );
         block_load_store_chip
@@ -145,9 +143,7 @@ impl<F: PrimeField32> VmExtension<F> for Native {
 
         inventory.add_executor(
             block_load_store_chip,
-            BLOCK_LOAD_STORE_OPCODES
-                .iter()
-                .map(|&opcode| VmOpcode::with_default_offset(opcode)),
+            NativeLoadStore4Opcode::iter().map(VmOpcode::with_default_offset),
         )?;
 
         let branch_equal_chip = NativeBranchEqChip::new(
