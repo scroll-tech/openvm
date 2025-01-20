@@ -24,6 +24,7 @@ use openvm_native_circuit::{
     CastFExtension, CastFExtensionExecutor, CastFExtensionPeriphery, Native, NativeExecutor,
     NativePeriphery,
 };
+use openvm_native_transpiler::LongFormTranspilerExtension;
 use openvm_pairing_circuit::{
     PairingExtension, PairingExtensionExecutor, PairingExtensionPeriphery,
 };
@@ -53,6 +54,7 @@ pub struct SdkVmConfig {
     pub keccak: Option<UnitStruct>,
     pub sha256: Option<UnitStruct>,
     pub native: Option<UnitStruct>,
+    pub castf: Option<UnitStruct>,
 
     pub rv32m: Option<Rv32M>,
     pub bigint: Option<Int256>,
@@ -60,7 +62,6 @@ pub struct SdkVmConfig {
     pub fp2: Option<Fp2Extension>,
     pub pairing: Option<PairingExtension>,
     pub ecc: Option<WeierstrassExtension>,
-    pub castf: Option<CastFExtension>,
 }
 
 #[derive(ChipUsageGetter, Chip, InstructionExecutor, From, AnyEnum, BytesStateful)]
@@ -156,7 +157,7 @@ impl SdkVmConfig {
         if self.ecc.is_some() {
             transpiler = transpiler.with_extension(EccTranspilerExtension);
         }
-        transpiler
+        transpiler.with_extension(LongFormTranspilerExtension)
     }
 }
 
@@ -192,6 +193,9 @@ impl<F: PrimeField32> VmConfig<F> for SdkVmConfig {
         if self.native.is_some() {
             complex = complex.extend(&Native)?;
         }
+        if self.castf.is_some() {
+            complex = complex.extend(&CastFExtension)?;
+        }
 
         if let Some(rv32m) = self.rv32m {
             let mut rv32m = rv32m;
@@ -224,9 +228,6 @@ impl<F: PrimeField32> VmConfig<F> for SdkVmConfig {
         }
         if let Some(ref ecc) = self.ecc {
             complex = complex.extend(ecc)?;
-        }
-        if let Some(ref castf) = self.castf {
-            complex = complex.extend(castf)?;
         }
 
         Ok(complex)
@@ -283,6 +284,12 @@ impl From<Sha256> for UnitStruct {
 
 impl From<Native> for UnitStruct {
     fn from(_: Native) -> Self {
+        UnitStruct {}
+    }
+}
+
+impl From<CastFExtension> for UnitStruct {
+    fn from(_: CastFExtension) -> Self {
         UnitStruct {}
     }
 }

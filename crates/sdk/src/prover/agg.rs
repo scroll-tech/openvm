@@ -87,6 +87,20 @@ impl AggStarkProver {
         })
     }
 
+    /// Generate a root stark proof to aggregate app proofs.
+    pub fn generate_root_proof(
+        &self,
+        app_proofs: ContinuationVmProof<SC>,
+    ) -> RootVmVerifierInput<SC> {
+        let leaf_proofs = self.leaf_prover.generate_proof(&app_proofs);
+        let public_values = app_proofs.user_public_values.public_values;
+        let internal_proof = self.generate_internal_proof_impl(leaf_proofs, &public_values);
+        RootVmVerifierInput {
+            proofs: vec![internal_proof],
+            public_values,
+        }
+    }
+
     fn generate_internal_proof_impl(
         &self,
         leaf_proofs: Vec<Proof<SC>>,

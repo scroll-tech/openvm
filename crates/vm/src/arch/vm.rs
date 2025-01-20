@@ -255,6 +255,7 @@ pub struct SingleSegmentVmExecutor<F, VC> {
 }
 
 /// Execution result of a single segment VM execution.
+#[derive(Debug)]
 pub struct SingleSegmentVmExecutionResult<F> {
     /// All user public values
     pub public_values: Vec<Option<F>>,
