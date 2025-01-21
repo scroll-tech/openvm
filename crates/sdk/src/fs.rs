@@ -9,8 +9,9 @@ use openvm_native_recursion::halo2::{wrapper::EvmVerifier, EvmProof};
 use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{
-    keygen::{AggProvingKey, AppProvingKey, AppVerifyingKey},
+    keygen::{AggProvingKey, AggStarkProvingKey, AppProvingKey, AppVerifyingKey},
     prover::vm::ContinuationVmProof,
+    verifier::root::types::RootVmVerifierInput,
     F, SC,
 };
 
@@ -54,12 +55,31 @@ pub fn write_app_proof_to_file<P: AsRef<Path>>(
     write_to_file_bitcode(path, proof)
 }
 
+pub fn write_root_proof_to_file<P: AsRef<Path>>(
+    proof: RootVmVerifierInput<SC>,
+    path: P,
+) -> Result<()> {
+    write_to_file_bitcode(path, proof)
+}
+
 pub fn read_agg_pk_from_file<P: AsRef<Path>>(path: P) -> Result<AggProvingKey> {
     read_from_file_bitcode(path)
 }
 
+pub fn read_root_pk_from_file<P: AsRef<Path>>(path: P) -> Result<AggStarkProvingKey> {
+    read_from_file_bitcode(path)
+}
+
+pub fn write_root_pk_to_file<P: AsRef<Path>>(agg_pk: AggStarkProvingKey, path: P) -> Result<()> {
+    write_to_file_bitcode(path, agg_pk)
+}
+
 pub fn write_agg_pk_to_file<P: AsRef<Path>>(agg_pk: AggProvingKey, path: P) -> Result<()> {
     write_to_file_bitcode(path, agg_pk)
+}
+
+pub fn read_root_proof_from_file<P: AsRef<Path>>(path: P) -> Result<RootVmVerifierInput<SC>> {
+    read_from_file_bitcode(path)
 }
 
 pub fn read_evm_proof_from_file<P: AsRef<Path>>(path: P) -> Result<EvmProof> {

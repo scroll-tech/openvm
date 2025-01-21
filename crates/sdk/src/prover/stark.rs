@@ -6,6 +6,7 @@ use openvm_stark_backend::{prover::types::Proof, Chip};
 use crate::{
     keygen::{AggStarkProvingKey, AppProvingKey},
     prover::{agg::AggStarkProver, app::AppProver},
+    verifier::root::types::RootVmVerifierInput,
     NonRootCommittedExe, RootSC, StdIn, F, SC,
 };
 
@@ -49,5 +50,14 @@ impl<VC> StarkProver<VC> {
     {
         let app_proof = self.app_prover.generate_app_proof(input);
         self.agg_prover.generate_agg_proof(app_proof)
+    }
+    pub fn generate_proof_for_root_program(&self, input: StdIn) -> RootVmVerifierInput<SC>
+    where
+        VC: VmConfig<F>,
+        VC::Executor: Chip<SC>,
+        VC::Periphery: Chip<SC>,
+    {
+        let app_proof = self.app_prover.generate_app_proof(input);
+        self.agg_prover.generate_root_proof(app_proof)
     }
 }
