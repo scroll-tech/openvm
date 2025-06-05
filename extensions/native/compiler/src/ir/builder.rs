@@ -620,6 +620,10 @@ impl<C: Config> Builder<C> {
         self.witness_space.get(id.value()).unwrap()
     }
 
+    pub fn ext_from_base_vec(&mut self, ext: Ext<C::F, C::EF>, base_vec: Vec<Felt<C::F>>) {
+        self.push(DslIr::ExtFromBaseVec(ext, base_vec));
+    }
+
     /// Throws an error.
     pub fn error(&mut self) {
         self.operations.trace_push(DslIr::Error());
