@@ -1,6 +1,8 @@
 use openvm_native_compiler_derive::iter_zip;
 use openvm_stark_backend::p3_field::FieldAlgebra;
 
+use crate::ir::Variable;
+
 use super::{Array, ArrayLike, Builder, Config, DslIr, Ext, Felt, MemIndex, Ptr, Usize, Var};
 
 pub const DIGEST_SIZE: usize = 8;
@@ -8,6 +10,38 @@ pub const HASH_RATE: usize = 8;
 pub const PERMUTATION_WIDTH: usize = 16;
 
 impl<C: Config> Builder<C> {
+    /// Extends native VM ability to observe multiple base elements in one opcode operation
+    /// Absorbs elements sequentially at the RATE portion of sponge state and performs as many permutations as necessary.
+    /// Returns the index position of the input_ptr and the final sponge state.
+    /// 
+    /// [Reference](https://docs.rs/p3-poseidon2/latest/p3_poseidon2/struct.Poseidon2.html)
+    pub fn poseidon2_multi_observe(
+        &mut self, 
+        sponge_state: &Array<C, Felt<C::F>>, 
+        input_ptr: Ptr<C::N>,
+        io_full_ptr: Ptr<C::N>,
+        arr: &Array<C, Felt<C::F>>,
+    ) -> Usize<C::N> {
+        match sponge_state {
+            Array::Fixed(values) => {
+                panic!("Poseidon2 permutation is not allowed on fixed arrays");
+            }
+            Array::Dyn(ptr, len) => {
+                let init_pos: Var<C::N> = Var::uninit(self);
+                self.assign(&init_pos, io_full_ptr.address - input_ptr.address);
+
+                self.operations.push(DslIr::Poseidon2MultiObserve(
+                    sponge_state.clone(),
+                    init_pos,
+                    *ptr,
+                    len.clone(),
+                ));
+
+                Usize::Var(init_pos)
+            }
+        }
+    }
+
     /// Applies the Poseidon2 permutation to the given array.
     ///
     /// [Reference](https://docs.rs/p3-poseidon2/latest/p3_poseidon2/struct.Poseidon2.html)
