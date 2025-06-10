@@ -198,7 +198,7 @@ pub enum DslIr<C: Config> {
     CircuitPoseidon2Permute([Var<C::N>; 3]),
     /// Absorbs an array of baby bear elements into a duplex transcript with Poseidon2 permutations (output = p2_multi_observe(array, els)).
     Poseidon2MultiObserve(
-        Array<C, Felt<C::F>>,   // sponge_state (array)
+        Ptr<C::N>,              // sponge_state
         Var<C::N>,              // initial input_ptr position
         Ptr<C::N>,              // input array (els)
         Usize<C::N>,            // len of els

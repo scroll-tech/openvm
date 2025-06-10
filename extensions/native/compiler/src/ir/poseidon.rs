@@ -16,28 +16,38 @@ impl<C: Config> Builder<C> {
     /// 
     /// [Reference](https://docs.rs/p3-poseidon2/latest/p3_poseidon2/struct.Poseidon2.html)
     pub fn poseidon2_multi_observe(
-        &mut self, 
+        &mut self,
         sponge_state: &Array<C, Felt<C::F>>, 
         input_ptr: Ptr<C::N>,
         io_full_ptr: Ptr<C::N>,
         arr: &Array<C, Felt<C::F>>,
     ) -> Usize<C::N> {
+        let buffer_size: Var<C::N> = Var::uninit(self);
+        self.assign(&buffer_size, C::N::from_canonical_usize(HASH_RATE));
+
         match sponge_state {
-            Array::Fixed(values) => {
+            Array::Fixed(_) => {
                 panic!("Poseidon2 permutation is not allowed on fixed arrays");
             }
-            Array::Dyn(ptr, len) => {
-                let init_pos: Var<C::N> = Var::uninit(self);
-                self.assign(&init_pos, io_full_ptr.address - input_ptr.address);
+            Array::Dyn(sponge_ptr, _) => {
+                match arr {
+                    Array::Fixed(_) => {
+                        panic!("Base elements input must be dynamic");
+                    }
+                    Array::Dyn(ptr, len) => {
+                        let init_pos: Var<C::N> = Var::uninit(self);
+                        self.assign(&init_pos, buffer_size - (io_full_ptr.address - input_ptr.address));
 
-                self.operations.push(DslIr::Poseidon2MultiObserve(
-                    sponge_state.clone(),
-                    init_pos,
-                    *ptr,
-                    len.clone(),
-                ));
+                        self.operations.push(DslIr::Poseidon2MultiObserve(
+                            *sponge_ptr,
+                            init_pos,
+                            *ptr,
+                            len.clone(),
+                        ));
 
-                Usize::Var(init_pos)
+                        Usize::Var(init_pos)
+                    }
+                }
             }
         }
     }

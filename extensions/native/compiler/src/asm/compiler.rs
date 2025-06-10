@@ -490,13 +490,10 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
                     self.push(AsmInstruction::HintBits(var.fp(), len), debug_info);
                 }
                 DslIr::Poseidon2MultiObserve(dst, init_pos, arr_ptr, len) => {
-                    match dst {
-                        Array::Dyn(dst, _) => self.push(
-                AsmInstruction::Poseidon2MultiObserve(dst.fp(), init_pos.fp(), arr_ptr.fp(), len.get_var().fp()),
-                            debug_info,
-                        ),
-                        _ => unimplemented!(),
-                    }
+                    self.push(
+            AsmInstruction::Poseidon2MultiObserve(dst.fp(), init_pos.fp(), arr_ptr.fp(), len.get_var().fp()),
+                        debug_info,
+                    );
                 },
                 DslIr::Poseidon2PermuteBabyBear(dst, src) => match (dst, src) {
                     (Array::Dyn(dst, _), Array::Dyn(src, _)) => self.push(
