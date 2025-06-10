@@ -248,7 +248,7 @@ pub enum DslIr<C: Config> {
     /// Operation to halt the program. Should be the last instruction in the program.
     Halt,
 
-    /// Samples an ext from a vector of felts.
+    /// Packs a vector of felts into an ext.
     ExtFromBaseVec(Ext<C::F, C::EF>, Vec<Felt<C::F>>),
 
     // Public inputs for circuits.
