@@ -492,11 +492,11 @@ impl<C: Config + Debug> Halo2ConstraintCompiler<C> {
                     }
                     DslIr::CycleTrackerStart(_name) => {
                         #[cfg(feature = "bench-metrics")]
-                        cell_tracker.start(_name);
+                        cell_tracker.start(_name, 0);
                     }
                     DslIr::CycleTrackerEnd(_name) => {
                         #[cfg(feature = "bench-metrics")]
-                        cell_tracker.end(_name);
+                        cell_tracker.end(_name, 0);
                     }
                     DslIr::CircuitPublish(val, index) => {
                         public_values[index] = vars[&val.0];
