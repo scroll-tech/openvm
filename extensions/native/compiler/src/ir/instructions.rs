@@ -236,6 +236,9 @@ pub enum DslIr<C: Config> {
     /// Operation to halt the program. Should be the last instruction in the program.
     Halt,
 
+    /// Packs a vector of felts into an ext.
+    ExtFromBaseVec(Ext<C::F, C::EF>, Vec<Felt<C::F>>),
+
     // Public inputs for circuits.
     /// Publish a field element as the ith public value. Should only be used when target is a circuit.
     CircuitPublish(Var<C::N>, usize),

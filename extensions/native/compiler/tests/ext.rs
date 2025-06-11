@@ -35,7 +35,7 @@ fn test_ext2felt() {
 }
 
 #[test]
-fn test_ext_from_base_slice() {
+fn test_ext_from_base_vec() {
     const D: usize = 4;
     type F = BabyBear;
     type EF = BinomialExtensionField<BabyBear, D>;
@@ -52,8 +52,9 @@ fn test_ext_from_base_slice() {
     let val = EF::from_base_slice(base_slice);
     let expected: Ext<_, _> = builder.constant(val);
 
-    let felts = base_slice.map(|e| builder.constant::<Felt<_>>(e));
-    let actual = builder.ext_from_base_slice(&felts);
+    let felts = base_slice.map(|e| builder.constant::<Felt<_>>(e)).to_vec();
+    let actual = builder.uninit();
+    builder.ext_from_base_vec(actual, felts);
     builder.assert_ext_eq(actual, expected);
 
     builder.halt();
