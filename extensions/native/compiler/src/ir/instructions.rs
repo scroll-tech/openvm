@@ -212,7 +212,7 @@ pub enum DslIr<C: Config> {
     Poseidon2MultiObserve(
         Ptr<C::N>,              // sponge_state
         Var<C::N>,              // initial input_ptr position
-        Ptr<C::N>,              // input array (els)
+        Ptr<C::N>,              // input array (base elements)
         Usize<C::N>,            // len of els
     ),
 

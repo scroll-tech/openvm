@@ -490,14 +490,14 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                 a: output_register,
                 b: input_register_1,
                 c: input_register_2,
-                d: input_register_3,
+                d: data_address_space,
                 e: register_address_space,
-                f: data_address_space,
+                f: input_register_3,
                 ..
             } = instruction;
 
-            let (_, sponge_ptr) = memory.read_cell(data_address_space, output_register);
-            let (_, arr_ptr) = memory.read_cell(data_address_space, input_register_2);
+            let (_, sponge_ptr) = memory.read_cell(register_address_space, output_register);
+            let (_, arr_ptr) = memory.read_cell(register_address_space, input_register_2);
 
             let init_pos_read = memory.read_cell(register_address_space, input_register_1);
             let mut pos = init_pos_read.1.as_canonical_u32() as usize;
@@ -507,14 +507,14 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
 
             for i in 0..len {
                 let mod_pos = pos % CHUNK;
-                let n_read = memory.read_cell(register_address_space, arr_ptr + F::from_canonical_usize(i));
+                let n_read = memory.read_cell(data_address_space, arr_ptr + F::from_canonical_usize(i));
                 let n_f = n_read.1;
 
-                memory.write_cell(register_address_space, sponge_ptr + F::from_canonical_usize(mod_pos), n_f);
+                memory.write_cell(data_address_space, sponge_ptr + F::from_canonical_usize(mod_pos), n_f);
                 pos += 1;
 
                 if pos % CHUNK == 0 {
-                    let (_, sponge_state) = memory.read::<{CHUNK * 2}>(register_address_space, sponge_ptr);
+                    let (_, sponge_state) = memory.read::<{CHUNK * 2}>(data_address_space, sponge_ptr);
                     let output = self.subchip.permute(sponge_state);
                     memory.write::<{CHUNK * 2}>(data_address_space, sponge_ptr, std::array::from_fn(|i| output[i]));
                 }
