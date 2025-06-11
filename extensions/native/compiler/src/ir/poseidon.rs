@@ -12,14 +12,13 @@ pub const PERMUTATION_WIDTH: usize = 16;
 impl<C: Config> Builder<C> {
     /// Extends native VM ability to observe multiple base elements in one opcode operation
     /// Absorbs elements sequentially at the RATE portion of sponge state and performs as many permutations as necessary.
-    /// Returns the index position of the input_ptr and the final sponge state.
+    /// Returns the index position of the next input_ptr.
     /// 
     /// [Reference](https://docs.rs/p3-poseidon2/latest/p3_poseidon2/struct.Poseidon2.html)
     pub fn poseidon2_multi_observe(
         &mut self,
         sponge_state: &Array<C, Felt<C::F>>, 
         input_ptr: Ptr<C::N>,
-        io_full_ptr: Ptr<C::N>,
         arr: &Array<C, Felt<C::F>>,
     ) -> Usize<C::N> {
         let buffer_size: Var<C::N> = Var::uninit(self);
@@ -36,7 +35,7 @@ impl<C: Config> Builder<C> {
                     }
                     Array::Dyn(ptr, len) => {
                         let init_pos: Var<C::N> = Var::uninit(self);
-                        self.assign(&init_pos, buffer_size - (io_full_ptr.address - input_ptr.address));
+                        self.assign(&init_pos, input_ptr.address - sponge_ptr.address);
 
                         self.operations.push(DslIr::Poseidon2MultiObserve(
                             *sponge_ptr,
