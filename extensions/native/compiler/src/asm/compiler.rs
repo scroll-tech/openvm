@@ -617,6 +617,15 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
                         debug_info,
                     );
                 }
+                DslIr::ExtFromBaseVec(ext, base_vec) => {
+                    assert_eq!(base_vec.len(), EF::D);
+                    for (i, base) in base_vec.into_iter().enumerate() {
+                        self.push(
+                            AsmInstruction::CopyF(ext.fp() + (i as i32), base.fp()),
+                            debug_info.clone(),
+                        );
+                    }
+                }
                 _ => unimplemented!(),
             }
         }
