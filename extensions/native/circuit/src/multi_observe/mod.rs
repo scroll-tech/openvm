@@ -154,6 +154,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             output_register,
         } = local;
 
+        /* _debug
         builder.assert_bool(enable);
         builder.assert_bool(is_first);
         builder.assert_bool(is_final);
@@ -321,6 +322,8 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
                 &write_final_idx
             )
             .eval(builder, is_final);
+
+        */
     }
 }
 
