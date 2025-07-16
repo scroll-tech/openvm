@@ -21,8 +21,8 @@ use openvm_stark_backend::{
 };
 
 use crate::{
-    chip::{NUM_INITIAL_READS, NUM_SIMPLE_ACCESSES},
     poseidon2::{
+        chip::{NUM_INITIAL_READS, NUM_SIMPLE_ACCESSES},
         columns::{
             InsideRowSpecificCols, NativePoseidon2Cols, SimplePoseidonSpecificCols,
             TopLevelSpecificCols,
