@@ -103,28 +103,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             enable,
             is_first,
             is_final,
-            
-            // TODO: Should pass to execution bridge for Poseidon2 permutation
-            // Example:
-            // self.execution_bridge
-            //     .execute_and_increment_pc(
-            //         is_permute.clone()
-            //             * AB::F::from_canonical_usize(PERM_POS2.global_opcode().as_usize())
-            //             + is_compress
-            //                 * AB::F::from_canonical_usize(COMP_POS2.global_opcode().as_usize()),
-            //         [
-            //             output_register.into(),
-            //             input_register_1.into(),
-            //             input_register_2.into(),
-            //             self.address_space.into(),
-            //             self.address_space.into(),
-            //         ],
-            //         ExecutionState::new(pc, start_timestamp),
-            //         AB::Expr::from_canonical_u32(NUM_SIMPLE_ACCESSES),
-            //     )
-            //     .eval(builder, simple);
-            pc: _,    
-
+            pc,
             state_idx,
             remaining_len,
             counter,
@@ -154,12 +133,66 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             output_register,
         } = local;
 
-        /* _debug
-        builder.assert_bool(enable);
-        builder.assert_bool(is_first);
-        builder.assert_bool(is_final);
-        builder.assert_bool(should_permute);
+        self.execution_bridge
+            .execute_and_increment_pc(
+                AB::F::from_canonical_usize(MULTI_OBSERVE.global_opcode().as_usize()),
+                [
+                    output_register.into(),
+                    input_register_1.into(),
+                    input_register_2.into(),
+                    self.address_space.into(),
+                    self.address_space.into(),
+                    input_register_3.into(),
+                ],
+                ExecutionState::new(pc, first_timestamp),
+                AB::Expr::from_canonical_u32(4),
+            )
+            .eval(builder, is_first);
 
+        // Memory operations
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(self.address_space, output_register),
+                [state_ptr],
+                first_timestamp,
+                &read_state_ptr,
+            )
+            .eval(builder, is_first);
+
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(self.address_space, input_register_2),
+                [input_ptr],
+                first_timestamp + AB::F::ONE,
+                &read_input_ptr,
+            )
+            .eval(builder, is_first);
+
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(self.address_space, input_register_1),
+                [init_pos],
+                first_timestamp + AB::F::TWO,
+                &read_init_pos,
+            )
+            .eval(builder, is_first);
+        
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(self.address_space, input_register_3),
+                [len],
+                first_timestamp + AB::F::from_canonical_usize(3),
+                &read_len,
+            )
+            .eval(builder, is_first);
+
+        
+        // builder.assert_bool(enable);
+        // builder.assert_bool(is_first);
+        // builder.assert_bool(is_final);
+        // builder.assert_bool(should_permute);
+        
+        /* _debug
         // Row transitions
 
         // Each row must operate one element
@@ -229,42 +262,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             .when(not(next.is_first))
             .assert_eq(output_register, next.output_register);
 
-        // Memory operations
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(self.address_space, output_register),
-                [state_ptr],
-                first_timestamp,
-                &read_state_ptr,
-            )
-            .eval(builder, is_first);
-
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(self.address_space, input_register_2),
-                [input_ptr],
-                first_timestamp + AB::F::ONE,
-                &read_input_ptr,
-            )
-            .eval(builder, is_first);
-
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(self.address_space, input_register_1),
-                [init_pos],
-                first_timestamp + AB::F::TWO,
-                &read_init_pos,
-            )
-            .eval(builder, is_first);
         
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(self.address_space, input_register_3),
-                [len],
-                first_timestamp + AB::F::from_canonical_usize(3),
-                &read_len,
-            )
-            .eval(builder, is_first);
 
         self.memory_bridge
             .read(
@@ -424,11 +422,11 @@ impl<F: PrimeField32> NativeMultiObserveChip<F> {
         let read_init_pos_record = memory.record_by_id(record.read_init_pos);
         let read_len_record = memory.record_by_id(record.read_len);
 
-        let read_data_record = memory.record_by_id(record.read_input_data);
-        let write_data_record = memory.record_by_id(record.write_input_data);
-
-        let read_sponge_record = memory.record_by_id(record.read_sponge_state);
-        let write_sponge_record = memory.record_by_id(record.write_sponge_state);
+        // _debug
+        // let read_data_record = memory.record_by_id(record.read_input_data);
+        // let write_data_record = memory.record_by_id(record.write_input_data);
+        // let read_sponge_record = memory.record_by_id(record.read_sponge_state);
+        // let write_sponge_record = memory.record_by_id(record.write_sponge_state);
 
         cols.state_ptr = record.state_ptr;
         cols.input_ptr = record.input_ptr;
@@ -457,14 +455,15 @@ impl<F: PrimeField32> NativeMultiObserveChip<F> {
         aux_cols_factory.generate_read_aux(read_input_ptr_record, &mut cols.read_input_ptr);
         aux_cols_factory.generate_read_aux(read_init_pos_record, &mut cols.read_init_pos);
         aux_cols_factory.generate_read_aux(read_len_record, &mut cols.read_len);
-        aux_cols_factory.generate_read_aux(read_data_record, &mut cols.read_data);
-        aux_cols_factory.generate_write_aux(write_data_record, &mut cols.write_data);
 
-        aux_cols_factory.generate_read_aux(read_sponge_record, &mut cols.read_sponge_state);
-        aux_cols_factory.generate_write_aux(write_sponge_record, &mut cols.write_sponge_state);
+        // _debug
+        // aux_cols_factory.generate_read_aux(read_data_record, &mut cols.read_data);
+        // aux_cols_factory.generate_write_aux(write_data_record, &mut cols.write_data);
+        // aux_cols_factory.generate_read_aux(read_sponge_record, &mut cols.read_sponge_state);
+        // aux_cols_factory.generate_write_aux(write_sponge_record, &mut cols.write_sponge_state);
 
-        let write_final_idx_record = memory.record_by_id(record.write_final_idx);
-        aux_cols_factory.generate_write_aux(write_final_idx_record, &mut cols.write_final_idx);
+        // let write_final_idx_record = memory.record_by_id(record.write_final_idx);
+        // aux_cols_factory.generate_write_aux(write_final_idx_record, &mut cols.write_final_idx);
     }
 
     fn generate_trace(self) -> RowMajorMatrix<F> {
@@ -517,7 +516,34 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeMultiObserveChip<F> {
         let len = len.as_canonical_u32() as usize;
 
         let mut curr_timestamp = 0usize;
+
+        let head_record: TranscriptObservationRecord<F> = TranscriptObservationRecord {
+            from_state,
+            instruction: instruction.clone(),
+            is_first: true,
+            state_idx: pos % CHUNK,
+            remaining_len: len, 
+            counter: 0,
+            read_state_ptr: read_sponge_ptr, 
+            read_input_ptr: read_arr_ptr,
+            state_ptr: sponge_ptr, 
+            input_ptr: arr_ptr, 
+            read_init_pos: read_init_pos, 
+            init_pos, 
+            read_len, 
+            len,
+            input_register_1,
+            input_register_2,
+            input_register_3,
+            output_register,
+            ..Default::default()
+        };
         
+        self.height += 1;
+        observation_records.push(head_record);
+        
+
+        /* _debug
         for i in 0..len {
             let mut record: TranscriptObservationRecord<F> = TranscriptObservationRecord {
                 from_state,
@@ -580,6 +606,12 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeMultiObserveChip<F> {
             observation_records[len - 1].final_idx = final_idx;
         }
 
+        */
+
+        for record in observation_records {
+            self.record_set.transcript_observation_records.push(record);
+        }
+        
         Ok(ExecutionState {
             pc: from_state.pc + DEFAULT_PC_STEP,
             timestamp: memory.timestamp(),

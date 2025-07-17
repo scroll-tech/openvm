@@ -128,8 +128,9 @@ fn test_multi_observe() {
     };
 
     let engine = BabyBearPoseidon2Engine::new(fri_params);
+    let mut config = NativeConfig::aggregation(0, poseidon2_max_constraint_degree);
+    config.system.memory_config.max_access_adapter_n = 16;
 
-    let config = NativeConfig::aggregation(0, poseidon2_max_constraint_degree);
     let vm = VirtualMachine::new(engine, config);
 
     let pk = vm.keygen();
@@ -160,6 +161,6 @@ fn build_test_program<C: Config>(
     */
 
     // MultiObserve
-    // let mut challenger = DuplexChallengerVariable::new(builder);
-    // builder.poseidon2_multi_observe(&challenger.sponge_state, challenger.input_ptr, &sample_input);
+    let mut challenger = DuplexChallengerVariable::new(builder);
+    builder.poseidon2_multi_observe(&challenger.sponge_state, challenger.input_ptr, &sample_input);
 }
