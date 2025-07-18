@@ -6,7 +6,7 @@ use openvm_circuit::{
     arch::{ExecutionBridge, ExecutionState, ExecutionError, InstructionExecutor, SystemPort},
     system::memory::{offline_checker::MemoryBridge, MemoryAddress, MemoryController, OfflineMemory, RecordId},
 };
-use openvm_circuit_primitives::utils::not;
+use openvm_circuit_primitives::utils::{not, and};
 use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode};
 use openvm_native_compiler::{
     conversion::AS,
@@ -48,6 +48,7 @@ pub struct NativeMultiObserveCols<T> {
     /// and all following intermediate observation rows.
     pub first_timestamp: T,
     pub curr_timestamp: T,
+    pub final_timestamp_increment: T,
 
     pub read_state_ptr: MemoryReadAuxCols<T>,
     pub read_input_ptr: MemoryReadAuxCols<T>,
@@ -110,6 +111,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             should_permute,
             first_timestamp,
             curr_timestamp,
+            final_timestamp_increment,
             read_state_ptr,
             read_input_ptr,
             state_ptr,
@@ -145,7 +147,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
                     input_register_3.into(),
                 ],
                 ExecutionState::new(pc, first_timestamp),
-                AB::Expr::from_canonical_u32(4),
+                final_timestamp_increment,
             )
             .eval(builder, is_first);
 
@@ -186,11 +188,23 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             )
             .eval(builder, is_first);
 
-        
-        // builder.assert_bool(enable);
-        // builder.assert_bool(is_first);
-        // builder.assert_bool(is_final);
-        // builder.assert_bool(should_permute);
+        self.memory_bridge
+            .write(
+                MemoryAddress::new(
+                    self.address_space,
+                    input_register_1,
+                ),
+                [final_idx],
+                first_timestamp + curr_timestamp + is_first * AB::F::from_canonical_usize(4) + should_permute * AB::F::from_canonical_usize(4),
+                // + (AB::F::ONE - is_first) * AB::F::TWO,   // _debug
+                &write_final_idx
+            )
+            .eval(builder, is_final);
+
+        builder.assert_bool(enable);
+        builder.assert_bool(is_first);
+        builder.assert_bool(is_final);
+        builder.assert_bool(should_permute);
         
         /* _debug
         // Row transitions
@@ -309,17 +323,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             )
             .eval(builder, should_permute);
 
-        self.memory_bridge
-            .write(
-                MemoryAddress::new(
-                    self.address_space,
-                    input_register_1,
-                ),
-                [final_idx],
-                first_timestamp + curr_timestamp + is_first * AB::F::from_canonical_usize(4) + should_permute * AB::F::TWO + AB::F::TWO,
-                &write_final_idx
-            )
-            .eval(builder, is_final);
+        
 
         */
     }
@@ -332,6 +336,7 @@ pub struct TranscriptObservationRecord<F: Field> {
     pub from_state: ExecutionState<u32>,
     pub instruction: Instruction<F>,
     pub curr_timestamp: usize,
+    pub final_timestamp_increment: usize,
     
     pub state_idx: usize,
     
@@ -434,6 +439,7 @@ impl<F: PrimeField32> NativeMultiObserveChip<F> {
         cols.len = F::from_canonical_usize(record.len);
         cols.data = record.input_data;
         cols.curr_timestamp = F::from_canonical_usize(record.curr_timestamp);
+        cols.final_timestamp_increment = F::from_canonical_usize(record.final_timestamp_increment);
 
         cols.permutation_input = record.permutation_input;
         cols.permutation_output = record.permutation_output;
@@ -451,10 +457,12 @@ impl<F: PrimeField32> NativeMultiObserveChip<F> {
         cols.input_register_3 = record.input_register_3;
         cols.output_register = record.output_register;
 
-        aux_cols_factory.generate_read_aux(read_state_ptr_record, &mut cols.read_state_ptr);
-        aux_cols_factory.generate_read_aux(read_input_ptr_record, &mut cols.read_input_ptr);
-        aux_cols_factory.generate_read_aux(read_init_pos_record, &mut cols.read_init_pos);
-        aux_cols_factory.generate_read_aux(read_len_record, &mut cols.read_len);
+        if record.is_first {
+            aux_cols_factory.generate_read_aux(read_state_ptr_record, &mut cols.read_state_ptr);
+            aux_cols_factory.generate_read_aux(read_input_ptr_record, &mut cols.read_input_ptr);
+            aux_cols_factory.generate_read_aux(read_init_pos_record, &mut cols.read_init_pos);
+            aux_cols_factory.generate_read_aux(read_len_record, &mut cols.read_len);
+        }
 
         // _debug
         // aux_cols_factory.generate_read_aux(read_data_record, &mut cols.read_data);
@@ -462,8 +470,10 @@ impl<F: PrimeField32> NativeMultiObserveChip<F> {
         // aux_cols_factory.generate_read_aux(read_sponge_record, &mut cols.read_sponge_state);
         // aux_cols_factory.generate_write_aux(write_sponge_record, &mut cols.write_sponge_state);
 
-        // let write_final_idx_record = memory.record_by_id(record.write_final_idx);
-        // aux_cols_factory.generate_write_aux(write_final_idx_record, &mut cols.write_final_idx);
+        if record.is_final {
+            let write_final_idx_record = memory.record_by_id(record.write_final_idx);
+            aux_cols_factory.generate_write_aux(write_final_idx_record, &mut cols.write_final_idx);
+        }
     }
 
     fn generate_trace(self) -> RowMajorMatrix<F> {
@@ -478,7 +488,7 @@ impl<F: PrimeField32> NativeMultiObserveChip<F> {
             self.record_to_row(
                 record,
                 &aux_cols_factory,
-                &mut flat_trace[used_cells..],
+                &mut flat_trace[used_cells..used_cells + width],
                 &memory,
             );
             used_cells += width;
@@ -515,8 +525,6 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeMultiObserveChip<F> {
         let (read_len, len) = memory.read_cell(register_address_space, input_register_3);
         let len = len.as_canonical_u32() as usize;
 
-        let mut curr_timestamp = 0usize;
-
         let head_record: TranscriptObservationRecord<F> = TranscriptObservationRecord {
             from_state,
             instruction: instruction.clone(),
@@ -541,9 +549,9 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeMultiObserveChip<F> {
         
         self.height += 1;
         observation_records.push(head_record);
-        
 
-        /* _debug
+        let mut curr_timestamp = 4usize;
+        
         for i in 0..len {
             let mut record: TranscriptObservationRecord<F> = TranscriptObservationRecord {
                 from_state,
@@ -567,6 +575,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeMultiObserveChip<F> {
                 ..Default::default()
             };
 
+            /* _debug
             let (n_read, n_f) = memory.read_cell(data_address_space, arr_ptr + F::from_canonical_usize(i));
             record.read_input_data = n_read;
             record.input_data = n_f;
@@ -591,22 +600,25 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeMultiObserveChip<F> {
                 record.permutation_input = permutation_input;
                 record.permutation_output = output;
             }
+            */
 
             observation_records.push(record);
             self.height += 1;
         }
+        
 
         let mod_pos = pos % CHUNK;
         let (write_final, final_idx) = memory.write_cell(register_address_space, input_register_1, F::from_canonical_usize(mod_pos));
+        curr_timestamp += 1;
 
-        if observation_records.len() > 0 {
-            observation_records[0].is_first = true;
-            observation_records[len - 1].is_final = true;
-            observation_records[len - 1].write_final_idx = write_final;
-            observation_records[len - 1].final_idx = final_idx;
+        observation_records[0].is_first = true;
+        observation_records.last_mut().unwrap().is_final = true;
+        observation_records.last_mut().unwrap().write_final_idx = write_final;
+        observation_records.last_mut().unwrap().final_idx = final_idx;
+
+        for record in &mut observation_records {
+            record.final_timestamp_increment = curr_timestamp;
         }
-
-        */
 
         for record in observation_records {
             self.record_set.transcript_observation_records.push(record);
