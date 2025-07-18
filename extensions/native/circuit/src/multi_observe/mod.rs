@@ -188,18 +188,18 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             )
             .eval(builder, is_first);
 
-        self.memory_bridge
-            .write(
-                MemoryAddress::new(
-                    self.address_space,
-                    input_register_1,
-                ),
-                [final_idx],
-                first_timestamp + curr_timestamp + is_first * AB::F::from_canonical_usize(4) + should_permute * AB::F::from_canonical_usize(4),
-                // + (AB::F::ONE - is_first) * AB::F::TWO,   // _debug
-                &write_final_idx
-            )
-            .eval(builder, is_final);
+        // self.memory_bridge
+        //     .write(
+        //         MemoryAddress::new(
+        //             self.address_space,
+        //             input_register_1,
+        //         ),
+        //         [final_idx],
+        //         first_timestamp + curr_timestamp + is_first * AB::F::from_canonical_usize(4) + should_permute * AB::F::from_canonical_usize(4),
+        //         // + (AB::F::ONE - is_first) * AB::F::TWO,   // _debug
+        //         &write_final_idx
+        //     )
+        //     .eval(builder, is_final);
 
         builder.assert_bool(enable);
         builder.assert_bool(is_first);
@@ -471,8 +471,8 @@ impl<F: PrimeField32> NativeMultiObserveChip<F> {
         // aux_cols_factory.generate_write_aux(write_sponge_record, &mut cols.write_sponge_state);
 
         if record.is_final {
-            let write_final_idx_record = memory.record_by_id(record.write_final_idx);
-            aux_cols_factory.generate_write_aux(write_final_idx_record, &mut cols.write_final_idx);
+            // let write_final_idx_record = memory.record_by_id(record.write_final_idx);
+            // aux_cols_factory.generate_write_aux(write_final_idx_record, &mut cols.write_final_idx);
         }
     }
 
@@ -608,13 +608,13 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeMultiObserveChip<F> {
         
 
         let mod_pos = pos % CHUNK;
-        let (write_final, final_idx) = memory.write_cell(register_address_space, input_register_1, F::from_canonical_usize(mod_pos));
-        curr_timestamp += 1;
+        // let (write_final, final_idx) = memory.write_cell(register_address_space, input_register_1, F::from_canonical_usize(mod_pos));
+        // curr_timestamp += 1;
 
         observation_records[0].is_first = true;
         observation_records.last_mut().unwrap().is_final = true;
-        observation_records.last_mut().unwrap().write_final_idx = write_final;
-        observation_records.last_mut().unwrap().final_idx = final_idx;
+        // observation_records.last_mut().unwrap().write_final_idx = write_final;
+        // observation_records.last_mut().unwrap().final_idx = final_idx;
 
         for record in &mut observation_records {
             record.final_timestamp_increment = curr_timestamp;
