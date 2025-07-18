@@ -37,6 +37,7 @@ pub struct NativeMultiObserveCols<T> {
     pub enable: T,
     pub is_first: T,
     pub is_final: T,
+    pub is_observe: T,
 
     pub pc: T,
     pub state_idx: T,
@@ -104,6 +105,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             enable,
             is_first,
             is_final,
+            is_observe,
             pc,
             state_idx,
             remaining_len,
@@ -188,6 +190,27 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             )
             .eval(builder, is_first);
 
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(self.address_space, input_ptr + counter - AB::F::ONE),
+                [data],
+                first_timestamp + curr_timestamp,
+                &read_data
+            )
+            .eval(builder, is_observe);
+            
+        self.memory_bridge
+            .write(
+                MemoryAddress::new(
+                    self.address_space,
+                    state_ptr + state_idx,
+                ),
+                [data],
+                first_timestamp + curr_timestamp + AB::F::ONE,
+                &write_data,
+            )
+            .eval(builder, is_observe);
+
         // self.memory_bridge
         //     .write(
         //         MemoryAddress::new(
@@ -201,10 +224,10 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
         //     )
         //     .eval(builder, is_final);
 
-        builder.assert_bool(enable);
-        builder.assert_bool(is_first);
-        builder.assert_bool(is_final);
-        builder.assert_bool(should_permute);
+        // builder.assert_bool(enable);
+        // builder.assert_bool(is_first);
+        // builder.assert_bool(is_final);
+        // builder.assert_bool(should_permute);
         
         /* _debug
         // Row transitions
@@ -278,26 +301,9 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
 
         
 
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(self.address_space, input_ptr + counter),
-                [data],
-                first_timestamp + curr_timestamp + is_first * AB::F::from_canonical_usize(4),
-                &read_data
-            )
-            .eval(builder, is_first);
+        
 
-        self.memory_bridge
-            .write(
-                MemoryAddress::new(
-                    self.address_space,
-                    state_ptr + state_idx,
-                ),
-                [data],
-                first_timestamp + curr_timestamp + is_first * AB::F::from_canonical_usize(4) + AB::F::ONE,
-                &write_data,
-            )
-            .eval(builder, enable);
+        
 
         self.memory_bridge
             .read(
@@ -341,6 +347,7 @@ pub struct TranscriptObservationRecord<F: Field> {
     pub state_idx: usize,
     
     pub is_first: bool,
+    pub is_observe: bool,
     pub is_final: bool,
     pub remaining_len: usize,
     pub counter: usize,
@@ -420,18 +427,13 @@ impl<F: PrimeField32> NativeMultiObserveChip<F> {
         cols.enable = F::ONE;
         cols.is_first = if record.is_first { F::ONE } else { F::ZERO };
         cols.is_final = if record.is_final { F::ONE } else { F::ZERO };
+        cols.is_observe = if !record.is_first { F::ONE } else { F::ZERO };
         cols.should_permute = if record.should_permute { F::ONE } else { F::ZERO };
 
         let read_state_ptr_record = memory.record_by_id(record.read_state_ptr);
         let read_input_ptr_record = memory.record_by_id(record.read_input_ptr);
         let read_init_pos_record = memory.record_by_id(record.read_init_pos);
         let read_len_record = memory.record_by_id(record.read_len);
-
-        // _debug
-        // let read_data_record = memory.record_by_id(record.read_input_data);
-        // let write_data_record = memory.record_by_id(record.write_input_data);
-        // let read_sponge_record = memory.record_by_id(record.read_sponge_state);
-        // let write_sponge_record = memory.record_by_id(record.write_sponge_state);
 
         cols.state_ptr = record.state_ptr;
         cols.input_ptr = record.input_ptr;
@@ -444,9 +446,9 @@ impl<F: PrimeField32> NativeMultiObserveChip<F> {
         cols.permutation_input = record.permutation_input;
         cols.permutation_output = record.permutation_output;
 
-        cols.state_idx = cols.state_idx;
-        cols.remaining_len = cols.remaining_len;
-        cols.counter = cols.counter;
+        cols.state_idx = F::from_canonical_usize(record.state_idx);
+        cols.remaining_len = F::from_canonical_usize(record.remaining_len);
+        cols.counter = F::from_canonical_usize(record.counter);
         cols.final_idx = record.final_idx;
 
         cols.first_timestamp = F::from_canonical_u32(record.from_state.timestamp);
@@ -464,11 +466,19 @@ impl<F: PrimeField32> NativeMultiObserveChip<F> {
             aux_cols_factory.generate_read_aux(read_len_record, &mut cols.read_len);
         }
 
-        // _debug
-        // aux_cols_factory.generate_read_aux(read_data_record, &mut cols.read_data);
-        // aux_cols_factory.generate_write_aux(write_data_record, &mut cols.write_data);
-        // aux_cols_factory.generate_read_aux(read_sponge_record, &mut cols.read_sponge_state);
-        // aux_cols_factory.generate_write_aux(write_sponge_record, &mut cols.write_sponge_state);
+        if record.is_observe {
+            let read_data_record = memory.record_by_id(record.read_input_data);
+            let write_data_record = memory.record_by_id(record.write_input_data);
+            aux_cols_factory.generate_read_aux(read_data_record, &mut cols.read_data);
+            aux_cols_factory.generate_write_aux(write_data_record, &mut cols.write_data);
+        }
+
+        if record.should_permute {
+            // let read_sponge_record = memory.record_by_id(record.read_sponge_state);
+            // let write_sponge_record = memory.record_by_id(record.write_sponge_state);
+            // aux_cols_factory.generate_read_aux(read_sponge_record, &mut cols.read_sponge_state);
+            // aux_cols_factory.generate_write_aux(write_sponge_record, &mut cols.write_sponge_state);
+        }
 
         if record.is_final {
             // let write_final_idx_record = memory.record_by_id(record.write_final_idx);
@@ -551,15 +561,17 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeMultiObserveChip<F> {
         observation_records.push(head_record);
 
         let mut curr_timestamp = 4usize;
+
         
         for i in 0..len {
             let mut record: TranscriptObservationRecord<F> = TranscriptObservationRecord {
                 from_state,
                 curr_timestamp,
                 instruction: instruction.clone(),
+                is_observe: true,
                 state_idx: pos % CHUNK,
-                remaining_len: len - i, 
-                counter: i, 
+                remaining_len: len - i - 1, 
+                counter: i + 1, 
                 read_state_ptr: read_sponge_ptr, 
                 read_input_ptr: read_arr_ptr,
                 state_ptr: sponge_ptr, 
@@ -575,7 +587,6 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeMultiObserveChip<F> {
                 ..Default::default()
             };
 
-            /* _debug
             let (n_read, n_f) = memory.read_cell(data_address_space, arr_ptr + F::from_canonical_usize(i));
             record.read_input_data = n_read;
             record.input_data = n_f;
@@ -586,6 +597,8 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeMultiObserveChip<F> {
             curr_timestamp += 1;
 
             pos += 1;
+
+            /* _debug
 
             if pos % CHUNK == 0 {
                 record.should_permute = true;
@@ -606,7 +619,6 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeMultiObserveChip<F> {
             self.height += 1;
         }
         
-
         let mod_pos = pos % CHUNK;
         // let (write_final, final_idx) = memory.write_cell(register_address_space, input_register_1, F::from_canonical_usize(mod_pos));
         // curr_timestamp += 1;
