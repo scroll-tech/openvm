@@ -157,31 +157,4 @@ fn build_test_program<C: Config>(
 
         builder.poseidon2_multi_observe(&challenger.sponge_state, challenger.input_ptr, &sample_input);
     }
-
-
-
-
-
-
-    /* _debug
-    let sample_len: usize = 10;
-
-    let mut rng = create_seeded_rng();
-    let sample_input: Array<C, Felt<C::F>> = builder.dyn_array(sample_len);
-    builder.range(0, sample_len).for_each(|idx_vec, builder| {
-        let f_u32: u32 = rng.gen_range(1..1 << 30);
-        builder.set(&sample_input, idx_vec[0], C::F::from_canonical_u32(f_u32));
-    });
-
-    /* _debug
-    builder.range(0, sample_len).for_each(|idx_vec, builder| {
-        let f = builder.get(&sample_input, idx_vec[0]);
-        builder.print_f(f);
-    });
-    */
-
-    // MultiObserve
-    let challenger = DuplexChallengerVariable::new(builder);
-    builder.poseidon2_multi_observe(&challenger.sponge_state, challenger.input_ptr, &sample_input);
-    */
 }
