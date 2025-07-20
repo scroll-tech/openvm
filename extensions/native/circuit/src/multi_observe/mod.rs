@@ -6,7 +6,7 @@ use openvm_circuit::{
     arch::{ExecutionBridge, ExecutionState, ExecutionError, InstructionExecutor, SystemPort},
     system::memory::{offline_checker::MemoryBridge, MemoryAddress, MemoryController, OfflineMemory, RecordId},
 };
-use openvm_circuit_primitives::utils::{not, and};
+use openvm_circuit_primitives::utils::not;
 use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode};
 use openvm_native_compiler::{
     conversion::AS,
@@ -247,15 +247,25 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             )
             .eval(builder, is_final);
 
-        // builder.assert_bool(enable);
-        // builder.assert_bool(is_first);
-        // builder.assert_bool(is_final);
-        // builder.assert_bool(should_permute);
-        
-        /* _debug
-        // Row transitions
+        // Binary indicators columns
+        builder.assert_bool(enable);
+        builder.assert_bool(is_first);
+        builder.assert_bool(is_observe);
+        builder.assert_bool(is_final);
+        builder.assert_bool(should_permute);
 
-        // Each row must operate one element
+        // Except header rows, any other rows must observe an element
+        // All rows following the header row must observe an element
+        builder
+            .when(enable)
+            .assert_eq(is_first + is_observe, AB::F::ONE);
+        builder
+            .when(is_observe)
+            .when(next.enable)
+            .when(not(next.is_first))
+            .assert_eq(next.is_observe, AB::F::ONE);
+
+        // Each non-header row must process a field element
         builder
             .when(next.enable)
             .when(not(next.is_first))
@@ -265,14 +275,8 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             .when(not(next.is_first))
             .assert_eq(next.remaining_len, remaining_len - AB::F::ONE);
 
-        // After each permutation, the sponge state index must revert to 0
-        builder
-            .when(should_permute)
-            .when(not(next.is_first))
-            .assert_eq(next.state_idx, AB::F::ZERO);
-
         // Boundary conditions
-        // At the first row, counter must be 0, remaining_len must be len
+        // At the header row, counter must be 0, remaining_len must be len
         builder
             .when(is_first)
             .assert_eq(counter, AB::F::ZERO);
@@ -280,13 +284,38 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             .when(is_first)
             .assert_eq(remaining_len, len);
 
-        // At the last row, counter must be len - 1, remaining_len must be 1
+        // At the final row, counter must be len, remaining_len must be 0
         builder
             .when(is_final)
-            .assert_eq(counter, len - AB::F::ONE);
+            .assert_eq(counter, len);
         builder
             .when(is_final)
-            .assert_eq(remaining_len, AB::F::ONE);
+            .assert_eq(remaining_len, AB::F::ZERO);
+
+        // After each permutation, the sponge state index must revert to 0
+        builder
+            .when(should_permute)
+            .when(not(next.is_first))
+            .assert_eq(next.state_idx, AB::F::ZERO);
+
+        // Timestamp constraints
+        builder
+            .when(is_first)
+            .assert_eq(curr_timestamp, AB::F::ZERO);
+        builder
+            .when(is_first)
+            .when(not(is_final))
+            .assert_eq(next.curr_timestamp - curr_timestamp, AB::F::from_canonical_usize(4));
+        builder
+            .when(is_observe)
+            .when(not(is_final))
+            .when(not(should_permute))
+            .assert_eq(next.curr_timestamp - curr_timestamp, AB::F::TWO);
+        builder
+            .when(is_observe)
+            .when(not(is_final))
+            .when(should_permute)
+            .assert_eq(next.curr_timestamp - curr_timestamp, AB::F::from_canonical_usize(4));
 
         // Fields that remain constant for a single MULTI_OBSERVE call
         builder
@@ -321,7 +350,6 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             .when(next.enable)
             .when(not(next.is_first))
             .assert_eq(output_register, next.output_register);
-        */
     }
 }
 
