@@ -211,6 +211,30 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             )
             .eval(builder, is_observe);
 
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(
+                    self.address_space,
+                    state_ptr,
+                ),
+                permutation_input,
+                first_timestamp + curr_timestamp + AB::F::TWO,
+                &read_sponge_state,
+            )
+            .eval(builder, should_permute);
+        
+        self.memory_bridge
+            .write(
+                MemoryAddress::new(
+                    self.address_space,
+                    state_ptr
+                ),
+                permutation_output,
+                first_timestamp + curr_timestamp + AB::F::from_canonical_usize(3),
+                &write_sponge_state,
+            )
+            .eval(builder, should_permute);
+
         // self.memory_bridge
         //     .write(
         //         MemoryAddress::new(
@@ -298,39 +322,6 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             .when(next.enable)
             .when(not(next.is_first))
             .assert_eq(output_register, next.output_register);
-
-        
-
-        
-
-        
-
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(
-                    self.address_space,
-                    state_ptr,
-                ),
-                permutation_input,
-                first_timestamp + curr_timestamp + is_first * AB::F::from_canonical_usize(4) + AB::F::TWO,
-                &read_sponge_state,
-            )
-            .eval(builder, should_permute);
-        
-        self.memory_bridge
-            .write(
-                MemoryAddress::new(
-                    self.address_space,
-                    state_ptr
-                ),
-                permutation_output,
-                first_timestamp + curr_timestamp + is_first * AB::F::from_canonical_usize(4) + AB::F::from_canonical_usize(3),
-                &write_sponge_state,
-            )
-            .eval(builder, should_permute);
-
-        
-
         */
     }
 }
@@ -474,10 +465,10 @@ impl<F: PrimeField32> NativeMultiObserveChip<F> {
         }
 
         if record.should_permute {
-            // let read_sponge_record = memory.record_by_id(record.read_sponge_state);
-            // let write_sponge_record = memory.record_by_id(record.write_sponge_state);
-            // aux_cols_factory.generate_read_aux(read_sponge_record, &mut cols.read_sponge_state);
-            // aux_cols_factory.generate_write_aux(write_sponge_record, &mut cols.write_sponge_state);
+            let read_sponge_record = memory.record_by_id(record.read_sponge_state);
+            let write_sponge_record = memory.record_by_id(record.write_sponge_state);
+            aux_cols_factory.generate_read_aux(read_sponge_record, &mut cols.read_sponge_state);
+            aux_cols_factory.generate_write_aux(write_sponge_record, &mut cols.write_sponge_state);
         }
 
         if record.is_final {
@@ -598,8 +589,6 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeMultiObserveChip<F> {
 
             pos += 1;
 
-            /* _debug
-
             if pos % CHUNK == 0 {
                 record.should_permute = true;
                 let (read_sponge_record, permutation_input) = memory.read::<{CHUNK * 2}>(data_address_space, sponge_ptr);
@@ -613,7 +602,6 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeMultiObserveChip<F> {
                 record.permutation_input = permutation_input;
                 record.permutation_output = output;
             }
-            */
 
             observation_records.push(record);
             self.height += 1;
