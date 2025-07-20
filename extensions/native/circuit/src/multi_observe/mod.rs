@@ -235,18 +235,17 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             )
             .eval(builder, should_permute);
 
-        // self.memory_bridge
-        //     .write(
-        //         MemoryAddress::new(
-        //             self.address_space,
-        //             input_register_1,
-        //         ),
-        //         [final_idx],
-        //         first_timestamp + curr_timestamp + is_first * AB::F::from_canonical_usize(4) + should_permute * AB::F::from_canonical_usize(4),
-        //         // + (AB::F::ONE - is_first) * AB::F::TWO,   // _debug
-        //         &write_final_idx
-        //     )
-        //     .eval(builder, is_final);
+        self.memory_bridge
+            .write(
+                MemoryAddress::new(
+                    self.address_space,
+                    input_register_1,
+                ),
+                [final_idx],
+                first_timestamp + curr_timestamp + is_first * AB::F::from_canonical_usize(4) + is_observe * AB::F::TWO + should_permute * AB::F::TWO,
+                &write_final_idx
+            )
+            .eval(builder, is_final);
 
         // builder.assert_bool(enable);
         // builder.assert_bool(is_first);
@@ -364,7 +363,7 @@ pub struct TranscriptObservationRecord<F: Field> {
     pub permutation_output: [F; 2 * CHUNK],
 
     pub write_final_idx: RecordId,
-    pub final_idx: F,
+    pub final_idx: usize,
 
     pub input_register_1: F,
     pub input_register_2: F,
@@ -440,7 +439,7 @@ impl<F: PrimeField32> NativeMultiObserveChip<F> {
         cols.state_idx = F::from_canonical_usize(record.state_idx);
         cols.remaining_len = F::from_canonical_usize(record.remaining_len);
         cols.counter = F::from_canonical_usize(record.counter);
-        cols.final_idx = record.final_idx;
+        cols.final_idx = F::from_canonical_usize(record.final_idx);
 
         cols.first_timestamp = F::from_canonical_u32(record.from_state.timestamp);
         cols.pc = F::from_canonical_u32(record.from_state.pc);
@@ -472,8 +471,8 @@ impl<F: PrimeField32> NativeMultiObserveChip<F> {
         }
 
         if record.is_final {
-            // let write_final_idx_record = memory.record_by_id(record.write_final_idx);
-            // aux_cols_factory.generate_write_aux(write_final_idx_record, &mut cols.write_final_idx);
+            let write_final_idx_record = memory.record_by_id(record.write_final_idx);
+            aux_cols_factory.generate_write_aux(write_final_idx_record, &mut cols.write_final_idx);
         }
     }
 
@@ -608,13 +607,13 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeMultiObserveChip<F> {
         }
         
         let mod_pos = pos % CHUNK;
-        // let (write_final, final_idx) = memory.write_cell(register_address_space, input_register_1, F::from_canonical_usize(mod_pos));
-        // curr_timestamp += 1;
+        let (write_final, _) = memory.write_cell(register_address_space, input_register_1, F::from_canonical_usize(mod_pos));
+        curr_timestamp += 1;
 
         observation_records[0].is_first = true;
         observation_records.last_mut().unwrap().is_final = true;
-        // observation_records.last_mut().unwrap().write_final_idx = write_final;
-        // observation_records.last_mut().unwrap().final_idx = final_idx;
+        observation_records.last_mut().unwrap().write_final_idx = write_final;
+        observation_records.last_mut().unwrap().final_idx = mod_pos;
 
         for record in &mut observation_records {
             record.final_timestamp_increment = curr_timestamp;
