@@ -9,7 +9,7 @@ use openvm_circuit::{
 use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode};
 use openvm_native_compiler::{
     conversion::AS,
-    Poseidon2Opcode::{COMP_POS2, PERM_POS2, MULTI_OBSERVE},
+    Poseidon2Opcode::{COMP_POS2, PERM_POS2},
     VerifyBatchOpcode::VERIFY_BATCH,
 };
 use openvm_poseidon2_air::{Poseidon2Config, Poseidon2SubAir, Poseidon2SubChip};
@@ -485,43 +485,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     initial_log_height: initial_log_height as usize,
                     top_level,
                 });
-        } else if instruction.opcode == MULTI_OBSERVE.global_opcode() {
-            let &Instruction {
-                a: output_register,
-                b: input_register_1,
-                c: input_register_2,
-                d: data_address_space,
-                e: register_address_space,
-                f: input_register_3,
-                ..
-            } = instruction;
-
-            let (_, sponge_ptr) = memory.read_cell(register_address_space, output_register);
-            let (_, arr_ptr) = memory.read_cell(register_address_space, input_register_2);
-
-            let init_pos_read = memory.read_cell(register_address_space, input_register_1);
-            let mut pos = init_pos_read.1.as_canonical_u32() as usize;
-
-            let len_read = memory.read_cell(register_address_space, input_register_3);
-            let len = len_read.1.as_canonical_u32() as usize;
-
-            for i in 0..len {
-                let mod_pos = pos % CHUNK;
-                let n_read = memory.read_cell(data_address_space, arr_ptr + F::from_canonical_usize(i));
-                let n_f = n_read.1;
-
-                memory.write_cell(data_address_space, sponge_ptr + F::from_canonical_usize(mod_pos), n_f);
-                pos += 1;
-
-                if pos % CHUNK == 0 {
-                    let (_, sponge_state) = memory.read::<{CHUNK * 2}>(data_address_space, sponge_ptr);
-                    let output = self.subchip.permute(sponge_state);
-                    memory.write::<{CHUNK * 2}>(data_address_space, sponge_ptr, std::array::from_fn(|i| output[i]));
-                }
-            }
-
-            let mod_pos = pos % CHUNK;
-            memory.write_cell(register_address_space, input_register_1, F::from_canonical_usize(mod_pos));
         } else {
             unreachable!()
         }
@@ -538,8 +501,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
             String::from("PERM_POS2")
         } else if opcode == COMP_POS2.global_opcode().as_usize() {
             String::from("COMP_POS2")
-        } else if opcode == MULTI_OBSERVE.global_opcode().as_usize() {
-            String::from("MULTI_OBSERVE")
         } else {
             unreachable!("unsupported opcode: {}", opcode)
         }
