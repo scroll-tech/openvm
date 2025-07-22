@@ -117,7 +117,7 @@ impl VmMetrics {
                 .map(|(_, func)| (*func).clone())
                 .unwrap();
             if pc == self.current_fn.start {
-                self.cycle_tracker.start(self.current_fn.name.clone());
+                self.cycle_tracker.start(self.current_fn.name.clone(), 0);
             } else {
                 while let Some(name) = self.cycle_tracker.top() {
                     if name == &self.current_fn.name {
