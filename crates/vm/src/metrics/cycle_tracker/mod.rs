@@ -2,9 +2,9 @@
 #[derive(Clone, Debug, Default)]
 pub struct SpanInfo {
     /// The name of the span.
-    tag: String,
+    pub tag: String,
     /// The cycle count at which the span starts.
-    start: usize,
+    pub start: usize,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -21,7 +21,10 @@ impl CycleTracker {
     }
 
     pub fn top(&self) -> Option<&String> {
-        self.stack.last()
+        match self.stack.last() {
+            Some(span) => Some(&span.tag),
+            _ => None
+        }
     }
 
     /// Starts a new cycle tracker span for the given name.
