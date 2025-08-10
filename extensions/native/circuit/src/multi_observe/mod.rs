@@ -190,50 +190,50 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
         //     )
         //     .eval(builder, is_first);
 
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(self.address_space, input_ptr + counter - AB::F::ONE),
-                [data],
-                first_timestamp + curr_timestamp,
-                &read_data
-            )
-            .eval(builder, is_observe);
+        // self.memory_bridge
+        //     .read(
+        //         MemoryAddress::new(self.address_space, input_ptr + counter - AB::F::ONE),
+        //         [data],
+        //         first_timestamp + curr_timestamp,
+        //         &read_data
+        //     )
+        //     .eval(builder, is_observe);
             
-        self.memory_bridge
-            .write(
-                MemoryAddress::new(
-                    self.address_space,
-                    state_ptr + state_idx,
-                ),
-                [data],
-                first_timestamp + curr_timestamp + AB::F::ONE,
-                &write_data,
-            )
-            .eval(builder, is_observe);
+        // self.memory_bridge
+        //     .write(
+        //         MemoryAddress::new(
+        //             self.address_space,
+        //             state_ptr + state_idx,
+        //         ),
+        //         [data],
+        //         first_timestamp + curr_timestamp + AB::F::ONE,
+        //         &write_data,
+        //     )
+        //     .eval(builder, is_observe);
 
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(
-                    self.address_space,
-                    state_ptr,
-                ),
-                permutation_input,
-                first_timestamp + curr_timestamp + AB::F::TWO,
-                &read_sponge_state,
-            )
-            .eval(builder, should_permute);
+        // self.memory_bridge
+        //     .read(
+        //         MemoryAddress::new(
+        //             self.address_space,
+        //             state_ptr,
+        //         ),
+        //         permutation_input,
+        //         first_timestamp + curr_timestamp + AB::F::TWO,
+        //         &read_sponge_state,
+        //     )
+        //     .eval(builder, should_permute);
         
-        self.memory_bridge
-            .write(
-                MemoryAddress::new(
-                    self.address_space,
-                    state_ptr
-                ),
-                permutation_output,
-                first_timestamp + curr_timestamp + AB::F::from_canonical_usize(3),
-                &write_sponge_state,
-            )
-            .eval(builder, should_permute);
+        // self.memory_bridge
+        //     .write(
+        //         MemoryAddress::new(
+        //             self.address_space,
+        //             state_ptr
+        //         ),
+        //         permutation_output,
+        //         first_timestamp + curr_timestamp + AB::F::from_canonical_usize(3),
+        //         &write_sponge_state,
+        //     )
+        //     .eval(builder, should_permute);
 
         self.memory_bridge
             .write(

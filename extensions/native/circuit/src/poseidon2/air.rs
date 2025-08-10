@@ -716,6 +716,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             read_data,
             write_data,
             data,
+            should_permute,
             read_sponge_state,
             write_sponge_state,
             permutation_input,
@@ -803,6 +804,70 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 )
                 .eval(builder, aux_after_start[i] * aux_before_end[i]);
         }
+
+        for i in 0..(CHUNK - 1) {
+            builder
+                .when(aux_after_start[i])
+                .assert_one(aux_after_start[i + 1]);
+        }
+
+        for i in 1..CHUNK {
+            builder
+                .when(aux_before_end[i])
+                .assert_one(aux_before_end[i - 1]);
+        }
+
+        builder
+            .when(multi_observe_row * (AB::Expr::ONE - is_first))
+            .assert_eq(
+                aux_after_start[0] 
+                + aux_after_start[1]
+                + aux_after_start[2]
+                + aux_after_start[3]
+                + aux_after_start[4]
+                + aux_after_start[5]
+                + aux_after_start[6]
+                + aux_after_start[7],
+                AB::Expr::from_canonical_usize(CHUNK) - start_idx.into()
+            );
+
+        builder
+            .when(multi_observe_row * (AB::Expr::ONE - is_first))
+            .assert_eq(
+                aux_before_end[0]
+                + aux_before_end[1]
+                + aux_before_end[2]
+                + aux_before_end[3]
+                + aux_before_end[4]
+                + aux_before_end[5]
+                + aux_before_end[6]
+                + aux_before_end[7], 
+                end_idx
+            );
+
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(
+                    self.address_space,
+                    state_ptr,
+                ),
+                permutation_input,
+                start_timestamp + end_idx * AB::F::TWO - start_idx * AB::F::TWO,
+                &read_sponge_state,
+            )
+            .eval(builder, multi_observe_row * should_permute);
+        
+        self.memory_bridge
+            .write(
+                MemoryAddress::new(
+                    self.address_space,
+                    state_ptr
+                ),
+                permutation_output,
+                start_timestamp + end_idx * AB::F::TWO - start_idx * AB::F::TWO + AB::F::ONE,
+                &write_sponge_state,
+            )
+            .eval(builder, multi_observe_row * should_permute);
     }
 }
 

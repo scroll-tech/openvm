@@ -132,17 +132,13 @@ pub struct TranscriptObservationRecord<F: Field> {
     pub is_last: bool,
     pub curr_timestamp_increment: usize,
     pub final_timestamp_increment: usize,
-
-    // pub read_state_ptr: RecordId,
-    // pub read_input_ptr: RecordId,
+    
     pub state_ptr: F,
     pub input_ptr: F,
-
-    // pub read_init_pos: RecordId,
     pub init_pos: F,
-    // pub read_len: RecordId,
     pub len: usize,
     pub curr_len: usize,
+    pub should_permute: bool,
 
     pub read_input_data: [RecordId; CHUNK],
     pub write_input_data: [RecordId; CHUNK],
@@ -398,18 +394,19 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     curr_timestamp += 1;
                 }
 
-                // if record.end_idx >= CHUNK {
-                //     let (read_sponge_record, permutation_input) = memory.read::<{CHUNK * 2}>(data_address_space, sponge_ptr);
-                //     let output = self.subchip.permute(permutation_input);
-                //     let (write_sponge_record, _) = memory.write::<{CHUNK * 2}>(data_address_space, sponge_ptr, std::array::from_fn(|i| output[i]));
+                if record.end_idx >= CHUNK {
+                    let (read_sponge_record, permutation_input) = memory.read::<{CHUNK * 2}>(data_address_space, sponge_ptr);
+                    let output = self.subchip.permute(permutation_input);
+                    let (write_sponge_record, _) = memory.write::<{CHUNK * 2}>(data_address_space, sponge_ptr, std::array::from_fn(|i| output[i]));
 
-                //     curr_timestamp += 2;
+                    curr_timestamp += 2;
 
-                //     record.read_sponge_state = read_sponge_record;
-                //     record.write_sponge_state = write_sponge_record;
-                //     record.permutation_input = permutation_input;
-                //     record.permutation_output = output;
-                // }
+                    record.should_permute = true;
+                    record.read_sponge_state = read_sponge_record;
+                    record.write_sponge_state = write_sponge_record;
+                    record.permutation_input = permutation_input;
+                    record.permutation_output = output;
+                }
 
                 observation_records.push(record);
                 self.height += 1;

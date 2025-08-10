@@ -470,6 +470,8 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
             for i in record.start_idx..CHUNK {
                 specific.aux_after_start[i] = F::ONE;
             }
+            // _debug
+            println!("=> specific.aux_after_start - {:?}", specific.aux_after_start);
             for i in 0..record.end_idx {
                 specific.aux_before_end[i] = F::ONE;
             }
@@ -480,15 +482,15 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
                 aux_cols_factory.generate_write_aux(write_data_record, &mut specific.write_data[i]);
                 specific.data[i] = record.input_data[i];
             }
-
-            // if record.end_idx >= CHUNK {
-            //     let read_sponge_record = memory.record_by_id(record.read_sponge_state);
-            //     let write_sponge_record = memory.record_by_id(record.write_sponge_state);
-            //     aux_cols_factory.generate_read_aux(read_sponge_record, &mut specific.read_sponge_state);
-            //     aux_cols_factory.generate_write_aux(write_sponge_record, &mut specific.write_sponge_state);
-            //     specific.permutation_input = record.permutation_input;
-            //     specific.permutation_output = record.permutation_output;
-            // }
+            if record.should_permute {
+                let read_sponge_record = memory.record_by_id(record.read_sponge_state);
+                let write_sponge_record = memory.record_by_id(record.write_sponge_state);
+                aux_cols_factory.generate_read_aux(read_sponge_record, &mut specific.read_sponge_state);
+                aux_cols_factory.generate_write_aux(write_sponge_record, &mut specific.write_sponge_state);
+                specific.should_permute = F::ONE;
+                specific.permutation_input = record.permutation_input;
+                specific.permutation_output = record.permutation_output;
+            }
         }
 
         // if record.is_last {
