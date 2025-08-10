@@ -8,7 +8,6 @@ mod fri;
 mod jal;
 mod loadstore;
 mod poseidon2;
-mod multi_observe;
 
 pub use branch_eq::*;
 pub use castf::*;
@@ -18,7 +17,6 @@ pub use fri::*;
 pub use jal::*;
 pub use loadstore::*;
 pub use poseidon2::*;
-pub use multi_observe::*;
 
 mod extension;
 pub use extension::*;

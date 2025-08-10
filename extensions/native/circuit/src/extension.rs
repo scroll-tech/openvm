@@ -31,7 +31,6 @@ use strum::IntoEnumIterator;
 use crate::{
     adapters::{convert_adapter::ConvertAdapterChip, *},
     poseidon2::chip::NativePoseidon2Chip,
-    multi_observe::NativeMultiObserveChip,
     phantom::*,
     *,
 };
@@ -77,7 +76,6 @@ pub enum NativeExecutor<F: PrimeField32> {
     FieldExtension(FieldExtensionChip<F>),
     FriReducedOpening(FriReducedOpeningChip<F>),
     VerifyBatch(NativePoseidon2Chip<F, 1>),
-    MultiObserve(NativeMultiObserveChip<F>),
 }
 
 #[derive(From, ChipUsageGetter, Chip, AnyEnum)]
@@ -205,17 +203,9 @@ impl<F: PrimeField32> VmExtension<F> for Native {
                 VerifyBatchOpcode::VERIFY_BATCH.global_opcode(),
                 Poseidon2Opcode::PERM_POS2.global_opcode(),
                 Poseidon2Opcode::COMP_POS2.global_opcode(),
+                Poseidon2Opcode::MULTI_OBSERVE.global_opcode(),
             ],
         )?;
-
-        let multi_observe_chip = NativeMultiObserveChip::new(
-            builder.system_port(),
-            offline_memory.clone(),
-            Poseidon2Config::default(),
-        );
-        inventory.add_executor(multi_observe_chip, [
-            Poseidon2Opcode::MULTI_OBSERVE.global_opcode(),
-        ])?;
 
         builder.add_phantom_sub_executor(
             NativeHintInputSubEx,

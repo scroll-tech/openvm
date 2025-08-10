@@ -9,7 +9,7 @@ use openvm_circuit::{
 use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode};
 use openvm_native_compiler::{
     conversion::AS,
-    Poseidon2Opcode::{COMP_POS2, PERM_POS2},
+    Poseidon2Opcode::{COMP_POS2, PERM_POS2, MULTI_OBSERVE},
     VerifyBatchOpcode::VERIFY_BATCH,
 };
 use openvm_poseidon2_air::{Poseidon2Config, Poseidon2SubAir, Poseidon2SubChip};
@@ -120,11 +120,53 @@ pub struct SimplePoseidonRecord<F: Field> {
     pub p2_input: [F; 2 * CHUNK],
 }
 
+#[repr(C)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[serde(bound = "F: Field")]
+pub struct TranscriptObservationRecord<F: Field> {
+    pub from_state: ExecutionState<u32>,
+    pub instruction: Instruction<F>,
+    pub start_idx: usize,
+    pub end_idx: usize,
+    pub is_first: bool,
+    pub is_last: bool,
+    pub curr_timestamp_increment: usize,
+    pub final_timestamp_increment: usize,
+
+    // pub read_state_ptr: RecordId,
+    // pub read_input_ptr: RecordId,
+    pub state_ptr: F,
+    pub input_ptr: F,
+
+    // pub read_init_pos: RecordId,
+    pub init_pos: F,
+    // pub read_len: RecordId,
+    pub len: usize,
+
+    pub read_input_data: [RecordId; CHUNK],
+    pub write_input_data: [RecordId; CHUNK],
+    pub input_data: [F; CHUNK],
+
+    pub read_sponge_state: RecordId,
+    pub write_sponge_state: RecordId,
+    pub permutation_input: [F; 2 * CHUNK],
+    pub permutation_output: [F; 2 * CHUNK],
+
+    pub write_final_idx: RecordId,
+    pub final_idx: usize,
+
+    pub input_register_1: F,
+    pub input_register_2: F,
+    pub input_register_3: F,
+    pub output_register: F,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(bound = "F: Field")]
 pub struct NativePoseidon2RecordSet<F: Field> {
     pub verify_batch_records: Vec<VerifyBatchRecord<F>>,
     pub simple_permute_records: Vec<SimplePoseidonRecord<F>>,
+    pub transcript_observation_records: Vec<TranscriptObservationRecord<F>>,
 }
 
 pub struct NativePoseidon2Chip<F: Field, const SBOX_REGISTERS: usize> {
@@ -259,6 +301,133 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     p2_input,
                 });
             self.height += 1;
+        } else if instruction.opcode == MULTI_OBSERVE.global_opcode() {
+            let mut observation_records: Vec<TranscriptObservationRecord<F>> = vec![];
+            
+            let &Instruction {
+                a: output_register,
+                b: input_register_1,
+                c: input_register_2,
+                d: data_address_space,
+                e: register_address_space,
+                f: input_register_3,
+                ..
+            } = instruction;
+
+            let (read_sponge_ptr, sponge_ptr) = memory.read_cell(register_address_space, output_register);
+            let (read_arr_ptr, arr_ptr) = memory.read_cell(register_address_space, input_register_2);
+            let (read_init_pos, pos) = memory.read_cell(register_address_space, input_register_1);
+            let init_pos = pos.clone();
+            let mut pos = pos.as_canonical_u32() as usize;
+            let (read_len, len) = memory.read_cell(register_address_space, input_register_3);
+            let mut len = len.as_canonical_u32() as usize;
+
+            let mut header_record: TranscriptObservationRecord<F> = TranscriptObservationRecord {
+                from_state,
+                instruction: instruction.clone(),
+                curr_timestamp_increment: 0,
+                is_first: true,
+                state_ptr: sponge_ptr, 
+                input_ptr: arr_ptr, 
+                init_pos,
+                len,
+                input_register_1,
+                input_register_2,
+                input_register_3,
+                output_register,
+                ..Default::default()
+            };
+            header_record.read_input_data[0] = read_sponge_ptr;
+            header_record.read_input_data[1] = read_arr_ptr;
+            header_record.read_input_data[2] = read_init_pos;
+            header_record.read_input_data[3] = read_len;
+
+            observation_records.push(header_record);
+            self.height += 1;
+
+            // Observe bytes
+            let mut observation_chunks: Vec<(usize, usize, bool)> = vec![];
+            while len > 0 {
+                if len >= (CHUNK - pos) {
+                    observation_chunks.push((pos.clone(), CHUNK.clone(), true));
+                    pos = 0;
+                    len -= CHUNK - pos;
+                } else {
+                    observation_chunks.push((pos.clone(), pos + len, false));
+                    pos = pos + len;
+                    len = 0;
+                }
+            }
+
+            // _debug
+            println!("=> observation_chunks: {:?}", observation_chunks);
+
+            let mut curr_timestamp = 4usize;
+
+            /* _debug
+            let mut input_idx: usize = 0;
+            for chunk in observation_chunks {
+                let mut record: TranscriptObservationRecord<F> = TranscriptObservationRecord {
+                    from_state,
+                    instruction: instruction.clone(),
+
+                    start_idx: chunk.0,
+                    end_idx: chunk.1,
+
+                    curr_timestamp_increment: curr_timestamp,
+                    state_ptr: sponge_ptr, 
+                    input_ptr: arr_ptr, 
+                    init_pos,
+                    len,
+                    input_register_1,
+                    input_register_2,
+                    input_register_3,
+                    output_register,
+                    ..Default::default()
+                };
+
+                for j in chunk.0..chunk.1 {
+                    let (n_read, n_f) = memory.read_cell(data_address_space, arr_ptr + F::from_canonical_usize(input_idx));
+                    record.read_input_data[j] = n_read;
+                    record.input_data[j] = n_f;
+                    input_idx += 1;
+                    curr_timestamp += 1;
+
+                    let (n_write, _) = memory.write_cell(data_address_space, sponge_ptr + F::from_canonical_usize(j), n_f);
+                    record.write_input_data[j] = n_write;
+                    curr_timestamp += 1;
+                }
+
+                if record.end_idx >= CHUNK {
+                    let (read_sponge_record, permutation_input) = memory.read::<{CHUNK * 2}>(data_address_space, sponge_ptr);
+                    let output = self.subchip.permute(permutation_input);
+                    let (write_sponge_record, _) = memory.write::<{CHUNK * 2}>(data_address_space, sponge_ptr, std::array::from_fn(|i| output[i]));
+
+                    curr_timestamp += 2;
+
+                    record.read_sponge_state = read_sponge_record;
+                    record.write_sponge_state = write_sponge_record;
+                    record.permutation_input = permutation_input;
+                    record.permutation_output = output;
+                }
+
+                observation_records.push(record);
+                self.height += 1;
+            }
+
+            let last_record = observation_records.last_mut().unwrap();
+            let (write_final, _) = memory.write_cell(register_address_space, input_register_1, F::from_canonical_usize(last_record.end_idx));
+            curr_timestamp += 1;
+            last_record.is_last = true;
+            last_record.write_final_idx = write_final;
+            */
+
+            for record in &mut observation_records {
+                record.final_timestamp_increment = curr_timestamp;
+            }
+            for record in observation_records {
+                self.record_set.transcript_observation_records.push(record);
+            }
         } else if instruction.opcode == VERIFY_BATCH.global_opcode() {
             let &Instruction {
                 a: dim_register,
@@ -501,7 +670,9 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
             String::from("PERM_POS2")
         } else if opcode == COMP_POS2.global_opcode().as_usize() {
             String::from("COMP_POS2")
-        } else {
+        } else if opcode == MULTI_OBSERVE.global_opcode().as_usize() {
+            String::from("MULTI_OBSERVE")
+        }else {
             unreachable!("unsupported opcode: {}", opcode)
         }
     }

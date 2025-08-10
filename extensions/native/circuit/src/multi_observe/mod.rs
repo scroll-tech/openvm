@@ -137,58 +137,58 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
             output_register,
         } = local;
 
-        self.execution_bridge
-            .execute_and_increment_pc(
-                AB::F::from_canonical_usize(MULTI_OBSERVE.global_opcode().as_usize()),
-                [
-                    output_register.into(),
-                    input_register_1.into(),
-                    input_register_2.into(),
-                    self.address_space.into(),
-                    self.address_space.into(),
-                    input_register_3.into(),
-                ],
-                ExecutionState::new(pc, first_timestamp),
-                final_timestamp_increment,
-            )
-            .eval(builder, is_first);
+        // self.execution_bridge
+        //     .execute_and_increment_pc(
+        //         AB::F::from_canonical_usize(MULTI_OBSERVE.global_opcode().as_usize()),
+        //         [
+        //             output_register.into(),
+        //             input_register_1.into(),
+        //             input_register_2.into(),
+        //             self.address_space.into(),
+        //             self.address_space.into(),
+        //             input_register_3.into(),
+        //         ],
+        //         ExecutionState::new(pc, first_timestamp),
+        //         final_timestamp_increment,
+        //     )
+        //     .eval(builder, is_first);
 
-        // Memory operations
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(self.address_space, output_register),
-                [state_ptr],
-                first_timestamp,
-                &read_state_ptr,
-            )
-            .eval(builder, is_first);
+        // // Memory operations
+        // self.memory_bridge
+        //     .read(
+        //         MemoryAddress::new(self.address_space, output_register),
+        //         [state_ptr],
+        //         first_timestamp,
+        //         &read_state_ptr,
+        //     )
+        //     .eval(builder, is_first);
 
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(self.address_space, input_register_2),
-                [input_ptr],
-                first_timestamp + AB::F::ONE,
-                &read_input_ptr,
-            )
-            .eval(builder, is_first);
+        // self.memory_bridge
+        //     .read(
+        //         MemoryAddress::new(self.address_space, input_register_2),
+        //         [input_ptr],
+        //         first_timestamp + AB::F::ONE,
+        //         &read_input_ptr,
+        //     )
+        //     .eval(builder, is_first);
 
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(self.address_space, input_register_1),
-                [init_pos],
-                first_timestamp + AB::F::TWO,
-                &read_init_pos,
-            )
-            .eval(builder, is_first);
+        // self.memory_bridge
+        //     .read(
+        //         MemoryAddress::new(self.address_space, input_register_1),
+        //         [init_pos],
+        //         first_timestamp + AB::F::TWO,
+        //         &read_init_pos,
+        //     )
+        //     .eval(builder, is_first);
         
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(self.address_space, input_register_3),
-                [len],
-                first_timestamp + AB::F::from_canonical_usize(3),
-                &read_len,
-            )
-            .eval(builder, is_first);
+        // self.memory_bridge
+        //     .read(
+        //         MemoryAddress::new(self.address_space, input_register_3),
+        //         [len],
+        //         first_timestamp + AB::F::from_canonical_usize(3),
+        //         &read_len,
+        //     )
+        //     .eval(builder, is_first);
 
         self.memory_bridge
             .read(

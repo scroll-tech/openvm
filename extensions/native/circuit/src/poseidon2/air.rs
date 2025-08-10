@@ -7,7 +7,7 @@ use openvm_circuit::{
 use openvm_circuit_primitives::utils::not;
 use openvm_instructions::LocalOpcode;
 use openvm_native_compiler::{
-    Poseidon2Opcode::{COMP_POS2, PERM_POS2},
+    Poseidon2Opcode::{COMP_POS2, PERM_POS2, MULTI_OBSERVE},
     VerifyBatchOpcode::VERIFY_BATCH,
 };
 use openvm_poseidon2_air::{Poseidon2SubAir, BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS};
@@ -20,16 +20,13 @@ use openvm_stark_backend::{
     rap::{BaseAirWithPublicValues, PartitionedBaseAir},
 };
 
-use crate::{
-    poseidon2::{
+use crate::poseidon2::{
         chip::{NUM_INITIAL_READS, NUM_SIMPLE_ACCESSES},
         columns::{
-            InsideRowSpecificCols, NativePoseidon2Cols, SimplePoseidonSpecificCols,
-            TopLevelSpecificCols,
+            InsideRowSpecificCols, MultiObserveCols, NativePoseidon2Cols, SimplePoseidonSpecificCols, TopLevelSpecificCols
         },
         CHUNK,
-    },
-};
+    };
 
 #[derive(Clone, Debug)]
 pub struct NativePoseidon2Air<F: Field, const SBOX_REGISTERS: usize> {
@@ -72,6 +69,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             incorporate_sibling,
             inside_row,
             simple,
+            multi_observe_row,
             end_inside_row,
             end_top_level,
             start_top_level,
@@ -99,7 +97,8 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         builder.assert_bool(incorporate_sibling);
         builder.assert_bool(inside_row);
         builder.assert_bool(simple);
-        let enabled = incorporate_row + incorporate_sibling + inside_row + simple;
+        builder.assert_bool(multi_observe_row);
+        let enabled = incorporate_row + incorporate_sibling + inside_row + simple + multi_observe_row;
         builder.assert_bool(enabled.clone());
         builder.assert_bool(end_inside_row);
         builder.when(end_inside_row).assert_one(inside_row);
@@ -117,14 +116,14 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         builder.assert_eq(end.clone() * next.incorporate_row, next.start_top_level);
 
         // poseidon2 constraints are always checked
-        let mut sub_builder =
-            SubAirBuilder::<AB, Poseidon2SubAir<AB::F, SBOX_REGISTERS>, AB::F>::new(
-                builder,
-                0..self.subair.width(),
-            );
-        self.subair.eval(&mut sub_builder);
+        // let mut sub_builder =
+        //     SubAirBuilder::<AB, Poseidon2SubAir<AB::F, SBOX_REGISTERS>, AB::F>::new(
+        //         builder,
+        //         0..self.subair.width(),
+        //     );
+        // self.subair.eval(&mut sub_builder);
 
-        //// inside row constraints
+        // inside row constraints
 
         let inside_row_specific: &InsideRowSpecificCols<AB::Var> =
             specific[..InsideRowSpecificCols::<AB::Var>::width()].borrow();
@@ -680,6 +679,106 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 &write_data_2,
             )
             .eval(builder, simple * is_permute);
+
+        // multi_observe contraints
+        let multi_observe_specific: &MultiObserveCols<AB::Var> =
+            specific[..MultiObserveCols::<AB::Var>::width()].borrow();
+            // _debug
+        //         inner: _,
+            // incorporate_row,
+            // incorporate_sibling,
+            // inside_row,
+            // simple,
+            // multi_observe_row,
+            // end_inside_row,
+            // end_top_level,
+            // start_top_level,
+            // very_first_timestamp,
+            // start_timestamp,
+            // opened_element_size_inv,
+            // initial_opened_index,
+            // opened_base_pointer,
+            // is_exhausted,
+            // specific,
+        let &MultiObserveCols {
+            pc,
+            final_timestamp_increment,
+            state_ptr,
+            input_ptr,
+            init_pos,
+            len,
+            is_first,
+            is_last,
+            start_idx,
+            end_idx,
+            aux_after_start,
+            aux_before_end,
+            read_data,
+            write_data,
+            data,
+            read_sponge_state,
+            write_sponge_state,
+            permutation_input,
+            permutation_output,
+            write_final_idx,
+            final_idx,
+            input_register_1,
+            input_register_2,
+            input_register_3,
+            output_register
+        } = multi_observe_specific;
+
+        self.execution_bridge
+            .execute_and_increment_pc(
+                AB::F::from_canonical_usize(MULTI_OBSERVE.global_opcode().as_usize()),
+                [
+                    output_register.into(),
+                    input_register_1.into(),
+                    input_register_2.into(),
+                    self.address_space.into(),
+                    self.address_space.into(),
+                    input_register_3.into(),
+                ],
+                ExecutionState::new(pc, very_first_timestamp),
+                final_timestamp_increment,
+            )
+            .eval(builder, multi_observe_row * is_first);
+
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(self.address_space, output_register),
+                [state_ptr],
+                very_first_timestamp,
+                &read_data[0],
+            )
+            .eval(builder, multi_observe_row * is_first);
+
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(self.address_space, input_register_2),
+                [input_ptr],
+                very_first_timestamp + AB::F::ONE,
+                &read_data[1],
+            )
+            .eval(builder, multi_observe_row * is_first);
+
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(self.address_space, input_register_1),
+                [init_pos],
+                very_first_timestamp + AB::F::TWO,
+                &read_data[2],
+            )
+            .eval(builder, multi_observe_row * is_first);
+        
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(self.address_space, input_register_3),
+                [len],
+                very_first_timestamp + AB::F::from_canonical_usize(3),
+                &read_data[3],
+            )
+            .eval(builder, multi_observe_row * is_first);
     }
 }
 
