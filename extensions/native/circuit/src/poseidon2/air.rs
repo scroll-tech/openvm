@@ -682,23 +682,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         // multi_observe contraints
         let multi_observe_specific: &MultiObserveCols<AB::Var> =
             specific[..MultiObserveCols::<AB::Var>::width()].borrow();
-            // _debug
-        //         inner: _,
-            // incorporate_row,
-            // incorporate_sibling,
-            // inside_row,
-            // simple,
-            // multi_observe_row,
-            // end_inside_row,
-            // end_top_level,
-            // start_top_level,
-            // very_first_timestamp,
-            // start_timestamp,
-            // opened_element_size_inv,
-            // initial_opened_index,
-            // opened_base_pointer,
-            // is_exhausted,
-            // specific,
         let &MultiObserveCols {
             pc,
             final_timestamp_increment,
@@ -868,6 +851,18 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 &write_sponge_state,
             )
             .eval(builder, multi_observe_row * should_permute);
+
+        self.memory_bridge
+            .write(
+                MemoryAddress::new(
+                    self.address_space,
+                    input_register_1,
+                ),
+                [final_idx],
+                start_timestamp + is_first * AB::F::from_canonical_usize(4) + (end_idx - start_idx) * AB::F::TWO + should_permute * AB::F::TWO,
+                &write_final_idx
+            )
+            .eval(builder, multi_observe_row * is_last);
     }
 }
 

@@ -132,7 +132,7 @@ pub struct TranscriptObservationRecord<F: Field> {
     pub is_last: bool,
     pub curr_timestamp_increment: usize,
     pub final_timestamp_increment: usize,
-    
+
     pub state_ptr: F,
     pub input_ptr: F,
     pub init_pos: F,
@@ -411,14 +411,14 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                 observation_records.push(record);
                 self.height += 1;
             }
-            /* _debug
 
             let last_record = observation_records.last_mut().unwrap();
-            let (write_final, _) = memory.write_cell(register_address_space, input_register_1, F::from_canonical_usize(last_record.end_idx));
-            curr_timestamp += 1;
+            let final_idx = last_record.end_idx % CHUNK;
+            let (write_final, _) = memory.write_cell(register_address_space, input_register_1, F::from_canonical_usize(final_idx));
             last_record.is_last = true;
             last_record.write_final_idx = write_final;
-            */
+            last_record.final_idx = final_idx;
+            curr_timestamp += 1;
 
             for record in &mut observation_records {
                 record.final_timestamp_increment = curr_timestamp;

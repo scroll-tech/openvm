@@ -445,8 +445,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
             cols.specific[..MultiObserveCols::<F>::width()].borrow_mut();
 
         specific.pc = F::from_canonical_u32(record.from_state.pc);
-        specific.is_first = if record.is_first { F::ONE } else { F::ZERO };
-        specific.is_last = if record.is_last { F::ONE } else { F::ZERO };
         specific.final_timestamp_increment = F::from_canonical_usize(record.final_timestamp_increment);
         specific.state_ptr = record.state_ptr;
         specific.input_ptr = record.input_ptr;
@@ -455,6 +453,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
         specific.curr_len = F::from_canonical_usize(record.curr_len);
 
         if record.is_first {
+            specific.is_first = F::ONE;
             let read_state_ptr_record = memory.record_by_id(record.read_input_data[0]);
             let read_input_ptr_record = memory.record_by_id(record.read_input_data[1]);
             let read_init_pos_record = memory.record_by_id(record.read_input_data[2]);
@@ -470,8 +469,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
             for i in record.start_idx..CHUNK {
                 specific.aux_after_start[i] = F::ONE;
             }
-            // _debug
-            println!("=> specific.aux_after_start - {:?}", specific.aux_after_start);
             for i in 0..record.end_idx {
                 specific.aux_before_end[i] = F::ONE;
             }
@@ -493,11 +490,12 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
             }
         }
 
-        // if record.is_last {
-        //     specific.final_idx = F::from_canonical_usize(record.final_idx);
-        //     let write_final_idx_record = memory.record_by_id(record.write_final_idx);
-        //     aux_cols_factory.generate_write_aux(write_final_idx_record, &mut specific.write_final_idx);
-        // }
+        if record.is_last {
+            specific.is_last = F::ONE;
+            specific.final_idx = F::from_canonical_usize(record.final_idx);
+            let write_final_idx_record = memory.record_by_id(record.write_final_idx);
+            aux_cols_factory.generate_write_aux(write_final_idx_record, &mut specific.write_final_idx);
+        }
 
         specific.input_register_1 = record.input_register_1;
         specific.input_register_2 = record.input_register_2;

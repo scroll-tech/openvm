@@ -145,7 +145,9 @@ fn test_multi_observe() {
 fn build_test_program<C: Config>(
     builder: &mut Builder<C>,
 ) {
-    let sample_lens: Vec<usize> = vec![0, 10, 20];
+    let sample_lens: Vec<usize> = vec![0, 1, 2, 3];
+    // let sample_lens: Vec<usize> = vec![0, 10, 20];
+
     let mut rng = create_seeded_rng();
     let challenger = DuplexChallengerVariable::new(builder);
 
@@ -156,6 +158,19 @@ fn build_test_program<C: Config>(
             builder.set(&sample_input, idx_vec[0], C::F::from_canonical_u32(f_u32));
         });
 
-        builder.poseidon2_multi_observe(&challenger.sponge_state, challenger.input_ptr, &sample_input);
+        let next_input_ptr = builder.poseidon2_multi_observe(&challenger.sponge_state, challenger.input_ptr, &sample_input);
+
+        builder.assign(
+            &challenger.input_ptr,
+            challenger.io_empty_ptr + next_input_ptr.clone(),
+        );
+        builder.if_ne(next_input_ptr, Usize::from(0)).then_or_else(
+            |builder| {
+                builder.assign(&challenger.output_ptr, challenger.io_empty_ptr);
+            },
+            |builder| {
+                builder.assign(&challenger.output_ptr, challenger.io_full_ptr);
+            },
+        );
     }
 }

@@ -235,17 +235,17 @@ impl<AB: InteractionBuilder> Air<AB> for NativeMultiObserveAir<AB::F> {
         //     )
         //     .eval(builder, should_permute);
 
-        self.memory_bridge
-            .write(
-                MemoryAddress::new(
-                    self.address_space,
-                    input_register_1,
-                ),
-                [final_idx],
-                first_timestamp + curr_timestamp + is_first * AB::F::from_canonical_usize(4) + is_observe * AB::F::TWO + should_permute * AB::F::TWO,
-                &write_final_idx
-            )
-            .eval(builder, is_final);
+        // self.memory_bridge
+        //     .write(
+        //         MemoryAddress::new(
+        //             self.address_space,
+        //             input_register_1,
+        //         ),
+        //         [final_idx],
+        //         first_timestamp + curr_timestamp + is_first * AB::F::from_canonical_usize(4) + is_observe * AB::F::TWO + should_permute * AB::F::TWO,
+        //         &write_final_idx
+        //     )
+        //     .eval(builder, is_final);
 
         // Binary indicators columns
         builder.assert_bool(enable);
