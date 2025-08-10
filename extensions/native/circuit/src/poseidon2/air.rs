@@ -2,7 +2,7 @@ use std::{array::from_fn, borrow::Borrow, sync::Arc};
 
 use openvm_circuit::{
     arch::{ExecutionBridge, ExecutionState},
-    system::memory::{offline_checker::MemoryBridge, MemoryAddress},
+    system::memory::{offline_checker::MemoryBridge, MemoryAddress, CHUNK},
 };
 use openvm_circuit_primitives::utils::not;
 use openvm_instructions::LocalOpcode;
@@ -25,7 +25,6 @@ use crate::poseidon2::{
         columns::{
             InsideRowSpecificCols, MultiObserveCols, NativePoseidon2Cols, SimplePoseidonSpecificCols, TopLevelSpecificCols
         },
-        CHUNK,
     };
 
 #[derive(Clone, Debug)]
@@ -709,6 +708,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             len,
             is_first,
             is_last,
+            curr_len,
             start_idx,
             end_idx,
             aux_after_start,
@@ -779,6 +779,30 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 &read_data[3],
             )
             .eval(builder, multi_observe_row * is_first);
+
+        for i in 0..CHUNK {
+            let i_var = AB::F::from_canonical_usize(i);
+            self.memory_bridge
+                .read(
+                    MemoryAddress::new(self.address_space, input_ptr + curr_len + i_var - start_idx),
+                    [data[i]],
+                    start_timestamp + i_var * AB::F::TWO - start_idx * AB::F::TWO,
+                    &read_data[i]
+                )
+                .eval(builder, aux_after_start[i] * aux_before_end[i]);
+                
+            self.memory_bridge
+                .write(
+                    MemoryAddress::new(
+                        self.address_space,
+                        state_ptr + i_var,
+                    ),
+                    [data[i]],
+                    start_timestamp + i_var * AB::F::TWO - start_idx * AB::F::TWO + AB::F::ONE,
+                    &write_data[i],
+                )
+                .eval(builder, aux_after_start[i] * aux_before_end[i]);
+        }
     }
 }
 

@@ -142,6 +142,7 @@ pub struct TranscriptObservationRecord<F: Field> {
     pub init_pos: F,
     // pub read_len: RecordId,
     pub len: usize,
+    pub curr_len: usize,
 
     pub read_input_data: [RecordId; CHUNK],
     pub write_input_data: [RecordId; CHUNK],
@@ -363,8 +364,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
             println!("=> observation_chunks: {:?}", observation_chunks);
 
             let mut curr_timestamp = 4usize;
-
-            /* _debug
             let mut input_idx: usize = 0;
             for chunk in observation_chunks {
                 let mut record: TranscriptObservationRecord<F> = TranscriptObservationRecord {
@@ -379,6 +378,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     input_ptr: arr_ptr, 
                     init_pos,
                     len,
+                    curr_len: input_idx,
                     input_register_1,
                     input_register_2,
                     input_register_3,
@@ -398,22 +398,23 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     curr_timestamp += 1;
                 }
 
-                if record.end_idx >= CHUNK {
-                    let (read_sponge_record, permutation_input) = memory.read::<{CHUNK * 2}>(data_address_space, sponge_ptr);
-                    let output = self.subchip.permute(permutation_input);
-                    let (write_sponge_record, _) = memory.write::<{CHUNK * 2}>(data_address_space, sponge_ptr, std::array::from_fn(|i| output[i]));
+                // if record.end_idx >= CHUNK {
+                //     let (read_sponge_record, permutation_input) = memory.read::<{CHUNK * 2}>(data_address_space, sponge_ptr);
+                //     let output = self.subchip.permute(permutation_input);
+                //     let (write_sponge_record, _) = memory.write::<{CHUNK * 2}>(data_address_space, sponge_ptr, std::array::from_fn(|i| output[i]));
 
-                    curr_timestamp += 2;
+                //     curr_timestamp += 2;
 
-                    record.read_sponge_state = read_sponge_record;
-                    record.write_sponge_state = write_sponge_record;
-                    record.permutation_input = permutation_input;
-                    record.permutation_output = output;
-                }
+                //     record.read_sponge_state = read_sponge_record;
+                //     record.write_sponge_state = write_sponge_record;
+                //     record.permutation_input = permutation_input;
+                //     record.permutation_output = output;
+                // }
 
                 observation_records.push(record);
                 self.height += 1;
             }
+            /* _debug
 
             let last_record = observation_records.last_mut().unwrap();
             let (write_final, _) = memory.write_cell(register_address_space, input_register_1, F::from_canonical_usize(last_record.end_idx));

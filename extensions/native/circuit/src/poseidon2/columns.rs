@@ -219,6 +219,7 @@ pub struct MultiObserveCols<T> {
 
     pub is_first: T,
     pub is_last: T,
+    pub curr_len: T,
     pub start_idx: T,
     pub end_idx: T,
     pub aux_after_start: [T; CHUNK],

@@ -119,14 +119,12 @@ fn test_multi_observe() {
     let fri_params = if matches!(std::env::var("OPENVM_FAST_TEST"), Ok(x) if &x == "1") {
         FriParameters {
             // max constraint degree = 2^log_blowup + 1
-            // _debug
             log_blowup: 1, 
             log_final_poly_len: 0,
             num_queries: 2,
             proof_of_work_bits: 0,
         }
     } else {
-        // _debug
         standard_fri_params_with_100_bits_conjectured_security(1)
     };
 

@@ -452,6 +452,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
         specific.input_ptr = record.input_ptr;
         specific.init_pos = record.init_pos;
         specific.len = F::from_canonical_usize(record.len);
+        specific.curr_len = F::from_canonical_usize(record.curr_len);
 
         if record.is_first {
             let read_state_ptr_record = memory.record_by_id(record.read_input_data[0]);
@@ -463,8 +464,11 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
             aux_cols_factory.generate_read_aux(read_init_pos_record, &mut specific.read_data[2]);
             aux_cols_factory.generate_read_aux(read_len_record, &mut specific.read_data[3]);
         } else {
+            specific.start_idx = F::from_canonical_usize(record.start_idx);
+            specific.end_idx = F::from_canonical_usize(record.end_idx);
+
             for i in record.start_idx..CHUNK {
-            specific.aux_after_start[i] = F::ONE;
+                specific.aux_after_start[i] = F::ONE;
             }
             for i in 0..record.end_idx {
                 specific.aux_before_end[i] = F::ONE;
@@ -477,21 +481,21 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
                 specific.data[i] = record.input_data[i];
             }
 
-            if record.end_idx >= CHUNK {
-                let read_sponge_record = memory.record_by_id(record.read_sponge_state);
-                let write_sponge_record = memory.record_by_id(record.write_sponge_state);
-                aux_cols_factory.generate_read_aux(read_sponge_record, &mut specific.read_sponge_state);
-                aux_cols_factory.generate_write_aux(write_sponge_record, &mut specific.write_sponge_state);
-                specific.permutation_input = record.permutation_input;
-                specific.permutation_output = record.permutation_output;
-            }
+            // if record.end_idx >= CHUNK {
+            //     let read_sponge_record = memory.record_by_id(record.read_sponge_state);
+            //     let write_sponge_record = memory.record_by_id(record.write_sponge_state);
+            //     aux_cols_factory.generate_read_aux(read_sponge_record, &mut specific.read_sponge_state);
+            //     aux_cols_factory.generate_write_aux(write_sponge_record, &mut specific.write_sponge_state);
+            //     specific.permutation_input = record.permutation_input;
+            //     specific.permutation_output = record.permutation_output;
+            // }
         }
 
-        if record.is_last {
-            specific.final_idx = F::from_canonical_usize(record.final_idx);
-            let write_final_idx_record = memory.record_by_id(record.write_final_idx);
-            aux_cols_factory.generate_write_aux(write_final_idx_record, &mut specific.write_final_idx);
-        }
+        // if record.is_last {
+        //     specific.final_idx = F::from_canonical_usize(record.final_idx);
+        //     let write_final_idx_record = memory.record_by_id(record.write_final_idx);
+        //     aux_cols_factory.generate_write_aux(write_final_idx_record, &mut specific.write_final_idx);
+        // }
 
         specific.input_register_1 = record.input_register_1;
         specific.input_register_2 = record.input_register_2;
