@@ -317,6 +317,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
             let init_pos = pos.clone();
             let mut pos = pos.as_canonical_u32() as usize;
             let (read_len, len) = memory.read_cell(register_address_space, input_register_3);
+            let init_len = len.as_canonical_u32() as usize;
             let mut len = len.as_canonical_u32() as usize;
 
             let mut header_record: TranscriptObservationRecord<F> = TranscriptObservationRecord {
@@ -327,7 +328,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                 state_ptr: sponge_ptr, 
                 input_ptr: arr_ptr, 
                 init_pos,
-                len,
+                len: init_len,
                 input_register_1,
                 input_register_2,
                 input_register_3,
@@ -356,9 +357,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                 }
             }
 
-            // _debug
-            println!("=> observation_chunks: {:?}", observation_chunks);
-
             let mut curr_timestamp = 4usize;
             let mut input_idx: usize = 0;
             for chunk in observation_chunks {
@@ -373,7 +371,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                     state_ptr: sponge_ptr, 
                     input_ptr: arr_ptr, 
                     init_pos,
-                    len,
+                    len: init_len,
                     curr_len: input_idx,
                     input_register_1,
                     input_register_2,

@@ -682,6 +682,8 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         // multi_observe contraints
         let multi_observe_specific: &MultiObserveCols<AB::Var> =
             specific[..MultiObserveCols::<AB::Var>::width()].borrow();
+        let next_multi_observe_specific: &MultiObserveCols<AB::Var> =
+            next.specific[..MultiObserveCols::<AB::Var>::width()].borrow();
         let &MultiObserveCols {
             pc,
             final_timestamp_increment,
@@ -711,6 +713,16 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             input_register_3,
             output_register
         } = multi_observe_specific;
+
+        builder
+            .when(multi_observe_row)
+            .assert_bool(is_first);
+        builder
+            .when(multi_observe_row)
+            .assert_bool(is_last);
+        builder
+            .when(multi_observe_row)
+            .assert_bool(should_permute);
 
         self.execution_bridge
             .execute_and_increment_pc(
@@ -863,6 +875,46 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 &write_final_idx
             )
             .eval(builder, multi_observe_row * is_last);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(state_ptr, next_multi_observe_specific.state_ptr);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(input_ptr, next_multi_observe_specific.input_ptr);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(init_pos, next_multi_observe_specific.init_pos);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(len, next_multi_observe_specific.len);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(input_register_1, next_multi_observe_specific.input_register_1);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(input_register_2, next_multi_observe_specific.input_register_2);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(input_register_3, next_multi_observe_specific.input_register_3);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(output_register, next_multi_observe_specific.output_register);
     }
 }
 

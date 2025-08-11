@@ -531,9 +531,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
             used_cells += width;
         }
         for record in self.record_set.transcript_observation_records.iter() {
-            // _debug
-            println!("=> record: {:?}", record);
-
             self.multi_observe_record_to_row(
                 record,
                 &aux_cols_factory,
