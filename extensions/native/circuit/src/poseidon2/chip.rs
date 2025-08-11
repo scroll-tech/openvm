@@ -315,6 +315,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
             let (read_arr_ptr, arr_ptr) = memory.read_cell(register_address_space, input_register_2);
             let (read_init_pos, pos) = memory.read_cell(register_address_space, input_register_1);
             let init_pos = pos.clone();
+
             let mut pos = pos.as_canonical_u32() as usize;
             let (read_len, len) = memory.read_cell(register_address_space, input_register_3);
             let init_len = len.as_canonical_u32() as usize;
@@ -348,15 +349,15 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
             while len > 0 {
                 if len >= (CHUNK - pos) {
                     observation_chunks.push((pos.clone(), CHUNK.clone(), true));
-                    pos = 0;
                     len -= CHUNK - pos;
+                    pos = 0;
                 } else {
                     observation_chunks.push((pos.clone(), pos + len, false));
-                    pos = pos + len;
                     len = 0;
+                    pos = pos + len;
                 }
             }
-
+            
             let mut curr_timestamp = 4usize;
             let mut input_idx: usize = 0;
             for chunk in observation_chunks {

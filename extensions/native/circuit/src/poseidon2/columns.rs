@@ -244,23 +244,3 @@ pub struct MultiObserveCols<T> {
     pub input_register_3: T,
     pub output_register: T,
 }
-
-// _debug
-// pub struct NativeMultiObserveCols<T> {
-//     pub enable: T,
-//     pub is_first: T,
-//     pub is_final: T,
-//     pub is_observe: T,
-
-//     pub pc: T,
-//     pub state_idx: T,
-//     pub remaining_len: T,
-//     pub counter: T,
-//     pub should_permute: T,
-
-//     /// The initial timestamp of the instruction, which must be identical for first row
-//     /// and all following intermediate observation rows.
-//     pub first_timestamp: T,
-//     pub curr_timestamp: T,
-//     pub final_timestamp_increment: T,
-// }

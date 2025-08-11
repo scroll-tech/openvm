@@ -877,6 +877,25 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             )
             .eval(builder, multi_observe_row * is_last);
 
+        // Field transitions
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(next_multi_observe_specific.curr_len, multi_observe_specific.curr_len + end_idx - start_idx);
+
+        // Boundary conditions
+        builder
+            .when(multi_observe_row)
+            .when(is_first)
+            .assert_zero(curr_len);
+
+        builder
+            .when(multi_observe_row)
+            .when(is_last)
+            .assert_eq(curr_len + (end_idx - start_idx), len);
+
+
+        // Field consistency
         builder
             .when(next.multi_observe_row)
             .when(not(next_multi_observe_specific.is_first))
@@ -916,6 +935,17 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .when(next.multi_observe_row)
             .when(not(next_multi_observe_specific.is_first))
             .assert_eq(output_register, next_multi_observe_specific.output_register);
+
+        // Timestamp constraints
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(very_first_timestamp, next.very_first_timestamp);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(next.start_timestamp, start_timestamp + is_first * AB::F::from_canonical_usize(4) + (end_idx - start_idx) * AB::F::TWO + should_permute * AB::F::TWO);
     }
 }
 
