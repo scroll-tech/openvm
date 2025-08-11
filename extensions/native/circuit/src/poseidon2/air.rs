@@ -115,12 +115,12 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         builder.assert_eq(end.clone() * next.incorporate_row, next.start_top_level);
 
         // poseidon2 constraints are always checked
-        // let mut sub_builder =
-        //     SubAirBuilder::<AB, Poseidon2SubAir<AB::F, SBOX_REGISTERS>, AB::F>::new(
-        //         builder,
-        //         0..self.subair.width(),
-        //     );
-        // self.subair.eval(&mut sub_builder);
+        let mut sub_builder =
+            SubAirBuilder::<AB, Poseidon2SubAir<AB::F, SBOX_REGISTERS>, AB::F>::new(
+                builder,
+                0..self.subair.width(),
+            );
+        self.subair.eval(&mut sub_builder);
 
         // inside row constraints
 

@@ -436,6 +436,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
         slice: &mut [F],
         memory: &OfflineMemory<F>,
     ) {
+        self.generate_subair_cols(record.permutation_input, slice);
         let cols: &mut NativePoseidon2Cols<F, SBOX_REGISTERS> = slice.borrow_mut();
         cols.very_first_timestamp = F::from_canonical_u32(record.from_state.timestamp);
         cols.start_timestamp = F::from_canonical_usize(record.from_state.timestamp as usize + record.curr_timestamp_increment);
