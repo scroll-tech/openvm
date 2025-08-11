@@ -894,7 +894,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .when(is_last)
             .assert_eq(curr_len + (end_idx - start_idx), len);
 
-
         // Field consistency
         builder
             .when(next.multi_observe_row)
