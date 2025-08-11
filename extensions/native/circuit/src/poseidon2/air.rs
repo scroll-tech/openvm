@@ -704,8 +704,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             should_permute,
             read_sponge_state,
             write_sponge_state,
-            permutation_input,
-            permutation_output,
             write_final_idx,
             final_idx,
             input_register_1,
@@ -840,13 +838,16 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 end_idx
             );
 
+        let full_sponge_input = from_fn::<_, {CHUNK * 2}, _>(|i| local.inner.inputs[i]);
+        let full_sponge_output = from_fn::<_, {CHUNK * 2}, _>(|i| local.inner.ending_full_rounds[BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS - 1].post[i]);
+
         self.memory_bridge
             .read(
                 MemoryAddress::new(
                     self.address_space,
                     state_ptr,
                 ),
-                permutation_input,
+                full_sponge_input,
                 start_timestamp + end_idx * AB::F::TWO - start_idx * AB::F::TWO,
                 &read_sponge_state,
             )
@@ -858,7 +859,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     self.address_space,
                     state_ptr
                 ),
-                permutation_output,
+                full_sponge_output,
                 start_timestamp + end_idx * AB::F::TWO - start_idx * AB::F::TWO + AB::F::ONE,
                 &write_sponge_state,
             )

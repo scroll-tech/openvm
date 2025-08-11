@@ -486,8 +486,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
                 aux_cols_factory.generate_read_aux(read_sponge_record, &mut specific.read_sponge_state);
                 aux_cols_factory.generate_write_aux(write_sponge_record, &mut specific.write_sponge_state);
                 specific.should_permute = F::ONE;
-                specific.permutation_input = record.permutation_input;
-                specific.permutation_output = record.permutation_output;
             }
         }
 
