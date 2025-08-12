@@ -122,7 +122,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             );
         self.subair.eval(&mut sub_builder);
 
-        // inside row constraints
+        //// inside row constraints
 
         let inside_row_specific: &InsideRowSpecificCols<AB::Var> =
             specific[..InsideRowSpecificCols::<AB::Var>::width()].borrow();
@@ -679,7 +679,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             )
             .eval(builder, simple * is_permute);
 
-        // multi_observe contraints
+        //// multi_observe contraints
         let multi_observe_specific: &MultiObserveCols<AB::Var> =
             specific[..MultiObserveCols::<AB::Var>::width()].borrow();
         let next_multi_observe_specific: &MultiObserveCols<AB::Var> =
@@ -749,8 +749,8 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(self.address_space, input_register_2),
-                [input_ptr],
+                MemoryAddress::new(self.address_space, input_register_1),
+                [init_pos],
                 very_first_timestamp + AB::F::ONE,
                 &read_data[1],
             )
@@ -758,13 +758,13 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(self.address_space, input_register_1),
-                [init_pos],
+                MemoryAddress::new(self.address_space, input_register_2),
+                [input_ptr],
                 very_first_timestamp + AB::F::TWO,
                 &read_data[2],
             )
             .eval(builder, multi_observe_row * is_first);
-        
+
         self.memory_bridge
             .read(
                 MemoryAddress::new(self.address_space, input_register_3),
@@ -811,7 +811,8 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         }
 
         builder
-            .when(multi_observe_row * (AB::Expr::ONE - is_first))
+            .when(multi_observe_row)
+            .when(not(is_first))
             .assert_eq(
                 aux_after_start[0] 
                 + aux_after_start[1]
@@ -825,7 +826,8 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             );
 
         builder
-            .when(multi_observe_row * (AB::Expr::ONE - is_first))
+            .when(multi_observe_row)
+            .when(not(is_first))
             .assert_eq(
                 aux_before_end[0]
                 + aux_before_end[1]

@@ -312,8 +312,8 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
             } = instruction;
 
             let (read_sponge_ptr, sponge_ptr) = memory.read_cell(register_address_space, output_register);
-            let (read_arr_ptr, arr_ptr) = memory.read_cell(register_address_space, input_register_2);
             let (read_init_pos, pos) = memory.read_cell(register_address_space, input_register_1);
+            let (read_arr_ptr, arr_ptr) = memory.read_cell(register_address_space, input_register_2);
             let init_pos = pos.clone();
 
             let mut pos = pos.as_canonical_u32() as usize;
@@ -422,9 +422,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
             for record in &mut observation_records {
                 record.final_timestamp_increment = curr_timestamp;
             }
-            for record in observation_records {
-                self.record_set.transcript_observation_records.push(record);
-            }
+            self.record_set.transcript_observation_records.extend(observation_records);
         } else if instruction.opcode == VERIFY_BATCH.global_opcode() {
             let &Instruction {
                 a: dim_register,

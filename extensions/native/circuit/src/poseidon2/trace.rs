@@ -460,8 +460,8 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
             let read_init_pos_record = memory.record_by_id(record.read_input_data[2]);
             let read_len_record = memory.record_by_id(record.read_input_data[3]);
             aux_cols_factory.generate_read_aux(read_state_ptr_record, &mut specific.read_data[0]);
-            aux_cols_factory.generate_read_aux(read_input_ptr_record, &mut specific.read_data[1]);
-            aux_cols_factory.generate_read_aux(read_init_pos_record, &mut specific.read_data[2]);
+            aux_cols_factory.generate_read_aux(read_init_pos_record, &mut specific.read_data[1]);
+            aux_cols_factory.generate_read_aux(read_input_ptr_record, &mut specific.read_data[2]);
             aux_cols_factory.generate_read_aux(read_len_record, &mut specific.read_data[3]);
         } else {
             specific.start_idx = F::from_canonical_usize(record.start_idx);
