@@ -884,7 +884,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .when(next.multi_observe_row)
             .when(not(next_multi_observe_specific.is_first))
             .assert_eq(next_multi_observe_specific.curr_len, multi_observe_specific.curr_len + end_idx - start_idx);
-
+        
         // Boundary conditions
         builder
             .when(multi_observe_row)
@@ -895,6 +895,16 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .when(multi_observe_row)
             .when(is_last)
             .assert_eq(curr_len + (end_idx - start_idx), len);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_one(multi_observe_row);
+
+        builder
+            .when(multi_observe_row)
+            .when(not(is_last))
+            .assert_one(next.multi_observe_row);
 
         // Field consistency
         builder
