@@ -110,6 +110,11 @@ pub enum AsmInstruction<F, EF> {
     /// Halt.
     Halt,
 
+    /// Absorbs multiple base elements into a duplex transcript with Poseidon2 permutation
+    /// (sponge_state, init_pos, arr_ptr, len)
+    /// Returns the final index position of hash sponge
+    Poseidon2MultiObserve(i32, i32, i32, i32),
+
     /// Perform a Poseidon2 permutation on state starting at address `lhs`
     /// and store new state at `rhs`.
     /// (a, b) are pointers to (lhs, rhs).
@@ -334,6 +339,9 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
             AsmInstruction::Trap => write!(f, "trap"),
             AsmInstruction::Halt => write!(f, "halt"),
             AsmInstruction::HintBits(src, len) => write!(f, "hint_bits ({})fp, {}", src, len),
+            AsmInstruction::Poseidon2MultiObserve(dst, init_pos, arr, len) => {
+                write!(f, "poseidon2_multi_observe ({})fp, ({})fp ({})fp ({})fp", dst, init_pos, arr, len)
+            }
             AsmInstruction::Poseidon2Permute(dst, lhs) => {
                 write!(f, "poseidon2_permute ({})fp, ({})fp", dst, lhs)
             }

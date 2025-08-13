@@ -467,7 +467,8 @@ fn tester_with_random_poseidon2_ops(num_ops: usize) -> VmChipTester<BabyBearBlak
             PERM_POS2 => {
                 tester.write(e, lhs, data_left);
                 tester.write(e, lhs + CHUNK, data_right);
-            }
+            },
+            MULTI_OBSERVE => {}
         }
 
         tester.execute(&mut harness.executor, &mut harness.arena, &instruction);
@@ -484,6 +485,7 @@ fn tester_with_random_poseidon2_ops(num_ops: usize) -> VmChipTester<BabyBearBlak
                 let actual = [actual_0, actual_1].concat();
                 assert_eq!(&hash, &actual[..]);
             }
+            MULTI_OBSERVE => {}
         }
     }
     tester.build().load(harness).finalize()

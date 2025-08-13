@@ -101,7 +101,9 @@ impl<C: Config> DuplexChallengerVariable<C> {
         let b = self.sample(builder);
         let c = self.sample(builder);
         let d = self.sample(builder);
-        builder.ext_from_base_slice(&[a, b, c, d])
+        let ext = builder.uninit();
+        builder.ext_from_base_vec(ext, vec![a, b, c, d]);
+        ext
     }
 
     fn sample_bits(&self, builder: &mut Builder<C>, nb_bits: RVar<C::N>) -> Array<C, Var<C::N>>

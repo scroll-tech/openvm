@@ -12,7 +12,7 @@ use openvm_circuit::{
 use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode};
 use openvm_native_compiler::{
     conversion::AS,
-    Poseidon2Opcode::{COMP_POS2, PERM_POS2},
+    Poseidon2Opcode::{COMP_POS2, PERM_POS2, MULTI_OBSERVE},
     VerifyBatchOpcode::VERIFY_BATCH,
 };
 use openvm_poseidon2_air::{Poseidon2Config, Poseidon2SubChip, Poseidon2SubCols};
@@ -659,7 +659,9 @@ where
             String::from("PERM_POS2")
         } else if opcode == COMP_POS2.global_opcode().as_usize() {
             String::from("COMP_POS2")
-        } else {
+        } else if opcode == MULTI_OBSERVE.global_opcode().as_usize() {
+            String::from("MULTI_OBSERVE")
+        }else {
             unreachable!("unsupported opcode: {}", opcode)
         }
     }

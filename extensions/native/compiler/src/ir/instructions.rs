@@ -208,6 +208,13 @@ pub enum DslIr<C: Config> {
     /// Permutes an array of Bn254 elements using Poseidon2 (output = p2_permute(array)). Should
     /// only be used when target is a circuit.
     CircuitPoseidon2Permute([Var<C::N>; 3]),
+    /// Absorbs an array of baby bear elements into a duplex transcript with Poseidon2 permutations (output = p2_multi_observe(array, els)).
+    Poseidon2MultiObserve(
+        Ptr<C::N>,              // sponge_state
+        Var<C::N>,              // initial input_ptr position
+        Ptr<C::N>,              // input array (base elements)
+        Usize<C::N>,            // len of els
+    ),
 
     // Miscellaneous instructions.
     /// Prints a variable.
@@ -240,6 +247,9 @@ pub enum DslIr<C: Config> {
     Publish(Felt<C::F>, Var<C::N>),
     /// Operation to halt the program. Should be the last instruction in the program.
     Halt,
+
+    /// Packs a vector of felts into an ext.
+    ExtFromBaseVec(Ext<C::F, C::EF>, Vec<Felt<C::F>>),
 
     // Public inputs for circuits.
     /// Publish a field element as the ith public value. Should only be used when target is a

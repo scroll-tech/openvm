@@ -489,6 +489,12 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
                 DslIr::HintBitsF(var, len) => {
                     self.push(AsmInstruction::HintBits(var.fp(), len), debug_info);
                 }
+                DslIr::Poseidon2MultiObserve(dst, init_pos, arr_ptr, len) => {
+                    self.push(
+            AsmInstruction::Poseidon2MultiObserve(dst.fp(), init_pos.fp(), arr_ptr.fp(), len.get_var().fp()),
+                        debug_info,
+                    );
+                },
                 DslIr::Poseidon2PermuteBabyBear(dst, src) => match (dst, src) {
                     (Array::Dyn(dst, _), Array::Dyn(src, _)) => self.push(
                         AsmInstruction::Poseidon2Permute(dst.fp(), src.fp()),
@@ -616,6 +622,15 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
                         AsmInstruction::RangeCheck(v.fp(), lo_bits, hi_bits),
                         debug_info,
                     );
+                }
+                DslIr::ExtFromBaseVec(ext, base_vec) => {
+                    assert_eq!(base_vec.len(), EF::D);
+                    for (i, base) in base_vec.into_iter().enumerate() {
+                        self.push(
+                            AsmInstruction::CopyF(ext.fp() + (i as i32), base.fp()),
+                            debug_info.clone(),
+                        );
+                    }
                 }
                 _ => unimplemented!(),
             }

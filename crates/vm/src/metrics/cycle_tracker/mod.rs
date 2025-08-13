@@ -1,7 +1,18 @@
+/// Stats for a nested span in the execution segment that is tracked by the [`CycleTracker`].
+#[derive(Clone, Debug, Default)]
+pub struct SpanInfo {
+    /// The name of the span.
+    pub tag: String,
+    /// The cycle count at which the span starts.
+    pub start: usize,
+}
+
 #[derive(Clone, Debug, Default)]
 pub struct CycleTracker {
     /// Stack of span names, with most recent at the end
-    stack: Vec<String>,
+    stack: Vec<SpanInfo>,
+    /// Depth of the stack.
+    depth: usize,
 }
 
 impl CycleTracker {
@@ -10,29 +21,41 @@ impl CycleTracker {
     }
 
     pub fn top(&self) -> Option<&String> {
-        self.stack.last()
+        match self.stack.last() {
+            Some(span) => Some(&span.tag),
+            _ => None
+        }
     }
 
     /// Starts a new cycle tracker span for the given name.
-    /// If a span already exists for the given name, it ends the existing span and pushes a new one
-    /// to the vec.
-    pub fn start(&mut self, mut name: String) {
+    /// If a span already exists for the given name, it ends the existing span and pushes a new one to the vec.
+    pub fn start(&mut self, mut name: String, cycles_count: usize) {
         // hack to remove "CT-" prefix
         if name.starts_with("CT-") {
             name = name.split_off(3);
         }
-        self.stack.push(name);
+        self.stack.push(SpanInfo {
+            tag: name.clone(),
+            start: cycles_count,
+        });
+        let padding = "│ ".repeat(self.depth);
+        tracing::info!("{}┌╴{}", padding, name);
+        self.depth += 1;
     }
 
     /// Ends the cycle tracker span for the given name.
     /// If no span exists for the given name, it panics.
-    pub fn end(&mut self, mut name: String) {
+    pub fn end(&mut self, mut name: String, cycles_count: usize) {
         // hack to remove "CT-" prefix
         if name.starts_with("CT-") {
             name = name.split_off(3);
         }
-        let stack_top = self.stack.pop();
-        assert_eq!(stack_top.unwrap(), name, "Stack top does not match name");
+        let SpanInfo { tag, start } = self.stack.pop().unwrap();
+        assert_eq!(tag, name, "Stack top does not match name");
+        self.depth -= 1;
+        let padding = "│ ".repeat(self.depth);
+        let span_cycles = cycles_count - start;
+        tracing::info!("{}└╴{} cycles", padding, span_cycles);
     }
 
     /// Ends the current cycle tracker span.
@@ -42,7 +65,11 @@ impl CycleTracker {
 
     /// Get full name of span with all parent names separated by ";" in flamegraph format
     pub fn get_full_name(&self) -> String {
-        self.stack.join(";")
+        self.stack
+            .iter()
+            .map(|span_info| span_info.tag.clone())
+            .collect::<Vec<String>>()
+            .join(";")
     }
 }
 
