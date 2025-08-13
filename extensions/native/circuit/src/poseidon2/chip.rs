@@ -411,13 +411,13 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> InstructionExecutor<F>
                 self.height += 1;
             }
 
-            let last_record = observation_records.last_mut().unwrap();
-            let final_idx = last_record.end_idx % CHUNK;
-            let (write_final, _) = memory.write_cell(register_address_space, input_register_1, F::from_canonical_usize(final_idx));
-            last_record.is_last = true;
-            last_record.write_final_idx = write_final;
-            last_record.final_idx = final_idx;
-            curr_timestamp += 1;
+            // let last_record = observation_records.last_mut().unwrap();
+            // let final_idx = last_record.end_idx % CHUNK;
+            // let (write_final, _) = memory.write_cell(register_address_space, input_register_1, F::from_canonical_usize(final_idx));
+            // last_record.is_last = true;
+            // last_record.write_final_idx = write_final;
+            // last_record.final_idx = final_idx;
+            // curr_timestamp += 1;
 
             for record in &mut observation_records {
                 record.final_timestamp_increment = curr_timestamp;
