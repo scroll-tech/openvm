@@ -2,12 +2,12 @@ use std::{array::from_fn, borrow::Borrow, sync::Arc};
 
 use openvm_circuit::{
     arch::{ExecutionBridge, ExecutionState},
-    system::memory::{offline_checker::MemoryBridge, MemoryAddress},
+    system::memory::{offline_checker::MemoryBridge, MemoryAddress, CHUNK},
 };
 use openvm_circuit_primitives::utils::not;
 use openvm_instructions::LocalOpcode;
 use openvm_native_compiler::{
-    Poseidon2Opcode::{COMP_POS2, PERM_POS2},
+    Poseidon2Opcode::{COMP_POS2, PERM_POS2, MULTI_OBSERVE},
     VerifyBatchOpcode::VERIFY_BATCH,
 };
 use openvm_poseidon2_air::{Poseidon2SubAir, BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS};
@@ -20,16 +20,12 @@ use openvm_stark_backend::{
     rap::{BaseAirWithPublicValues, PartitionedBaseAir},
 };
 
-use crate::{
-    chip::{NUM_INITIAL_READS, NUM_SIMPLE_ACCESSES},
-    poseidon2::{
+use crate::poseidon2::{
+        chip::{NUM_INITIAL_READS, NUM_SIMPLE_ACCESSES},
         columns::{
-            InsideRowSpecificCols, NativePoseidon2Cols, SimplePoseidonSpecificCols,
-            TopLevelSpecificCols,
+            InsideRowSpecificCols, MultiObserveCols, NativePoseidon2Cols, SimplePoseidonSpecificCols, TopLevelSpecificCols
         },
-        CHUNK,
-    },
-};
+    };
 
 #[derive(Clone, Debug)]
 pub struct NativePoseidon2Air<F: Field, const SBOX_REGISTERS: usize> {
@@ -72,6 +68,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             incorporate_sibling,
             inside_row,
             simple,
+            multi_observe_row,
             end_inside_row,
             end_top_level,
             start_top_level,
@@ -99,7 +96,8 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         builder.assert_bool(incorporate_sibling);
         builder.assert_bool(inside_row);
         builder.assert_bool(simple);
-        let enabled = incorporate_row + incorporate_sibling + inside_row + simple;
+        builder.assert_bool(multi_observe_row);
+        let enabled = incorporate_row + incorporate_sibling + inside_row + simple + multi_observe_row;
         builder.assert_bool(enabled.clone());
         builder.assert_bool(end_inside_row);
         builder.when(end_inside_row).assert_one(inside_row);
@@ -680,6 +678,285 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 &write_data_2,
             )
             .eval(builder, simple * is_permute);
+
+        //// multi_observe contraints
+        let multi_observe_specific: &MultiObserveCols<AB::Var> =
+            specific[..MultiObserveCols::<AB::Var>::width()].borrow();
+        let next_multi_observe_specific: &MultiObserveCols<AB::Var> =
+            next.specific[..MultiObserveCols::<AB::Var>::width()].borrow();
+        let &MultiObserveCols {
+            pc,
+            final_timestamp_increment,
+            state_ptr,
+            input_ptr,
+            init_pos,
+            len,
+            is_first,
+            is_last,
+            curr_len,
+            start_idx,
+            end_idx,
+            aux_after_start,
+            aux_before_end,
+            read_data,
+            write_data,
+            data,
+            should_permute,
+            read_sponge_state,
+            write_sponge_state,
+            write_final_idx,
+            final_idx,
+            input_register_1,
+            input_register_2,
+            input_register_3,
+            output_register
+        } = multi_observe_specific;
+
+        builder
+            .when(multi_observe_row)
+            .assert_bool(is_first);
+        builder
+            .when(multi_observe_row)
+            .assert_bool(is_last);
+        builder
+            .when(multi_observe_row)
+            .assert_bool(should_permute);
+
+        self.execution_bridge
+            .execute_and_increment_pc(
+                AB::F::from_canonical_usize(MULTI_OBSERVE.global_opcode().as_usize()),
+                [
+                    output_register.into(),
+                    input_register_1.into(),
+                    input_register_2.into(),
+                    self.address_space.into(),
+                    self.address_space.into(),
+                    input_register_3.into(),
+                ],
+                ExecutionState::new(pc, very_first_timestamp),
+                final_timestamp_increment,
+            )
+            .eval(builder, multi_observe_row * is_first);
+
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(self.address_space, output_register),
+                [state_ptr],
+                very_first_timestamp,
+                &read_data[0],
+            )
+            .eval(builder, multi_observe_row * is_first);
+
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(self.address_space, input_register_1),
+                [init_pos],
+                very_first_timestamp + AB::F::ONE,
+                &read_data[1],
+            )
+            .eval(builder, multi_observe_row * is_first);
+
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(self.address_space, input_register_2),
+                [input_ptr],
+                very_first_timestamp + AB::F::TWO,
+                &read_data[2],
+            )
+            .eval(builder, multi_observe_row * is_first);
+
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(self.address_space, input_register_3),
+                [len],
+                very_first_timestamp + AB::F::from_canonical_usize(3),
+                &read_data[3],
+            )
+            .eval(builder, multi_observe_row * is_first);
+
+        for i in 0..CHUNK {
+            let i_var = AB::F::from_canonical_usize(i);
+            self.memory_bridge
+                .read(
+                    MemoryAddress::new(self.address_space, input_ptr + curr_len + i_var - start_idx),
+                    [data[i]],
+                    start_timestamp + i_var * AB::F::TWO - start_idx * AB::F::TWO,
+                    &read_data[i]
+                )
+                .eval(builder, aux_after_start[i] * aux_before_end[i]);
+                
+            self.memory_bridge
+                .write(
+                    MemoryAddress::new(
+                        self.address_space,
+                        state_ptr + i_var,
+                    ),
+                    [data[i]],
+                    start_timestamp + i_var * AB::F::TWO - start_idx * AB::F::TWO + AB::F::ONE,
+                    &write_data[i],
+                )
+                .eval(builder, aux_after_start[i] * aux_before_end[i]);
+        }
+
+        for i in 0..(CHUNK - 1) {
+            builder
+                .when(aux_after_start[i])
+                .assert_one(aux_after_start[i + 1]);
+        }
+
+        for i in 1..CHUNK {
+            builder
+                .when(aux_before_end[i])
+                .assert_one(aux_before_end[i - 1]);
+        }
+
+        builder
+            .when(multi_observe_row)
+            .when(not(is_first))
+            .assert_eq(
+                aux_after_start[0] 
+                + aux_after_start[1]
+                + aux_after_start[2]
+                + aux_after_start[3]
+                + aux_after_start[4]
+                + aux_after_start[5]
+                + aux_after_start[6]
+                + aux_after_start[7],
+                AB::Expr::from_canonical_usize(CHUNK) - start_idx.into()
+            );
+
+        builder
+            .when(multi_observe_row)
+            .when(not(is_first))
+            .assert_eq(
+                aux_before_end[0]
+                + aux_before_end[1]
+                + aux_before_end[2]
+                + aux_before_end[3]
+                + aux_before_end[4]
+                + aux_before_end[5]
+                + aux_before_end[6]
+                + aux_before_end[7], 
+                end_idx
+            );
+
+        let full_sponge_input = from_fn::<_, {CHUNK * 2}, _>(|i| local.inner.inputs[i]);
+        let full_sponge_output = from_fn::<_, {CHUNK * 2}, _>(|i| local.inner.ending_full_rounds[BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS - 1].post[i]);
+
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(
+                    self.address_space,
+                    state_ptr,
+                ),
+                full_sponge_input,
+                start_timestamp + end_idx * AB::F::TWO - start_idx * AB::F::TWO,
+                &read_sponge_state,
+            )
+            .eval(builder, multi_observe_row * should_permute);
+        
+        self.memory_bridge
+            .write(
+                MemoryAddress::new(
+                    self.address_space,
+                    state_ptr
+                ),
+                full_sponge_output,
+                start_timestamp + end_idx * AB::F::TWO - start_idx * AB::F::TWO + AB::F::ONE,
+                &write_sponge_state,
+            )
+            .eval(builder, multi_observe_row * should_permute);
+
+        self.memory_bridge
+            .write(
+                MemoryAddress::new(
+                    self.address_space,
+                    input_register_1,
+                ),
+                [final_idx],
+                start_timestamp + is_first * AB::F::from_canonical_usize(4) + (end_idx - start_idx) * AB::F::TWO + should_permute * AB::F::TWO,
+                &write_final_idx
+            )
+            .eval(builder, multi_observe_row * is_last);
+
+        // Field transitions
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(next_multi_observe_specific.curr_len, multi_observe_specific.curr_len + end_idx - start_idx);
+        
+        // Boundary conditions
+        builder
+            .when(multi_observe_row)
+            .when(is_first)
+            .assert_zero(curr_len);
+
+        builder
+            .when(multi_observe_row)
+            .when(is_last)
+            .assert_eq(curr_len + (end_idx - start_idx), len);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_one(multi_observe_row);
+
+        builder
+            .when(multi_observe_row)
+            .when(not(is_last))
+            .assert_one(next.multi_observe_row);
+
+        // Field consistency
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(state_ptr, next_multi_observe_specific.state_ptr);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(input_ptr, next_multi_observe_specific.input_ptr);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(init_pos, next_multi_observe_specific.init_pos);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(len, next_multi_observe_specific.len);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(input_register_1, next_multi_observe_specific.input_register_1);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(input_register_2, next_multi_observe_specific.input_register_2);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(input_register_3, next_multi_observe_specific.input_register_3);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(output_register, next_multi_observe_specific.output_register);
+
+        // Timestamp constraints
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(very_first_timestamp, next.very_first_timestamp);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(next.start_timestamp, start_timestamp + is_first * AB::F::from_canonical_usize(4) + (end_idx - start_idx) * AB::F::TWO + should_permute * AB::F::TWO);
     }
 }
 

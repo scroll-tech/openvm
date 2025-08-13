@@ -282,16 +282,18 @@ impl<F: PrimeField32, VC: VmConfig<F>> ExecutionSegment<F, VC> {
                         Some(SysPhantom::CtStart) =>
                         {
                             #[cfg(feature = "bench-metrics")]
-                            metrics
-                                .cycle_tracker
-                                .start(dsl_instr.cloned().unwrap_or("Default".to_string()))
+                            metrics.cycle_tracker.start(
+                                dsl_instr.cloned().unwrap_or("Default".to_string()),
+                                metrics.cycle_count,
+                            )
                         }
                         Some(SysPhantom::CtEnd) =>
                         {
                             #[cfg(feature = "bench-metrics")]
-                            metrics
-                                .cycle_tracker
-                                .end(dsl_instr.cloned().unwrap_or("Default".to_string()))
+                            metrics.cycle_tracker.end(
+                                dsl_instr.cloned().unwrap_or("Default".to_string()),
+                                metrics.cycle_count,
+                            )
                         }
                         _ => {}
                     }

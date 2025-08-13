@@ -184,6 +184,7 @@ pub enum NativePhantom {
 pub enum Poseidon2Opcode {
     PERM_POS2,
     COMP_POS2,
+    MULTI_OBSERVE,
 }
 
 /// Opcodes for FRI opening proofs.

@@ -1,4 +1,4 @@
-use air::VerifyBatchBus;
+use poseidon2::air::VerifyBatchBus;
 use alu_native_adapter::AluNativeAdapterChip;
 use branch_native_adapter::BranchNativeAdapterChip;
 use derive_more::derive::From;
@@ -30,7 +30,7 @@ use strum::IntoEnumIterator;
 
 use crate::{
     adapters::{convert_adapter::ConvertAdapterChip, *},
-    chip::NativePoseidon2Chip,
+    poseidon2::chip::NativePoseidon2Chip,
     phantom::*,
     *,
 };
@@ -203,6 +203,7 @@ impl<F: PrimeField32> VmExtension<F> for Native {
                 VerifyBatchOpcode::VERIFY_BATCH.global_opcode(),
                 Poseidon2Opcode::PERM_POS2.global_opcode(),
                 Poseidon2Opcode::COMP_POS2.global_opcode(),
+                Poseidon2Opcode::MULTI_OBSERVE.global_opcode(),
             ],
         )?;
 

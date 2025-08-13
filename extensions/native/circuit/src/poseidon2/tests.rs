@@ -434,7 +434,8 @@ fn tester_with_random_poseidon2_ops(num_ops: usize) -> VmChipTester<BabyBearBlak
             }
             PERM_POS2 => {
                 tester.write(e, lhs, data);
-            }
+            },
+            MULTI_OBSERVE => {}
         }
 
         tester.execute(&mut chip, &instruction);
@@ -449,6 +450,7 @@ fn tester_with_random_poseidon2_ops(num_ops: usize) -> VmChipTester<BabyBearBlak
                 let actual = tester.read::<{ 2 * CHUNK }>(e, dst);
                 assert_eq!(hash, actual);
             }
+            MULTI_OBSERVE => {}
         }
     }
     tester.build().load(chip).finalize()

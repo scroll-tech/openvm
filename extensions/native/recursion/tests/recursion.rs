@@ -1,13 +1,30 @@
-use openvm_circuit::arch::{instructions::program::Program, SystemConfig, VmConfig, VmExecutor};
+use openvm_circuit::arch::{instructions::program::Program, SystemConfig, VmConfig, VmExecutor, verify_single, VirtualMachine,};
 use openvm_native_circuit::{Native, NativeConfig};
-use openvm_native_compiler::{asm::AsmBuilder, ir::Felt};
-use openvm_native_recursion::testing_utils::inner::run_recursive_test;
+use openvm_native_compiler::{
+    prelude::*,
+    asm::{AsmBuilder, AsmCompiler}, ir::Felt,
+    conversion::{convert_program, CompilerOptions}, 
+};
+use openvm_native_recursion::{testing_utils::inner::run_recursive_test, challenger::duplex::DuplexChallengerVariable};
 use openvm_stark_backend::{
     config::{Domain, StarkGenericConfig},
     p3_commit::PolynomialSpace,
     p3_field::{extension::BinomialExtensionField, FieldAlgebra},
 };
-use openvm_stark_sdk::{config::FriParameters, p3_baby_bear::BabyBear, utils::ProofInputForTest};
+use openvm_stark_sdk::{
+    config::FriParameters, 
+    p3_baby_bear::BabyBear, 
+    utils::ProofInputForTest,
+    config::{
+        baby_bear_poseidon2::BabyBearPoseidon2Engine,
+        fri_params::standard_fri_params_with_100_bits_conjectured_security,
+    },
+    engine::StarkFriEngine,
+    utils::create_seeded_rng,
+};
+use rand::Rng;
+pub type F = BabyBear;
+pub type E = BinomialExtensionField<F, 4>;
 
 fn fibonacci_program(a: u32, b: u32, n: u32) -> Program<BabyBear> {
     type F = BabyBear;
@@ -78,4 +95,81 @@ fn test_fibonacci_program_halo2_verify() {
 
     let fib_program_stark = fibonacci_program_test_proof_input(0, 1, 32);
     run_static_verifier_test(fib_program_stark, FriParameters::new_for_testing(3));
+}
+
+#[test]
+fn test_multi_observe() {
+    let mut builder = AsmBuilder::<BabyBear, BinomialExtensionField<F, 4>>::default();
+
+    build_test_program(&mut builder);
+
+    // Fill in test program logic
+    builder.halt();
+
+    let compilation_options = CompilerOptions::default().with_cycle_tracker();
+    let mut compiler = AsmCompiler::new(compilation_options.word_size);
+    compiler.build(builder.operations);
+    let asm_code = compiler.code();
+
+    // let program = Program::from_instructions(&instructions);
+    let program: Program<_> = convert_program(asm_code, compilation_options);
+
+    let poseidon2_max_constraint_degree = 3;
+    
+    let fri_params = if matches!(std::env::var("OPENVM_FAST_TEST"), Ok(x) if &x == "1") {
+        FriParameters {
+            // max constraint degree = 2^log_blowup + 1
+            log_blowup: 1, 
+            log_final_poly_len: 0,
+            num_queries: 2,
+            proof_of_work_bits: 0,
+        }
+    } else {
+        standard_fri_params_with_100_bits_conjectured_security(1)
+    };
+
+    let engine = BabyBearPoseidon2Engine::new(fri_params);
+    let mut config = NativeConfig::aggregation(0, poseidon2_max_constraint_degree);
+    config.system.memory_config.max_access_adapter_n = 16;
+
+    let vm = VirtualMachine::new(engine, config);
+
+    let pk = vm.keygen();
+    let result = vm.execute_and_generate(program, vec![]).unwrap();
+    let proofs = vm.prove(&pk, result);
+    for proof in proofs {
+        verify_single(&vm.engine, &pk.get_vk(), &proof).expect("Verification failed");
+    }
+}
+
+fn build_test_program<C: Config>(
+    builder: &mut Builder<C>,
+) {
+    let sample_lens: Vec<usize> = vec![10, 2, 0, 3, 20];
+
+    let mut rng = create_seeded_rng();
+    let challenger = DuplexChallengerVariable::new(builder);
+
+    for l in sample_lens {
+        let sample_input: Array<C, Felt<C::F>> = builder.dyn_array(l);
+        builder.range(0, l).for_each(|idx_vec, builder| {
+            let f_u32: u32 = rng.gen_range(1..1 << 30);
+            builder.set(&sample_input, idx_vec[0], C::F::from_canonical_u32(f_u32));
+        });
+
+        let next_input_ptr = builder.poseidon2_multi_observe(&challenger.sponge_state, challenger.input_ptr, &sample_input);
+
+        builder.assign(
+            &challenger.input_ptr,
+            challenger.io_empty_ptr + next_input_ptr.clone(),
+        );
+        builder.if_ne(next_input_ptr, Usize::from(0)).then_or_else(
+            |builder| {
+                builder.assign(&challenger.output_ptr, challenger.io_empty_ptr);
+            },
+            |builder| {
+                builder.assign(&challenger.output_ptr, challenger.io_full_ptr);
+            },
+        );
+    }
 }

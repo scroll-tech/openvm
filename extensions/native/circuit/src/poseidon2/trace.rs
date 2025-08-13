@@ -15,18 +15,15 @@ use openvm_stark_backend::{
 };
 
 use crate::{
-    chip::{SimplePoseidonRecord, NUM_INITIAL_READS},
-    poseidon2::{
+    chip::TranscriptObservationRecord, poseidon2::{
         chip::{
-            CellRecord, IncorporateRowRecord, IncorporateSiblingRecord, InsideRowRecord,
-            NativePoseidon2Chip, VerifyBatchRecord,
+            CellRecord, IncorporateRowRecord, IncorporateSiblingRecord, InsideRowRecord, NativePoseidon2Chip, SimplePoseidonRecord, VerifyBatchRecord, NUM_INITIAL_READS
         },
         columns::{
-            InsideRowSpecificCols, NativePoseidon2Cols, SimplePoseidonSpecificCols,
-            TopLevelSpecificCols,
+            InsideRowSpecificCols, MultiObserveCols, NativePoseidon2Cols, SimplePoseidonSpecificCols, TopLevelSpecificCols
         },
         CHUNK,
-    },
+    }
 };
 impl<F: Field, const SBOX_REGISTERS: usize> ChipUsageGetter
     for NativePoseidon2Chip<F, SBOX_REGISTERS>
@@ -432,6 +429,79 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
         }
     }
 
+    fn multi_observe_record_to_row(
+        &self,
+        record: &TranscriptObservationRecord<F>,
+        aux_cols_factory: &MemoryAuxColsFactory<F>,
+        slice: &mut [F],
+        memory: &OfflineMemory<F>,
+    ) {
+        self.generate_subair_cols(record.permutation_input, slice);
+        let cols: &mut NativePoseidon2Cols<F, SBOX_REGISTERS> = slice.borrow_mut();
+        cols.very_first_timestamp = F::from_canonical_u32(record.from_state.timestamp);
+        cols.start_timestamp = F::from_canonical_usize(record.from_state.timestamp as usize + record.curr_timestamp_increment);
+        cols.multi_observe_row = F::ONE;
+
+        let specific: &mut MultiObserveCols<F> =
+            cols.specific[..MultiObserveCols::<F>::width()].borrow_mut();
+
+        specific.pc = F::from_canonical_u32(record.from_state.pc);
+        specific.final_timestamp_increment = F::from_canonical_usize(record.final_timestamp_increment);
+        specific.state_ptr = record.state_ptr;
+        specific.input_ptr = record.input_ptr;
+        specific.init_pos = record.init_pos;
+        specific.len = F::from_canonical_usize(record.len);
+        specific.curr_len = F::from_canonical_usize(record.curr_len);
+
+        if record.is_first {
+            specific.is_first = F::ONE;
+            let read_state_ptr_record = memory.record_by_id(record.read_input_data[0]);
+            let read_input_ptr_record = memory.record_by_id(record.read_input_data[1]);
+            let read_init_pos_record = memory.record_by_id(record.read_input_data[2]);
+            let read_len_record = memory.record_by_id(record.read_input_data[3]);
+            aux_cols_factory.generate_read_aux(read_state_ptr_record, &mut specific.read_data[0]);
+            aux_cols_factory.generate_read_aux(read_init_pos_record, &mut specific.read_data[1]);
+            aux_cols_factory.generate_read_aux(read_input_ptr_record, &mut specific.read_data[2]);
+            aux_cols_factory.generate_read_aux(read_len_record, &mut specific.read_data[3]);
+        } else {
+            specific.start_idx = F::from_canonical_usize(record.start_idx);
+            specific.end_idx = F::from_canonical_usize(record.end_idx);
+
+            for i in record.start_idx..CHUNK {
+                specific.aux_after_start[i] = F::ONE;
+            }
+            for i in 0..record.end_idx {
+                specific.aux_before_end[i] = F::ONE;
+            }
+            for i in record.start_idx..record.end_idx {
+                let read_data_record = memory.record_by_id(record.read_input_data[i]);
+                let write_data_record = memory.record_by_id(record.write_input_data[i]);
+                aux_cols_factory.generate_read_aux(read_data_record, &mut specific.read_data[i]);
+                aux_cols_factory.generate_write_aux(write_data_record, &mut specific.write_data[i]);
+                specific.data[i] = record.input_data[i];
+            }
+            if record.should_permute {
+                let read_sponge_record = memory.record_by_id(record.read_sponge_state);
+                let write_sponge_record = memory.record_by_id(record.write_sponge_state);
+                aux_cols_factory.generate_read_aux(read_sponge_record, &mut specific.read_sponge_state);
+                aux_cols_factory.generate_write_aux(write_sponge_record, &mut specific.write_sponge_state);
+                specific.should_permute = F::ONE;
+            }
+        }
+
+        if record.is_last {
+            specific.is_last = F::ONE;
+            specific.final_idx = F::from_canonical_usize(record.final_idx);
+            let write_final_idx_record = memory.record_by_id(record.write_final_idx);
+            aux_cols_factory.generate_write_aux(write_final_idx_record, &mut specific.write_final_idx);
+        }
+
+        specific.input_register_1 = record.input_register_1;
+        specific.input_register_2 = record.input_register_2;
+        specific.input_register_3 = record.input_register_3;
+        specific.output_register = record.output_register;
+    }
+
     fn generate_trace(self) -> RowMajorMatrix<F> {
         let width = self.trace_width();
         let height = next_power_of_two_or_zero(self.height);
@@ -452,6 +522,15 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
         }
         for record in self.record_set.simple_permute_records.iter() {
             self.simple_record_to_row(
+                record,
+                &aux_cols_factory,
+                &mut flat_trace[used_cells..used_cells + width],
+                &memory,
+            );
+            used_cells += width;
+        }
+        for record in self.record_set.transcript_observation_records.iter() {
+            self.multi_observe_record_to_row(
                 record,
                 &aux_cols_factory,
                 &mut flat_trace[used_cells..used_cells + width],
