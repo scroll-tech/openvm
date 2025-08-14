@@ -98,6 +98,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         builder.assert_bool(simple);
         builder.assert_bool(multi_observe_row);
         let enabled = incorporate_row + incorporate_sibling + inside_row + simple + multi_observe_row;
+
         builder.assert_bool(enabled.clone());
         builder.assert_bool(end_inside_row);
         builder.when(end_inside_row).assert_one(inside_row);
@@ -679,6 +680,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             )
             .eval(builder, simple * is_permute);
 
+        
         //// multi_observe contraints
         let multi_observe_specific: &MultiObserveCols<AB::Var> =
             specific[..MultiObserveCols::<AB::Var>::width()].borrow();
@@ -698,6 +700,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             end_idx,
             aux_after_start,
             aux_before_end,
+            aux_read_enabled,
             read_data,
             write_data,
             data,
@@ -783,7 +786,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     start_timestamp + i_var * AB::F::TWO - start_idx * AB::F::TWO,
                     &read_data[i]
                 )
-                .eval(builder, aux_after_start[i] * aux_before_end[i]);
+                .eval(builder, multi_observe_row * aux_read_enabled[i]);
                 
             self.memory_bridge
                 .write(
@@ -795,19 +798,27 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     start_timestamp + i_var * AB::F::TWO - start_idx * AB::F::TWO + AB::F::ONE,
                     &write_data[i],
                 )
-                .eval(builder, aux_after_start[i] * aux_before_end[i]);
+                .eval(builder, multi_observe_row * aux_read_enabled[i]);
         }
 
         for i in 0..(CHUNK - 1) {
             builder
+                .when(multi_observe_row)
                 .when(aux_after_start[i])
                 .assert_one(aux_after_start[i + 1]);
         }
 
         for i in 1..CHUNK {
             builder
+                .when(multi_observe_row)
                 .when(aux_before_end[i])
                 .assert_one(aux_before_end[i - 1]);
+        }
+
+        for i in 0..CHUNK {
+            builder
+                .when(multi_observe_row)
+                .assert_eq(aux_after_start[i] * aux_before_end[i], aux_read_enabled[i]);
         }
 
         builder
