@@ -517,10 +517,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
         let aux_cols_factory = memory.aux_cols_factory();
 
         let mut used_cells = 0;
-
-        // _debug
-        println!("=> self.record_set: {:?}", self.record_set);
-
         for record in self.record_set.verify_batch_records.iter() {
             used_cells += self.verify_batch_record_to_rows(
                 record,

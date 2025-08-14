@@ -98,7 +98,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         builder.assert_bool(simple);
         builder.assert_bool(multi_observe_row);
         let enabled = incorporate_row + incorporate_sibling + inside_row + simple + multi_observe_row;
-
         builder.assert_bool(enabled.clone());
         builder.assert_bool(end_inside_row);
         builder.when(end_inside_row).assert_one(inside_row);
@@ -680,7 +679,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             )
             .eval(builder, simple * is_permute);
 
-        
         //// multi_observe contraints
         let multi_observe_specific: &MultiObserveCols<AB::Var> =
             specific[..MultiObserveCols::<AB::Var>::width()].borrow();
