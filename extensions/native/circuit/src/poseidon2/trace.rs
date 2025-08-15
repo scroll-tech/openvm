@@ -473,6 +473,11 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Chip<F, SBOX_R
             for i in 0..record.end_idx {
                 specific.aux_before_end[i] = F::ONE;
             }
+            for i in 0..CHUNK {
+                if specific.aux_after_start[i] + specific.aux_before_end[i] >= F::TWO {
+                    specific.aux_read_enabled[i] = F::ONE;
+                }
+            }
             for i in record.start_idx..record.end_idx {
                 let read_data_record = memory.record_by_id(record.read_input_data[i]);
                 let write_data_record = memory.record_by_id(record.write_input_data[i]);

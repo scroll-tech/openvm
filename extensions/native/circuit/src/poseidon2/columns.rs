@@ -224,6 +224,7 @@ pub struct MultiObserveCols<T> {
     pub end_idx: T,
     pub aux_after_start: [T; CHUNK],
     pub aux_before_end: [T; CHUNK],
+    pub aux_read_enabled: [T; CHUNK],
 
     // Transcript observation
     pub read_data: [MemoryReadAuxCols<T>; CHUNK],

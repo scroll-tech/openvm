@@ -698,6 +698,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             end_idx,
             aux_after_start,
             aux_before_end,
+            aux_read_enabled,
             read_data,
             write_data,
             data,
@@ -783,7 +784,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     start_timestamp + i_var * AB::F::TWO - start_idx * AB::F::TWO,
                     &read_data[i]
                 )
-                .eval(builder, aux_after_start[i] * aux_before_end[i]);
+                .eval(builder, multi_observe_row * aux_read_enabled[i]);
                 
             self.memory_bridge
                 .write(
@@ -795,19 +796,27 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     start_timestamp + i_var * AB::F::TWO - start_idx * AB::F::TWO + AB::F::ONE,
                     &write_data[i],
                 )
-                .eval(builder, aux_after_start[i] * aux_before_end[i]);
+                .eval(builder, multi_observe_row * aux_read_enabled[i]);
         }
 
         for i in 0..(CHUNK - 1) {
             builder
+                .when(multi_observe_row)
                 .when(aux_after_start[i])
                 .assert_one(aux_after_start[i + 1]);
         }
 
         for i in 1..CHUNK {
             builder
+                .when(multi_observe_row)
                 .when(aux_before_end[i])
                 .assert_one(aux_before_end[i - 1]);
+        }
+
+        for i in 0..CHUNK {
+            builder
+                .when(multi_observe_row)
+                .assert_eq(aux_after_start[i] * aux_before_end[i], aux_read_enabled[i]);
         }
 
         builder
