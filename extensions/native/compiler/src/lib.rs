@@ -212,3 +212,15 @@ pub enum VerifyBatchOpcode {
     /// per column polynomial, per opening point
     VERIFY_BATCH,
 }
+
+/// Opcodes for sumcheck.
+#[derive(
+    Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, EnumCount, EnumIter, FromRepr, LocalOpcode,
+)]
+#[opcode_offset = 0x180]
+#[repr(usize)]
+#[allow(non_camel_case_types)]
+pub enum SumcheckOpcode {
+    /// Computer the evaluation for a sumcheck layer
+    SUMCHECK_LAYER_EVAL,
+}

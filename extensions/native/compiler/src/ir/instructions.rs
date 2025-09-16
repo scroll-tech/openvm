@@ -319,6 +319,15 @@ pub enum DslIr<C: Config> {
     CycleTrackerStart(String),
     /// End the cycle tracker used by a block of code annotated by the string input.
     CycleTrackerEnd(String),
+
+    /// Sumcheck calculate layer eval
+    SumcheckLayerEval(
+        Array<C, Usize<C::N>>,      // Input ctx: round, num_prod_spec, num_logup_spec, num_variables
+        Array<C, Ext<C::F, C::EF>>, // Challenges: alpha, coeffs
+        Ptr<C::N>,                  // prod_specs_eval
+        Ptr<C::N>,                  // logup_specs_eval
+        // Ptr<C::N>                   // output
+    )
 }
 
 impl<C: Config> Default for DslIr<C> {

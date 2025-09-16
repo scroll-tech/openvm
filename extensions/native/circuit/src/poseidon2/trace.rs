@@ -15,9 +15,9 @@ use openvm_stark_backend::{
 };
 
 use crate::{
-    chip::TranscriptObservationRecord, poseidon2::{
+    poseidon2::{
         chip::{
-            CellRecord, IncorporateRowRecord, IncorporateSiblingRecord, InsideRowRecord, NativePoseidon2Chip, SimplePoseidonRecord, VerifyBatchRecord, NUM_INITIAL_READS
+            TranscriptObservationRecord, CellRecord, IncorporateRowRecord, IncorporateSiblingRecord, InsideRowRecord, NativePoseidon2Chip, SimplePoseidonRecord, VerifyBatchRecord, NUM_INITIAL_READS
         },
         columns::{
             InsideRowSpecificCols, MultiObserveCols, NativePoseidon2Cols, SimplePoseidonSpecificCols, TopLevelSpecificCols

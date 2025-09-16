@@ -8,6 +8,7 @@ mod fri;
 mod jal;
 mod loadstore;
 mod poseidon2;
+mod sumcheck;
 
 pub use branch_eq::*;
 pub use castf::*;
@@ -17,6 +18,7 @@ pub use fri::*;
 pub use jal::*;
 pub use loadstore::*;
 pub use poseidon2::*;
+pub use sumcheck::*;
 
 mod extension;
 pub use extension::*;

@@ -15,9 +15,7 @@ use openvm_circuit_derive::{AnyEnum, InstructionExecutor, VmConfig};
 use openvm_circuit_primitives_derive::{Chip, ChipUsageGetter};
 use openvm_instructions::{program::DEFAULT_PC_STEP, LocalOpcode, PhantomDiscriminant};
 use openvm_native_compiler::{
-    CastfOpcode, FieldArithmeticOpcode, FieldExtensionOpcode, FriOpcode, NativeBranchEqualOpcode,
-    NativeJalOpcode, NativeLoadStore4Opcode, NativeLoadStoreOpcode, NativePhantom,
-    NativeRangeCheckOpcode, Poseidon2Opcode, VerifyBatchOpcode, BLOCK_LOAD_STORE_SIZE,
+    CastfOpcode, FieldArithmeticOpcode, FieldExtensionOpcode, FriOpcode, NativeBranchEqualOpcode, NativeJalOpcode, NativeLoadStore4Opcode, NativeLoadStoreOpcode, NativePhantom, NativeRangeCheckOpcode, Poseidon2Opcode, SumcheckOpcode, VerifyBatchOpcode, BLOCK_LOAD_STORE_SIZE
 };
 use openvm_poseidon2_air::Poseidon2Config;
 use openvm_rv32im_circuit::{
@@ -29,10 +27,7 @@ use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 
 use crate::{
-    adapters::{convert_adapter::ConvertAdapterChip, *},
-    poseidon2::chip::NativePoseidon2Chip,
-    phantom::*,
-    *,
+    adapters::{convert_adapter::ConvertAdapterChip, *}, phantom::*, poseidon2::chip::NativePoseidon2Chip, sumcheck::chip::NativeSumcheckChip, *
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize, VmConfig, derive_new::new)]
@@ -76,6 +71,7 @@ pub enum NativeExecutor<F: PrimeField32> {
     FieldExtension(FieldExtensionChip<F>),
     FriReducedOpening(FriReducedOpeningChip<F>),
     VerifyBatch(NativePoseidon2Chip<F, 1>),
+    SumcheckLayerEval(NativeSumcheckChip<F>),
 }
 
 #[derive(From, ChipUsageGetter, Chip, AnyEnum)]
@@ -207,6 +203,17 @@ impl<F: PrimeField32> VmExtension<F> for Native {
             ],
         )?;
 
+        let sumcheck_chip = NativeSumcheckChip::new(
+            builder.system_port(),
+            offline_memory.clone(),
+        );
+        inventory.add_executor(
+            sumcheck_chip,
+            [
+                SumcheckOpcode::SUMCHECK_LAYER_EVAL.global_opcode(),
+            ]
+        )?;
+        
         builder.add_phantom_sub_executor(
             NativeHintInputSubEx,
             PhantomDiscriminant(NativePhantom::HintInput as u16),
