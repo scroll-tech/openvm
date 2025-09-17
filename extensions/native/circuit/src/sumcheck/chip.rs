@@ -98,7 +98,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 prod_specs_inner_inner_len,
                 logup_specs_inner_len,
                 logup_specs_inner_inner_len,
-                _,
+                in_round,
             ] = ctx;
 
             let (alpha_read, alpha) = memory.read::<EXT_DEG>(data_address_space, cs_pointer);
@@ -122,14 +122,20 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                     );
                     let (read_p1, p1) = memory.read::<EXT_DEG>(data_address_space, prod_ptr + start);
                     let (read_p2, p2) = memory.read::<EXT_DEG>(data_address_space, prod_ptr + start + F::from_canonical_usize(EXT_DEG));
-                    let evals = FieldExtension::add(
-                        FieldExtension::multiply(p1, c1),
-                        FieldExtension::multiply(p2, c2),
-                    );
 
+                    let evals = if in_round > F::ZERO {
+                        FieldExtension::multiply(p1, p2)
+                    } else {
+                        FieldExtension::add(
+                            FieldExtension::multiply(p1, c1),
+                            FieldExtension::multiply(p2, c2),
+                        )
+                    };
+                    
                     let (write_slice_eval_1, _) = memory.write::<EXT_DEG>(data_address_space, r_ptr + (F::ONE + i) * F::from_canonical_usize(EXT_DEG), evals);
 
-                    if (round + F::from_canonical_usize(1)) < (max_round - F::from_canonical_usize(1)) {
+                    let not_in_round = F::ONE - in_round;
+                    if (round + not_in_round) < (max_round - F::from_canonical_usize(1)) {
                         eval_acc = FieldExtension::add(eval_acc, FieldExtension::multiply(alpha_acc, evals));
                     }
                 }
@@ -157,19 +163,32 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                     let (read_q1, q1) = memory.read::<EXT_DEG>(data_address_space, logup_ptr + start + F::from_canonical_usize(EXT_DEG * 2));
                     let (read_q2, q2) = memory.read::<EXT_DEG>(data_address_space, logup_ptr + start + F::from_canonical_usize(EXT_DEG * 3));
 
-                    let p_evals = FieldExtension::add(
-                        FieldExtension::multiply(p1, c1),
-                        FieldExtension::multiply(p2, c2),
-                    );
-                    let q_evals = FieldExtension::add(
-                        FieldExtension::multiply(q1, c1),
-                        FieldExtension::multiply(q2, c2),
-                    );
+                    let p_evals = if in_round > F::ZERO {
+                        FieldExtension::add(
+                            FieldExtension::multiply(p1, q2),
+                            FieldExtension::multiply(p2, q1),
+                        )
+                    } else {
+                        FieldExtension::add(
+                            FieldExtension::multiply(p1, c1),
+                            FieldExtension::multiply(p2, c2),
+                        )
+                    };
+                    
+                    let q_evals = if in_round > F::ZERO {
+                        FieldExtension::multiply(q1, q2)
+                    } else {
+                        FieldExtension::add(
+                            FieldExtension::multiply(q1, c1),
+                            FieldExtension::multiply(q2, c2),
+                        )
+                    };
 
                     let (write_slice_eval_1, _) = memory.write::<EXT_DEG>(data_address_space, r_ptr + (F::ONE + num_prod_spec + i) * F::from_canonical_usize(EXT_DEG), p_evals);
                     let (write_slice_eval_2, _) = memory.write::<EXT_DEG>(data_address_space, r_ptr + (F::ONE + num_prod_spec + num_logup_spec + i) * F::from_canonical_usize(EXT_DEG), q_evals);
 
-                    if (round + F::from_canonical_usize(1)) < (max_round - F::from_canonical_usize(1)) {
+                    let not_in_round = F::ONE - in_round;
+                    if (round + not_in_round) < (max_round - F::from_canonical_usize(1)) {
                         eval_acc = FieldExtension::add(eval_acc, FieldExtension::multiply(alpha_acc, p_evals));
                         let alpha_denominator = FieldExtension::multiply(alpha_acc, alpha);
                         eval_acc = FieldExtension::add(eval_acc, FieldExtension::multiply(alpha_denominator, q_evals));

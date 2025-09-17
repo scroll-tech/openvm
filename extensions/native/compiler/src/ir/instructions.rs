@@ -322,11 +322,11 @@ pub enum DslIr<C: Config> {
 
     /// Sumcheck calculate layer eval
     SumcheckLayerEval(
-        Array<C, Usize<C::N>>,      // Input ctx: round, num_prod_spec, num_logup_spec, num_variables
-        Array<C, Ext<C::F, C::EF>>, // Challenges: alpha, coeffs
-        Ptr<C::N>,                  // prod_specs_eval
-        Ptr<C::N>,                  // logup_specs_eval
-        Ptr<C::N>                   // output
+        Ptr<C::N>,          // Input ctx: round, num_prod_spec, num_logup_spec, num_variables
+        Ptr<C::N>,          // Challenges: alpha, coeffs
+        Ptr<C::N>,          // prod_specs_eval
+        Ptr<C::N>,          // logup_specs_eval
+        Ptr<C::N>           // output
     )
 }
 
