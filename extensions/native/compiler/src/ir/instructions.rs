@@ -326,7 +326,7 @@ pub enum DslIr<C: Config> {
         Array<C, Ext<C::F, C::EF>>, // Challenges: alpha, coeffs
         Ptr<C::N>,                  // prod_specs_eval
         Ptr<C::N>,                  // logup_specs_eval
-        // Ptr<C::N>                   // output
+        Ptr<C::N>                   // output
     )
 }
 

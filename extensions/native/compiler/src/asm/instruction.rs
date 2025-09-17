@@ -172,7 +172,7 @@ pub enum AsmInstruction<F, EF> {
     CycleTrackerStart(),
     CycleTrackerEnd(),
 
-    SumcheckLayerEval(i32, i32, i32, i32),
+    SumcheckLayerEval(i32, i32, i32, i32, i32),
 }
 
 impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
@@ -405,8 +405,8 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
             AsmInstruction::RangeCheck(fp, lo_bits, hi_bits) => {
                 write!(f, "range_check_fp ({})fp, ({}), ({})", fp, lo_bits, hi_bits)
             }
-            AsmInstruction::SumcheckLayerEval(ctx, cs, p_ptr, l_ptr) => {
-                write!(f, "sumcheck_layer_eval ({})fp, ({})fp, ({})fp, ({})fp", ctx, cs, p_ptr, l_ptr)
+            AsmInstruction::SumcheckLayerEval(ctx, cs, p_ptr, l_ptr, r_ptr) => {
+                write!(f, "sumcheck_layer_eval ({})fp, ({})fp, ({})fp, ({})fp, ({})fp", ctx, cs, p_ptr, l_ptr, r_ptr)
             }
         }
     }

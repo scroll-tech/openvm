@@ -632,9 +632,9 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
                         );
                     }
                 }
-                DslIr::SumcheckLayerEval(input_ctx, challenges, prod_ptr, logup_ptr) => {
+                DslIr::SumcheckLayerEval(input_ctx, challenges, prod_ptr, logup_ptr, r_ptr) => {
                     self.push(
-                        AsmInstruction::SumcheckLayerEval(input_ctx.ptr().fp(), challenges.ptr().fp(), prod_ptr.fp(), logup_ptr.fp()),
+                        AsmInstruction::SumcheckLayerEval(input_ctx.ptr().fp(), challenges.ptr().fp(), prod_ptr.fp(), logup_ptr.fp(), r_ptr.fp()),
                         debug_info,
                     );
                 }

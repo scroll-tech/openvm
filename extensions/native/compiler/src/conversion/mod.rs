@@ -533,10 +533,10 @@ fn convert_instruction<F: PrimeField32, EF: ExtensionField<F>>(
                 AS::Immediate,
             )]
         },
-        AsmInstruction::SumcheckLayerEval(ctx, cs, p_ptr, l_ptr) => vec![
+        AsmInstruction::SumcheckLayerEval(ctx, cs, p_ptr, l_ptr, r_ptr) => vec![
             Instruction {
                 opcode: options.opcode_with_offset(SumcheckOpcode::SUMCHECK_LAYER_EVAL),
-                a: F::ZERO, // _debug
+                a: i32_f(r_ptr),
                 b: i32_f(ctx),
                 c: i32_f(cs),
                 d: AS::Native.to_field(),

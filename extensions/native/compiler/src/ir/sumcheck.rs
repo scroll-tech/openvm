@@ -11,14 +11,14 @@ impl<C: Config> Builder<C> {
         challenges: Array<C, Ext<C::F, C::EF>>,
         prod_specs_eval: &Array<C, Ext<C::F, C::EF>>,
         logup_specs_eval: &Array<C, Ext<C::F, C::EF>>,
-        // r_evals: &Array<C, Ext<C::F, C::EF>>,
+        r_evals: &Array<C, Ext<C::F, C::EF>>,
     ) -> Usize<C::N> {
         self.operations.push(DslIr::SumcheckLayerEval(
             input_ctx,
             challenges,
             prod_specs_eval.ptr(), 
             logup_specs_eval.ptr(),
-            // r_evals.ptr(),
+            r_evals.ptr(),
         ));
 
         Usize::from(0)
