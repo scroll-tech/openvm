@@ -10,7 +10,7 @@ use openvm_stark_backend::{
     p3_field::{Field, PrimeField, PrimeField32},
     p3_maybe_rayon::prelude::{ParallelIterator, ParallelSlice},
 };
-use crate::fri::elem_to_ext;
+use crate::{fri::elem_to_ext, sumcheck::columns::{HeaderSpecificCols, LogupSpecificCols, NativeSumcheckCols, ProdSpecificCols}};
 use openvm_native_compiler::{
     conversion::AS,
     SumcheckOpcode::SUMCHECK_LAYER_EVAL,
@@ -20,6 +20,60 @@ use crate::{
     field_extension::{FieldExtension, EXT_DEG},
     utils::const_max,
 };
+use serde::{Deserialize, Serialize};
+
+#[repr(C)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[serde(bound = "F: Field")]
+pub struct SumcheckEvalRecord<F: Field> {
+    pub from_state: ExecutionState<u32>,
+    pub instruction: Instruction<F>,
+    pub row_type: usize,        // 0 - header; 1 - prod; 2 - logup
+    pub curr_timestamp_increment: usize,
+    pub final_timestamp_increment: usize,
+
+    pub ctx: [F; EXT_DEG * 2],
+    pub challenges: [F; EXT_DEG * 4],
+    pub read_data_records: [RecordId; 7],
+    pub write_data_records: [RecordId; 2],
+
+    pub register_ptrs: [F; 5],
+
+}
+// pub struct TranscriptObservationRecord<F: Field> {
+//     pub from_state: ExecutionState<u32>,
+//     pub instruction: Instruction<F>,
+//     pub start_idx: usize,
+//     pub end_idx: usize,
+//     pub is_first: bool,
+//     pub is_last: bool,
+//     pub curr_timestamp_increment: usize,
+//     pub final_timestamp_increment: usize,
+
+//     pub state_ptr: F,
+//     pub input_ptr: F,
+//     pub init_pos: F,
+//     pub len: usize,
+//     pub curr_len: usize,
+//     pub should_permute: bool,
+
+//     pub read_input_data: [RecordId; CHUNK],
+//     pub write_input_data: [RecordId; CHUNK],
+//     pub input_data: [F; CHUNK],
+
+//     pub read_sponge_state: RecordId,
+//     pub write_sponge_state: RecordId,
+//     pub permutation_input: [F; 2 * CHUNK],
+//     pub permutation_output: [F; 2 * CHUNK],
+
+//     pub write_final_idx: RecordId,
+//     pub final_idx: usize,
+
+//     pub input_register_1: F,
+//     pub input_register_2: F,
+//     pub input_register_3: F,
+//     pub output_register: F,
+// }
 
 fn calculate_3d_ext_idx<F: Field>(
     inner_inner_len: F,
@@ -77,6 +131,11 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
             } = instruction;
 
         if op == SUMCHECK_LAYER_EVAL.global_opcode() {
+            println!("=> column width: {:?}", NativeSumcheckCols::<usize>::width());
+            println!("=> header width: {:?}", HeaderSpecificCols::<usize>::width());
+            println!("=> prod width: {:?}", ProdSpecificCols::<usize>::width());
+            println!("=> logup width: {:?}", LogupSpecificCols::<usize>::width());
+
             let (read_ctx_pointer, ctx_pointer) =
                 memory.read_cell(register_address_space, input_register_1);
             let (read_cs_pointer, cs_pointer) =
@@ -101,12 +160,19 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 in_round,
             ] = ctx;
 
-            let (alpha_read, alpha) = memory.read::<EXT_DEG>(data_address_space, cs_pointer);
-            let (c1_read, c1) = memory.read::<EXT_DEG>(data_address_space, cs_pointer + F::from_canonical_usize(EXT_DEG * 1));
-            let (c2_read, c2) = memory.read::<EXT_DEG>(data_address_space, cs_pointer + F::from_canonical_usize(EXT_DEG * 2));
+            let (challenges_read, challenges): (RecordId, [F; EXT_DEG * 4]) = memory.read::<{EXT_DEG * 4}>(data_address_space, cs_pointer);
+
+            let alpha: [F; 4] = challenges[0..EXT_DEG].try_into().expect("");
+            let c1: [F; 4] = challenges[EXT_DEG..(EXT_DEG * 2)].try_into().expect("");
+            let c2: [F; 4] = challenges[(EXT_DEG * 2)..(EXT_DEG * 3)].try_into().expect("");
+
+            // let (alpha_read, alpha) = memory.read::<EXT_DEG>(data_address_space, cs_pointer);
+            // let (c1_read, c1) = memory.read::<EXT_DEG>(data_address_space, cs_pointer + F::from_canonical_usize(EXT_DEG * 1));
+            // let (c2_read, c2) = memory.read::<EXT_DEG>(data_address_space, cs_pointer + F::from_canonical_usize(EXT_DEG * 2));
 
             let mut eval_acc = elem_to_ext(F::from_canonical_u32(0));
             let mut alpha_acc = elem_to_ext(F::from_canonical_u32(1));
+            self.height += 1;
 
             let mut i = F::ZERO;
             while i < num_prod_spec {
@@ -120,8 +186,12 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                         round,
                         F::from_canonical_usize(0),
                     );
-                    let (read_p1, p1) = memory.read::<EXT_DEG>(data_address_space, prod_ptr + start);
-                    let (read_p2, p2) = memory.read::<EXT_DEG>(data_address_space, prod_ptr + start + F::from_canonical_usize(EXT_DEG));
+                    // let (read_p1, p1) = memory.read::<EXT_DEG>(data_address_space, prod_ptr + start);
+                    // let (read_p2, p2) = memory.read::<EXT_DEG>(data_address_space, prod_ptr + start + F::from_canonical_usize(EXT_DEG));
+
+                    let (read_p, ps) = memory.read::<{EXT_DEG * 2}>(data_address_space, prod_ptr + start);
+                    let p1: [F; 4] = ps[0..EXT_DEG].try_into().expect("");
+                    let p2: [F; 4] = ps[EXT_DEG..(EXT_DEG * 2)].try_into().expect("");
 
                     let evals = if in_round > F::ZERO {
                         FieldExtension::multiply(p1, p2)
@@ -143,6 +213,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 alpha_acc = FieldExtension::multiply(alpha_acc, alpha);
 
                 i = i + F::ONE;
+                self.height += 1;
             }
 
             let mut i = F::ZERO;
@@ -158,10 +229,16 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                         F::from_canonical_usize(0),
                     );
 
-                    let (read_p1, p1) = memory.read::<EXT_DEG>(data_address_space, logup_ptr + start);
-                    let (read_p2, p2) = memory.read::<EXT_DEG>(data_address_space, logup_ptr + start + F::from_canonical_usize(EXT_DEG));
-                    let (read_q1, q1) = memory.read::<EXT_DEG>(data_address_space, logup_ptr + start + F::from_canonical_usize(EXT_DEG * 2));
-                    let (read_q2, q2) = memory.read::<EXT_DEG>(data_address_space, logup_ptr + start + F::from_canonical_usize(EXT_DEG * 3));
+                    // let (read_p1, p1) = memory.read::<EXT_DEG>(data_address_space, logup_ptr + start);
+                    // let (read_p2, p2) = memory.read::<EXT_DEG>(data_address_space, logup_ptr + start + F::from_canonical_usize(EXT_DEG));
+                    // let (read_q1, q1) = memory.read::<EXT_DEG>(data_address_space, logup_ptr + start + F::from_canonical_usize(EXT_DEG * 2));
+                    // let (read_q2, q2) = memory.read::<EXT_DEG>(data_address_space, logup_ptr + start + F::from_canonical_usize(EXT_DEG * 3));
+
+                    let (read_pqs, pqs) = memory.read::<{EXT_DEG * 4}>(data_address_space, logup_ptr + start);
+                    let p1: [F; 4] = pqs[0..EXT_DEG].try_into().expect("");
+                    let p2: [F; 4] = pqs[EXT_DEG..(EXT_DEG * 2)].try_into().expect("");
+                    let q1: [F; 4] = pqs[(EXT_DEG * 2)..(EXT_DEG * 3)].try_into().expect("");
+                    let q2: [F; 4] = pqs[(EXT_DEG * 3)..(EXT_DEG * 4)].try_into().expect("");
 
                     let p_evals = if in_round > F::ZERO {
                         FieldExtension::add(
@@ -198,9 +275,12 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 alpha_acc = FieldExtension::multiply(FieldExtension::multiply(alpha_acc, alpha), alpha);
 
                 i = i + F::ONE;
+                self.height += 1;
             }
 
             let (write_r, _) = memory.write::<EXT_DEG>(data_address_space, r_ptr, eval_acc);
+
+            println!("=> current_height: {:?}", self.height);
         } else {
             unreachable!()
         }
