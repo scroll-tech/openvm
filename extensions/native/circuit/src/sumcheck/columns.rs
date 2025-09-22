@@ -17,6 +17,11 @@ pub struct NativeSumcheckCols<T> {
     /// Indicates that this row is a step for logup_spec in the layer sum operation
     pub logup_row: T,
 
+    /// Timestamps
+    pub first_timestamp: T,
+    pub start_timestamp: T,
+    pub last_timestamp: T,
+
     // Register values
     pub register_ptrs: [T; 5],
 
@@ -37,10 +42,13 @@ pub struct NativeSumcheckCols<T> {
     pub curr_logup_n: T,
 
     // alpha1, c1, c2, alpha2 (for logup rows)
+    pub alpha: [T; EXT_DEG],
     pub challenges: [T; EXT_DEG * 4],
 
     // Specific to each row
     pub max_round: T,
+    // Should the evaluation be accumualted
+    pub should_acc: T,
 
     // The current final evaluation accumulator. Extension element.
     pub eval_acc: [T; EXT_DEG],

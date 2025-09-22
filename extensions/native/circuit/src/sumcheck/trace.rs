@@ -13,20 +13,7 @@ use openvm_stark_backend::{
     prover::types::AirProofInput,
     AirRef, Chip, ChipUsageGetter,
 };
-use crate::sumcheck::chip::NativeSumcheckChip;
-
-impl<F: PrimeField32> NativeSumcheckChip<F> {
-    fn generate_trace(self) -> RowMajorMatrix<F> {
-        let width = self.trace_width();
-        let height = next_power_of_two_or_zero(self.height);
-        let mut flat_trace = F::zero_vec(width * height);
-        let memory = self.offline_memory.lock().unwrap();
-        let aux_cols_factory = memory.aux_cols_factory();
-        let mut used_cells = 0;
-
-        RowMajorMatrix::new(flat_trace, width)
-    }
-}
+use crate::sumcheck::{chip::NativeSumcheckChip, columns::{HeaderSpecificCols, LogupSpecificCols, NativeSumcheckCols, ProdSpecificCols}};
 
 impl<F: Field> ChipUsageGetter
     for NativeSumcheckChip<F>
@@ -40,8 +27,47 @@ impl<F: Field> ChipUsageGetter
     }
 
     fn trace_width(&self) -> usize {
-        // _debug
-        0
+        NativeSumcheckCols::<F>::width()
+    }
+}
+
+impl<F: PrimeField32> NativeSumcheckChip<F> {
+    fn generate_trace(self) -> RowMajorMatrix<F> {
+        let width = self.trace_width();
+        let height = next_power_of_two_or_zero(self.height);
+        let mut flat_trace: Vec<F> = F::zero_vec(width * height);
+
+        let memory = self.offline_memory.lock().unwrap();
+        let aux_cols_factory = memory.aux_cols_factory();
+
+        let mut used_cells = 0;
+        for record in self.record_set {
+            let slice = &mut flat_trace[used_cells..used_cells + width];
+            let cols: &mut NativeSumcheckCols<F> = slice.borrow_mut();
+            cols.first_timestamp = F::from_canonical_u32(record.from_state.timestamp);
+            cols.start_timestamp = F::from_canonical_usize(record.from_state.timestamp as usize + record.curr_timestamp_increment);
+            cols.last_timestamp = F::from_canonical_usize(record.final_timestamp_increment);
+
+            if record.row_type == 0 {
+                cols.header_row = F::ONE;
+                let header: &mut HeaderSpecificCols<F> =
+                    cols.specific[..HeaderSpecificCols::<F>::width()].borrow_mut();
+            } else if record.row_type == 1 {
+                cols.prod_row = F::ONE;
+                let prod: &mut ProdSpecificCols<F> =
+                    cols.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
+            } else if record.row_type == 2 {
+                cols.logup_row = F::ONE;
+                let logup: &mut LogupSpecificCols<F> =
+                    cols.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
+            } else {
+                unreachable!()
+            }
+            
+            used_cells += width;
+        }
+
+        RowMajorMatrix::new(flat_trace, width)
     }
 }
 
