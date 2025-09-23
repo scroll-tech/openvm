@@ -46,12 +46,31 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
             let cols: &mut NativeSumcheckCols<F> = slice.borrow_mut();
             cols.first_timestamp = F::from_canonical_u32(record.from_state.timestamp);
             cols.start_timestamp = F::from_canonical_usize(record.from_state.timestamp as usize + record.curr_timestamp_increment);
-            cols.last_timestamp = F::from_canonical_usize(record.final_timestamp_increment);
+            cols.last_timestamp = F::from_canonical_usize(record.from_state.timestamp as usize + record.final_timestamp_increment);
+            cols.register_ptrs = record.register_ptrs;
+            cols.ctx = record.ctx;
+            cols.challenges = record.challenges;
 
             if record.row_type == 0 {
                 cols.header_row = F::ONE;
                 let header: &mut HeaderSpecificCols<F> =
                     cols.specific[..HeaderSpecificCols::<F>::width()].borrow_mut();
+
+                header.pc = F::from_canonical_u32(record.from_state.pc);
+                header.registers = record.registers;
+            
+                // registers, ctx, challenges
+                // _debug
+                for i in 0..1usize {
+                    let mem_record = memory.record_by_id(record.read_data_records[i]);
+                    aux_cols_factory.generate_read_aux(mem_record, &mut header.read_records[i]);
+                }
+
+
+
+
+
+
             } else if record.row_type == 1 {
                 cols.prod_row = F::ONE;
                 let prod: &mut ProdSpecificCols<F> =

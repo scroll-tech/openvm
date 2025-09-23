@@ -124,6 +124,9 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
 
             let (read_ctx_pointer, ctx_pointer) =
                 memory.read_cell(register_address_space, input_register_1);
+
+            // _debug
+            /*
             let (read_cs_pointer, cs_pointer) =
                 memory.read_cell(register_address_space, input_register_2);
             let (read_prod_pointer, prod_ptr) =
@@ -156,6 +159,8 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
             let mut alpha_acc = elem_to_ext(F::from_canonical_u32(1));
 
             let register_ptrs: [F; 5] = [ctx_pointer, cs_pointer, prod_ptr, logup_ptr, r_ptr];
+            
+
             let mut header_row: SumcheckEvalRecord<F> = SumcheckEvalRecord { 
                 from_state, 
                 instruction: instruction.clone(), 
@@ -183,9 +188,35 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 alpha,
                 ..Default::default()
             };
+            */
+
+
+            // _debug
+            let mut header_row   = SumcheckEvalRecord { 
+                from_state, 
+                instruction: instruction.clone(), 
+                row_type: 0, 
+                curr_timestamp_increment: curr_timestamp,
+                registers: [
+                    input_register_1,
+                    input_register_2,
+                    input_register_3,
+                    input_register_4,
+                    output_register,
+                ],
+                ..Default::default()
+            };
+            println!("=> ctx_pointer: {:?}", ctx_pointer);
+            header_row.register_ptrs[0] = ctx_pointer;
+            println!("=> read_ctx_pointer: {:?}", read_ctx_pointer);
+            header_row.read_data_records[0] = read_ctx_pointer;
+
             observation_records.push(header_row);
             self.height += 1;
-            curr_timestamp += 7;
+            // _debug
+            // curr_timestamp += 7;
+            curr_timestamp += 1;
+
 
             /* 
 
@@ -354,14 +385,15 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
             curr_timestamp += 1;
             observation_records[0].write_data_records[0] = write_r;
 
+            */
             for record in &mut observation_records {
                 record.final_timestamp_increment = curr_timestamp;
-                record.eval_acc = FieldExtension::subtract(eval_acc, record.eval_acc);
+                // _debug
+                // record.eval_acc = FieldExtension::subtract(eval_acc, record.eval_acc);
             }
 
             self.record_set.extend(observation_records);
             println!("=> current_height: {:?}", self.height);
-            */
         } else {
             unreachable!()
         }

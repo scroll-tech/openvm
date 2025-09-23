@@ -92,11 +92,14 @@ impl<AB: InteractionBuilder> Air<AB>
                     registers[3].into(),
                 ],
                 ExecutionState::new(header_row_specific.pc, first_timestamp),
-                last_timestamp,
+                last_timestamp - first_timestamp,
             )
             .eval(builder, header_row);
 
-        for i in 0..5usize {
+        // Read registers
+        // _debug
+        // for i in 0..5usize {
+        for i in 0..1usize {
             self.memory_bridge
                 .read(
                     MemoryAddress::new(self.address_space, registers[i]),
@@ -107,14 +110,13 @@ impl<AB: InteractionBuilder> Air<AB>
                 .eval(builder, header_row);
         }
 
-        /* _debug
-
-        // Read context variables
+        /* 
+        // React ctx
         self.memory_bridge
             .read(
                 MemoryAddress::new(self.address_space, register_ptrs[0]),
                 ctx,
-                first_timestamp + AB::F::from_canonical_usize(6),
+                first_timestamp + AB::F::from_canonical_usize(5),
                 &header_row_specific.read_records[5],
             )
             .eval(builder, header_row);
@@ -124,12 +126,13 @@ impl<AB: InteractionBuilder> Air<AB>
             .read(
                 MemoryAddress::new(self.address_space, register_ptrs[1]),
                 challenges,
-                first_timestamp + AB::F::from_canonical_usize(7),
+                first_timestamp + AB::F::from_canonical_usize(6),
                 &header_row_specific.read_records[6],
             )
             .eval(builder, header_row);
+        */
 
-
+        /* _debug
         // Separate aggregate column clusters
         let alpha1: [_; EXT_DEG] = challenges[0..EXT_DEG].try_into().expect("");
         let c1: [_; EXT_DEG] = challenges[EXT_DEG..{EXT_DEG * 2}].try_into().expect("");

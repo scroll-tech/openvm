@@ -10,7 +10,7 @@ use openvm_native_recursion::{testing_utils::inner::run_recursive_test, challeng
 use openvm_stark_backend::{
     config::{Domain, StarkGenericConfig},
     p3_commit::PolynomialSpace,
-    p3_field::{extension::BinomialExtensionField, FieldAlgebra},
+    p3_field::{extension::BinomialExtensionField, FieldAlgebra, PackedValue, FieldExtensionAlgebra},
 };
 use openvm_stark_sdk::{
     config::FriParameters, 
@@ -69,23 +69,22 @@ fn test_sumcheck_layer_eval() {
     let result = vm.execute_and_generate(program, vec![]).unwrap();
     let proofs = vm.prove(&pk, result);
 
-    /* 
     for proof in proofs {
         verify_single(&vm.engine, &pk.get_vk(), &proof).expect("Verification failed");
     }
-    */
 }
 
 fn build_test_program<C: Config>(
     builder: &mut Builder<C>,
 ) {
-    /* 
+    
     let ctx_u32s = [3u32, 6, 5, 8, 2, 8, 4, 0, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9];
     let ctx: Array<C, Usize<C::N>> = builder.dyn_array(ctx_u32s.len());
     for (idx, n) in ctx_u32s.into_iter().enumerate() {
         builder.set(&ctx, idx, Usize::from(n as usize));
     }
 
+    
     let challenges_u32s = [
         548478283u32, 456436544, 1716290291, 791326976,
         1829717553, 1422025771, 1917123958, 727015942,
@@ -93,12 +92,13 @@ fn build_test_program<C: Config>(
     ];
     let challenges: Array<C, Ext<C::F, C::EF>> = builder.dyn_array(challenges_u32s.len() / EXT_DEG);
     for (idx, n) in challenges_u32s.chunks(EXT_DEG).enumerate() {
-        let f1 = builder.constant(C::F::from_canonical_u32(n[0]));
-        let f2 = builder.constant(C::F::from_canonical_u32(n[1]));
-        let f3 = builder.constant(C::F::from_canonical_u32(n[2]));
-        let f4 = builder.constant(C::F::from_canonical_u32(n[3]));
+        let e: Ext<C::F, C::EF> = builder.constant(C::EF::from_base_slice(&[
+            C::F::from_canonical_u32(n[0]),
+            C::F::from_canonical_u32(n[1]),
+            C::F::from_canonical_u32(n[2]),
+            C::F::from_canonical_u32(n[3])
+        ]));
 
-        let e = builder.felts2ext(&[f1, f2, f3, f4]);
         builder.set(&challenges, idx, e);
     }
 
@@ -203,12 +203,13 @@ fn build_test_program<C: Config>(
 
     let prod_spec_evals: Array<C, Ext<C::F, C::EF>> = builder.dyn_array(prod_spec_eval_u32s.len() / EXT_DEG);
     for (idx, n) in prod_spec_eval_u32s.chunks(EXT_DEG).enumerate() {
-        let f1 = builder.constant(C::F::from_canonical_u32(n[0]));
-        let f2 = builder.constant(C::F::from_canonical_u32(n[1]));
-        let f3 = builder.constant(C::F::from_canonical_u32(n[2]));
-        let f4 = builder.constant(C::F::from_canonical_u32(n[3]));
+        let e: Ext<C::F, C::EF> = builder.constant(C::EF::from_base_slice(&[
+            C::F::from_canonical_u32(n[0]),
+            C::F::from_canonical_u32(n[1]),
+            C::F::from_canonical_u32(n[2]),
+            C::F::from_canonical_u32(n[3])
+        ]));
 
-        let e = builder.felts2ext(&[f1, f2, f3, f4]);
         builder.set(&prod_spec_evals, idx, e);
     }
 
@@ -377,12 +378,13 @@ fn build_test_program<C: Config>(
 
     let logup_spec_evals: Array<C, Ext<C::F, C::EF>> = builder.dyn_array(logup_spec_eval_u32s.len() / EXT_DEG);
     for (idx, n) in logup_spec_eval_u32s.chunks(EXT_DEG).enumerate() {
-        let f1 = builder.constant(C::F::from_canonical_u32(n[0]));
-        let f2 = builder.constant(C::F::from_canonical_u32(n[1]));
-        let f3 = builder.constant(C::F::from_canonical_u32(n[2]));
-        let f4 = builder.constant(C::F::from_canonical_u32(n[3]));
+        let e: Ext<C::F, C::EF> = builder.constant(C::EF::from_base_slice(&[
+            C::F::from_canonical_u32(n[0]),
+            C::F::from_canonical_u32(n[1]),
+            C::F::from_canonical_u32(n[2]),
+            C::F::from_canonical_u32(n[3])
+        ]));
 
-        let e = builder.felts2ext(&[f1, f2, f3, f4]);
         builder.set(&logup_spec_evals, idx, e);
     }
 
@@ -408,15 +410,15 @@ fn build_test_program<C: Config>(
 
     let next_layer_evals: Array<C, Ext<C::F, C::EF>> = builder.dyn_array(r_evals_u32s.len() / EXT_DEG);
     for (idx, n) in r_evals_u32s.chunks(EXT_DEG).enumerate() {
-        let f1 = builder.constant(C::F::from_canonical_u32(n[0]));
-        let f2 = builder.constant(C::F::from_canonical_u32(n[1]));
-        let f3 = builder.constant(C::F::from_canonical_u32(n[2]));
-        let f4 = builder.constant(C::F::from_canonical_u32(n[3]));
+        let e: Ext<C::F, C::EF> = builder.constant(C::EF::from_base_slice(&[
+            C::F::from_canonical_u32(n[0]),
+            C::F::from_canonical_u32(n[1]),
+            C::F::from_canonical_u32(n[2]),
+            C::F::from_canonical_u32(n[3])
+        ]));
 
-        let e = builder.felts2ext(&[f1, f2, f3, f4]);
         builder.set(&next_layer_evals, idx, e);
     }
-    */
 
-    // builder.sumcheck_layer_eval(&ctx, &challenges, &prod_spec_evals, &logup_spec_evals, &next_layer_evals);
+    builder.sumcheck_layer_eval(&ctx, &challenges, &prod_spec_evals, &logup_spec_evals, &next_layer_evals);
 }
