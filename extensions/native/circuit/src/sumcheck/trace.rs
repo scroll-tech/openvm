@@ -50,6 +50,7 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
             cols.register_ptrs = record.register_ptrs;
             cols.ctx = record.ctx;
             cols.challenges = record.challenges;
+            cols.alpha = record.alpha;
 
             if record.row_type == 0 {
                 cols.header_row = F::ONE;
@@ -65,11 +66,7 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                     aux_cols_factory.generate_read_aux(mem_record, &mut header.read_records[i]);
                 }
 
-
-
-
-
-
+                
             } else if record.row_type == 1 {
                 cols.prod_row = F::ONE;
                 let prod: &mut ProdSpecificCols<F> =

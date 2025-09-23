@@ -134,9 +134,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 memory.read_cell(register_address_space, output_register);
             let register_ptrs: [F; 5] = [ctx_pointer, cs_pointer, prod_ptr, logup_ptr, r_ptr];
 
-            
             let (ctx_read, ctx): (RecordId, [F; EXT_DEG * 2]) = memory.read::<{EXT_DEG * 2}>(data_address_space, ctx_pointer);
-
             let [
                 round,
                 num_prod_spec,
@@ -149,6 +147,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
             ] = ctx;
 
             let (challenges_read, challenges): (RecordId, [F; EXT_DEG * 4]) = memory.read::<{EXT_DEG * 4}>(data_address_space, cs_pointer);
+            let alpha: [F; 4] = challenges[0..EXT_DEG].try_into().expect("");
 
             let mut header_row   = SumcheckEvalRecord { 
                 from_state, 
@@ -156,6 +155,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 row_type: 0, 
                 curr_timestamp_increment: curr_timestamp,
                 register_ptrs,
+                alpha,
                 registers: [
                     input_register_1,
                     input_register_2,
@@ -181,11 +181,11 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
             self.height += 1;
             curr_timestamp += 7;
 
-            // let mut eval_acc = elem_to_ext(F::from_canonical_u32(0));
-            // let mut alpha_acc = elem_to_ext(F::from_canonical_u32(1));
-            let alpha: [F; 4] = challenges[0..EXT_DEG].try_into().expect("");
-            // let c1: [F; 4] = challenges[EXT_DEG..(EXT_DEG * 2)].try_into().expect("");
-            // let c2: [F; 4] = challenges[(EXT_DEG * 2)..(EXT_DEG * 3)].try_into().expect("");
+            let mut eval_acc = elem_to_ext(F::from_canonical_u32(0));
+            let mut alpha_acc = elem_to_ext(F::from_canonical_u32(1));
+            
+            let c1: [F; 4] = challenges[EXT_DEG..(EXT_DEG * 2)].try_into().expect("");
+            let c2: [F; 4] = challenges[(EXT_DEG * 2)..(EXT_DEG * 3)].try_into().expect("");
 
             /* 
 
