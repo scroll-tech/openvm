@@ -97,9 +97,7 @@ impl<AB: InteractionBuilder> Air<AB>
             .eval(builder, header_row);
 
         // Read registers
-        // _debug
-        // for i in 0..5usize {
-        for i in 0..1usize {
+        for i in 0..5usize {
             self.memory_bridge
                 .read(
                     MemoryAddress::new(self.address_space, registers[i]),
@@ -110,7 +108,6 @@ impl<AB: InteractionBuilder> Air<AB>
                 .eval(builder, header_row);
         }
 
-        /* 
         // React ctx
         self.memory_bridge
             .read(
@@ -130,7 +127,6 @@ impl<AB: InteractionBuilder> Air<AB>
                 &header_row_specific.read_records[6],
             )
             .eval(builder, header_row);
-        */
 
         /* _debug
         // Separate aggregate column clusters

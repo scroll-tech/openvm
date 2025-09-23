@@ -60,8 +60,7 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 header.registers = record.registers;
             
                 // registers, ctx, challenges
-                // _debug
-                for i in 0..1usize {
+                for i in 0..7usize {
                     let mem_record = memory.record_by_id(record.read_data_records[i]);
                     aux_cols_factory.generate_read_aux(mem_record, &mut header.read_records[i]);
                 }
