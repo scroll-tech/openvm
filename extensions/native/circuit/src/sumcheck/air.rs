@@ -63,6 +63,7 @@ impl<AB: InteractionBuilder> Air<AB>
             alpha,
             challenges,
             max_round,
+            within_round_limit,
             should_acc,
             eval_acc,
             specific,
@@ -128,13 +129,60 @@ impl<AB: InteractionBuilder> Air<AB>
             )
             .eval(builder, header_row);
 
-        /* _debug
         // Separate aggregate column clusters
         let alpha1: [_; EXT_DEG] = challenges[0..EXT_DEG].try_into().expect("");
         let c1: [_; EXT_DEG] = challenges[EXT_DEG..{EXT_DEG * 2}].try_into().expect("");
         let c2: [_; EXT_DEG] = challenges[{EXT_DEG * 2}..{EXT_DEG * 3}].try_into().expect("");
         let alpha2: [_; EXT_DEG] = challenges[{EXT_DEG * 3}..{EXT_DEG * 4}].try_into().expect("");
 
+        // Prod spec evaluation
+        let prod_row_specific: &ProdSpecificCols<AB::Var> =
+            specific[..ProdSpecificCols::<AB::Var>::width()].borrow();
+
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(self.address_space, register_ptrs[0] + AB::F::from_canonical_usize(EXT_DEG * 2 - 1) + curr_prod_n),
+                [max_round],
+                start_timestamp,
+                &prod_row_specific.read_records[0],
+            )
+            .eval(builder, prod_row);
+
+        // _debug
+        // let p_start_ptr = register_ptrs[2] + (ctx[4] * ctx[3] * (curr_prod_n - AB::F::ONE) + ctx[4] * ctx[0]) * AB::F::from_canonical_usize(EXT_DEG);
+        
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(
+                    self.address_space,
+                    register_ptrs[2] + prod_row_specific.data_ptr,
+                ),
+                prod_row_specific.p,
+                start_timestamp + AB::F::ONE,
+                &prod_row_specific.read_records[1],
+            )
+            .eval(builder, prod_row * within_round_limit);
+
+        
+        let p1: [_; EXT_DEG] = prod_row_specific.p[0..EXT_DEG].try_into().expect("");
+        let p2: [_; EXT_DEG] = prod_row_specific.p[EXT_DEG..(EXT_DEG * 2)].try_into().expect("");
+
+        self.memory_bridge
+            .write(
+                MemoryAddress::new(
+                    self.address_space,
+                    register_ptrs[4] + curr_prod_n * AB::F::from_canonical_usize(EXT_DEG),
+                ),
+                prod_row_specific.p_evals,
+                start_timestamp + AB::F::TWO,
+                &prod_row_specific.write_record,
+            )
+            .eval(builder, prod_row * within_round_limit);
+
+
+
+
+        /* _debug
         // Carry along columns
         assert_array_eq(&mut builder.when(next.prod_row + next.logup_row), register_ptrs, next.register_ptrs);
         assert_array_eq(&mut builder.when(next.prod_row + next.logup_row), ctx, next.ctx);
@@ -169,45 +217,7 @@ impl<AB: InteractionBuilder> Air<AB>
 
 
 
-        // Prod spec evaluation
-        let prod_row_specific: &ProdSpecificCols<AB::Var> =
-            specific[..ProdSpecificCols::<AB::Var>::width()].borrow();
-
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(self.address_space, register_ptrs[0] + AB::F::from_canonical_usize(EXT_DEG * 2 - 1) + curr_prod_n),
-                [max_round],
-                start_timestamp,
-                &prod_row_specific.read_records[0],
-            )
-            .eval(builder, prod_row);
-
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(
-                    self.address_space,
-                    register_ptrs[2] + (ctx[4] * ctx[3] * (curr_prod_n - AB::F::ONE) + ctx[4] * ctx[0]) * AB::F::from_canonical_usize(EXT_DEG),
-                ),
-                prod_row_specific.p,
-                start_timestamp + AB::F::ONE,
-                &prod_row_specific.read_records[1],
-            )
-            .eval(builder, prod_row);
-
-        let p1: [_; EXT_DEG] = prod_row_specific.p[0..EXT_DEG].try_into().expect("");
-        let p2: [_; EXT_DEG] = prod_row_specific.p[EXT_DEG..(EXT_DEG * 2)].try_into().expect("");
-
-        self.memory_bridge
-            .write(
-                MemoryAddress::new(
-                    self.address_space,
-                    register_ptrs[4] + curr_prod_n * AB::F::from_canonical_usize(EXT_DEG),
-                ),
-                prod_row_specific.p_evals,
-                start_timestamp + AB::F::TWO,
-                &prod_row_specific.write_record,
-            )
-            .eval(builder, prod_row);
+        
 
         // Logup spec evaluation
         let logup_row_specific: &LogupSpecificCols<AB::Var> =

@@ -47,6 +47,8 @@ pub struct NativeSumcheckCols<T> {
 
     // Specific to each row
     pub max_round: T,
+    // Is this round within max_round
+    pub within_round_limit: T,
     // Should the evaluation be accumualted
     pub should_acc: T,
 
@@ -82,6 +84,8 @@ pub struct HeaderSpecificCols<T> {
 #[repr(C)]
 #[derive(AlignedBorrow)]
 pub struct ProdSpecificCols<T> {
+    /// Pointer
+    pub data_ptr: T,
     /// 2 extension elements
     pub p: [T; EXT_DEG * 2],
     /// read max varibale and 2 p values
@@ -95,6 +99,8 @@ pub struct ProdSpecificCols<T> {
 #[repr(C)]
 #[derive(AlignedBorrow)]
 pub struct LogupSpecificCols<T> {
+    /// Pointer
+    pub data_ptr: T,
     /// 4 extension elements
     pub pq: [T; EXT_DEG * 4],
     /// read max variable and 4 values: p1, p2, q1, q2

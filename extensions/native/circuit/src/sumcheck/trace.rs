@@ -13,7 +13,7 @@ use openvm_stark_backend::{
     prover::types::AirProofInput,
     AirRef, Chip, ChipUsageGetter,
 };
-use crate::sumcheck::{chip::NativeSumcheckChip, columns::{HeaderSpecificCols, LogupSpecificCols, NativeSumcheckCols, ProdSpecificCols}};
+use crate::{sumcheck::{chip::NativeSumcheckChip, columns::{HeaderSpecificCols, LogupSpecificCols, NativeSumcheckCols, ProdSpecificCols}}, EXT_DEG};
 
 impl<F: Field> ChipUsageGetter
     for NativeSumcheckChip<F>
@@ -51,6 +51,10 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
             cols.ctx = record.ctx;
             cols.challenges = record.challenges;
             cols.alpha = record.alpha;
+            cols.max_round = record.max_round;
+            cols.within_round_limit = if record.within_round_limit { F::ONE } else { F::ZERO };
+            cols.should_acc = if record.should_acc { F::ONE } else { F::ZERO };
+            cols.eval_acc = record.eval_acc;
 
             if record.row_type == 0 {
                 cols.header_row = F::ONE;
@@ -60,21 +64,59 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 header.pc = F::from_canonical_u32(record.from_state.pc);
                 header.registers = record.registers;
             
-                // registers, ctx, challenges
                 for i in 0..7usize {
                     let mem_record = memory.record_by_id(record.read_data_records[i]);
                     aux_cols_factory.generate_read_aux(mem_record, &mut header.read_records[i]);
                 }
-
-                
             } else if record.row_type == 1 {
                 cols.prod_row = F::ONE;
                 let prod: &mut ProdSpecificCols<F> =
                     cols.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
+
+                cols.curr_prod_n = F::from_canonical_usize(record.prod_spec_n + 1);
+                cols.challenges[0..EXT_DEG].copy_from_slice(&record.alpha1);
+                prod.p[0..EXT_DEG].copy_from_slice(&record.p1);
+                prod.p[EXT_DEG..(EXT_DEG * 2)].copy_from_slice(&record.p2);
+                prod.data_ptr = record.data_ptr;
+
+                // Read max_round
+                let mem_record = memory.record_by_id(record.read_data_records[0]);
+                aux_cols_factory.generate_read_aux(mem_record, &mut prod.read_records[0]);
+
+                if record.within_round_limit {
+                    // Read p1, p2
+                    let mem_record = memory.record_by_id(record.read_data_records[1]);
+                    aux_cols_factory.generate_read_aux(mem_record, &mut prod.read_records[1]);
+
+                    // Write p eval
+                    prod.p_evals = record.p_evals;
+                    let mem_record = memory.record_by_id(record.write_data_records[0]);
+                    aux_cols_factory.generate_write_aux(mem_record, &mut prod.write_record);
+                }
             } else if record.row_type == 2 {
                 cols.logup_row = F::ONE;
                 let logup: &mut LogupSpecificCols<F> =
                     cols.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
+
+                cols.curr_logup_n = F::from_canonical_usize(record.logup_spec_n + 1);
+                cols.challenges[0..EXT_DEG].copy_from_slice(&record.alpha1);
+                cols.challenges[(EXT_DEG * 3)..(EXT_DEG * 4)].copy_from_slice(&record.alpha2);
+
+
+//     pub p1: [F; EXT_DEG],
+//     pub p2: [F; EXT_DEG],
+//     pub q1: [F; EXT_DEG],
+//     pub q2: [F; EXT_DEG],
+//     pub p_evals: [F; EXT_DEG],
+//     pub q_evals: [F; EXT_DEG],
+// }
+// logup.data_ptr = record.data_ptr;
+
+
+
+
+
+
             } else {
                 unreachable!()
             }

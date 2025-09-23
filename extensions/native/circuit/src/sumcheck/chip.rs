@@ -40,12 +40,14 @@ pub struct SumcheckEvalRecord<F: Field> {
     pub write_data_records: [RecordId; 2],
 
     pub max_round: F,
+    pub within_round_limit: bool,
     pub should_acc: bool,
     pub prod_spec_n: usize,
     pub logup_spec_n: usize,
     pub alpha: [F; EXT_DEG],
     pub alpha1: [F; EXT_DEG],
     pub alpha2: [F; EXT_DEG],
+    pub data_ptr: F,
     pub p1: [F; EXT_DEG],
     pub p2: [F; EXT_DEG],
     pub q1: [F; EXT_DEG],
@@ -183,11 +185,8 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
 
             let mut eval_acc = elem_to_ext(F::from_canonical_u32(0));
             let mut alpha_acc = elem_to_ext(F::from_canonical_u32(1));
-            
             let c1: [F; 4] = challenges[EXT_DEG..(EXT_DEG * 2)].try_into().expect("");
             let c2: [F; 4] = challenges[(EXT_DEG * 2)..(EXT_DEG * 3)].try_into().expect("");
-
-            /* 
 
             let mut i = F::ZERO;
             let mut i_usize = 0usize;
@@ -212,6 +211,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 curr_timestamp += 1;
 
                 if round < (max_round - F::from_canonical_usize(1)) {
+                    prod_row.within_round_limit = true;
                     let start = calculate_3d_ext_idx(
                         prod_specs_inner_inner_len,
                         prod_specs_inner_len,
@@ -219,6 +219,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                         round,
                         F::from_canonical_usize(0),
                     );
+                    prod_row.data_ptr = start;
 
                     let (read_p, ps) = memory.read::<{EXT_DEG * 2}>(data_address_space, prod_ptr + start);
                     let p1: [F; 4] = ps[0..EXT_DEG].try_into().expect("");
@@ -247,6 +248,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                         prod_row.should_acc = true;
                         prod_row.eval_acc = eval_acc.clone();
                     }
+
                     curr_timestamp += 2;
                 }
 
@@ -258,6 +260,8 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 self.height += 1;
             }
 
+
+            /* 
             let mut i = F::ZERO;
             let mut i_usize = 0usize;
             while i < num_logup_spec {
@@ -278,6 +282,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 curr_timestamp += 1;
 
                 if round < (max_round - F::from_canonical_usize(1)) {
+                    logup_row.within_round_limit = true;
                     let start = calculate_3d_ext_idx(
                         logup_specs_inner_inner_len, 
                         logup_specs_inner_len, 
