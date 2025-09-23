@@ -71,6 +71,8 @@ pub struct NativeSumcheckCols<T> {
 #[repr(C)]
 #[derive(AlignedBorrow)]
 pub struct HeaderSpecificCols<T> {
+    pub pc: T,
+    pub registers: [T; 5],
     /// 5 register reads + ctx read + challenges read
     pub read_records: [MemoryReadAuxCols<T>; 7],
     /// Write the final evaluation
@@ -82,8 +84,8 @@ pub struct HeaderSpecificCols<T> {
 pub struct ProdSpecificCols<T> {
     /// 2 extension elements
     pub p: [T; EXT_DEG * 2],
-    /// read 2 p values
-    pub read_record: MemoryReadAuxCols<T>,
+    /// read max varibale and 2 p values
+    pub read_records: [MemoryReadAuxCols<T>; 2],
     /// Calculated p evals
     pub p_evals: [T; EXT_DEG],
     /// write p_evals
@@ -95,8 +97,8 @@ pub struct ProdSpecificCols<T> {
 pub struct LogupSpecificCols<T> {
     /// 4 extension elements
     pub pq: [T; EXT_DEG * 4],
-    /// read 4 values: p1, p2, q1, q2
-    pub read_record: MemoryReadAuxCols<T>,
+    /// read max variable and 4 values: p1, p2, q1, q2
+    pub read_records: [MemoryReadAuxCols<T>; 2],
     /// Calculated p evals
     pub p_evals: [T; EXT_DEG],
     /// Calculated q evals

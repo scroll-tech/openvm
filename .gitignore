@@ -9,6 +9,9 @@ Cargo.lock
 **/.env
 .DS_Store
 
+# Log outputs
+*.log
+
 .cache/
 rustc-*
 

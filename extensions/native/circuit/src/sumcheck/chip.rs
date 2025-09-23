@@ -33,6 +33,7 @@ pub struct SumcheckEvalRecord<F: Field> {
     pub final_timestamp_increment: usize,
 
     pub register_ptrs: [F; 5],
+    pub registers: [F; 5],
     pub ctx: [F; EXT_DEG * 2],
     pub challenges: [F; EXT_DEG * 4],
     pub read_data_records: [RecordId; 7],
@@ -131,7 +132,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 memory.read_cell(register_address_space, input_register_4);
             let (read_result_pointer, r_ptr) =
                 memory.read_cell(register_address_space, output_register);
-
+            
             let (ctx_read, ctx): (RecordId, [F; EXT_DEG * 2]) = memory.read::<{EXT_DEG * 2}>(data_address_space, ctx_pointer);
 
             let [
@@ -161,6 +162,13 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 row_type: 0, 
                 curr_timestamp_increment: curr_timestamp, 
                 register_ptrs, 
+                registers: [
+                    input_register_1,
+                    input_register_2,
+                    input_register_3,
+                    input_register_4,
+                    output_register,
+                ],
                 ctx,
                 challenges, 
                 read_data_records: [
@@ -178,6 +186,8 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
             observation_records.push(header_row);
             self.height += 1;
             curr_timestamp += 7;
+
+            /* 
 
             let mut i = F::ZERO;
             let mut i_usize = 0usize;
@@ -351,6 +361,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
 
             self.record_set.extend(observation_records);
             println!("=> current_height: {:?}", self.height);
+            */
         } else {
             unreachable!()
         }
