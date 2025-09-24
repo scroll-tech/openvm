@@ -313,6 +313,8 @@ impl<AB: InteractionBuilder> Air<AB>
             .assert_eq(logup_row_specific.data_ptr, (logup_nested_len * (curr_logup_n - AB::F::ONE) + ctx[6] * ctx[0]) * AB::F::from_canonical_usize(EXT_DEG));
         builder
             .assert_eq(logup_row * logup_row_within_max_round * in_round, logup_in_round_evaluation);
+        builder
+            .assert_eq(logup_row * logup_row_within_max_round * not(in_round), logup_next_round_evaluation);
 
         self.memory_bridge
             .read(
@@ -354,5 +356,26 @@ impl<AB: InteractionBuilder> Air<AB>
                 &logup_row_specific.write_records[1],
             )
             .eval(builder, logup_row_within_max_round);
+
+        // Calculate evaluations
+        let next_round_p_evals = FieldExtension::add(
+            FieldExtension::multiply::<AB::Var, AB::Expr>(p1, c1),
+            FieldExtension::multiply::<AB::Var, AB::Expr>(p2, c2),
+        );
+        let in_round_p_evals = FieldExtension::add(
+            FieldExtension::multiply::<AB::Var, AB::Expr>(p1, q2),
+            FieldExtension::multiply::<AB::Var, AB::Expr>(p2, q1),
+        );
+        assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_in_round_evaluation), in_round_p_evals, logup_row_specific.p_evals);
+        assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_next_round_evaluation), next_round_p_evals, logup_row_specific.p_evals);
+
+        let next_round_q_evals = FieldExtension::add(
+            FieldExtension::multiply::<AB::Var, AB::Expr>(q1, c1),
+            FieldExtension::multiply::<AB::Var, AB::Expr>(q2, c2),
+        );
+        let in_round_q_evals = FieldExtension::multiply::<AB::Var, AB::Expr>(q1, q2);
+        assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_in_round_evaluation), in_round_q_evals, logup_row_specific.q_evals);
+        assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_next_round_evaluation), next_round_q_evals, logup_row_specific.q_evals);
+
     }
 }
