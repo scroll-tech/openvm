@@ -29,6 +29,12 @@ pub struct NativeSumcheckCols<T> {
     /// Indicates that the logup row is within maximum round
     pub logup_row_within_max_round: T,
 
+    /// Indicates what type of evaluation constraints should be applied
+    pub prod_in_round_evaluation: T,
+    pub prod_next_round_evaluation: T,
+    pub logup_in_round_evaluation: T,
+    pub logup_next_round_evaluation: T,
+
     /// Timestamps
     pub first_timestamp: T,
     pub start_timestamp: T,

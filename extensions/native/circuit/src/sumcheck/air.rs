@@ -1,6 +1,6 @@
 use std::{array::from_fn, borrow::Borrow, sync::Arc};
 use openvm_circuit::{
-    arch::{ExecutionBridge, ExecutionState},
+    arch::{ContinuationVmProof, ExecutionBridge, ExecutionState},
     system::memory::{offline_checker::MemoryBridge, MemoryAddress},
 };
 use openvm_circuit_primitives::utils::{assert_array_eq, not};
@@ -50,6 +50,7 @@ impl<AB: InteractionBuilder> Air<AB>
         let next: &NativeSumcheckCols<AB::Var> = (*next).borrow();
 
         let &NativeSumcheckCols {
+            // Row indicators
             header_row,
             prod_row,
             logup_row,
@@ -58,17 +59,30 @@ impl<AB: InteractionBuilder> Air<AB>
             logup_continuation,
             prod_row_within_max_round,
             logup_row_within_max_round,
+
+            prod_in_round_evaluation,
+            prod_next_round_evaluation,
+            logup_in_round_evaluation,
+            logup_next_round_evaluation,
+
+            // Timestamps
             first_timestamp,
             start_timestamp,
             last_timestamp,
+
+            // Results from reading registers
             register_ptrs,
             ctx,
             prod_nested_len,
             logup_nested_len,
-            curr_prod_n,
-            curr_logup_n,
+
+            // Challenges
             alpha,
             challenges,
+
+            curr_prod_n,
+            curr_logup_n,
+            
             max_round,
             within_round_limit,
             should_acc,
@@ -79,8 +93,16 @@ impl<AB: InteractionBuilder> Air<AB>
         builder.assert_bool(header_row);
         builder.assert_bool(prod_row);
         builder.assert_bool(logup_row);
+        builder.assert_bool(header_continuation);
+        builder.assert_bool(prod_continuation);
+        builder.assert_bool(logup_continuation);
+        builder.assert_bool(prod_row_within_max_round);
+        builder.assert_bool(logup_row_within_max_round);
+        builder.assert_bool(prod_in_round_evaluation);
+        builder.assert_bool(logup_in_round_evaluation);
         let enabled = header_row + prod_row + logup_row;
         builder.assert_bool(enabled.clone());
+        let in_round = ctx[7];
 
         // Carry along columns
         assert_array_eq(&mut builder.when(next.prod_row + next.logup_row), register_ptrs, next.register_ptrs);
@@ -109,9 +131,18 @@ impl<AB: InteractionBuilder> Air<AB>
             .when(next.logup_row)
             .assert_eq(ctx[1], curr_prod_n);
         builder
+            .when(prod_row)
+            .when(not(prod_continuation))
+            .assert_eq(ctx[1], curr_prod_n);
+        builder
             .when(logup_row)
-            .when(not(next.logup_row))
+            .when(not(logup_continuation))
             .assert_eq(ctx[2], curr_logup_n);
+
+        // Termination condition
+        let continuation = header_continuation + prod_continuation + logup_continuation;
+        builder.assert_bool(continuation.clone());
+        assert_array_eq(&mut builder.when::<AB::Expr>(not(continuation)), eval_acc, [AB::F::ZERO; 4]);
 
         // Timestamp transition
         builder
@@ -127,14 +158,12 @@ impl<AB: InteractionBuilder> Air<AB>
             .when(next.prod_row + next.logup_row)
             .assert_eq(next.start_timestamp, start_timestamp + AB::F::ONE + within_round_limit * AB::F::from_canonical_usize(3));
 
-
         // Randomness transition
         let alpha1: [_; EXT_DEG] = challenges[0..EXT_DEG].try_into().expect("");
         let c1: [_; EXT_DEG] = challenges[EXT_DEG..{EXT_DEG * 2}].try_into().expect("");
         let c2: [_; EXT_DEG] = challenges[{EXT_DEG * 2}..{EXT_DEG * 3}].try_into().expect("");
         let alpha2: [_; EXT_DEG] = challenges[{EXT_DEG * 3}..{EXT_DEG * 4}].try_into().expect("");
         let next_alpha1: [_; EXT_DEG] = next.challenges[0..EXT_DEG].try_into().expect("");
-        let next_alpha2: [_; EXT_DEG] = next.challenges[{EXT_DEG * 3}..{EXT_DEG * 4}].try_into().expect("");
 
         let alpha_denominator = FieldExtension::multiply(alpha1, alpha);
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(prod_continuation), alpha_denominator.clone(), next_alpha1);
@@ -225,7 +254,11 @@ impl<AB: InteractionBuilder> Air<AB>
         builder
             .when(prod_row_within_max_round)
             .assert_eq(prod_row_specific.data_ptr, (prod_nested_len * (curr_prod_n - AB::F::ONE) + ctx[4] * ctx[0]) * AB::F::from_canonical_usize(EXT_DEG));
-        
+        builder
+            .assert_eq(prod_row * prod_row_within_max_round * in_round, prod_in_round_evaluation);
+        builder
+            .assert_eq(prod_row * prod_row_within_max_round * not(in_round), prod_next_round_evaluation);
+
         self.memory_bridge
             .read(
                 MemoryAddress::new(
@@ -238,8 +271,8 @@ impl<AB: InteractionBuilder> Air<AB>
             )
             .eval(builder, prod_row_within_max_round);
 
-        let p1: [_; EXT_DEG] = prod_row_specific.p[0..EXT_DEG].try_into().expect("");
-        let p2: [_; EXT_DEG] = prod_row_specific.p[EXT_DEG..(EXT_DEG * 2)].try_into().expect("");
+        let p1: [AB::Var; EXT_DEG] = prod_row_specific.p[0..EXT_DEG].try_into().expect("");
+        let p2: [AB::Var; EXT_DEG] = prod_row_specific.p[EXT_DEG..(EXT_DEG * 2)].try_into().expect("");
 
         self.memory_bridge
             .write(
@@ -252,6 +285,15 @@ impl<AB: InteractionBuilder> Air<AB>
                 &prod_row_specific.write_record,
             )
             .eval(builder, prod_row_within_max_round);
+
+        // Calculate evaluations
+        let next_round_p_evals = FieldExtension::add(
+            FieldExtension::multiply::<AB::Var, AB::Expr>(p1, c1),
+            FieldExtension::multiply::<AB::Var, AB::Expr>(p2, c2),
+        );
+        let in_round_p_evals = FieldExtension::multiply::<AB::Var, AB::Expr>(p1, p2);
+        assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(prod_in_round_evaluation), in_round_p_evals, prod_row_specific.p_evals);
+        assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(prod_next_round_evaluation), next_round_p_evals, prod_row_specific.p_evals);
 
         // Logup spec evaluation
         let logup_row_specific: &LogupSpecificCols<AB::Var> =
@@ -269,6 +311,8 @@ impl<AB: InteractionBuilder> Air<AB>
         builder
             .when(logup_row_within_max_round)
             .assert_eq(logup_row_specific.data_ptr, (logup_nested_len * (curr_logup_n - AB::F::ONE) + ctx[6] * ctx[0]) * AB::F::from_canonical_usize(EXT_DEG));
+        builder
+            .assert_eq(logup_row * logup_row_within_max_round * in_round, logup_in_round_evaluation);
 
         self.memory_bridge
             .read(

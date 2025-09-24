@@ -79,6 +79,8 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 cols.prod_row = F::ONE;
                 cols.prod_continuation = if record.continuation { F::ONE } else { F::ZERO };
                 cols.prod_row_within_max_round = if record.within_round_limit { F::ONE } else { F::ZERO };
+                cols.prod_in_round_evaluation = if record.within_round_limit { record.ctx[7] } else { F::ZERO };
+                cols.prod_next_round_evaluation = if record.within_round_limit { F::ONE - record.ctx[7] } else { F::ZERO };
                 let prod: &mut ProdSpecificCols<F> =
                     cols.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
 
@@ -106,6 +108,8 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 cols.logup_row = F::ONE;
                 cols.logup_continuation = if record.continuation { F::ONE } else { F::ZERO };
                 cols.logup_row_within_max_round = if record.within_round_limit { F::ONE } else { F::ZERO };
+                cols.logup_in_round_evaluation = if record.within_round_limit { record.ctx[7] } else { F::ZERO };
+                cols.logup_next_round_evaluation = if record.within_round_limit { F::ONE - record.ctx[7] } else { F::ZERO };
                 let logup: &mut LogupSpecificCols<F> =
                     cols.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
 
