@@ -298,15 +298,5 @@ impl<AB: InteractionBuilder> Air<AB>
                 &logup_row_specific.write_records[1],
             )
             .eval(builder, logup_row_within_max_round);
-
-
-
-        /* _debug
-        
-
-        
-        // Timestamp transition
-
-        */
     }
 }
