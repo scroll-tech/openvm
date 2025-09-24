@@ -56,6 +56,7 @@ pub struct SumcheckEvalRecord<F: Field> {
     pub p_evals: [F; EXT_DEG],
     pub q_evals: [F; EXT_DEG],
     pub eval_acc: [F; EXT_DEG],
+    pub acc_eval: [F; EXT_DEG],
 }
 
 fn calculate_3d_ext_idx<F: Field>(
@@ -247,7 +248,9 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
 
                     let not_in_round = F::ONE - in_round;
                     if (round + not_in_round) < (max_round - F::from_canonical_usize(1)) {
-                        eval_acc = FieldExtension::add(eval_acc, FieldExtension::multiply(alpha_acc, evals));
+                        let acc_eval = FieldExtension::multiply(alpha_acc, evals);
+                        prod_row.acc_eval = acc_eval;
+                        eval_acc = FieldExtension::add(eval_acc, acc_eval);
                         prod_row.should_acc = true;
                         prod_row.eval_acc = eval_acc.clone();
                     }
@@ -341,10 +344,13 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
 
                     let not_in_round = F::ONE - in_round;
                     if (round + not_in_round) < (max_round - F::from_canonical_usize(1)) {
-                        eval_acc = FieldExtension::add(eval_acc, FieldExtension::multiply(alpha_acc, p_evals));
                         let alpha_denominator = FieldExtension::multiply(alpha_acc, alpha);
-                        eval_acc = FieldExtension::add(eval_acc, FieldExtension::multiply(alpha_denominator, q_evals));
-
+                        let acc_eval = FieldExtension::add(
+                            FieldExtension::multiply(alpha_acc, p_evals),
+                            FieldExtension::multiply(alpha_denominator, q_evals),
+                        );
+                        logup_row.acc_eval = acc_eval;
+                        eval_acc = FieldExtension::add(eval_acc, acc_eval);
                         logup_row.should_acc = true;
                         logup_row.alpha2 = alpha_denominator;
                         logup_row.eval_acc = eval_acc.clone();

@@ -54,16 +54,25 @@ impl<AB: InteractionBuilder> Air<AB>
             header_row,
             prod_row,
             logup_row,
+
+            // Whether valid prod/logup row operations follow this row
             header_continuation,
             prod_continuation,
             logup_continuation,
+
+            // Round limit
             prod_row_within_max_round,
             logup_row_within_max_round,
 
+            // What type of evaluation is performed
             prod_in_round_evaluation,
             prod_next_round_evaluation,
             logup_in_round_evaluation,
             logup_next_round_evaluation,
+
+            // Indicates whether the round evaluations should be added to the accumulator
+            prod_acc,
+            logup_acc,
 
             // Timestamps
             first_timestamp,
@@ -241,6 +250,8 @@ impl<AB: InteractionBuilder> Air<AB>
         // Prod spec evaluation
         let prod_row_specific: &ProdSpecificCols<AB::Var> =
             specific[..ProdSpecificCols::<AB::Var>::width()].borrow();
+        let next_prod_row_specific: &ProdSpecificCols<AB::Var> =
+            next.specific[..ProdSpecificCols::<AB::Var>::width()].borrow();
 
         self.memory_bridge
             .read(
@@ -258,6 +269,8 @@ impl<AB: InteractionBuilder> Air<AB>
             .assert_eq(prod_row * prod_row_within_max_round * in_round, prod_in_round_evaluation);
         builder
             .assert_eq(prod_row * prod_row_within_max_round * not(in_round), prod_next_round_evaluation);
+        builder
+            .assert_eq(prod_row * should_acc, prod_acc);
 
         self.memory_bridge
             .read(
@@ -295,9 +308,21 @@ impl<AB: InteractionBuilder> Air<AB>
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(prod_in_round_evaluation), in_round_p_evals, prod_row_specific.p_evals);
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(prod_next_round_evaluation), next_round_p_evals, prod_row_specific.p_evals);
 
+        // Accumulate evaluation
+        let acc_eval = FieldExtension::multiply::<AB::Var, AB::Expr>(prod_row_specific.p_evals, alpha1);
+        assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(prod_acc), prod_row_specific.acc_eval, acc_eval);
+
+        let next_acc = FieldExtension::subtract(
+            eval_acc, 
+            next_prod_row_specific.acc_eval,
+        );
+        assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(next.prod_acc), next.eval_acc, next_acc);
+
         // Logup spec evaluation
         let logup_row_specific: &LogupSpecificCols<AB::Var> =
             specific[..LogupSpecificCols::<AB::Var>::width()].borrow();
+        let next_logup_row_specfic: &LogupSpecificCols<AB::Var> =
+            next.specific[..LogupSpecificCols::<AB::Var>::width()].borrow();
 
         self.memory_bridge
             .read(
@@ -315,6 +340,8 @@ impl<AB: InteractionBuilder> Air<AB>
             .assert_eq(logup_row * logup_row_within_max_round * in_round, logup_in_round_evaluation);
         builder
             .assert_eq(logup_row * logup_row_within_max_round * not(in_round), logup_next_round_evaluation);
+        builder
+            .assert_eq(logup_row * should_acc, logup_acc);
 
         self.memory_bridge
             .read(
@@ -376,6 +403,18 @@ impl<AB: InteractionBuilder> Air<AB>
         let in_round_q_evals = FieldExtension::multiply::<AB::Var, AB::Expr>(q1, q2);
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_in_round_evaluation), in_round_q_evals, logup_row_specific.q_evals);
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_next_round_evaluation), next_round_q_evals, logup_row_specific.q_evals);
+        
+        // Accumulate evaluation
+        let acc_eval = FieldExtension::add(
+            FieldExtension::multiply::<AB::Var, AB::Expr>(logup_row_specific.p_evals, alpha1),
+            FieldExtension::multiply::<AB::Var, AB::Expr>(logup_row_specific.q_evals, alpha2),
+        );
+        assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_acc), logup_row_specific.acc_eval, acc_eval);
 
+        let next_acc = FieldExtension::subtract(
+            eval_acc, 
+            next_logup_row_specfic.acc_eval,
+        );
+        assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(next.logup_acc), next.eval_acc, next_acc);
     }
 }

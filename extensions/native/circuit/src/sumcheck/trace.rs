@@ -81,6 +81,7 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 cols.prod_row_within_max_round = if record.within_round_limit { F::ONE } else { F::ZERO };
                 cols.prod_in_round_evaluation = if record.within_round_limit { record.ctx[7] } else { F::ZERO };
                 cols.prod_next_round_evaluation = if record.within_round_limit { F::ONE - record.ctx[7] } else { F::ZERO };
+                cols.prod_acc = if record.should_acc { F::ONE } else { F::ZERO };
                 let prod: &mut ProdSpecificCols<F> =
                     cols.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
 
@@ -89,6 +90,7 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 prod.p[0..EXT_DEG].copy_from_slice(&record.p1);
                 prod.p[EXT_DEG..(EXT_DEG * 2)].copy_from_slice(&record.p2);
                 prod.data_ptr = record.data_ptr;
+                prod.acc_eval = record.acc_eval;
 
                 // Read max_round
                 let mem_record = memory.record_by_id(record.read_data_records[0]);
@@ -110,6 +112,7 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 cols.logup_row_within_max_round = if record.within_round_limit { F::ONE } else { F::ZERO };
                 cols.logup_in_round_evaluation = if record.within_round_limit { record.ctx[7] } else { F::ZERO };
                 cols.logup_next_round_evaluation = if record.within_round_limit { F::ONE - record.ctx[7] } else { F::ZERO };
+                cols.logup_acc = if record.should_acc { F::ONE } else { F::ZERO };
                 let logup: &mut LogupSpecificCols<F> =
                     cols.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
 
@@ -121,6 +124,7 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 logup.pq[(EXT_DEG * 2)..(EXT_DEG * 3)].copy_from_slice(&record.q1);
                 logup.pq[(EXT_DEG * 3)..(EXT_DEG * 4)].copy_from_slice(&record.q2);
                 logup.data_ptr = record.data_ptr;
+                logup.acc_eval = record.acc_eval;
 
                 // Read max_round
                 let mem_record = memory.record_by_id(record.read_data_records[0]);

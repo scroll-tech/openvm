@@ -35,6 +35,10 @@ pub struct NativeSumcheckCols<T> {
     pub logup_in_round_evaluation: T,
     pub logup_next_round_evaluation: T,
 
+    /// Indicates if evaluations are accumulated
+    pub prod_acc: T,
+    pub logup_acc: T,
+
     /// Timestamps
     pub first_timestamp: T,
     pub start_timestamp: T,
@@ -115,6 +119,8 @@ pub struct ProdSpecificCols<T> {
     pub p_evals: [T; EXT_DEG],
     /// write p_evals
     pub write_record: MemoryWriteAuxCols<T, EXT_DEG>,
+    /// Evaluation for the accumulator
+    pub acc_eval: [T; EXT_DEG],
 }
 
 #[repr(C)]
@@ -130,7 +136,8 @@ pub struct LogupSpecificCols<T> {
     pub p_evals: [T; EXT_DEG],
     /// Calculated q evals
     pub q_evals: [T; EXT_DEG],
-
     /// write both p_evals and q_evals
     pub write_records: [MemoryWriteAuxCols<T, EXT_DEG>; 2],
+    /// Evaluation for the accumulator
+    pub acc_eval: [T; EXT_DEG],
 }
