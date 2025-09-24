@@ -79,6 +79,37 @@ impl<AB: InteractionBuilder> Air<AB>
         let enabled = header_row + prod_row + logup_row;
         builder.assert_bool(enabled.clone());
 
+        // Carry along columns
+        assert_array_eq(&mut builder.when(next.prod_row + next.logup_row), register_ptrs, next.register_ptrs);
+        assert_array_eq(&mut builder.when(next.prod_row + next.logup_row), ctx, next.ctx);
+        assert_array_eq::<_, _, _, {EXT_DEG * 2}>(
+            &mut builder.when(next.prod_row + next.logup_row), 
+            challenges[EXT_DEG..(EXT_DEG * 3)].try_into().expect(""), 
+            next.challenges[EXT_DEG..(EXT_DEG * 3)].try_into().expect("")
+        );
+        builder.when(next.prod_row + next.logup_row).assert_eq(prod_nested_len, next.prod_nested_len);
+        builder.when(next.prod_row + next.logup_row).assert_eq(logup_nested_len, next.logup_nested_len);
+
+        // Row transition
+        builder
+            .when(next.prod_row)
+            .assert_eq(curr_prod_n + AB::F::ONE, next.curr_prod_n);
+        builder
+            .when(next.logup_row)
+            .assert_eq(curr_logup_n + AB::F::ONE, next.curr_logup_n);
+        builder
+            .when(header_row)
+            .when(next.logup_row)
+            .assert_zero(ctx[1]);
+        builder
+            .when(prod_row)
+            .when(next.logup_row)
+            .assert_eq(ctx[1], curr_prod_n);
+        builder
+            .when(logup_row)
+            .when(not(next.logup_row))
+            .assert_eq(ctx[2], curr_logup_n);
+
         // Header
         let header_row_specific: &HeaderSpecificCols<AB::Var> =
             specific[..HeaderSpecificCols::<AB::Var>::width()].borrow();
@@ -209,7 +240,6 @@ impl<AB: InteractionBuilder> Air<AB>
             )
             .eval(builder, logup_row);
 
-        // _debug
         builder
             .when(logup_row_within_max_round)
             .assert_eq(logup_row_specific.data_ptr, (logup_nested_len * (curr_logup_n - AB::F::ONE) + ctx[6] * ctx[0]) * AB::F::from_canonical_usize(EXT_DEG));
@@ -258,35 +288,10 @@ impl<AB: InteractionBuilder> Air<AB>
 
 
         /* _debug
-        // Carry along columns
-        assert_array_eq(&mut builder.when(next.prod_row + next.logup_row), register_ptrs, next.register_ptrs);
-        assert_array_eq(&mut builder.when(next.prod_row + next.logup_row), ctx, next.ctx);
-        assert_array_eq::<_, _, _, {EXT_DEG * 2}>(
-            &mut builder.when(next.prod_row + next.logup_row), 
-            challenges[EXT_DEG..(EXT_DEG * 3)].try_into().expect(""), 
-            next.challenges[EXT_DEG..(EXT_DEG * 3)].try_into().expect("")
-        );
-        assert_array_eq(&mut builder.when(next.prod_row + next.logup_row), register_ptrs, next.register_ptrs);
+        
 
         // Row transitions
-        builder
-            .when(header_row)
-            .when(next.logup_row)
-            .assert_zero(ctx[1]);
-        builder
-            .when(next.prod_row)
-            .assert_eq(curr_prod_n + AB::F::ONE, next.curr_prod_n);
-        builder
-            .when(next.logup_row)
-            .assert_eq(curr_logup_n + AB::F::ONE, next.curr_logup_n);
-        builder
-            .when(prod_row)
-            .when(next.logup_row)
-            .assert_eq(ctx[1], curr_prod_n);
-        builder
-            .when(logup_row)
-            .when(not(next.logup_row))
-            .assert_eq(ctx[2], curr_logup_n);
+        
 
 
 
@@ -297,6 +302,7 @@ impl<AB: InteractionBuilder> Air<AB>
         
 
         // Termination condition
+        // Timestamp transition
 
         */
     }
