@@ -217,13 +217,12 @@ impl<AB: InteractionBuilder> Air<AB>
         let p2: [_; EXT_DEG] = logup_row_specific.pq[EXT_DEG..(EXT_DEG * 2)].try_into().expect("");
         let q1: [_; EXT_DEG] = logup_row_specific.pq[(EXT_DEG * 2)..{EXT_DEG * 3}].try_into().expect("");
         let q2: [_; EXT_DEG] = logup_row_specific.pq[(EXT_DEG * 3)..(EXT_DEG * 4)].try_into().expect("");
-
-        /* _debug
+        
         self.memory_bridge
             .write(
                 MemoryAddress::new(
                     self.address_space,
-                    register_ptrs[4] + (ctx[1] + curr_prod_n) * AB::F::from_canonical_usize(EXT_DEG),
+                    register_ptrs[4] + (ctx[1] + curr_logup_n) * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 logup_row_specific.p_evals,
                 start_timestamp + AB::F::TWO,
@@ -235,18 +234,13 @@ impl<AB: InteractionBuilder> Air<AB>
             .write(
                 MemoryAddress::new(
                     self.address_space,
-                    register_ptrs[4] + (ctx[1] + ctx[2] + curr_prod_n) * AB::F::from_canonical_usize(EXT_DEG),
+                    register_ptrs[4] + (ctx[1] + ctx[2] + curr_logup_n) * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 logup_row_specific.q_evals,
                 start_timestamp + AB::F::from_canonical_usize(3),
                 &logup_row_specific.write_records[1],
             )
             .eval(builder, logup_row_within_max_round);
-        */
-
-
-
-
 
 
 

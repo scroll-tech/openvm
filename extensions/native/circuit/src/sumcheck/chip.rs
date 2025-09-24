@@ -329,13 +329,11 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                     logup_row.p_evals = p_evals;
                     logup_row.q_evals = q_evals;
 
-                    /* _debug
                     let (write_slice_eval_1, _) = memory.write::<EXT_DEG>(data_address_space, r_ptr + (F::ONE + num_prod_spec + i) * F::from_canonical_usize(EXT_DEG), p_evals);
                     let (write_slice_eval_2, _) = memory.write::<EXT_DEG>(data_address_space, r_ptr + (F::ONE + num_prod_spec + num_logup_spec + i) * F::from_canonical_usize(EXT_DEG), q_evals);
                     
                     logup_row.write_data_records[0] = write_slice_eval_1;
                     logup_row.write_data_records[1] = write_slice_eval_2;
-                    */
 
                     let not_in_round = F::ONE - in_round;
                     if (round + not_in_round) < (max_round - F::from_canonical_usize(1)) {
@@ -348,9 +346,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                         logup_row.eval_acc = eval_acc.clone();
                     }
 
-                    // _debug
-                    // curr_timestamp += 3;
-                    curr_timestamp += 1;
+                    curr_timestamp += 3;
                 }
 
                 alpha_acc = FieldExtension::multiply(FieldExtension::multiply(alpha_acc, alpha), alpha);

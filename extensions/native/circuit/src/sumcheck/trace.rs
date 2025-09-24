@@ -121,14 +121,12 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                     aux_cols_factory.generate_read_aux(mem_record, &mut logup.read_records[1]);
 
                     // Write p and q eval
-                    /* _debug
                     logup.p_evals = record.p_evals;
                     logup.q_evals = record.q_evals;
                     for i in 0..2usize {
                         let mem_record = memory.record_by_id(record.write_data_records[i]);
                         aux_cols_factory.generate_write_aux(mem_record, &mut logup.write_records[i]);
                     }
-                    */
                 }
             } else {
                 unreachable!()
