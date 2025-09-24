@@ -70,6 +70,10 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                     let mem_record = memory.record_by_id(record.read_data_records[i]);
                     aux_cols_factory.generate_read_aux(mem_record, &mut header.read_records[i]);
                 }
+
+                // write the final result
+                let mem_record = memory.record_by_id(record.write_data_records[0]);
+                aux_cols_factory.generate_write_aux(mem_record, &mut header.write_records);
             } else if record.row_type == 1 {
                 cols.prod_row = F::ONE;
                 cols.prod_row_within_max_round = if record.within_round_limit { F::ONE } else { F::ZERO };

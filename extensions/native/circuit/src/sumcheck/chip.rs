@@ -357,11 +357,9 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 self.height += 1;
             }
 
-            /* _debug
             let (write_r, _) = memory.write::<EXT_DEG>(data_address_space, r_ptr, eval_acc);
             curr_timestamp += 1;
             observation_records[0].write_data_records[0] = write_r;
-            */
 
             for record in &mut observation_records {
                 record.final_timestamp_increment = curr_timestamp;

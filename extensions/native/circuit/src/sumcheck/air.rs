@@ -133,6 +133,19 @@ impl<AB: InteractionBuilder> Air<AB>
             )
             .eval(builder, header_row);
 
+        // Write final result
+        self.memory_bridge
+            .write(
+                MemoryAddress::new(
+                    self.address_space,
+                    register_ptrs[4],
+                ),
+                eval_acc,
+                last_timestamp - AB::F::ONE,
+                &header_row_specific.write_records,
+            )
+            .eval(builder, header_row);
+
         // Separate aggregate column clusters
         let alpha1: [_; EXT_DEG] = challenges[0..EXT_DEG].try_into().expect("");
         let c1: [_; EXT_DEG] = challenges[EXT_DEG..{EXT_DEG * 2}].try_into().expect("");
