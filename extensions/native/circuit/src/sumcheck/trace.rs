@@ -49,6 +49,8 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
             cols.last_timestamp = F::from_canonical_usize(record.from_state.timestamp as usize + record.final_timestamp_increment);
             cols.register_ptrs = record.register_ptrs;
             cols.ctx = record.ctx;
+            cols.prod_nested_len = record.ctx[4] * record.ctx[3];
+            cols.logup_nested_len = record.ctx[6] * record.ctx[5];
             cols.challenges = record.challenges;
             cols.alpha = record.alpha;
             cols.max_round = record.max_round;
@@ -70,6 +72,7 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 }
             } else if record.row_type == 1 {
                 cols.prod_row = F::ONE;
+                cols.prod_row_within_max_round = if record.within_round_limit { F::ONE } else { F::ZERO };
                 let prod: &mut ProdSpecificCols<F> =
                     cols.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
 
@@ -95,28 +98,38 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 }
             } else if record.row_type == 2 {
                 cols.logup_row = F::ONE;
+                cols.logup_row_within_max_round = if record.within_round_limit { F::ONE } else { F::ZERO };
                 let logup: &mut LogupSpecificCols<F> =
                     cols.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
 
                 cols.curr_logup_n = F::from_canonical_usize(record.logup_spec_n + 1);
                 cols.challenges[0..EXT_DEG].copy_from_slice(&record.alpha1);
                 cols.challenges[(EXT_DEG * 3)..(EXT_DEG * 4)].copy_from_slice(&record.alpha2);
+                logup.pq[0..EXT_DEG].copy_from_slice(&record.p1);
+                logup.pq[EXT_DEG..(EXT_DEG * 2)].copy_from_slice(&record.p2);
+                logup.pq[(EXT_DEG * 2)..(EXT_DEG * 3)].copy_from_slice(&record.q1);
+                logup.pq[(EXT_DEG * 3)..(EXT_DEG * 4)].copy_from_slice(&record.q2);
+                logup.data_ptr = record.data_ptr;
 
+                // Read max_round
+                let mem_record = memory.record_by_id(record.read_data_records[0]);
+                aux_cols_factory.generate_read_aux(mem_record, &mut logup.read_records[0]);
 
-//     pub p1: [F; EXT_DEG],
-//     pub p2: [F; EXT_DEG],
-//     pub q1: [F; EXT_DEG],
-//     pub q2: [F; EXT_DEG],
-//     pub p_evals: [F; EXT_DEG],
-//     pub q_evals: [F; EXT_DEG],
-// }
-// logup.data_ptr = record.data_ptr;
+                if record.within_round_limit {
+                    // Read p1, p2, q1, q2
+                    let mem_record = memory.record_by_id(record.read_data_records[1]);
+                    aux_cols_factory.generate_read_aux(mem_record, &mut logup.read_records[1]);
 
-
-
-
-
-
+                    // Write p and q eval
+                    /* _debug
+                    logup.p_evals = record.p_evals;
+                    logup.q_evals = record.q_evals;
+                    for i in 0..2usize {
+                        let mem_record = memory.record_by_id(record.write_data_records[i]);
+                        aux_cols_factory.generate_write_aux(mem_record, &mut logup.write_records[i]);
+                    }
+                    */
+                }
             } else {
                 unreachable!()
             }

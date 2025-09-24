@@ -17,6 +17,11 @@ pub struct NativeSumcheckCols<T> {
     /// Indicates that this row is a step for logup_spec in the layer sum operation
     pub logup_row: T,
 
+    /// Indicates that the prod row is within maximum round
+    pub prod_row_within_max_round: T,
+    /// Indicates that the logup row is within maximum round
+    pub logup_row_within_max_round: T,
+
     /// Timestamps
     pub first_timestamp: T,
     pub start_timestamp: T,
@@ -37,6 +42,9 @@ pub struct NativeSumcheckCols<T> {
     //     in_layer,
     // ]
     pub ctx: [T; EXT_DEG * 2],
+
+    pub prod_nested_len: T,
+    pub logup_nested_len: T,
 
     pub curr_prod_n: T,
     pub curr_logup_n: T,

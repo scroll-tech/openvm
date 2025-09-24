@@ -53,11 +53,15 @@ impl<AB: InteractionBuilder> Air<AB>
             header_row,
             prod_row,
             logup_row,
+            prod_row_within_max_round,
+            logup_row_within_max_round,
             first_timestamp,
             start_timestamp,
             last_timestamp,
             register_ptrs,
             ctx,
+            prod_nested_len,
+            logup_nested_len,
             curr_prod_n,
             curr_logup_n,
             alpha,
@@ -148,8 +152,9 @@ impl<AB: InteractionBuilder> Air<AB>
             )
             .eval(builder, prod_row);
 
-        // _debug
-        // let p_start_ptr = register_ptrs[2] + (ctx[4] * ctx[3] * (curr_prod_n - AB::F::ONE) + ctx[4] * ctx[0]) * AB::F::from_canonical_usize(EXT_DEG);
+        builder
+            .when(prod_row_within_max_round)
+            .assert_eq(prod_row_specific.data_ptr, (prod_nested_len * (curr_prod_n - AB::F::ONE) + ctx[4] * ctx[0]) * AB::F::from_canonical_usize(EXT_DEG));
         
         self.memory_bridge
             .read(
@@ -161,9 +166,8 @@ impl<AB: InteractionBuilder> Air<AB>
                 start_timestamp + AB::F::ONE,
                 &prod_row_specific.read_records[1],
             )
-            .eval(builder, prod_row * within_round_limit);
+            .eval(builder, prod_row_within_max_round);
 
-        
         let p1: [_; EXT_DEG] = prod_row_specific.p[0..EXT_DEG].try_into().expect("");
         let p2: [_; EXT_DEG] = prod_row_specific.p[EXT_DEG..(EXT_DEG * 2)].try_into().expect("");
 
@@ -177,7 +181,71 @@ impl<AB: InteractionBuilder> Air<AB>
                 start_timestamp + AB::F::TWO,
                 &prod_row_specific.write_record,
             )
-            .eval(builder, prod_row * within_round_limit);
+            .eval(builder, prod_row_within_max_round);
+
+        // Logup spec evaluation
+        let logup_row_specific: &LogupSpecificCols<AB::Var> =
+            specific[..LogupSpecificCols::<AB::Var>::width()].borrow();
+
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(self.address_space, register_ptrs[0] + AB::F::from_canonical_usize(EXT_DEG * 2 - 1) + ctx[1] + curr_logup_n),
+                [max_round],
+                start_timestamp,
+                &logup_row_specific.read_records[0],
+            )
+            .eval(builder, logup_row);
+
+        // _debug
+        builder
+            .when(logup_row_within_max_round)
+            .assert_eq(logup_row_specific.data_ptr, (logup_nested_len * (curr_logup_n - AB::F::ONE) + ctx[6] * ctx[0]) * AB::F::from_canonical_usize(EXT_DEG));
+
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(
+                    self.address_space,
+                    register_ptrs[3] + logup_row_specific.data_ptr,
+                ),
+                logup_row_specific.pq,
+                start_timestamp + AB::F::ONE,
+                &logup_row_specific.read_records[1],
+            )
+            .eval(builder, logup_row_within_max_round);
+
+        let p1: [_; EXT_DEG] = logup_row_specific.pq[0..EXT_DEG].try_into().expect("");
+        let p2: [_; EXT_DEG] = logup_row_specific.pq[EXT_DEG..(EXT_DEG * 2)].try_into().expect("");
+        let q1: [_; EXT_DEG] = logup_row_specific.pq[(EXT_DEG * 2)..{EXT_DEG * 3}].try_into().expect("");
+        let q2: [_; EXT_DEG] = logup_row_specific.pq[(EXT_DEG * 3)..(EXT_DEG * 4)].try_into().expect("");
+
+        /* _debug
+        self.memory_bridge
+            .write(
+                MemoryAddress::new(
+                    self.address_space,
+                    register_ptrs[4] + (ctx[1] + curr_prod_n) * AB::F::from_canonical_usize(EXT_DEG),
+                ),
+                logup_row_specific.p_evals,
+                start_timestamp + AB::F::TWO,
+                &logup_row_specific.write_records[0],
+            )
+            .eval(builder, logup_row_within_max_round);
+
+        self.memory_bridge
+            .write(
+                MemoryAddress::new(
+                    self.address_space,
+                    register_ptrs[4] + (ctx[1] + ctx[2] + curr_prod_n) * AB::F::from_canonical_usize(EXT_DEG),
+                ),
+                logup_row_specific.q_evals,
+                start_timestamp + AB::F::from_canonical_usize(3),
+                &logup_row_specific.write_records[1],
+            )
+            .eval(builder, logup_row_within_max_round);
+        */
+
+
+
 
 
 
@@ -219,47 +287,7 @@ impl<AB: InteractionBuilder> Air<AB>
 
         
 
-        // Logup spec evaluation
-        let logup_row_specific: &LogupSpecificCols<AB::Var> =
-            specific[..LogupSpecificCols::<AB::Var>::width()].borrow();
-
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(self.address_space, register_ptrs[0] + ctx[1] + AB::F::from_canonical_usize(EXT_DEG * 2 - 1) + curr_logup_n),
-                [max_round],
-                start_timestamp,
-                &prod_row_specific.read_records[0],
-            )
-            .eval(builder, prod_row);
-
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(
-                    self.address_space,
-                    register_ptrs[2] + (ctx[4] * ctx[3] * (curr_prod_n - AB::F::ONE) + ctx[4] * ctx[0]) * AB::F::from_canonical_usize(EXT_DEG),
-                ),
-                prod_row_specific.p,
-                start_timestamp + AB::F::ONE,
-                &prod_row_specific.read_records[1],
-            )
-            .eval(builder, prod_row);
-
-        let p1: [_; EXT_DEG] = logup_row_specific.pq[0..EXT_DEG].try_into().expect("");
-        let p2: [_; EXT_DEG] = logup_row_specific.pq[EXT_DEG..(EXT_DEG * 2)].try_into().expect("");
-        let q1: [_; EXT_DEG] = logup_row_specific.pq[(EXT_DEG * 2)..{EXT_DEG * 3}].try_into().expect("");
-        let q2: [_; EXT_DEG] = logup_row_specific.pq[(EXT_DEG * 3)..(EXT_DEG * 4)].try_into().expect("");
-
-        self.memory_bridge
-            .write(
-                MemoryAddress::new(
-                    self.address_space,
-                    register_ptrs[4] + curr_prod_n * AB::F::from_canonical_usize(EXT_DEG),
-                ),
-                prod_row_specific.p_evals,
-                start_timestamp + AB::F::TWO,
-                &prod_row_specific.write_record,
-            )
-            .eval(builder, prod_row);
+        
 
         // Termination condition
 
