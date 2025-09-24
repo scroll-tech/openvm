@@ -110,6 +110,20 @@ impl<AB: InteractionBuilder> Air<AB>
             .when(not(next.logup_row))
             .assert_eq(ctx[2], curr_logup_n);
 
+        // Timestamp transition
+        builder
+            .when(header_row)
+            .when(next.prod_row + next.logup_row)
+            .assert_eq(next.start_timestamp, start_timestamp + AB::F::from_canonical_usize(7));
+        builder
+            .when(prod_row)
+            .when(next.prod_row + next.logup_row)
+            .assert_eq(next.start_timestamp, start_timestamp + AB::F::ONE + within_round_limit * AB::F::TWO);
+        builder
+            .when(logup_row)
+            .when(next.prod_row + next.logup_row)
+            .assert_eq(next.start_timestamp, start_timestamp + AB::F::ONE + within_round_limit * AB::F::from_canonical_usize(3));
+
         // Header
         let header_row_specific: &HeaderSpecificCols<AB::Var> =
             specific[..HeaderSpecificCols::<AB::Var>::width()].borrow();
@@ -290,18 +304,7 @@ impl<AB: InteractionBuilder> Air<AB>
         /* _debug
         
 
-        // Row transitions
         
-
-
-
-
-
-        
-
-        
-
-        // Termination condition
         // Timestamp transition
 
         */
