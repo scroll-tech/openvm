@@ -31,6 +31,7 @@ pub struct SumcheckEvalRecord<F: Field> {
     pub row_type: usize,        // 0 - header; 1 - prod; 2 - logup
     pub curr_timestamp_increment: usize,
     pub final_timestamp_increment: usize,
+    pub continuation: bool,
 
     pub register_ptrs: [F; 5],
     pub registers: [F; 5],
@@ -151,10 +152,11 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
             let (challenges_read, challenges): (RecordId, [F; EXT_DEG * 4]) = memory.read::<{EXT_DEG * 4}>(data_address_space, cs_pointer);
             let alpha: [F; 4] = challenges[0..EXT_DEG].try_into().expect("");
 
-            let mut header_row   = SumcheckEvalRecord { 
+            let mut header_row = SumcheckEvalRecord { 
                 from_state, 
                 instruction: instruction.clone(), 
                 row_type: 0, 
+                continuation: true,
                 curr_timestamp_increment: curr_timestamp,
                 register_ptrs,
                 alpha,
@@ -195,6 +197,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                     from_state,
                     instruction: instruction.clone(),
                     row_type: 1, 
+                    continuation: true,
                     curr_timestamp_increment: curr_timestamp, 
                     register_ptrs,
                     ctx,
@@ -267,6 +270,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                     from_state, 
                     instruction: instruction.clone(), 
                     row_type: 2, 
+                    continuation: true,
                     curr_timestamp_increment: curr_timestamp, 
                     register_ptrs, 
                     ctx, 
@@ -365,6 +369,8 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 record.final_timestamp_increment = curr_timestamp;
                 record.eval_acc = FieldExtension::subtract(eval_acc, record.eval_acc);
             }
+            let last_idx = observation_records.len() - 1;
+            observation_records[last_idx].continuation = false;
 
             self.record_set.extend(observation_records);
             println!("=> current_height: {:?}", self.height);

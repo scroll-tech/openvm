@@ -14,7 +14,7 @@ use openvm_stark_backend::{
     p3_matrix::Matrix,
     rap::{BaseAirWithPublicValues, PartitionedBaseAir},
 };
-use crate::{sumcheck::columns::{HeaderSpecificCols, LogupSpecificCols, NativeSumcheckCols, ProdSpecificCols}, EXT_DEG};
+use crate::{sumcheck::columns::{HeaderSpecificCols, LogupSpecificCols, NativeSumcheckCols, ProdSpecificCols}, FieldExtension, EXT_DEG};
 
 #[derive(Clone, Debug)]
 pub struct NativeSumcheckAir<F: Field> {
@@ -53,6 +53,9 @@ impl<AB: InteractionBuilder> Air<AB>
             header_row,
             prod_row,
             logup_row,
+            header_continuation,
+            prod_continuation,
+            logup_continuation,
             prod_row_within_max_round,
             logup_row_within_max_round,
             first_timestamp,
@@ -124,6 +127,21 @@ impl<AB: InteractionBuilder> Air<AB>
             .when(next.prod_row + next.logup_row)
             .assert_eq(next.start_timestamp, start_timestamp + AB::F::ONE + within_round_limit * AB::F::from_canonical_usize(3));
 
+
+        // Randomness transition
+        let alpha1: [_; EXT_DEG] = challenges[0..EXT_DEG].try_into().expect("");
+        let c1: [_; EXT_DEG] = challenges[EXT_DEG..{EXT_DEG * 2}].try_into().expect("");
+        let c2: [_; EXT_DEG] = challenges[{EXT_DEG * 2}..{EXT_DEG * 3}].try_into().expect("");
+        let alpha2: [_; EXT_DEG] = challenges[{EXT_DEG * 3}..{EXT_DEG * 4}].try_into().expect("");
+        let next_alpha1: [_; EXT_DEG] = next.challenges[0..EXT_DEG].try_into().expect("");
+        let next_alpha2: [_; EXT_DEG] = next.challenges[{EXT_DEG * 3}..{EXT_DEG * 4}].try_into().expect("");
+
+        let alpha_denominator = FieldExtension::multiply(alpha1, alpha);
+        assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(prod_continuation), alpha_denominator.clone(), next_alpha1);
+        assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_row), alpha_denominator, alpha2);
+        let logup_next_alpha = FieldExtension::multiply(alpha2, alpha);
+        assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_continuation), logup_next_alpha, next_alpha1);
+
         // Header
         let header_row_specific: &HeaderSpecificCols<AB::Var> =
             specific[..HeaderSpecificCols::<AB::Var>::width()].borrow();
@@ -190,12 +208,6 @@ impl<AB: InteractionBuilder> Air<AB>
                 &header_row_specific.write_records,
             )
             .eval(builder, header_row);
-
-        // Separate aggregate column clusters
-        let alpha1: [_; EXT_DEG] = challenges[0..EXT_DEG].try_into().expect("");
-        let c1: [_; EXT_DEG] = challenges[EXT_DEG..{EXT_DEG * 2}].try_into().expect("");
-        let c2: [_; EXT_DEG] = challenges[{EXT_DEG * 2}..{EXT_DEG * 3}].try_into().expect("");
-        let alpha2: [_; EXT_DEG] = challenges[{EXT_DEG * 3}..{EXT_DEG * 4}].try_into().expect("");
 
         // Prod spec evaluation
         let prod_row_specific: &ProdSpecificCols<AB::Var> =

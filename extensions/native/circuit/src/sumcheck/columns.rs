@@ -16,6 +16,13 @@ pub struct NativeSumcheckCols<T> {
     pub prod_row: T,
     /// Indicates that this row is a step for logup_spec in the layer sum operation
     pub logup_row: T,
+    
+    /// Indicates that there are valid operations following this header row
+    pub header_continuation: T,
+    /// Indicates that there are valid operations following this product evaluation row
+    pub prod_continuation: T,
+    /// Indicates that there are valid operations following this logup row
+    pub logup_continuation: T,
 
     /// Indicates that the prod row is within maximum round
     pub prod_row_within_max_round: T,

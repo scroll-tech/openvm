@@ -60,6 +60,7 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
 
             if record.row_type == 0 {
                 cols.header_row = F::ONE;
+                cols.header_continuation = if record.continuation { F::ONE } else { F::ZERO };
                 let header: &mut HeaderSpecificCols<F> =
                     cols.specific[..HeaderSpecificCols::<F>::width()].borrow_mut();
 
@@ -76,6 +77,7 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 aux_cols_factory.generate_write_aux(mem_record, &mut header.write_records);
             } else if record.row_type == 1 {
                 cols.prod_row = F::ONE;
+                cols.prod_continuation = if record.continuation { F::ONE } else { F::ZERO };
                 cols.prod_row_within_max_round = if record.within_round_limit { F::ONE } else { F::ZERO };
                 let prod: &mut ProdSpecificCols<F> =
                     cols.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
@@ -102,6 +104,7 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 }
             } else if record.row_type == 2 {
                 cols.logup_row = F::ONE;
+                cols.logup_continuation = if record.continuation { F::ONE } else { F::ZERO };
                 cols.logup_row_within_max_round = if record.within_round_limit { F::ONE } else { F::ZERO };
                 let logup: &mut LogupSpecificCols<F> =
                     cols.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
