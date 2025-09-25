@@ -386,7 +386,6 @@ impl<AB: InteractionBuilder> Air<AB>
             )
             .eval(builder, logup_row_within_max_round);
 
-        /* _debug
         // Calculate evaluations
         let next_round_p_evals = FieldExtension::add(
             FieldExtension::multiply::<AB::Var, AB::Expr>(p1, c1),
@@ -419,6 +418,5 @@ impl<AB: InteractionBuilder> Air<AB>
             next_logup_row_specfic.acc_eval,
         );
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(next.logup_acc), next.eval_acc, next_acc);
-        */
     }
 }
