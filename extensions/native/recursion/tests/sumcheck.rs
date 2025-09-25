@@ -77,14 +77,12 @@ fn test_sumcheck_layer_eval() {
 fn build_test_program<C: Config>(
     builder: &mut Builder<C>,
 ) {
-    
     let ctx_u32s = [3u32, 6, 5, 8, 2, 8, 4, 0, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9];
     let ctx: Array<C, Usize<C::N>> = builder.dyn_array(ctx_u32s.len());
     for (idx, n) in ctx_u32s.into_iter().enumerate() {
         builder.set(&ctx, idx, Usize::from(n as usize));
     }
 
-    
     let challenges_u32s = [
         548478283u32, 456436544, 1716290291, 791326976,
         1829717553, 1422025771, 1917123958, 727015942,

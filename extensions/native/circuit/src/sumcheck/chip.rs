@@ -121,10 +121,10 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
             let mut curr_timestamp: usize = 0;
 
             // _debug
-            println!("=> column width: {:?}", NativeSumcheckCols::<usize>::width());
-            println!("=> header width: {:?}", HeaderSpecificCols::<usize>::width());
-            println!("=> prod width: {:?}", ProdSpecificCols::<usize>::width());
-            println!("=> logup width: {:?}", LogupSpecificCols::<usize>::width());
+            // println!("=> column width: {:?}", NativeSumcheckCols::<usize>::width());
+            // println!("=> header width: {:?}", HeaderSpecificCols::<usize>::width());
+            // println!("=> prod width: {:?}", ProdSpecificCols::<usize>::width());
+            // println!("=> logup width: {:?}", LogupSpecificCols::<usize>::width());
 
             let (read_ctx_pointer, ctx_pointer) =
                 memory.read_cell(register_address_space, input_register_1);
