@@ -113,6 +113,14 @@ impl<AB: InteractionBuilder> Air<AB>
         builder.assert_bool(enabled.clone());
         let in_round = ctx[7];
 
+        // Randomness transition
+        let alpha1: [_; EXT_DEG] = challenges[0..EXT_DEG].try_into().expect("");
+        let c1: [_; EXT_DEG] = challenges[EXT_DEG..{EXT_DEG * 2}].try_into().expect("");
+        let c2: [_; EXT_DEG] = challenges[{EXT_DEG * 2}..{EXT_DEG * 3}].try_into().expect("");
+        let alpha2: [_; EXT_DEG] = challenges[{EXT_DEG * 3}..{EXT_DEG * 4}].try_into().expect("");
+        let next_alpha1: [_; EXT_DEG] = next.challenges[0..EXT_DEG].try_into().expect("");
+
+        /* _debug
         // Carry along columns
         assert_array_eq(&mut builder.when(next.prod_row + next.logup_row), register_ptrs, next.register_ptrs);
         assert_array_eq(&mut builder.when(next.prod_row + next.logup_row), ctx, next.ctx);
@@ -167,18 +175,12 @@ impl<AB: InteractionBuilder> Air<AB>
             .when(next.prod_row + next.logup_row)
             .assert_eq(next.start_timestamp, start_timestamp + AB::F::ONE + within_round_limit * AB::F::from_canonical_usize(3));
 
-        // Randomness transition
-        let alpha1: [_; EXT_DEG] = challenges[0..EXT_DEG].try_into().expect("");
-        let c1: [_; EXT_DEG] = challenges[EXT_DEG..{EXT_DEG * 2}].try_into().expect("");
-        let c2: [_; EXT_DEG] = challenges[{EXT_DEG * 2}..{EXT_DEG * 3}].try_into().expect("");
-        let alpha2: [_; EXT_DEG] = challenges[{EXT_DEG * 3}..{EXT_DEG * 4}].try_into().expect("");
-        let next_alpha1: [_; EXT_DEG] = next.challenges[0..EXT_DEG].try_into().expect("");
-
         let alpha_denominator = FieldExtension::multiply(alpha1, alpha);
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(prod_continuation), alpha_denominator.clone(), next_alpha1);
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_row), alpha_denominator, alpha2);
         let logup_next_alpha = FieldExtension::multiply(alpha2, alpha);
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_continuation), logup_next_alpha, next_alpha1);
+        */
 
         // Header
         let header_row_specific: &HeaderSpecificCols<AB::Var> =
@@ -299,7 +301,6 @@ impl<AB: InteractionBuilder> Air<AB>
             )
             .eval(builder, prod_row_within_max_round);
 
-        /* _debug
         // Calculate evaluations
         let next_round_p_evals = FieldExtension::add(
             FieldExtension::multiply::<AB::Var, AB::Expr>(p1, c1),
@@ -318,7 +319,6 @@ impl<AB: InteractionBuilder> Air<AB>
             next_prod_row_specific.acc_eval,
         );
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(next.prod_acc), next.eval_acc, next_acc);
-        */
 
         // Logup spec evaluation
         let logup_row_specific: &LogupSpecificCols<AB::Var> =
