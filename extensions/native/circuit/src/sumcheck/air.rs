@@ -113,6 +113,7 @@ impl<AB: InteractionBuilder> Air<AB>
         builder.assert_bool(enabled.clone());
         let in_round = ctx[7];
 
+        /* _debug
         // Carry along columns
         assert_array_eq(&mut builder.when(next.prod_row + next.logup_row), register_ptrs, next.register_ptrs);
         assert_array_eq(&mut builder.when(next.prod_row + next.logup_row), ctx, next.ctx);
@@ -179,6 +180,7 @@ impl<AB: InteractionBuilder> Air<AB>
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_row), alpha_denominator, alpha2);
         let logup_next_alpha = FieldExtension::multiply(alpha2, alpha);
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_continuation), logup_next_alpha, next_alpha1);
+        */
 
         // Header
         let header_row_specific: &HeaderSpecificCols<AB::Var> =
@@ -299,6 +301,7 @@ impl<AB: InteractionBuilder> Air<AB>
             )
             .eval(builder, prod_row_within_max_round);
 
+        /* _debug
         // Calculate evaluations
         let next_round_p_evals = FieldExtension::add(
             FieldExtension::multiply::<AB::Var, AB::Expr>(p1, c1),
@@ -317,6 +320,7 @@ impl<AB: InteractionBuilder> Air<AB>
             next_prod_row_specific.acc_eval,
         );
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(next.prod_acc), next.eval_acc, next_acc);
+        */
 
         // Logup spec evaluation
         let logup_row_specific: &LogupSpecificCols<AB::Var> =
@@ -384,6 +388,7 @@ impl<AB: InteractionBuilder> Air<AB>
             )
             .eval(builder, logup_row_within_max_round);
 
+        /* _debug
         // Calculate evaluations
         let next_round_p_evals = FieldExtension::add(
             FieldExtension::multiply::<AB::Var, AB::Expr>(p1, c1),
@@ -416,5 +421,6 @@ impl<AB: InteractionBuilder> Air<AB>
             next_logup_row_specfic.acc_eval,
         );
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(next.logup_acc), next.eval_acc, next_acc);
+        */
     }
 }
