@@ -113,7 +113,6 @@ impl<AB: InteractionBuilder> Air<AB>
         builder.assert_bool(enabled.clone());
         let in_round = ctx[7];
 
-        /* _debug
         // Carry along columns
         assert_array_eq(&mut builder.when(next.prod_row + next.logup_row), register_ptrs, next.register_ptrs);
         assert_array_eq(&mut builder.when(next.prod_row + next.logup_row), ctx, next.ctx);
@@ -180,7 +179,6 @@ impl<AB: InteractionBuilder> Air<AB>
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_row), alpha_denominator, alpha2);
         let logup_next_alpha = FieldExtension::multiply(alpha2, alpha);
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_continuation), logup_next_alpha, next_alpha1);
-        */
 
         // Header
         let header_row_specific: &HeaderSpecificCols<AB::Var> =
