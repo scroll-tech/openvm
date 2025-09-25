@@ -112,6 +112,8 @@ impl<AB: InteractionBuilder> Air<AB>
         let enabled = header_row + prod_row + logup_row;
         builder.assert_bool(enabled.clone());
         let in_round = ctx[7];
+        let continuation = header_continuation + prod_continuation + logup_continuation;
+        builder.assert_bool(continuation.clone());
 
         // Randomness transition
         let alpha1: [_; EXT_DEG] = challenges[0..EXT_DEG].try_into().expect("");
@@ -120,7 +122,6 @@ impl<AB: InteractionBuilder> Air<AB>
         let alpha2: [_; EXT_DEG] = challenges[{EXT_DEG * 3}..{EXT_DEG * 4}].try_into().expect("");
         let next_alpha1: [_; EXT_DEG] = next.challenges[0..EXT_DEG].try_into().expect("");
 
-        /* _debug
         // Carry along columns
         assert_array_eq(&mut builder.when(next.prod_row + next.logup_row), register_ptrs, next.register_ptrs);
         assert_array_eq(&mut builder.when(next.prod_row + next.logup_row), ctx, next.ctx);
@@ -132,6 +133,7 @@ impl<AB: InteractionBuilder> Air<AB>
         builder.when(next.prod_row + next.logup_row).assert_eq(prod_nested_len, next.prod_nested_len);
         builder.when(next.prod_row + next.logup_row).assert_eq(logup_nested_len, next.logup_nested_len);
 
+        /* _debug
         // Row transition
         builder
             .when(next.prod_row)
@@ -157,8 +159,6 @@ impl<AB: InteractionBuilder> Air<AB>
             .assert_eq(ctx[2], curr_logup_n);
 
         // Termination condition
-        let continuation = header_continuation + prod_continuation + logup_continuation;
-        builder.assert_bool(continuation.clone());
         assert_array_eq(&mut builder.when::<AB::Expr>(not(continuation)), eval_acc, [AB::F::ZERO; 4]);
 
         // Timestamp transition
