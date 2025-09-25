@@ -157,10 +157,6 @@ impl<AB: InteractionBuilder> Air<AB>
             .when(not(logup_continuation))
             .assert_eq(ctx[2], curr_logup_n);
 
-        /* _debug
-        // Termination condition
-        assert_array_eq(&mut builder.when::<AB::Expr>(not(continuation)), eval_acc, [AB::F::ZERO; 4]);
-
         // Timestamp transition
         builder
             .when(header_row)
@@ -174,6 +170,10 @@ impl<AB: InteractionBuilder> Air<AB>
             .when(logup_row)
             .when(next.prod_row + next.logup_row)
             .assert_eq(next.start_timestamp, start_timestamp + AB::F::ONE + within_round_limit * AB::F::from_canonical_usize(3));
+
+        /* _debug
+        // Termination condition
+        assert_array_eq(&mut builder.when::<AB::Expr>(not(continuation)), eval_acc, [AB::F::ZERO; 4]);
 
         let alpha_denominator = FieldExtension::multiply(alpha1, alpha);
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(prod_continuation), alpha_denominator.clone(), next_alpha1);
