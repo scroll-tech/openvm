@@ -132,8 +132,7 @@ impl<AB: InteractionBuilder> Air<AB>
         );
         builder.when(next.prod_row + next.logup_row).assert_eq(prod_nested_len, next.prod_nested_len);
         builder.when(next.prod_row + next.logup_row).assert_eq(logup_nested_len, next.logup_nested_len);
-
-        /* _debug
+        
         // Row transition
         builder
             .when(next.prod_row)
@@ -158,6 +157,7 @@ impl<AB: InteractionBuilder> Air<AB>
             .when(not(logup_continuation))
             .assert_eq(ctx[2], curr_logup_n);
 
+        /* _debug
         // Termination condition
         assert_array_eq(&mut builder.when::<AB::Expr>(not(continuation)), eval_acc, [AB::F::ZERO; 4]);
 
