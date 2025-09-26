@@ -148,7 +148,7 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 unreachable!()
             }
 
-            // _debug
+            /* _debug
             println!("=> header_row: {:?}, prod_row: {:?}, logup_row: {:?}, prod_row_continuation: {:?}, logup-row_continuation: {:?}, alpha: {:?}, challenges: {:?}", 
                 cols.header_row,
                 cols.prod_row,
@@ -157,7 +157,8 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 cols.logup_continuation,
                 cols.alpha,
                 cols.challenges,
-            );            
+            );        
+            */    
 
             used_cells += width;
         }
