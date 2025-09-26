@@ -13,6 +13,7 @@ use openvm_stark_backend::{
     prover::types::AirProofInput,
     AirRef, Chip, ChipUsageGetter,
 };
+use rand::distributions::Alphanumeric;
 use crate::{sumcheck::{chip::NativeSumcheckChip, columns::{HeaderSpecificCols, LogupSpecificCols, NativeSumcheckCols, ProdSpecificCols}}, EXT_DEG};
 
 impl<F: Field> ChipUsageGetter
@@ -146,7 +147,18 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
             } else {
                 unreachable!()
             }
-            
+
+            // _debug
+            println!("=> header_row: {:?}, prod_row: {:?}, logup_row: {:?}, prod_row_continuation: {:?}, logup-row_continuation: {:?}, alpha: {:?}, challenges: {:?}", 
+                cols.header_row,
+                cols.prod_row,
+                cols.logup_row,
+                cols.prod_continuation,
+                cols.logup_continuation,
+                cols.alpha,
+                cols.challenges,
+            );            
+
             used_cells += width;
         }
 
