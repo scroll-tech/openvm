@@ -148,21 +148,6 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 unreachable!()
             }
 
-            // /* _debug
-            let alpha1: [_; EXT_DEG] = cols.challenges[0..EXT_DEG].try_into().expect("");
-            let calculated_alpha_denominator = FieldExtension::multiply(alpha1, cols.alpha);
-            println!("=> header_row: {:?}, prod_row: {:?}, logup_row: {:?}, prod_row_continuation: {:?}, logup-row_continuation: {:?}, alpha: {:?}, challenges: {:?}, calculated_alpha_denominator: {:?}", 
-                cols.header_row,
-                cols.prod_row,
-                cols.logup_row,
-                cols.prod_continuation,
-                cols.logup_continuation,
-                cols.alpha,
-                cols.challenges,
-                calculated_alpha_denominator,
-            );        
-            // */    
-
             used_cells += width;
         }
 

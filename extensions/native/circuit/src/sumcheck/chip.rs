@@ -74,8 +74,6 @@ pub struct NativeSumcheckChip<F: Field> {
     pub(super) air: NativeSumcheckAir<F>,
     pub(super) offline_memory: Arc<Mutex<OfflineMemory<F>>>,
     pub record_set: Vec<SumcheckEvalRecord<F>>,
-    // _debug
-    //     pub(super) streams: Arc<Mutex<Streams<F>>>,
 }
 
 impl<F: PrimeField32> NativeSumcheckChip<F> {
@@ -119,13 +117,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
         if op == SUMCHECK_LAYER_EVAL.global_opcode() {
             let mut observation_records: Vec<SumcheckEvalRecord<F>> = vec![];
             let mut curr_timestamp: usize = 0;
-
-            // _debug
-            // println!("=> column width: {:?}", NativeSumcheckCols::<usize>::width());
-            // println!("=> header width: {:?}", HeaderSpecificCols::<usize>::width());
-            // println!("=> prod width: {:?}", ProdSpecificCols::<usize>::width());
-            // println!("=> logup width: {:?}", LogupSpecificCols::<usize>::width());
-
+            
             let (read_ctx_pointer, ctx_pointer) =
                 memory.read_cell(register_address_space, input_register_1);
             let (read_cs_pointer, cs_pointer) =
