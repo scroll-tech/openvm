@@ -14,7 +14,7 @@ use openvm_stark_backend::{
     AirRef, Chip, ChipUsageGetter,
 };
 use rand::distributions::Alphanumeric;
-use crate::{sumcheck::{chip::NativeSumcheckChip, columns::{HeaderSpecificCols, LogupSpecificCols, NativeSumcheckCols, ProdSpecificCols}}, EXT_DEG};
+use crate::{FieldExtension, sumcheck::{chip::NativeSumcheckChip, columns::{HeaderSpecificCols, LogupSpecificCols, NativeSumcheckCols, ProdSpecificCols}}, EXT_DEG};
 
 impl<F: Field> ChipUsageGetter
     for NativeSumcheckChip<F>
@@ -148,8 +148,10 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 unreachable!()
             }
 
-            /* _debug
-            println!("=> header_row: {:?}, prod_row: {:?}, logup_row: {:?}, prod_row_continuation: {:?}, logup-row_continuation: {:?}, alpha: {:?}, challenges: {:?}", 
+            // /* _debug
+            let alpha1: [_; EXT_DEG] = cols.challenges[0..EXT_DEG].try_into().expect("");
+            let calculated_alpha_denominator = FieldExtension::multiply(alpha1, cols.alpha);
+            println!("=> header_row: {:?}, prod_row: {:?}, logup_row: {:?}, prod_row_continuation: {:?}, logup-row_continuation: {:?}, alpha: {:?}, challenges: {:?}, calculated_alpha_denominator: {:?}", 
                 cols.header_row,
                 cols.prod_row,
                 cols.logup_row,
@@ -157,8 +159,9 @@ impl<F: PrimeField32> NativeSumcheckChip<F> {
                 cols.logup_continuation,
                 cols.alpha,
                 cols.challenges,
+                calculated_alpha_denominator,
             );        
-            */    
+            // */    
 
             used_cells += width;
         }

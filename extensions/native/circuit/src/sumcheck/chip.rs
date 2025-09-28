@@ -247,9 +247,10 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                     prod_row.write_data_records[0] = write_slice_eval_1;
 
                     let not_in_round = F::ONE - in_round;
+                    let acc_eval = FieldExtension::multiply(alpha_acc, evals);
+                    prod_row.acc_eval = acc_eval;
+
                     if (round + not_in_round) < (max_round - F::from_canonical_usize(1)) {
-                        let acc_eval = FieldExtension::multiply(alpha_acc, evals);
-                        prod_row.acc_eval = acc_eval;
                         eval_acc = FieldExtension::add(eval_acc, acc_eval);
                         prod_row.should_acc = true;
                         prod_row.eval_acc = eval_acc.clone();
@@ -343,8 +344,10 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                     logup_row.write_data_records[1] = write_slice_eval_2;
 
                     let not_in_round = F::ONE - in_round;
+                    let alpha_denominator = FieldExtension::multiply(alpha_acc, alpha);
+                    logup_row.alpha2 = alpha_denominator;
+
                     if (round + not_in_round) < (max_round - F::from_canonical_usize(1)) {
-                        let alpha_denominator = FieldExtension::multiply(alpha_acc, alpha);
                         let acc_eval = FieldExtension::add(
                             FieldExtension::multiply(alpha_acc, p_evals),
                             FieldExtension::multiply(alpha_denominator, q_evals),
@@ -352,7 +355,6 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                         logup_row.acc_eval = acc_eval;
                         eval_acc = FieldExtension::add(eval_acc, acc_eval);
                         logup_row.should_acc = true;
-                        logup_row.alpha2 = alpha_denominator;
                         logup_row.eval_acc = eval_acc.clone();
                     }
 

@@ -173,18 +173,16 @@ impl<AB: InteractionBuilder> Air<AB>
 
         // Termination condition
         assert_array_eq(&mut builder.when::<AB::Expr>(not(continuation)), eval_acc, [AB::F::ZERO; 4]);
-        assert_array_eq(&mut builder.when(header_continuation), next.challenges[0..EXT_DEG].try_into().expect(""), [AB::F::ONE, AB::F::ZERO, AB::F::ZERO, AB::F::ZERO]);
-
-        /* _debug
+        
         // Randomness transition
-        let prod_next_alpha = FieldExtension::multiply(alpha1, alpha);
-        assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(prod_continuation), prod_next_alpha, next_alpha1);
+        assert_array_eq(&mut builder.when(header_continuation), next.challenges[0..EXT_DEG].try_into().expect(""), [AB::F::ONE, AB::F::ZERO, AB::F::ZERO, AB::F::ZERO]);
         let alpha_denominator = FieldExtension::multiply(alpha1, alpha);
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_row), alpha_denominator, alpha2);
+        let prod_next_alpha = FieldExtension::multiply(alpha1, alpha);
+        assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(prod_continuation), prod_next_alpha, next_alpha1);
         let logup_next_alpha = FieldExtension::multiply(alpha2, alpha);
         assert_array_eq::<_, _, _, EXT_DEG>(&mut builder.when(logup_continuation), logup_next_alpha, next_alpha1);
-        */
-
+        
         // Header
         let header_row_specific: &HeaderSpecificCols<AB::Var> =
             specific[..HeaderSpecificCols::<AB::Var>::width()].borrow();
