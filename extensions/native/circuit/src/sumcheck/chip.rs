@@ -373,7 +373,6 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
             observation_records[last_idx].continuation = false;
 
             self.record_set.extend(observation_records);
-            println!("=> current_height: {:?}", self.height);
         } else {
             unreachable!()
         }
