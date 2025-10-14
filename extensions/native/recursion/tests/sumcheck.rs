@@ -36,8 +36,6 @@ fn test_sumcheck_layer_eval() {
     // Fill in test program logic
     builder.halt();
 
-    
-
     let compilation_options = CompilerOptions::default().with_cycle_tracker();
     let mut compiler = AsmCompiler::new(compilation_options.word_size);
     compiler.build(builder.operations);

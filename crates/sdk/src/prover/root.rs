@@ -63,6 +63,8 @@ impl SingleSegmentVmProver<RootSC> for RootVerifierLocalProver {
             "All AIRs of root verifier should present"
         );
         proof_input.per_air.iter().for_each(|(air_id, input)| {
+            // _debug
+            println!("air_id: {:?}, input.main_trace_height: {:?}, self.root_verifier_pk.air_heights[*air_id]: {:?}", air_id, input.main_trace_height(), self.root_verifier_pk.air_heights[*air_id]);
             assert_eq!(
                 input.main_trace_height(),
                 self.root_verifier_pk.air_heights[*air_id],
