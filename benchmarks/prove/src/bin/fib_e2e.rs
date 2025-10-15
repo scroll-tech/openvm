@@ -58,6 +58,7 @@ async fn main() -> Result<()> {
     let n = 800_000u64;
     let mut stdin = StdIn::default();
     stdin.write(&n);
+    /* _debug
     run_with_metric_collection("OUTPUT_PATH", || {
         let mut e2e_prover = EvmHalo2Prover::<_, BabyBearPoseidon2Engine>::new(
             &halo2_params_reader,
@@ -69,6 +70,7 @@ async fn main() -> Result<()> {
         e2e_prover.set_program_name("fib_e2e");
         // let _proof = e2e_prover.generate_proof_for_evm(stdin);
     });
+    */
 
     Ok(())
 }
