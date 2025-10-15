@@ -1062,9 +1062,13 @@ impl<F: PrimeField32, E, P> VmChipComplex<F, E, P> {
         } = self.base;
 
         // System: Program Chip
+        // _debug
+        println!("=> Add program chip air id: {:?}", builder.curr_air_id);
         debug_assert_eq!(builder.curr_air_id, PROGRAM_AIR_ID);
         builder.add_air_proof_input(program_chip.generate_air_proof_input(cached_program));
         // System: Connector Chip
+        // _debug
+        println!("=> Add connector chip air id: {:?}", builder.curr_air_id);
         debug_assert_eq!(builder.curr_air_id, CONNECTOR_AIR_ID);
         builder.add_air_proof_input(connector_chip.generate_air_proof_input());
 
@@ -1102,6 +1106,8 @@ impl<F: PrimeField32, E, P> VmChipComplex<F, E, P> {
 
         if let Some(input) = public_values_input {
             debug_assert_eq!(builder.curr_air_id, PUBLIC_VALUES_AIR_ID);
+            // _debug
+            println!("=> Adding public values air id: {:?}", builder.curr_air_id);
             builder.add_air_proof_input(input);
         }
         // System: Memory Controller
@@ -1109,14 +1115,20 @@ impl<F: PrimeField32, E, P> VmChipComplex<F, E, P> {
             // memory
             let air_proof_inputs = memory_controller.generate_air_proof_inputs();
             for air_proof_input in air_proof_inputs {
+                // _debug
+                println!("=> Adding memory controller air id: {:?}", builder.curr_air_id);
                 builder.add_air_proof_input(air_proof_input);
             }
         }
         // Non-system chips
+        // _debug
+        println!("=> Adding non-system chips air ids from: {:?}", builder.curr_air_id);
         non_sys_inputs
             .into_iter()
             .for_each(|input| builder.add_air_proof_input(input));
         // System: Range Checker Chip
+        // _debug
+        println!("=> Adding range checker air id: {:?}", builder.curr_air_id);
         builder.add_air_proof_input(range_checker_chip.generate_air_proof_input());
 
         Ok(builder.build())
