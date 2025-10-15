@@ -569,6 +569,8 @@ impl<F: PrimeField32> MemoryController<F> {
         } = self;
         match interface_chip {
             MemoryInterface::Volatile { boundary_chip } => {
+                // _debug
+                println!("=> MemoryInterface::Volatile");
                 ret.push(boundary_chip.generate_air_proof_input());
             }
             MemoryInterface::Persistent {
@@ -576,6 +578,8 @@ impl<F: PrimeField32> MemoryController<F> {
                 boundary_chip,
                 ..
             } => {
+                // _debug
+                println!("=> MemoryInterface::Persistent");
                 debug_assert_eq!(ret.len(), BOUNDARY_AIR_OFFSET);
                 ret.push(boundary_chip.generate_air_proof_input());
                 debug_assert_eq!(ret.len(), MERKLE_AIR_OFFSET);
