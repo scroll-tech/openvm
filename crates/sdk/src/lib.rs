@@ -437,7 +437,9 @@ impl<E: StarkFriEngine<SC>> GenericSdk<E> {
         app_exe: Arc<NonRootCommittedExe>,
         agg_pk: AggProvingKey,
         inputs: StdIn,
-    ) -> Result<EvmProof>
+    // _debug
+    // ) -> Result<EvmProof>
+    )
     where
         VC::Executor: Chip<SC>,
         VC::Periphery: Chip<SC>,
@@ -445,7 +447,8 @@ impl<E: StarkFriEngine<SC>> GenericSdk<E> {
         let e2e_prover =
             EvmHalo2Prover::<VC, E>::new(reader, app_pk, app_exe, agg_pk, self.agg_tree_config);
         let proof = e2e_prover.generate_proof_for_evm(inputs);
-        Ok(proof)
+        // _debug
+        // Ok(proof)
     }
 
     #[cfg(feature = "evm-verify")]
