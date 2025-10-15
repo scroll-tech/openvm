@@ -51,14 +51,17 @@ impl<VC, E: StarkFriEngine<SC>> StarkProver<VC, E> {
         self.app_prover.set_program_name(program_name);
         self
     }
-    pub fn generate_proof_for_outer_recursion(&self, input: StdIn) -> Proof<RootSC>
+    // _debug
+    // pub fn generate_proof_for_outer_recursion(&self, input: StdIn) -> Proof<RootSC>
+    pub fn generate_proof_for_outer_recursion(&self, input: StdIn)
     where
         VC: VmConfig<F>,
         VC::Executor: Chip<SC>,
         VC::Periphery: Chip<SC>,
     {
         let app_proof = self.app_prover.generate_app_proof(input);
-        self.agg_prover.generate_root_proof(app_proof)
+        // _debug
+        // self.agg_prover.generate_root_proof(app_proof)
     }
 
     pub fn generate_root_verifier_input(&self, input: StdIn) -> RootVmVerifierInput<SC>

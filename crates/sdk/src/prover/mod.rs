@@ -65,14 +65,17 @@ mod evm {
             self
         }
 
-        pub fn generate_proof_for_evm(&self, input: StdIn) -> EvmProof
+        // _debug
+        // pub fn generate_proof_for_evm(&self, input: StdIn) -> EvmProof
+        pub fn generate_proof_for_evm(&self, input: StdIn)
         where
             VC: VmConfig<F>,
             VC::Executor: Chip<SC>,
             VC::Periphery: Chip<SC>,
         {
             let root_proof = self.stark_prover.generate_proof_for_outer_recursion(input);
-            self.halo2_prover.prove_for_evm(&root_proof)
+            // _debug
+            // self.halo2_prover.prove_for_evm(&root_proof)
         }
     }
 }
