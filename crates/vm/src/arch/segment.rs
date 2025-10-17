@@ -30,7 +30,7 @@ use crate::{
 /// Check segment every 100 instructions.
 const SEGMENT_CHECK_INTERVAL: usize = 100;
 
-const DEFAULT_MAX_SEGMENT_LEN: usize = (1 << 22) - 100;
+pub const DEFAULT_MAX_SEGMENT_LEN: usize = (1 << 22) - 100;
 // a heuristic number for the maximum number of cells per chip in a segment
 // a few reasons for this number:
 //  1. `VmAirWrapper<Rv32BaseAluAdapterAir, BaseAluCoreAir<4, 8>` is

@@ -58,6 +58,11 @@ impl<VC, E: StarkFriEngine<SC>> StarkProver<VC, E> {
         VC::Periphery: Chip<SC>,
     {
         let app_proof = self.app_prover.generate_app_proof(input);
+
+        // _debug
+        let json = serde_json::to_string(&app_proof).unwrap();
+        println!("Aggregation - segmented_continuation_proof size: {:?}", json.len());
+
         self.agg_prover.generate_root_proof(app_proof)
     }
 

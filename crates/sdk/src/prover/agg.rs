@@ -97,6 +97,11 @@ impl<E: StarkFriEngine<SC>> AggStarkProver<E> {
         let leaf_proofs = self.generate_leaf_proofs(&app_proofs);
         let public_values = app_proofs.user_public_values.public_values;
         let e2e_stark_proof = self.aggregate_leaf_proofs(leaf_proofs, public_values);
+
+        // _debug
+        let json = serde_json::to_string(&e2e_stark_proof).unwrap();
+        println!("Aggregation - e2e_stark_proof size: {:?}", json.len());
+
         self.wrap_e2e_stark_proof(e2e_stark_proof)
     }
 
@@ -135,7 +140,13 @@ impl<E: StarkFriEngine<SC>> AggStarkProver<E> {
                     .map(|input| {
                         internal_node_idx += 1;
                         info_span!("single_internal_agg", idx = internal_node_idx,).in_scope(|| {
-                            SingleSegmentVmProver::prove(&self.internal_prover, input.write())
+                            // _debug
+                            let p = SingleSegmentVmProver::prove(&self.internal_prover, input.write());
+
+                            let json = serde_json::to_string(&p).unwrap();
+                            println!("Aggregation - internal proof size: {:?}", json.len());
+
+                            p
                         })
                     })
                     .collect()
@@ -203,7 +214,15 @@ impl LeafProvingController {
                 .enumerate()
                 .map(|(leaf_node_idx, input)| {
                     info_span!("single_leaf_agg", idx = leaf_node_idx)
-                        .in_scope(|| SingleSegmentVmProver::prove(prover, input.write_to_stream()))
+                        .in_scope(|| {
+                            // _debug
+                            let p = SingleSegmentVmProver::prove(prover, input.write_to_stream());
+
+                            let json = serde_json::to_string(&p).unwrap();
+                            println!("Aggregation - leaf proof size: {:?}", json.len());
+
+                            p
+                        })
                 })
                 .collect::<Vec<_>>()
         })

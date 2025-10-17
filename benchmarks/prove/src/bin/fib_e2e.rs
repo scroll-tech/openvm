@@ -3,7 +3,7 @@ use std::{path::PathBuf, sync::Arc};
 use clap::Parser;
 use eyre::Result;
 use openvm_benchmarks_prove::util::BenchmarkCli;
-use openvm_circuit::arch::{instructions::exe::VmExe, DEFAULT_MAX_NUM_PUBLIC_VALUES};
+use openvm_circuit::arch::{instructions::exe::VmExe, DEFAULT_MAX_NUM_PUBLIC_VALUES, segment::DEFAULT_MAX_SEGMENT_LEN};
 use openvm_native_recursion::halo2::utils::{CacheHalo2ParamsReader, DEFAULT_PARAMS_DIR};
 use openvm_rv32im_circuit::Rv32ImConfig;
 use openvm_rv32im_transpiler::{
@@ -24,7 +24,8 @@ async fn main() -> Result<()> {
     let args = BenchmarkCli::parse();
 
     // Must be larger than RangeTupleCheckerAir.height == 524288
-    let max_segment_length = args.max_segment_length.unwrap_or(1_000_000);
+    // let max_segment_length = args.max_segment_length.unwrap_or(1_000_000);
+    let max_segment_length = DEFAULT_MAX_SEGMENT_LEN;
 
     let app_config = args.app_config(Rv32ImConfig::with_public_values_and_segment_len(
         NUM_PUBLIC_VALUES,
