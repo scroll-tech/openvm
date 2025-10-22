@@ -163,8 +163,9 @@ impl RootVmVerifierConfig {
             array::from_fn(|i| builder.eval(self.internal_vm_verifier_commit[i]));
         let non_leaf_verifier = NonLeafVerifierVariables {
             internal_program_commit,
-            leaf_pcs,
-            leaf_advice,
+            // _debug
+            app_pcs: leaf_pcs,
+            app_advice: leaf_advice,
             internal_pcs,
             internal_advice,
         };

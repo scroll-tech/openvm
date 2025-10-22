@@ -35,6 +35,7 @@ use openvm_continuations::verifier::{
 pub use openvm_continuations::{RootSC, C, F, SC};
 #[cfg(feature = "evm-prove")]
 use openvm_native_recursion::halo2::utils::Halo2ParamsReader;
+use openvm_native_circuit::NativeConfig;
 use openvm_stark_backend::proof::Proof;
 use openvm_stark_sdk::{
     config::{baby_bear_poseidon2::BabyBearPoseidon2Engine, FriParameters},
@@ -265,15 +266,16 @@ impl<E: StarkFriEngine<SC>> GenericSdk<E> {
     pub fn agg_keygen(
         &self,
         config: AggConfig,
+        app_config: AppConfig<NativeConfig>,
         reader: &impl Halo2ParamsReader,
         pv_handler: &impl StaticVerifierPvHandler,
     ) -> Result<AggProvingKey> {
-        let agg_pk = AggProvingKey::keygen(config, reader, pv_handler);
+        let agg_pk = AggProvingKey::keygen(config, app_config, reader, pv_handler);
         Ok(agg_pk)
     }
 
-    pub fn agg_stark_keygen(&self, config: AggStarkConfig) -> Result<AggStarkProvingKey> {
-        let agg_pk = AggStarkProvingKey::keygen(config);
+    pub fn agg_stark_keygen(&self, config: AggStarkConfig, app_config: AppConfig<NativeConfig>) -> Result<AggStarkProvingKey> {
+        let agg_pk = AggStarkProvingKey::keygen(config, app_config);
         Ok(agg_pk)
     }
 

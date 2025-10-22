@@ -21,7 +21,7 @@ const DEFAULT_NUM_CHILDREN_LEAF: usize = 1;
 const DEFAULT_NUM_CHILDREN_INTERNAL: usize = 3;
 const DEFAULT_MAX_INTERNAL_WRAPPER_LAYERS: usize = 4;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Default)]
 pub struct AppConfig<VC> {
     #[serde(default)]
     pub app_fri_params: AppFriParams,

@@ -48,6 +48,7 @@ pub struct SetupCmd {
 
 impl SetupCmd {
     pub async fn run(&self) -> Result<()> {
+        /* _debug
         let default_agg_stark_pk_path = default_agg_stark_pk_path();
         let default_params_dir = default_params_dir();
         let default_evm_halo2_verifier_path = default_evm_halo2_verifier_path();
@@ -125,6 +126,7 @@ impl SetupCmd {
             println!("Writing verifier contract to file...");
             write_evm_halo2_verifier_to_folder(verifier, &default_evm_halo2_verifier_path)?;
         }
+        */
         Ok(())
     }
 

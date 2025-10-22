@@ -20,8 +20,8 @@ use crate::verifier::{
 
 pub struct NonLeafVerifierVariables<C: Config> {
     pub internal_program_commit: [Felt<C::F>; DIGEST_SIZE],
-    pub leaf_pcs: TwoAdicFriPcsVariable<C>,
-    pub leaf_advice: MultiStarkVerificationAdvice<C>,
+    pub app_pcs: TwoAdicFriPcsVariable<C>,
+    pub app_advice: MultiStarkVerificationAdvice<C>,
     pub internal_pcs: TwoAdicFriPcsVariable<C>,
     pub internal_advice: MultiStarkVerificationAdvice<C>,
 }

@@ -53,6 +53,22 @@ impl NativeConfig {
             native: Default::default(),
         }
     }
+
+    pub fn app(num_public_values: usize, max_constraint_degree: usize) -> Self {
+        Self {
+            system: SystemConfig::new(
+                max_constraint_degree,
+                MemoryConfig {
+                    max_access_adapter_n: 16,
+                    ..Default::default()
+                },
+                num_public_values,
+            )
+            .with_max_segment_len((1 << 24) - 100)
+            .with_continuations(),
+            native: Default::default(),
+        }
+    }
 }
 
 // Default implementation uses no init file

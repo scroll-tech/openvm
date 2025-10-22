@@ -9,7 +9,7 @@ use openvm_circuit::{
 use openvm_continuations::verifier::{
     internal::InternalVmVerifierConfig, leaf::LeafVmVerifierConfig, root::RootVmVerifierConfig,
 };
-use openvm_native_circuit::NativeConfig;
+use openvm_native_circuit::{Native, NativeConfig};
 use openvm_native_compiler::ir::DIGEST_SIZE;
 use openvm_stark_backend::{
     config::Val,
@@ -256,15 +256,36 @@ fn check_recursive_verifier_size<SC: StarkGenericConfig>(
 }
 
 impl AggStarkProvingKey {
-    pub fn keygen(config: AggStarkConfig) -> Self {
+    pub fn keygen(config: AggStarkConfig, app_config: AppConfig<NativeConfig>) -> Self {
         tracing::info_span!("agg_stark_keygen", group = "agg_stark_keygen")
-            .in_scope(|| Self::dummy_proof_and_keygen(config).0)
+            .in_scope(|| Self::dummy_proof_and_keygen(config, app_config).0)
     }
 
-    pub fn dummy_proof_and_keygen(config: AggStarkConfig) -> (Self, Proof<SC>) {
+    pub fn dummy_proof_and_keygen(config: AggStarkConfig, app_config: AppConfig<NativeConfig>) -> (Self, Proof<SC>) {
         let leaf_vm_config = config.leaf_vm_config();
         let internal_vm_config = config.internal_vm_config();
         let root_vm_config = config.root_verifier_vm_config();
+
+        let app_engine = BabyBearPoseidon2Engine::new(app_config.app_fri_params.fri_params);
+        let app_vm_pk = {
+            let vm = VirtualMachine::new(app_engine, app_config.app_vm_config.clone());
+            let vm_pk = vm.keygen();
+            assert!(
+                vm_pk.max_constraint_degree
+                    <= app_config.app_fri_params.fri_params.max_constraint_degree()
+            );
+            VmProvingKey {
+                fri_params: app_config.app_fri_params.fri_params,
+                vm_config: app_config.app_vm_config.clone(),
+                vm_pk,
+            }
+        };
+        let app_vm_vk = app_vm_pk.vm_pk.get_vk();
+        check_recursive_verifier_size(
+            &app_vm_vk,
+            app_config.app_fri_params.fri_params,
+            config.internal_fri_params.log_blowup,
+        );
 
         let leaf_engine = BabyBearPoseidon2Engine::new(config.leaf_fri_params);
         let leaf_vm_pk = Arc::new({
@@ -305,7 +326,7 @@ impl AggStarkProvingKey {
         );
 
         let internal_program = InternalVmVerifierConfig {
-            leaf_fri_params: config.leaf_fri_params,
+            app_fri_params: app_config.app_fri_params.fri_params,
             internal_fri_params: config.internal_fri_params,
             compiler_options: config.compiler_options,
         }
@@ -420,6 +441,7 @@ impl AggProvingKey {
     #[tracing::instrument(level = "info", fields(group = "agg_keygen"), skip_all)]
     pub fn keygen(
         config: AggConfig,
+        app_config: AppConfig<NativeConfig>,
         reader: &impl Halo2ParamsReader,
         pv_handler: &impl StaticVerifierPvHandler,
     ) -> Self {
@@ -428,7 +450,7 @@ impl AggProvingKey {
             halo2_config,
         } = config;
         let (agg_stark_pk, dummy_internal_proof) =
-            AggStarkProvingKey::dummy_proof_and_keygen(agg_stark_config);
+            AggStarkProvingKey::dummy_proof_and_keygen(agg_stark_config, app_config);
         let dummy_root_proof = agg_stark_pk
             .root_verifier_pk
             .generate_dummy_root_proof(dummy_internal_proof);

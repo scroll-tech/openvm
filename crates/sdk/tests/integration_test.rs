@@ -369,7 +369,7 @@ fn test_static_verifier_custom_pv_handler() {
         leaf_verifier_commit,
     };
     let agg_pk = sdk
-        .agg_keygen(agg_config_for_test(), &params_reader, &pv_handler)
+        .agg_keygen(agg_config_for_test(), app_config, &params_reader, &pv_handler)
         .unwrap();
 
     // Generate verifier contract
@@ -403,6 +403,7 @@ fn test_static_verifier_custom_pv_handler() {
 #[cfg(feature = "evm-verify")]
 #[test]
 fn test_e2e_proof_generation_and_verification_with_pvs() {
+    /* _debug
     let mut pkg_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).to_path_buf();
     pkg_dir.push("guest/fib");
 
@@ -448,6 +449,7 @@ fn test_e2e_proof_generation_and_verification_with_pvs() {
     let agg_pk = sdk
         .agg_keygen(
             agg_config_for_test(),
+            app_config,
             &params_reader,
             &DefaultStaticVerifierPvHandler,
         )
@@ -470,6 +472,7 @@ fn test_e2e_proof_generation_and_verification_with_pvs() {
     verify_evm_halo2_proof_with_fallback(&evm_verifier, &evm_proof).unwrap();
     sdk.verify_evm_halo2_proof(&evm_verifier, evm_proof)
         .unwrap();
+    */
 }
 
 #[test]

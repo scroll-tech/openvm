@@ -25,7 +25,7 @@ pub mod vars;
 
 /// Config to generate internal VM verifier program.
 pub struct InternalVmVerifierConfig {
-    pub leaf_fri_params: FriParameters,
+    pub app_fri_params: FriParameters,
     pub internal_fri_params: FriParameters,
     pub compiler_options: CompilerOptions,
 }
@@ -33,10 +33,10 @@ pub struct InternalVmVerifierConfig {
 impl InternalVmVerifierConfig {
     pub fn build_program(
         &self,
-        leaf_vm_vk: &MultiStarkVerifyingKey<BabyBearPoseidon2Config>,
+        app_vm_vk: &MultiStarkVerifyingKey<BabyBearPoseidon2Config>,
         internal_vm_vk: &MultiStarkVerifyingKey<BabyBearPoseidon2Config>,
     ) -> Program<F> {
-        let leaf_advice = new_from_inner_multi_vk(leaf_vm_vk);
+        let app_advice = new_from_inner_multi_vk(app_vm_vk);
         let internal_advice = new_from_inner_multi_vk(internal_vm_vk);
         let mut builder = Builder::<C>::default();
         {
@@ -47,8 +47,8 @@ impl InternalVmVerifierConfig {
             } = InternalVmVerifierInput::<BabyBearPoseidon2Config>::read(&mut builder);
             builder.cycle_tracker_end("ReadProofsFromInput");
             builder.cycle_tracker_start("InitializePcsConst");
-            let leaf_pcs = TwoAdicFriPcsVariable {
-                config: const_fri_config(&mut builder, &self.leaf_fri_params),
+            let app_pcs = TwoAdicFriPcsVariable {
+                config: const_fri_config(&mut builder, &self.app_fri_params),
             };
             let internal_pcs = TwoAdicFriPcsVariable {
                 config: const_fri_config(&mut builder, &self.internal_fri_params),
@@ -56,8 +56,8 @@ impl InternalVmVerifierConfig {
             builder.cycle_tracker_end("InitializePcsConst");
             let non_leaf_verifier = NonLeafVerifierVariables {
                 internal_program_commit: self_program_commit,
-                leaf_pcs,
-                leaf_advice,
+                app_pcs,
+                app_advice,
                 internal_pcs,
                 internal_advice,
             };
