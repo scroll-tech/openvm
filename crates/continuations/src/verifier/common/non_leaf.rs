@@ -126,12 +126,14 @@ impl<C: Config> NonLeafVerifierVariables<C> {
                 );
             },
             |builder| {
+                /* _debug
                 StarkVerifier::verify::<DuplexChallengerVariable<C>>(
                     builder,
                     &self.leaf_pcs,
                     &self.leaf_advice,
                     proof,
                 );
+                */
                 // Leaf verifier doesn't have extra public values.
                 assign_array_to_slice(
                     builder,
