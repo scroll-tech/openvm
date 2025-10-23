@@ -16,6 +16,8 @@ use openvm_stark_sdk::{
 };
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use static_assertions::assert_impl_all;
+use crate::verifier::leaf::types::UserPublicValuesRootProof;
+use openvm_circuit::arch::ContinuationVmProof;
 
 use crate::{verifier::common::types::VmVerifierPvs, SC};
 
@@ -27,6 +29,9 @@ pub struct InternalVmVerifierInput<SC: StarkGenericConfig> {
     pub self_program_commit: [Val<SC>; DIGEST_SIZE],
     /// The proofs of leaf verifier or internal verifier in the execution order.
     pub proofs: Vec<Proof<SC>>,
+    /// The public values root proof. Leaf VM verifier only needs this when verifying the last
+    /// segment.
+    pub public_values_root_proof: Option<UserPublicValuesRootProof<Val<SC>>>,
 }
 assert_impl_all!(InternalVmVerifierInput<BabyBearPoseidon2Config>: Serialize, DeserializeOwned);
 
@@ -62,17 +67,38 @@ pub struct InternalVmVerifierExtraPvs<T> {
 
 impl InternalVmVerifierInput<SC> {
     pub fn chunk_leaf_or_internal_proofs(
+        is_app_layer: bool,
+        app_proof: &ContinuationVmProof<SC>,
         self_program_commit: [Val<SC>; DIGEST_SIZE],
         proofs: &[Proof<SC>],
         chunk: usize,
     ) -> Vec<Self> {
-        proofs
-            .chunks(chunk)
-            .map(|chunk| Self {
-                self_program_commit,
-                proofs: chunk.to_vec(),
-            })
-            .collect()
+        if !is_app_layer {
+            proofs
+                .chunks(chunk)
+                .map(|chunk| Self {
+                    self_program_commit,
+                    proofs: chunk.to_vec(),
+                    public_values_root_proof: None,
+                })
+                .collect()
+        } else {
+            let ContinuationVmProof {
+                per_segment,
+                user_public_values,
+            } = app_proof;
+            let mut ret: Vec<Self> = per_segment
+                .chunks(chunk)
+                .map(|proof| Self {
+                    self_program_commit,
+                    proofs: proof.to_vec(),
+                    public_values_root_proof: None,
+                })
+                .collect();
+            ret.last_mut().unwrap().public_values_root_proof =
+                Some(UserPublicValuesRootProof::extract(user_public_values));
+            ret
+        }
     }
 }
 

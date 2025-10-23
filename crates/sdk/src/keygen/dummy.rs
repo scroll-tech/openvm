@@ -71,11 +71,13 @@ pub(super) fn compute_root_proof_heights(
 pub(super) fn dummy_internal_proof(
     internal_vm_pk: Arc<VmProvingKey<SC, NativeConfig>>,
     internal_exe: Arc<NonRootCommittedExe>,
-    leaf_proof: Proof<SC>,
+    app_proof: ContinuationVmProof<SC>,
 ) -> Proof<SC> {
     let mut internal_inputs = InternalVmVerifierInput::chunk_leaf_or_internal_proofs(
+        true,
+        &app_proof,
         internal_exe.get_program_commit().into(),
-        &[leaf_proof],
+        &[],
         1,
     );
     let internal_input = internal_inputs.pop().unwrap();
@@ -86,15 +88,19 @@ pub(super) fn dummy_internal_proof(
     SingleSegmentVmProver::prove(&internal_prover, internal_input.write())
 }
 
-pub(super) fn dummy_internal_proof_riscv_app_vm(
-    leaf_vm_pk: Arc<VmProvingKey<SC, NativeConfig>>,
+pub(super) fn dummy_internal_proof_riscv_app_vm<VC: VmConfig<F>>(
+    app_vm_pk: Arc<VmProvingKey<SC, VC>>,
     internal_vm_pk: Arc<VmProvingKey<SC, NativeConfig>>,
     internal_exe: Arc<NonRootCommittedExe>,
     num_public_values: usize,
-) -> Proof<SC> {
+) -> Proof<SC> 
+where
+    VC::Executor: Chip<SC>,
+    VC::Periphery: Chip<SC>,
+{
     let fri_params = standard_fri_params_with_100_bits_conjectured_security(1);
-    let leaf_proof = dummy_leaf_proof_riscv_app_vm(leaf_vm_pk, num_public_values, fri_params);
-    dummy_internal_proof(internal_vm_pk, internal_exe, leaf_proof)
+    let app_proof = dummy_app_proof_impl(app_vm_pk.clone(), None);
+    dummy_internal_proof(internal_vm_pk, internal_exe, app_proof)
 }
 
 #[allow(dead_code)]

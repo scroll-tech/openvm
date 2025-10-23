@@ -32,6 +32,8 @@ fn read_elf() -> Result<(), Box<dyn std::error::Error>> {
 
 #[allow(unused_variables, unused_doc_comments)]
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /* _debug
+    
     // ANCHOR: vm_config
     let vm_config = SdkVmConfig::builder()
         .system(Default::default())
@@ -116,6 +118,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 11. Verify the EVM proof
     sdk.verify_evm_halo2_proof(&verifier, proof)?;
     // ANCHOR_END: evm_verification
+
+    */
 
     Ok(())
 }

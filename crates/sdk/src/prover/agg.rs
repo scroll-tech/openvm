@@ -23,8 +23,9 @@ use crate::{
 };
 
 pub struct AggStarkProver<E: StarkFriEngine<SC>> {
-    pub leaf_prover: VmLocalProver<SC, NativeConfig, E>,
-    pub leaf_controller: LeafProvingController,
+    // _debug
+    // pub leaf_prover: VmLocalProver<SC, NativeConfig, E>,
+    // pub leaf_controller: LeafProvingController,
 
     pub internal_prover: VmLocalProver<SC, NativeConfig, E>,
     pub root_prover: RootVerifierLocalProver,
@@ -41,22 +42,23 @@ pub struct LeafProvingController {
 impl<E: StarkFriEngine<SC>> AggStarkProver<E> {
     pub fn new(
         agg_stark_pk: AggStarkProvingKey,
-        leaf_committed_exe: Arc<NonRootCommittedExe>,
+        // leaf_committed_exe: Arc<NonRootCommittedExe>,
         tree_config: AggregationTreeConfig,
     ) -> Self {
-        let leaf_prover =
-            VmLocalProver::<SC, NativeConfig, E>::new(agg_stark_pk.leaf_vm_pk, leaf_committed_exe);
-        let leaf_controller = LeafProvingController {
-            num_children: tree_config.num_children_leaf,
-        };
+        // _debug
+        // let leaf_prover =
+        //     VmLocalProver::<SC, NativeConfig, E>::new(agg_stark_pk.leaf_vm_pk, leaf_committed_exe);
+        // let leaf_controller = LeafProvingController {
+        //     num_children: tree_config.num_children_leaf,
+        // };
         let internal_prover = VmLocalProver::<SC, NativeConfig, E>::new(
             agg_stark_pk.internal_vm_pk,
             agg_stark_pk.internal_committed_exe,
         );
         let root_prover = RootVerifierLocalProver::new(agg_stark_pk.root_verifier_pk);
         Self {
-            leaf_prover,
-            leaf_controller,
+            // leaf_prover,
+            // leaf_controller,
             internal_prover,
             root_prover,
             num_children_internal: tree_config.num_children_internal,
@@ -64,10 +66,11 @@ impl<E: StarkFriEngine<SC>> AggStarkProver<E> {
         }
     }
 
-    pub fn with_num_children_leaf(mut self, num_children_leaf: usize) -> Self {
-        self.leaf_controller.num_children = num_children_leaf;
-        self
-    }
+    // _debug
+    // pub fn with_num_children_leaf(mut self, num_children_leaf: usize) -> Self {
+    //     self.leaf_controller.num_children = num_children_leaf;
+    //     self
+    // }
 
     pub fn with_num_children_internal(mut self, num_children_internal: usize) -> Self {
         self.num_children_internal = num_children_internal;
@@ -85,33 +88,36 @@ impl<E: StarkFriEngine<SC>> AggStarkProver<E> {
         self.generate_root_proof_impl(root_verifier_input)
     }
 
-    pub fn generate_leaf_proofs(&self, app_proofs: &ContinuationVmProof<SC>) -> Vec<Proof<SC>> {
-        self.leaf_controller
-            .generate_proof(&self.leaf_prover, app_proofs)
-    }
+    // _debug
+    // pub fn generate_leaf_proofs(&self, app_proofs: &ContinuationVmProof<SC>) -> Vec<Proof<SC>> {
+    //     self.leaf_controller
+    //         .generate_proof(&self.leaf_prover, app_proofs)
+    // }
 
     pub fn generate_root_verifier_input(
         &self,
         app_proofs: ContinuationVmProof<SC>,
     ) -> RootVmVerifierInput<SC> {
-        let leaf_proofs = self.generate_leaf_proofs(&app_proofs);
-        let public_values = app_proofs.user_public_values.public_values;
-        let e2e_stark_proof = self.aggregate_leaf_proofs(leaf_proofs, public_values);
+        // let leaf_proofs = self.generate_leaf_proofs(&app_proofs);
+        // let public_values = app_proofs.user_public_values.public_values;
+        let e2e_stark_proof = self.aggregate_leaf_proofs(app_proofs);
         self.wrap_e2e_stark_proof(e2e_stark_proof)
     }
 
     pub fn aggregate_leaf_proofs(
         &self,
-        leaf_proofs: Vec<Proof<SC>>,
-        public_values: Vec<F>,
+        app_proofs: ContinuationVmProof<SC>,
     ) -> VmStarkProof<SC> {
+        let public_values = app_proofs.user_public_values.public_values.clone();
         let mut internal_node_idx = -1;
         let mut internal_node_height = 0;
-        let mut proofs = leaf_proofs;
+        let mut proofs = app_proofs.per_segment.clone();
         // We will always generate at least one internal proof, even if there is only one leaf
         // proof, in order to shrink the proof size
         while proofs.len() > 1 || internal_node_height == 0 {
             let internal_inputs = InternalVmVerifierInput::chunk_leaf_or_internal_proofs(
+                internal_node_height == 0,
+                &app_proofs,
                 self.internal_prover
                     .committed_exe
                     .get_program_commit()
@@ -242,6 +248,7 @@ pub fn wrap_e2e_stark_proof<E: StarkFriEngine<SC>>(
         let input = InternalVmVerifierInput {
             self_program_commit: internal_commit,
             proofs: vec![proof.clone()],
+            public_values_root_proof: None,
         };
         proof = info_span!(
             "wrapper_layer",

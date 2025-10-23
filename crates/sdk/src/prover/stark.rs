@@ -28,10 +28,11 @@ impl<VC, E: StarkFriEngine<SC>> StarkProver<VC, E> {
     where
         VC: VmConfig<F>,
     {
-        assert_eq!(
-            app_pk.leaf_fri_params, agg_stark_pk.leaf_vm_pk.fri_params,
-            "App VM is incompatible with Agg VM because of leaf FRI parameters"
-        );
+        // _debug
+        // assert_eq!(
+        //     app_pk.leaf_fri_params, agg_stark_pk.leaf_vm_pk.fri_params,
+        //     "App VM is incompatible with Agg VM because of leaf FRI parameters"
+        // );
         assert_eq!(
             app_pk.app_vm_pk.vm_config.system().num_public_values,
             agg_stark_pk.num_user_public_values(),
@@ -42,7 +43,7 @@ impl<VC, E: StarkFriEngine<SC>> StarkProver<VC, E> {
             app_prover: AppProver::new(app_pk.app_vm_pk.clone(), app_committed_exe),
             agg_prover: AggStarkProver::new(
                 agg_stark_pk,
-                app_pk.leaf_committed_exe.clone(),
+                // app_pk.leaf_committed_exe.clone(),
                 agg_tree_config,
             ),
         }
@@ -78,8 +79,9 @@ impl<VC, E: StarkFriEngine<SC>> StarkProver<VC, E> {
         VC::Periphery: Chip<SC>,
     {
         let app_proof = self.app_prover.generate_app_proof(input);
-        let leaf_proofs = self.agg_prover.generate_leaf_proofs(&app_proof);
+        // _debug
+        // let leaf_proofs = self.agg_prover.generate_leaf_proofs(&app_proof);
         self.agg_prover
-            .aggregate_leaf_proofs(leaf_proofs, app_proof.user_public_values.public_values)
+            .aggregate_leaf_proofs(app_proof)
     }
 }

@@ -29,7 +29,7 @@ mod vars;
 
 /// Config to generate Root VM verifier program.
 pub struct RootVmVerifierConfig {
-    pub leaf_fri_params: FriParameters,
+    pub app_fri_params: FriParameters,
     pub internal_fri_params: FriParameters,
     pub num_user_public_values: usize,
     pub internal_vm_verifier_commit: [F; DIGEST_SIZE],
@@ -38,23 +38,26 @@ pub struct RootVmVerifierConfig {
 impl RootVmVerifierConfig {
     pub fn build_program(
         &self,
-        leaf_vm_vk: &MultiStarkVerifyingKey<SC>,
+        app_vm_pk: &MultiStarkVerifyingKey<SC>,
         internal_vm_vk: &MultiStarkVerifyingKey<SC>,
     ) -> Program<F> {
         let mut builder = Builder::<C>::default();
 
+        /* _debug
         builder.cycle_tracker_start("ReadProofsFromInput");
         let root_verifier_input = RootVmVerifierInput::<SC>::read(&mut builder);
         builder.cycle_tracker_end("ReadProofsFromInput");
         let pvs = self.verifier_impl(
             &mut builder,
-            leaf_vm_vk,
+            app_vm_pk,
             internal_vm_vk,
             root_verifier_input,
         );
         pvs.flatten()
             .into_iter()
             .for_each(|v| builder.commit_public_value(v));
+        */
+
         builder.halt();
         builder.compile_isa_with_options(self.compiler_options)
     }
@@ -69,7 +72,7 @@ impl RootVmVerifierConfig {
     /// from RISC-V guest programs.
     pub fn build_kernel_asm(
         &self,
-        leaf_vm_vk: &MultiStarkVerifyingKey<SC>,
+        app_vm_pk: &MultiStarkVerifyingKey<SC>,
         internal_vm_vk: &MultiStarkVerifyingKey<SC>,
     ) -> Program<F> {
         let mut builder = Builder::<C>::default();
@@ -120,7 +123,7 @@ impl RootVmVerifierConfig {
         builder.set(&proofs, 0, proof);
         let pvs = self.verifier_impl(
             &mut builder,
-            leaf_vm_vk,
+            app_vm_pk,
             internal_vm_vk,
             RootVmVerifierInputVariable {
                 proofs,
@@ -139,11 +142,11 @@ impl RootVmVerifierConfig {
     fn verifier_impl(
         &self,
         builder: &mut Builder<C>,
-        leaf_vm_vk: &MultiStarkVerifyingKey<SC>,
+        app_vm_vk: &MultiStarkVerifyingKey<SC>,
         internal_vm_vk: &MultiStarkVerifyingKey<SC>,
         root_verifier_input: RootVmVerifierInputVariable<C>,
     ) -> RootVmVerifierPvs<Felt<F>> {
-        let leaf_advice = new_from_inner_multi_vk(leaf_vm_vk);
+        let leaf_advice = new_from_inner_multi_vk(app_vm_vk);
         let internal_advice = new_from_inner_multi_vk(internal_vm_vk);
         let RootVmVerifierInputVariable {
             proofs,
@@ -152,7 +155,7 @@ impl RootVmVerifierConfig {
 
         builder.cycle_tracker_start("InitializePcsConst");
         let leaf_pcs = TwoAdicFriPcsVariable {
-            config: const_fri_config(builder, &self.leaf_fri_params),
+            config: const_fri_config(builder, &self.app_fri_params),
         };
         let internal_pcs = TwoAdicFriPcsVariable {
             config: const_fri_config(builder, &self.internal_fri_params),

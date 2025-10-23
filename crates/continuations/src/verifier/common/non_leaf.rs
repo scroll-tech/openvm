@@ -47,7 +47,65 @@ impl<C: Config> NonLeafVerifierVariables<C> {
             let i = i_vec[0];
             let proof = builder.get(proofs, i);
             assert_required_air_for_agg_vm_present(builder, &proof);
-            let proof_vm_pvs = self.verify_internal_or_leaf_verifier_proof(builder, &proof);
+            // _debug
+            // let proof_vm_pvs = self.verify_internal_or_leaf_verifier_proof(builder, &proof);
+
+            let flatten_proof_vm_pvs = InternalVmVerifierPvs::<Felt<C::F>>::uninit(builder).flatten();
+            let proof_vm_pvs_arr = builder
+                .get(&proof.per_air, PUBLIC_VALUES_AIR_ID)
+                .public_values;
+
+            let program_commit = get_program_commit(builder, &proof);
+            let is_self_program =
+                eq_felt_slice(builder, &self.internal_program_commit, &program_commit);
+
+            builder.if_eq(is_self_program, RVar::one()).then_or_else(
+                |builder| {
+                    StarkVerifier::verify::<DuplexChallengerVariable<C>>(
+                        builder,
+                        &self.internal_pcs,
+                        &self.internal_advice,
+                        &proof,
+                    );
+                    assign_array_to_slice(builder, &flatten_proof_vm_pvs, &proof_vm_pvs_arr, 0);
+                    let proof_vm_pvs: &InternalVmVerifierPvs<_> =
+                        flatten_proof_vm_pvs.as_slice().borrow();
+                    // Handle recursive verification
+                    // For proofs, its program commitment should be committed.
+                    builder.assert_eq::<[_; DIGEST_SIZE]>(
+                        proof_vm_pvs.extra_pvs.internal_program_commit,
+                        program_commit,
+                    );
+                },
+                |builder| {
+                    /* _debug
+                    StarkVerifier::verify::<DuplexChallengerVariable<C>>(
+                        builder,
+                        &self.leaf_pcs,
+                        &self.leaf_advice,
+                        proof,
+                    );
+                    */
+
+                    /* _debug
+                    StarkVerifier::verify::<DuplexChallengerVariable<C>>(
+                        builder, &self.app_pcs, &self.app_advice, &proof,
+                    );
+                    */
+
+                    // Leaf verifier doesn't have extra public values.
+                    assign_array_to_slice(
+                        builder,
+                        &flatten_proof_vm_pvs[..VmVerifierPvs::<u8>::width()],
+                        &proof_vm_pvs_arr,
+                        0,
+                    );
+                    let proof_vm_pvs: &InternalVmVerifierPvs<_> =
+                        flatten_proof_vm_pvs.as_slice().borrow();
+                    builder.assign(&proof_vm_pvs.extra_pvs.leaf_verifier_commit, program_commit);
+                },
+            );
+            let proof_vm_pvs: InternalVmVerifierPvs<Felt<C::F>> = *flatten_proof_vm_pvs.as_slice().borrow();
 
             assert_single_segment_vm_exit_successfully(builder, &proof);
             builder.if_eq(i, RVar::zero()).then_or_else(

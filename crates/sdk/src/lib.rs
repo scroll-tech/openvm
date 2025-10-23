@@ -281,7 +281,7 @@ impl<E: StarkFriEngine<SC>> GenericSdk<E> {
 
     pub fn generate_root_verifier_asm(&self, agg_stark_pk: &AggStarkProvingKey) -> String {
         let kernel_asm = RootVmVerifierConfig {
-            leaf_fri_params: agg_stark_pk.leaf_vm_pk.fri_params,
+            app_fri_params: agg_stark_pk.app_vm_pk.fri_params,
             internal_fri_params: agg_stark_pk.internal_vm_pk.fri_params,
             num_user_public_values: agg_stark_pk.num_user_public_values(),
             internal_vm_verifier_commit: agg_stark_pk
@@ -291,7 +291,7 @@ impl<E: StarkFriEngine<SC>> GenericSdk<E> {
             compiler_options: Default::default(),
         }
         .build_kernel_asm(
-            &agg_stark_pk.leaf_vm_pk.vm_pk.get_vk(),
+            &agg_stark_pk.app_vm_pk.vm_pk.get_vk(),
             &agg_stark_pk.internal_vm_pk.vm_pk.get_vk(),
         );
         program_to_asm(kernel_asm)
@@ -376,7 +376,7 @@ impl<E: StarkFriEngine<SC>> GenericSdk<E> {
                 internal_pvs.extra_pvs.leaf_verifier_commit,
             )
         } else {
-            (&agg_stark_pk.leaf_vm_pk, *program_commit)
+            (&agg_stark_pk.app_vm_pk, *program_commit)
         };
         let e = E::new(vm_pk.fri_params);
         e.verify(&vm_pk.vm_pk.get_vk(), &proof.proof)?;
