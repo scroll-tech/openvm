@@ -373,7 +373,7 @@ impl<E: StarkFriEngine<SC>> GenericSdk<E> {
             }
             (
                 &agg_stark_pk.internal_vm_pk,
-                internal_pvs.extra_pvs.leaf_verifier_commit,
+                internal_pvs.extra_pvs.app_verifier_commit,
             )
         } else {
             (&agg_stark_pk.app_vm_pk, *program_commit)

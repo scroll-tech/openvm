@@ -146,7 +146,7 @@ impl RootVmVerifierConfig {
         internal_vm_vk: &MultiStarkVerifyingKey<SC>,
         root_verifier_input: RootVmVerifierInputVariable<C>,
     ) -> RootVmVerifierPvs<Felt<F>> {
-        let leaf_advice = new_from_inner_multi_vk(app_vm_vk);
+        let app_advice = new_from_inner_multi_vk(app_vm_vk);
         let internal_advice = new_from_inner_multi_vk(internal_vm_vk);
         let RootVmVerifierInputVariable {
             proofs,
@@ -154,7 +154,7 @@ impl RootVmVerifierConfig {
         } = root_verifier_input;
 
         builder.cycle_tracker_start("InitializePcsConst");
-        let leaf_pcs = TwoAdicFriPcsVariable {
+        let app_pcs = TwoAdicFriPcsVariable {
             config: const_fri_config(builder, &self.app_fri_params),
         };
         let internal_pcs = TwoAdicFriPcsVariable {
@@ -166,14 +166,13 @@ impl RootVmVerifierConfig {
             array::from_fn(|i| builder.eval(self.internal_vm_verifier_commit[i]));
         let non_leaf_verifier = NonLeafVerifierVariables {
             internal_program_commit,
-            // _debug
-            app_pcs: leaf_pcs,
-            app_advice: leaf_advice,
+            app_pcs,
+            app_advice,
             internal_pcs,
             internal_advice,
         };
         let (merged_pvs, expected_leaf_commit) =
-            non_leaf_verifier.verify_internal_or_leaf_verifier_proofs(builder, &proofs);
+            non_leaf_verifier.verify_internal_or_app_proofs(builder, &proofs);
         builder.cycle_tracker_end("VerifyProofs");
 
         // App Program should terminate

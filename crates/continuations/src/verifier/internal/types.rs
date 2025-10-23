@@ -57,8 +57,8 @@ pub struct InternalVmVerifierPvs<T> {
 #[derive(Debug, Clone, Copy, AlignedBorrow)]
 #[repr(C)]
 pub struct InternalVmVerifierExtraPvs<T> {
-    /// The commitment of the leaf verifier program.
-    pub leaf_verifier_commit: [T; DIGEST_SIZE],
+    /// The commitment of the app verifier program.
+    pub app_verifier_commit: [T; DIGEST_SIZE],
     /// For recursion verification, a program need its own commitment, but its own commitment
     /// cannot be hardcoded inside the program itself. So the commitment has to be read from
     /// external and be committed.
@@ -122,7 +122,7 @@ impl<F: Default + Clone> InternalVmVerifierPvs<Felt<F>> {
 impl<F: PrimeField32> InternalVmVerifierExtraPvs<Felt<F>> {
     pub fn uninit<C: Config<F = F>>(builder: &mut Builder<C>) -> Self {
         Self {
-            leaf_verifier_commit: array::from_fn(|_| builder.uninit()),
+            app_verifier_commit: array::from_fn(|_| builder.uninit()),
             internal_program_commit: array::from_fn(|_| builder.uninit()),
         }
     }

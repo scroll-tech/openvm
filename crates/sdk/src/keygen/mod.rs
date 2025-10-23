@@ -308,6 +308,7 @@ impl AggStarkProvingKey {
 
         let internal_program = InternalVmVerifierConfig {
             app_fri_params: app_config.app_fri_params.fri_params,
+            app_system_config: <NativeConfig as VmConfig<F>>::system(&app_config.app_vm_config).clone(),
             internal_fri_params: config.internal_fri_params,
             compiler_options: config.compiler_options,
         }

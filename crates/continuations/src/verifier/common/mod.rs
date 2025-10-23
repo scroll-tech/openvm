@@ -29,8 +29,8 @@ pub fn assert_or_assign_app_and_leaf_commit_pvs<C: Config>(
                 proof_pvs.vm_verifier_pvs.app_commit,
             );
             builder.assign(
-                &dst.extra_pvs.leaf_verifier_commit,
-                proof_pvs.extra_pvs.leaf_verifier_commit,
+                &dst.extra_pvs.app_verifier_commit,
+                proof_pvs.extra_pvs.app_verifier_commit,
             );
         },
         |builder| {
@@ -39,8 +39,8 @@ pub fn assert_or_assign_app_and_leaf_commit_pvs<C: Config>(
                 proof_pvs.vm_verifier_pvs.app_commit,
             );
             builder.assert_eq::<[_; DIGEST_SIZE]>(
-                dst.extra_pvs.leaf_verifier_commit,
-                proof_pvs.extra_pvs.leaf_verifier_commit,
+                dst.extra_pvs.app_verifier_commit,
+                proof_pvs.extra_pvs.app_verifier_commit,
             );
         },
     );
