@@ -46,10 +46,15 @@ impl<C: Config> NonLeafVerifierVariables<C> {
         builder.range(0, proofs.len()).for_each(|i_vec, builder| {
             let i = i_vec[0];
             let proof = builder.get(proofs, i);
+            
+            /* _debug
             assert_required_air_for_agg_vm_present(builder, &proof);
+            */
+
             let proof_vm_pvs = self.verify_internal_or_leaf_verifier_proof(builder, &proof);
 
             assert_single_segment_vm_exit_successfully(builder, &proof);
+
             builder.if_eq(i, RVar::zero()).then_or_else(
                 |builder| {
                     builder.assign(&pvs.app_commit, proof_vm_pvs.vm_verifier_pvs.app_commit);
@@ -132,6 +137,7 @@ impl<C: Config> NonLeafVerifierVariables<C> {
                     &self.leaf_advice,
                     proof,
                 );
+
                 // Leaf verifier doesn't have extra public values.
                 assign_array_to_slice(
                     builder,
