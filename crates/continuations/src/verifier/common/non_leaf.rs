@@ -52,7 +52,6 @@ impl<C: Config> NonLeafVerifierVariables<C> {
             */
 
             let proof_vm_pvs = self.verify_internal_or_leaf_verifier_proof(builder, &proof);
-
             assert_single_segment_vm_exit_successfully(builder, &proof);
 
             builder.if_eq(i, RVar::zero()).then_or_else(
@@ -74,6 +73,8 @@ impl<C: Config> NonLeafVerifierVariables<C> {
                     );
                 },
             );
+            
+            /* _debug
             assert_or_assign_connector_pvs(
                 builder,
                 &pvs.connector,
@@ -86,6 +87,8 @@ impl<C: Config> NonLeafVerifierVariables<C> {
                 i,
                 &proof_vm_pvs.vm_verifier_pvs.memory,
             );
+            */
+            
             // This is only needed when `is_terminate` but branching here won't save much, so we
             // always assign it.
             builder.assign(
@@ -93,6 +96,8 @@ impl<C: Config> NonLeafVerifierVariables<C> {
                 proof_vm_pvs.vm_verifier_pvs.public_values_commit,
             );
         });
+        
+
         (pvs, leaf_verifier_commit)
     }
     fn verify_internal_or_leaf_verifier_proof(
