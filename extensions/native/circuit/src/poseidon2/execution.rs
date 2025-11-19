@@ -8,7 +8,7 @@ use openvm_circuit_primitives::AlignedBytesBorrow;
 use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode};
 use openvm_native_compiler::{
     conversion::AS,
-    Poseidon2Opcode::{COMP_POS2, PERM_POS2},
+    Poseidon2Opcode::{COMP_POS2, MULTI_OBSERVE, PERM_POS2},
     VerifyBatchOpcode::VERIFY_BATCH,
 };
 use openvm_poseidon2_air::Poseidon2SubChip;
@@ -27,6 +27,16 @@ struct Pos2PreCompute<'a, F: Field, const SBOX_REGISTERS: usize> {
     output_register: u32,
     input_register_1: u32,
     input_register_2: u32,
+}
+
+#[derive(AlignedBytesBorrow, Clone)]
+#[repr(C)]
+struct MultiObservePreCompute<'a, F: Field, const SBOX_REGISTERS: usize> {
+    subchip: &'a Poseidon2SubChip<F, SBOX_REGISTERS>,
+    pub init_pos_register: u32,
+    pub input_ptr_register: u32,
+    pub len_register: u32,
+    pub state_ptr_register: u32,
 }
 
 #[derive(AlignedBytesBorrow, Clone)]
@@ -88,6 +98,51 @@ impl<'a, F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Executor<F
     }
 
     #[inline(always)]
+    fn pre_compute_multi_observe_impl(
+        &'a self,
+        pc: u32,
+        inst: &Instruction<F>,
+        multi_observe_data: &mut MultiObservePreCompute<'a, F, SBOX_REGISTERS>,
+    ) -> Result<(), StaticProgramError> {
+        let &Instruction {
+            opcode,
+            a,
+            b,
+            c,
+            d,
+            e,
+            f,
+            ..
+        } = inst;
+
+        if opcode != MULTI_OBSERVE.global_opcode() {
+            return Err(StaticProgramError::InvalidInstruction(pc));
+        }
+
+        let a = a.as_canonical_u32();
+        let b = b.as_canonical_u32();
+        let c = c.as_canonical_u32();
+        let d = d.as_canonical_u32();
+        let e = e.as_canonical_u32();
+        let f = f.as_canonical_u32();
+
+        if d != AS::Native as u32 {
+            return Err(StaticProgramError::InvalidInstruction(pc));
+        }
+        if e != AS::Native as u32 {
+            return Err(StaticProgramError::InvalidInstruction(pc));
+        }
+
+        multi_observe_data.subchip = &self.subchip;
+        multi_observe_data.state_ptr_register = a;
+        multi_observe_data.init_pos_register = b;
+        multi_observe_data.input_ptr_register = c;
+        multi_observe_data.len_register = f;
+
+        Ok(())
+    }
+
+    #[inline(always)]
     fn pre_compute_verify_batch_impl(
         &'a self,
         pc: u32,
@@ -142,6 +197,7 @@ impl<'a, F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Executor<F
 macro_rules! dispatch1 {
     (
         $execute_pos2_impl:ident,
+        $execute_multi_observe_impl:ident,
         $execute_verify_batch_impl:ident,
         $executor:ident,
         $opcode:expr,
@@ -157,6 +213,11 @@ macro_rules! dispatch1 {
             } else {
                 Ok($execute_pos2_impl::<_, _, SBOX_REGISTERS, false>)
             }
+        } else if $opcode == MULTI_OBSERVE.global_opcode() {
+            let multi_observe_data: &mut MultiObservePreCompute<F, SBOX_REGISTERS> =
+                $data.borrow_mut();
+            $executor.pre_compute_multi_observe_impl($pc, $inst, multi_observe_data)?;
+            Ok($execute_multi_observe_impl::<_, _, SBOX_REGISTERS>)
         } else {
             let verify_batch_data: &mut VerifyBatchPreCompute<F, SBOX_REGISTERS> =
                 $data.borrow_mut();
@@ -187,6 +248,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> Executor<F>
     ) -> Result<ExecuteFunc<F, Ctx>, StaticProgramError> {
         dispatch1!(
             execute_pos2_e1_impl,
+            execute_multi_observe_e1_impl,
             execute_verify_batch_e1_impl,
             self,
             inst.opcode,
@@ -205,6 +267,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> Executor<F>
     ) -> Result<Handler<F, Ctx>, StaticProgramError> {
         dispatch1!(
             execute_pos2_e1_handler,
+            execute_multi_observe_e1_handler,
             execute_verify_batch_e1_handler,
             self,
             inst.opcode,
@@ -218,6 +281,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> Executor<F>
 macro_rules! dispatch2 {
     (
         $execute_pos2_impl:ident,
+        $execute_multi_observe_impl:ident,
         $execute_verify_batch_impl:ident,
         $executor:ident,
         $opcode:expr,
@@ -237,6 +301,13 @@ macro_rules! dispatch2 {
             } else {
                 Ok($execute_pos2_impl::<_, _, SBOX_REGISTERS, false>)
             }
+        } else if $opcode == MULTI_OBSERVE.global_opcode() {
+            let pre_compute: &mut E2PreCompute<MultiObservePreCompute<F, SBOX_REGISTERS>> =
+                $data.borrow_mut();
+            pre_compute.chip_idx = $chip_idx as u32;
+
+            $executor.pre_compute_multi_observe_impl($pc, $inst, &mut pre_compute.data)?;
+            Ok($execute_multi_observe_impl::<_, _, SBOX_REGISTERS>)
         } else {
             let pre_compute: &mut E2PreCompute<VerifyBatchPreCompute<F, SBOX_REGISTERS>> =
                 $data.borrow_mut();
@@ -270,6 +341,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> MeteredExecutor<F>
     ) -> Result<ExecuteFunc<F, Ctx>, StaticProgramError> {
         dispatch2!(
             execute_pos2_e2_impl,
+            execute_multi_observe_e2_impl,
             execute_verify_batch_e2_impl,
             self,
             inst.opcode,
@@ -344,6 +416,50 @@ unsafe fn execute_pos2_e2_impl<
         .ctx
         .on_height_change(pre_compute.chip_idx as usize, height);
 }
+
+#[create_handler]
+#[inline(always)]
+unsafe fn execute_multi_observe_e1_impl<
+    F: PrimeField32,
+    CTX: ExecutionCtxTrait,
+    const SBOX_REGISTERS: usize,
+>(
+    pre_compute: &[u8],
+    instret: &mut u64,
+    pc: &mut u32,
+    _arg: u64,
+    exec_state: &mut VmExecState<F, GuestMemory, CTX>,
+) {
+    let pre_compute: &MultiObservePreCompute<F, SBOX_REGISTERS> = pre_compute.borrow();
+    execute_multi_observe_e12_impl::<_, _, SBOX_REGISTERS>(pre_compute, instret, pc, exec_state);
+}
+
+#[create_handler]
+#[inline(always)]
+unsafe fn execute_multi_observe_e2_impl<
+    F: PrimeField32,
+    CTX: MeteredExecutionCtxTrait,
+    const SBOX_REGISTERS: usize,
+>(
+    pre_compute: &[u8],
+    instret: &mut u64,
+    pc: &mut u32,
+    _arg: u64,
+    exec_state: &mut VmExecState<F, GuestMemory, CTX>,
+) {
+    let pre_compute: &E2PreCompute<MultiObservePreCompute<F, SBOX_REGISTERS>> = pre_compute.borrow();
+    let height = execute_multi_observe_e12_impl::<_, _, SBOX_REGISTERS>(
+        &pre_compute.data,
+        instret,
+        pc,
+        exec_state,
+    );
+    exec_state
+        .ctx
+        .on_height_change(pre_compute.chip_idx as usize, height);
+    todo!()
+}
+
 
 #[create_handler]
 #[inline(always)]
@@ -450,6 +566,20 @@ unsafe fn execute_pos2_e12_impl<
     *instret += 1;
 
     1
+}
+
+#[inline(always)]
+unsafe fn execute_multi_observe_e12_impl<
+    F: PrimeField32,
+    CTX: ExecutionCtxTrait,
+    const SBOX_REGISTERS: usize,
+>(
+    pre_compute: &MultiObservePreCompute<F, SBOX_REGISTERS>,
+    instret: &mut u64,
+    pc: &mut u32,
+    exec_state: &mut VmExecState<F, GuestMemory, CTX>,
+) -> u32 {
+    todo!()
 }
 
 #[inline(always)]

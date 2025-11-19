@@ -165,6 +165,7 @@ impl<F: PrimeField32> VmExecutionExtension<F> for Native {
                 VerifyBatchOpcode::VERIFY_BATCH.global_opcode(),
                 Poseidon2Opcode::PERM_POS2.global_opcode(),
                 Poseidon2Opcode::COMP_POS2.global_opcode(),
+                Poseidon2Opcode::MULTI_OBSERVE.global_opcode(),
             ],
         )?;
 

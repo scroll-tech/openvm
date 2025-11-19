@@ -644,6 +644,8 @@ where
             if !self.optimistic {
                 assert_eq!(commit, root);
             }
+        } else if instruction.opcode == MULTI_OBSERVE.global_opcode() {
+            todo!()
         } else {
             unreachable!()
         }
