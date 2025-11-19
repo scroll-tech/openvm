@@ -362,6 +362,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> MeteredExecutor<F>
     ) -> Result<Handler<F, Ctx>, StaticProgramError> {
         dispatch2!(
             execute_pos2_e2_handler,
+            execute_multi_observe_e2_handler,
             execute_verify_batch_e2_handler,
             self,
             inst.opcode,
@@ -457,7 +458,6 @@ unsafe fn execute_multi_observe_e2_impl<
     exec_state
         .ctx
         .on_height_change(pre_compute.chip_idx as usize, height);
-    todo!()
 }
 
 
