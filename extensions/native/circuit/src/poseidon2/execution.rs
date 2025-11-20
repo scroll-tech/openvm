@@ -5,7 +5,7 @@ use std::{
 
 use openvm_circuit::{arch::*, system::memory::online::GuestMemory};
 use openvm_circuit_primitives::AlignedBytesBorrow;
-use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode};
+use openvm_instructions::{LocalOpcode, NATIVE_AS, instruction::Instruction, program::DEFAULT_PC_STEP};
 use openvm_native_compiler::{
     conversion::AS,
     Poseidon2Opcode::{COMP_POS2, MULTI_OBSERVE, PERM_POS2},
@@ -579,7 +579,53 @@ unsafe fn execute_multi_observe_e12_impl<
     pc: &mut u32,
     exec_state: &mut VmExecState<F, GuestMemory, CTX>,
 ) -> u32 {
-    todo!()
+    let subchip = pre_compute.subchip;
+
+    let [sponge_ptr]: [F; 1] = exec_state.vm_read(AS::Native as u32, pre_compute.state_ptr_register);
+    let [init_pos]: [F; 1] = exec_state.vm_read(AS::Native as u32, pre_compute.init_pos_register);
+    let [input_ptr]: [F; 1] = exec_state.vm_read(AS::Native as u32, pre_compute.input_ptr_register);
+    let [len]: [F; 1] = exec_state.vm_read(AS::Native as u32, pre_compute.len_register);
+
+    let mut len = len.as_canonical_u32() as usize;
+    let mut pos = init_pos.as_canonical_u32() as usize;
+    let input_ptr_u32 = input_ptr.as_canonical_u32();
+    let sponge_ptr_u32 = sponge_ptr.as_canonical_u32();
+    let mut height = 0;
+
+    // split input into chunks s.t. each chunk fills the RATE portion of sponge state
+    let mut observation_chunks: Vec<(usize, usize)> = vec![];
+    while len > 0 {
+        if len >= (CHUNK - pos) { 
+            observation_chunks.push((pos, CHUNK));
+            len -= CHUNK - pos;
+            pos = 0;
+        } else {
+            observation_chunks.push((pos, pos + len));
+            len = 0;
+            pos = pos + len;
+        }
+    }
+
+    let mut input_idx = 0;
+    
+    for (chunk_start, chunk_end) in observation_chunks {
+        for j in chunk_start..chunk_end {
+            let [n_f]: [F; 1] = exec_state.vm_read(NATIVE_AS as u32, input_ptr_u32 + input_idx);
+            exec_state.vm_write(NATIVE_AS as u32, sponge_ptr_u32 + (j as u32),  &[n_f]);
+            input_idx += 1;
+        }
+        if chunk_end == CHUNK {
+            let mut p2_input: [F; CHUNK*2] = exec_state.vm_read(NATIVE_AS as u32, sponge_ptr_u32);
+            subchip.permute_mut(&mut p2_input);
+            exec_state.vm_write(NATIVE_AS as u32, sponge_ptr_u32, &p2_input);
+        }
+
+        height += 1;
+    }
+    *pc = pc.wrapping_add(DEFAULT_PC_STEP);
+    *instret += 1;
+
+    height
 }
 
 #[inline(always)]
