@@ -24,11 +24,9 @@ use openvm_stark_backend::{
 };
 
 use crate::poseidon2::{
-    columns::{
-        InsideRowSpecificCols, NativePoseidon2Cols, SimplePoseidonSpecificCols,
-        TopLevelSpecificCols,
-    },
-    CHUNK,
+    CHUNK, columns::{
+        InsideRowSpecificCols, MultiObserveCols, NativePoseidon2Cols, SimplePoseidonSpecificCols, TopLevelSpecificCols
+    }
 };
 
 #[derive(Clone)]
@@ -645,7 +643,140 @@ where
                 assert_eq!(commit, root);
             }
         } else if instruction.opcode == MULTI_OBSERVE.global_opcode() {
-            todo!()
+            let &Instruction {
+                a: state_ptr_register,
+                b: init_pos_register,
+                c: input_ptr_register,
+                d: register_address_space,
+                e: data_address_space,
+                f: len_register,
+                ..
+            } = instruction;
+            
+            assert_eq!(register_address_space, F::from_canonical_u32(AS::Native as u32));
+            assert_eq!(data_address_space, F::from_canonical_u32(AS::Native as u32));
+
+            let [init_pos]: [F; 1] = memory_read_native(state.memory.data(), init_pos_register.as_canonical_u32());
+            let [input_len]: [F; 1] = memory_read_native(state.memory.data(), len_register.as_canonical_u32());
+
+            let mut len = input_len.as_canonical_u32() as usize;
+            let mut pos = init_pos.as_canonical_u32() as usize;
+            let mut chunks: Vec<(usize, usize, bool)> = vec![];
+            
+            while len > 0 {
+                if len >= (CHUNK - pos) {
+                    chunks.push((pos.clone(), CHUNK.clone(), true));
+                    len -= CHUNK - pos;
+                    pos = 0;
+                } else {
+                    chunks.push((pos.clone(), pos + len, false));
+                    len = 0;
+                    pos = pos + len;
+                }
+            }
+
+            let allocated_rows = arena
+                .alloc(MultiRowLayout::new(NativePoseidon2Metadata {
+                    num_rows: chunks.len(),
+                }))
+                .0;
+            let head_cols = &mut allocated_rows[0];
+            let head_multi_observe_cols: &mut MultiObserveCols<F> =
+                head_cols.specific[..MultiObserveCols::<u8>::width()].borrow_mut();
+
+            let [state_ptr]: [F; 1] = tracing_read_native_helper(
+                state.memory,
+                state_ptr_register.as_canonical_u32(),
+                head_multi_observe_cols.read_data[0].as_mut(),
+            );
+            let [init_pos]: [F; 1] = tracing_read_native_helper(
+                state.memory,
+                init_pos_register.as_canonical_u32(),
+                head_multi_observe_cols.read_data[1].as_mut(),
+            );
+            let [input_ptr]: [F; 1] = tracing_read_native_helper(
+                state.memory,
+                input_ptr_register.as_canonical_u32(),
+                head_multi_observe_cols.read_data[2].as_mut(),
+            );
+            let [input_len]: [F; 1] = tracing_read_native_helper(
+                state.memory,
+                len_register.as_canonical_u32(),
+                head_multi_observe_cols.read_data[3].as_mut(),
+            );
+            
+            let input_ptr_u32 = input_ptr.as_canonical_u32();
+            let state_ptr_u32 = state_ptr.as_canonical_u32();
+            let len = input_len.as_canonical_u32() as usize;
+
+            head_cols.multi_observe_row = F::ONE;
+            head_cols.inner.export = F::from_canonical_u32(chunks.len() as u32);
+
+            head_multi_observe_cols.init_pos = init_pos;
+            head_multi_observe_cols.input_ptr = input_ptr;
+            head_multi_observe_cols.state_ptr = state_ptr;
+            head_multi_observe_cols.len = input_len;
+            head_multi_observe_cols.pc = F::from_canonical_u32(*state.pc);
+
+            head_multi_observe_cols.input_register_1 = init_pos_register;
+            head_multi_observe_cols.input_register_2 = input_ptr_register;
+            head_multi_observe_cols.input_register_3 = len_register;
+            head_multi_observe_cols.output_register = state_ptr_register;
+            head_multi_observe_cols.is_first = F::ONE;
+
+            let mut input_idx: usize = 0;
+            for (chunk, cols) in chunks.into_iter().zip(allocated_rows.iter_mut().skip(1)) {
+                let multi_observe_cols: &mut MultiObserveCols<F> =
+                    cols.specific[..MultiObserveCols::<u8>::width()].borrow_mut();
+
+                multi_observe_cols.input_register_1 = init_pos_register;
+                multi_observe_cols.input_register_2 = input_ptr_register;
+                multi_observe_cols.input_register_3 = len_register;
+                multi_observe_cols.output_register = state_ptr_register;
+                multi_observe_cols.init_pos = init_pos;
+                multi_observe_cols.input_ptr = input_ptr;
+                multi_observe_cols.state_ptr = state_ptr;
+                multi_observe_cols.len = input_len;
+
+                multi_observe_cols.start_idx = F::from_canonical_usize(chunk.0);
+                multi_observe_cols.end_idx = F::from_canonical_usize(chunk.1);
+
+                multi_observe_cols.is_last = F::ZERO;
+                multi_observe_cols.curr_len = F::from_canonical_usize(len - input_idx);
+
+                for j in chunk.0..chunk.1 {
+                    let n_f: [F; 1] = tracing_read_native_helper(
+                        state.memory,
+                        input_ptr_u32 + input_idx as u32,
+                        multi_observe_cols.read_data[j].as_mut(),
+                    );
+                    tracing_write_native_inplace(
+                        state.memory,
+                         state_ptr_u32 + j as u32, 
+                        n_f,
+                         &mut multi_observe_cols.write_data[j],
+                    );
+                    input_idx += 1;
+
+                }
+
+                if chunk.1 >= CHUNK {
+                    let permutation_input: [F; 16] = tracing_read_native_helper(
+                        state.memory,
+                        state_ptr_u32,
+                        multi_observe_cols.read_sponge_state.as_mut(),
+                    );
+                    let output = self.subchip.permute(permutation_input);
+                    tracing_write_native_inplace(
+                        state.memory,
+                        state_ptr_u32,
+                        std::array::from_fn(|i| output[i]),
+                        &mut multi_observe_cols.write_sponge_state,
+                    );
+
+                    multi_observe_cols.should_permute = F::ONE;
+                }
+            }
         } else {
             unreachable!()
         }
@@ -690,6 +821,10 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> TraceFiller<F>
             let (curr, rest) = if cols.simple.is_one() {
                 row_idx += 1;
                 row_slice.split_at_mut(width)
+            } else if cols.multi_observe_row.is_one() {
+                let total_num_row = cols.inner.export.as_canonical_u32() as usize;
+                row_idx += total_num_row;
+                row_slice.split_at_mut(total_num_row * width)
             } else {
                 let num_non_inside_row = cols.inner.export.as_canonical_u32() as usize;
                 let start = (num_non_inside_row - 1) * width;
@@ -706,6 +841,8 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> TraceFiller<F>
             let cols: &NativePoseidon2Cols<F, SBOX_REGISTERS> = chunk_slice[..width].borrow();
             if cols.simple.is_one() {
                 self.fill_simple_chunk(mem_helper, chunk_slice);
+            } else if cols.multi_observe_row.is_one() {
+                self.fill_multi_observe_chunk(mem_helper, chunk_slice);
             } else {
                 self.fill_verify_batch_chunk(mem_helper, chunk_slice);
             }
@@ -961,6 +1098,40 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Filler<F, SBOX
         } else {
             unreachable!()
         }
+    }
+
+    fn fill_multi_observe_chunk(&self, mem_helper: &MemoryAuxColsFactory<F>, chunk_slice: &mut [F]) {
+        let inner_width = self.subchip.air.width();
+        let width = NativePoseidon2Cols::<F, SBOX_REGISTERS>::width();
+        let head_cols: &mut NativePoseidon2Cols<F, SBOX_REGISTERS> = chunk_slice[..width].borrow_mut();
+        let num_rows = head_cols.inner.export.as_canonical_u32() as usize;
+
+        let head_multi_observe_cols: &mut MultiObserveCols<F> =
+            head_cols.specific[..MultiObserveCols::<u8>::width()].borrow_mut();
+        let start_timestamp_u32 = head_cols.start_timestamp.as_canonical_u32();
+        // state_ptr, init_pos, input_ptr, len
+        mem_fill_helper(
+            mem_helper,
+            start_timestamp_u32,
+            head_multi_observe_cols.read_data[0].as_mut(),
+        );
+        mem_fill_helper(
+            mem_helper,
+            start_timestamp_u32 + 1,
+            head_multi_observe_cols.read_data[1].as_mut(),
+        );
+        mem_fill_helper(
+            mem_helper,
+            start_timestamp_u32 + 2,
+            head_multi_observe_cols.read_data[2].as_mut(),
+        );
+        mem_fill_helper(
+            mem_helper,
+            start_timestamp_u32 + 3,
+            head_multi_observe_cols.read_data[3].as_mut(),
+        );
+        
+        // todo!()
     }
 
     #[inline(always)]

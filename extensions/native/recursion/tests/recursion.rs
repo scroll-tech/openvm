@@ -214,7 +214,7 @@ fn test_multi_observe() {
 }
 
 fn build_test_program<C: Config>(builder: &mut Builder<C>) {
-    let sample_lens: Vec<usize> = vec![10, 2, 0, 3, 20];
+    let sample_lens: Vec<usize> = vec![10, 2, 1, 3, 20];
 
     let mut rng = create_seeded_rng();
     let challenger = DuplexChallengerVariable::new(builder);
