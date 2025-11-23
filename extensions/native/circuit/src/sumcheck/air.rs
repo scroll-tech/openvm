@@ -258,7 +258,7 @@ impl<AB: InteractionBuilder> Air<AB>
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(self.address_space, register_ptrs[0] + AB::F::from_canonical_usize(EXT_DEG * 2 - 1) + curr_prod_n),
+                MemoryAddress::new(self.address_space, register_ptrs[0] + AB::F::from_canonical_usize(EXT_DEG * 2) + (curr_prod_n - AB::F::ONE)),       // curr_prod_n starts at 1.
                 [max_round],
                 start_timestamp,
                 &prod_row_specific.read_records[0],
@@ -329,7 +329,7 @@ impl<AB: InteractionBuilder> Air<AB>
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(self.address_space, register_ptrs[0] + AB::F::from_canonical_usize(EXT_DEG * 2 - 1) + ctx[1] + curr_logup_n),
+                MemoryAddress::new(self.address_space, register_ptrs[0] + AB::F::from_canonical_usize(EXT_DEG * 2) + ctx[1] + (curr_logup_n - AB::F::ONE)),     // curr_logup_n starts at 1.
                 [max_round],
                 start_timestamp,
                 &logup_row_specific.read_records[0],
