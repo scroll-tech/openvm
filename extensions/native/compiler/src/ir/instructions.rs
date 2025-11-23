@@ -322,7 +322,7 @@ pub enum DslIr<C: Config> {
 
     /// Native operation for calculating a sumcheck layer's evaluation
     /// This op supports two modes:
-    /// 1. for computing expected evaluation,
+    /// 1. for computing expected evaluation for current layer,
     ///     output = [
     ///         \sum_i alpha^i * prod[i][0] * prod[i][1] + 
     ///         \sum_j alpha^(2j) * (logup_q[i][0] * logup_q[i][1] + 
@@ -333,10 +333,9 @@ pub enum DslIr<C: Config> {
     /// 2. for computing expected evaluation of next layer,
     ///     output[1+i] = eq(0,r)*p[i][0] + eq(1,r) * p[i][1].
     SumcheckLayerEval(
-        Ptr<C::N>,          // Context variables
-                            // 
-                            // 0: round,
-                            // 1: number of product
+        Ptr<C::N>,          // Context variables:
+                            // 0. round,
+                            // 1. number of product
                             // 2. number of logup
                             // 3. (3D array description) prod_specs_eval inner length
                             // 4. (3D array description) prod_specs_eval inner_inner length
