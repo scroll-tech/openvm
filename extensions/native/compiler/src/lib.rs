@@ -221,6 +221,9 @@ pub enum VerifyBatchOpcode {
 #[repr(usize)]
 #[allow(non_camel_case_types)]
 pub enum SumcheckOpcode {
-    /// Computer the evaluation for a sumcheck layer
+    /// Compute the expected evaluation for each layer in the tower structure that GKR product IOP and logup IOP uses
+    /// Supports two modes of operation: 
+    /// 1. Calculate current layer's expected evaluation
+    /// 2. Calculate next layer's evaluation
     SUMCHECK_LAYER_EVAL,
 }

@@ -172,6 +172,13 @@ pub enum AsmInstruction<F, EF> {
     CycleTrackerStart(),
     CycleTrackerEnd(),
 
+    // Native opcode for calculating sumcheck layer evaluation
+    // SumcheckLayerEval(reg_a, reg_b, reg_c, ... , reg_f, reg_g)
+    // - reg_a: Output ptr for next layer's evaluations
+    // - reg_b: Context variables
+    // - reg_c: Challenge values (alpha, coeff)
+    // - reg_g: GKR product IOP evaluations
+    // - reg_f: GKR logup IOP evaluations
     SumcheckLayerEval(i32, i32, i32, i32, i32),
 }
 

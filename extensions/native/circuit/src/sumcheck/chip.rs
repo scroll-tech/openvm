@@ -21,6 +21,7 @@ use crate::{
     utils::const_max,
 };
 use serde::{Deserialize, Serialize};
+const CONTEXT_ARR_BASE_LEN: usize = EXT_DEG * 2;
 
 #[repr(C)]
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -139,7 +140,13 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 prod_specs_inner_inner_len,
                 logup_specs_inner_len,
                 logup_specs_inner_inner_len,
-                in_round,
+                is_op_for_cur_sumcheck_round,    // This opcode supports two modes of operation:
+                                                    // 1. calculate the expected evaluation of two types of sumchecks for the current round
+                                                    //      a. product sumcheck: v' = v[0] * v[1]
+                                                    //      b. logup sumcheck: p'= p[0] * q[1] + p[1] * q[0] and q'= q[0] * q[1].     
+                                                    // 2. calculate the expected value of next layer:
+                                                    //      a. product sumcheck: v[r] = eq(0,r) * v[0] + eq(1,r) * v[1]
+                                                    //      b. logup sumcheck: p[r] = eq(0,r) * p[0] + eq(1,r) * p[1] and q[r] = eq(0,r) * q[0] + eq(1,r) * q[1]
             ] = ctx;
 
             let (challenges_read, challenges): (RecordId, [F; EXT_DEG * 4]) = memory.read::<{EXT_DEG * 4}>(data_address_space, cs_pointer);
@@ -201,7 +208,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 };
                 prod_row.alpha1 = alpha_acc;
 
-                let (read_max_round, max_round) = memory.read_cell(data_address_space, ctx_pointer + F::from_canonical_usize(EXT_DEG * 2) + i);
+                let (read_max_round, max_round) = memory.read_cell(data_address_space, ctx_pointer + F::from_canonical_usize(CONTEXT_ARR_BASE_LEN) + i);
                 prod_row.max_round = max_round;
                 prod_row.read_data_records[0] = read_max_round;
                 curr_timestamp += 1;
@@ -225,7 +232,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                     prod_row.p1 = p1;
                     prod_row.p2 = p2;
 
-                    let evals = if in_round > F::ZERO {
+                    let evals = if is_op_for_cur_sumcheck_round > F::ZERO {
                         FieldExtension::multiply(p1, p2)
                     } else {
                         FieldExtension::add(
@@ -238,11 +245,11 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                     let (write_slice_eval_1, _) = memory.write::<EXT_DEG>(data_address_space, r_ptr + (F::ONE + i) * F::from_canonical_usize(EXT_DEG), evals);
                     prod_row.write_data_records[0] = write_slice_eval_1;
 
-                    let not_in_round = F::ONE - in_round;
+                    let is_op_for_next_sumcheck_round = F::ONE - is_op_for_cur_sumcheck_round;
                     let acc_eval = FieldExtension::multiply(alpha_acc, evals);
                     prod_row.acc_eval = acc_eval;
 
-                    if (round + not_in_round) < (max_round - F::from_canonical_usize(1)) {
+                    if (round + is_op_for_next_sumcheck_round) < (max_round - F::from_canonical_usize(1)) {
                         eval_acc = FieldExtension::add(eval_acc, acc_eval);
                         prod_row.should_acc = true;
                         prod_row.eval_acc = eval_acc.clone();
@@ -277,7 +284,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                 };
                 logup_row.alpha1 = alpha_acc;
 
-                let (read_max_round, max_round) = memory.read_cell(data_address_space, ctx_pointer + F::from_canonical_usize(EXT_DEG * 2) + num_prod_spec + i);
+                let (read_max_round, max_round) = memory.read_cell(data_address_space, ctx_pointer + F::from_canonical_usize(CONTEXT_ARR_BASE_LEN) + num_prod_spec + i);
                 logup_row.max_round = max_round;
                 logup_row.read_data_records[0] = read_max_round;
                 curr_timestamp += 1;
@@ -305,7 +312,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                     logup_row.q1 = q1;
                     logup_row.q2 = q2;
 
-                    let p_evals = if in_round > F::ZERO {
+                    let p_evals = if is_op_for_cur_sumcheck_round > F::ZERO {
                         FieldExtension::add(
                             FieldExtension::multiply(p1, q2),
                             FieldExtension::multiply(p2, q1),
@@ -317,7 +324,7 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                         )
                     };
                     
-                    let q_evals = if in_round > F::ZERO {
+                    let q_evals = if is_op_for_cur_sumcheck_round > F::ZERO {
                         FieldExtension::multiply(q1, q2)
                     } else {
                         FieldExtension::add(
@@ -335,11 +342,11 @@ impl<F: PrimeField32> InstructionExecutor<F> for NativeSumcheckChip<F> {
                     logup_row.write_data_records[0] = write_slice_eval_1;
                     logup_row.write_data_records[1] = write_slice_eval_2;
 
-                    let not_in_round = F::ONE - in_round;
+                    let is_op_for_next_sumcheck_round = F::ONE - is_op_for_cur_sumcheck_round;
                     let alpha_denominator = FieldExtension::multiply(alpha_acc, alpha);
                     logup_row.alpha2 = alpha_denominator;
 
-                    if (round + not_in_round) < (max_round - F::from_canonical_usize(1)) {
+                    if (round + is_op_for_next_sumcheck_round) < (max_round - F::from_canonical_usize(1)) {
                         let acc_eval = FieldExtension::add(
                             FieldExtension::multiply(alpha_acc, p_evals),
                             FieldExtension::multiply(alpha_denominator, q_evals),
