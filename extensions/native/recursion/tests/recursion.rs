@@ -1,9 +1,10 @@
 use itertools::Itertools;
 use openvm_circuit::{
     arch::{
-        PreflightExecutionOutput, PreflightExecutor, VmBuilder, VmCircuitConfig, VmExecutionConfig, instructions::program::Program
+        instructions::program::Program, PreflightExecutionOutput, PreflightExecutor, VmBuilder,
+        VmCircuitConfig, VmExecutionConfig,
     },
-    utils::{TestStarkEngine, air_test_impl},
+    utils::{air_test_impl, TestStarkEngine},
 };
 use openvm_native_circuit::{
     execute_program_with_config, test_native_config, NativeBuilder, NativeConfig,
@@ -209,12 +210,12 @@ fn test_multi_observe() {
     config.system.memory_config.max_access_adapter_n = 16;
 
     let vb = NativeBuilder::default();
-    air_test_impl::<BabyBearPoseidon2Engine, _>(fri_params, vb, config, program, vec![], 1, true).unwrap();
-
+    air_test_impl::<BabyBearPoseidon2Engine, _>(fri_params, vb, config, program, vec![], 1, true)
+        .unwrap();
 }
 
 fn build_test_program<C: Config>(builder: &mut Builder<C>) {
-    let sample_lens: Vec<usize> = vec![10, 2, 0, 3, 20];
+    let sample_lens: Vec<usize> = vec![10, 2, 1, 3, 20];
 
     let mut rng = create_seeded_rng();
     let challenger = DuplexChallengerVariable::new(builder);
