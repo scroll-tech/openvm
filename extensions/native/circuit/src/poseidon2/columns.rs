@@ -212,10 +212,15 @@ pub struct MultiObserveCols<T> {
     pub final_timestamp_increment: T,
 
     // Initial reads from registers
+    // They are same across same instance of multi_observe
     pub state_ptr: T,
     pub input_ptr: T,
     pub init_pos: T,
     pub len: T,
+    pub input_register_1: T,
+    pub input_register_2: T,
+    pub input_register_3: T,
+    pub output_register: T,
 
     pub is_first: T,
     pub is_last: T,
@@ -238,9 +243,4 @@ pub struct MultiObserveCols<T> {
     // Final write back and registers
     pub write_final_idx: MemoryWriteAuxCols<T, 1>,
     pub final_idx: T,
-
-    pub input_register_1: T,
-    pub input_register_2: T,
-    pub input_register_3: T,
-    pub output_register: T,
 }

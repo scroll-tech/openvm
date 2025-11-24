@@ -12,7 +12,7 @@ use openvm_circuit::{
 use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode};
 use openvm_native_compiler::{
     conversion::AS,
-    Poseidon2Opcode::{COMP_POS2, PERM_POS2, MULTI_OBSERVE},
+    Poseidon2Opcode::{COMP_POS2, MULTI_OBSERVE, PERM_POS2},
     VerifyBatchOpcode::VERIFY_BATCH,
 };
 use openvm_poseidon2_air::{Poseidon2Config, Poseidon2SubChip, Poseidon2SubCols};
@@ -24,9 +24,11 @@ use openvm_stark_backend::{
 };
 
 use crate::poseidon2::{
-    CHUNK, columns::{
-        InsideRowSpecificCols, MultiObserveCols, NativePoseidon2Cols, SimplePoseidonSpecificCols, TopLevelSpecificCols
-    }
+    columns::{
+        InsideRowSpecificCols, MultiObserveCols, NativePoseidon2Cols, SimplePoseidonSpecificCols,
+        TopLevelSpecificCols,
+    },
+    CHUNK,
 };
 
 #[derive(Clone)]
@@ -652,24 +654,33 @@ where
                 f: len_register,
                 ..
             } = instruction;
-            
-            assert_eq!(register_address_space, F::from_canonical_u32(AS::Native as u32));
+
+            assert_eq!(
+                register_address_space,
+                F::from_canonical_u32(AS::Native as u32)
+            );
             assert_eq!(data_address_space, F::from_canonical_u32(AS::Native as u32));
 
-            let [init_pos]: [F; 1] = memory_read_native(state.memory.data(), init_pos_register.as_canonical_u32());
-            let [input_len]: [F; 1] = memory_read_native(state.memory.data(), len_register.as_canonical_u32());
+            let [init_pos]: [F; 1] =
+                memory_read_native(state.memory.data(), init_pos_register.as_canonical_u32());
+            let [input_len]: [F; 1] =
+                memory_read_native(state.memory.data(), len_register.as_canonical_u32());
 
             let mut len = input_len.as_canonical_u32() as usize;
             let mut pos = init_pos.as_canonical_u32() as usize;
-            let mut chunks: Vec<(usize, usize, bool)> = vec![];
-            
+            let mut chunks: Vec<(usize, usize)> = vec![];
+
+            const NUM_HEAD_ACCESSES: usize = 4;
+            let mut final_timestamp_inc = NUM_HEAD_ACCESSES;
             while len > 0 {
                 if len >= (CHUNK - pos) {
-                    chunks.push((pos.clone(), CHUNK.clone(), true));
+                    chunks.push((pos.clone(), CHUNK.clone()));
                     len -= CHUNK - pos;
+                    final_timestamp_inc += 2 * (CHUNK - pos + 1);
                     pos = 0;
                 } else {
-                    chunks.push((pos.clone(), pos + len, false));
+                    chunks.push((pos.clone(), pos + len));
+                    final_timestamp_inc += 2 * len;
                     len = 0;
                     pos = pos + len;
                 }
@@ -677,7 +688,7 @@ where
 
             let allocated_rows = arena
                 .alloc(MultiRowLayout::new(NativePoseidon2Metadata {
-                    num_rows: chunks.len(),
+                    num_rows: 1 + chunks.len(),
                 }))
                 .0;
             let head_cols = &mut allocated_rows[0];
@@ -704,31 +715,15 @@ where
                 len_register.as_canonical_u32(),
                 head_multi_observe_cols.read_data[3].as_mut(),
             );
-            
+
             let input_ptr_u32 = input_ptr.as_canonical_u32();
             let state_ptr_u32 = state_ptr.as_canonical_u32();
-            let len = input_len.as_canonical_u32() as usize;
 
-            head_cols.multi_observe_row = F::ONE;
-            head_cols.inner.export = F::from_canonical_u32(chunks.len() as u32);
+            let init_timestamp = F::from_canonical_u32(init_timestamp_u32);
 
-            head_multi_observe_cols.init_pos = init_pos;
-            head_multi_observe_cols.input_ptr = input_ptr;
-            head_multi_observe_cols.state_ptr = state_ptr;
-            head_multi_observe_cols.len = input_len;
-            head_multi_observe_cols.pc = F::from_canonical_u32(*state.pc);
-
-            head_multi_observe_cols.input_register_1 = init_pos_register;
-            head_multi_observe_cols.input_register_2 = input_ptr_register;
-            head_multi_observe_cols.input_register_3 = len_register;
-            head_multi_observe_cols.output_register = state_ptr_register;
-            head_multi_observe_cols.is_first = F::ONE;
-
-            let mut input_idx: usize = 0;
-            for (chunk, cols) in chunks.into_iter().zip(allocated_rows.iter_mut().skip(1)) {
+            for (i, cols) in allocated_rows.iter_mut().enumerate() {
                 let multi_observe_cols: &mut MultiObserveCols<F> =
                     cols.specific[..MultiObserveCols::<u8>::width()].borrow_mut();
-
                 multi_observe_cols.input_register_1 = init_pos_register;
                 multi_observe_cols.input_register_2 = input_ptr_register;
                 multi_observe_cols.input_register_3 = len_register;
@@ -738,13 +733,53 @@ where
                 multi_observe_cols.state_ptr = state_ptr;
                 multi_observe_cols.len = input_len;
 
-                multi_observe_cols.start_idx = F::from_canonical_usize(chunk.0);
-                multi_observe_cols.end_idx = F::from_canonical_usize(chunk.1);
+                cols.multi_observe_row = F::ONE;
+                cols.very_first_timestamp = init_timestamp;
 
-                multi_observe_cols.is_last = F::ZERO;
-                multi_observe_cols.curr_len = F::from_canonical_usize(len - input_idx);
+                if i == 0 {
+                    // head row
+                    cols.inner.export = F::from_canonical_u32(1 + chunks.len() as u32);
+                    multi_observe_cols.pc = F::from_canonical_u32(*state.pc);
+                    multi_observe_cols.final_timestamp_increment =
+                        F::from_canonical_usize(final_timestamp_inc);
+                    multi_observe_cols.is_first = F::ONE;
+                    multi_observe_cols.is_last = F::ZERO;
+                    multi_observe_cols.curr_len = F::ZERO;
+                    multi_observe_cols.should_permute = F::ZERO;
+                }
+            }
 
-                for j in chunk.0..chunk.1 {
+            let mut input_idx: usize = 0;
+            let mut cur_timestamp = init_timestamp_u32 + NUM_HEAD_ACCESSES as u32;
+            let num_chunks = chunks.len();
+            for (i, ((chunk_start, chunk_end), cols)) in chunks
+                .into_iter()
+                .zip(allocated_rows.iter_mut().skip(1))
+                .enumerate()
+            {
+                let multi_observe_cols: &mut MultiObserveCols<F> =
+                    cols.specific[..MultiObserveCols::<u8>::width()].borrow_mut();
+
+                cols.start_timestamp = F::from_canonical_u32(cur_timestamp);
+
+                multi_observe_cols.start_idx = F::from_canonical_usize(chunk_start);
+                multi_observe_cols.end_idx = F::from_canonical_usize(chunk_end);
+
+                multi_observe_cols.is_first = F::ZERO;
+                multi_observe_cols.is_last = if i == num_chunks - 1 {
+                    F::ONE
+                } else {
+                    F::ZERO
+                };
+                multi_observe_cols.curr_len = F::from_canonical_usize(input_idx);
+
+                for j in chunk_start..CHUNK {
+                    multi_observe_cols.aux_after_start[j] = F::ONE;
+                }
+                for j in 0..chunk_end {
+                    multi_observe_cols.aux_before_end[j] = F::ONE;
+                }
+                for j in chunk_start..chunk_end {
                     let n_f: [F; 1] = tracing_read_native_helper(
                         state.memory,
                         input_ptr_u32 + input_idx as u32,
@@ -752,20 +787,23 @@ where
                     );
                     tracing_write_native_inplace(
                         state.memory,
-                         state_ptr_u32 + j as u32, 
+                        state_ptr_u32 + j as u32,
                         n_f,
-                         &mut multi_observe_cols.write_data[j],
+                        &mut multi_observe_cols.write_data[j],
                     );
+                    multi_observe_cols.data[j] = n_f[0];
                     input_idx += 1;
-
+                    cur_timestamp += 2;
                 }
 
-                if chunk.1 >= CHUNK {
+                if chunk_end >= CHUNK {
+                    multi_observe_cols.should_permute = F::ONE;
                     let permutation_input: [F; 16] = tracing_read_native_helper(
                         state.memory,
                         state_ptr_u32,
                         multi_observe_cols.read_sponge_state.as_mut(),
                     );
+                    cols.inner.inputs.clone_from_slice(&permutation_input);
                     let output = self.subchip.permute(permutation_input);
                     tracing_write_native_inplace(
                         state.memory,
@@ -773,8 +811,12 @@ where
                         std::array::from_fn(|i| output[i]),
                         &mut multi_observe_cols.write_sponge_state,
                     );
-
-                    multi_observe_cols.should_permute = F::ONE;
+                    cur_timestamp += 2;
+                } else {
+                    multi_observe_cols.should_permute = F::ZERO;
+                    let sponge_state: [F; 16] =
+                        memory_read_native(state.memory.data(), state_ptr_u32);
+                    cols.inner.inputs.clone_from_slice(&sponge_state);
                 }
             }
         } else {
@@ -794,7 +836,7 @@ where
             String::from("COMP_POS2")
         } else if opcode == MULTI_OBSERVE.global_opcode().as_usize() {
             String::from("MULTI_OBSERVE")
-        }else {
+        } else {
             unreachable!("unsupported opcode: {}", opcode)
         }
     }
@@ -1100,15 +1142,21 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Filler<F, SBOX
         }
     }
 
-    fn fill_multi_observe_chunk(&self, mem_helper: &MemoryAuxColsFactory<F>, chunk_slice: &mut [F]) {
+    fn fill_multi_observe_chunk(
+        &self,
+        mem_helper: &MemoryAuxColsFactory<F>,
+        chunk_slice: &mut [F],
+    ) {
         let inner_width = self.subchip.air.width();
         let width = NativePoseidon2Cols::<F, SBOX_REGISTERS>::width();
-        let head_cols: &mut NativePoseidon2Cols<F, SBOX_REGISTERS> = chunk_slice[..width].borrow_mut();
+        let head_cols: &mut NativePoseidon2Cols<F, SBOX_REGISTERS> =
+            chunk_slice[..width].borrow_mut();
         let num_rows = head_cols.inner.export.as_canonical_u32() as usize;
 
         let head_multi_observe_cols: &mut MultiObserveCols<F> =
             head_cols.specific[..MultiObserveCols::<u8>::width()].borrow_mut();
-        let start_timestamp_u32 = head_cols.start_timestamp.as_canonical_u32();
+        let start_timestamp_u32 = head_cols.very_first_timestamp.as_canonical_u32();
+
         // state_ptr, init_pos, input_ptr, len
         mem_fill_helper(
             mem_helper,
@@ -1130,8 +1178,56 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Filler<F, SBOX
             start_timestamp_u32 + 3,
             head_multi_observe_cols.read_data[3].as_mut(),
         );
-        
-        // todo!()
+
+        // generate permutation traces for each row
+        for row_idx in 0..num_rows {
+            let cols: &NativePoseidon2Cols<F, SBOX_REGISTERS> = chunk_slice
+                [row_idx * width..(row_idx + 1) * width]
+                .as_ref()
+                .borrow();
+            let inner_cols = &self.subchip.generate_trace(vec![cols.inner.inputs]).values;
+            chunk_slice[row_idx * width..(row_idx + 1) * width][..inner_width]
+                .copy_from_slice(inner_cols);
+        }
+
+        for row_idx in 1..num_rows {
+            let cols: &mut NativePoseidon2Cols<F, SBOX_REGISTERS> =
+                chunk_slice[row_idx * width..(row_idx + 1) * width].borrow_mut();
+            let multi_observe_cols: &mut MultiObserveCols<F> =
+                cols.specific[..MultiObserveCols::<u8>::width()].borrow_mut();
+
+            let mut start_timestamp_u32 = cols.start_timestamp.as_canonical_u32();
+            let chunk_start = multi_observe_cols.start_idx.as_canonical_u32();
+            let chunk_end = multi_observe_cols.end_idx.as_canonical_u32();
+
+            for j in chunk_start..chunk_end {
+                mem_fill_helper(
+                    mem_helper,
+                    start_timestamp_u32,
+                    multi_observe_cols.read_data[j as usize].as_mut(),
+                );
+                mem_fill_helper(
+                    mem_helper,
+                    start_timestamp_u32 + 1,
+                    multi_observe_cols.write_data[j as usize].as_mut(),
+                );
+
+                start_timestamp_u32 += 2;
+            }
+
+            if chunk_end >= CHUNK as u32 {
+                mem_fill_helper(
+                    mem_helper,
+                    start_timestamp_u32,
+                    multi_observe_cols.read_sponge_state.as_mut(),
+                );
+                mem_fill_helper(
+                    mem_helper,
+                    start_timestamp_u32 + 1,
+                    multi_observe_cols.write_sponge_state.as_mut(),
+                );
+            }
+        }
     }
 
     #[inline(always)]
