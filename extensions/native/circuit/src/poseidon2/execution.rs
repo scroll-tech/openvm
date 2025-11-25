@@ -610,7 +610,7 @@ unsafe fn execute_multi_observe_e12_impl<
         } else {
             observation_chunks.push((pos, pos + len));
             len = 0;
-            pos = pos + len;
+            pos += len;
         }
     }
 
@@ -619,14 +619,14 @@ unsafe fn execute_multi_observe_e12_impl<
 
     for (chunk_start, chunk_end) in observation_chunks {
         for j in chunk_start..chunk_end {
-            let [n_f]: [F; 1] = exec_state.vm_read(NATIVE_AS as u32, input_ptr_u32 + input_idx);
-            exec_state.vm_write(NATIVE_AS as u32, sponge_ptr_u32 + (j as u32), &[n_f]);
+            let [n_f]: [F; 1] = exec_state.vm_read(NATIVE_AS, input_ptr_u32 + input_idx);
+            exec_state.vm_write(NATIVE_AS, sponge_ptr_u32 + (j as u32), &[n_f]);
             input_idx += 1;
         }
         if chunk_end == CHUNK {
-            let mut p2_input: [F; CHUNK * 2] = exec_state.vm_read(NATIVE_AS as u32, sponge_ptr_u32);
+            let mut p2_input: [F; CHUNK * 2] = exec_state.vm_read(NATIVE_AS, sponge_ptr_u32);
             subchip.permute_mut(&mut p2_input);
-            exec_state.vm_write(NATIVE_AS as u32, sponge_ptr_u32, &p2_input);
+            exec_state.vm_write(NATIVE_AS, sponge_ptr_u32, &p2_input);
         }
 
         height += 1;

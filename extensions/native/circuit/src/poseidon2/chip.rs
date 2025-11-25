@@ -674,15 +674,15 @@ where
             let mut final_timestamp_inc = NUM_HEAD_ACCESSES;
             while len > 0 {
                 if len >= (CHUNK - pos) {
-                    chunks.push((pos.clone(), CHUNK.clone()));
+                    chunks.push((pos, CHUNK));
                     len -= CHUNK - pos;
                     final_timestamp_inc += 2 * (CHUNK - pos) + 1;
                     pos = 0;
                 } else {
-                    chunks.push((pos.clone(), pos + len));
+                    chunks.push((pos, pos + len));
                     final_timestamp_inc += 2 * len;
                     len = 0;
-                    pos = pos + len;
+                    pos += len;
                 }
             }
 
