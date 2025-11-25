@@ -22,6 +22,7 @@ template <typename T, size_t SBOX_REGISTERS> struct NativePoseidon2Cols {
     T incorporate_sibling;
     T inside_row;
     T simple;
+    T multi_observe_row;
 
     T end_inside_row;
     T end_top_level;
@@ -38,7 +39,7 @@ template <typename T, size_t SBOX_REGISTERS> struct NativePoseidon2Cols {
 };
 
 __device__ void mem_fill_base(
-    MemoryAuxColsFactory mem_helper,
+    MemoryAuxColsFactory &mem_helper,
     uint32_t timestamp,
     RowSlice base_aux
 ) {
@@ -58,6 +59,8 @@ template <size_t SBOX_REGISTERS> struct Poseidon2Wrapper {
     ) {
         if (row[COL_INDEX(Cols, simple)] == Fp::one()) {
             fill_simple_chunk(row, range_checker, timestamp_max_bits);
+        } else if (row[COL_INDEX(Cols, multi_observe_row)] == Fp::one()) {
+            fill_multi_observe_chunk(row, range_checker, timestamp_max_bits);
         } else {
             fill_verify_batch_chunk(row, range_checker, timestamp_max_bits);
         }
@@ -331,6 +334,66 @@ template <size_t SBOX_REGISTERS> struct Poseidon2Wrapper {
                     specific.slice_from(COL_INDEX(
                         TopLevelSpecificCols, read_initial_height_or_sibling_is_on_right.base
                     ))
+                );
+            }
+        }
+    }
+
+    __device__ static void fill_multi_observe_chunk(
+        RowSlice row,
+        VariableRangeChecker range_checker,
+        uint32_t timestamp_max_bits
+    ) {
+        MemoryAuxColsFactory mem_helper(range_checker, timestamp_max_bits);
+        Poseidon2Row head_row(row);
+        uint32_t num_rows = head_row.export_col()[0].asUInt32();
+
+        for (uint32_t idx = 0; idx < num_rows; ++idx) {
+            RowSlice curr_row = row.shift_row(idx);
+            fill_inner(curr_row);
+            fill_multi_observe_specific(curr_row, mem_helper);
+        }
+    }
+
+    __device__ static void fill_multi_observe_specific(
+        RowSlice row,
+        MemoryAuxColsFactory &mem_helper
+    ) {
+        RowSlice specific = row.slice_from(COL_INDEX(Cols, specific));
+        if (specific[COL_INDEX(MultiObserveCols, is_first)] == Fp::one()) {
+            uint32_t very_start_timestamp =
+                row[COL_INDEX(Cols, very_first_timestamp)].asUInt32();
+            for (uint32_t i = 0; i < 4; ++i) {
+                mem_fill_base(
+                    mem_helper,
+                    very_start_timestamp + i,
+                    specific.slice_from(COL_INDEX(MultiObserveCols, read_data[i].base))
+                );
+            }
+        } else {
+            uint32_t start_timestamp = row[COL_INDEX(Cols, start_timestamp)].asUInt32();
+            uint32_t chunk_start =
+                specific[COL_INDEX(MultiObserveCols, start_idx)].asUInt32();
+            uint32_t chunk_end =
+                specific[COL_INDEX(MultiObserveCols, end_idx)].asUInt32();
+            for (uint32_t j = chunk_start; j < chunk_end; ++j) {
+                mem_fill_base(
+                    mem_helper,
+                    start_timestamp,
+                    specific.slice_from(COL_INDEX(MultiObserveCols, read_data[j].base))
+                );
+                mem_fill_base(
+                    mem_helper,
+                    start_timestamp + 1,
+                    specific.slice_from(COL_INDEX(MultiObserveCols, write_data[j].base))
+                );
+                start_timestamp += 2;
+            }
+            if (chunk_end >= CHUNK) {
+                mem_fill_base(
+                    mem_helper,
+                    start_timestamp,
+                    specific.slice_from(COL_INDEX(MultiObserveCols, write_sponge_state.base))
                 );
             }
         }
