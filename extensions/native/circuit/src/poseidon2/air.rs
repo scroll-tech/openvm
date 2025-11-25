@@ -1,5 +1,6 @@
 use std::{array::from_fn, borrow::Borrow, sync::Arc};
 
+use itertools::Itertools;
 use openvm_circuit::{
     arch::{ExecutionBridge, ExecutionState},
     system::memory::{offline_checker::MemoryBridge, MemoryAddress, CHUNK},
@@ -724,7 +725,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             write_data,
             data,
             should_permute,
-            read_sponge_state,
             write_sponge_state,
             write_final_idx,
             final_idx,
@@ -856,28 +856,29 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                 end_idx,
             );
 
-        let full_sponge_input = from_fn::<_, { CHUNK * 2 }, _>(|i| local.inner.inputs[i]);
         let full_sponge_output = from_fn::<_, { CHUNK * 2 }, _>(|i| {
             local.inner.ending_full_rounds[BABY_BEAR_POSEIDON2_HALF_FULL_ROUNDS - 1].post[i]
         });
 
         self.memory_bridge
-            .read(
-                MemoryAddress::new(self.address_space, state_ptr),
-                full_sponge_input,
-                start_timestamp + (end_idx - start_idx) * AB::F::TWO,
-                &read_sponge_state,
-            )
-            .eval(builder, multi_observe_row * should_permute);
-
-        self.memory_bridge
             .write(
                 MemoryAddress::new(self.address_space, state_ptr),
                 full_sponge_output,
-                start_timestamp + (end_idx - start_idx) * AB::F::TWO + AB::F::ONE,
+                start_timestamp + (end_idx - start_idx) * AB::F::TWO,
                 &write_sponge_state,
             )
             .eval(builder, multi_observe_row * should_permute);
+
+        // enforce that prev_data is permutation input
+        write_sponge_state
+            .prev_data()
+            .iter()
+            .zip_eq(local.inner.inputs.iter())
+            .for_each(|(a, b)| {
+                builder
+                    .when(multi_observe_row * should_permute)
+                    .assert_eq(*a, *b);
+            });
 
         /*
         self.memory_bridge
@@ -897,7 +898,10 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         builder
             .when(next.multi_observe_row)
             .when(not(next_multi_observe_specific.is_first))
-            .assert_eq(next_multi_observe_specific.curr_len, multi_observe_specific.curr_len + end_idx - start_idx);
+            .assert_eq(
+                next_multi_observe_specific.curr_len,
+                multi_observe_specific.curr_len + end_idx - start_idx,
+            );
 
         // Boundary conditions
         builder

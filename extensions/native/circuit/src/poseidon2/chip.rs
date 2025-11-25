@@ -676,7 +676,7 @@ where
                 if len >= (CHUNK - pos) {
                     chunks.push((pos.clone(), CHUNK.clone()));
                     len -= CHUNK - pos;
-                    final_timestamp_inc += 2 * (CHUNK - pos + 1);
+                    final_timestamp_inc += 2 * (CHUNK - pos) + 1;
                     pos = 0;
                 } else {
                     chunks.push((pos.clone(), pos + len));
@@ -766,11 +766,7 @@ where
                 multi_observe_cols.end_idx = F::from_canonical_usize(chunk_end);
 
                 multi_observe_cols.is_first = F::ZERO;
-                multi_observe_cols.is_last = if i == num_chunks - 1 {
-                    F::ONE
-                } else {
-                    F::ZERO
-                };
+                multi_observe_cols.is_last = if i == num_chunks - 1 { F::ONE } else { F::ZERO };
                 multi_observe_cols.curr_len = F::from_canonical_usize(input_idx);
 
                 for j in chunk_start..CHUNK {
@@ -796,13 +792,10 @@ where
                     cur_timestamp += 2;
                 }
 
+                let permutation_input: [F; 16] =
+                    memory_read_native(state.memory.data(), state_ptr_u32);
                 if chunk_end >= CHUNK {
                     multi_observe_cols.should_permute = F::ONE;
-                    let permutation_input: [F; 16] = tracing_read_native_helper(
-                        state.memory,
-                        state_ptr_u32,
-                        multi_observe_cols.read_sponge_state.as_mut(),
-                    );
                     cols.inner.inputs.clone_from_slice(&permutation_input);
                     let output = self.subchip.permute(permutation_input);
                     tracing_write_native_inplace(
@@ -811,12 +804,10 @@ where
                         std::array::from_fn(|i| output[i]),
                         &mut multi_observe_cols.write_sponge_state,
                     );
-                    cur_timestamp += 2;
+                    cur_timestamp += 1;
                 } else {
                     multi_observe_cols.should_permute = F::ZERO;
-                    let sponge_state: [F; 16] =
-                        memory_read_native(state.memory.data(), state_ptr_u32);
-                    cols.inner.inputs.clone_from_slice(&sponge_state);
+                    cols.inner.inputs.clone_from_slice(&permutation_input);
                 }
             }
         } else {
@@ -1219,11 +1210,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Filler<F, SBOX
                 mem_fill_helper(
                     mem_helper,
                     start_timestamp_u32,
-                    multi_observe_cols.read_sponge_state.as_mut(),
-                );
-                mem_fill_helper(
-                    mem_helper,
-                    start_timestamp_u32 + 1,
                     multi_observe_cols.write_sponge_state.as_mut(),
                 );
             }

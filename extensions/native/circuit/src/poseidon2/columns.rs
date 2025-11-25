@@ -237,7 +237,6 @@ pub struct MultiObserveCols<T> {
 
     // Permutation
     pub should_permute: T,
-    pub read_sponge_state: MemoryReadAuxCols<T>,
     pub write_sponge_state: MemoryWriteAuxCols<T, { CHUNK * 2 }>,
 
     // Final write back and registers
