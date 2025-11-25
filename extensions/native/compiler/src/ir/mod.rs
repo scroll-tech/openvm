@@ -23,6 +23,7 @@ mod types;
 mod utils;
 mod var;
 mod verify_batch;
+mod sumcheck;
 
 pub trait Config: Clone + Default {
     type N: PrimeField;

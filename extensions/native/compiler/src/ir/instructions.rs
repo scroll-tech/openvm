@@ -319,6 +319,35 @@ pub enum DslIr<C: Config> {
     CycleTrackerStart(String),
     /// End the cycle tracker used by a block of code annotated by the string input.
     CycleTrackerEnd(String),
+
+    /// Native operation for calculating a sumcheck layer's evaluation
+    /// This op supports two modes:
+    /// 1. for computing expected evaluation for current layer,
+    ///     output = [
+    ///         \sum_i alpha^i * prod[i][0] * prod[i][1] + 
+    ///         \sum_j alpha^(2j) * (logup_q[i][0] * logup_q[i][1] + 
+    ///         alpha* logup_p[i][0] * logup_q[i][1] + 
+    ///         alpha * logup_p[i][1] * logup_q[i][0]
+    ///     ];
+    /// 
+    /// 2. for computing expected evaluation of next layer,
+    ///     output[1+i] = eq(0,r)*p[i][0] + eq(1,r) * p[i][1].
+    SumcheckLayerEval(
+        Ptr<C::N>,          // Context variables:
+                            // 0. round,
+                            // 1. number of product
+                            // 2. number of logup
+                            // 3. (3D array description) prod_specs_eval inner length
+                            // 4. (3D array description) prod_specs_eval inner_inner length
+                            // 5. (3D array description) logup_spec_eval inner length
+                            // 6. (3D array description) logup_spec_eval inner length                
+                            // 7. Operational mode indicator
+                            // 8+. usize-type variables indicating maximum rounds
+        Ptr<C::N>,          // Challenges: alpha, coeffs
+        Ptr<C::N>,          // prod_specs_eval
+        Ptr<C::N>,          // logup_specs_eval
+        Ptr<C::N>           // output
+    )
 }
 
 impl<C: Config> Default for DslIr<C> {

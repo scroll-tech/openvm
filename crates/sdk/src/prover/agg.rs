@@ -23,11 +23,11 @@ use crate::{
 };
 
 pub struct AggStarkProver<E: StarkFriEngine<SC>> {
-    leaf_prover: VmLocalProver<SC, NativeConfig, E>,
-    leaf_controller: LeafProvingController,
+    pub leaf_prover: VmLocalProver<SC, NativeConfig, E>,
+    pub leaf_controller: LeafProvingController,
 
-    internal_prover: VmLocalProver<SC, NativeConfig, E>,
-    root_prover: RootVerifierLocalProver,
+    pub internal_prover: VmLocalProver<SC, NativeConfig, E>,
+    pub root_prover: RootVerifierLocalProver,
 
     pub num_children_internal: usize,
     pub max_internal_wrapper_layers: usize,
