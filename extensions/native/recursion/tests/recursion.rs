@@ -16,7 +16,8 @@ use openvm_native_compiler::{
     prelude::Usize,
 };
 use openvm_native_recursion::{
-    challenger::duplex::DuplexChallengerVariable, testing_utils::inner::run_recursive_test,
+    challenger::{duplex::DuplexChallengerVariable, CanObserveVariable},
+    testing_utils::inner::run_recursive_test,
 };
 use openvm_stark_backend::{
     config::{Domain, StarkGenericConfig, Val},
@@ -218,7 +219,14 @@ fn build_test_program<C: Config>(builder: &mut Builder<C>) {
     let sample_lens: Vec<usize> = vec![10, 2, 1, 3, 20];
 
     let mut rng = create_seeded_rng();
-    let challenger = DuplexChallengerVariable::new(builder);
+    let mut challenger = DuplexChallengerVariable::new(builder);
+
+    // Observe a setup label
+    let label_f: Vec<u64> = vec![128, 3098, 192, 394, 1662, 928, 374, 281, 598, 182, 475, 729];
+    for n in label_f {
+        let f: Felt<C::F> = builder.constant(C::F::from_canonical_u64(n));
+        challenger.observe(builder, f);
+    }
 
     for l in sample_lens {
         let sample_input: Array<C, Felt<C::F>> = builder.dyn_array(l);

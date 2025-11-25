@@ -781,6 +781,7 @@ where
                         input_ptr_u32 + input_idx as u32,
                         multi_observe_cols.read_data[j].as_mut(),
                     );
+                    multi_observe_cols.aux_read_enabled[j] = F::ONE;
                     tracing_write_native_inplace(
                         state.memory,
                         state_ptr_u32 + j as u32,
