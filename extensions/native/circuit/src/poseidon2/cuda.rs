@@ -53,6 +53,9 @@ impl<const SBOX_REGISTERS: usize> Chip<DenseRecordArena, GpuBackend>
                 chunk_start.push(row_idx as u32);
                 if cols.simple.is_one() {
                     row_idx += 1;
+                } else if cols.multi_observe_row.is_one() {
+                    let num_rows = cols.inner.export.as_canonical_u32() as usize;
+                    row_idx += num_rows;
                 } else {
                     let num_non_inside_row = cols.inner.export.as_canonical_u32() as usize;
                     let non_inside_start = start + (num_non_inside_row - 1) * width;

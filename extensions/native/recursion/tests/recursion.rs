@@ -6,6 +6,8 @@ use openvm_circuit::{
     },
     utils::{air_test_impl, TestStarkEngine},
 };
+#[cfg(feature = "cuda")]
+use openvm_cuda_backend::engine::GpuBabyBearPoseidon2Engine;
 use openvm_native_circuit::{
     execute_program_with_config, test_native_config, NativeBuilder, NativeConfig,
 };
@@ -211,8 +213,22 @@ fn test_multi_observe() {
     config.system.memory_config.max_access_adapter_n = 16;
 
     let vb = NativeBuilder::default();
+    #[cfg(not(feature = "cuda"))]
     air_test_impl::<BabyBearPoseidon2Engine, _>(fri_params, vb, config, program, vec![], 1, true)
         .unwrap();
+    #[cfg(feature = "cuda")]
+    {
+        air_test_impl::<GpuBabyBearPoseidon2Engine, _>(
+            fri_params,
+            vb,
+            config,
+            program,
+            vec![],
+            1,
+            true,
+        )
+        .unwrap();
+    }
 }
 
 fn build_test_program<C: Config>(builder: &mut Builder<C>) {
