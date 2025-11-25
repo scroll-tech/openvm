@@ -340,7 +340,11 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
             AsmInstruction::Halt => write!(f, "halt"),
             AsmInstruction::HintBits(src, len) => write!(f, "hint_bits ({})fp, {}", src, len),
             AsmInstruction::Poseidon2MultiObserve(dst, init_pos, arr, len) => {
-                write!(f, "poseidon2_multi_observe ({})fp, ({})fp ({})fp ({})fp", dst, init_pos, arr, len)
+                write!(
+                    f,
+                    "poseidon2_multi_observe ({})fp, ({})fp ({})fp ({})fp",
+                    dst, init_pos, arr, len
+                )
             }
             AsmInstruction::Poseidon2Permute(dst, lhs) => {
                 write!(f, "poseidon2_permute ({})fp, ({})fp", dst, lhs)

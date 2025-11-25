@@ -467,7 +467,7 @@ fn tester_with_random_poseidon2_ops(num_ops: usize) -> VmChipTester<BabyBearBlak
             PERM_POS2 => {
                 tester.write(e, lhs, data_left);
                 tester.write(e, lhs + CHUNK, data_right);
-            },
+            }
             MULTI_OBSERVE => {}
         }
 

@@ -23,12 +23,13 @@ impl CycleTracker {
     pub fn top(&self) -> Option<&String> {
         match self.stack.last() {
             Some(span) => Some(&span.tag),
-            _ => None
+            _ => None,
         }
     }
 
     /// Starts a new cycle tracker span for the given name.
-    /// If a span already exists for the given name, it ends the existing span and pushes a new one to the vec.
+    /// If a span already exists for the given name, it ends the existing span and pushes a new one
+    /// to the vec.
     pub fn start(&mut self, mut name: String, cycles_count: usize) {
         // hack to remove "CT-" prefix
         if name.starts_with("CT-") {
