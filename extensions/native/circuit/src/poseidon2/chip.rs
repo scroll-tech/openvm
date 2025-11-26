@@ -685,6 +685,7 @@ where
                     pos += len;
                 }
             }
+            final_timestamp_inc += 1; // write back to init_pos_register
 
             let allocated_rows = arena
                 .alloc(MultiRowLayout::new(NativePoseidon2Metadata {
@@ -809,6 +810,15 @@ where
                 } else {
                     multi_observe_cols.should_permute = F::ZERO;
                     cols.inner.inputs.clone_from_slice(&permutation_input);
+                }
+                if i == num_chunks - 1 {
+                    let final_idx = F::from_canonical_usize(chunk_end % CHUNK);
+                    tracing_write_native_inplace(
+                        state.memory,
+                        init_pos_register.as_canonical_u32(),
+                        [final_idx],
+                        &mut multi_observe_cols.write_final_idx,
+                    );
                 }
             }
         } else {
@@ -1212,6 +1222,14 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Filler<F, SBOX
                     mem_helper,
                     start_timestamp_u32,
                     multi_observe_cols.write_sponge_state.as_mut(),
+                );
+                start_timestamp_u32 += 1;
+            }
+            if row_idx == num_rows - 1 {
+                mem_fill_helper(
+                    mem_helper,
+                    start_timestamp_u32,
+                    multi_observe_cols.write_final_idx.as_mut(),
                 );
             }
         }

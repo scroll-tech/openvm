@@ -395,6 +395,14 @@ template <size_t SBOX_REGISTERS> struct Poseidon2Wrapper {
                     start_timestamp,
                     specific.slice_from(COL_INDEX(MultiObserveCols, write_sponge_state.base))
                 );
+                start_timestamp += 1;
+            }
+            if (specific[COL_INDEX(MultiObserveCols, is_last)] == Fp::one()) {
+                mem_fill_base(
+                    mem_helper,
+                    start_timestamp,
+                    specific.slice_from(COL_INDEX(MultiObserveCols, write_final_idx.base))
+                );
             }
         }
     }
