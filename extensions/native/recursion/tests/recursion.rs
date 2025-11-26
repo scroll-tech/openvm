@@ -191,7 +191,6 @@ fn test_multi_observe() {
     compiler.build(builder.operations);
     let asm_code = compiler.code();
 
-    // let program = Program::from_instructions(&instructions);
     let program: Program<_> = convert_program(asm_code, compilation_options);
 
     let poseidon2_max_constraint_degree = 3;
@@ -231,7 +230,7 @@ fn test_multi_observe() {
 }
 
 fn build_test_program<C: Config>(builder: &mut Builder<C>) {
-    let sample_lens: Vec<usize> = vec![10];
+    let sample_lens: Vec<usize> = vec![10, 2, 1, 3, 20, 200, 400];
 
     let mut rng = create_seeded_rng();
 
