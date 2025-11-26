@@ -230,7 +230,7 @@ fn test_multi_observe() {
 }
 
 fn build_test_program<C: Config>(builder: &mut Builder<C>) {
-    let sample_lens: Vec<usize> = vec![10, 2, 1, 3, 20, 200, 400];
+    let sample_lens: Vec<usize> = vec![10, 2, 1, 0, 3, 20, 200, 400];
 
     let mut rng = create_seeded_rng();
 
