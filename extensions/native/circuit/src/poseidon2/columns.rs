@@ -242,5 +242,4 @@ pub struct MultiObserveCols<T> {
 
     // Final write back and registers
     pub write_final_idx: MemoryWriteAuxCols<T, 1>,
-    pub final_idx: T,
 }

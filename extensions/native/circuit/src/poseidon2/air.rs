@@ -728,7 +728,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             should_permute,
             write_sponge_state,
             write_final_idx,
-            final_idx,
             input_register_1,
             input_register_2,
             input_register_3,
@@ -832,6 +831,16 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         for i in 0..CHUNK {
             builder
                 .when(multi_observe_row)
+                .assert_bool(aux_after_start[i]);
+            builder
+                .when(multi_observe_row)
+                .assert_bool(aux_before_end[i]);
+            builder
+                .when(multi_observe_row)
+                .when(is_first)
+                .assert_zero(aux_read_enabled[i]);
+            builder
+                .when(multi_observe_row)
                 .assert_eq(aux_after_start[i] * aux_before_end[i], aux_read_enabled[i]);
         }
 
@@ -889,19 +898,22 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     .assert_eq(*a, *b);
             });
 
-        /*
+        builder
+            .when(multi_observe_row)
+            .when(aux_read_enabled[CHUNK - 1])
+            .assert_one(should_permute);
+
+        // final_idx = aux_read_enabled[CHUNK-1] * 0 + (1 - aux_read_enabled[CHUNK-1]) * end_idx
+        let final_idx = aux_read_enabled[CHUNK - 1] * AB::Expr::ZERO
+            + (AB::Expr::ONE - aux_read_enabled[CHUNK - 1]) * end_idx;
         self.memory_bridge
             .write(
-                MemoryAddress::new(
-                    self.address_space,
-                    input_register_1,
-                ),
+                MemoryAddress::new(self.address_space, input_register_1),
                 [final_idx],
-                start_timestamp + is_first * AB::F::from_canonical_usize(4) + (end_idx - start_idx) * AB::F::TWO + should_permute * AB::F::TWO,
-                &write_final_idx
+                start_timestamp + (end_idx - start_idx) * AB::F::TWO + should_permute,
+                &write_final_idx,
             )
             .eval(builder, multi_observe_row * is_last);
-        */
 
         // Field transitions
         builder

@@ -331,8 +331,9 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> MeteredExecutor<F>
 {
     #[inline(always)]
     fn metered_pre_compute_size(&self) -> usize {
-        std::cmp::max(
+        max3(
             size_of::<E2PreCompute<Pos2PreCompute<F, SBOX_REGISTERS>>>(),
+            size_of::<E2PreCompute<MultiObservePreCompute<F, SBOX_REGISTERS>>>(),
             size_of::<E2PreCompute<VerifyBatchPreCompute<F, SBOX_REGISTERS>>>(),
         )
     }
