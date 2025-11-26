@@ -614,6 +614,7 @@ unsafe fn execute_multi_observe_e12_impl<
             pos += len;
         }
     }
+    let final_idx = observation_chunks.last().map(|(_, end)| *end % CHUNK);
 
     height += 1;
     let mut input_idx = 0;
@@ -631,6 +632,13 @@ unsafe fn execute_multi_observe_e12_impl<
         }
 
         height += 1;
+    }
+    if let Some(final_idx) = final_idx {
+        exec_state.vm_write::<F, 1>(
+            NATIVE_AS,
+            pre_compute.init_pos_register,
+            &[F::from_canonical_usize(final_idx)],
+        );
     }
     *pc = pc.wrapping_add(DEFAULT_PC_STEP);
     *instret += 1;

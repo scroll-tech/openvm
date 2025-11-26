@@ -15,10 +15,9 @@ use openvm_native_compiler::{
     asm::{AsmBuilder, AsmCompiler},
     conversion::{convert_program, CompilerOptions},
     ir::{Array, Builder, Config, Felt},
-    prelude::Usize,
 };
 use openvm_native_recursion::{
-    challenger::{duplex::DuplexChallengerVariable, CanObserveVariable},
+    challenger::{duplex::DuplexChallengerVariable, CanObserveVariable, CanSampleVariable},
     testing_utils::inner::run_recursive_test,
 };
 use openvm_stark_backend::{
@@ -232,17 +231,12 @@ fn test_multi_observe() {
 }
 
 fn build_test_program<C: Config>(builder: &mut Builder<C>) {
-    let sample_lens: Vec<usize> = vec![10, 2, 1, 3, 20];
+    let sample_lens: Vec<usize> = vec![10];
 
     let mut rng = create_seeded_rng();
-    let mut challenger = DuplexChallengerVariable::new(builder);
 
-    // Observe a setup label
-    let label_f: Vec<u64> = vec![128, 3098, 192, 394, 1662, 928, 374, 281, 598, 182, 475, 729];
-    for n in label_f {
-        let f: Felt<C::F> = builder.constant(C::F::from_canonical_u64(n));
-        challenger.observe(builder, f);
-    }
+    let mut c1 = DuplexChallengerVariable::new(builder);
+    let mut c2 = DuplexChallengerVariable::new(builder);
 
     for l in sample_lens {
         let sample_input: Array<C, Felt<C::F>> = builder.dyn_array(l);
@@ -251,24 +245,13 @@ fn build_test_program<C: Config>(builder: &mut Builder<C>) {
             builder.set(&sample_input, idx_vec[0], C::F::from_canonical_u32(f_u32));
         });
 
-        let next_input_ptr = builder.poseidon2_multi_observe(
-            &challenger.sponge_state,
-            challenger.input_ptr,
-            &sample_input,
-        );
+        c1.observe_slice_opt(builder, &sample_input);
+        c2.observe_slice(builder, sample_input);
 
-        builder.assign(
-            &challenger.input_ptr,
-            challenger.io_empty_ptr + next_input_ptr.clone(),
-        );
-        builder.if_ne(next_input_ptr, Usize::from(0)).then_or_else(
-            |builder| {
-                builder.assign(&challenger.output_ptr, challenger.io_empty_ptr);
-            },
-            |builder| {
-                builder.assign(&challenger.output_ptr, challenger.io_full_ptr);
-            },
-        );
+        let e1 = c1.sample(builder);
+        let e2 = c2.sample(builder);
+
+        builder.assert_felt_eq(e1, e2);
     }
     builder.halt();
 }

@@ -77,6 +77,22 @@ impl<C: Config> DuplexChallengerVariable<C> {
         }
     }
 
+    // Observes multiple elements from an array.
+    // This is equivalent to calling `observe` multiple times, but more efficient.
+    pub fn observe_slice_opt(&self, builder: &mut Builder<C>, arr: &Array<C, Felt<C::F>>) {
+        let next_pos = builder.poseidon2_multi_observe(&self.sponge_state, self.input_ptr, &arr);
+
+        builder.assign(&self.input_ptr, self.io_empty_ptr + next_pos.clone());
+        builder.if_ne(next_pos, Usize::from(0)).then_or_else(
+            |builder| {
+                builder.assign(&self.output_ptr, self.io_empty_ptr);
+            },
+            |builder| {
+                builder.assign(&self.output_ptr, self.io_full_ptr);
+            },
+        );
+    }
+
     fn sample(&self, builder: &mut Builder<C>) -> Felt<C::F> {
         builder
             .if_ne(self.input_ptr.address, self.io_empty_ptr.address)

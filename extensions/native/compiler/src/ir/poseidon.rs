@@ -42,6 +42,7 @@ impl<C: Config> Builder<C> {
                         len.clone(),
                     ));
 
+                    // automatically updated by Poseidon2MultiObserve operation
                     Usize::Var(init_pos)
                 }
             },
