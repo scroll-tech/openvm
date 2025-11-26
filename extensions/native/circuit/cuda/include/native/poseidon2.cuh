@@ -87,7 +87,6 @@ template <typename T> struct MultiObserveCols {
     T should_permute;
     MemoryWriteAuxCols<T, CHUNK * 2> write_sponge_state;
     MemoryWriteAuxCols<T, 1> write_final_idx;
-    T final_idx;
 };
 
 template <typename T> constexpr T constexpr_max(T a, T b) { return a > b ? a : b; }
