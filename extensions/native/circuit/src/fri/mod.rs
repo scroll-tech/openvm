@@ -542,7 +542,7 @@ fn assert_array_eq<AB: AirBuilder, I1: Into<AB::Expr>, I2: Into<AB::Expr>, const
     }
 }
 
-fn elem_to_ext<F: Field>(elem: F) -> [F; EXT_DEG] {
+pub fn elem_to_ext<F: Field>(elem: F) -> [F; EXT_DEG] {
     let mut ret = [F::ZERO; EXT_DEG];
     ret[0] = elem;
     ret

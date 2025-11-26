@@ -42,6 +42,7 @@ mod fri;
 mod jal_rangecheck;
 mod loadstore;
 mod poseidon2;
+mod sumcheck;
 
 mod extension;
 pub use extension::*;
