@@ -107,6 +107,8 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             specific,
         } = local;
 
+        let [round, num_prod_spec, num_logup_spec, _prod_spec_inner_len, prod_spec_inner_inner_len, _logup_spec_inner_len, logup_spec_inner_inner_len, in_round] =
+            ctx;
         builder.assert_bool(header_row);
         builder.assert_bool(prod_row);
         builder.assert_bool(logup_row);
@@ -119,7 +121,6 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         builder.assert_bool(logup_in_round_evaluation);
         let enabled = header_row + prod_row + logup_row;
         builder.assert_bool(enabled.clone());
-        let in_round = ctx[7];
         let continuation = header_continuation + prod_continuation + logup_continuation;
         builder.assert_bool(continuation.clone());
 
@@ -169,19 +170,19 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         builder
             .when(header_row)
             .when(next.logup_row)
-            .assert_zero(ctx[1]);
+            .assert_zero(num_prod_spec);
         builder
             .when(prod_row)
             .when(next.logup_row)
-            .assert_eq(ctx[1], curr_prod_n);
+            .assert_eq(num_prod_spec, curr_prod_n);
         builder
             .when(prod_row)
             .when(not(prod_continuation))
-            .assert_eq(ctx[1], curr_prod_n);
+            .assert_eq(num_prod_spec, curr_prod_n);
         builder
             .when(logup_row)
             .when(not(logup_continuation))
-            .assert_eq(ctx[2], curr_logup_n);
+            .assert_eq(num_logup_spec, curr_logup_n);
 
         // Timestamp transition
         builder
@@ -324,7 +325,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
 
         builder.when(prod_row_within_max_round).assert_eq(
             prod_row_specific.data_ptr,
-            (prod_nested_len * (curr_prod_n - AB::F::ONE) + ctx[4] * ctx[0])
+            (prod_nested_len * (curr_prod_n - AB::F::ONE) + prod_spec_inner_inner_len * round)
                 * AB::F::from_canonical_usize(EXT_DEG),
         );
         builder.assert_eq(
@@ -408,7 +409,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                     native_as,
                     register_ptrs[0]
                         + AB::F::from_canonical_usize(EXT_DEG * 2)
-                        + ctx[1]
+                        + num_prod_spec
                         + (curr_logup_n - AB::F::ONE),
                 ), // curr_logup_n starts at 1.
                 [max_round],
@@ -419,7 +420,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
 
         builder.when(logup_row_within_max_round).assert_eq(
             logup_row_specific.data_ptr,
-            (logup_nested_len * (curr_logup_n - AB::F::ONE) + ctx[6] * ctx[0])
+            (logup_nested_len * (curr_logup_n - AB::F::ONE) + logup_spec_inner_inner_len * round)
                 * AB::F::from_canonical_usize(EXT_DEG),
         );
         builder.assert_eq(
@@ -457,7 +458,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                 MemoryAddress::new(
                     native_as,
                     register_ptrs[4]
-                        + (ctx[1] + curr_logup_n) * AB::F::from_canonical_usize(EXT_DEG),
+                        + (num_prod_spec + curr_logup_n) * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 logup_row_specific.p_evals,
                 start_timestamp + AB::F::TWO,
@@ -470,7 +471,8 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                 MemoryAddress::new(
                     native_as,
                     register_ptrs[4]
-                        + (ctx[1] + ctx[2] + curr_logup_n) * AB::F::from_canonical_usize(EXT_DEG),
+                        + (num_prod_spec + num_logup_spec + curr_logup_n)
+                            * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 logup_row_specific.q_evals,
                 start_timestamp + AB::F::from_canonical_usize(3),
