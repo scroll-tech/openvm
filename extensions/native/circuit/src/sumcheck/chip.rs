@@ -1,36 +1,27 @@
-use std::borrow::{Borrow, BorrowMut};
+use std::borrow::BorrowMut;
 
-use itertools::Itertools;
 use openvm_circuit::{
     arch::{
-        CustomBorrow, ExecutionError, ExecutionState, MultiRowLayout, MultiRowMetadata,
-        PreflightExecutor, RecordArena, Streams, TraceFiller, VmChipWrapper, VmStateMut,
+        CustomBorrow, ExecutionError, MultiRowLayout, MultiRowMetadata, PreflightExecutor,
+        RecordArena, TraceFiller, VmChipWrapper, VmStateMut,
     },
     system::{
-        memory::{online::TracingMemory, MemoryAuxColsFactory, MemoryController},
-        native_adapter::util::{
-            memory_read_native, tracing_read_native, tracing_write_native_inplace,
-        },
+        memory::{online::TracingMemory, MemoryAuxColsFactory},
+        native_adapter::util::{memory_read_native, tracing_write_native_inplace},
     },
 };
 use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode};
-use openvm_native_compiler::{conversion::AS, SumcheckOpcode::SUMCHECK_LAYER_EVAL};
-use openvm_stark_backend::{
-    p3_field::{Field, PrimeField, PrimeField32},
-    p3_matrix::{dense::RowMajorMatrix, Matrix},
-    p3_maybe_rayon::prelude::{IntoParallelIterator, ParallelIterator, ParallelSlice},
-};
+use openvm_native_compiler::SumcheckOpcode::SUMCHECK_LAYER_EVAL;
+use openvm_stark_backend::p3_field::PrimeField32;
 
 use crate::{
     field_extension::{FieldExtension, EXT_DEG},
     fri::elem_to_ext,
     mem_fill_helper,
-    sumcheck::{
-        air::NativeSumcheckAir,
-        columns::{HeaderSpecificCols, LogupSpecificCols, NativeSumcheckCols, ProdSpecificCols},
+    sumcheck::columns::{
+        HeaderSpecificCols, LogupSpecificCols, NativeSumcheckCols, ProdSpecificCols,
     },
     tracing_read_native_helper,
-    utils::const_max,
 };
 
 const CONTEXT_ARR_BASE_LEN: usize = EXT_DEG * 2;
