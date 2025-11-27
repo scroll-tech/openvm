@@ -215,7 +215,7 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
     let c1: [F; EXT_DEG] = challenges[EXT_DEG..EXT_DEG * 2].try_into().unwrap();
     let c2: [F; EXT_DEG] = challenges[EXT_DEG * 2..EXT_DEG * 3].try_into().unwrap();
 
-    let mut height = 0;
+    let mut height = 1;
     let mut alpha_acc = elem_to_ext(F::ONE);
     let mut eval_acc = elem_to_ext(F::ZERO);
 
@@ -265,8 +265,8 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
             .vm_read(NATIVE_AS, ctx_ptr_u32 + 8 + num_prod_spec + i)
             .map(|x: F| x.as_canonical_u32());
         let start = calculate_3d_ext_idx(
-            prod_specs_inner_inner_len,
-            prod_specs_inner_len,
+            logup_specs_inner_len,
+            logup_specs_inner_inner_len,
             i,
             round,
             0,
@@ -329,6 +329,9 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
         alpha_acc = FieldExtension::multiply(alpha_acc, FieldExtension::multiply(alpha, alpha));
         height += 1;
     }
+
+    *pc += DEFAULT_PC_STEP;
+    *instret += 1;
 
     exec_state.vm_write(NATIVE_AS, r_evals_ptr_u32, &eval_acc);
     // return height delta

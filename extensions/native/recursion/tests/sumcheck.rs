@@ -30,7 +30,6 @@ use openvm_stark_sdk::{
     },
     engine::StarkFriEngine,
     p3_baby_bear::BabyBear,
-    utils::{create_seeded_rng, ProofInputForTest},
 };
 
 pub type F = BabyBear;
@@ -42,15 +41,11 @@ fn test_sumcheck_layer_eval() {
 
     build_test_program(&mut builder);
 
-    // Fill in test program logic
-    builder.halt();
-
     let compilation_options = CompilerOptions::default().with_cycle_tracker();
     let mut compiler = AsmCompiler::new(compilation_options.word_size);
     compiler.build(builder.operations);
     let asm_code = compiler.code();
 
-    // let program = Program::from_instructions(&instructions);
     let program: Program<_> = convert_program(asm_code, compilation_options);
     let sumcheck_max_constraint_degree = 3;
     let fri_params = if matches!(std::env::var("OPENVM_FAST_TEST"), Ok(x) if &x == "1") {
@@ -1268,4 +1263,6 @@ fn build_test_program<C: Config>(builder: &mut Builder<C>) {
         &logup_spec_evals,
         &next_layer_evals,
     );
+
+    builder.halt();
 }

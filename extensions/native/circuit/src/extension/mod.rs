@@ -179,7 +179,7 @@ impl<F: PrimeField32> VmExecutionExtension<F> for Native {
         inventory.add_executor(
             tower_verify,
             [SumcheckOpcode::SUMCHECK_LAYER_EVAL.global_opcode()],
-        );
+        )?;
 
         inventory.add_phantom_sub_executor(
             NativeHintInputSubEx,
