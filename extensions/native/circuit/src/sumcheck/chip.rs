@@ -419,34 +419,6 @@ where
 }
 
 impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
-    /*
-    fn fill_trace(
-        &self,
-        mem_helper: &MemoryAuxColsFactory<F>,
-        trace: &mut RowMajorMatrix<F>,
-        rows_used: usize,
-    ) where
-        F: Send + Sync + Clone,
-    {
-        // Split the trace rows by instruction
-        let width = trace.width();
-        let mut row_idx = 0;
-        let mut row_slice = trace.values.as_mut_slice();
-        let mut chunk_start = Vec::new();
-        while row_idx < rows_used {
-            let cols: &NativeSumcheckCols<F> = row_slice[..width].borrow();
-            let num_rows = cols.num_rows.as_canonical_u32() as usize;
-            row_idx += num_rows;
-            let (curr, rest) = row_slice.split_at_mut(num_rows * width);
-            chunk_start.push(curr);
-            row_slice = rest;
-        }
-        chunk_start.into_par_iter().for_each(|chunk_slice| {
-            self.fill_trace_row(mem_helper, chunk_slice);
-        });
-    }
-     */
-
     fn fill_trace_row(&self, mem_helper: &MemoryAuxColsFactory<F>, row_slice: &mut [F]) {
         let cols: &mut NativeSumcheckCols<F> = row_slice.borrow_mut();
         let start_timestamp = cols.start_timestamp.as_canonical_u32();
