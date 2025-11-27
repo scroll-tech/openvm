@@ -5,32 +5,32 @@ use std::{
 
 use openvm_circuit::{arch::*, system::memory::online::GuestMemory};
 use openvm_circuit_primitives::AlignedBytesBorrow;
-use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP};
-use openvm_native_compiler::conversion::AS;
+use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP, NATIVE_AS};
 use openvm_stark_backend::p3_field::PrimeField32;
 
-use super::{elem_to_ext, FriReducedOpeningExecutor};
-use crate::field_extension::{FieldExtension, EXT_DEG};
+use crate::{
+    field_extension::{FieldExtension, EXT_DEG},
+    fri::elem_to_ext,
+    sumcheck::chip::{calculate_3d_ext_idx, NativeSumcheckExecutor},
+};
 
 #[derive(AlignedBytesBorrow, Clone)]
 #[repr(C)]
 struct NativeSumcheckPreCompute {
-    a_ptr_ptr: u32,
-    b_ptr_ptr: u32,
-    length_ptr: u32,
-    alpha_ptr: u32,
-    result_ptr: u32,
-    hint_id_ptr: u32,
-    is_init_ptr: u32,
+    r_evals_reg: u32,
+    ctx_reg: u32,
+    challenges_reg: u32,
+    prod_evals_reg: u32,
+    logup_evals_reg: u32,
 }
 
-impl NativeSumcheckPreCompute {
+impl NativeSumcheckExecutor {
     #[inline(always)]
     fn pre_compute_impl<F: PrimeField32>(
         &self,
-        _pc: u32,
+        pc: u32,
         inst: &Instruction<F>,
-        data: &mut FriReducedOpeningPreCompute,
+        data: &mut NativeSumcheckPreCompute,
     ) -> Result<(), StaticProgramError> {
         let &Instruction {
             a,
@@ -43,22 +43,25 @@ impl NativeSumcheckPreCompute {
             ..
         } = inst;
 
-        let a_ptr_ptr = a.as_canonical_u32();
-        let b_ptr_ptr = b.as_canonical_u32();
-        let length_ptr = c.as_canonical_u32();
-        let alpha_ptr = d.as_canonical_u32();
-        let result_ptr = e.as_canonical_u32();
-        let hint_id_ptr = f.as_canonical_u32();
-        let is_init_ptr = g.as_canonical_u32();
+        let r_evals_reg = a.as_canonical_u32();
+        let ctx_reg = b.as_canonical_u32();
+        let challenges_reg = c.as_canonical_u32();
+        let prod_evals_reg = f.as_canonical_u32();
+        let logup_evals_reg = g.as_canonical_u32();
 
-        *data = FriReducedOpeningPreCompute {
-            a_ptr_ptr,
-            b_ptr_ptr,
-            length_ptr,
-            alpha_ptr,
-            result_ptr,
-            hint_id_ptr,
-            is_init_ptr,
+        if d.as_canonical_u32() != NATIVE_AS {
+            return Err(StaticProgramError::InvalidInstruction(pc));
+        }
+        if e.as_canonical_u32() != NATIVE_AS {
+            return Err(StaticProgramError::InvalidInstruction(pc));
+        }
+
+        *data = NativeSumcheckPreCompute {
+            r_evals_reg,
+            ctx_reg,
+            challenges_reg,
+            prod_evals_reg,
+            logup_evals_reg,
         };
 
         Ok(())
@@ -190,5 +193,144 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
     pc: &mut u32,
     exec_state: &mut VmExecState<F, GuestMemory, CTX>,
 ) -> u32 {
-    todo!()
+    let [r_evals_ptr]: [F; 1] = exec_state.vm_read(NATIVE_AS, pre_compute.r_evals_reg);
+    let [ctx_ptr]: [F; 1] = exec_state.vm_read(NATIVE_AS, pre_compute.ctx_reg);
+    let [challenges_ptr]: [F; 1] = exec_state.vm_read(NATIVE_AS, pre_compute.challenges_reg);
+    let [prod_evals_ptr]: [F; 1] = exec_state.vm_read(NATIVE_AS, pre_compute.prod_evals_reg);
+    let [logup_evals_ptr]: [F; 1] = exec_state.vm_read(NATIVE_AS, pre_compute.logup_evals_reg);
+
+    let r_evals_ptr_u32 = r_evals_ptr.as_canonical_u32();
+    let ctx_ptr_u32 = ctx_ptr.as_canonical_u32();
+    let logup_evals_ptr = logup_evals_ptr.as_canonical_u32();
+    let prod_evals_ptr = prod_evals_ptr.as_canonical_u32();
+
+    let ctx: [u32; 8] = exec_state
+        .vm_read(NATIVE_AS, ctx_ptr_u32)
+        .map(|x: F| x.as_canonical_u32());
+    let [round, num_prod_spec, num_logup_spec, prod_specs_inner_len, prod_specs_inner_inner_len, logup_specs_inner_len, logup_specs_inner_inner_len, mode] =
+        ctx;
+    let challenges: [F; EXT_DEG * 3] =
+        exec_state.vm_read(NATIVE_AS, challenges_ptr.as_canonical_u32());
+    let alpha: [F; EXT_DEG] = challenges[0..EXT_DEG].try_into().unwrap();
+    let c1: [F; EXT_DEG] = challenges[EXT_DEG..EXT_DEG * 2].try_into().unwrap();
+    let c2: [F; EXT_DEG] = challenges[EXT_DEG * 2..EXT_DEG * 3].try_into().unwrap();
+
+    let mut height = 0;
+    let mut alpha_acc = elem_to_ext(F::ONE);
+    let mut eval_acc = elem_to_ext(F::ZERO);
+
+    for i in 0..num_prod_spec {
+        let [max_round]: [u32; 1] = exec_state
+            .vm_read(NATIVE_AS, ctx_ptr_u32 + 8)
+            .map(|x: F| x.as_canonical_u32());
+
+        let start = calculate_3d_ext_idx(
+            prod_specs_inner_inner_len,
+            prod_specs_inner_len,
+            i,
+            round,
+            0,
+        );
+
+        if round < max_round - 1 {
+            let ps: [F; EXT_DEG * 2] = exec_state.vm_read(NATIVE_AS, prod_evals_ptr + start);
+            let p1: [F; EXT_DEG] = ps[0..EXT_DEG].try_into().unwrap();
+            let p2: [F; EXT_DEG] = ps[EXT_DEG..EXT_DEG * 2].try_into().unwrap();
+
+            let eval = match mode {
+                1 => FieldExtension::multiply(p1, p2),
+                0 => FieldExtension::add(
+                    FieldExtension::multiply(p1, c1),
+                    FieldExtension::multiply(p2, c2),
+                ),
+                _ => unreachable!("mode can only be 0 or 1"),
+            };
+
+            exec_state.vm_write(NATIVE_AS, r_evals_ptr_u32 + 1 + i, &eval);
+
+            if round + mode < max_round - 1 {
+                // update eval_acc
+                eval_acc = FieldExtension::add(eval_acc, FieldExtension::multiply(alpha_acc, eval));
+            }
+        }
+
+        // update alpha_acc
+        alpha_acc = FieldExtension::multiply(alpha_acc, alpha);
+        height += 1;
+    }
+
+    for i in 0..num_logup_spec {
+        // read max_round
+        let [max_round]: [u32; 1] = exec_state
+            .vm_read(NATIVE_AS, ctx_ptr_u32 + 8 + num_prod_spec + i)
+            .map(|x: F| x.as_canonical_u32());
+        let start = calculate_3d_ext_idx(
+            prod_specs_inner_inner_len,
+            prod_specs_inner_len,
+            i,
+            round,
+            0,
+        );
+
+        if round < max_round - 1 {
+            // read logup_evals
+            let pqs: [F; EXT_DEG * 4] = exec_state.vm_read(NATIVE_AS, logup_evals_ptr + start);
+            let p1: [F; EXT_DEG] = pqs[0..EXT_DEG].try_into().unwrap();
+            let p2: [F; EXT_DEG] = pqs[EXT_DEG..EXT_DEG * 2].try_into().unwrap();
+            let q1: [F; EXT_DEG] = pqs[EXT_DEG * 2..EXT_DEG * 3].try_into().unwrap();
+            let q2: [F; EXT_DEG] = pqs[EXT_DEG * 3..EXT_DEG * 4].try_into().unwrap();
+
+            // compute p_eval and q_eval
+            let p_eval = match mode {
+                1 => FieldExtension::add(
+                    FieldExtension::multiply(p1, q2),
+                    FieldExtension::multiply(p2, q1),
+                ),
+                0 => FieldExtension::add(
+                    FieldExtension::multiply(p1, c1),
+                    FieldExtension::multiply(p2, c2),
+                ),
+                _ => unreachable!("mode can only be 0 or 1"),
+            };
+            let q_eval = match mode {
+                1 => FieldExtension::multiply(q1, q2),
+                0 => FieldExtension::add(
+                    FieldExtension::multiply(q1, c1),
+                    FieldExtension::multiply(q2, c2),
+                ),
+                _ => unreachable!("mode can only be 0 or 1"),
+            };
+
+            // write eval to r_evals
+            exec_state.vm_write(
+                NATIVE_AS,
+                r_evals_ptr_u32 + (1 + num_prod_spec + i) * EXT_DEG as u32,
+                &p_eval,
+            );
+            exec_state.vm_write(
+                NATIVE_AS,
+                r_evals_ptr_u32 + (1 + num_prod_spec + num_logup_spec + i) * EXT_DEG as u32,
+                &q_eval,
+            );
+
+            let alpha_denominator = FieldExtension::multiply(alpha_acc, alpha);
+            let alpha_numerator = alpha_acc;
+
+            if round + mode < max_round - 1 {
+                // update eval_acc
+                eval_acc = FieldExtension::add(
+                    FieldExtension::multiply(alpha_numerator, p_eval),
+                    FieldExtension::multiply(alpha_denominator, q_eval),
+                );
+            }
+        }
+
+        // update alpha_acc
+        alpha_acc = FieldExtension::multiply(alpha_acc, FieldExtension::multiply(alpha, alpha));
+        height += 1;
+    }
+
+    exec_state.vm_write(NATIVE_AS, r_evals_ptr_u32, &eval_acc);
+    // return height delta
+    height
 }

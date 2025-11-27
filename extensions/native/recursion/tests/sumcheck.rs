@@ -3,7 +3,9 @@ use openvm_circuit::arch::{
     instructions::program::Program, verify_single, SystemConfig, VirtualMachine, VmConfig,
     VmExecutor,
 };
-use openvm_native_circuit::{Native, NativeConfig, EXT_DEG};
+#[cfg(not(feature = "cuda"))]
+use openvm_circuit::utils::air_test_impl;
+use openvm_native_circuit::{NativeBuilder, NativeConfig, EXT_DEG};
 use openvm_native_compiler::{
     asm::{AsmBuilder, AsmCompiler},
     conversion::{convert_program, CompilerOptions},
@@ -30,9 +32,9 @@ use openvm_stark_sdk::{
     p3_baby_bear::BabyBear,
     utils::{create_seeded_rng, ProofInputForTest},
 };
-use rand::Rng;
+
 pub type F = BabyBear;
-pub type E = BinomialExtensionField<F, 4>;
+pub type E = BinomialExtensionField<F, EXT_DEG>;
 
 #[test]
 fn test_sumcheck_layer_eval() {
@@ -67,14 +69,22 @@ fn test_sumcheck_layer_eval() {
     let mut config = NativeConfig::aggregation(0, sumcheck_max_constraint_degree);
     config.system.memory_config.max_access_adapter_n = 16;
 
-    let vm = VirtualMachine::new(engine, config);
-
-    let pk = vm.keygen();
-    let result = vm.execute_and_generate(program, vec![]).unwrap();
-    let proofs = vm.prove(&pk, result);
-
-    for proof in proofs {
-        verify_single(&vm.engine, &pk.get_vk(), &proof).expect("Verification failed");
+    let vb = NativeBuilder::default();
+    #[cfg(not(feature = "cuda"))]
+    air_test_impl::<BabyBearPoseidon2Engine, _>(fri_params, vb, config, program, vec![], 1, true)
+        .unwrap();
+    #[cfg(feature = "cuda")]
+    {
+        air_test_impl::<GpuBabyBearPoseidon2Engine, _>(
+            fri_params,
+            vb,
+            config,
+            program,
+            vec![],
+            1,
+            true,
+        )
+        .unwrap();
     }
 }
 

@@ -17,7 +17,8 @@ use openvm_instructions::{program::DEFAULT_PC_STEP, LocalOpcode, PhantomDiscrimi
 use openvm_native_compiler::{
     CastfOpcode, FieldArithmeticOpcode, FieldExtensionOpcode, FriOpcode, NativeBranchEqualOpcode,
     NativeJalOpcode, NativeLoadStore4Opcode, NativeLoadStoreOpcode, NativePhantom,
-    NativeRangeCheckOpcode, Poseidon2Opcode, VerifyBatchOpcode, BLOCK_LOAD_STORE_SIZE,
+    NativeRangeCheckOpcode, Poseidon2Opcode, SumcheckOpcode, VerifyBatchOpcode,
+    BLOCK_LOAD_STORE_SIZE,
 };
 use openvm_poseidon2_air::Poseidon2Config;
 use openvm_rv32im_circuit::BranchEqualCoreAir;
@@ -61,6 +62,10 @@ use crate::{
         chip::{NativePoseidon2Executor, NativePoseidon2Filler},
         NativePoseidon2Chip,
     },
+    sumcheck::{
+        air::NativeSumcheckAir,
+        chip::{NativeSumcheckChip, NativeSumcheckExecutor, NativeSumcheckFiller},
+    },
 };
 
 cfg_if::cfg_if! {
@@ -94,6 +99,7 @@ pub enum NativeExecutor<F: Field> {
     FieldExtension(FieldExtensionExecutor),
     FriReducedOpening(FriReducedOpeningExecutor),
     VerifyBatch(NativePoseidon2Executor<F, 1>),
+    TowerVerify(NativeSumcheckExecutor),
 }
 
 impl<F: PrimeField32> VmExecutionExtension<F> for Native {
@@ -168,6 +174,12 @@ impl<F: PrimeField32> VmExecutionExtension<F> for Native {
                 Poseidon2Opcode::MULTI_OBSERVE.global_opcode(),
             ],
         )?;
+
+        let tower_verify = NativeSumcheckExecutor::new();
+        inventory.add_executor(
+            tower_verify,
+            [SumcheckOpcode::SUMCHECK_LAYER_EVAL.global_opcode()],
+        );
 
         inventory.add_phantom_sub_executor(
             NativeHintInputSubEx,
@@ -262,6 +274,9 @@ where
         );
         inventory.add_air(verify_batch);
 
+        let tower_evaluate = NativeSumcheckAir::new(exec_bridge, memory_bridge);
+        inventory.add_air(tower_evaluate);
+
         Ok(())
     }
 }
@@ -341,6 +356,9 @@ where
             mem_helper.clone(),
         );
         inventory.add_executor_chip(poseidon2);
+
+        let tower_verify = NativeSumcheckChip::new(NativeSumcheckFiller::new(), mem_helper.clone());
+        inventory.add_executor_chip(tower_verify);
 
         Ok(())
     }

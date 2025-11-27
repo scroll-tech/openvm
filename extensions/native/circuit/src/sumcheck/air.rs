@@ -5,7 +5,7 @@ use openvm_circuit::{
     system::memory::{offline_checker::MemoryBridge, MemoryAddress},
 };
 use openvm_circuit_primitives::utils::{assert_array_eq, not};
-use openvm_instructions::LocalOpcode;
+use openvm_instructions::{LocalOpcode, NATIVE_AS};
 use openvm_native_compiler::SumcheckOpcode::SUMCHECK_LAYER_EVAL;
 use openvm_stark_backend::{
     air_builders::sub::SubAirBuilder,
@@ -17,36 +17,45 @@ use openvm_stark_backend::{
 };
 
 use crate::{
+    field_extension::{FieldExtension, EXT_DEG},
     sumcheck::columns::{
         HeaderSpecificCols, LogupSpecificCols, NativeSumcheckCols, ProdSpecificCols,
     },
-    FieldExtension, EXT_DEG,
 };
 
 #[derive(Clone, Debug)]
-pub struct NativeSumcheckAir<F: Field> {
+pub struct NativeSumcheckAir {
     pub execution_bridge: ExecutionBridge,
     pub memory_bridge: MemoryBridge,
-    pub address_space: F,
 }
 
-impl<F: Field> BaseAir<F> for NativeSumcheckAir<F> {
+impl NativeSumcheckAir {
+    pub fn new(execution_bridge: ExecutionBridge, memory_bridge: MemoryBridge) -> Self {
+        Self {
+            execution_bridge,
+            memory_bridge,
+        }
+    }
+}
+
+impl<F: Field> BaseAir<F> for NativeSumcheckAir {
     fn width(&self) -> usize {
         NativeSumcheckCols::<F>::width()
     }
 }
 
-impl<F: Field> BaseAirWithPublicValues<F> for NativeSumcheckAir<F> {}
+impl<F: Field> BaseAirWithPublicValues<F> for NativeSumcheckAir {}
 
-impl<F: Field> PartitionedBaseAir<F> for NativeSumcheckAir<F> {}
+impl<F: Field> PartitionedBaseAir<F> for NativeSumcheckAir {}
 
-impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
+impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
         let local = main.row_slice(0);
         let local: &NativeSumcheckCols<AB::Var> = (*local).borrow();
         let next = main.row_slice(1);
         let next: &NativeSumcheckCols<AB::Var> = (*next).borrow();
+        let native_as = AB::F::from_canonical_u32(NATIVE_AS);
 
         let &NativeSumcheckCols {
             // Row indicators
@@ -211,19 +220,19 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
             [AB::F::ONE, AB::F::ZERO, AB::F::ZERO, AB::F::ZERO],
         );
         let alpha_denominator = FieldExtension::multiply(alpha1, alpha);
-        assert_array_eq::<_, _, _, EXT_DEG>(
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
             &mut builder.when(logup_row),
             alpha_denominator,
             alpha2,
         );
         let prod_next_alpha = FieldExtension::multiply(alpha1, alpha);
-        assert_array_eq::<_, _, _, EXT_DEG>(
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
             &mut builder.when(prod_continuation),
             prod_next_alpha,
             next_alpha1,
         );
         let logup_next_alpha = FieldExtension::multiply(alpha2, alpha);
-        assert_array_eq::<_, _, _, EXT_DEG>(
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
             &mut builder.when(logup_continuation),
             logup_next_alpha,
             next_alpha1,
@@ -241,8 +250,8 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
                     registers[4].into(),
                     registers[0].into(),
                     registers[1].into(),
-                    self.address_space.into(),
-                    self.address_space.into(),
+                    native_as.into(),
+                    native_as.into(),
                     registers[2].into(),
                     registers[3].into(),
                 ],
@@ -255,7 +264,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
         for i in 0..5usize {
             self.memory_bridge
                 .read(
-                    MemoryAddress::new(self.address_space, registers[i]),
+                    MemoryAddress::new(native_as, registers[i]),
                     [register_ptrs[i]],
                     first_timestamp + AB::F::from_canonical_usize(i),
                     &header_row_specific.read_records[i],
@@ -266,7 +275,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
         // React ctx
         self.memory_bridge
             .read(
-                MemoryAddress::new(self.address_space, register_ptrs[0]),
+                MemoryAddress::new(native_as, register_ptrs[0]),
                 ctx,
                 first_timestamp + AB::F::from_canonical_usize(5),
                 &header_row_specific.read_records[5],
@@ -276,7 +285,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
         // Read challenges
         self.memory_bridge
             .read(
-                MemoryAddress::new(self.address_space, register_ptrs[1]),
+                MemoryAddress::new(native_as, register_ptrs[1]),
                 challenges,
                 first_timestamp + AB::F::from_canonical_usize(6),
                 &header_row_specific.read_records[6],
@@ -286,7 +295,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
         // Write final result
         self.memory_bridge
             .write(
-                MemoryAddress::new(self.address_space, register_ptrs[4]),
+                MemoryAddress::new(native_as, register_ptrs[4]),
                 eval_acc,
                 last_timestamp - AB::F::ONE,
                 &header_row_specific.write_records,
@@ -302,7 +311,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
         self.memory_bridge
             .read(
                 MemoryAddress::new(
-                    self.address_space,
+                    native_as,
                     register_ptrs[0]
                         + AB::F::from_canonical_usize(EXT_DEG * 2)
                         + (curr_prod_n - AB::F::ONE),
@@ -330,10 +339,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(
-                    self.address_space,
-                    register_ptrs[2] + prod_row_specific.data_ptr,
-                ),
+                MemoryAddress::new(native_as, register_ptrs[2] + prod_row_specific.data_ptr),
                 prod_row_specific.p,
                 start_timestamp + AB::F::ONE,
                 &prod_row_specific.read_records[1],
@@ -348,7 +354,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
         self.memory_bridge
             .write(
                 MemoryAddress::new(
-                    self.address_space,
+                    native_as,
                     register_ptrs[4] + curr_prod_n * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 prod_row_specific.p_evals,
@@ -363,12 +369,12 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
             FieldExtension::multiply::<AB::Var, AB::Expr>(p2, c2),
         );
         let in_round_p_evals = FieldExtension::multiply::<AB::Var, AB::Expr>(p1, p2);
-        assert_array_eq::<_, _, _, EXT_DEG>(
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
             &mut builder.when(prod_in_round_evaluation),
             in_round_p_evals,
             prod_row_specific.p_evals,
         );
-        assert_array_eq::<_, _, _, EXT_DEG>(
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
             &mut builder.when(prod_next_round_evaluation),
             next_round_p_evals,
             prod_row_specific.p_evals,
@@ -377,14 +383,14 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
         // Accumulate evaluation
         let acc_eval =
             FieldExtension::multiply::<AB::Var, AB::Expr>(prod_row_specific.p_evals, alpha1);
-        assert_array_eq::<_, _, _, EXT_DEG>(
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
             &mut builder.when(prod_acc),
             prod_row_specific.acc_eval,
             acc_eval,
         );
 
         let next_acc = FieldExtension::subtract(eval_acc, next_prod_row_specific.acc_eval);
-        assert_array_eq::<_, _, _, EXT_DEG>(
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
             &mut builder.when(next.prod_acc),
             next.eval_acc,
             next_acc,
@@ -399,7 +405,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
         self.memory_bridge
             .read(
                 MemoryAddress::new(
-                    self.address_space,
+                    native_as,
                     register_ptrs[0]
                         + AB::F::from_canonical_usize(EXT_DEG * 2)
                         + ctx[1]
@@ -428,10 +434,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(
-                    self.address_space,
-                    register_ptrs[3] + logup_row_specific.data_ptr,
-                ),
+                MemoryAddress::new(native_as, register_ptrs[3] + logup_row_specific.data_ptr),
                 logup_row_specific.pq,
                 start_timestamp + AB::F::ONE,
                 &logup_row_specific.read_records[1],
@@ -452,7 +455,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
         self.memory_bridge
             .write(
                 MemoryAddress::new(
-                    self.address_space,
+                    native_as,
                     register_ptrs[4]
                         + (ctx[1] + curr_logup_n) * AB::F::from_canonical_usize(EXT_DEG),
                 ),
@@ -465,7 +468,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
         self.memory_bridge
             .write(
                 MemoryAddress::new(
-                    self.address_space,
+                    native_as,
                     register_ptrs[4]
                         + (ctx[1] + ctx[2] + curr_logup_n) * AB::F::from_canonical_usize(EXT_DEG),
                 ),
@@ -484,12 +487,12 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
             FieldExtension::multiply::<AB::Var, AB::Expr>(p1, q2),
             FieldExtension::multiply::<AB::Var, AB::Expr>(p2, q1),
         );
-        assert_array_eq::<_, _, _, EXT_DEG>(
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
             &mut builder.when(logup_in_round_evaluation),
             in_round_p_evals,
             logup_row_specific.p_evals,
         );
-        assert_array_eq::<_, _, _, EXT_DEG>(
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
             &mut builder.when(logup_next_round_evaluation),
             next_round_p_evals,
             logup_row_specific.p_evals,
@@ -500,12 +503,12 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
             FieldExtension::multiply::<AB::Var, AB::Expr>(q2, c2),
         );
         let in_round_q_evals = FieldExtension::multiply::<AB::Var, AB::Expr>(q1, q2);
-        assert_array_eq::<_, _, _, EXT_DEG>(
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
             &mut builder.when(logup_in_round_evaluation),
             in_round_q_evals,
             logup_row_specific.q_evals,
         );
-        assert_array_eq::<_, _, _, EXT_DEG>(
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
             &mut builder.when(logup_next_round_evaluation),
             next_round_q_evals,
             logup_row_specific.q_evals,
@@ -516,14 +519,14 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir<AB::F> {
             FieldExtension::multiply::<AB::Var, AB::Expr>(logup_row_specific.p_evals, alpha1),
             FieldExtension::multiply::<AB::Var, AB::Expr>(logup_row_specific.q_evals, alpha2),
         );
-        assert_array_eq::<_, _, _, EXT_DEG>(
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
             &mut builder.when(logup_acc),
             logup_row_specific.acc_eval,
             acc_eval,
         );
 
         let next_acc = FieldExtension::subtract(eval_acc, next_logup_row_specfic.acc_eval);
-        assert_array_eq::<_, _, _, EXT_DEG>(
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
             &mut builder.when(next.logup_acc),
             next.eval_acc,
             next_acc,

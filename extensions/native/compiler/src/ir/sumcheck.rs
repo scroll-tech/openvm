@@ -35,7 +35,7 @@ impl<C: Config> Builder<C> {
         input_ctx: &Array<C, Usize<C::N>>, // Context variables
         challenges: &Array<C, Ext<C::F, C::EF>>, // Challenges
         prod_specs_eval: &Array<C, Ext<C::F, C::EF>>, /* GKR product IOP evaluations. Flattened
-                                                       * from 3D array. */
+                                            * from 3D array. */
         logup_specs_eval: &Array<C, Ext<C::F, C::EF>>, /* GKR logup IOP evaluations. Flattened
                                                         * from 3D array. */
         r_evals: &Array<C, Ext<C::F, C::EF>>, /* Next layer's evaluations (pointer used for

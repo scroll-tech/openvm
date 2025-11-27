@@ -2,12 +2,11 @@ use std::sync::{Arc, Mutex};
 
 use openvm_circuit::{
     arch::{
-        ExecutionBridge, ExecutionError, ExecutionState, InstructionExecutor, PreflightExecutor,
-        RecordArena, Streams, SystemPort, TraceFiller, VmChipWrapper, VmStateMut,
+        CustomBorrow, ExecutionBridge, ExecutionError, ExecutionState, MultiRowLayout,
+        MultiRowMetadata, PreflightExecutor, RecordArena, Streams, TraceFiller, VmChipWrapper,
+        VmStateMut,
     },
-    system::memory::{
-        online::TracingMemory, MemoryAuxColsFactory, MemoryController, OfflineMemory, RecordId,
-    },
+    system::memory::{online::TracingMemory, MemoryAuxColsFactory, MemoryController},
 };
 use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode};
 use openvm_native_compiler::{conversion::AS, SumcheckOpcode::SUMCHECK_LAYER_EVAL};
@@ -28,52 +27,58 @@ use crate::{
 };
 const CONTEXT_ARR_BASE_LEN: usize = EXT_DEG * 2;
 
-#[repr(C)]
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-#[serde(bound = "F: Field")]
-pub struct SumcheckEvalRecord<F: Field> {
-    pub from_state: ExecutionState<u32>,
-    pub instruction: Instruction<F>,
-    pub row_type: usize, // 0 - header; 1 - prod; 2 - logup
-    pub curr_timestamp_increment: usize,
-    pub final_timestamp_increment: usize,
-    pub continuation: bool,
-
-    pub register_ptrs: [F; 5],
-    pub registers: [F; 5],
-    pub ctx: [F; EXT_DEG * 2],
-    pub challenges: [F; EXT_DEG * 4],
-    pub read_data_records: [RecordId; 7],
-    pub write_data_records: [RecordId; 2],
-
-    pub max_round: F,
-    pub within_round_limit: bool,
-    pub should_acc: bool,
-    pub prod_spec_n: usize,
-    pub logup_spec_n: usize,
-    pub alpha: [F; EXT_DEG],
-    pub alpha1: [F; EXT_DEG],
-    pub alpha2: [F; EXT_DEG],
-    pub data_ptr: F,
-    pub p1: [F; EXT_DEG],
-    pub p2: [F; EXT_DEG],
-    pub q1: [F; EXT_DEG],
-    pub q2: [F; EXT_DEG],
-    pub p_evals: [F; EXT_DEG],
-    pub q_evals: [F; EXT_DEG],
-    pub eval_acc: [F; EXT_DEG],
-    pub acc_eval: [F; EXT_DEG],
+pub(crate) fn calculate_3d_ext_idx(
+    inner_inner_len: u32,
+    inner_len: u32,
+    outer_idx: u32,
+    inner_idx: u32,
+    inner_inner_idx: u32,
+) -> u32 {
+    (inner_inner_len * inner_len * outer_idx + inner_inner_len * inner_idx + inner_inner_idx)
+        * EXT_DEG as u32
 }
 
-fn calculate_3d_ext_idx<F: Field>(
-    inner_inner_len: F,
-    inner_len: F,
-    outer_idx: F,
-    inner_idx: F,
-    inner_inner_idx: F,
-) -> F {
-    (inner_inner_len * inner_len * outer_idx + inner_inner_len * inner_idx + inner_inner_idx)
-        * F::from_canonical_usize(EXT_DEG)
+#[derive(Debug, Clone, Default)]
+pub struct NativeSumcheckMetadata {
+    num_rows: usize,
+}
+
+impl MultiRowMetadata for NativeSumcheckMetadata {
+    #[inline(always)]
+    fn get_num_rows(&self) -> usize {
+        self.num_rows
+    }
+}
+
+type NativeSumcheckRecordLayout = MultiRowLayout<NativeSumcheckMetadata>;
+
+pub struct NativeSumcheckRecordMut<'a, F>(&'a mut [NativeSumcheckCols<F>]);
+
+impl<'a, F: PrimeField32>
+    CustomBorrow<'a, NativeSumcheckRecordMut<'a, F>, NativeSumcheckRecordLayout> for [u8]
+{
+    fn custom_borrow(
+        &'a mut self,
+        layout: NativeSumcheckRecordLayout,
+    ) -> NativeSumcheckRecordMut<'a, F> {
+        // SAFETY:
+        // - align_to_mut() ensures proper alignment for NativeSumcheckCols<F>
+        // - Layout guarantees sufficient length for num_rows records
+        // - Slice bounds validated by taking only num_rows elements
+        let arr = unsafe { self.align_to_mut::<NativeSumcheckCols<F>>().1 };
+        NativeSumcheckRecordMut(&mut arr[..layout.metadata.num_rows])
+    }
+
+    unsafe fn extract_layout(&self) -> NativeSumcheckRecordLayout {
+        // Each instruction record consists solely of some number of contiguously
+        // stored NativeSumcheckCols<...> structs, each of which corresponds to a
+        // single trace row. Trace fillers don't actually need to know how many rows
+        // each instruction uses, and can thus treat each NativePoseidon2Cols<...>
+        // as a single record.
+        NativeSumcheckRecordLayout {
+            metadata: NativeSumcheckMetadata { num_rows: 1 },
+        }
+    }
 }
 
 #[derive(derive_new::new, Copy, Clone)]
@@ -93,7 +98,7 @@ impl Default for NativeSumcheckExecutor {
 impl<F, RA> PreflightExecutor<F, RA> for NativeSumcheckExecutor
 where
     F: PrimeField32,
-    for<'buf> RA: RecordArena<'buf, FriReducedOpeningLayout, FriReducedOpeningRecordMut<'buf, F>>,
+    for<'buf> RA: RecordArena<'buf, NativeSumcheckRecordLayout, NativeSumcheckRecordMut<'buf, F>>,
 {
     fn execute(
         &self,
@@ -112,6 +117,7 @@ where
         } = instruction;
 
         if op == SUMCHECK_LAYER_EVAL.global_opcode() {
+            /*
             let mut observation_records: Vec<SumcheckEvalRecord<F>> = vec![];
             let mut curr_timestamp: usize = 0;
 
@@ -140,7 +146,7 @@ where
                 is_op_for_cur_sumcheck_round,    // This opcode supports two modes of operation:
                                                     // 1. calculate the expected evaluation of two types of sumchecks for the current round
                                                     //      a. product sumcheck: v' = v[0] * v[1]
-                                                    //      b. logup sumcheck: p'= p[0] * q[1] + p[1] * q[0] and q'= q[0] * q[1].     
+                                                    //      b. logup sumcheck: p'= p[0] * q[1] + p[1] * q[0] and q'= q[0] * q[1].
                                                     // 2. calculate the expected value of next layer:
                                                     //      a. product sumcheck: v[r] = eq(0,r) * v[0] + eq(1,r) * v[1]
                                                     //      b. logup sumcheck: p[r] = eq(0,r) * p[0] + eq(1,r) * p[1] and q[r] = eq(0,r) * q[0] + eq(1,r) * q[1]
@@ -407,14 +413,12 @@ where
             observation_records[last_idx].continuation = false;
 
             self.record_set.extend(observation_records);
+            */
         } else {
             unreachable!()
         }
 
-        Ok(ExecutionState {
-            pc: from_state.pc + DEFAULT_PC_STEP,
-            timestamp: memory.timestamp(),
-        })
+        Ok(())
     }
 
     // GKR layered IOP for product and logup relations
@@ -427,6 +431,7 @@ where
 impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
     fn fill_trace_row(&self, mem_helper: &MemoryAuxColsFactory<F>, row_slice: &mut [F]) {
         todo!();
+        /*
         let slice = &mut flat_trace[used_cells..used_cells + width];
         let cols: &mut NativeSumcheckCols<F> = slice.borrow_mut();
         cols.first_timestamp = F::from_canonical_u32(record.from_state.timestamp);
@@ -561,5 +566,6 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
                 }
             }
         }
+        */
     }
 }
