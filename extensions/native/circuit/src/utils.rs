@@ -1,7 +1,34 @@
+use openvm_circuit::system::{
+    memory::{offline_checker::MemoryBaseAuxCols, online::TracingMemory, MemoryAuxColsFactory},
+    native_adapter::util::tracing_read_native,
+};
+use p3_field::PrimeField32;
+
 pub(crate) const CASTF_MAX_BITS: usize = 30;
 
 pub(crate) const fn const_max(a: usize, b: usize) -> usize {
     [a, b][(a < b) as usize]
+}
+
+/// Fill `MemoryBaseAuxCols`, assuming that the `prev_timestamp` is already set in `base_aux`.
+pub(crate) fn mem_fill_helper<F: PrimeField32>(
+    mem_helper: &MemoryAuxColsFactory<F>,
+    timestamp: u32,
+    base_aux: &mut MemoryBaseAuxCols<F>,
+) {
+    let prev_ts = base_aux.prev_timestamp.as_canonical_u32();
+    mem_helper.fill(prev_ts, timestamp, base_aux);
+}
+
+pub(crate) fn tracing_read_native_helper<F: PrimeField32, const BLOCK_SIZE: usize>(
+    memory: &mut TracingMemory,
+    ptr: u32,
+    base_aux: &mut MemoryBaseAuxCols<F>,
+) -> [F; BLOCK_SIZE] {
+    let mut prev_ts = 0;
+    let ret = tracing_read_native(memory, ptr, &mut prev_ts);
+    base_aux.set_prev(F::from_canonical_u32(prev_ts));
+    ret
 }
 
 /// Testing framework
