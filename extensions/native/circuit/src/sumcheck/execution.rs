@@ -11,7 +11,10 @@ use openvm_stark_backend::p3_field::PrimeField32;
 use crate::{
     field_extension::{FieldExtension, EXT_DEG},
     fri::elem_to_ext,
-    sumcheck::chip::{calculate_3d_ext_idx, NativeSumcheckExecutor},
+    sumcheck::chip::{
+        calculate_3d_ext_idx, NativeSumcheckExecutor, CONTEXT_ARR_BASE_LEN, CURRENT_LAYER_MODE,
+        NEXT_LAYER_MODE,
+    },
 };
 
 #[derive(AlignedBytesBorrow, Clone)]
@@ -209,7 +212,7 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
         .map(|x: F| x.as_canonical_u32());
     let [round, num_prod_spec, num_logup_spec, prod_specs_inner_len, prod_specs_inner_inner_len, logup_specs_inner_len, logup_specs_inner_inner_len, mode] =
         ctx;
-    let challenges: [F; EXT_DEG * 3] =
+    let challenges: [F; EXT_DEG * 4] =
         exec_state.vm_read(NATIVE_AS, challenges_ptr.as_canonical_u32());
     let alpha: [F; EXT_DEG] = challenges[0..EXT_DEG].try_into().unwrap();
     let c1: [F; EXT_DEG] = challenges[EXT_DEG..EXT_DEG * 2].try_into().unwrap();
@@ -219,9 +222,10 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
     let mut alpha_acc = elem_to_ext(F::ONE);
     let mut eval_acc = elem_to_ext(F::ZERO);
 
+    let prod_offset = ctx_ptr_u32 + CONTEXT_ARR_BASE_LEN as u32;
     for i in 0..num_prod_spec {
         let [max_round]: [u32; 1] = exec_state
-            .vm_read(NATIVE_AS, ctx_ptr_u32 + 8)
+            .vm_read(NATIVE_AS, prod_offset + i)
             .map(|x: F| x.as_canonical_u32());
 
         let start = calculate_3d_ext_idx(
@@ -238,17 +242,17 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
             let p2: [F; EXT_DEG] = ps[EXT_DEG..EXT_DEG * 2].try_into().unwrap();
 
             let eval = match mode {
-                1 => FieldExtension::multiply(p1, p2),
-                0 => FieldExtension::add(
+                CURRENT_LAYER_MODE => FieldExtension::multiply(p1, p2),
+                NEXT_LAYER_MODE => FieldExtension::add(
                     FieldExtension::multiply(p1, c1),
                     FieldExtension::multiply(p2, c2),
                 ),
-                _ => unreachable!("mode can only be 0 or 1"),
+                _ => unreachable!("mode can only be {CURRENT_LAYER_MODE} or {NEXT_LAYER_MODE}"),
             };
 
-            exec_state.vm_write(NATIVE_AS, r_evals_ptr_u32 + 1 + i, &eval);
+            exec_state.vm_write(NATIVE_AS, r_evals_ptr_u32 + (1 + i) * EXT_DEG as u32, &eval);
 
-            if round + mode < max_round - 1 {
+            if mode == NEXT_LAYER_MODE && round + 1 < max_round - 1 {
                 // update eval_acc
                 eval_acc = FieldExtension::add(eval_acc, FieldExtension::multiply(alpha_acc, eval));
             }
@@ -259,10 +263,11 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
         height += 1;
     }
 
+    let logup_offset = ctx_ptr_u32 + CONTEXT_ARR_BASE_LEN as u32 + num_prod_spec;
     for i in 0..num_logup_spec {
         // read max_round
         let [max_round]: [u32; 1] = exec_state
-            .vm_read(NATIVE_AS, ctx_ptr_u32 + 8 + num_prod_spec + i)
+            .vm_read(NATIVE_AS, logup_offset + i)
             .map(|x: F| x.as_canonical_u32());
         let start = calculate_3d_ext_idx(
             logup_specs_inner_len,
@@ -271,6 +276,9 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
             round,
             0,
         );
+
+        let alpha_denominator = FieldExtension::multiply(alpha_acc, alpha);
+        let alpha_numerator = alpha_acc;
 
         if round < max_round - 1 {
             // read logup_evals
@@ -282,23 +290,23 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
 
             // compute p_eval and q_eval
             let p_eval = match mode {
-                1 => FieldExtension::add(
+                CURRENT_LAYER_MODE => FieldExtension::add(
                     FieldExtension::multiply(p1, q2),
                     FieldExtension::multiply(p2, q1),
                 ),
-                0 => FieldExtension::add(
+                NEXT_LAYER_MODE => FieldExtension::add(
                     FieldExtension::multiply(p1, c1),
                     FieldExtension::multiply(p2, c2),
                 ),
-                _ => unreachable!("mode can only be 0 or 1"),
+                _ => unreachable!("mode can only be {CURRENT_LAYER_MODE} or {NEXT_LAYER_MODE}"),
             };
             let q_eval = match mode {
-                1 => FieldExtension::multiply(q1, q2),
-                0 => FieldExtension::add(
+                CURRENT_LAYER_MODE => FieldExtension::multiply(q1, q2),
+                NEXT_LAYER_MODE => FieldExtension::add(
                     FieldExtension::multiply(q1, c1),
                     FieldExtension::multiply(q2, c2),
                 ),
-                _ => unreachable!("mode can only be 0 or 1"),
+                _ => unreachable!("mode can only be {CURRENT_LAYER_MODE} or {NEXT_LAYER_MODE}"),
             };
 
             // write eval to r_evals
@@ -313,20 +321,18 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
                 &q_eval,
             );
 
-            let alpha_denominator = FieldExtension::multiply(alpha_acc, alpha);
-            let alpha_numerator = alpha_acc;
-
-            if round + mode < max_round - 1 {
+            let eval_rlc = FieldExtension::add(
+                FieldExtension::multiply(alpha_numerator, p_eval),
+                FieldExtension::multiply(alpha_denominator, q_eval),
+            );
+            if mode == NEXT_LAYER_MODE && round + 1 < max_round - 1 {
                 // update eval_acc
-                eval_acc = FieldExtension::add(
-                    FieldExtension::multiply(alpha_numerator, p_eval),
-                    FieldExtension::multiply(alpha_denominator, q_eval),
-                );
+                eval_acc = FieldExtension::add(eval_acc, eval_rlc);
             }
         }
 
         // update alpha_acc
-        alpha_acc = FieldExtension::multiply(alpha_acc, FieldExtension::multiply(alpha, alpha));
+        alpha_acc = FieldExtension::multiply(alpha_denominator, alpha);
         height += 1;
     }
 

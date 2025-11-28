@@ -27,8 +27,8 @@ use crate::{
 };
 
 pub(crate) const CONTEXT_ARR_BASE_LEN: usize = EXT_DEG * 2;
-const CURRENT_LAYER_MODE: u32 = 1;
-const NEXT_LAYER_MODE: u32 = 0;
+pub(crate) const CURRENT_LAYER_MODE: u32 = 1;
+pub(crate) const NEXT_LAYER_MODE: u32 = 0;
 
 pub(crate) fn calculate_3d_ext_idx(
     inner_inner_len: u32,
@@ -144,13 +144,15 @@ where
             .alloc(MultiRowLayout::new(NativeSumcheckMetadata { num_rows }))
             .0;
 
-        let mut cur_timestamp = 0;
+        let mut cur_timestamp = state.memory.timestamp();
         // head row
         let head_row: &mut NativeSumcheckCols<F> = &mut rows[0];
         let head_specific: &mut HeaderSpecificCols<F> =
             head_row.specific[..HeaderSpecificCols::<F>::width()].borrow_mut();
 
         head_row.header_row = F::ONE;
+        head_row.first_timestamp = F::from_canonical_u32(cur_timestamp);
+        head_row.start_timestamp = F::from_canonical_u32(cur_timestamp);
 
         head_specific.pc = F::from_canonical_u32(*state.pc);
 
@@ -210,6 +212,7 @@ where
 
         // all rows share same register values, ctx, challenges
         for row in rows.iter_mut() {
+            // c1, c2 are same during the entire execution
             row.challenges[EXT_DEG..3 * EXT_DEG].copy_from_slice(&challenges[EXT_DEG..3 * EXT_DEG]);
             row.alpha = alpha;
             row.ctx = ctx;
@@ -231,8 +234,8 @@ where
                 prod_row.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
 
             prod_row.prod_row = F::ONE;
-            prod_row.curr_prod_n = F::from_canonical_usize(i);
-            prod_row.start_timestamp = F::from_canonical_usize(cur_timestamp);
+            prod_row.curr_prod_n = F::from_canonical_usize(i + 1); // curr_prod_n starts from 1
+            prod_row.start_timestamp = F::from_canonical_u32(cur_timestamp);
 
             // read max_round
             let [max_round]: [F; 1] = tracing_read_native_helper(
@@ -245,8 +248,9 @@ where
             prod_row.challenges[0..EXT_DEG].copy_from_slice(&alpha_acc);
             prod_row.max_round = max_round;
 
+            let max_round = max_round.as_canonical_u32();
             // round starts from 0
-            if round < max_round.as_canonical_u32() - 1 {
+            if round < max_round - 1 {
                 prod_row.within_round_limit = F::ONE;
                 let start = calculate_3d_ext_idx(
                     prod_specs_inner_inner_len,
@@ -296,12 +300,12 @@ where
                     eval,
                     &mut prod_specific.write_record,
                 );
-                cur_timestamp += 1;
+                cur_timestamp += 2;
 
                 let eval_rlc = FieldExtension::multiply(alpha_acc, eval);
                 prod_specific.eval_rlc = eval_rlc;
 
-                if mode == NEXT_LAYER_MODE && round < max_round.as_canonical_u32() - 2 {
+                if mode == NEXT_LAYER_MODE && round + 1 < max_round - 1 {
                     eval_acc = FieldExtension::add(eval_acc, eval_rlc);
                     prod_row.should_acc = F::ONE;
                     prod_row.eval_acc = eval_acc;
@@ -309,7 +313,6 @@ where
             }
 
             alpha_acc = FieldExtension::multiply(alpha_acc, alpha);
-            prod_row.challenges[0..EXT_DEG].copy_from_slice(&alpha_acc);
         }
 
         // logup rows
@@ -318,8 +321,8 @@ where
                 logup_row.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
 
             logup_row.logup_row = F::ONE;
-            logup_row.curr_logup_n = F::from_canonical_usize(i);
-            logup_row.start_timestamp = F::from_canonical_usize(cur_timestamp);
+            logup_row.curr_logup_n = F::from_canonical_usize(i + 1); // curr_logup_n starts from 1
+            logup_row.start_timestamp = F::from_canonical_u32(cur_timestamp);
 
             let [max_round]: [F; 1] = tracing_read_native_helper(
                 state.memory,
@@ -334,7 +337,8 @@ where
             logup_row.challenges[0..EXT_DEG].copy_from_slice(&alpha_acc);
             logup_row.challenges[2 * EXT_DEG..(3 * EXT_DEG)].copy_from_slice(&alpha_denominator);
 
-            if round < max_round.as_canonical_u32() - 1 {
+            let max_round = max_round.as_canonical_u32();
+            if round < max_round - 1 {
                 logup_row.within_round_limit = F::ONE;
                 let start = calculate_3d_ext_idx(
                     prod_specs_inner_inner_len,
@@ -410,13 +414,13 @@ where
                 );
                 cur_timestamp += 3; // 1 read, 2 writes
 
-                let eval = FieldExtension::add(
+                let eval_rlc = FieldExtension::add(
                     FieldExtension::multiply(alpha_numerator, p_eval),
                     FieldExtension::multiply(alpha_denominator, q_eval),
                 );
-                logup_specific.eval_rlc = eval;
-                if mode == NEXT_LAYER_MODE && round < max_round.as_canonical_u32() - 2 {
-                    eval_acc = FieldExtension::add(eval_acc, eval);
+                logup_specific.eval_rlc = eval_rlc;
+                if mode == NEXT_LAYER_MODE && round + 1 < max_round - 1 {
+                    eval_acc = FieldExtension::add(eval_acc, eval_rlc);
                     logup_row.should_acc = F::ONE;
                     logup_row.logup_acc = F::ONE;
                     logup_row.eval_acc = eval_acc;
@@ -427,6 +431,8 @@ where
         }
 
         let head_row = &mut rows[0];
+        head_row.last_timestamp = F::from_canonical_u32(cur_timestamp + 1);
+
         let head_specific: &mut HeaderSpecificCols<F> =
             head_row.specific[..HeaderSpecificCols::<F>::width()].borrow_mut();
 
@@ -452,7 +458,9 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
     fn fill_trace_row(&self, mem_helper: &MemoryAuxColsFactory<F>, row_slice: &mut [F]) {
         let cols: &mut NativeSumcheckCols<F> = row_slice.borrow_mut();
         let start_timestamp = cols.start_timestamp.as_canonical_u32();
+        let last_timestamp = cols.last_timestamp.as_canonical_u32();
 
+        println!("start_timestamp: {}, cols.header_row: {:?}, prod_row: {:?}, logup_row: {:?}", start_timestamp, cols.header_row, cols.prod_row, cols.logup_row);
         if cols.header_row == F::ONE {
             let header: &mut HeaderSpecificCols<F> =
                 cols.specific[..HeaderSpecificCols::<F>::width()].borrow_mut();
@@ -460,58 +468,69 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
             for i in 0..7usize {
                 mem_fill_helper(
                     mem_helper,
-                    start_timestamp + i,
+                    start_timestamp + i as u32,
                     header.read_records[i].as_mut(),
                 );
             }
             mem_fill_helper(
                 mem_helper,
-                start_timestamp + 7,
+                last_timestamp - 1,
                 header.write_records.as_mut(),
             );
         } else if cols.prod_row == F::ONE {
             let prod_row_specific: &mut ProdSpecificCols<F> =
                 cols.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
 
+            // read max_round
             mem_fill_helper(
                 mem_helper,
                 start_timestamp,
                 prod_row_specific.read_records[0].as_mut(),
             );
-            mem_fill_helper(
-                mem_helper,
-                start_timestamp + 1,
-                prod_row_specific.read_records[1].as_mut(),
-            );
-            mem_fill_helper(
-                mem_helper,
-                start_timestamp + 2,
-                prod_row_specific.write_record.as_mut(),
-            );
+            if cols.within_round_limit == F::ONE {
+                // read p1, p2
+                mem_fill_helper(
+                    mem_helper,
+                    start_timestamp + 1,
+                    prod_row_specific.read_records[1].as_mut(),
+                );
+                // write p_eval
+                mem_fill_helper(
+                    mem_helper,
+                    start_timestamp + 2,
+                    prod_row_specific.write_record.as_mut(),
+                );
+            }
         } else if cols.logup_row == F::ONE {
             let logup_row_specific: &mut LogupSpecificCols<F> =
                 cols.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
 
+            // read max_round
             mem_fill_helper(
                 mem_helper,
                 start_timestamp,
                 logup_row_specific.read_records[0].as_mut(),
             );
-            mem_fill_helper(
-                mem_helper,
-                start_timestamp + 1,
-                logup_row_specific.read_records[1].as_mut(),
-            );
-            mem_fill_helper(
-                mem_helper,
-                start_timestamp + 2,
-                logup_row_specific.write_records[0].as_mut(),
-            );
-            mem_fill_helper(
-                mem_helper,
-                start_timestamp + 3,
-                logup_row_specific.write_records[1].as_mut(),
-            );
+            if cols.within_round_limit == F::ONE {
+                // read p1, p2, q1, q2
+                mem_fill_helper(
+                    mem_helper,
+                    start_timestamp + 1,
+                    logup_row_specific.read_records[1].as_mut(),
+                );
+                // write p_eval
+                mem_fill_helper(
+                    mem_helper,
+                    start_timestamp + 2,
+                    logup_row_specific.write_records[0].as_mut(),
+                );
+                // write q_eval
+                mem_fill_helper(
+                    mem_helper,
+                    start_timestamp + 3,
+                    logup_row_specific.write_records[1].as_mut(),
+                );
+            }
         }
     }
 }
