@@ -16,18 +16,8 @@ pub struct NativeSumcheckCols<T> {
     pub prod_row: T,
     /// Indicates that this row is a step for logup_spec in the layer sum operation
     pub logup_row: T,
-
-    /// Indicates that there are valid operations following this header row
-    pub header_continuation: T,
-    /// Indicates that there are valid operations following this product evaluation row
-    pub prod_continuation: T,
-    /// Indicates that there are valid operations following this logup row
-    pub logup_continuation: T,
-
-    /// Indicates that the prod row is within maximum round
-    pub prod_row_within_max_round: T,
-    /// Indicates that the logup row is within maximum round
-    pub logup_row_within_max_round: T,
+    /// Indicates that this row is the end of the entire layer sum operation
+    pub is_end: T,
 
     /// Indicates what type of evaluation constraints should be applied
     pub prod_in_round_evaluation: T,
@@ -66,8 +56,8 @@ pub struct NativeSumcheckCols<T> {
     pub curr_prod_n: T,
     pub curr_logup_n: T,
 
-    // alpha1, c1, c2, alpha2 (for logup rows)
     pub alpha: [T; EXT_DEG],
+    // alpha1, c1, c2, alpha2 (for logup rows)
     pub challenges: [T; EXT_DEG * 4],
 
     // Specific to each row
@@ -118,8 +108,8 @@ pub struct ProdSpecificCols<T> {
     pub p_evals: [T; EXT_DEG],
     /// write p_evals
     pub write_record: MemoryWriteAuxCols<T, EXT_DEG>,
-    /// Evaluation for the accumulator
-    pub acc_eval: [T; EXT_DEG],
+    /// p_evals * alpha^i
+    pub eval_rlc: [T; EXT_DEG],
 }
 
 #[repr(C)]
@@ -138,5 +128,5 @@ pub struct LogupSpecificCols<T> {
     /// write both p_evals and q_evals
     pub write_records: [MemoryWriteAuxCols<T, EXT_DEG>; 2],
     /// Evaluation for the accumulator
-    pub acc_eval: [T; EXT_DEG],
+    pub eval_rlc: [T; EXT_DEG],
 }

@@ -10,7 +10,9 @@ use openvm_circuit::{
         native_adapter::util::{memory_read_native, tracing_write_native_inplace},
     },
 };
-use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode};
+use openvm_instructions::{
+    instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode, NATIVE_AS,
+};
 use openvm_native_compiler::SumcheckOpcode::SUMCHECK_LAYER_EVAL;
 use openvm_stark_backend::p3_field::PrimeField32;
 
@@ -24,7 +26,7 @@ use crate::{
     tracing_read_native_helper,
 };
 
-const CONTEXT_ARR_BASE_LEN: usize = EXT_DEG * 2;
+pub(crate) const CONTEXT_ARR_BASE_LEN: usize = EXT_DEG * 2;
 const CURRENT_LAYER_MODE: u32 = 1;
 const NEXT_LAYER_MODE: u32 = 0;
 
@@ -126,6 +128,8 @@ where
         //   b. logup sumcheck: p[r] = eq(0,r) * p[0] + eq(1,r) * p[1]
         //         and q[r] = eq(0,r) * q[0] + eq(1,r) * q[1]
         assert_eq!(op, SUMCHECK_LAYER_EVAL.global_opcode());
+        assert_eq!(data_address_space.as_canonical_u32(), NATIVE_AS);
+        assert_eq!(register_address_space.as_canonical_u32(), NATIVE_AS);
 
         let [ctx_ptr]: [F; 1] = memory_read_native(state.memory.data(), ctx_reg.as_canonical_u32());
         let ctx: [u32; 8] = memory_read_native(state.memory.data(), ctx_ptr.as_canonical_u32())
@@ -135,7 +139,6 @@ where
             ctx;
         // allocate n rows
         let num_rows = (1 + num_prod_spec + num_logup_spec) as usize;
-        println!("num_rows = {}", num_rows);
         let rows = state
             .ctx
             .alloc(MultiRowLayout::new(NativeSumcheckMetadata { num_rows }))
@@ -204,11 +207,10 @@ where
 
         let mut eval_acc = elem_to_ext(F::from_canonical_u32(0));
         let mut alpha_acc = elem_to_ext(F::from_canonical_u32(1));
-        // TODO: write final eval
 
         // all rows share same register values, ctx, challenges
         for row in rows.iter_mut() {
-            row.challenges = challenges;
+            row.challenges[EXT_DEG..3 * EXT_DEG].copy_from_slice(&challenges[EXT_DEG..3 * EXT_DEG]);
             row.alpha = alpha;
             row.ctx = ctx;
             row.register_ptrs[0] = ctx_ptr;
@@ -230,6 +232,7 @@ where
 
             prod_row.prod_row = F::ONE;
             prod_row.curr_prod_n = F::from_canonical_usize(i);
+            prod_row.start_timestamp = F::from_canonical_usize(cur_timestamp);
 
             // read max_round
             let [max_round]: [F; 1] = tracing_read_native_helper(
@@ -239,7 +242,7 @@ where
             );
             cur_timestamp += 1;
 
-            prod_row.alpha = alpha_acc;
+            prod_row.challenges[0..EXT_DEG].copy_from_slice(&alpha_acc);
             prod_row.max_round = max_round;
 
             // round starts from 0
@@ -276,6 +279,16 @@ where
                 };
                 prod_specific.p_evals = eval;
 
+                match mode {
+                    NEXT_LAYER_MODE => {
+                        prod_row.prod_next_round_evaluation = F::ONE;
+                    }
+                    CURRENT_LAYER_MODE => {
+                        prod_row.prod_in_round_evaluation = F::ONE;
+                    }
+                    _ => unreachable!("mode should be {CURRENT_LAYER_MODE} or {NEXT_LAYER_MODE}"),
+                }
+
                 // write p eval
                 tracing_write_native_inplace(
                     state.memory,
@@ -285,16 +298,18 @@ where
                 );
                 cur_timestamp += 1;
 
-                let acc_eval = FieldExtension::multiply(alpha_acc, eval);
-                prod_row.eval_acc = acc_eval;
+                let eval_rlc = FieldExtension::multiply(alpha_acc, eval);
+                prod_specific.eval_rlc = eval_rlc;
 
                 if mode == NEXT_LAYER_MODE && round < max_round.as_canonical_u32() - 2 {
-                    eval_acc = FieldExtension::add(eval_acc, acc_eval);
+                    eval_acc = FieldExtension::add(eval_acc, eval_rlc);
                     prod_row.should_acc = F::ONE;
+                    prod_row.eval_acc = eval_acc;
                 }
             }
 
-            prod_row.alpha = FieldExtension::multiply(alpha_acc, alpha);
+            alpha_acc = FieldExtension::multiply(alpha_acc, alpha);
+            prod_row.challenges[0..EXT_DEG].copy_from_slice(&alpha_acc);
         }
 
         // logup rows
@@ -303,6 +318,8 @@ where
                 logup_row.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
 
             logup_row.logup_row = F::ONE;
+            logup_row.curr_logup_n = F::from_canonical_usize(i);
+            logup_row.start_timestamp = F::from_canonical_usize(cur_timestamp);
 
             let [max_round]: [F; 1] = tracing_read_native_helper(
                 state.memory,
@@ -311,6 +328,11 @@ where
             );
             logup_row.max_round = max_round;
             cur_timestamp += 1;
+
+            let alpha_numerator = alpha_acc;
+            let alpha_denominator = FieldExtension::multiply(alpha_acc, alpha);
+            logup_row.challenges[0..EXT_DEG].copy_from_slice(&alpha_acc);
+            logup_row.challenges[2 * EXT_DEG..(3 * EXT_DEG)].copy_from_slice(&alpha_denominator);
 
             if round < max_round.as_canonical_u32() - 1 {
                 logup_row.within_round_limit = F::ONE;
@@ -357,6 +379,16 @@ where
                     _ => unreachable!("mode should be {CURRENT_LAYER_MODE} or {NEXT_LAYER_MODE}"),
                 };
 
+                match mode {
+                    NEXT_LAYER_MODE => {
+                        logup_row.logup_next_round_evaluation = F::ONE;
+                    }
+                    CURRENT_LAYER_MODE => {
+                        logup_row.logup_in_round_evaluation = F::ONE;
+                    }
+                    _ => unreachable!("mode should be {CURRENT_LAYER_MODE} or {NEXT_LAYER_MODE}"),
+                }
+
                 logup_specific.p_evals = p_eval;
                 logup_specific.q_evals = q_eval;
 
@@ -378,22 +410,20 @@ where
                 );
                 cur_timestamp += 3; // 1 read, 2 writes
 
-                let alpha_numerator = alpha_acc;
-                let alpha_denominator = FieldExtension::multiply(alpha_acc, alpha);
-
+                let eval = FieldExtension::add(
+                    FieldExtension::multiply(alpha_numerator, p_eval),
+                    FieldExtension::multiply(alpha_denominator, q_eval),
+                );
+                logup_specific.eval_rlc = eval;
                 if mode == NEXT_LAYER_MODE && round < max_round.as_canonical_u32() - 2 {
-                    let eval = FieldExtension::add(
-                        FieldExtension::multiply(alpha_numerator, p_eval),
-                        FieldExtension::multiply(alpha_denominator, q_eval),
-                    );
-                    logup_specific.acc_eval = eval;
                     eval_acc = FieldExtension::add(eval_acc, eval);
                     logup_row.should_acc = F::ONE;
+                    logup_row.logup_acc = F::ONE;
                     logup_row.eval_acc = eval_acc;
                 }
             }
 
-            alpha_acc = FieldExtension::multiply(FieldExtension::multiply(alpha_acc, alpha), alpha);
+            alpha_acc = FieldExtension::multiply(alpha_denominator, alpha);
         }
 
         let head_row = &mut rows[0];
@@ -428,12 +458,60 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
                 cols.specific[..HeaderSpecificCols::<F>::width()].borrow_mut();
 
             for i in 0..7usize {
-                mem_fill_helper(mem_helper, start_timestamp, header.read_records[i].as_mut());
+                mem_fill_helper(
+                    mem_helper,
+                    start_timestamp + i,
+                    header.read_records[i].as_mut(),
+                );
             }
+            mem_fill_helper(
+                mem_helper,
+                start_timestamp + 7,
+                header.write_records.as_mut(),
+            );
         } else if cols.prod_row == F::ONE {
-            todo!()
+            let prod_row_specific: &mut ProdSpecificCols<F> =
+                cols.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
+
+            mem_fill_helper(
+                mem_helper,
+                start_timestamp,
+                prod_row_specific.read_records[0].as_mut(),
+            );
+            mem_fill_helper(
+                mem_helper,
+                start_timestamp + 1,
+                prod_row_specific.read_records[1].as_mut(),
+            );
+            mem_fill_helper(
+                mem_helper,
+                start_timestamp + 2,
+                prod_row_specific.write_record.as_mut(),
+            );
         } else if cols.logup_row == F::ONE {
-            todo!()
+            let logup_row_specific: &mut LogupSpecificCols<F> =
+                cols.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
+
+            mem_fill_helper(
+                mem_helper,
+                start_timestamp,
+                logup_row_specific.read_records[0].as_mut(),
+            );
+            mem_fill_helper(
+                mem_helper,
+                start_timestamp + 1,
+                logup_row_specific.read_records[1].as_mut(),
+            );
+            mem_fill_helper(
+                mem_helper,
+                start_timestamp + 2,
+                logup_row_specific.write_records[0].as_mut(),
+            );
+            mem_fill_helper(
+                mem_helper,
+                start_timestamp + 3,
+                logup_row_specific.write_records[1].as_mut(),
+            );
         }
     }
 }
