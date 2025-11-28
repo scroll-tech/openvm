@@ -1,27 +1,15 @@
-use itertools::Itertools;
-use openvm_circuit::arch::{
-    instructions::program::Program, verify_single, SystemConfig, VirtualMachine, VmConfig,
-    VmExecutor,
-};
+use openvm_circuit::arch::instructions::program::Program;
 #[cfg(not(feature = "cuda"))]
 use openvm_circuit::utils::air_test_impl;
 use openvm_native_circuit::{NativeBuilder, NativeConfig, EXT_DEG};
 use openvm_native_compiler::{
     asm::{AsmBuilder, AsmCompiler},
     conversion::{convert_program, CompilerOptions},
-    ir::{Ext, Felt, Usize},
+    ir::{Ext, Usize},
     prelude::*,
 };
-use openvm_native_recursion::{
-    challenger::{duplex::DuplexChallengerVariable, CanObserveVariable},
-    testing_utils::inner::run_recursive_test,
-};
-use openvm_stark_backend::{
-    config::{Domain, StarkGenericConfig},
-    p3_commit::PolynomialSpace,
-    p3_field::{
-        extension::BinomialExtensionField, FieldAlgebra, FieldExtensionAlgebra, PackedValue,
-    },
+use openvm_stark_backend::p3_field::{
+    extension::BinomialExtensionField, FieldAlgebra, FieldExtensionAlgebra, PackedValue,
 };
 use openvm_stark_sdk::{
     config::{
