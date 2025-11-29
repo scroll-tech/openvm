@@ -431,6 +431,10 @@ where
             alpha_acc = FieldExtension::multiply(alpha_denominator, alpha);
         }
 
+        if let Some(last_row) = rows.last_mut() {
+            last_row.is_end = F::ONE;
+        }
+
         let head_row = &mut rows[0];
         head_row.last_timestamp = F::from_canonical_u32(cur_timestamp + 1);
         head_row.eval_acc = eval_acc;
@@ -533,5 +537,11 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
                 );
             }
         }
+    }
+
+    fn fill_dummy_trace_row(&self, row_slice: &mut [F]) {
+        let cols: &mut NativeSumcheckCols<F> = row_slice.borrow_mut();
+
+        cols.is_end = F::ONE;
     }
 }
