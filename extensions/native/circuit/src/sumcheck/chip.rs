@@ -217,6 +217,10 @@ where
             row.challenges[EXT_DEG..3 * EXT_DEG].copy_from_slice(&challenges[EXT_DEG..3 * EXT_DEG]);
             row.alpha = alpha;
             row.ctx = ctx;
+            row.prod_nested_len =
+                F::from_canonical_u32(prod_specs_inner_len * prod_specs_inner_inner_len);
+            row.logup_nested_len =
+                F::from_canonical_u32(logup_specs_inner_len * logup_specs_inner_inner_len);
             row.register_ptrs[0] = ctx_ptr;
             row.register_ptrs[1] = challenges_ptr;
             row.register_ptrs[2] = prod_evals_ptr;
@@ -309,6 +313,7 @@ where
                 if mode == NEXT_LAYER_MODE && round + 1 < max_round - 1 {
                     eval_acc = FieldExtension::add(eval_acc, eval_rlc);
                     prod_row.should_acc = F::ONE;
+                    prod_row.prod_acc = F::ONE;
                     prod_row.eval_acc = eval_acc;
                 }
             }
