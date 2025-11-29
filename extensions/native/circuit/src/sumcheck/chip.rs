@@ -201,6 +201,7 @@ where
             head_specific.read_records[6].as_mut(),
         );
         cur_timestamp += 7; // 5 register reads + ctx read + challenges read
+        head_row.challenges.copy_from_slice(&challenges);
 
         // challenges = [alpha, c1=r, c2=1-r]
         let alpha: [F; 4] = challenges[0..EXT_DEG].try_into().unwrap();
@@ -335,7 +336,7 @@ where
             let alpha_numerator = alpha_acc;
             let alpha_denominator = FieldExtension::multiply(alpha_acc, alpha);
             logup_row.challenges[0..EXT_DEG].copy_from_slice(&alpha_acc);
-            logup_row.challenges[2 * EXT_DEG..(3 * EXT_DEG)].copy_from_slice(&alpha_denominator);
+            logup_row.challenges[3 * EXT_DEG..(4 * EXT_DEG)].copy_from_slice(&alpha_denominator);
 
             let max_round = max_round.as_canonical_u32();
             if round < max_round - 1 {
@@ -409,7 +410,7 @@ where
                     state.memory,
                     r_evals_ptr.as_canonical_u32()
                         + (1 + num_prod_spec + num_logup_spec + i as u32) * (EXT_DEG as u32),
-                    p_eval,
+                    q_eval,
                     &mut logup_specific.write_records[1],
                 );
                 cur_timestamp += 3; // 1 read, 2 writes
@@ -432,6 +433,7 @@ where
 
         let head_row = &mut rows[0];
         head_row.last_timestamp = F::from_canonical_u32(cur_timestamp + 1);
+        head_row.eval_acc = eval_acc;
 
         let head_specific: &mut HeaderSpecificCols<F> =
             head_row.specific[..HeaderSpecificCols::<F>::width()].borrow_mut();
@@ -460,7 +462,6 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
         let start_timestamp = cols.start_timestamp.as_canonical_u32();
         let last_timestamp = cols.last_timestamp.as_canonical_u32();
 
-        println!("start_timestamp: {}, cols.header_row: {:?}, prod_row: {:?}, logup_row: {:?}", start_timestamp, cols.header_row, cols.prod_row, cols.logup_row);
         if cols.header_row == F::ONE {
             let header: &mut HeaderSpecificCols<F> =
                 cols.specific[..HeaderSpecificCols::<F>::width()].borrow_mut();

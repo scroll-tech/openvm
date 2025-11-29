@@ -81,6 +81,7 @@ fn build_test_program<C: Config>(builder: &mut Builder<C>) {
         548478283u32, 456436544, 1716290291, 791326976,
         1829717553, 1422025771, 1917123958, 727015942,
         183548369, 591240150, 96141963, 1286249979,
+        0, 0, 0, 0,
     ];
     let challenges: Array<C, Ext<C::F, C::EF>> = builder.dyn_array(challenges_u32s.len() / EXT_DEG);
     for (idx, n) in challenges_u32s.chunks(EXT_DEG).enumerate() {
