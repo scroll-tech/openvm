@@ -19,6 +19,9 @@ pub struct NativeSumcheckCols<T> {
     /// Indicates that this row is the end of the entire layer sum operation
     pub is_end: T,
 
+    pub prod_continued: T,
+    pub logup_continued: T,
+
     /// Indicates what type of evaluation constraints should be applied
     pub prod_in_round_evaluation: T,
     pub prod_next_round_evaluation: T,

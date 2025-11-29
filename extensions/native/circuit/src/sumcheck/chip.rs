@@ -239,6 +239,11 @@ where
                 prod_row.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
 
             prod_row.prod_row = F::ONE;
+            prod_row.prod_continued = if i < (num_prod_spec - 1) as usize {
+                F::ONE
+            } else {
+                F::ZERO
+            };
             prod_row.curr_prod_n = F::from_canonical_usize(i + 1); // curr_prod_n starts from 1
             prod_row.start_timestamp = F::from_canonical_u32(cur_timestamp);
 
@@ -327,6 +332,11 @@ where
                 logup_row.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
 
             logup_row.logup_row = F::ONE;
+            logup_row.logup_continued = if i < (num_logup_spec - 1) as usize {
+                F::ONE
+            } else {
+                F::ZERO
+            };
             logup_row.curr_logup_n = F::from_canonical_usize(i + 1); // curr_logup_n starts from 1
             logup_row.start_timestamp = F::from_canonical_u32(cur_timestamp);
 

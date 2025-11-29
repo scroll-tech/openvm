@@ -67,6 +67,8 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             logup_row,
             is_end,
 
+            prod_continued,
+            logup_continued,
             // What type of evaluation is performed
             // mainly for reducing constraint degree
             prod_in_round_evaluation,
@@ -116,6 +118,12 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         let next_enabled = next.header_row + next.prod_row + next.logup_row;
         builder.assert_bool(enabled.clone());
 
+        builder
+            .when_transition()
+            .assert_eq(prod_row * next.prod_row, prod_continued);
+        builder
+            .when_transition()
+            .assert_eq(logup_row * next.logup_row, logup_continued);
         // TODO: handle last row properly
 
         builder.when_transition().assert_eq::<AB::Expr, AB::Expr>(
@@ -251,12 +259,11 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         );
         assert_array_eq::<_, _, _, { EXT_DEG }>(&mut builder.when(header_row), alpha, alpha1);
         let prod_next_alpha = FieldExtension::multiply(alpha1, alpha);
-        // TODO: reduce the degree
-        // assert_array_eq::<_, _, _, { EXT_DEG }>(
-        //     &mut builder.when(and(prod_row, next.prod_row)),
-        //     prod_next_alpha,
-        //     next_alpha1,
-        // );
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
+            &mut builder.when(prod_continued),
+            prod_next_alpha,
+            next_alpha1,
+        );
         // alpha1 = alpha_numerator, alpha2 = alpha_denominator for logup row
         let alpha_denominator = FieldExtension::multiply(alpha1, alpha);
         assert_array_eq::<_, _, _, { EXT_DEG }>(
@@ -265,12 +272,11 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             alpha2,
         );
         let logup_next_alpha = FieldExtension::multiply(alpha2, alpha);
-        // TODO: reduce the degree
-        // assert_array_eq::<_, _, _, { EXT_DEG }>(
-        //     &mut builder.when(and(logup_row, next.logup_row)),
-        //     logup_next_alpha,
-        //     next_alpha1,
-        // );
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
+            &mut builder.when(logup_continued),
+            logup_next_alpha,
+            next_alpha1,
+        );
 
         ///////////////////////////////////////
         // Header
