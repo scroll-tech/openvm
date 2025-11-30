@@ -357,8 +357,8 @@ where
             if round < max_round - 1 {
                 logup_row.within_round_limit = F::ONE;
                 let start = calculate_3d_ext_idx(
-                    prod_specs_inner_inner_len,
-                    prod_specs_inner_len,
+                    logup_specs_inner_inner_len,
+                    logup_specs_inner_len,
                     i as u32,
                     round,
                     0,

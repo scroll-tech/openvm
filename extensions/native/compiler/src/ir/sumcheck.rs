@@ -1,8 +1,4 @@
-use openvm_native_compiler_derive::iter_zip;
-use openvm_stark_backend::p3_field::FieldAlgebra;
-
-use super::{Array, ArrayLike, Builder, Config, DslIr, Ext, Felt, MemIndex, Ptr, Usize, Var};
-use crate::ir::Variable;
+use super::{Array, Builder, Config, DslIr, Ext, Usize};
 
 impl<C: Config> Builder<C> {
     /// Extends native VM ability to calculate the evaluation for a sumcheck layer

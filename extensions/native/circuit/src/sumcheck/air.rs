@@ -366,12 +366,15 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             )
             .eval(builder, prod_row);
 
-        // TODO: reduce the degree
-        // builder.when(prod_row * within_round_limit).assert_eq(
-        //     prod_row_specific.data_ptr,
-        //     (prod_nested_len * (curr_prod_n - AB::F::ONE) + prod_spec_inner_inner_len * round)
-        //         * AB::F::from_canonical_usize(EXT_DEG),
-        // );
+        // prod_row * within_round_limit =
+        //    prod_in_round_evaluation + prod_next_round_evaluation
+        builder
+            .when(prod_in_round_evaluation + prod_next_round_evaluation)
+            .assert_eq(
+                prod_row_specific.data_ptr,
+                (prod_nested_len * (curr_prod_n - AB::F::ONE) + prod_spec_inner_inner_len * round)
+                    * AB::F::from_canonical_usize(EXT_DEG),
+            );
         builder.assert_eq(
             prod_row * within_round_limit * in_round,
             prod_in_round_evaluation,
@@ -466,12 +469,16 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             )
             .eval(builder, logup_row);
 
-        // TODO: reduce the degree
-        // builder.when(logup_row * within_round_limit).assert_eq(
-        //     logup_row_specific.data_ptr,
-        //     (logup_nested_len * (curr_logup_n - AB::F::ONE) + logup_spec_inner_inner_len * round)
-        //         * AB::F::from_canonical_usize(EXT_DEG),
-        // );
+        // logup_row * within_round_limit =
+        //    logup_in_round_evaluation + logup_next_round_evaluation
+        builder
+            .when(logup_in_round_evaluation + logup_next_round_evaluation)
+            .assert_eq(
+                logup_row_specific.data_ptr,
+                (logup_nested_len * (curr_logup_n - AB::F::ONE)
+                    + logup_spec_inner_inner_len * round)
+                    * AB::F::from_canonical_usize(EXT_DEG),
+            );
         builder.assert_eq(
             logup_row * within_round_limit * in_round,
             logup_in_round_evaluation,
