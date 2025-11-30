@@ -244,12 +244,11 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             );
 
         // Termination condition
-        // TODO: enable this
-        // assert_array_eq(
-        //     &mut builder.when::<AB::Expr>(is_end.into()),
-        //     eval_acc,
-        //     [AB::F::ZERO; 4],
-        // );
+        assert_array_eq(
+            &mut builder.when::<AB::Expr>(is_end.into()),
+            eval_acc,
+            [AB::F::ZERO; 4],
+        );
 
         // Randomness transition
         assert_array_eq(
@@ -439,12 +438,11 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             prod_row_specific.eval_rlc,
             eval_rlc,
         );
-        // TODO: enable this
-        // assert_array_eq::<_, _, _, { EXT_DEG }>(
-        //     &mut builder.when(next.prod_acc),
-        //     FieldExtension::add(next.eval_acc, next_prod_row_specific.eval_rlc),
-        //     eval_acc,
-        // );
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
+            &mut builder.when(next.prod_acc),
+            FieldExtension::add(next.eval_acc, next_prod_row_specific.eval_rlc),
+            eval_acc,
+        );
 
         ///////////////////////////////////////
         // Logup spec evaluation
@@ -587,11 +585,10 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
 
         // Accumulate into global accumulator `eval_acc`
         // when round < max_round - 2
-        // TODO: enable this
-        // assert_array_eq::<_, _, _, { EXT_DEG }>(
-        //     &mut builder.when(next.logup_acc),
-        //     FieldExtension::add(next.eval_acc, next_logup_row_specfic.eval_rlc),
-        //     eval_acc,
-        // );
+        assert_array_eq::<_, _, _, { EXT_DEG }>(
+            &mut builder.when(next.logup_acc),
+            FieldExtension::add(next.eval_acc, next_logup_row_specfic.eval_rlc),
+            eval_acc,
+        );
     }
 }

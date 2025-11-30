@@ -452,7 +452,6 @@ where
 
         let head_row = &mut rows[0];
         head_row.last_timestamp = F::from_canonical_u32(cur_timestamp + 1);
-        head_row.eval_acc = eval_acc;
 
         let head_specific: &mut HeaderSpecificCols<F> =
             head_row.specific[..HeaderSpecificCols::<F>::width()].borrow_mut();
@@ -463,6 +462,24 @@ where
             eval_acc,
             &mut head_specific.write_records,
         );
+
+        for row in rows.iter_mut() {
+            if row.header_row == F::ONE {
+                row.eval_acc = eval_acc;
+            } else if row.prod_row == F::ONE {
+                let specific: &mut ProdSpecificCols<F> =
+                    row.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
+
+                eval_acc = FieldExtension::subtract(eval_acc, specific.eval_rlc);
+                row.eval_acc = eval_acc;
+            } else if row.logup_row == F::ONE {
+                let specific: &mut LogupSpecificCols<F> =
+                    row.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
+                eval_acc = FieldExtension::subtract(eval_acc, specific.eval_rlc);
+                row.eval_acc = eval_acc;
+            }
+        }
+        assert_eq!(eval_acc, elem_to_ext(F::from_canonical_u32(0)),);
 
         *state.pc = state.pc.wrapping_add(DEFAULT_PC_STEP);
         Ok(())
