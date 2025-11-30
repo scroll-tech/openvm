@@ -3,7 +3,7 @@ use std::borrow::BorrowMut;
 use openvm_circuit::{
     arch::{
         CustomBorrow, ExecutionError, MultiRowLayout, MultiRowMetadata, PreflightExecutor,
-        RecordArena, TraceFiller, VmChipWrapper, VmStateMut,
+        RecordArena, SizedRecord, TraceFiller, VmChipWrapper, VmStateMut,
     },
     system::{
         memory::{online::TracingMemory, MemoryAuxColsFactory},
@@ -76,11 +76,21 @@ impl<'a, F: PrimeField32>
         // Each instruction record consists solely of some number of contiguously
         // stored NativeSumcheckCols<...> structs, each of which corresponds to a
         // single trace row. Trace fillers don't actually need to know how many rows
-        // each instruction uses, and can thus treat each NativePoseidon2Cols<...>
+        // each instruction uses, and can thus treat each NativeSumcheckCols<...>
         // as a single record.
         NativeSumcheckRecordLayout {
             metadata: NativeSumcheckMetadata { num_rows: 1 },
         }
+    }
+}
+
+impl<F: PrimeField32> SizedRecord<NativeSumcheckRecordLayout> for NativeSumcheckRecordMut<'_, F> {
+    fn size(layout: &NativeSumcheckRecordLayout) -> usize {
+        layout.metadata.num_rows * size_of::<NativeSumcheckCols<F>>()
+    }
+
+    fn alignment(_layout: &NativeSumcheckRecordLayout) -> usize {
+        align_of::<NativeSumcheckCols<F>>()
     }
 }
 

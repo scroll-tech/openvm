@@ -1,6 +1,6 @@
-use openvm_circuit::arch::instructions::program::Program;
-#[cfg(not(feature = "cuda"))]
-use openvm_circuit::utils::air_test_impl;
+use openvm_circuit::{arch::instructions::program::Program, utils::air_test_impl};
+#[cfg(feature = "cuda")]
+use openvm_cuda_backend::engine::GpuBabyBearPoseidon2Engine;
 use openvm_native_circuit::{NativeBuilder, NativeConfig, EXT_DEG};
 use openvm_native_compiler::{
     asm::{AsmBuilder, AsmCompiler},
@@ -11,11 +11,10 @@ use openvm_native_compiler::{
 use openvm_stark_backend::p3_field::{
     extension::BinomialExtensionField, FieldAlgebra, FieldExtensionAlgebra,
 };
+#[cfg(not(feature = "cuda"))]
+use openvm_stark_sdk::config::baby_bear_poseidon2::BabyBearPoseidon2Engine;
 use openvm_stark_sdk::{
-    config::{
-        baby_bear_poseidon2::BabyBearPoseidon2Engine,
-        fri_params::standard_fri_params_with_100_bits_conjectured_security, FriParameters,
-    },
+    config::{fri_params::standard_fri_params_with_100_bits_conjectured_security, FriParameters},
     p3_baby_bear::BabyBear,
 };
 
