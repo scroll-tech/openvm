@@ -3,10 +3,8 @@ use std::borrow::{Borrow, BorrowMut};
 use openvm_circuit::{
     arch::*,
     system::{
-        memory::{offline_checker::MemoryBaseAuxCols, online::TracingMemory, MemoryAuxColsFactory},
-        native_adapter::util::{
-            memory_read_native, tracing_read_native, tracing_write_native_inplace,
-        },
+        memory::{online::TracingMemory, MemoryAuxColsFactory},
+        native_adapter::util::{memory_read_native, tracing_write_native_inplace},
     },
 };
 use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode};

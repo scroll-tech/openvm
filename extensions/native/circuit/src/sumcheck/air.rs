@@ -1,17 +1,14 @@
 use std::borrow::Borrow;
 
 use openvm_circuit::{
-    arch::{ContinuationVmProof, ExecutionBridge, ExecutionState},
+    arch::{ExecutionBridge, ExecutionState},
     system::memory::{offline_checker::MemoryBridge, MemoryAddress},
 };
-use openvm_circuit_primitives::{
-    utils::{and, assert_array_eq, not, or},
-    var_range::VariableRangeCheckerBus,
-};
+use openvm_circuit_primitives::utils::{and, assert_array_eq, not};
 use openvm_instructions::{LocalOpcode, NATIVE_AS};
 use openvm_native_compiler::SumcheckOpcode::SUMCHECK_LAYER_EVAL;
 use openvm_stark_backend::{
-    interaction::{BusIndex, InteractionBuilder, PermutationCheckBus},
+    interaction::InteractionBuilder,
     p3_air::{Air, AirBuilder, BaseAir},
     p3_field::{Field, FieldAlgebra},
     p3_matrix::Matrix,
