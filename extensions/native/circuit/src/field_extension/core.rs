@@ -254,10 +254,10 @@ pub(crate) struct FieldExtension;
 impl FieldExtension {
     pub(crate) fn add<V, E>(x: [V; EXT_DEG], y: [V; EXT_DEG]) -> [E; EXT_DEG]
     where
-        V: Copy,
+        V: Clone,
         V: Add<V, Output = E>,
     {
-        array::from_fn(|i| x[i] + y[i])
+        array::from_fn(|i| x[i].clone() + y[i].clone())
     }
 
     pub(crate) fn subtract<V, E>(x: [V; EXT_DEG], y: [V; EXT_DEG]) -> [E; EXT_DEG]

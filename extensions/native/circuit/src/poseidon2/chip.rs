@@ -3,10 +3,8 @@ use std::borrow::{Borrow, BorrowMut};
 use openvm_circuit::{
     arch::*,
     system::{
-        memory::{offline_checker::MemoryBaseAuxCols, online::TracingMemory, MemoryAuxColsFactory},
-        native_adapter::util::{
-            memory_read_native, tracing_read_native, tracing_write_native_inplace,
-        },
+        memory::{online::TracingMemory, MemoryAuxColsFactory},
+        native_adapter::util::{memory_read_native, tracing_write_native_inplace},
     },
 };
 use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode};
@@ -23,12 +21,16 @@ use openvm_stark_backend::{
     p3_maybe_rayon::prelude::{IntoParallelIterator, ParallelSliceMut, *},
 };
 
-use crate::poseidon2::{
-    columns::{
-        InsideRowSpecificCols, MultiObserveCols, NativePoseidon2Cols, SimplePoseidonSpecificCols,
-        TopLevelSpecificCols,
+use crate::{
+    mem_fill_helper,
+    poseidon2::{
+        columns::{
+            InsideRowSpecificCols, MultiObserveCols, NativePoseidon2Cols,
+            SimplePoseidonSpecificCols, TopLevelSpecificCols,
+        },
+        CHUNK,
     },
-    CHUNK,
+    tracing_read_native_helper,
 };
 
 #[derive(Clone)]
@@ -1239,25 +1241,4 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Filler<F, SBOX
     fn poseidon2_output_from_trace(inner: &Poseidon2SubCols<F, SBOX_REGISTERS>) -> &[F; 2 * CHUNK] {
         &inner.ending_full_rounds.last().unwrap().post
     }
-}
-
-fn tracing_read_native_helper<F: PrimeField32, const BLOCK_SIZE: usize>(
-    memory: &mut TracingMemory,
-    ptr: u32,
-    base_aux: &mut MemoryBaseAuxCols<F>,
-) -> [F; BLOCK_SIZE] {
-    let mut prev_ts = 0;
-    let ret = tracing_read_native(memory, ptr, &mut prev_ts);
-    base_aux.set_prev(F::from_canonical_u32(prev_ts));
-    ret
-}
-
-/// Fill `MemoryBaseAuxCols`, assuming that the `prev_timestamp` is already set in `base_aux`.
-fn mem_fill_helper<F: PrimeField32>(
-    mem_helper: &MemoryAuxColsFactory<F>,
-    timestamp: u32,
-    base_aux: &mut MemoryBaseAuxCols<F>,
-) {
-    let prev_ts = base_aux.prev_timestamp.as_canonical_u32();
-    mem_helper.fill(prev_ts, timestamp, base_aux);
 }

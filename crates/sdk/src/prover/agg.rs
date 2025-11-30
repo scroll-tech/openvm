@@ -27,12 +27,12 @@ where
     E: StarkFriEngine<SC = SC>,
     NativeBuilder: VmBuilder<E, VmConfig = NativeConfig>,
 {
-    leaf_prover: VmInstance<E, NativeBuilder>,
-    leaf_controller: LeafProvingController,
+    pub leaf_prover: VmInstance<E, NativeBuilder>,
+    pub leaf_controller: LeafProvingController,
 
     pub internal_prover: VmInstance<E, NativeBuilder>,
     #[cfg(feature = "evm-prove")]
-    root_prover: RootVerifierLocalProver,
+    pub root_prover: RootVerifierLocalProver,
     pub num_children_internal: usize,
     pub max_internal_wrapper_layers: usize,
 }
