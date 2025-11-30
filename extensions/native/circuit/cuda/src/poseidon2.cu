@@ -2,6 +2,7 @@
 #include "poseidon2-air/columns.cuh"
 #include "poseidon2-air/params.cuh"
 #include "poseidon2-air/tracegen.cuh"
+#include "native/utils.cuh"
 #include "primitives/trace_access.h"
 #include "system/memory/controller.cuh"
 
@@ -37,15 +38,6 @@ template <typename T, size_t SBOX_REGISTERS> struct NativePoseidon2Cols {
     T is_exhausted[CHUNK - 1];
     T specific[COL_SPECIFIC_WIDTH];
 };
-
-__device__ void mem_fill_base(
-    MemoryAuxColsFactory &mem_helper,
-    uint32_t timestamp,
-    RowSlice base_aux
-) {
-    uint32_t prev = base_aux[COL_INDEX(MemoryBaseAuxCols, prev_timestamp)].asUInt32();
-    mem_helper.fill(base_aux, prev, timestamp);
-}
 
 template <size_t SBOX_REGISTERS> struct Poseidon2Wrapper {
     template <typename T> using Cols = NativePoseidon2Cols<T, SBOX_REGISTERS>;

@@ -17,6 +17,7 @@ use crate::{
     jal_rangecheck::{JalRangeCheckAir, JalRangeCheckGpu},
     loadstore::{NativeLoadStoreAir, NativeLoadStoreChipGpu},
     poseidon2::{air::NativePoseidon2Air, NativePoseidon2ChipGpu},
+    sumcheck::{air::NativeSumcheckAir, NativeSumcheckChipGpu},
     CastFExtension, GpuBackend, Native,
 };
 
@@ -74,6 +75,10 @@ impl VmProverExtension<GpuBabyBearPoseidon2Engine, DenseRecordArena, Native>
         inventory.next_air::<NativePoseidon2Air<BabyBear, 1>>()?;
         let poseidon2 = NativePoseidon2ChipGpu::<1>::new(range_checker.clone(), timestamp_max_bits);
         inventory.add_executor_chip(poseidon2);
+
+        inventory.next_air::<NativeSumcheckAir>()?;
+        let sumcheck = NativeSumcheckChipGpu::new(range_checker.clone(), timestamp_max_bits);
+        inventory.add_executor_chip(sumcheck);
 
         Ok(())
     }

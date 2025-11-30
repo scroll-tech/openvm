@@ -235,6 +235,44 @@ pub mod poseidon2_cuda {
     }
 }
 
+pub mod sumcheck_cuda {
+    use super::*;
+
+    extern "C" {
+        pub fn _native_sumcheck_tracegen(
+            d_trace: *mut F,
+            height: usize,
+            width: usize,
+            d_records: *const F,
+            rows_used: usize,
+            d_range_checker: *mut u32,
+            range_checker_max_bins: u32,
+            timestamp_max_bits: u32,
+        ) -> i32;
+    }
+
+    pub unsafe fn tracegen(
+        d_trace: &DeviceBuffer<F>,
+        height: usize,
+        width: usize,
+        d_records: &DeviceBuffer<F>,
+        rows_used: usize,
+        d_range_checker: &DeviceBuffer<F>,
+        timestamp_max_bits: u32,
+    ) -> Result<(), CudaError> {
+        CudaError::from_result(_native_sumcheck_tracegen(
+            d_trace.as_mut_ptr(),
+            height,
+            width,
+            d_records.as_ptr(),
+            rows_used,
+            d_range_checker.as_mut_ptr() as *mut u32,
+            d_range_checker.len() as u32,
+            timestamp_max_bits,
+        ))
+    }
+}
+
 pub mod native_loadstore_cuda {
     use super::*;
 
