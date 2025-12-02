@@ -482,12 +482,16 @@ where
                 let specific: &mut ProdSpecificCols<F> =
                     row.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
 
-                eval_acc = FieldExtension::subtract(eval_acc, specific.eval_rlc);
+                if row.should_acc == F::ONE {
+                    eval_acc = FieldExtension::subtract(eval_acc, specific.eval_rlc);
+                }
                 row.eval_acc = eval_acc;
             } else if row.logup_row == F::ONE {
                 let specific: &mut LogupSpecificCols<F> =
                     row.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
-                eval_acc = FieldExtension::subtract(eval_acc, specific.eval_rlc);
+                if row.should_acc == F::ONE {
+                    eval_acc = FieldExtension::subtract(eval_acc, specific.eval_rlc);
+                }
                 row.eval_acc = eval_acc;
             }
         }
