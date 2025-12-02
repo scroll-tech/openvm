@@ -252,7 +252,8 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
 
             exec_state.vm_write(NATIVE_AS, r_evals_ptr_u32 + (1 + i) * EXT_DEG as u32, &eval);
 
-            if mode == NEXT_LAYER_MODE && round + 1 < max_round - 1 {
+            let to_next_round = if mode == NEXT_LAYER_MODE { 1 } else { 0 };
+            if round + to_next_round < max_round - 1 {
                 // update eval_acc
                 eval_acc = FieldExtension::add(eval_acc, FieldExtension::multiply(alpha_acc, eval));
             }
@@ -270,8 +271,8 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
             .vm_read(NATIVE_AS, logup_offset + i)
             .map(|x: F| x.as_canonical_u32());
         let start = calculate_3d_ext_idx(
-            logup_specs_inner_len,
             logup_specs_inner_inner_len,
+            logup_specs_inner_len,
             i,
             round,
             0,
@@ -325,7 +326,8 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
                 FieldExtension::multiply(alpha_numerator, p_eval),
                 FieldExtension::multiply(alpha_denominator, q_eval),
             );
-            if mode == NEXT_LAYER_MODE && round + 1 < max_round - 1 {
+            let to_next_round = if mode == NEXT_LAYER_MODE { 1 } else { 0 };
+            if round + to_next_round < max_round - 1 {
                 // update eval_acc
                 eval_acc = FieldExtension::add(eval_acc, eval_rlc);
             }

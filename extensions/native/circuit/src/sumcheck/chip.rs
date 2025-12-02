@@ -325,7 +325,8 @@ where
                 let eval_rlc = FieldExtension::multiply(alpha_acc, eval);
                 prod_specific.eval_rlc = eval_rlc;
 
-                if mode == NEXT_LAYER_MODE && round + 1 < max_round - 1 {
+                let to_next_round = if mode == NEXT_LAYER_MODE { 1 } else { 0 };
+                if round + to_next_round < max_round - 1 {
                     eval_acc = FieldExtension::add(eval_acc, eval_rlc);
                     prod_row.should_acc = F::ONE;
                     prod_row.prod_acc = F::ONE;
@@ -445,7 +446,8 @@ where
                     FieldExtension::multiply(alpha_denominator, q_eval),
                 );
                 logup_specific.eval_rlc = eval_rlc;
-                if mode == NEXT_LAYER_MODE && round + 1 < max_round - 1 {
+                let to_next_round = if mode == NEXT_LAYER_MODE { 1 } else { 0 };
+                if round + to_next_round < max_round - 1 {
                     eval_acc = FieldExtension::add(eval_acc, eval_rlc);
                     logup_row.should_acc = F::ONE;
                     logup_row.logup_acc = F::ONE;

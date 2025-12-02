@@ -1,3 +1,5 @@
+use std::iter::{once, repeat_n};
+
 use openvm_circuit::{arch::instructions::program::Program, utils::air_test_impl};
 #[cfg(feature = "cuda")]
 use openvm_cuda_backend::engine::GpuBabyBearPoseidon2Engine;
@@ -69,7 +71,25 @@ fn test_sumcheck_layer_eval() {
 }
 
 fn build_test_program<C: Config>(builder: &mut Builder<C>) {
-    let ctx_u32s = [3u32, 6, 5, 8, 2, 8, 4, 0, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9];
+    // 6 prod specs in 8 layers, 5 logup specs in 8 layers
+    let round = 3;
+    let num_prod_specs = 6;
+    let num_logup_specs = 5;
+    let num_layers = 8;
+    let mode = 1; // current_layer
+
+    let mut ctx_u32s = vec![
+        round,
+        num_prod_specs,
+        num_logup_specs,
+        num_layers,
+        2,
+        num_layers,
+        4,
+        mode,
+    ];
+    ctx_u32s.extend(repeat_n(num_layers, num_prod_specs + num_logup_specs));
+
     let ctx: Array<C, Usize<C::N>> = builder.dyn_array(ctx_u32s.len());
     for (idx, n) in ctx_u32s.into_iter().enumerate() {
         builder.set(&ctx, idx, Usize::from(n as usize));
@@ -384,39 +404,69 @@ fn build_test_program<C: Config>(builder: &mut Builder<C>) {
         builder.set(&logup_spec_evals, idx, e);
     }
 
-    #[rustfmt::skip]
-    let r_evals_u32s = [
-        941378355u32, 1078920879, 696738840, 496039492,
-        1555445457, 184545404, 905938226, 1847966044,
-        1024875886, 1782716223, 1625644635, 266865456,
-        465953066, 1663531470, 757423849, 1957075986,
-        1919693393, 839104130, 127480221, 1527842912,
-        918650796, 921462354, 575456073, 696646705,
-        1585912361, 258186488, 353168830, 1111094691,
-        1401166558, 1905942163, 1923083163, 393037255,
-        1042127700, 1126793296, 895794165, 1124924482,
-        1324266058, 722406365, 1963838171, 968504459,
-        1934378800, 714588691, 6465911, 1168379648,
-        903786009, 1326035939, 518289228, 418998914,
-        1513133474, 1578096058, 617547414, 1658315126,
-        68556894, 1697802593, 1346510664, 1709381671,
-        345062962, 1254089535, 1002281845, 1882822096,
-        700581748, 1431345304, 489112954, 98435728,
-        1799886007, 479788390, 223111065, 631662309,
-    ];
+    let alpha = builder.get(&challenges, 0);
+    let c1 = builder.get(&challenges, 1);
+    let c2 = builder.get(&challenges, 2);
+
+    let alpha_acc: Ext<C::F, C::EF> = builder.constant(C::EF::ONE);
+    let eval_acc: Ext<C::F, C::EF> = builder.constant(C::EF::ZERO);
+
+    let mut p_evals = vec![];
+    for i in 0..num_prod_specs {
+        let start = num_layers * 2 * i + 2 * round;
+        let p1 = builder.get(&prod_spec_evals, start);
+        let p2 = builder.get(&prod_spec_evals, start + 1);
+        let p_eval: Ext<C::F, C::EF> = if mode == 1 {
+            // current layer
+            builder.eval(p1 * p2)
+        } else {
+            // next layer
+            builder.eval(p1 * c1 + p2 * c2)
+        };
+        p_evals.push(p_eval);
+        let eval_rlc: Ext<C::F, C::EF> = builder.eval(alpha_acc * p_eval);
+        builder.assign(&eval_acc, eval_acc + eval_rlc);
+        builder.assign(&alpha_acc, alpha_acc * alpha);
+    }
+
+    let mut logup_p_evals = vec![];
+    let mut logup_q_evals = vec![];
+    for i in 0..num_logup_specs {
+        let start = num_layers * 4 * i + 4 * round;
+        let p1 = builder.get(&logup_spec_evals, start);
+        let p2 = builder.get(&logup_spec_evals, start + 1);
+        let q1 = builder.get(&logup_spec_evals, start + 2);
+        let q2 = builder.get(&logup_spec_evals, start + 3);
+        let p_eval: Ext<C::F, C::EF> = if mode == 1 {
+            builder.eval(p1 * q2 + p2 * q1)
+        } else {
+            builder.eval(p1 * c1 + p2 * c2)
+        };
+        let q_eval: Ext<C::F, C::EF> = if mode == 1 {
+            builder.eval(q1 * q2)
+        } else {
+            builder.eval(q1 * c1 + q2 * c2)
+        };
+
+        logup_p_evals.push(p_eval);
+        logup_q_evals.push(q_eval);
+
+        let alpha_denominator: Ext<C::F, C::EF> = builder.eval(alpha_acc * alpha);
+        let eval_rlc: Ext<C::F, C::EF> =
+            builder.eval(alpha_acc * p_eval + alpha_denominator * q_eval);
+
+        builder.assign(&eval_acc, eval_acc + eval_rlc);
+        builder.assign(&alpha_acc, alpha_acc * alpha * alpha);
+    }
+
+    let r_evals = once(eval_acc)
+        .chain(p_evals.into_iter())
+        .chain(logup_p_evals.into_iter())
+        .chain(logup_q_evals.into_iter())
+        .collect::<Vec<_>>();
 
     let next_layer_evals: Array<C, Ext<C::F, C::EF>> =
-        builder.dyn_array(r_evals_u32s.len() / EXT_DEG);
-    for (idx, n) in r_evals_u32s.chunks(EXT_DEG).enumerate() {
-        let e: Ext<C::F, C::EF> = builder.constant(C::EF::from_base_slice(&[
-            C::F::from_canonical_u32(n[0]),
-            C::F::from_canonical_u32(n[1]),
-            C::F::from_canonical_u32(n[2]),
-            C::F::from_canonical_u32(n[3]),
-        ]));
-
-        builder.set(&next_layer_evals, idx, e);
-    }
+        builder.dyn_array(r_evals.len());
 
     builder.sumcheck_layer_eval(
         &ctx,
@@ -425,6 +475,11 @@ fn build_test_program<C: Config>(builder: &mut Builder<C>) {
         &logup_spec_evals,
         &next_layer_evals,
     );
+
+    for (idx, e) in r_evals.into_iter().enumerate() {
+        let next_eval = builder.get(&next_layer_evals, idx);
+        builder.assert_ext_eq(next_eval, e);
+    }
 
     builder.halt();
 }
