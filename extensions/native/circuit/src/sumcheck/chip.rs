@@ -144,7 +144,6 @@ where
         let [ctx_ptr]: [F; 1] = memory_read_native(state.memory.data(), ctx_reg.as_canonical_u32());
         let ctx: [u32; 8] = memory_read_native(state.memory.data(), ctx_ptr.as_canonical_u32())
             .map(|x: F| x.as_canonical_u32());
-
         let [round, num_prod_spec, num_logup_spec, prod_specs_inner_len, prod_specs_inner_inner_len, logup_specs_inner_len, logup_specs_inner_inner_len, mode] =
             ctx;
         // allocate n rows
@@ -198,19 +197,22 @@ where
             r_evals_reg.as_canonical_u32(),
             head_specific.read_records[4].as_mut(),
         );
-
         let ctx: [F; CONTEXT_ARR_BASE_LEN] = tracing_read_native_helper(
             state.memory,
             ctx_ptr.as_canonical_u32(),
             head_specific.read_records[5].as_mut(),
         );
-
         let challenges: [F; EXT_DEG * 4] = tracing_read_native_helper(
             state.memory,
             challenges_ptr.as_canonical_u32(),
             head_specific.read_records[6].as_mut(),
         );
-        cur_timestamp += 7; // 5 register reads + ctx read + challenges read
+        let [max_round]: [F; 1] = tracing_read_native_helper(
+            state.memory,
+            ctx_ptr.as_canonical_u32() + CONTEXT_ARR_BASE_LEN as u32, 
+            head_specific.read_records[7].as_mut()
+        );
+        cur_timestamp += 8; // 5 register reads + ctx read + challenges read + max_round read
         head_row.challenges.copy_from_slice(&challenges);
 
         // challenges = [alpha, c1=r, c2=1-r]
@@ -221,7 +223,7 @@ where
         let mut eval_acc = elem_to_ext(F::from_canonical_u32(0));
         let mut alpha_acc = elem_to_ext(F::from_canonical_u32(1));
 
-        // all rows share same register values, ctx, challenges
+        // all rows share same register values, ctx, challenges, max_round
         for row in rows.iter_mut() {
             // c1, c2 are same during the entire execution
             row.challenges[EXT_DEG..3 * EXT_DEG].copy_from_slice(&challenges[EXT_DEG..3 * EXT_DEG]);
@@ -236,6 +238,7 @@ where
             row.register_ptrs[2] = prod_evals_ptr;
             row.register_ptrs[3] = logup_evals_ptr;
             row.register_ptrs[4] = r_evals_ptr;
+            row.max_round = max_round;
         }
 
         // product rows
@@ -256,15 +259,6 @@ where
             };
             prod_row.curr_prod_n = F::from_canonical_usize(i + 1); // curr_prod_n starts from 1
             prod_row.start_timestamp = F::from_canonical_u32(cur_timestamp);
-
-            // read max_round
-            let [max_round]: [F; 1] = tracing_read_native_helper(
-                state.memory,
-                ctx_ptr.as_canonical_u32() + (CONTEXT_ARR_BASE_LEN + i) as u32,
-                prod_specific.read_records[0].as_mut(),
-            );
-            cur_timestamp += 1;
-
             prod_row.challenges[0..EXT_DEG].copy_from_slice(&alpha_acc);
             prod_row.max_round = max_round;
 
@@ -285,7 +279,7 @@ where
                 let ps: [F; EXT_DEG * 2] = tracing_read_native_helper(
                     state.memory,
                     prod_evals_ptr.as_canonical_u32() + start,
-                    prod_specific.read_records[1].as_mut(),
+                    prod_specific.read_records[0].as_mut(),
                 );
                 let p1: [F; EXT_DEG] = ps[0..EXT_DEG].try_into().unwrap();
                 let p2: [F; EXT_DEG] = ps[EXT_DEG..(EXT_DEG * 2)].try_into().unwrap();
@@ -350,15 +344,7 @@ where
             };
             logup_row.curr_logup_n = F::from_canonical_usize(i + 1); // curr_logup_n starts from 1
             logup_row.start_timestamp = F::from_canonical_u32(cur_timestamp);
-
-            let [max_round]: [F; 1] = tracing_read_native_helper(
-                state.memory,
-                ctx_ptr.as_canonical_u32() + num_prod_spec + (CONTEXT_ARR_BASE_LEN + i) as u32,
-                logup_specific.read_records[0].as_mut(),
-            );
             logup_row.max_round = max_round;
-            cur_timestamp += 1;
-
             let alpha_numerator = alpha_acc;
             let alpha_denominator = FieldExtension::multiply(alpha_acc, alpha);
             logup_row.challenges[0..EXT_DEG].copy_from_slice(&alpha_acc);
@@ -380,7 +366,7 @@ where
                 let pqs: [F; EXT_DEG * 4] = tracing_read_native_helper(
                     state.memory,
                     logup_evals_ptr.as_canonical_u32() + start,
-                    logup_specific.read_records[1].as_mut(),
+                    logup_specific.read_records[0].as_mut(),
                 );
                 let p1: [F; EXT_DEG] = pqs[0..EXT_DEG].try_into().unwrap();
                 let p2: [F; EXT_DEG] = pqs[EXT_DEG..(EXT_DEG * 2)].try_into().unwrap();
@@ -545,7 +531,7 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
                 mem_fill_helper(
                     mem_helper,
                     start_timestamp + 1,
-                    prod_row_specific.read_records[1].as_mut(),
+                    prod_row_specific.read_records[0].as_mut(),
                 );
                 // write p_eval
                 mem_fill_helper(
@@ -569,7 +555,7 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
                 mem_fill_helper(
                     mem_helper,
                     start_timestamp + 1,
-                    logup_row_specific.read_records[1].as_mut(),
+                    logup_row_specific.read_records[0].as_mut(),
                 );
                 // write p_eval
                 mem_fill_helper(
