@@ -7,17 +7,31 @@ pub struct SpanInfo {
     pub start: usize,
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct CycleTracker {
     /// Stack of span names, with most recent at the end
     stack: Vec<SpanInfo>,
     /// Depth of the stack.
     depth: usize,
+    profile_depth: usize,
+}
+
+impl Default for CycleTracker {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl CycleTracker {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            stack: Vec::new(),
+            depth: 0,
+            profile_depth: std::env::var("CYCLE_TRACKER_PROFILE_DEPTH")
+                .ok()
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(3),
+        }
     }
 
     pub fn top(&self) -> Option<&String> {
@@ -40,8 +54,10 @@ impl CycleTracker {
             start: cycles_count,
         });
         let padding = "│ ".repeat(self.depth);
-        tracing::info!("{}┌╴{}", padding, name);
         self.depth += 1;
+        if self.depth < self.profile_depth {
+            tracing::info!("{}┌╴{}", padding, name);
+        }
     }
 
     /// Ends the cycle tracker span for the given name.
@@ -53,10 +69,12 @@ impl CycleTracker {
         }
         let SpanInfo { tag, start } = self.stack.pop().unwrap();
         assert_eq!(tag, name, "Stack top does not match name");
-        self.depth -= 1;
         let padding = "│ ".repeat(self.depth);
         let span_cycles = cycles_count - start;
-        tracing::info!("{}└╴{} cycles", padding, span_cycles);
+        if self.depth < self.profile_depth {
+            tracing::info!("{}└╴{} cycles ({})", padding, span_cycles, name);
+        }
+        self.depth -= 1;
     }
 
     /// Ends the current cycle tracker span.

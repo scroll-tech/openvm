@@ -50,37 +50,38 @@ impl<C: Config> NonLeafVerifierVariables<C> {
             let proof_vm_pvs = self.verify_internal_or_leaf_verifier_proof(builder, &proof);
 
             assert_single_segment_vm_exit_successfully(builder, &proof);
-            builder.if_eq(i, RVar::zero()).then_or_else(
-                |builder| {
-                    builder.assign(&pvs.app_commit, proof_vm_pvs.vm_verifier_pvs.app_commit);
-                    builder.assign(
-                        &leaf_verifier_commit,
-                        proof_vm_pvs.extra_pvs.leaf_verifier_commit,
-                    );
-                },
-                |builder| {
-                    builder.assert_eq::<[_; DIGEST_SIZE]>(
-                        pvs.app_commit,
-                        proof_vm_pvs.vm_verifier_pvs.app_commit,
-                    );
-                    builder.assert_eq::<[_; DIGEST_SIZE]>(
-                        leaf_verifier_commit,
-                        proof_vm_pvs.extra_pvs.leaf_verifier_commit,
-                    );
-                },
-            );
+
+            // builder.if_eq(i, RVar::zero()).then_or_else(
+            //     |builder| {
+            //         builder.assign(&pvs.app_commit, proof_vm_pvs.vm_verifier_pvs.app_commit);
+            //         builder.assign(
+            //             &leaf_verifier_commit,
+            //             proof_vm_pvs.extra_pvs.leaf_verifier_commit,
+            //         );
+            //     },
+            //     |builder| {
+            //         builder.assert_eq::<[_; DIGEST_SIZE]>(
+            //             pvs.app_commit,
+            //             proof_vm_pvs.vm_verifier_pvs.app_commit,
+            //         );
+            //         builder.assert_eq::<[_; DIGEST_SIZE]>(
+            //             leaf_verifier_commit,
+            //             proof_vm_pvs.extra_pvs.leaf_verifier_commit,
+            //         );
+            //     },
+            // );
             assert_or_assign_connector_pvs(
                 builder,
                 &pvs.connector,
                 i,
                 &proof_vm_pvs.vm_verifier_pvs.connector,
             );
-            assert_or_assign_memory_pvs(
-                builder,
-                &pvs.memory,
-                i,
-                &proof_vm_pvs.vm_verifier_pvs.memory,
-            );
+            // assert_or_assign_memory_pvs(
+            //     builder,
+            //     &pvs.memory,
+            //     i,
+            //     &proof_vm_pvs.vm_verifier_pvs.memory,
+            // );
             // This is only needed when `is_terminate` but branching here won't save much, so we
             // always assign it.
             builder.assign(
@@ -106,15 +107,18 @@ impl<C: Config> NonLeafVerifierVariables<C> {
         let program_commit = get_program_commit(builder, proof);
         let is_self_program =
             eq_felt_slice(builder, &self.internal_program_commit, &program_commit);
+        builder.print_v(is_self_program);
 
         builder.if_eq(is_self_program, RVar::one()).then_or_else(
             |builder| {
+                builder.cycle_tracker_start("verify stark");
                 StarkVerifier::verify::<DuplexChallengerVariable<C>>(
                     builder,
                     &self.internal_pcs,
                     &self.internal_advice,
                     proof,
                 );
+                builder.cycle_tracker_end("verify stark");
                 assign_array_to_slice(builder, &flatten_proof_vm_pvs, &proof_vm_pvs_arr, 0);
                 let proof_vm_pvs: &InternalVmVerifierPvs<_> =
                     flatten_proof_vm_pvs.as_slice().borrow();
@@ -126,12 +130,14 @@ impl<C: Config> NonLeafVerifierVariables<C> {
                 );
             },
             |builder| {
+                builder.cycle_tracker_start("verify stark");
                 StarkVerifier::verify::<DuplexChallengerVariable<C>>(
                     builder,
                     &self.leaf_pcs,
                     &self.leaf_advice,
                     proof,
                 );
+                builder.cycle_tracker_end("verify stark");
                 // Leaf verifier doesn't have extra public values.
                 assign_array_to_slice(
                     builder,
