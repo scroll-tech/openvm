@@ -224,7 +224,6 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
     let mut alpha_acc = elem_to_ext(F::ONE);
     let mut eval_acc = elem_to_ext(F::ZERO);
 
-    let prod_offset = ctx_ptr_u32 + CONTEXT_ARR_BASE_LEN as u32;
     for i in 0..num_prod_spec {
         let start = calculate_3d_ext_idx(
             prod_specs_inner_inner_len,
@@ -262,7 +261,6 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
         height += 1;
     }
 
-    let logup_offset = ctx_ptr_u32 + CONTEXT_ARR_BASE_LEN as u32 + num_prod_spec;
     for i in 0..num_logup_spec {
         let start = calculate_3d_ext_idx(
             logup_specs_inner_inner_len,

@@ -169,6 +169,9 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         );
         builder
             .when(next.prod_row + next.logup_row)
+            .assert_eq(max_round, next.max_round);
+        builder
+            .when(next.prod_row + next.logup_row)
             .assert_eq(prod_nested_len, next.prod_nested_len);
         builder
             .when(next.prod_row + next.logup_row)
@@ -223,21 +226,21 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             .when(next.prod_row + next.logup_row)
             .assert_eq(
                 next.start_timestamp,
-                start_timestamp + AB::F::from_canonical_usize(7),
+                start_timestamp + AB::F::from_canonical_usize(8),
             );
         builder
             .when(prod_row)
             .when(next.prod_row + next.logup_row)
             .assert_eq(
                 next.start_timestamp,
-                start_timestamp + AB::F::ONE + within_round_limit * AB::F::TWO,
+                start_timestamp + within_round_limit * AB::F::TWO,
             );
         builder
             .when(logup_row)
             .when(next.prod_row + next.logup_row)
             .assert_eq(
                 next.start_timestamp,
-                start_timestamp + AB::F::ONE + within_round_limit * AB::F::from_canonical_usize(3),
+                start_timestamp + within_round_limit * AB::F::from_canonical_usize(3),
             );
 
         // Termination condition
@@ -333,7 +336,10 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         // Read max_round
         self.memory_bridge
             .read(
-                MemoryAddress::new(native_as, register_ptrs[0]),
+                MemoryAddress::new(
+                    native_as,
+                    register_ptrs[0] + AB::F::from_canonical_usize(CONTEXT_ARR_BASE_LEN),
+                ),
                 [max_round],
                 first_timestamp + AB::F::from_canonical_usize(7),
                 &header_row_specific.read_records[7],

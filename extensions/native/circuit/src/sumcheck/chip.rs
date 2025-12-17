@@ -260,7 +260,6 @@ where
             prod_row.curr_prod_n = F::from_canonical_usize(i + 1); // curr_prod_n starts from 1
             prod_row.start_timestamp = F::from_canonical_u32(cur_timestamp);
             prod_row.challenges[0..EXT_DEG].copy_from_slice(&alpha_acc);
-            prod_row.max_round = max_round;
 
             let max_round = max_round.as_canonical_u32();
             // round starts from 0
@@ -344,7 +343,6 @@ where
             };
             logup_row.curr_logup_n = F::from_canonical_usize(i + 1); // curr_logup_n starts from 1
             logup_row.start_timestamp = F::from_canonical_u32(cur_timestamp);
-            logup_row.max_round = max_round;
             let alpha_numerator = alpha_acc;
             let alpha_denominator = FieldExtension::multiply(alpha_acc, alpha);
             logup_row.challenges[0..EXT_DEG].copy_from_slice(&alpha_acc);
@@ -504,7 +502,7 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
             let header: &mut HeaderSpecificCols<F> =
                 cols.specific[..HeaderSpecificCols::<F>::width()].borrow_mut();
 
-            for i in 0..7usize {
+            for i in 0..8usize {
                 mem_fill_helper(
                     mem_helper,
                     start_timestamp + i as u32,
@@ -520,23 +518,17 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
             let prod_row_specific: &mut ProdSpecificCols<F> =
                 cols.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
 
-            // read max_round
-            mem_fill_helper(
-                mem_helper,
-                start_timestamp,
-                prod_row_specific.read_records[0].as_mut(),
-            );
             if cols.within_round_limit == F::ONE {
                 // read p1, p2
                 mem_fill_helper(
                     mem_helper,
-                    start_timestamp + 1,
+                    start_timestamp,
                     prod_row_specific.read_records[0].as_mut(),
                 );
                 // write p_eval
                 mem_fill_helper(
                     mem_helper,
-                    start_timestamp + 2,
+                    start_timestamp + 1,
                     prod_row_specific.write_record.as_mut(),
                 );
             }
@@ -544,29 +536,23 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
             let logup_row_specific: &mut LogupSpecificCols<F> =
                 cols.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
 
-            // read max_round
-            mem_fill_helper(
-                mem_helper,
-                start_timestamp,
-                logup_row_specific.read_records[0].as_mut(),
-            );
             if cols.within_round_limit == F::ONE {
                 // read p1, p2, q1, q2
                 mem_fill_helper(
                     mem_helper,
-                    start_timestamp + 1,
+                    start_timestamp,
                     logup_row_specific.read_records[0].as_mut(),
                 );
                 // write p_eval
                 mem_fill_helper(
                     mem_helper,
-                    start_timestamp + 2,
+                    start_timestamp + 1,
                     logup_row_specific.write_records[0].as_mut(),
                 );
                 // write q_eval
                 mem_fill_helper(
                     mem_helper,
-                    start_timestamp + 3,
+                    start_timestamp + 2,
                     logup_row_specific.write_records[1].as_mut(),
                 );
             }
