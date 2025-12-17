@@ -11,7 +11,7 @@ __device__ void fill_sumcheck_specific(RowSlice row, MemoryAuxColsFactory &mem_h
     uint32_t start_timestamp = row[COL_INDEX(NativeSumcheckCols, start_timestamp)].asUInt32();
 
     if (row[COL_INDEX(NativeSumcheckCols, header_row)] == Fp::one()) {
-        for (uint32_t i = 0; i < 7; ++i) {
+        for (uint32_t i = 0; i < 8; ++i) {
             mem_fill_base(
                 mem_helper,
                 start_timestamp + i,
@@ -25,43 +25,33 @@ __device__ void fill_sumcheck_specific(RowSlice row, MemoryAuxColsFactory &mem_h
             specific.slice_from(COL_INDEX(HeaderSpecificCols, write_records.base))
         );
     } else if (row[COL_INDEX(NativeSumcheckCols, prod_row)] == Fp::one()) {
-        mem_fill_base(
-            mem_helper,
-            start_timestamp,
-            specific.slice_from(COL_INDEX(ProdSpecificCols, read_records[0].base))
-        );
         if (row[COL_INDEX(NativeSumcheckCols, within_round_limit)] == Fp::one()) {
             mem_fill_base(
                 mem_helper,
-                start_timestamp + 1,
-                specific.slice_from(COL_INDEX(ProdSpecificCols, read_records[1].base))
+                start_timestamp,
+                specific.slice_from(COL_INDEX(ProdSpecificCols, read_records[0].base))
             );
             mem_fill_base(
                 mem_helper,
-                start_timestamp + 2,
+                start_timestamp + 1,
                 specific.slice_from(COL_INDEX(ProdSpecificCols, write_record.base))
             );
         }
     } else if (row[COL_INDEX(NativeSumcheckCols, logup_row)] == Fp::one()) {
-        mem_fill_base(
-            mem_helper,
-            start_timestamp,
-            specific.slice_from(COL_INDEX(LogupSpecificCols, read_records[0].base))
-        );
         if (row[COL_INDEX(NativeSumcheckCols, within_round_limit)] == Fp::one()) {
             mem_fill_base(
                 mem_helper,
-                start_timestamp + 1,
-                specific.slice_from(COL_INDEX(LogupSpecificCols, read_records[1].base))
+                start_timestamp,
+                specific.slice_from(COL_INDEX(LogupSpecificCols, read_records[0].base))
             );
             mem_fill_base(
                 mem_helper,
-                start_timestamp + 2,
+                start_timestamp + 1,
                 specific.slice_from(COL_INDEX(LogupSpecificCols, write_records[0].base))
             );
             mem_fill_base(
                 mem_helper,
-                start_timestamp + 3,
+                start_timestamp + 2,
                 specific.slice_from(COL_INDEX(LogupSpecificCols, write_records[1].base))
             );
         }
