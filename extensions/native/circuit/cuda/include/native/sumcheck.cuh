@@ -8,14 +8,14 @@ using namespace native;
 template <typename T> struct HeaderSpecificCols {
     T pc;
     T registers[5];
-    MemoryReadAuxCols<T> read_records[7];
+    MemoryReadAuxCols<T> read_records[8];
     MemoryWriteAuxCols<T, EXT_DEG> write_records;
 };
 
 template <typename T> struct ProdSpecificCols {
     T data_ptr;
     T p[EXT_DEG * 2];
-    MemoryReadAuxCols<T> read_records[2];
+    MemoryReadAuxCols<T> read_records[1];
     T p_evals[EXT_DEG];
     MemoryWriteAuxCols<T, EXT_DEG> write_record;
     T eval_rlc[EXT_DEG];
@@ -24,7 +24,7 @@ template <typename T> struct ProdSpecificCols {
 template <typename T> struct LogupSpecificCols {
     T data_ptr;
     T pq[EXT_DEG * 4];
-    MemoryReadAuxCols<T> read_records[2];
+    MemoryReadAuxCols<T> read_records[1];
     T p_evals[EXT_DEG];
     T q_evals[EXT_DEG];
     MemoryWriteAuxCols<T, EXT_DEG> write_records[2];

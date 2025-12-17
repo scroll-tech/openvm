@@ -169,6 +169,9 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         );
         builder
             .when(next.prod_row + next.logup_row)
+            .assert_eq(max_round, next.max_round);
+        builder
+            .when(next.prod_row + next.logup_row)
             .assert_eq(prod_nested_len, next.prod_nested_len);
         builder
             .when(next.prod_row + next.logup_row)
@@ -223,21 +226,21 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             .when(next.prod_row + next.logup_row)
             .assert_eq(
                 next.start_timestamp,
-                start_timestamp + AB::F::from_canonical_usize(7),
+                start_timestamp + AB::F::from_canonical_usize(8),
             );
         builder
             .when(prod_row)
             .when(next.prod_row + next.logup_row)
             .assert_eq(
                 next.start_timestamp,
-                start_timestamp + AB::F::ONE + within_round_limit * AB::F::TWO,
+                start_timestamp + within_round_limit * AB::F::TWO,
             );
         builder
             .when(logup_row)
             .when(next.prod_row + next.logup_row)
             .assert_eq(
                 next.start_timestamp,
-                start_timestamp + AB::F::ONE + within_round_limit * AB::F::from_canonical_usize(3),
+                start_timestamp + within_round_limit * AB::F::from_canonical_usize(3),
             );
 
         // Termination condition
@@ -330,6 +333,19 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             )
             .eval(builder, header_row);
 
+        // Read max_round
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(
+                    native_as,
+                    register_ptrs[0] + AB::F::from_canonical_usize(CONTEXT_ARR_BASE_LEN),
+                ),
+                [max_round],
+                first_timestamp + AB::F::from_canonical_usize(7),
+                &header_row_specific.read_records[7],
+            )
+            .eval(builder, header_row);
+
         // Write final result
         self.memory_bridge
             .write(
@@ -347,20 +363,6 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             specific[..ProdSpecificCols::<AB::Var>::width()].borrow();
         let next_prod_row_specific: &ProdSpecificCols<AB::Var> =
             next.specific[..ProdSpecificCols::<AB::Var>::width()].borrow();
-
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(
-                    native_as,
-                    register_ptrs[0]
-                        + AB::F::from_canonical_usize(CONTEXT_ARR_BASE_LEN)
-                        + (curr_prod_n - AB::F::ONE),
-                ), // curr_prod_n starts at 1.
-                [max_round],
-                start_timestamp,
-                &prod_row_specific.read_records[0],
-            )
-            .eval(builder, prod_row);
 
         // prod_row * within_round_limit =
         //    prod_in_round_evaluation + prod_next_round_evaluation
@@ -385,8 +387,8 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             .read(
                 MemoryAddress::new(native_as, register_ptrs[2] + prod_row_specific.data_ptr),
                 prod_row_specific.p,
-                start_timestamp + AB::F::ONE,
-                &prod_row_specific.read_records[1],
+                start_timestamp,
+                &prod_row_specific.read_records[0],
             )
             .eval(builder, prod_row * within_round_limit);
 
@@ -402,7 +404,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                     register_ptrs[4] + curr_prod_n * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 prod_row_specific.p_evals,
-                start_timestamp + AB::F::TWO,
+                start_timestamp + AB::F::ONE,
                 &prod_row_specific.write_record,
             )
             .eval(builder, prod_row * within_round_limit);
@@ -449,21 +451,6 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         let next_logup_row_specfic: &LogupSpecificCols<AB::Var> =
             next.specific[..LogupSpecificCols::<AB::Var>::width()].borrow();
 
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(
-                    native_as,
-                    register_ptrs[0]
-                        + AB::F::from_canonical_usize(EXT_DEG * 2)
-                        + num_prod_spec
-                        + (curr_logup_n - AB::F::ONE),
-                ), // curr_logup_n starts at 1.
-                [max_round],
-                start_timestamp,
-                &logup_row_specific.read_records[0],
-            )
-            .eval(builder, logup_row);
-
         // logup_row * within_round_limit =
         //    logup_in_round_evaluation + logup_next_round_evaluation
         builder
@@ -488,8 +475,8 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             .read(
                 MemoryAddress::new(native_as, register_ptrs[3] + logup_row_specific.data_ptr),
                 logup_row_specific.pq,
-                start_timestamp + AB::F::ONE,
-                &logup_row_specific.read_records[1],
+                start_timestamp,
+                &logup_row_specific.read_records[0],
             )
             .eval(builder, logup_row * within_round_limit);
 
@@ -513,7 +500,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                         + (num_prod_spec + curr_logup_n) * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 logup_row_specific.p_evals,
-                start_timestamp + AB::F::TWO,
+                start_timestamp + AB::F::ONE,
                 &logup_row_specific.write_records[0],
             )
             .eval(builder, logup_row * within_round_limit);
@@ -528,7 +515,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                             * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 logup_row_specific.q_evals,
-                start_timestamp + AB::F::from_canonical_usize(3),
+                start_timestamp + AB::F::TWO,
                 &logup_row_specific.write_records[1],
             )
             .eval(builder, logup_row * within_round_limit);

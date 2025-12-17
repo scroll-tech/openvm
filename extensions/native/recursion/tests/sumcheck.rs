@@ -103,7 +103,7 @@ fn build_test_program<C: Config>(builder: &mut Builder<C>) {
 
     let ctx: Array<C, Usize<C::N>> = builder.dyn_array(ctx_u32s.len());
     for (idx, n) in ctx_u32s.into_iter().enumerate() {
-        builder.set(&ctx, idx, Usize::from(n as usize));
+        builder.set(&ctx, idx, Usize::from(n));
     }
 
     #[rustfmt::skip]
@@ -197,9 +197,9 @@ fn build_test_program<C: Config>(builder: &mut Builder<C>) {
     }
 
     let r_evals = once(eval_acc)
-        .chain(p_evals.into_iter())
-        .chain(logup_p_evals.into_iter())
-        .chain(logup_q_evals.into_iter())
+        .chain(p_evals)
+        .chain(logup_p_evals)
+        .chain(logup_q_evals)
         .collect::<Vec<_>>();
 
     let next_layer_evals: Array<C, Ext<C::F, C::EF>> = builder.dyn_array(r_evals.len());

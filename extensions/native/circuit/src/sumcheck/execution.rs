@@ -214,6 +214,8 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
         ctx;
     let challenges: [F; EXT_DEG * 4] =
         exec_state.vm_read(NATIVE_AS, challenges_ptr.as_canonical_u32());
+    let [max_round]: [u32; 1] =
+        exec_state.vm_read(NATIVE_AS, ctx_ptr_u32 + CONTEXT_ARR_BASE_LEN as u32);
     let alpha: [F; EXT_DEG] = challenges[0..EXT_DEG].try_into().unwrap();
     let c1: [F; EXT_DEG] = challenges[EXT_DEG..EXT_DEG * 2].try_into().unwrap();
     let c2: [F; EXT_DEG] = challenges[EXT_DEG * 2..EXT_DEG * 3].try_into().unwrap();
@@ -222,12 +224,7 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
     let mut alpha_acc = elem_to_ext(F::ONE);
     let mut eval_acc = elem_to_ext(F::ZERO);
 
-    let prod_offset = ctx_ptr_u32 + CONTEXT_ARR_BASE_LEN as u32;
     for i in 0..num_prod_spec {
-        let [max_round]: [u32; 1] = exec_state
-            .vm_read(NATIVE_AS, prod_offset + i)
-            .map(|x: F| x.as_canonical_u32());
-
         let start = calculate_3d_ext_idx(
             prod_specs_inner_inner_len,
             prod_specs_inner_len,
@@ -264,12 +261,7 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
         height += 1;
     }
 
-    let logup_offset = ctx_ptr_u32 + CONTEXT_ARR_BASE_LEN as u32 + num_prod_spec;
     for i in 0..num_logup_spec {
-        // read max_round
-        let [max_round]: [u32; 1] = exec_state
-            .vm_read(NATIVE_AS, logup_offset + i)
-            .map(|x: F| x.as_canonical_u32());
         let start = calculate_3d_ext_idx(
             logup_specs_inner_inner_len,
             logup_specs_inner_len,
