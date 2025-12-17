@@ -209,8 +209,8 @@ where
         );
         let [max_round]: [F; 1] = tracing_read_native_helper(
             state.memory,
-            ctx_ptr.as_canonical_u32() + CONTEXT_ARR_BASE_LEN as u32, 
-            head_specific.read_records[7].as_mut()
+            ctx_ptr.as_canonical_u32() + CONTEXT_ARR_BASE_LEN as u32,
+            head_specific.read_records[7].as_mut(),
         );
         cur_timestamp += 8; // 5 register reads + ctx read + challenges read + max_round read
         head_row.challenges.copy_from_slice(&challenges);
