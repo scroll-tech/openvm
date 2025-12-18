@@ -76,6 +76,8 @@ where
             *state.pc = state.pc.wrapping_add(self.pc_step);
         }
 
+        *state.instret += 1;
+
         Ok(())
     }
 }

@@ -175,6 +175,7 @@ where
         core_record.pointer_read = pointer_read;
         core_record.data = data;
 
+        *state.instret += 1;
         *state.pc = state.pc.wrapping_add(DEFAULT_PC_STEP);
 
         Ok(())

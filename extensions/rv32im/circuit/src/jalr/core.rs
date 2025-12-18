@@ -267,6 +267,8 @@ where
         // RISC-V spec explicitly sets the least significant bit of `to_pc` to 0
         *state.pc = to_pc & !1;
 
+        *state.instret += 1;
+
         Ok(())
     }
 }

@@ -132,8 +132,10 @@ impl TestBuilder<F> for GpuChipTestBuilder {
         tracing::debug!("initial_timestamp={}", initial_state.timestamp);
 
         let mut pc = initial_pc;
+        let mut instret = 0;
         let state_mut = VmStateMut::new(
             &mut pc,
+            &mut instret,
             &mut self.memory.memory,
             &mut self.streams,
             &mut self.rng,

@@ -157,14 +157,18 @@ where
                 SysPhantom::CtStart => {
                     let metrics = state.metrics;
                     if let Some(info) = metrics.debug_infos.get(pc) {
-                        metrics.cycle_tracker.start(info.dsl_instruction.clone());
+                        metrics
+                            .cycle_tracker
+                            .start(info.dsl_instruction.clone(), *state.instret as usize);
                     }
                 }
                 #[cfg(feature = "perf-metrics")]
                 SysPhantom::CtEnd => {
                     let metrics = state.metrics;
                     if let Some(info) = metrics.debug_infos.get(pc) {
-                        metrics.cycle_tracker.end(info.dsl_instruction.clone());
+                        metrics
+                            .cycle_tracker
+                            .end(info.dsl_instruction.clone(), *state.instret as usize);
                     }
                 }
                 _ => {}
@@ -187,6 +191,7 @@ where
                     inner: err,
                 })?;
         }
+        *state.instret += 1;
         *state.pc += DEFAULT_PC_STEP;
         state.memory.increment_timestamp();
 

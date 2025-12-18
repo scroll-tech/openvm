@@ -216,6 +216,7 @@ pub trait PreflightExecutor<F, RA = MatrixRecordArena<F>> {
 #[derive(derive_new::new)]
 pub struct VmStateMut<'a, F, MEM, RA> {
     pub pc: &'a mut u32,
+    pub instret: &'a mut u64,
     pub memory: &'a mut MEM,
     pub streams: &'a mut Streams<F>,
     pub rng: &'a mut StdRng,

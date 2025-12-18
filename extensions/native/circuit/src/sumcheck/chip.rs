@@ -481,6 +481,7 @@ where
         }
         assert_eq!(eval_acc, elem_to_ext(F::from_canonical_u32(0)),);
 
+        *state.instret += 1;
         *state.pc = state.pc.wrapping_add(DEFAULT_PC_STEP);
         Ok(())
     }

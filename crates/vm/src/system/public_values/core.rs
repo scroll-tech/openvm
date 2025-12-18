@@ -202,6 +202,7 @@ where
             }
         }
 
+        *state.instret += 1;
         *state.pc = state.pc.wrapping_add(DEFAULT_PC_STEP);
 
         Ok(())
