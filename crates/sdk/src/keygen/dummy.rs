@@ -54,7 +54,7 @@ use crate::{
 /// - trace heights ordered by AIR ID
 ///
 /// All trace heights are rounded to the next power of two (or 0 -> 0).
-pub(super) fn compute_root_proof_heights(
+pub fn compute_root_proof_heights(
     root_vm: &mut VirtualMachine<BabyBearPoseidon2RootEngine, NativeCpuBuilder>,
     root_committed_exe: &VmCommittedExe<BabyBearPoseidon2RootConfig>,
     dummy_internal_proof: &Proof<SC>,

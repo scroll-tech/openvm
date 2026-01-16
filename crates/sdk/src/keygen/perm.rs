@@ -4,7 +4,7 @@ use std::cmp::Reverse;
 use openvm_continuations::verifier::common::types::SpecialAirIds;
 
 /// Permutation of the AIR IDs to order them by forced trace heights.
-pub(crate) struct AirIdPermutation {
+pub struct AirIdPermutation {
     pub perm: Vec<usize>,
 }
 
