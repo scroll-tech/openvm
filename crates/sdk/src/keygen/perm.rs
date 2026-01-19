@@ -47,7 +47,7 @@ impl AirIdPermutation {
         ret
     }
     /// arr[i] <- arr[perm[i]]
-    pub(crate) fn permute<T>(&self, arr: &mut [T]) {
+    pub fn permute<T>(&self, arr: &mut [T]) {
         debug_assert_eq!(arr.len(), self.perm.len());
         let mut perm = self.perm.clone();
         for i in 0..perm.len() {
