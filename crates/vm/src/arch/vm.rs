@@ -910,7 +910,7 @@ where
     #[getset(get = "pub")]
     exe: Arc<VmExe<Val<E::SC>>>,
     #[getset(get = "pub", get_mut = "pub")]
-    state: Option<VmState<Val<E::SC>, GuestMemory>>,
+    pub state: Option<VmState<Val<E::SC>, GuestMemory>>,
 }
 
 impl<E, VB> VmInstance<E, VB>
