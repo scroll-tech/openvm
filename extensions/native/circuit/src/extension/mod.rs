@@ -87,7 +87,7 @@ cfg_if::cfg_if! {
 // ============ VmExtension Implementations ============
 
 #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize)]
-pub struct Native;
+pub struct Native(pub bool);    // Encloses an indicator for whether NativeSumcheckAIR is present
 
 #[derive(Clone, From, AnyEnum, Executor, MeteredExecutor, PreflightExecutor)]
 pub enum NativeExecutor<F: Field> {
@@ -175,12 +175,14 @@ impl<F: PrimeField32> VmExecutionExtension<F> for Native {
             ],
         )?;
 
-        let tower_verify = NativeSumcheckExecutor::new();
-        inventory.add_executor(
-            tower_verify,
-            [SumcheckOpcode::SUMCHECK_LAYER_EVAL.global_opcode()],
-        )?;
-
+        if self.0 {
+            let tower_verify = NativeSumcheckExecutor::new();
+            inventory.add_executor(
+                tower_verify,
+                [SumcheckOpcode::SUMCHECK_LAYER_EVAL.global_opcode()],
+            )?;
+        }   
+        
         inventory.add_phantom_sub_executor(
             NativeHintInputSubEx,
             PhantomDiscriminant(NativePhantom::HintInput as u16),
@@ -274,9 +276,11 @@ where
         );
         inventory.add_air(verify_batch);
 
-        let tower_evaluate = NativeSumcheckAir::new(exec_bridge, memory_bridge);
-        inventory.add_air(tower_evaluate);
-
+        if self.0 {
+            let tower_evaluate = NativeSumcheckAir::new(exec_bridge, memory_bridge);
+            inventory.add_air(tower_evaluate);
+        }
+        
         Ok(())
     }
 }
@@ -293,7 +297,7 @@ where
 {
     fn extend_prover(
         &self,
-        _: &Native,
+        ext_config: &Native,
         inventory: &mut ChipInventory<SC, RA, CpuBackend<SC>>,
     ) -> Result<(), ChipInventoryError> {
         let range_checker = inventory.range_checker()?.clone();
@@ -357,8 +361,10 @@ where
         );
         inventory.add_executor_chip(poseidon2);
 
-        let tower_verify = NativeSumcheckChip::new(NativeSumcheckFiller::new(), mem_helper.clone());
-        inventory.add_executor_chip(tower_verify);
+        if ext_config.0 {
+            let tower_verify = NativeSumcheckChip::new(NativeSumcheckFiller::new(), mem_helper.clone());
+            inventory.add_executor_chip(tower_verify);
+        }
 
         Ok(())
     }
