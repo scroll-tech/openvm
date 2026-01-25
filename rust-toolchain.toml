@@ -1,5 +1,5 @@
 [toolchain]
-channel = "1.86.0"
-# To use the "tco" feature, switch to Rust nightly:
-# channel = "nightly-2025-08-19"
-components = ["clippy", "rustfmt"]
+channel = "nightly-2025-11-20"
+targets = ["riscv32im-unknown-none-elf"]
+# We need the sources for build-std.
+components = ["rust-src", "clippy", "rustfmt"]

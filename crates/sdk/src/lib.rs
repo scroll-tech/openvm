@@ -800,6 +800,7 @@ where
         Ok(())
     }
 
+    /* _debug: forge_fmt
     #[cfg(feature = "evm-verify")]
     pub fn generate_halo2_verifier_solidity(&self) -> Result<types::EvmHalo2Verifier, SdkError> {
         use std::{
@@ -1036,6 +1037,7 @@ where
         };
         Ok(evm_verifier)
     }
+    */
 
     #[cfg(feature = "evm-verify")]
     /// Uses the `verify(..)` interface of the `OpenVmHalo2Verifier` contract.

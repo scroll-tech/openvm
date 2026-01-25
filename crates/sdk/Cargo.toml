@@ -57,7 +57,7 @@ snark-verifier = { workspace = true, optional = true }
 snark-verifier-sdk = { workspace = true, optional = true }
 tempfile.workspace = true
 hex.workspace = true
-forge-fmt = { workspace = true, optional = true }
+# forge-fmt = { workspace = true, optional = true }
 rrs-lib.workspace = true
 num-bigint.workspace = true
 cfg-if.workspace = true
@@ -75,7 +75,6 @@ evm-verify = [
     "evm-prove",
     "openvm-native-recursion/evm-verify",
     "dep:alloy-sol-types",
-    "dep:forge-fmt",
 ]
 metrics = [
     "openvm-circuit/metrics",

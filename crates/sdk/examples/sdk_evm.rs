@@ -51,7 +51,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // [!region evm_verification]
     // 5. Generate the SNARK verifier smart contract
-    let verifier = sdk.generate_halo2_verifier_solidity()?;
+    // _debug: forge_fmt
+    // let verifier = sdk.generate_halo2_verifier_solidity()?;
 
     // 6. Generate an EVM proof
     // NOTE: this will do app_keygen, agg_keygen, halo2_keygen automatically if they have never been
@@ -60,7 +61,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let proof = sdk.prove_evm(elf, stdin)?;
 
     // 7. Verify the EVM proof
-    Sdk::verify_evm_halo2_proof(&verifier, proof)?;
+    // _debug: forge_fmt
+    // Sdk::verify_evm_halo2_proof(&verifier, proof)?;
     // [!endregion evm_verification]
 
     Ok(())
