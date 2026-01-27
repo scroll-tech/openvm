@@ -157,14 +157,14 @@ where
                 SysPhantom::CtStart => {
                     let metrics = state.metrics;
                     if let Some(info) = metrics.debug_infos.get(pc) {
-                        metrics.cycle_tracker.start(info.dsl_instruction.clone());
+                        metrics.cycle_tracker.start(info.dsl_instruction.clone(), metrics.num_insns_executed, &metrics.counts);
                     }
                 }
                 #[cfg(feature = "perf-metrics")]
                 SysPhantom::CtEnd => {
                     let metrics = state.metrics;
                     if let Some(info) = metrics.debug_infos.get(pc) {
-                        metrics.cycle_tracker.end(info.dsl_instruction.clone());
+                        metrics.cycle_tracker.end(info.dsl_instruction.clone(), metrics.num_insns_executed, &metrics.counts);
                     }
                 }
                 _ => {}
