@@ -23,8 +23,8 @@ struct NativeSumcheckPreCompute {
     r_evals_reg: u32,
     ctx_reg: u32,
     challenges_reg: u32,
-    prod_evals_reg: u32,
-    logup_evals_reg: u32,
+    prod_evals_id_ptr: u32,
+    logup_evals_id_ptr: u32,
 }
 
 impl NativeSumcheckExecutor {
@@ -49,8 +49,8 @@ impl NativeSumcheckExecutor {
         let r_evals_reg = a.as_canonical_u32();
         let ctx_reg = b.as_canonical_u32();
         let challenges_reg = c.as_canonical_u32();
-        let prod_evals_reg = f.as_canonical_u32();
-        let logup_evals_reg = g.as_canonical_u32();
+        let prod_evals_id_ptr = f.as_canonical_u32();
+        let logup_evals_id_ptr = g.as_canonical_u32();
 
         if d.as_canonical_u32() != NATIVE_AS {
             return Err(StaticProgramError::InvalidInstruction(pc));
@@ -63,8 +63,8 @@ impl NativeSumcheckExecutor {
             r_evals_reg,
             ctx_reg,
             challenges_reg,
-            prod_evals_reg,
-            logup_evals_reg,
+            prod_evals_id_ptr,
+            logup_evals_id_ptr,
         };
 
         Ok(())
@@ -199,13 +199,13 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
     let [r_evals_ptr]: [F; 1] = exec_state.vm_read(NATIVE_AS, pre_compute.r_evals_reg);
     let [ctx_ptr]: [F; 1] = exec_state.vm_read(NATIVE_AS, pre_compute.ctx_reg);
     let [challenges_ptr]: [F; 1] = exec_state.vm_read(NATIVE_AS, pre_compute.challenges_reg);
-    let [prod_evals_ptr]: [F; 1] = exec_state.vm_read(NATIVE_AS, pre_compute.prod_evals_reg);
-    let [logup_evals_ptr]: [F; 1] = exec_state.vm_read(NATIVE_AS, pre_compute.logup_evals_reg);
+    let [prod_evals_id]: [F; 1] = exec_state.host_read(NATIVE_AS, pre_compute.prod_evals_id_ptr);
+    let [logup_evals_id]: [F; 1] = exec_state.host_read(NATIVE_AS, pre_compute.logup_evals_id_ptr);
 
     let r_evals_ptr_u32 = r_evals_ptr.as_canonical_u32();
     let ctx_ptr_u32 = ctx_ptr.as_canonical_u32();
-    let logup_evals_ptr = logup_evals_ptr.as_canonical_u32();
-    let prod_evals_ptr = prod_evals_ptr.as_canonical_u32();
+    let logup_evals_id = logup_evals_id.as_canonical_u32();
+    let prod_evals_id = prod_evals_id.as_canonical_u32();
 
     let ctx: [u32; 8] = exec_state
         .vm_read(NATIVE_AS, ctx_ptr_u32)
@@ -224,6 +224,9 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
     let mut alpha_acc = elem_to_ext(F::ONE);
     let mut eval_acc = elem_to_ext(F::ZERO);
 
+    let prod_evals = exec_state.streams.hint_space[prod_evals_id as usize].clone();
+    let logup_evals = exec_state.streams.hint_space[logup_evals_id as usize].clone();
+
     for i in 0..num_prod_spec {
         let start = calculate_3d_ext_idx(
             prod_specs_inner_inner_len,
@@ -231,10 +234,10 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
             i,
             round,
             0,
-        );
+        ) as usize;
 
         if round < max_round - 1 {
-            let ps: [F; EXT_DEG * 2] = exec_state.vm_read(NATIVE_AS, prod_evals_ptr + start);
+            let ps: &[F] = &prod_evals[start..start + EXT_DEG * 2];
             let p1: [F; EXT_DEG] = ps[0..EXT_DEG].try_into().unwrap();
             let p2: [F; EXT_DEG] = ps[EXT_DEG..EXT_DEG * 2].try_into().unwrap();
 
@@ -268,14 +271,14 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
             i,
             round,
             0,
-        );
+        ) as usize;
 
         let alpha_denominator = FieldExtension::multiply(alpha_acc, alpha);
         let alpha_numerator = alpha_acc;
 
         if round < max_round - 1 {
             // read logup_evals
-            let pqs: [F; EXT_DEG * 4] = exec_state.vm_read(NATIVE_AS, logup_evals_ptr + start);
+            let pqs: &[F] = &logup_evals[start..start + EXT_DEG * 4];
             let p1: [F; EXT_DEG] = pqs[0..EXT_DEG].try_into().unwrap();
             let p2: [F; EXT_DEG] = pqs[EXT_DEG..EXT_DEG * 2].try_into().unwrap();
             let q1: [F; EXT_DEG] = pqs[EXT_DEG * 2..EXT_DEG * 3].try_into().unwrap();
