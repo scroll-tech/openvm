@@ -23,6 +23,8 @@ use crate::{
     },
 };
 
+pub const TOPLEVEL_TIMESTAMP_DIFF: usize = 6;
+
 #[derive(Clone, Debug)]
 pub struct NativeSumcheckAir {
     pub execution_bridge: ExecutionBridge,
@@ -226,7 +228,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             .when(next.prod_row + next.logup_row)
             .assert_eq(
                 next.start_timestamp,
-                start_timestamp + AB::F::from_canonical_usize(8),
+                start_timestamp + AB::F::from_canonical_usize(TOPLEVEL_TIMESTAMP_DIFF),
             );
         builder
             .when(prod_row)
@@ -301,14 +303,18 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             )
             .eval(builder, header_row);
 
+        let mut header_timestamp_diff = (0..TOPLEVEL_TIMESTAMP_DIFF)
+            .into_iter()
+            .map(|i| AB::F::from_canonical_usize(i));
+        let mut header_read_records_iter = header_row_specific.read_records.iter();
         // Read registers
         for i in 0..3usize {
             self.memory_bridge
                 .read(
                     MemoryAddress::new(native_as, registers[i]),
                     [register_ptrs[i]],
-                    first_timestamp + AB::F::from_canonical_usize(i),
-                    &header_row_specific.read_records[i],
+                    first_timestamp + header_timestamp_diff.next().unwrap(),
+                    header_read_records_iter.next().unwrap(),
                 )
                 .eval(builder, header_row);
         }
@@ -318,8 +324,8 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             .read(
                 MemoryAddress::new(native_as, register_ptrs[0]),
                 ctx,
-                first_timestamp + AB::F::from_canonical_usize(3),
-                &header_row_specific.read_records[3],
+                first_timestamp + header_timestamp_diff.next().unwrap(),
+                header_read_records_iter.next().unwrap(),
             )
             .eval(builder, header_row);
 
@@ -328,8 +334,8 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             .read(
                 MemoryAddress::new(native_as, register_ptrs[1]),
                 challenges,
-                first_timestamp + AB::F::from_canonical_usize(4),
-                &header_row_specific.read_records[4],
+                first_timestamp + header_timestamp_diff.next().unwrap(),
+                header_read_records_iter.next().unwrap(),
             )
             .eval(builder, header_row);
 
@@ -341,8 +347,8 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                     register_ptrs[0] + AB::F::from_canonical_usize(CONTEXT_ARR_BASE_LEN),
                 ),
                 [max_round],
-                first_timestamp + AB::F::from_canonical_usize(5),
-                &header_row_specific.read_records[5],
+                first_timestamp + header_timestamp_diff.next().unwrap(),
+                header_read_records_iter.next().unwrap(),
             )
             .eval(builder, header_row);
 

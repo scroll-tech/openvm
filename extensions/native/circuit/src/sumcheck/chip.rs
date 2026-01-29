@@ -169,16 +169,17 @@ where
         head_specific.registers[1] = challenges_reg;
         head_specific.registers[2] = r_evals_reg;
 
+        let mut head_read_records_iter = head_specific.read_records.iter_mut().map(|r| r.as_mut());
         // read pointers
         let [ctx_ptr]: [F; 1] = tracing_read_native_helper(
             state.memory,
             ctx_reg.as_canonical_u32(),
-            head_specific.read_records[0].as_mut(),
+            head_read_records_iter.next().unwrap(),
         );
         let [challenges_ptr]: [F; 1] = tracing_read_native_helper(
             state.memory,
             challenges_reg.as_canonical_u32(),
-            head_specific.read_records[1].as_mut(),
+            head_read_records_iter.next().unwrap(),
         );
         let [prod_evals_id]: [F; 1] =
             memory_read_native(state.memory.data(), prod_evals_id_ptr.as_canonical_u32());
@@ -187,23 +188,24 @@ where
         let [r_evals_ptr]: [F; 1] = tracing_read_native_helper(
             state.memory,
             r_evals_reg.as_canonical_u32(),
-            head_specific.read_records[2].as_mut(),
+            head_read_records_iter.next().unwrap(),
         );
         let ctx: [F; CONTEXT_ARR_BASE_LEN] = tracing_read_native_helper(
             state.memory,
             ctx_ptr.as_canonical_u32(),
-            head_specific.read_records[3].as_mut(),
+            head_read_records_iter.next().unwrap(),
         );
         let challenges: [F; EXT_DEG * 4] = tracing_read_native_helper(
             state.memory,
             challenges_ptr.as_canonical_u32(),
-            head_specific.read_records[4].as_mut(),
+            head_read_records_iter.next().unwrap(),
         );
         let [max_round]: [F; 1] = tracing_read_native_helper(
             state.memory,
             ctx_ptr.as_canonical_u32() + CONTEXT_ARR_BASE_LEN as u32,
-            head_specific.read_records[5].as_mut(),
+            head_read_records_iter.next().unwrap(),
         );
+        assert!(head_read_records_iter.next().is_none());
         cur_timestamp += 6; // 3 register reads + ctx read + challenges read + max_round read
         head_row.challenges.copy_from_slice(&challenges);
 
@@ -491,7 +493,7 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
             let header: &mut HeaderSpecificCols<F> =
                 cols.specific[..HeaderSpecificCols::<F>::width()].borrow_mut();
 
-            for i in 0..8usize {
+            for i in 0..6usize {
                 mem_fill_helper(
                     mem_helper,
                     start_timestamp + i as u32,

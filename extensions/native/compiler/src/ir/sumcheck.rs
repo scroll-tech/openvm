@@ -1,5 +1,4 @@
-use super::{Array, Builder, Config, DslIr, Ext, Usize};
-use crate::ir::Var;
+use super::{Array, Builder, Config, DslIr, Ext, Usize, Var};
 
 impl<C: Config> Builder<C> {
     /// Extends native VM ability to calculate the evaluation for a sumcheck layer
@@ -31,10 +30,8 @@ impl<C: Config> Builder<C> {
         &mut self,
         input_ctx: &Array<C, Usize<C::N>>, // Context variables
         challenges: &Array<C, Ext<C::F, C::EF>>, // Challenges
-        prod_specs_eval_id: Var<C::N>,     /* GKR product IOP evaluations. Flattened
-                                            * from 3D array. */
-        logup_specs_eval_id: Var<C::N>, /* GKR logup IOP evaluations. Flattened
-                                         * from 3D array. */
+        prod_specs_eval_id: Var<C::N>, /* ID for GKR product IOP evaluations hint. */
+        logup_specs_eval_id: Var<C::N>, /* ID for GKR logup IOP evaluations hint. */
         r_evals: &Array<C, Ext<C::F, C::EF>>, /* Next layer's evaluations (pointer used for
                                                * storing opcode output) */
     ) {
