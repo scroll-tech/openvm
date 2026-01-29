@@ -72,17 +72,17 @@ fn test_sumcheck_layer_eval() {
         standard_fri_params_with_100_bits_conjectured_security(1)
     };
 
-    let mut input_stream = vec![];
+    let mut input_stream: Vec<Vec<F>> = vec![];
     input_stream.push(
         prod_evals
             .into_iter()
-            .flat_map(|e| e.as_base_slice().iter().cloned().collect::<Vec<_>>())
+            .flat_map(|e| <E as FieldExtensionAlgebra<F>>::as_base_slice(&e).to_vec())
             .collect(),
     );
     input_stream.push(
         logup_evals
             .into_iter()
-            .flat_map(|e| e.as_base_slice().iter().cloned().collect::<Vec<_>>())
+            .flat_map(|e| <E as FieldExtensionAlgebra<F>>::as_base_slice(&e).to_vec())
             .collect(),
     );
 
@@ -108,7 +108,7 @@ fn test_sumcheck_layer_eval() {
             vb,
             config,
             program,
-            vec![],
+            input_stream,
             1,
             true,
         )
