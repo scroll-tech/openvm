@@ -23,6 +23,10 @@ use crate::{
     },
 };
 
+pub const TOPLEVEL_TIMESTAMP_DIFF: usize = 6;
+pub const NUM_RWS_FOR_PRODUCT: usize = 1;
+pub const NUM_RWS_FOR_LOGUP: usize = 2;
+
 #[derive(Clone, Debug)]
 pub struct NativeSumcheckAir {
     pub execution_bridge: ExecutionBridge,
@@ -226,21 +230,23 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             .when(next.prod_row + next.logup_row)
             .assert_eq(
                 next.start_timestamp,
-                start_timestamp + AB::F::from_canonical_usize(8),
+                start_timestamp + AB::F::from_canonical_usize(TOPLEVEL_TIMESTAMP_DIFF),
             );
         builder
             .when(prod_row)
             .when(next.prod_row + next.logup_row)
             .assert_eq(
                 next.start_timestamp,
-                start_timestamp + within_round_limit * AB::F::TWO,
+                start_timestamp
+                    + within_round_limit * AB::F::from_canonical_usize(NUM_RWS_FOR_PRODUCT),
             );
         builder
             .when(logup_row)
             .when(next.prod_row + next.logup_row)
             .assert_eq(
                 next.start_timestamp,
-                start_timestamp + within_round_limit * AB::F::from_canonical_usize(3),
+                start_timestamp
+                    + within_round_limit * AB::F::from_canonical_usize(NUM_RWS_FOR_LOGUP),
             );
 
         // Termination condition
@@ -288,27 +294,31 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             .execute_and_increment_pc(
                 AB::Expr::from_canonical_usize(SUMCHECK_LAYER_EVAL.global_opcode().as_usize()),
                 [
-                    registers[4].into(),
+                    registers[2].into(),
                     registers[0].into(),
                     registers[1].into(),
                     native_as.into(),
                     native_as.into(),
-                    registers[2].into(),
-                    registers[3].into(),
+                    header_row_specific.prod_id.into(),
+                    header_row_specific.logup_id.into(),
                 ],
                 ExecutionState::new(header_row_specific.pc, first_timestamp),
                 last_timestamp - first_timestamp,
             )
             .eval(builder, header_row);
 
+        let mut header_timestamp_diff = (0..TOPLEVEL_TIMESTAMP_DIFF)
+            .into_iter()
+            .map(|i| AB::F::from_canonical_usize(i));
+        let mut header_read_records_iter = header_row_specific.read_records.iter();
         // Read registers
-        for i in 0..5usize {
+        for i in 0..3usize {
             self.memory_bridge
                 .read(
                     MemoryAddress::new(native_as, registers[i]),
                     [register_ptrs[i]],
-                    first_timestamp + AB::F::from_canonical_usize(i),
-                    &header_row_specific.read_records[i],
+                    first_timestamp + header_timestamp_diff.next().unwrap(),
+                    header_read_records_iter.next().unwrap(),
                 )
                 .eval(builder, header_row);
         }
@@ -318,8 +328,8 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             .read(
                 MemoryAddress::new(native_as, register_ptrs[0]),
                 ctx,
-                first_timestamp + AB::F::from_canonical_usize(5),
-                &header_row_specific.read_records[5],
+                first_timestamp + header_timestamp_diff.next().unwrap(),
+                header_read_records_iter.next().unwrap(),
             )
             .eval(builder, header_row);
 
@@ -328,8 +338,8 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             .read(
                 MemoryAddress::new(native_as, register_ptrs[1]),
                 challenges,
-                first_timestamp + AB::F::from_canonical_usize(6),
-                &header_row_specific.read_records[6],
+                first_timestamp + header_timestamp_diff.next().unwrap(),
+                header_read_records_iter.next().unwrap(),
             )
             .eval(builder, header_row);
 
@@ -341,15 +351,15 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                     register_ptrs[0] + AB::F::from_canonical_usize(CONTEXT_ARR_BASE_LEN),
                 ),
                 [max_round],
-                first_timestamp + AB::F::from_canonical_usize(7),
-                &header_row_specific.read_records[7],
+                first_timestamp + header_timestamp_diff.next().unwrap(),
+                header_read_records_iter.next().unwrap(),
             )
             .eval(builder, header_row);
 
         // Write final result
         self.memory_bridge
             .write(
-                MemoryAddress::new(native_as, register_ptrs[4]),
+                MemoryAddress::new(native_as, register_ptrs[2]),
                 eval_acc,
                 last_timestamp - AB::F::ONE,
                 &header_row_specific.write_records,
@@ -383,14 +393,17 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         );
         builder.assert_eq(prod_row * should_acc, prod_acc);
 
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(native_as, register_ptrs[2] + prod_row_specific.data_ptr),
-                prod_row_specific.p,
-                start_timestamp,
-                &prod_row_specific.read_records[0],
-            )
-            .eval(builder, prod_row * within_round_limit);
+        let mut prod_timestamp_diff = (0..1).into_iter().map(|i| AB::F::from_canonical_usize(i));
+
+        // TODO: read from hint space then write to memory
+        // self.memory_bridge
+        //     .read(
+        //         MemoryAddress::new(native_as, register_ptrs[2] + prod_row_specific.data_ptr),
+        //         prod_row_specific.p,
+        //         start_timestamp,
+        //         &prod_row_specific.read_records[0],
+        //     )
+        //     .eval(builder, prod_row * within_round_limit);
 
         let p1: [AB::Var; EXT_DEG] = prod_row_specific.p[0..EXT_DEG].try_into().unwrap();
         let p2: [AB::Var; EXT_DEG] = prod_row_specific.p[EXT_DEG..(EXT_DEG * 2)]
@@ -401,13 +414,15 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             .write(
                 MemoryAddress::new(
                     native_as,
-                    register_ptrs[4] + curr_prod_n * AB::F::from_canonical_usize(EXT_DEG),
+                    register_ptrs[2] + curr_prod_n * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 prod_row_specific.p_evals,
-                start_timestamp + AB::F::ONE,
+                start_timestamp + prod_timestamp_diff.next().unwrap(),
                 &prod_row_specific.write_record,
             )
             .eval(builder, prod_row * within_round_limit);
+
+        assert!(prod_timestamp_diff.next().is_none());
 
         // Calculate evaluations
         let next_round_p_evals = FieldExtension::add(
@@ -471,14 +486,16 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         );
         builder.assert_eq(logup_row * should_acc, logup_acc);
 
-        self.memory_bridge
-            .read(
-                MemoryAddress::new(native_as, register_ptrs[3] + logup_row_specific.data_ptr),
-                logup_row_specific.pq,
-                start_timestamp,
-                &logup_row_specific.read_records[0],
-            )
-            .eval(builder, logup_row * within_round_limit);
+        let mut logup_timestamp_diff = (0..2).into_iter().map(|i| AB::F::from_canonical_usize(i));
+
+        // self.memory_bridge
+        //     .read(
+        //         MemoryAddress::new(native_as, register_ptrs[3] + logup_row_specific.data_ptr),
+        //         logup_row_specific.pq,
+        //         start_timestamp,
+        //         &logup_row_specific.read_records[0],
+        //     )
+        //     .eval(builder, logup_row * within_round_limit);
 
         let p1: [_; EXT_DEG] = logup_row_specific.pq[0..EXT_DEG].try_into().unwrap();
         let p2: [_; EXT_DEG] = logup_row_specific.pq[EXT_DEG..(EXT_DEG * 2)]
@@ -496,11 +513,11 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             .write(
                 MemoryAddress::new(
                     native_as,
-                    register_ptrs[4]
+                    register_ptrs[2]
                         + (num_prod_spec + curr_logup_n) * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 logup_row_specific.p_evals,
-                start_timestamp + AB::F::ONE,
+                start_timestamp + logup_timestamp_diff.next().unwrap(),
                 &logup_row_specific.write_records[0],
             )
             .eval(builder, logup_row * within_round_limit);
@@ -510,12 +527,12 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             .write(
                 MemoryAddress::new(
                     native_as,
-                    register_ptrs[4]
+                    register_ptrs[2]
                         + (num_prod_spec + num_logup_spec + curr_logup_n)
                             * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 logup_row_specific.q_evals,
-                start_timestamp + AB::F::TWO,
+                start_timestamp + logup_timestamp_diff.next().unwrap(),
                 &logup_row_specific.write_records[1],
             )
             .eval(builder, logup_row * within_round_limit);
