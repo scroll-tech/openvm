@@ -208,6 +208,8 @@ where
         assert!(head_read_records_iter.next().is_none());
         cur_timestamp += 6; // 3 register reads + ctx read + challenges read + max_round read
         head_row.challenges.copy_from_slice(&challenges);
+        head_specific.prod_id = prod_evals_id_ptr;
+        head_specific.logup_id = logup_evals_id_ptr;
 
         // challenges = [alpha, c1=r, c2=1-r]
         let alpha: [F; 4] = challenges[0..EXT_DEG].try_into().unwrap();
@@ -271,7 +273,7 @@ where
                 ) as usize;
                 prod_specific.data_ptr = F::from_canonical_usize(start);
 
-                // read p1, p2
+                // read p1, p2 from hint space
                 let ps: [F; EXT_DEG * 2] =
                     prod_evals[start..start + EXT_DEG * 2].try_into().unwrap();
                 let p1: [F; EXT_DEG] = ps[0..EXT_DEG].try_into().unwrap();
@@ -307,7 +309,7 @@ where
                     eval,
                     &mut prod_specific.write_record,
                 );
-                cur_timestamp += 2;
+                cur_timestamp += 1; // 1 write
 
                 let eval_rlc = FieldExtension::multiply(alpha_acc, eval);
                 prod_specific.eval_rlc = eval_rlc;
@@ -354,7 +356,7 @@ where
                 ) as usize;
                 logup_specific.data_ptr = F::from_canonical_usize(start);
 
-                // read p1, p2, q1, q2
+                // read p1, p2, q1, q2 from hint space
                 let pqs: [F; EXT_DEG * 4] =
                     logup_evals[start..start + EXT_DEG * 4].try_into().unwrap();
                 let p1: [F; EXT_DEG] = pqs[0..EXT_DEG].try_into().unwrap();
@@ -414,7 +416,7 @@ where
                     q_eval,
                     &mut logup_specific.write_records[1],
                 );
-                cur_timestamp += 3; // 1 read, 2 writes
+                cur_timestamp += 2; // 0 read, 2 writes
 
                 let eval_rlc = FieldExtension::add(
                     FieldExtension::multiply(alpha_numerator, p_eval),
@@ -510,16 +512,16 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
                 cols.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
 
             if cols.within_round_limit == F::ONE {
-                // read p1, p2
-                mem_fill_helper(
-                    mem_helper,
-                    start_timestamp,
-                    prod_row_specific.read_records[0].as_mut(),
-                );
+                // TODO: read p1, p2 from hint space, then write to memory
+                // mem_fill_helper(
+                //     mem_helper,
+                //     start_timestamp,
+                // prod_row_specific.read_records[0].as_mut(),
+                // );
                 // write p_eval
                 mem_fill_helper(
                     mem_helper,
-                    start_timestamp + 1,
+                    start_timestamp,
                     prod_row_specific.write_record.as_mut(),
                 );
             }
@@ -528,22 +530,22 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
                 cols.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
 
             if cols.within_round_limit == F::ONE {
-                // read p1, p2, q1, q2
-                mem_fill_helper(
-                    mem_helper,
-                    start_timestamp,
-                    logup_row_specific.read_records[0].as_mut(),
-                );
+                // TODO: read p1, p2, q1, q2 from hint space
+                // mem_fill_helper(
+                //     mem_helper,
+                //     start_timestamp,
+                //     logup_row_specific.read_records[0].as_mut(),
+                // );
                 // write p_eval
                 mem_fill_helper(
                     mem_helper,
-                    start_timestamp + 1,
+                    start_timestamp,
                     logup_row_specific.write_records[0].as_mut(),
                 );
                 // write q_eval
                 mem_fill_helper(
                     mem_helper,
-                    start_timestamp + 2,
+                    start_timestamp + 1,
                     logup_row_specific.write_records[1].as_mut(),
                 );
             }

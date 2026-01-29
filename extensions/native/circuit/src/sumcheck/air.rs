@@ -24,6 +24,8 @@ use crate::{
 };
 
 pub const TOPLEVEL_TIMESTAMP_DIFF: usize = 6;
+pub const NUM_RWS_FOR_PRODUCT: usize = 1;
+pub const NUM_RWS_FOR_LOGUP: usize = 2;
 
 #[derive(Clone, Debug)]
 pub struct NativeSumcheckAir {
@@ -235,14 +237,16 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             .when(next.prod_row + next.logup_row)
             .assert_eq(
                 next.start_timestamp,
-                start_timestamp + within_round_limit * AB::F::TWO,
+                start_timestamp
+                    + within_round_limit * AB::F::from_canonical_usize(NUM_RWS_FOR_PRODUCT),
             );
         builder
             .when(logup_row)
             .when(next.prod_row + next.logup_row)
             .assert_eq(
                 next.start_timestamp,
-                start_timestamp + within_round_limit * AB::F::from_canonical_usize(3),
+                start_timestamp
+                    + within_round_limit * AB::F::from_canonical_usize(NUM_RWS_FOR_LOGUP),
             );
 
         // Termination condition
@@ -389,6 +393,9 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         );
         builder.assert_eq(prod_row * should_acc, prod_acc);
 
+        let mut prod_timestamp_diff = (0..1).into_iter().map(|i| AB::F::from_canonical_usize(i));
+
+        // TODO: read from hint space then write to memory
         // self.memory_bridge
         //     .read(
         //         MemoryAddress::new(native_as, register_ptrs[2] + prod_row_specific.data_ptr),
@@ -410,10 +417,12 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                     register_ptrs[2] + curr_prod_n * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 prod_row_specific.p_evals,
-                start_timestamp + AB::F::ONE,
+                start_timestamp + prod_timestamp_diff.next().unwrap(),
                 &prod_row_specific.write_record,
             )
             .eval(builder, prod_row * within_round_limit);
+
+        assert!(prod_timestamp_diff.next().is_none());
 
         // Calculate evaluations
         let next_round_p_evals = FieldExtension::add(
@@ -477,6 +486,8 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         );
         builder.assert_eq(logup_row * should_acc, logup_acc);
 
+        let mut logup_timestamp_diff = (0..2).into_iter().map(|i| AB::F::from_canonical_usize(i));
+
         // self.memory_bridge
         //     .read(
         //         MemoryAddress::new(native_as, register_ptrs[3] + logup_row_specific.data_ptr),
@@ -506,7 +517,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                         + (num_prod_spec + curr_logup_n) * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 logup_row_specific.p_evals,
-                start_timestamp + AB::F::ONE,
+                start_timestamp + logup_timestamp_diff.next().unwrap(),
                 &logup_row_specific.write_records[0],
             )
             .eval(builder, logup_row * within_round_limit);
@@ -521,7 +532,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                             * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 logup_row_specific.q_evals,
-                start_timestamp + AB::F::TWO,
+                start_timestamp + logup_timestamp_diff.next().unwrap(),
                 &logup_row_specific.write_records[1],
             )
             .eval(builder, logup_row * within_round_limit);
