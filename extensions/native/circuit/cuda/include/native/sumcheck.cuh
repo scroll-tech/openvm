@@ -7,10 +7,8 @@ using namespace native;
 
 template <typename T> struct HeaderSpecificCols {
     T pc;
-    T registers[3];
-    T prod_id;
-    T logup_id;
-    MemoryReadAuxCols<T> read_records[6];
+    T registers[5];
+    MemoryReadAuxCols<T> read_records[8];
     MemoryWriteAuxCols<T, EXT_DEG> write_records;
 };
 
@@ -63,7 +61,7 @@ template <typename T> struct NativeSumcheckCols {
     T start_timestamp;
     T last_timestamp;
 
-    T register_ptrs[3];
+    T register_ptrs[5];
 
     T ctx[EXT_DEG * 2];
 

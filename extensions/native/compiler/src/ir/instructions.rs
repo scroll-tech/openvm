@@ -341,8 +341,8 @@ pub enum DslIr<C: Config> {
         // 7. Operational mode indicator
         // 8+. usize-type variables indicating maximum rounds
         Ptr<C::N>, // Challenges: alpha, coeffs
-        Var<C::N>, // prod_specs_eval
-        Var<C::N>, // logup_specs_eval
+        Ptr<C::N>, // prod_specs_eval
+        Ptr<C::N>, // logup_specs_eval
         Ptr<C::N>, // output
     ),
 }

@@ -38,7 +38,7 @@ pub struct NativeSumcheckCols<T> {
     pub last_timestamp: T,
 
     // Register values
-    pub register_ptrs: [T; 3],
+    pub register_ptrs: [T; 5],
 
     // Context variables
     // [
@@ -91,11 +91,9 @@ pub struct NativeSumcheckCols<T> {
 #[derive(AlignedBorrow)]
 pub struct HeaderSpecificCols<T> {
     pub pc: T,
-    pub registers: [T; 3],
-    pub prod_id: T,
-    pub logup_id: T,
-    /// 3 register reads + ctx read + max round read + challenges read
-    pub read_records: [MemoryReadAuxCols<T>; 6],
+    pub registers: [T; 5],
+    /// 5 register reads + ctx read + max round read + challenges read
+    pub read_records: [MemoryReadAuxCols<T>; 8],
     /// Write the final evaluation
     pub write_records: MemoryWriteAuxCols<T, EXT_DEG>,
 }
