@@ -103,8 +103,8 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             should_acc,
             eval_acc,
             is_hint_src_id,
-            prod_evals_id: _,
-            logup_evals_id: _,
+            prod_evals_id,
+            logup_evals_id,
             specific,
         } = local;
 
@@ -346,7 +346,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                     native_as,
                     register_ptrs[0] + AB::F::from_canonical_usize(CONTEXT_ARR_BASE_LEN),
                 ),
-                [max_round],
+                [max_round, is_hint_src_id, prod_evals_id, logup_evals_id],
                 first_timestamp + AB::F::from_canonical_usize(7),
                 &header_row_specific.read_records[7],
             )
