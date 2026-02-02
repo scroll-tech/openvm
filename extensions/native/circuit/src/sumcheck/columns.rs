@@ -73,6 +73,12 @@ pub struct NativeSumcheckCols<T> {
     // The current final evaluation accumulator. Extension element.
     pub eval_acc: [T; EXT_DEG],
 
+    // Indicate whether the prod/logup evals are from hint space
+    pub is_hint_src_id: T,
+    // Hint space Ids
+    pub prod_evals_id: T,
+    pub logup_evals_id: T,
+
     // /// 1. For header row, 5 registers, ctx, challenges
     // /// 2. For the rest: max_variables, p1, p2, q1, q2
     // pub read_records: [MemoryReadAuxCols<T>; 7],

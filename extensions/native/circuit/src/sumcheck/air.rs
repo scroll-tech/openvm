@@ -23,6 +23,9 @@ use crate::{
     },
 };
 
+pub const NUM_RWS_FOR_PRODUCT: usize = 2;
+pub const NUM_RWS_FOR_LOGUP: usize = 3;
+
 #[derive(Clone, Debug)]
 pub struct NativeSumcheckAir {
     pub execution_bridge: ExecutionBridge,
@@ -99,6 +102,11 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             within_round_limit,
             should_acc,
             eval_acc,
+            
+            is_hint_src_id,
+            prod_evals_id,
+            logup_evals_id,
+            
             specific,
         } = local;
 
