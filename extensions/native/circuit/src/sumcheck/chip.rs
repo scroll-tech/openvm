@@ -207,11 +207,12 @@ where
             challenges_ptr.as_canonical_u32(),
             head_specific.read_records[6].as_mut(),
         );
-        let [max_round, is_hint_src_id, prod_evals_id, logup_evals_id]: [F; EXT_DEG] = tracing_read_native_helper(
-            state.memory,
-            ctx_ptr.as_canonical_u32() + CONTEXT_ARR_BASE_LEN as u32,
-            head_specific.read_records[7].as_mut(),
-        );
+        let [max_round, is_hint_src_id, prod_evals_id, logup_evals_id]: [F; EXT_DEG] =
+            tracing_read_native_helper(
+                state.memory,
+                ctx_ptr.as_canonical_u32() + CONTEXT_ARR_BASE_LEN as u32,
+                head_specific.read_records[7].as_mut(),
+            );
         cur_timestamp += 8; // 5 register reads + ctx read + challenges read + max_round read
         head_row.challenges.copy_from_slice(&challenges);
 
@@ -292,7 +293,9 @@ where
 
                 // read p1, p2
                 let ps: [F; EXT_DEG * 2] = if is_hint_src_id {
-                    prod_evals[(start as usize)..((start as usize) + EXT_DEG * 2)].try_into().unwrap()
+                    prod_evals[(start as usize)..((start as usize) + EXT_DEG * 2)]
+                        .try_into()
+                        .unwrap()
                 } else {
                     tracing_read_native_helper(
                         state.memory,
@@ -343,7 +346,7 @@ where
                     eval,
                     &mut prod_specific.write_record,
                 );
-                cur_timestamp += 2;     // Either 1 read, 1 write (witness array input), or 2 writes (hint_ptr_id)
+                cur_timestamp += 2; // Either 1 read, 1 write (witness array input), or 2 writes (hint_ptr_id)
 
                 let eval_rlc = FieldExtension::multiply(alpha_acc, eval);
                 prod_specific.eval_rlc = eval_rlc;
@@ -392,7 +395,9 @@ where
 
                 // read p1, p2, q1, q2
                 let pqs: [F; EXT_DEG * 4] = if is_hint_src_id {
-                    logup_evals[(start as usize)..(start as usize) + EXT_DEG * 4].try_into().unwrap()
+                    logup_evals[(start as usize)..(start as usize) + EXT_DEG * 4]
+                        .try_into()
+                        .unwrap()
                 } else {
                     tracing_read_native_helper(
                         state.memory,

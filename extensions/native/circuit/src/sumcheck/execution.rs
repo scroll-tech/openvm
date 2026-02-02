@@ -214,8 +214,9 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
         ctx;
     let challenges: [F; EXT_DEG * 4] =
         exec_state.vm_read(NATIVE_AS, challenges_ptr.as_canonical_u32());
-    let [max_round, is_hint_space_ids, prod_evals_id, logup_evals_id]: [u32; 4] =
-        exec_state.vm_read(NATIVE_AS, ctx_ptr_u32 + CONTEXT_ARR_BASE_LEN as u32).map(|x: F| x.as_canonical_u32());
+    let [max_round, is_hint_space_ids, prod_evals_id, logup_evals_id]: [u32; 4] = exec_state
+        .vm_read(NATIVE_AS, ctx_ptr_u32 + CONTEXT_ARR_BASE_LEN as u32)
+        .map(|x: F| x.as_canonical_u32());
     let alpha: [F; EXT_DEG] = challenges[0..EXT_DEG].try_into().unwrap();
     let c1: [F; EXT_DEG] = challenges[EXT_DEG..EXT_DEG * 2].try_into().unwrap();
     let c2: [F; EXT_DEG] = challenges[EXT_DEG * 2..EXT_DEG * 3].try_into().unwrap();
@@ -225,7 +226,10 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
     let mut eval_acc = elem_to_ext(F::ZERO);
 
     let (prod_evals, logup_evals) = if is_hint_space_ids > 0 {
-        (exec_state.streams.hint_space[prod_evals_id as usize].clone(), exec_state.streams.hint_space[logup_evals_id as usize].clone())
+        (
+            exec_state.streams.hint_space[prod_evals_id as usize].clone(),
+            exec_state.streams.hint_space[logup_evals_id as usize].clone(),
+        )
     } else {
         (Vec::new(), Vec::new())
     };
@@ -243,7 +247,7 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
             let ps: &[F] = if is_hint_space_ids > 0 {
                 &prod_evals[(start as usize)..(start as usize) + EXT_DEG * 2]
             } else {
-                &exec_state.vm_read::<_, {EXT_DEG * 2}>(NATIVE_AS, prod_evals_ptr + start)
+                &exec_state.vm_read::<_, { EXT_DEG * 2 }>(NATIVE_AS, prod_evals_ptr + start)
             };
 
             let p1: [F; EXT_DEG] = ps[0..EXT_DEG].try_into().unwrap();
@@ -289,7 +293,7 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
             let pqs: &[F] = if is_hint_space_ids > 0 {
                 &logup_evals[(start as usize)..(start as usize) + EXT_DEG * 4]
             } else {
-                &exec_state.vm_read::<_, {EXT_DEG * 4}>(NATIVE_AS, logup_evals_ptr + start)
+                &exec_state.vm_read::<_, { EXT_DEG * 4 }>(NATIVE_AS, logup_evals_ptr + start)
             };
             let p1: [F; EXT_DEG] = pqs[0..EXT_DEG].try_into().unwrap();
             let p2: [F; EXT_DEG] = pqs[EXT_DEG..EXT_DEG * 2].try_into().unwrap();

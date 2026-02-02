@@ -118,7 +118,7 @@ pub struct ProdSpecificCols<T> {
     /// write p_evals
     pub write_record: MemoryWriteAuxCols<T, EXT_DEG>,
     /// write p1, p2 values back to witness array if the source is hint space id
-    pub write_ps_record: MemoryWriteAuxCols<T, {EXT_DEG * 2}>,
+    pub write_ps_record: MemoryWriteAuxCols<T, { EXT_DEG * 2 }>,
     /// p_evals * alpha^i
     pub eval_rlc: [T; EXT_DEG],
 }
@@ -139,7 +139,7 @@ pub struct LogupSpecificCols<T> {
     /// write both p_evals and q_evals
     pub write_records: [MemoryWriteAuxCols<T, EXT_DEG>; 2],
     /// write p1, p2, q1, q2 back to witness array if the source is hint space id
-    pub write_pqs_record: MemoryWriteAuxCols<T, {EXT_DEG * 4}>,
+    pub write_pqs_record: MemoryWriteAuxCols<T, { EXT_DEG * 4 }>,
     /// Evaluation for the accumulator
     pub eval_rlc: [T; EXT_DEG],
 }
