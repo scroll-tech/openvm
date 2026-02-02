@@ -80,6 +80,10 @@ template <typename T> struct NativeSumcheckCols {
 
     T eval_acc[EXT_DEG];
 
+    T is_hint_src_id;
+    T prod_evals_id;
+    T logup_evals_id;
+
     T specific[COL_SPECIFIC_WIDTH];
 };
 

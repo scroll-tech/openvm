@@ -396,7 +396,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                 start_timestamp,
                 &prod_row_specific.read_records[0],
             )
-            .eval(builder, prod_row * within_round_limit * not(is_hint_src_id));
+            .eval(builder, (prod_in_round_evaluation + prod_next_round_evaluation) * not(is_hint_src_id));
         self.memory_bridge
             .write(
                 MemoryAddress::new(
@@ -407,7 +407,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                 start_timestamp,
                 &prod_row_specific.write_ps_record,
             )
-            .eval(builder, prod_row * within_round_limit * is_hint_src_id);
+            .eval(builder, (prod_in_round_evaluation + prod_next_round_evaluation) * is_hint_src_id);
 
         let p1: [AB::Var; EXT_DEG] = prod_row_specific.p[0..EXT_DEG].try_into().unwrap();
         let p2: [AB::Var; EXT_DEG] = prod_row_specific.p[EXT_DEG..(EXT_DEG * 2)]
@@ -495,7 +495,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                 start_timestamp,
                 &logup_row_specific.read_records[0],
             )
-            .eval(builder, logup_row * within_round_limit * not(is_hint_src_id));
+            .eval(builder, (logup_in_round_evaluation + logup_next_round_evaluation) * not(is_hint_src_id));
         self.memory_bridge
             .write(
                 MemoryAddress::new(
@@ -507,7 +507,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                 start_timestamp,
                 &logup_row_specific.write_pqs_record,
             )
-            .eval(builder, logup_row * within_round_limit * is_hint_src_id);
+            .eval(builder, (logup_in_round_evaluation + logup_next_round_evaluation) * is_hint_src_id);
         let p1: [_; EXT_DEG] = logup_row_specific.pq[0..EXT_DEG].try_into().unwrap();
         let p2: [_; EXT_DEG] = logup_row_specific.pq[EXT_DEG..(EXT_DEG * 2)]
             .try_into()
