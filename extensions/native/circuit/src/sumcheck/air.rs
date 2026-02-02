@@ -23,6 +23,9 @@ use crate::{
     },
 };
 
+pub const NUM_RWS_FOR_PRODUCT: usize = 2;
+pub const NUM_RWS_FOR_LOGUP: usize = 3;
+
 #[derive(Clone, Debug)]
 pub struct NativeSumcheckAir {
     pub execution_bridge: ExecutionBridge,
@@ -99,6 +102,9 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             within_round_limit,
             should_acc,
             eval_acc,
+            is_hint_src_id,
+            prod_evals_id: _,
+            logup_evals_id: _,
             specific,
         } = local;
 
@@ -233,14 +239,14 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             .when(next.prod_row + next.logup_row)
             .assert_eq(
                 next.start_timestamp,
-                start_timestamp + within_round_limit * AB::F::TWO,
+                start_timestamp + within_round_limit * AB::F::from_canonical_usize(NUM_RWS_FOR_PRODUCT),
             );
         builder
             .when(logup_row)
             .when(next.prod_row + next.logup_row)
             .assert_eq(
                 next.start_timestamp,
-                start_timestamp + within_round_limit * AB::F::from_canonical_usize(3),
+                start_timestamp + within_round_limit * AB::F::from_canonical_usize(NUM_RWS_FOR_LOGUP),
             );
 
         // Termination condition
@@ -390,7 +396,18 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                 start_timestamp,
                 &prod_row_specific.read_records[0],
             )
-            .eval(builder, prod_row * within_round_limit);
+            .eval(builder, prod_row * within_round_limit * not(is_hint_src_id));
+        self.memory_bridge
+            .write(
+                MemoryAddress::new(
+                    native_as,
+                    register_ptrs[2] + prod_row_specific.data_ptr,
+                ),
+                prod_row_specific.p,
+                start_timestamp,
+                &prod_row_specific.write_ps_record,
+            )
+            .eval(builder, prod_row * within_round_limit * is_hint_src_id);
 
         let p1: [AB::Var; EXT_DEG] = prod_row_specific.p[0..EXT_DEG].try_into().unwrap();
         let p2: [AB::Var; EXT_DEG] = prod_row_specific.p[EXT_DEG..(EXT_DEG * 2)]
@@ -478,8 +495,19 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                 start_timestamp,
                 &logup_row_specific.read_records[0],
             )
-            .eval(builder, logup_row * within_round_limit);
-
+            .eval(builder, logup_row * within_round_limit * not(is_hint_src_id));
+        self.memory_bridge
+            .write(
+                MemoryAddress::new(
+                    native_as,
+                    register_ptrs[3]
+                        + logup_row_specific.data_ptr,
+                ),
+                logup_row_specific.pq,
+                start_timestamp,
+                &logup_row_specific.write_pqs_record,
+            )
+            .eval(builder, logup_row * within_round_limit * is_hint_src_id);
         let p1: [_; EXT_DEG] = logup_row_specific.pq[0..EXT_DEG].try_into().unwrap();
         let p2: [_; EXT_DEG] = logup_row_specific.pq[EXT_DEG..(EXT_DEG * 2)]
             .try_into()

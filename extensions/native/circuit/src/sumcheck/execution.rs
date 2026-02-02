@@ -214,8 +214,8 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
         ctx;
     let challenges: [F; EXT_DEG * 4] =
         exec_state.vm_read(NATIVE_AS, challenges_ptr.as_canonical_u32());
-    let [max_round]: [u32; 1] =
-        exec_state.vm_read(NATIVE_AS, ctx_ptr_u32 + CONTEXT_ARR_BASE_LEN as u32);
+    let [max_round, is_hint_space_ids, prod_evals_id, logup_evals_id]: [u32; 4] =
+        exec_state.vm_read(NATIVE_AS, ctx_ptr_u32 + CONTEXT_ARR_BASE_LEN as u32).map(|x: F| x.as_canonical_u32());
     let alpha: [F; EXT_DEG] = challenges[0..EXT_DEG].try_into().unwrap();
     let c1: [F; EXT_DEG] = challenges[EXT_DEG..EXT_DEG * 2].try_into().unwrap();
     let c2: [F; EXT_DEG] = challenges[EXT_DEG * 2..EXT_DEG * 3].try_into().unwrap();
@@ -223,6 +223,12 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
     let mut height = 1;
     let mut alpha_acc = elem_to_ext(F::ONE);
     let mut eval_acc = elem_to_ext(F::ZERO);
+
+    let (prod_evals, logup_evals) = if is_hint_space_ids > 0 {
+        (exec_state.streams.hint_space[prod_evals_id as usize].clone(), exec_state.streams.hint_space[logup_evals_id as usize].clone())
+    } else {
+        (Vec::new(), Vec::new())
+    };
 
     for i in 0..num_prod_spec {
         let start = calculate_3d_ext_idx(
@@ -234,7 +240,12 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
         );
 
         if round < max_round - 1 {
-            let ps: [F; EXT_DEG * 2] = exec_state.vm_read(NATIVE_AS, prod_evals_ptr + start);
+            let ps: &[F] = if is_hint_space_ids > 0 {
+                &prod_evals[(start as usize)..(start as usize) + EXT_DEG * 2]
+            } else {
+                &exec_state.vm_read::<_, {EXT_DEG * 2}>(NATIVE_AS, prod_evals_ptr + start)
+            };
+
             let p1: [F; EXT_DEG] = ps[0..EXT_DEG].try_into().unwrap();
             let p2: [F; EXT_DEG] = ps[EXT_DEG..EXT_DEG * 2].try_into().unwrap();
 
@@ -275,7 +286,11 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
 
         if round < max_round - 1 {
             // read logup_evals
-            let pqs: [F; EXT_DEG * 4] = exec_state.vm_read(NATIVE_AS, logup_evals_ptr + start);
+            let pqs: &[F] = if is_hint_space_ids > 0 {
+                &logup_evals[(start as usize)..(start as usize) + EXT_DEG * 4]
+            } else {
+                &exec_state.vm_read::<_, {EXT_DEG * 4}>(NATIVE_AS, logup_evals_ptr + start)
+            };
             let p1: [F; EXT_DEG] = pqs[0..EXT_DEG].try_into().unwrap();
             let p2: [F; EXT_DEG] = pqs[EXT_DEG..EXT_DEG * 2].try_into().unwrap();
             let q1: [F; EXT_DEG] = pqs[EXT_DEG * 2..EXT_DEG * 3].try_into().unwrap();
