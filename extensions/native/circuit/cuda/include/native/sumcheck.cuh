@@ -8,6 +8,8 @@ using namespace native;
 template <typename T> struct HeaderSpecificCols {
     T pc;
     T registers[5];
+    T prod_evals_id;
+    T logup_evals_id;
     MemoryReadAuxCols<T> read_records[8];
     MemoryWriteAuxCols<T, EXT_DEG> write_records;
 };
@@ -81,8 +83,6 @@ template <typename T> struct NativeSumcheckCols {
     T eval_acc[EXT_DEG];
 
     T is_hint_src_id;
-    T prod_evals_id;
-    T logup_evals_id;
 
     T specific[COL_SPECIFIC_WIDTH];
 };

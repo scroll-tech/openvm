@@ -2,7 +2,7 @@ use std::borrow::Borrow;
 
 use openvm_circuit::{
     arch::{ExecutionBridge, ExecutionState},
-    system::memory::{offline_checker::MemoryBridge, MemoryAddress},
+    system::memory::{MemoryAddress, offline_checker::{MemoryBridge, MemoryReadAuxCols}},
 };
 use openvm_circuit_primitives::utils::{and, assert_array_eq, not};
 use openvm_instructions::{LocalOpcode, NATIVE_AS};
@@ -103,8 +103,6 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             should_acc,
             eval_acc,
             is_hint_src_id,
-            prod_evals_id,
-            logup_evals_id,
             specific,
         } = local;
 
@@ -348,7 +346,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                     native_as,
                     register_ptrs[0] + AB::F::from_canonical_usize(CONTEXT_ARR_BASE_LEN),
                 ),
-                [max_round, is_hint_src_id, prod_evals_id, logup_evals_id],
+                [max_round, is_hint_src_id, header_row_specific.prod_evals_id, header_row_specific.logup_evals_id],
                 first_timestamp + AB::F::from_canonical_usize(7),
                 &header_row_specific.read_records[7],
             )
@@ -391,23 +389,28 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         );
         builder.assert_eq(prod_row * should_acc, prod_acc);
 
+        // Read p1, p2 from witness arrays
         self.memory_bridge
             .read(
                 MemoryAddress::new(native_as, register_ptrs[2] + prod_row_specific.data_ptr),
                 prod_row_specific.p,
                 start_timestamp,
-                &prod_row_specific.read_records[0],
+                &MemoryReadAuxCols {
+                    base: prod_row_specific.ps_record.base,
+                },
             )
             .eval(
                 builder,
                 (prod_in_round_evaluation + prod_next_round_evaluation) * not(is_hint_src_id),
             );
+        
+        // Obtain p1, p2 from hint space and write back to witness arrays
         self.memory_bridge
             .write(
                 MemoryAddress::new(native_as, register_ptrs[2] + prod_row_specific.data_ptr),
                 prod_row_specific.p,
                 start_timestamp,
-                &prod_row_specific.write_ps_record,
+                &prod_row_specific.ps_record,
             )
             .eval(
                 builder,
@@ -493,23 +496,28 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         );
         builder.assert_eq(logup_row * should_acc, logup_acc);
 
+        // Read p1, p2, q1, q2 from witness arrays
         self.memory_bridge
             .read(
                 MemoryAddress::new(native_as, register_ptrs[3] + logup_row_specific.data_ptr),
                 logup_row_specific.pq,
                 start_timestamp,
-                &logup_row_specific.read_records[0],
+                &MemoryReadAuxCols {
+                    base: logup_row_specific.pqs_record.base,
+                },
             )
             .eval(
                 builder,
                 (logup_in_round_evaluation + logup_next_round_evaluation) * not(is_hint_src_id),
             );
+        
+        // Obtain p1, p2, q1, q2 from hint space
         self.memory_bridge
             .write(
                 MemoryAddress::new(native_as, register_ptrs[3] + logup_row_specific.data_ptr),
                 logup_row_specific.pq,
                 start_timestamp,
-                &logup_row_specific.write_pqs_record,
+                &logup_row_specific.pqs_record,
             )
             .eval(
                 builder,

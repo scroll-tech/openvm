@@ -75,9 +75,6 @@ pub struct NativeSumcheckCols<T> {
 
     // Indicator for an alternative source form of the inputs prod_evals/logup_evals
     pub is_hint_src_id: T,
-    // Pointer ids for hint slices
-    pub prod_evals_id: T,
-    pub logup_evals_id: T,
 
     // /// 1. For header row, 5 registers, ctx, challenges
     // /// 2. For the rest: max_variables, p1, p2, q1, q2
@@ -98,6 +95,9 @@ pub struct NativeSumcheckCols<T> {
 pub struct HeaderSpecificCols<T> {
     pub pc: T,
     pub registers: [T; 5],
+    // Pointer ids for hint slices
+    pub prod_evals_id: T,
+    pub logup_evals_id: T,
     /// 5 register reads + ctx read + max round/hint ptrs read + challenges read
     pub read_records: [MemoryReadAuxCols<T>; 8],
     /// Write the final evaluation
@@ -111,14 +111,13 @@ pub struct ProdSpecificCols<T> {
     pub data_ptr: T,
     /// 2 extension elements
     pub p: [T; EXT_DEG * 2],
-    /// read 2 p values
-    pub read_records: [MemoryReadAuxCols<T>; 1],
     /// Calculated p evals
     pub p_evals: [T; EXT_DEG],
     /// write p_evals
     pub write_record: MemoryWriteAuxCols<T, EXT_DEG>,
-    /// write p1, p2 values back to witness array if the source is hint space id
-    pub write_ps_record: MemoryWriteAuxCols<T, { EXT_DEG * 2 }>,
+    /// Scenario 1: read p1, p2 values from witness array
+    /// Scenario 2: write p1, p2 values back to witness array if the source is hint space id
+    pub ps_record: MemoryWriteAuxCols<T, { EXT_DEG * 2 }>,
     /// p_evals * alpha^i
     pub eval_rlc: [T; EXT_DEG],
 }
@@ -131,15 +130,15 @@ pub struct LogupSpecificCols<T> {
     /// 4 extension elements
     pub pq: [T; EXT_DEG * 4],
     /// read 4 values: p1, p2, q1, q2
-    pub read_records: [MemoryReadAuxCols<T>; 1],
     /// Calculated p evals
     pub p_evals: [T; EXT_DEG],
     /// Calculated q evals
     pub q_evals: [T; EXT_DEG],
+    /// Scenario 1: read p1, p2, q1, q2 from witness array
+    /// Scenario 2: write p1, p2, q1, q2 back to witness array if the source is hint space id
+    pub pqs_record: MemoryWriteAuxCols<T, { EXT_DEG * 4 }>,
     /// write both p_evals and q_evals
     pub write_records: [MemoryWriteAuxCols<T, EXT_DEG>; 2],
-    /// write p1, p2, q1, q2 back to witness array if the source is hint space id
-    pub write_pqs_record: MemoryWriteAuxCols<T, { EXT_DEG * 4 }>,
     /// Evaluation for the accumulator
     pub eval_rlc: [T; EXT_DEG],
 }

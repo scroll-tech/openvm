@@ -241,8 +241,6 @@ where
             row.register_ptrs[4] = r_evals_ptr;
             row.max_round = max_round;
             row.is_hint_src_id = is_hint_src_id;
-            row.prod_evals_id = prod_evals_id;
-            row.logup_evals_id = logup_evals_id;
         }
 
         // Load hints if source is a ptr
@@ -300,7 +298,7 @@ where
                     tracing_read_native_helper(
                         state.memory,
                         prod_evals_ptr.as_canonical_u32() + start,
-                        prod_specific.read_records[0].as_mut(),
+                        prod_specific.ps_record.as_mut(),
                     )
                 };
                 let p1: [F; EXT_DEG] = ps[0..EXT_DEG].try_into().unwrap();
@@ -314,7 +312,7 @@ where
                         state.memory,
                         prod_evals_ptr.as_canonical_u32() + start,
                         ps,
-                        &mut prod_specific.write_ps_record,
+                        &mut prod_specific.ps_record,
                     );
                 }
 
@@ -402,7 +400,7 @@ where
                     tracing_read_native_helper(
                         state.memory,
                         logup_evals_ptr.as_canonical_u32() + start,
-                        logup_specific.read_records[0].as_mut(),
+                        logup_specific.pqs_record.as_mut(),
                     )
                 };
                 let p1: [F; EXT_DEG] = pqs[0..EXT_DEG].try_into().unwrap();
@@ -418,7 +416,7 @@ where
                         state.memory,
                         logup_evals_ptr.as_canonical_u32() + start,
                         pqs,
-                        &mut logup_specific.write_pqs_record,
+                        &mut logup_specific.pqs_record,
                     );
                 }
 
@@ -568,21 +566,12 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
                 cols.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
 
             if cols.within_round_limit == F::ONE {
-                if cols.is_hint_src_id == F::ONE {
-                    // write p1, p2 to witness arrays from hint space pointers
-                    mem_fill_helper(
-                        mem_helper,
-                        start_timestamp,
-                        prod_row_specific.write_ps_record.as_mut(),
-                    );
-                } else {
-                    // read p1, p2 from witness arrays
-                    mem_fill_helper(
-                        mem_helper,
-                        start_timestamp,
-                        prod_row_specific.read_records[0].as_mut(),
-                    );
-                }
+                // obtain p1, p2
+                mem_fill_helper(
+                    mem_helper,
+                    start_timestamp,
+                    prod_row_specific.ps_record.as_mut(),
+                );
                 // write p_eval
                 mem_fill_helper(
                     mem_helper,
@@ -595,21 +584,12 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
                 cols.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
 
             if cols.within_round_limit == F::ONE {
-                if cols.is_hint_src_id == F::ONE {
-                    // write p1, p2, q1, q2 to witness arrays from hint space pointers
-                    mem_fill_helper(
-                        mem_helper,
-                        start_timestamp,
-                        logup_row_specific.write_pqs_record.as_mut(),
-                    );
-                } else {
-                    // read p1, p2, q1, q2 from witness arrays
-                    mem_fill_helper(
-                        mem_helper,
-                        start_timestamp,
-                        logup_row_specific.read_records[0].as_mut(),
-                    );
-                }
+                // obtain p1, p2, q1, q2
+                mem_fill_helper(
+                    mem_helper,
+                    start_timestamp,
+                    logup_row_specific.pqs_record.as_mut(),
+                );
                 // write p_eval
                 mem_fill_helper(
                     mem_helper,
