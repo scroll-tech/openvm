@@ -25,10 +25,33 @@ pub type F = BabyBear;
 pub type E = BinomialExtensionField<F, EXT_DEG>;
 
 #[test]
-fn test_sumcheck_layer_eval() {
+fn test_sumcheck_layer_eval_with_hint_ids() {
+    let mut rng = thread_rng();
     let mut builder = AsmBuilder::<BabyBear, BinomialExtensionField<F, 4>>::default();
 
-    build_test_program(&mut builder);
+    let num_layers = 8;
+    let num_prod_specs = 6;
+    let num_logup_specs = 8;
+
+    let prod_evals: Vec<E> = (0..(num_prod_specs * num_layers * 2))
+        .into_iter()
+        .map(|_| new_rand_ext(&mut rng))
+        .collect();
+
+    let logup_evals: Vec<E> = (0..(num_logup_specs * num_layers * 4))
+        .into_iter()
+        .map(|_| new_rand_ext(&mut rng))
+        .collect();
+
+    build_test_program(
+        &mut builder,
+        prod_evals.clone(),
+        logup_evals.clone(),
+        num_prod_specs,
+        num_logup_specs,
+        num_layers,
+        3,
+    );
 
     let compilation_options = CompilerOptions::default().with_cycle_tracker();
     let mut compiler = AsmCompiler::new(compilation_options.word_size);
@@ -49,13 +72,35 @@ fn test_sumcheck_layer_eval() {
         standard_fri_params_with_100_bits_conjectured_security(1)
     };
 
+    let mut input_stream: Vec<Vec<F>> = vec![];
+    input_stream.push(
+        prod_evals
+            .into_iter()
+            .flat_map(|e| <E as FieldExtensionAlgebra<F>>::as_base_slice(&e).to_vec())
+            .collect(),
+    );
+    input_stream.push(
+        logup_evals
+            .into_iter()
+            .flat_map(|e| <E as FieldExtensionAlgebra<F>>::as_base_slice(&e).to_vec())
+            .collect(),
+    );
+
     let mut config = NativeConfig::aggregation(0, sumcheck_max_constraint_degree);
     config.system.memory_config.max_access_adapter_n = 16;
 
     let vb = NativeBuilder::default();
     #[cfg(not(feature = "cuda"))]
-    air_test_impl::<BabyBearPoseidon2Engine, _>(fri_params, vb, config, program, vec![], 1, true)
-        .unwrap();
+    air_test_impl::<BabyBearPoseidon2Engine, _>(
+        fri_params,
+        vb,
+        config,
+        program,
+        input_stream,
+        1,
+        true,
+    )
+    .unwrap();
     #[cfg(feature = "cuda")]
     {
         air_test_impl::<GpuBabyBearPoseidon2Engine, _>(
@@ -63,7 +108,7 @@ fn test_sumcheck_layer_eval() {
             vb,
             config,
             program,
-            vec![],
+            input_stream,
             1,
             true,
         )
@@ -71,22 +116,24 @@ fn test_sumcheck_layer_eval() {
     }
 }
 
-fn new_rand_ext<C: Config, R: RngCore>(rng: &mut R) -> C::EF {
-    C::EF::from_base_slice(&[
-        C::F::from_canonical_u32(rng.next_u32()),
-        C::F::from_canonical_u32(rng.next_u32()),
-        C::F::from_canonical_u32(rng.next_u32()),
-        C::F::from_canonical_u32(rng.next_u32()),
+fn new_rand_ext<R: RngCore>(rng: &mut R) -> E {
+    E::from_base_slice(&[
+        F::from_canonical_u32(rng.next_u32()),
+        F::from_canonical_u32(rng.next_u32()),
+        F::from_canonical_u32(rng.next_u32()),
+        F::from_canonical_u32(rng.next_u32()),
     ])
 }
 
-fn build_test_program<C: Config>(builder: &mut Builder<C>) {
-    let mut rng = thread_rng();
-    // 6 prod specs in 8 layers, 5 logup specs in 8 layers
-    let round = 3;
-    let num_prod_specs = 6;
-    let num_logup_specs = 5;
-    let num_layers = 8;
+fn build_test_program<C: Config>(
+    builder: &mut Builder<C>,
+    prod_evals: Vec<C::EF>,
+    logup_evals: Vec<C::EF>,
+    num_prod_specs: usize,
+    num_logup_specs: usize,
+    num_layers: usize,
+    round: usize,
+) {
     let mode = 1; // current_layer
 
     let mut ctx_u32s = vec![
@@ -98,6 +145,10 @@ fn build_test_program<C: Config>(builder: &mut Builder<C>) {
         num_layers,
         4,
         mode,
+        999,
+        1,
+        0,
+        0,
     ];
     ctx_u32s.extend(repeat_n(num_layers, num_prod_specs + num_logup_specs));
 
@@ -128,7 +179,7 @@ fn build_test_program<C: Config>(builder: &mut Builder<C>) {
     let num_prod_evals = num_prod_specs * num_layers * 2;
     let prod_spec_evals: Array<C, Ext<C::F, C::EF>> = builder.dyn_array(num_prod_evals);
     for idx in 0..num_prod_evals {
-        let e: Ext<C::F, C::EF> = builder.constant(new_rand_ext::<C, _>(&mut rng));
+        let e: Ext<C::F, C::EF> = builder.constant(prod_evals[idx]);
 
         builder.set(&prod_spec_evals, idx, e);
     }
@@ -136,7 +187,7 @@ fn build_test_program<C: Config>(builder: &mut Builder<C>) {
     let num_logup_evals = num_logup_specs * num_layers * 4;
     let logup_spec_evals: Array<C, Ext<C::F, C::EF>> = builder.dyn_array(num_logup_evals);
     for idx in 0..num_logup_evals {
-        let e: Ext<C::F, C::EF> = builder.constant(new_rand_ext::<C, _>(&mut rng));
+        let e: Ext<C::F, C::EF> = builder.constant(logup_evals[idx]);
 
         builder.set(&logup_spec_evals, idx, e);
     }
@@ -201,6 +252,11 @@ fn build_test_program<C: Config>(builder: &mut Builder<C>) {
         .chain(logup_p_evals)
         .chain(logup_q_evals)
         .collect::<Vec<_>>();
+
+    let prod_spec_evals_id = builder.hint_load();
+    let logup_spec_evals_id = builder.hint_load();
+    builder.set(&ctx, 10, prod_spec_evals_id);
+    builder.set(&ctx, 11, logup_spec_evals_id);
 
     let next_layer_evals: Array<C, Ext<C::F, C::EF>> = builder.dyn_array(r_evals.len());
 
