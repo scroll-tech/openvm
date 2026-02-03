@@ -20,6 +20,7 @@ use openvm_stark_sdk::{
     p3_baby_bear::BabyBear,
 };
 use rand::{thread_rng, RngCore};
+const PRIME: u32 = 0x78000001;
 
 pub type F = BabyBear;
 pub type E = BinomialExtensionField<F, EXT_DEG>;
@@ -118,10 +119,10 @@ fn test_sumcheck_layer_eval_with_hint_ids() {
 
 fn new_rand_ext<R: RngCore>(rng: &mut R) -> E {
     E::from_base_slice(&[
-        F::from_canonical_u32(rng.next_u32()),
-        F::from_canonical_u32(rng.next_u32()),
-        F::from_canonical_u32(rng.next_u32()),
-        F::from_canonical_u32(rng.next_u32()),
+        F::from_canonical_u32(rng.next_u32() % PRIME),
+        F::from_canonical_u32(rng.next_u32() % PRIME),
+        F::from_canonical_u32(rng.next_u32() % PRIME),
+        F::from_canonical_u32(rng.next_u32() % PRIME),
     ])
 }
 
@@ -145,13 +146,11 @@ fn build_test_program<C: Config>(
         num_layers,
         4,
         mode,
-        999,
-        1,
+        999,    // max round
+        1,      // input from hint ids
         0,
         0,
     ];
-    ctx_u32s.extend(repeat_n(num_layers, num_prod_specs + num_logup_specs));
-
     let ctx: Array<C, Usize<C::N>> = builder.dyn_array(ctx_u32s.len());
     for (idx, n) in ctx_u32s.into_iter().enumerate() {
         builder.set(&ctx, idx, Usize::from(n));
