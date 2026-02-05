@@ -76,20 +76,20 @@ impl CycleTracker {
         if name.starts_with("CT-") {
             name = name.split_off(3);
         }
+        // keep padding info before pop
+        let padding = "│ ".repeat(self.depth);
         self.depth -= 1;
         if self.depth >= self.max_depth {
             return;
         }
         let SpanInfo { tag, start, counts: num_insns_start } = self.stack.pop().unwrap();
         assert_eq!(tag, name, "Stack top does not match name");
-        let padding = "│ ".repeat(self.depth);
         let span_cycles = cycles_count - start;
         for (dsl_opcode, num_insns) in num_insns_by_dsl {
             let start_count = num_insns_start.get(dsl_opcode).cloned().unwrap_or(0);
             let span_count = num_insns - start_count;
             if span_count > 0 {
                 tracing::info!("{}│   ({:?},{}): {} instructions", padding, dsl_opcode.0, dsl_opcode.1, span_count);
-
             }
         }
         tracing::info!("{}└╴({}) {} cycles", padding, name, span_cycles);
