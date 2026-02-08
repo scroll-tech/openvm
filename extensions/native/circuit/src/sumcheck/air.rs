@@ -2,7 +2,10 @@ use std::borrow::Borrow;
 
 use openvm_circuit::{
     arch::{ExecutionBridge, ExecutionState},
-    system::memory::{MemoryAddress, offline_checker::{MemoryBridge, MemoryReadAuxCols}},
+    system::memory::{
+        offline_checker::{MemoryBridge, MemoryReadAuxCols},
+        MemoryAddress,
+    },
 };
 use openvm_circuit_primitives::utils::{and, assert_array_eq, not};
 use openvm_instructions::{LocalOpcode, NATIVE_AS};
@@ -403,7 +406,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                 builder,
                 (prod_in_round_evaluation + prod_next_round_evaluation) * not(is_hint_src_id),
             );
-        
+
         // Obtain p1, p2 from hint space and write back to witness arrays
         self.memory_bridge
             .write(
@@ -510,7 +513,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                 builder,
                 (logup_in_round_evaluation + logup_next_round_evaluation) * not(is_hint_src_id),
             );
-        
+
         // Obtain p1, p2, q1, q2 from hint space
         self.memory_bridge
             .write(

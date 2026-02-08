@@ -146,8 +146,8 @@ fn build_test_program<C: Config>(
         num_layers,
         4,
         mode,
-        999,    // max round
-        1,      // input from hint ids
+        999, // max round
+        1,   // input from hint ids
         0,
         0,
     ];

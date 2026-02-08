@@ -190,9 +190,9 @@ where
             logup_evals_reg.as_canonical_u32(),
             head_specific.read_records[3].as_mut(),
         );
-        let [prod_evals_id]: [F; 1] = 
+        let [prod_evals_id]: [F; 1] =
             memory_read_native(state.memory.data(), prod_evals_id_ptr.as_canonical_u32());
-        let [logup_evals_id]: [F; 1] = 
+        let [logup_evals_id]: [F; 1] =
             memory_read_native(state.memory.data(), logup_evals_id_ptr.as_canonical_u32());
         let [r_evals_ptr]: [F; 1] = tracing_read_native_helper(
             state.memory,
@@ -209,12 +209,11 @@ where
             challenges_ptr.as_canonical_u32(),
             head_specific.read_records[6].as_mut(),
         );
-        let [max_round, is_hint_src_id]: [F; 2] =
-            tracing_read_native_helper(
-                state.memory,
-                ctx_ptr.as_canonical_u32() + CONTEXT_ARR_BASE_LEN as u32,
-                head_specific.read_records[7].as_mut(),
-            );
+        let [max_round, is_hint_src_id]: [F; 2] = tracing_read_native_helper(
+            state.memory,
+            ctx_ptr.as_canonical_u32() + CONTEXT_ARR_BASE_LEN as u32,
+            head_specific.read_records[7].as_mut(),
+        );
         cur_timestamp += 8; // 5 register reads + ctx read + challenges read + max_round read
         head_row.challenges.copy_from_slice(&challenges);
         head_specific.prod_evals_id = prod_evals_id_ptr;
