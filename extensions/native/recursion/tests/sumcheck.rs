@@ -264,6 +264,8 @@ fn build_test_program<C: Config>(
         &challenges,
         &prod_spec_evals,
         &logup_spec_evals,
+        prod_spec_evals_id,
+        logup_spec_evals_id,
         &next_layer_evals,
     );
 

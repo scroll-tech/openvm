@@ -25,6 +25,8 @@ struct NativeSumcheckPreCompute {
     challenges_reg: u32,
     prod_evals_reg: u32,
     logup_evals_reg: u32,
+    prod_evals_id_ptr: u32,
+    logup_evals_id_ptr: u32,
 }
 
 impl NativeSumcheckExecutor {
@@ -49,15 +51,10 @@ impl NativeSumcheckExecutor {
         let r_evals_reg = a.as_canonical_u32();
         let ctx_reg = b.as_canonical_u32();
         let challenges_reg = c.as_canonical_u32();
+        let prod_evals_id_ptr = d.as_canonical_u32();
+        let logup_evals_id_ptr = e.as_canonical_u32();
         let prod_evals_reg = f.as_canonical_u32();
         let logup_evals_reg = g.as_canonical_u32();
-
-        if d.as_canonical_u32() != NATIVE_AS {
-            return Err(StaticProgramError::InvalidInstruction(pc));
-        }
-        if e.as_canonical_u32() != NATIVE_AS {
-            return Err(StaticProgramError::InvalidInstruction(pc));
-        }
 
         *data = NativeSumcheckPreCompute {
             r_evals_reg,
@@ -65,6 +62,8 @@ impl NativeSumcheckExecutor {
             challenges_reg,
             prod_evals_reg,
             logup_evals_reg,
+            prod_evals_id_ptr,
+            logup_evals_id_ptr,
         };
 
         Ok(())
@@ -201,11 +200,15 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
     let [challenges_ptr]: [F; 1] = exec_state.vm_read(NATIVE_AS, pre_compute.challenges_reg);
     let [prod_evals_ptr]: [F; 1] = exec_state.vm_read(NATIVE_AS, pre_compute.prod_evals_reg);
     let [logup_evals_ptr]: [F; 1] = exec_state.vm_read(NATIVE_AS, pre_compute.logup_evals_reg);
+    let [prod_evals_id]: [F; 1] = exec_state.host_read(NATIVE_AS, pre_compute.prod_evals_id_ptr);
+    let [logup_evals_id]: [F; 1] = exec_state.host_read(NATIVE_AS, pre_compute.logup_evals_id_ptr);
 
     let r_evals_ptr_u32 = r_evals_ptr.as_canonical_u32();
     let ctx_ptr_u32 = ctx_ptr.as_canonical_u32();
     let logup_evals_ptr = logup_evals_ptr.as_canonical_u32();
     let prod_evals_ptr = prod_evals_ptr.as_canonical_u32();
+    let prod_evals_id = prod_evals_id.as_canonical_u32();
+    let logup_evals_id = logup_evals_id.as_canonical_u32();
 
     let ctx: [u32; 8] = exec_state
         .vm_read(NATIVE_AS, ctx_ptr_u32)
@@ -214,7 +217,7 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
         ctx;
     let challenges: [F; EXT_DEG * 4] =
         exec_state.vm_read(NATIVE_AS, challenges_ptr.as_canonical_u32());
-    let [max_round, is_hint_space_ids, prod_evals_id, logup_evals_id]: [u32; 4] = exec_state
+    let [max_round, is_hint_space_ids]: [u32; 2] = exec_state
         .vm_read(NATIVE_AS, ctx_ptr_u32 + CONTEXT_ARR_BASE_LEN as u32)
         .map(|x: F| x.as_canonical_u32());
     let alpha: [F; EXT_DEG] = challenges[0..EXT_DEG].try_into().unwrap();

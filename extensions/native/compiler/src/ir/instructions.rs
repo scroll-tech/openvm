@@ -343,6 +343,8 @@ pub enum DslIr<C: Config> {
         Ptr<C::N>, // Challenges: alpha, coeffs
         Ptr<C::N>, // prod_specs_eval
         Ptr<C::N>, // logup_specs_eval
+        Var<C::N>, // prod_specs_eval
+        Var<C::N>, // logup_specs_eval
         Ptr<C::N>, // output
     ),
 }

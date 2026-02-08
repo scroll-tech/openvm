@@ -123,8 +123,8 @@ where
             a: r_evals_reg,
             b: ctx_reg,
             c: challenges_reg,
-            d: data_address_space,
-            e: register_address_space,
+            d: prod_evals_id_ptr,
+            e: logup_evals_id_ptr,
             f: prod_evals_reg,
             g: logup_evals_reg,
         } = instruction;
@@ -138,8 +138,6 @@ where
         //   b. logup sumcheck: p[r] = eq(0,r) * p[0] + eq(1,r) * p[1]
         //         and q[r] = eq(0,r) * q[0] + eq(1,r) * q[1]
         assert_eq!(op, SUMCHECK_LAYER_EVAL.global_opcode());
-        assert_eq!(data_address_space.as_canonical_u32(), NATIVE_AS);
-        assert_eq!(register_address_space.as_canonical_u32(), NATIVE_AS);
 
         let [ctx_ptr]: [F; 1] = memory_read_native(state.memory.data(), ctx_reg.as_canonical_u32());
         let ctx: [u32; 8] = memory_read_native(state.memory.data(), ctx_ptr.as_canonical_u32())
@@ -192,6 +190,10 @@ where
             logup_evals_reg.as_canonical_u32(),
             head_specific.read_records[3].as_mut(),
         );
+        let [prod_evals_id]: [F; 1] = 
+            memory_read_native(state.memory.data(), prod_evals_id_ptr.as_canonical_u32());
+        let [logup_evals_id]: [F; 1] = 
+            memory_read_native(state.memory.data(), logup_evals_id_ptr.as_canonical_u32());
         let [r_evals_ptr]: [F; 1] = tracing_read_native_helper(
             state.memory,
             r_evals_reg.as_canonical_u32(),
@@ -207,7 +209,7 @@ where
             challenges_ptr.as_canonical_u32(),
             head_specific.read_records[6].as_mut(),
         );
-        let [max_round, is_hint_src_id, prod_evals_id, logup_evals_id]: [F; EXT_DEG] =
+        let [max_round, is_hint_src_id]: [F; 2] =
             tracing_read_native_helper(
                 state.memory,
                 ctx_ptr.as_canonical_u32() + CONTEXT_ARR_BASE_LEN as u32,
@@ -215,6 +217,8 @@ where
             );
         cur_timestamp += 8; // 5 register reads + ctx read + challenges read + max_round read
         head_row.challenges.copy_from_slice(&challenges);
+        head_specific.prod_evals_id = prod_evals_id_ptr;
+        head_specific.logup_evals_id = logup_evals_id_ptr;
 
         // challenges = [alpha, c1=r, c2=1-r]
         let alpha: [F; 4] = challenges[0..EXT_DEG].try_into().unwrap();
