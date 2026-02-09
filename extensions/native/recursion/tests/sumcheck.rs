@@ -148,8 +148,6 @@ fn build_test_program<C: Config>(
         mode,
         999, // max round
         1,   // input from hint ids
-        0,
-        0,
     ];
     let ctx: Array<C, Usize<C::N>> = builder.dyn_array(ctx_u32s.len());
     for (idx, n) in ctx_u32s.into_iter().enumerate() {
