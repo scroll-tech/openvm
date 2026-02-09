@@ -177,9 +177,11 @@ pub enum AsmInstruction<F, EF> {
     // - reg_a: Output ptr for next layer's evaluations
     // - reg_b: Context variables
     // - reg_c: Challenge values (alpha, coeff)
+    // - reg_d: GKR product IOP evaluations hint space ID
+    // - reg_e: GKR logup IOP evaluations hint space ID
     // - reg_g: GKR product IOP evaluations
     // - reg_f: GKR logup IOP evaluations
-    SumcheckLayerEval(i32, i32, i32, i32, i32),
+    SumcheckLayerEval(i32, i32, i32, i32, i32, i32, i32),
 }
 
 impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
@@ -416,11 +418,11 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
             AsmInstruction::RangeCheck(fp, lo_bits, hi_bits) => {
                 write!(f, "range_check_fp ({})fp, ({}), ({})", fp, lo_bits, hi_bits)
             }
-            AsmInstruction::SumcheckLayerEval(ctx, cs, p_ptr, l_ptr, r_ptr) => {
+            AsmInstruction::SumcheckLayerEval(ctx, cs, p_ptr, l_ptr, p_id, l_id, r_ptr) => {
                 write!(
                     f,
-                    "sumcheck_layer_eval ({})fp, ({})fp, ({})fp, ({})fp, ({})fp",
-                    ctx, cs, p_ptr, l_ptr, r_ptr
+                    "sumcheck_layer_eval ({})fp, ({})fp, ({})fp, ({})fp, ({})fp, ({})fp, ({})fp",
+                    ctx, cs, p_ptr, l_ptr, p_id, l_id, r_ptr
                 )
             }
         }
