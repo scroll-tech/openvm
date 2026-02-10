@@ -26,6 +26,7 @@ impl<C: Config> Builder<C> {
     ///
     /// 2. for computing expected eval of next layer, output[1+i] = eq(0,r)*p[i][0] + eq(1,r) *
     ///    p[i][1].
+    #[allow(clippy::too_many_arguments)]
     pub fn sumcheck_layer_eval(
         &mut self,
         input_ctx: &Array<C, Usize<C::N>>, // Context variables

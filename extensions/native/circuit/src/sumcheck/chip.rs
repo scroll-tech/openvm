@@ -10,9 +10,7 @@ use openvm_circuit::{
         native_adapter::util::{memory_read_native, tracing_write_native_inplace},
     },
 };
-use openvm_instructions::{
-    instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode, NATIVE_AS,
-};
+use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode};
 use openvm_native_compiler::SumcheckOpcode::SUMCHECK_LAYER_EVAL;
 use openvm_stark_backend::p3_field::PrimeField32;
 
@@ -227,7 +225,8 @@ where
         let mut eval_acc = elem_to_ext(F::from_canonical_u32(0));
         let mut alpha_acc = elem_to_ext(F::from_canonical_u32(1));
 
-        // all rows share same register values, ctx, challenges, max_round, hint_space_ptrs (optional)
+        // all rows share same register values, ctx, challenges, max_round, hint_space_ptrs
+        // (optional)
         for row in rows.iter_mut() {
             // c1, c2 are same during the entire execution
             row.challenges[EXT_DEG..3 * EXT_DEG].copy_from_slice(&challenges[EXT_DEG..3 * EXT_DEG]);
