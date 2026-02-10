@@ -1,4 +1,4 @@
-use std::iter::{once, repeat_n};
+use std::iter::once;
 
 use openvm_circuit::{arch::instructions::program::Program, utils::air_test_impl};
 #[cfg(feature = "cuda")]
@@ -35,12 +35,10 @@ fn test_sumcheck_layer_eval_with_hint_ids() {
     let num_logup_specs = 8;
 
     let prod_evals: Vec<E> = (0..(num_prod_specs * num_layers * 2))
-        .into_iter()
         .map(|_| new_rand_ext(&mut rng))
         .collect();
 
     let logup_evals: Vec<E> = (0..(num_logup_specs * num_layers * 4))
-        .into_iter()
         .map(|_| new_rand_ext(&mut rng))
         .collect();
 
@@ -73,13 +71,10 @@ fn test_sumcheck_layer_eval_with_hint_ids() {
         standard_fri_params_with_100_bits_conjectured_security(1)
     };
 
-    let mut input_stream: Vec<Vec<F>> = vec![];
-    input_stream.push(
-        prod_evals
-            .into_iter()
-            .flat_map(|e| <E as FieldExtensionAlgebra<F>>::as_base_slice(&e).to_vec())
-            .collect(),
-    );
+    let mut input_stream: Vec<Vec<F>> = vec![prod_evals
+        .into_iter()
+        .flat_map(|e| <E as FieldExtensionAlgebra<F>>::as_base_slice(&e).to_vec())
+        .collect()];
     input_stream.push(
         logup_evals
             .into_iter()
@@ -137,7 +132,7 @@ fn build_test_program<C: Config>(
 ) {
     let mode = 1; // current_layer
 
-    let mut ctx_u32s = vec![
+    let ctx_u32s = vec![
         round,
         num_prod_specs,
         num_logup_specs,
@@ -175,16 +170,16 @@ fn build_test_program<C: Config>(
 
     let num_prod_evals = num_prod_specs * num_layers * 2;
     let prod_spec_evals: Array<C, Ext<C::F, C::EF>> = builder.dyn_array(num_prod_evals);
-    for idx in 0..num_prod_evals {
-        let e: Ext<C::F, C::EF> = builder.constant(prod_evals[idx]);
+    for (idx, prod_eval) in prod_evals.into_iter().enumerate() {
+        let e: Ext<C::F, C::EF> = builder.constant(prod_eval);
 
         builder.set(&prod_spec_evals, idx, e);
     }
 
     let num_logup_evals = num_logup_specs * num_layers * 4;
     let logup_spec_evals: Array<C, Ext<C::F, C::EF>> = builder.dyn_array(num_logup_evals);
-    for idx in 0..num_logup_evals {
-        let e: Ext<C::F, C::EF> = builder.constant(logup_evals[idx]);
+    for (idx, logup_eval) in logup_evals.into_iter().enumerate() {
+        let e: Ext<C::F, C::EF> = builder.constant(logup_eval);
 
         builder.set(&logup_spec_evals, idx, e);
     }

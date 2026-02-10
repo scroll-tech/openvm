@@ -33,7 +33,7 @@ impl NativeSumcheckExecutor {
     #[inline(always)]
     fn pre_compute_impl<F: PrimeField32>(
         &self,
-        pc: u32,
+        _pc: u32,
         inst: &Instruction<F>,
         data: &mut NativeSumcheckPreCompute,
     ) -> Result<(), StaticProgramError> {
