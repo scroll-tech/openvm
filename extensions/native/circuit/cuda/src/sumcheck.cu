@@ -6,12 +6,18 @@
 
 using namespace native;
 
+constexpr uint32_t header_read_records_len() {
+    return sizeof(((HeaderSpecificCols<uint8_t> *)nullptr)->read_records)
+        / sizeof(MemoryReadAuxCols<uint8_t>);
+}
+
 __device__ void fill_sumcheck_specific(RowSlice row, MemoryAuxColsFactory &mem_helper) {
     RowSlice specific = row.slice_from(COL_INDEX(NativeSumcheckCols, specific));
     uint32_t start_timestamp = row[COL_INDEX(NativeSumcheckCols, start_timestamp)].asUInt32();
 
     if (row[COL_INDEX(NativeSumcheckCols, header_row)] == Fp::one()) {
-        for (uint32_t i = 0; i < 8; ++i) {
+        constexpr uint32_t header_records = header_read_records_len();
+        for (uint32_t i = 0; i < header_records; ++i) {
             mem_fill_base(
                 mem_helper,
                 start_timestamp + i,
