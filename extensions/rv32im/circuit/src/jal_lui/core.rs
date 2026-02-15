@@ -203,6 +203,7 @@ where
             .write(state.memory, instruction, rd_data, &mut adapter_record);
 
         *state.pc = to_pc;
+        *state.instret += 1;
 
         Ok(())
     }

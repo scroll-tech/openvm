@@ -233,6 +233,8 @@ where
             *state.pc = state.pc.wrapping_add(DEFAULT_PC_STEP);
         }
 
+        *state.instret += 1;
+
         Ok(())
     }
 }

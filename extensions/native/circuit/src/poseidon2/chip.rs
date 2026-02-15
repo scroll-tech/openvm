@@ -827,6 +827,7 @@ where
             unreachable!()
         }
 
+        *state.instret += 1;
         *state.pc += DEFAULT_PC_STEP;
         Ok(())
     }

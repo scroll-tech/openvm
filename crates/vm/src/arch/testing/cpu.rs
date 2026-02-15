@@ -98,8 +98,10 @@ where
         tracing::debug!("initial_timestamp={}", self.memory.memory.timestamp());
 
         let mut pc = initial_pc;
+        let mut instret = 0;
         let state_mut = VmStateMut {
             pc: &mut pc,
+            instret: &mut instret,
             memory: &mut self.memory.memory,
             streams: &mut self.streams,
             rng: &mut self.rng,

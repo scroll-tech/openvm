@@ -235,6 +235,7 @@ where
         }
 
         // Due to the AIR constraints, the final memory timestamp should be the following:
+        *state.instret += 1;
         state.memory.timestamp = record.inner.timestamp
             + (len + KECCAK_REGISTER_READS + KECCAK_ABSORB_READS + KECCAK_DIGEST_WRITES) as u32;
         *state.pc = state.pc.wrapping_add(DEFAULT_PC_STEP);

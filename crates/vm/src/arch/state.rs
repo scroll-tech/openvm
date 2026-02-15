@@ -67,6 +67,7 @@ impl<F: Clone, MEM> VmState<F, MEM> {
     pub fn into_mut<'a, RA>(&'a mut self, ctx: &'a mut RA) -> VmStateMut<'a, F, MEM, RA> {
         VmStateMut {
             pc: &mut self.pc,
+            instret: &mut self.instret,
             memory: &mut self.memory,
             streams: &mut self.streams,
             rng: &mut self.rng,

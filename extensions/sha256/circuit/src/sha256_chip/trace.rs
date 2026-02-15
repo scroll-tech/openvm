@@ -239,6 +239,7 @@ where
             &mut record.inner.write_aux.prev_data,
         );
 
+        *state.instret += 1;
         *state.pc = state.pc.wrapping_add(DEFAULT_PC_STEP);
 
         Ok(())
