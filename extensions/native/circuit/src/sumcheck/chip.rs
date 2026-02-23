@@ -207,7 +207,7 @@ where
             challenges_ptr.as_canonical_u32(),
             head_specific.read_records[6].as_mut(),
         );
-        let [max_round, is_hint_src_id]: [F; 2] = tracing_read_native_helper(
+        let [max_round, is_writeback]: [F; 2] = tracing_read_native_helper(
             state.memory,
             ctx_ptr.as_canonical_u32() + CONTEXT_ARR_BASE_LEN as u32,
             head_specific.read_records[7].as_mut(),
@@ -242,21 +242,13 @@ where
             row.register_ptrs[3] = logup_evals_ptr;
             row.register_ptrs[4] = r_evals_ptr;
             row.max_round = max_round;
-            row.is_hint_src_id = is_hint_src_id;
+            row.is_writeback = is_writeback;
         }
 
-        // Load hints if source is a ptr
-        let is_hint_src_id = is_hint_src_id > F::ZERO;
         let prod_evals_id = prod_evals_id.as_canonical_u32();
         let logup_evals_id = logup_evals_id.as_canonical_u32();
-        let (prod_evals, logup_evals) = if is_hint_src_id {
-            (
-                state.streams.hint_space[prod_evals_id as usize].clone(),
-                state.streams.hint_space[logup_evals_id as usize].clone(),
-            )
-        } else {
-            (Vec::new(), Vec::new())
-        };
+        let prod_evals = state.streams.hint_space[prod_evals_id as usize].clone();
+        let logup_evals = state.streams.hint_space[logup_evals_id as usize].clone();
 
         // product rows
         for (i, prod_row) in rows
@@ -292,24 +284,16 @@ where
                 prod_specific.data_ptr = F::from_canonical_u32(start);
 
                 // read p1, p2
-                let ps: [F; EXT_DEG * 2] = if is_hint_src_id {
-                    prod_evals[(start as usize)..((start as usize) + EXT_DEG * 2)]
-                        .try_into()
-                        .unwrap()
-                } else {
-                    tracing_read_native_helper(
-                        state.memory,
-                        prod_evals_ptr.as_canonical_u32() + start,
-                        prod_specific.ps_record.as_mut(),
-                    )
-                };
+                let ps: [F; EXT_DEG * 2] = prod_evals[(start as usize)..((start as usize) + EXT_DEG * 2)]
+                    .try_into()
+                    .unwrap();
                 let p1: [F; EXT_DEG] = ps[0..EXT_DEG].try_into().unwrap();
                 let p2: [F; EXT_DEG] = ps[EXT_DEG..(EXT_DEG * 2)].try_into().unwrap();
 
                 prod_specific.p = ps;
 
                 // If p values come from the hint stream, write back to the actual witness array
-                if is_hint_src_id {
+                if is_writeback > F::ZERO {
                     tracing_write_native_inplace(
                         state.memory,
                         prod_evals_ptr.as_canonical_u32() + start,
@@ -346,7 +330,7 @@ where
                     eval,
                     &mut prod_specific.write_record,
                 );
-                cur_timestamp += 2; // Either 1 read, 1 write (witness array input), or 2 writes (hint_ptr_id)
+                cur_timestamp += if is_writeback > F::ZERO { 2 } else { 1 }; // Only write back to the witness array when the is_writeback indicator is true
 
                 let eval_rlc = FieldExtension::multiply(alpha_acc, eval);
                 prod_specific.eval_rlc = eval_rlc;
@@ -394,17 +378,9 @@ where
                 logup_specific.data_ptr = F::from_canonical_u32(start);
 
                 // read p1, p2, q1, q2
-                let pqs: [F; EXT_DEG * 4] = if is_hint_src_id {
-                    logup_evals[(start as usize)..(start as usize) + EXT_DEG * 4]
-                        .try_into()
-                        .unwrap()
-                } else {
-                    tracing_read_native_helper(
-                        state.memory,
-                        logup_evals_ptr.as_canonical_u32() + start,
-                        logup_specific.pqs_record.as_mut(),
-                    )
-                };
+                let pqs: [F; EXT_DEG * 4] = logup_evals[(start as usize)..(start as usize) + EXT_DEG * 4]
+                    .try_into()
+                    .unwrap();
                 let p1: [F; EXT_DEG] = pqs[0..EXT_DEG].try_into().unwrap();
                 let p2: [F; EXT_DEG] = pqs[EXT_DEG..(EXT_DEG * 2)].try_into().unwrap();
                 let q1: [F; EXT_DEG] = pqs[(EXT_DEG * 2)..(EXT_DEG * 3)].try_into().unwrap();
@@ -413,7 +389,7 @@ where
                 logup_specific.pq = pqs;
 
                 // write pqs
-                if is_hint_src_id {
+                if is_writeback > F::ZERO {
                     tracing_write_native_inplace(
                         state.memory,
                         logup_evals_ptr.as_canonical_u32() + start,
@@ -472,7 +448,7 @@ where
                     q_eval,
                     &mut logup_specific.write_records[1],
                 );
-                cur_timestamp += 3; // 1 read, 2 writes (witness array case) or 3 writes (hint space ptr case)
+                cur_timestamp += if is_writeback > F::ZERO { 3 } else { 2 }; // Only write back to the witness array when the is_writeback indicator is true
 
                 let eval_rlc = FieldExtension::add(
                     FieldExtension::multiply(alpha_numerator, p_eval),
@@ -568,12 +544,15 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
                 cols.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
 
             if cols.within_round_limit == F::ONE {
-                // obtain p1, p2
-                mem_fill_helper(
-                    mem_helper,
-                    start_timestamp,
-                    prod_row_specific.ps_record.as_mut(),
-                );
+                if cols.is_writeback == F::ONE {
+                    // writeback p1, p2
+                    mem_fill_helper(
+                        mem_helper,
+                        start_timestamp,
+                        prod_row_specific.ps_record.as_mut(),
+                    );
+                }
+                
                 // write p_eval
                 mem_fill_helper(
                     mem_helper,
@@ -586,12 +565,15 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
                 cols.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
 
             if cols.within_round_limit == F::ONE {
-                // obtain p1, p2, q1, q2
-                mem_fill_helper(
-                    mem_helper,
-                    start_timestamp,
-                    logup_row_specific.pqs_record.as_mut(),
-                );
+                if cols.is_writeback == F::ONE {
+                    // writeback p1, p2, q1, q2
+                    mem_fill_helper(
+                        mem_helper,
+                        start_timestamp,
+                        logup_row_specific.pqs_record.as_mut(),
+                    );
+                }
+
                 // write p_eval
                 mem_fill_helper(
                     mem_helper,
