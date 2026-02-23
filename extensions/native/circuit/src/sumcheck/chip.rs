@@ -293,14 +293,15 @@ where
                 prod_specific.p = ps;
 
                 // If p values come from the hint stream, write back to the actual witness array
-                if is_writeback > F::ZERO {
-                    tracing_write_native_inplace(
-                        state.memory,
-                        prod_evals_ptr.as_canonical_u32() + start,
-                        ps,
-                        &mut prod_specific.ps_record,
-                    );
-                }
+                // _debug
+                // if is_writeback > F::ZERO {
+                //     tracing_write_native_inplace(
+                //         state.memory,
+                //         prod_evals_ptr.as_canonical_u32() + start,
+                //         ps,
+                //         &mut prod_specific.ps_record,
+                //     );
+                // }
 
                 // compute expected eval
                 let eval = match mode {
@@ -389,14 +390,15 @@ where
                 logup_specific.pq = pqs;
 
                 // write pqs
-                if is_writeback > F::ZERO {
-                    tracing_write_native_inplace(
-                        state.memory,
-                        logup_evals_ptr.as_canonical_u32() + start,
-                        pqs,
-                        &mut logup_specific.pqs_record,
-                    );
-                }
+                // _debug
+                // if is_writeback > F::ZERO {
+                //     tracing_write_native_inplace(
+                //         state.memory,
+                //         logup_evals_ptr.as_canonical_u32() + start,
+                //         pqs,
+                //         &mut logup_specific.pqs_record,
+                //     );
+                // }
 
                 // compute expected evals
                 let p_eval = match mode {
@@ -551,14 +553,20 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
                         start_timestamp,
                         prod_row_specific.ps_record.as_mut(),
                     );
+                    // write p_eval
+                    mem_fill_helper(
+                        mem_helper,
+                        start_timestamp + 1,
+                        prod_row_specific.write_record.as_mut(),
+                    );
+                } else {
+                    // write p_eval
+                    mem_fill_helper(
+                        mem_helper,
+                        start_timestamp,
+                        prod_row_specific.write_record.as_mut(),
+                    );
                 }
-                
-                // write p_eval
-                mem_fill_helper(
-                    mem_helper,
-                    start_timestamp + 1,
-                    prod_row_specific.write_record.as_mut(),
-                );
             }
         } else if cols.logup_row == F::ONE {
             let logup_row_specific: &mut LogupSpecificCols<F> =
@@ -572,20 +580,32 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
                         start_timestamp,
                         logup_row_specific.pqs_record.as_mut(),
                     );
+                    // write p_eval
+                    mem_fill_helper(
+                        mem_helper,
+                        start_timestamp + 1,
+                        logup_row_specific.write_records[0].as_mut(),
+                    );
+                    // write q_eval
+                    mem_fill_helper(
+                        mem_helper,
+                        start_timestamp + 2,
+                        logup_row_specific.write_records[1].as_mut(),
+                    );
+                } else {
+                    // write p_eval
+                    mem_fill_helper(
+                        mem_helper,
+                        start_timestamp,
+                        logup_row_specific.write_records[0].as_mut(),
+                    );
+                    // write q_eval
+                    mem_fill_helper(
+                        mem_helper,
+                        start_timestamp + 1,
+                        logup_row_specific.write_records[1].as_mut(),
+                    );
                 }
-
-                // write p_eval
-                mem_fill_helper(
-                    mem_helper,
-                    start_timestamp + 1,
-                    logup_row_specific.write_records[0].as_mut(),
-                );
-                // write q_eval
-                mem_fill_helper(
-                    mem_helper,
-                    start_timestamp + 2,
-                    logup_row_specific.write_records[1].as_mut(),
-                );
             }
         }
     }
