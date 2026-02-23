@@ -245,10 +245,9 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
             let p1: [F; EXT_DEG] = ps[0..EXT_DEG].try_into().unwrap();
             let p2: [F; EXT_DEG] = ps[EXT_DEG..EXT_DEG * 2].try_into().unwrap();
 
-            // _debug
-            // if is_writeback > 0 {
-            //     exec_state.vm_write(NATIVE_AS, prod_evals_ptr + start, &ps);
-            // }
+            if is_writeback > 0 {
+                exec_state.vm_write(NATIVE_AS, prod_evals_ptr + start, &ps);
+            }
 
             let eval = match mode {
                 CURRENT_LAYER_MODE => FieldExtension::multiply(p1, p2),
@@ -293,10 +292,9 @@ unsafe fn execute_e12_impl<F: PrimeField32, CTX: ExecutionCtxTrait>(
             let q1: [F; EXT_DEG] = pqs[EXT_DEG * 2..EXT_DEG * 3].try_into().unwrap();
             let q2: [F; EXT_DEG] = pqs[EXT_DEG * 3..EXT_DEG * 4].try_into().unwrap();
 
-            // _debug
-            // if is_writeback > 0 {
-            //     exec_state.vm_write(NATIVE_AS, logup_evals_ptr + start, &pqs);
-            // }
+            if is_writeback > 0 {
+                exec_state.vm_write(NATIVE_AS, logup_evals_ptr + start, &pqs);
+            }
 
             // compute p_eval and q_eval
             let p_eval = match mode {

@@ -395,18 +395,17 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         builder.assert_eq(prod_row * should_acc, prod_acc);
 
         // Obtain p1, p2 from hint space and write back to witness arrays
-        // _debug
-        // self.memory_bridge
-        //     .write(
-        //         MemoryAddress::new(native_as, register_ptrs[2] + prod_row_specific.data_ptr),
-        //         prod_row_specific.p,
-        //         start_timestamp,
-        //         &prod_row_specific.ps_record,
-        //     )
-        //     .eval(
-        //         builder,
-        //         (prod_in_round_evaluation + prod_next_round_evaluation) * is_writeback,
-        //     );
+        self.memory_bridge
+            .write(
+                MemoryAddress::new(native_as, register_ptrs[2] + prod_row_specific.data_ptr),
+                prod_row_specific.p,
+                start_timestamp,
+                &prod_row_specific.ps_record,
+            )
+            .eval(
+                builder,
+                (prod_in_round_evaluation + prod_next_round_evaluation) * is_writeback,
+            );
 
         let p1: [AB::Var; EXT_DEG] = prod_row_specific.p[0..EXT_DEG].try_into().unwrap();
         let p2: [AB::Var; EXT_DEG] = prod_row_specific.p[EXT_DEG..(EXT_DEG * 2)]
@@ -488,18 +487,17 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         builder.assert_eq(logup_row * should_acc, logup_acc);
 
         // Obtain p1, p2, q1, q2 from hint space
-        // _debug
-        // self.memory_bridge
-        //     .write(
-        //         MemoryAddress::new(native_as, register_ptrs[3] + logup_row_specific.data_ptr),
-        //         logup_row_specific.pq,
-        //         start_timestamp,
-        //         &logup_row_specific.pqs_record,
-        //     )
-        //     .eval(
-        //         builder,
-        //         (logup_in_round_evaluation + logup_next_round_evaluation) * is_writeback,
-        //     );
+        self.memory_bridge
+            .write(
+                MemoryAddress::new(native_as, register_ptrs[3] + logup_row_specific.data_ptr),
+                logup_row_specific.pq,
+                start_timestamp,
+                &logup_row_specific.pqs_record,
+            )
+            .eval(
+                builder,
+                (logup_in_round_evaluation + logup_next_round_evaluation) * is_writeback,
+            );
 
         let p1: [_; EXT_DEG] = logup_row_specific.pq[0..EXT_DEG].try_into().unwrap();
         let p2: [_; EXT_DEG] = logup_row_specific.pq[EXT_DEG..(EXT_DEG * 2)]

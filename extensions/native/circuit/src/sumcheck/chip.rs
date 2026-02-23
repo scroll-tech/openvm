@@ -293,15 +293,14 @@ where
                 prod_specific.p = ps;
 
                 // If p values come from the hint stream, write back to the actual witness array
-                // _debug
-                // if is_writeback > F::ZERO {
-                //     tracing_write_native_inplace(
-                //         state.memory,
-                //         prod_evals_ptr.as_canonical_u32() + start,
-                //         ps,
-                //         &mut prod_specific.ps_record,
-                //     );
-                // }
+                if is_writeback > F::ZERO {
+                    tracing_write_native_inplace(
+                        state.memory,
+                        prod_evals_ptr.as_canonical_u32() + start,
+                        ps,
+                        &mut prod_specific.ps_record,
+                    );
+                }
 
                 // compute expected eval
                 let eval = match mode {
@@ -390,15 +389,14 @@ where
                 logup_specific.pq = pqs;
 
                 // write pqs
-                // _debug
-                // if is_writeback > F::ZERO {
-                //     tracing_write_native_inplace(
-                //         state.memory,
-                //         logup_evals_ptr.as_canonical_u32() + start,
-                //         pqs,
-                //         &mut logup_specific.pqs_record,
-                //     );
-                // }
+                if is_writeback > F::ZERO {
+                    tracing_write_native_inplace(
+                        state.memory,
+                        logup_evals_ptr.as_canonical_u32() + start,
+                        pqs,
+                        &mut logup_specific.pqs_record,
+                    );
+                }
 
                 // compute expected evals
                 let p_eval = match mode {
