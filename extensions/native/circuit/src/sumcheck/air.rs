@@ -477,7 +477,6 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                 builder,
                 (logup_in_round_evaluation + logup_next_round_evaluation) * is_writeback,
             );
-
         let p1: [_; EXT_DEG] = logup_row_specific.pq[0..EXT_DEG].try_into().unwrap();
         let p2: [_; EXT_DEG] = logup_row_specific.pq[EXT_DEG..(EXT_DEG * 2)]
             .try_into()
