@@ -236,24 +236,6 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                 start_timestamp + AB::F::from_canonical_usize(8),
             );
 
-        // _debug
-        // builder
-        //     .when(prod_row)
-        //     .when(next.prod_row + next.logup_row)
-        //     .assert_eq(
-        //         next.start_timestamp,
-        //         start_timestamp
-        //             + within_round_limit * AB::F::from_canonical_usize(NUM_RWS_FOR_PRODUCT),
-        //     );
-        // builder
-        //     .when(logup_row)
-        //     .when(next.prod_row + next.logup_row)
-        //     .assert_eq(
-        //         next.start_timestamp,
-        //         start_timestamp
-        //             + within_round_limit * AB::F::from_canonical_usize(NUM_RWS_FOR_LOGUP),
-        //     );
-
         // Termination condition
         assert_array_eq(
             &mut builder.when::<AB::Expr>(is_end.into()),
