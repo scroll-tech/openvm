@@ -3,7 +3,7 @@ use std::borrow::Borrow;
 use openvm_circuit::{
     arch::{ExecutionBridge, ExecutionState},
     system::memory::{
-        offline_checker::{MemoryBridge, MemoryReadAuxCols},
+        offline_checker::MemoryBridge,
         MemoryAddress,
     },
 };
@@ -25,9 +25,6 @@ use crate::{
         columns::{HeaderSpecificCols, LogupSpecificCols, NativeSumcheckCols, ProdSpecificCols},
     },
 };
-
-pub const NUM_RWS_FOR_PRODUCT: usize = 2;
-pub const NUM_RWS_FOR_LOGUP: usize = 3;
 
 #[derive(Clone, Debug)]
 pub struct NativeSumcheckAir {
