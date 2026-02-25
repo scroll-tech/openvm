@@ -32,7 +32,7 @@ __device__ void fill_sumcheck_specific(RowSlice row, MemoryAuxColsFactory &mem_h
         );
     } else if (row[COL_INDEX(NativeSumcheckCols, prod_row)] == Fp::one()) {
         if (row[COL_INDEX(NativeSumcheckCols, within_round_limit)] == Fp::one()) {
-            if row[COL_INDEX(NativeSumcheckCols, is_writeback)] == Fp::one() {
+            if (row[COL_INDEX(NativeSumcheckCols, is_writeback)] == Fp::one()) {
                 mem_fill_base(
                     mem_helper,
                     start_timestamp,
@@ -53,7 +53,7 @@ __device__ void fill_sumcheck_specific(RowSlice row, MemoryAuxColsFactory &mem_h
         }
     } else if (row[COL_INDEX(NativeSumcheckCols, logup_row)] == Fp::one()) {
         if (row[COL_INDEX(NativeSumcheckCols, within_round_limit)] == Fp::one()) {
-            if row[COL_INDEX(NativeSumcheckCols, is_writeback)] == Fp::one() {
+            if (row[COL_INDEX(NativeSumcheckCols, is_writeback)] == Fp::one()) {
                 mem_fill_base(
                     mem_helper,
                     start_timestamp,
