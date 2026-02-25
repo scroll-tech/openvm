@@ -92,7 +92,7 @@ impl CycleTracker {
                 tracing::info!("{}│   ({:?},{}): {} instructions", padding, dsl_opcode.0, dsl_opcode.1, span_count);
             }
         }
-        tracing::info!("{}└╴({}) {} cycles", padding, name, span_cycles);
+        tracing::info!("{}└╴({}) {} cycles, abs: {}", padding, name, span_cycles, cycles_count);
     }
 
     /// Ends the current cycle tracker span.
