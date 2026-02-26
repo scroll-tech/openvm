@@ -3,7 +3,7 @@ use std::borrow::Borrow;
 use openvm_circuit::{
     arch::{ExecutionBridge, ExecutionState},
     system::memory::{
-        offline_checker::MemoryBridge,
+        offline_checker::{MemoryBridge, MemoryReadAuxCols},
         MemoryAddress,
     },
 };
@@ -25,6 +25,9 @@ use crate::{
         columns::{HeaderSpecificCols, LogupSpecificCols, NativeSumcheckCols, ProdSpecificCols},
     },
 };
+
+pub const NUM_RWS_FOR_PRODUCT: usize = 2;
+pub const NUM_RWS_FOR_LOGUP: usize = 3;
 
 #[derive(Clone, Debug)]
 pub struct NativeSumcheckAir {
@@ -102,7 +105,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             within_round_limit,
             should_acc,
             eval_acc,
-            is_writeback,
+            is_hint_src_id,
             specific,
         } = local;
 
@@ -232,6 +235,22 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                 next.start_timestamp,
                 start_timestamp + AB::F::from_canonical_usize(8),
             );
+        builder
+            .when(prod_row)
+            .when(next.prod_row + next.logup_row)
+            .assert_eq(
+                next.start_timestamp,
+                start_timestamp
+                    + within_round_limit * AB::F::from_canonical_usize(NUM_RWS_FOR_PRODUCT),
+            );
+        builder
+            .when(logup_row)
+            .when(next.prod_row + next.logup_row)
+            .assert_eq(
+                next.start_timestamp,
+                start_timestamp
+                    + within_round_limit * AB::F::from_canonical_usize(NUM_RWS_FOR_LOGUP),
+            );
 
         // Termination condition
         assert_array_eq(
@@ -330,7 +349,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                     native_as,
                     register_ptrs[0] + AB::F::from_canonical_usize(CONTEXT_ARR_BASE_LEN),
                 ),
-                [max_round, is_writeback],
+                [max_round, is_hint_src_id],
                 first_timestamp + AB::F::from_canonical_usize(7),
                 &header_row_specific.read_records[7],
             )
@@ -373,6 +392,21 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         );
         builder.assert_eq(prod_row * should_acc, prod_acc);
 
+        // Read p1, p2 from witness arrays
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(native_as, register_ptrs[2] + prod_row_specific.data_ptr),
+                prod_row_specific.p,
+                start_timestamp,
+                &MemoryReadAuxCols {
+                    base: prod_row_specific.ps_record.base,
+                },
+            )
+            .eval(
+                builder,
+                (prod_in_round_evaluation + prod_next_round_evaluation) * not(is_hint_src_id),
+            );
+
         // Obtain p1, p2 from hint space and write back to witness arrays
         self.memory_bridge
             .write(
@@ -383,7 +417,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             )
             .eval(
                 builder,
-                (prod_in_round_evaluation + prod_next_round_evaluation) * is_writeback,
+                (prod_in_round_evaluation + prod_next_round_evaluation) * is_hint_src_id,
             );
 
         let p1: [AB::Var; EXT_DEG] = prod_row_specific.p[0..EXT_DEG].try_into().unwrap();
@@ -398,7 +432,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                     register_ptrs[4] + curr_prod_n * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 prod_row_specific.p_evals,
-                start_timestamp + is_writeback * AB::F::ONE,
+                start_timestamp + AB::F::ONE,
                 &prod_row_specific.write_record,
             )
             .eval(builder, prod_row * within_round_limit);
@@ -465,6 +499,21 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         );
         builder.assert_eq(logup_row * should_acc, logup_acc);
 
+        // Read p1, p2, q1, q2 from witness arrays
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(native_as, register_ptrs[3] + logup_row_specific.data_ptr),
+                logup_row_specific.pq,
+                start_timestamp,
+                &MemoryReadAuxCols {
+                    base: logup_row_specific.pqs_record.base,
+                },
+            )
+            .eval(
+                builder,
+                (logup_in_round_evaluation + logup_next_round_evaluation) * not(is_hint_src_id),
+            );
+
         // Obtain p1, p2, q1, q2 from hint space
         self.memory_bridge
             .write(
@@ -475,7 +524,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             )
             .eval(
                 builder,
-                (logup_in_round_evaluation + logup_next_round_evaluation) * is_writeback,
+                (logup_in_round_evaluation + logup_next_round_evaluation) * is_hint_src_id,
             );
         let p1: [_; EXT_DEG] = logup_row_specific.pq[0..EXT_DEG].try_into().unwrap();
         let p2: [_; EXT_DEG] = logup_row_specific.pq[EXT_DEG..(EXT_DEG * 2)]
@@ -497,7 +546,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                         + (num_prod_spec + curr_logup_n) * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 logup_row_specific.p_evals,
-                start_timestamp + is_writeback * AB::F::ONE,
+                start_timestamp + AB::F::ONE,
                 &logup_row_specific.write_records[0],
             )
             .eval(builder, logup_row * within_round_limit);
@@ -512,7 +561,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                             * AB::F::from_canonical_usize(EXT_DEG),
                 ),
                 logup_row_specific.q_evals,
-                start_timestamp + is_writeback * AB::F::ONE + AB::F::ONE,
+                start_timestamp + AB::F::TWO,
                 &logup_row_specific.write_records[1],
             )
             .eval(builder, logup_row * within_round_limit);
