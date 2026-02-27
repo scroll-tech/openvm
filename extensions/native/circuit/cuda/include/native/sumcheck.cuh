@@ -82,7 +82,7 @@ template <typename T> struct NativeSumcheckCols {
 
     T eval_acc[EXT_DEG];
 
-    T is_writeback;
+    T is_hint_src_id;
 
     T specific[COL_SPECIFIC_WIDTH];
 };
