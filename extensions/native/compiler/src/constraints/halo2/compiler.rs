@@ -136,7 +136,10 @@ impl<C: Config + Debug> Halo2ConstraintCompiler<C> {
         C: Config<N = Bn254Fr, F = BabyBear, EF = BabyBearExt4>,
     {
         #[cfg(feature = "metrics")]
-        let mut cell_tracker = CycleTracker::new();
+        let mut cell_tracker = CycleTracker::new(std::env::var("CYCLE_TRACKER_MAX_DEPTH")
+            .ok()
+            .and_then(|s| s.parse().ok())
+            .unwrap_or(2));
         let range = Arc::new(halo2_state.builder.range_chip());
         let f_chip = Arc::new(BabyBearChip::new(range.clone()));
         let ext_chip = BabyBearExt4Chip::new(Arc::clone(&f_chip));
