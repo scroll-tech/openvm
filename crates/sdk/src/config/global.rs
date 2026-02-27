@@ -270,7 +270,7 @@ impl SdkVmConfig {
         let io = config.io.map(|_| Rv32Io);
         let keccak = config.keccak.map(|_| Keccak256);
         let sha256 = config.sha256.map(|_| Sha256);
-        let native = config.native.map(|_| Native);
+        let native = config.native.map(|_| Native(false));
         let castf = config.castf.map(|_| CastFExtension);
         let rv32m = config.rv32m;
         let bigint = config.bigint;

@@ -44,7 +44,7 @@ mod loadstore;
 mod poseidon2;
 mod sumcheck;
 
-mod extension;
+pub mod extension;
 pub use extension::*;
 pub use field_extension::EXT_DEG;
 
@@ -173,7 +173,7 @@ impl Default for Rv32WithKernelsConfig {
             rv32i: Rv32I,
             rv32m: Rv32M::default(),
             io: Rv32Io,
-            native: Native,
+            native: Native(false),
             castf: CastFExtension,
         }
     }

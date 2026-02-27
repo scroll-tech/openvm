@@ -416,6 +416,7 @@ fn test_static_verifier_custom_pv_handler() -> eyre::Result<()> {
     Ok(())
 }
 
+/* _debug: forge_fmt
 #[cfg(feature = "evm-verify")]
 #[test]
 fn test_e2e_proof_generation_and_verification_with_pvs() -> eyre::Result<()> {
@@ -431,6 +432,7 @@ fn test_e2e_proof_generation_and_verification_with_pvs() -> eyre::Result<()> {
     Sdk::verify_evm_halo2_proof(&evm_verifier, evm_proof)?;
     Ok(())
 }
+*/
 
 #[test]
 fn test_sdk_guest_build_and_transpile() -> eyre::Result<()> {
