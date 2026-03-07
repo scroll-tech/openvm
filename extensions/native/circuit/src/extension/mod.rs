@@ -219,6 +219,7 @@ where
             execution_bus,
             program_bus,
             memory_bridge,
+            hint_bridge: _,
         } = inventory.system().port();
         let exec_bridge = ExecutionBridge::new(execution_bus, program_bus);
         let range_checker = inventory.range_checker().bus;
@@ -542,6 +543,7 @@ impl<SC: StarkGenericConfig> VmCircuitExtension<SC> for CastFExtension {
             execution_bus,
             program_bus,
             memory_bridge,
+            hint_bridge: _,
         } = inventory.system().port();
         let exec_bridge = ExecutionBridge::new(execution_bus, program_bus);
         let range_checker = inventory.range_checker().bus;

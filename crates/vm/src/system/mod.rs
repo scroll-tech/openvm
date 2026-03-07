@@ -36,7 +36,7 @@ use crate::{
         connector::VmConnectorChip,
         memory::{
             interface::MemoryInterfaceAirs,
-            offline_checker::{MemoryBridge, MemoryBus},
+            offline_checker::{HintBridge, HintBus, MemoryBridge, MemoryBus},
             online::GuestMemory,
             MemoryAirInventory, MemoryController, TimestampedEquipartition, CHUNK,
         },
@@ -149,6 +149,7 @@ pub struct SystemPort {
     pub execution_bus: ExecutionBus,
     pub program_bus: ProgramBus,
     pub memory_bridge: MemoryBridge,
+    pub hint_bridge: HintBridge,
 }
 
 #[derive(Clone)]
@@ -156,6 +157,7 @@ pub struct SystemAirInventory<SC: StarkGenericConfig> {
     pub program: ProgramAir,
     pub connector: VmConnectorAir,
     pub memory: MemoryAirInventory<SC>,
+    pub hint_bridge: HintBridge,
     /// Public values AIR exists if and only if continuations is disabled and `num_public_values`
     /// is greater than 0.
     pub public_values: Option<PublicValuesAir>,
@@ -171,6 +173,7 @@ impl<SC: StarkGenericConfig> SystemAirInventory<SC> {
             execution_bus,
             program_bus,
             memory_bridge,
+            hint_bridge,
         } = port;
         let range_bus = memory_bridge.range_bus();
         let program = ProgramAir::new(program_bus);
@@ -212,6 +215,7 @@ impl<SC: StarkGenericConfig> SystemAirInventory<SC> {
             program,
             connector,
             memory,
+            hint_bridge,
             public_values,
         }
     }
@@ -221,6 +225,7 @@ impl<SC: StarkGenericConfig> SystemAirInventory<SC> {
             memory_bridge: self.memory.bridge,
             program_bus: self.program.bus,
             execution_bus: self.connector.execution_bus,
+            hint_bridge: self.hint_bridge,
         }
     }
 
@@ -300,10 +305,13 @@ impl<SC: StarkGenericConfig> VmCircuitConfig<SC> for SystemConfig {
         };
         let memory_bridge =
             MemoryBridge::new(memory_bus, self.memory_config.timestamp_max_bits, range_bus);
+        let hint_bus = HintBus::new(bus_idx_mgr.new_bus_idx());
+        let hint_bridge = HintBridge::new(hint_bus);
         let system_port = SystemPort {
             execution_bus,
             program_bus,
             memory_bridge,
+            hint_bridge,
         };
         let system = SystemAirInventory::new(self, system_port, merkle_compression_buses);
 

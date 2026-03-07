@@ -10,10 +10,11 @@ use openvm_stark_backend::{
     interaction::InteractionBuilder, p3_air::AirBuilder, p3_field::FieldAlgebra,
 };
 
-use super::bus::MemoryBus;
+use super::bus::{HintBus, MemoryBus};
 use crate::system::memory::{
     offline_checker::columns::{
-        MemoryBaseAuxCols, MemoryReadAuxCols, MemoryReadOrImmediateAuxCols, MemoryWriteAuxCols,
+        HintReadAuxCols, HintWriteAuxCols, MemoryBaseAuxCols, MemoryReadAuxCols,
+        MemoryReadOrImmediateAuxCols, MemoryWriteAuxCols,
     },
     MemoryAddress,
 };
@@ -323,6 +324,137 @@ impl MemoryOfflineChecker {
 
         self.memory_bus
             .send(address, data.to_vec(), timestamp)
+            .eval(builder, enabled);
+    }
+}
+
+/// The [HintBridge] is used to constrain logical hint memory operations (read/write).
+/// It adds all necessary constraints and interactions for a separate hint space.
+#[derive(Clone, Copy, Debug)]
+pub struct HintBridge {
+    hint_bus: HintBus,
+}
+
+impl HintBridge {
+    /// Create a new [HintBridge] with the provided hint bus.
+    pub fn new(hint_bus: HintBus) -> Self {
+        Self { hint_bus }
+    }
+
+    pub fn hint_bus(&self) -> HintBus {
+        self.hint_bus
+    }
+
+    /// Prepare a logical hint read operation.
+    /// A read or write interaction has the form: (hint_id, offset, value, timestamp)
+    #[must_use]
+    pub fn read<'a, T, V>(
+        &self,
+        hint_id: impl Into<T>,
+        offset: impl Into<T>,
+        value: impl Into<T>,
+        timestamp: impl Into<T>,
+        aux: &'a HintReadAuxCols<V>,
+    ) -> HintReadOperation<'a, T, V> {
+        HintReadOperation {
+            hint_bus: self.hint_bus,
+            hint_id: hint_id.into(),
+            offset: offset.into(),
+            value: value.into(),
+            timestamp: timestamp.into(),
+            aux,
+        }
+    }
+
+    /// Prepare a logical hint write operation.
+    /// A read or write interaction has the form: (hint_id, offset, value, timestamp)
+    #[must_use]
+    pub fn write<'a, T, V>(
+        &self,
+        hint_id: impl Into<T>,
+        offset: impl Into<T>,
+        value: impl Into<T>,
+        timestamp: impl Into<T>,
+        aux: &'a HintWriteAuxCols<V>,
+    ) -> HintWriteOperation<'a, T, V> {
+        HintWriteOperation {
+            hint_bus: self.hint_bus,
+            hint_id: hint_id.into(),
+            offset: offset.into(),
+            value: value.into(),
+            timestamp: timestamp.into(),
+            aux,
+        }
+    }
+}
+
+/// Constraints and interactions for a logical hint read of `(hint_id, offset, value)` at time `timestamp`.
+/// This reads `(hint_id, offset, value, timestamp_prev)` from the hint bus and writes
+/// `(hint_id, offset, value, timestamp)` to the hint bus.
+///
+/// The generic `T` type is intended to be `AB::Expr` where `AB` is the [AirBuilder].
+/// The auxiliary columns are not expected to be expressions, so the generic `V` type is intended
+/// to be `AB::Var`.
+pub struct HintReadOperation<'a, T, V> {
+    hint_bus: HintBus,
+    hint_id: T,
+    offset: T,
+    value: T,
+    timestamp: T,
+    aux: &'a HintReadAuxCols<V>,
+}
+
+impl<F: FieldAlgebra, V: Copy + Into<F>> HintReadOperation<'_, F, V> {
+    /// Evaluate constraints and send/receive interactions.
+    pub fn eval<AB>(self, builder: &mut AB, enabled: impl Into<AB::Expr>)
+    where
+        AB: InteractionBuilder<Var = V, Expr = F>,
+    {
+        let enabled = enabled.into();
+
+        self.hint_bus
+            .receive(self.hint_id.clone(), self.offset.clone(), self.value.clone(), self.aux.prev_timestamp)
+            .eval(builder, enabled.clone());
+
+        self.hint_bus
+            .send(self.hint_id, self.offset, self.value, self.timestamp)
+            .eval(builder, enabled);
+    }
+}
+
+/// Constraints and interactions for a logical hint write of `(hint_id, offset, value)` at time
+/// `timestamp`. This reads `(hint_id, offset, prev_value, timestamp_prev)` from the hint bus
+/// and writes `(hint_id, offset, value, timestamp)` to the hint bus.
+///
+/// **Note:** This can be used as a logical read operation by setting `prev_value = value`.
+pub struct HintWriteOperation<'a, T, V> {
+    hint_bus: HintBus,
+    hint_id: T,
+    offset: T,
+    value: T,
+    timestamp: T,
+    aux: &'a HintWriteAuxCols<V>,
+}
+
+impl<T: FieldAlgebra, V: Copy + Into<T>> HintWriteOperation<'_, T, V> {
+    /// Evaluate constraints and send/receive interactions. `enabled` must be boolean.
+    pub fn eval<AB>(self, builder: &mut AB, enabled: impl Into<AB::Expr>)
+    where
+        AB: InteractionBuilder<Var = V, Expr = T>,
+    {
+        let enabled = enabled.into();
+
+        self.hint_bus
+            .receive(
+                self.hint_id.clone(),
+                self.offset.clone(),
+                self.aux.prev_value.clone(),
+                self.aux.prev_timestamp,
+            )
+            .eval(builder, enabled.clone());
+
+        self.hint_bus
+            .send(self.hint_id, self.offset, self.value, self.timestamp)
             .eval(builder, enabled);
     }
 }
