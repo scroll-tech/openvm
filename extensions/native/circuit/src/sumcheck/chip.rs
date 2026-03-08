@@ -17,6 +17,7 @@ use openvm_stark_backend::p3_field::PrimeField32;
 use crate::{
     field_extension::{FieldExtension, EXT_DEG},
     fri::elem_to_ext,
+    hint_space_provider::SharedHintSpaceProviderChip,
     mem_fill_helper,
     sumcheck::columns::{
         HeaderSpecificCols, LogupSpecificCols, NativeSumcheckCols, ProdSpecificCols,
@@ -96,9 +97,11 @@ impl<F: PrimeField32> SizedRecord<NativeSumcheckRecordLayout> for NativeSumcheck
 pub struct NativeSumcheckExecutor;
 
 #[derive(derive_new::new)]
-pub struct NativeSumcheckFiller;
+pub struct NativeSumcheckFiller<F> {
+    pub hint_space_provider: SharedHintSpaceProviderChip<F>,
+}
 
-pub type NativeSumcheckChip<F> = VmChipWrapper<F, NativeSumcheckFiller>;
+pub type NativeSumcheckChip<F> = VmChipWrapper<F, NativeSumcheckFiller<F>>;
 
 impl Default for NativeSumcheckExecutor {
     fn default() -> Self {
@@ -243,6 +246,8 @@ where
             row.register_ptrs[4] = r_evals_ptr;
             row.max_round = max_round;
             row.is_writeback = is_writeback;
+            row.prod_hint_id = prod_evals_id;
+            row.logup_hint_id = logup_evals_id;
         }
 
         let prod_evals_id = prod_evals_id.as_canonical_u32();
@@ -517,7 +522,7 @@ where
     }
 }
 
-impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
+impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller<F> {
     fn fill_trace_row(&self, mem_helper: &MemoryAuxColsFactory<F>, row_slice: &mut [F]) {
         let cols: &mut NativeSumcheckCols<F> = row_slice.borrow_mut();
         let start_timestamp = cols.start_timestamp.as_canonical_u32();
@@ -544,6 +549,15 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
                 cols.specific[..ProdSpecificCols::<F>::width()].borrow_mut();
 
             if cols.within_round_limit == F::ONE {
+                // Register each p element with the hint space provider for the lookup bus
+                for (j, &val) in prod_row_specific.p.iter().enumerate() {
+                    self.hint_space_provider.request(
+                        cols.prod_hint_id,
+                        prod_row_specific.data_ptr + F::from_canonical_usize(j),
+                        val,
+                    );
+                }
+
                 if cols.is_writeback == F::ONE {
                     // writeback p1, p2
                     mem_fill_helper(
@@ -571,6 +585,15 @@ impl<F: PrimeField32> TraceFiller<F> for NativeSumcheckFiller {
                 cols.specific[..LogupSpecificCols::<F>::width()].borrow_mut();
 
             if cols.within_round_limit == F::ONE {
+                // Register each pq element with the hint space provider for the lookup bus
+                for (j, &val) in logup_row_specific.pq.iter().enumerate() {
+                    self.hint_space_provider.request(
+                        cols.logup_hint_id,
+                        logup_row_specific.data_ptr + F::from_canonical_usize(j),
+                        val,
+                    );
+                }
+
                 if cols.is_writeback == F::ONE {
                     // writeback p1, p2, q1, q2
                     mem_fill_helper(

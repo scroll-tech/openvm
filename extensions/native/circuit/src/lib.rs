@@ -39,6 +39,7 @@ mod castf;
 mod field_arithmetic;
 mod field_extension;
 mod fri;
+pub(crate) mod hint_space_provider;
 mod jal_rangecheck;
 mod loadstore;
 mod poseidon2;

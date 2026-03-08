@@ -109,6 +109,8 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
             should_acc,
             eval_acc,
             is_writeback,
+            prod_hint_id,
+            logup_hint_id,
             specific,
         } = local;
 
@@ -186,6 +188,12 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         builder
             .when(next.prod_row + next.logup_row)
             .assert_eq(logup_nested_len, next.logup_nested_len);
+        builder
+            .when(next.prod_row + next.logup_row)
+            .assert_eq(prod_hint_id, next.prod_hint_id);
+        builder
+            .when(next.prod_row + next.logup_row)
+            .assert_eq(logup_hint_id, next.logup_hint_id);
 
         ////////////////////////////////////////////////////////////////
         // Row transitions from current to next row
@@ -392,6 +400,18 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                 (prod_in_round_evaluation + prod_next_round_evaluation) * is_writeback,
             );
 
+        // Lookup each element of p in the hint bus to constrain hint_space reads
+        let prod_enabled: AB::Expr = prod_in_round_evaluation + prod_next_round_evaluation;
+        for (j, &val) in prod_row_specific.p.iter().enumerate() {
+            self.hint_bridge.lookup(
+                builder,
+                prod_hint_id,
+                prod_row_specific.data_ptr + AB::F::from_canonical_usize(j),
+                val,
+                prod_enabled.clone(),
+            );
+        }
+
         let p1: [AB::Var; EXT_DEG] = prod_row_specific.p[0..EXT_DEG].try_into().unwrap();
         let p2: [AB::Var; EXT_DEG] = prod_row_specific.p[EXT_DEG..(EXT_DEG * 2)]
             .try_into()
@@ -483,6 +503,18 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                 builder,
                 (logup_in_round_evaluation + logup_next_round_evaluation) * is_writeback,
             );
+
+        // Lookup each element of pq in the hint bus to constrain hint_space reads
+        let logup_enabled: AB::Expr = logup_in_round_evaluation + logup_next_round_evaluation;
+        for (j, &val) in logup_row_specific.pq.iter().enumerate() {
+            self.hint_bridge.lookup(
+                builder,
+                logup_hint_id,
+                logup_row_specific.data_ptr + AB::F::from_canonical_usize(j),
+                val,
+                logup_enabled.clone(),
+            );
+        }
         let p1: [_; EXT_DEG] = logup_row_specific.pq[0..EXT_DEG].try_into().unwrap();
         let p2: [_; EXT_DEG] = logup_row_specific.pq[EXT_DEG..(EXT_DEG * 2)]
             .try_into()

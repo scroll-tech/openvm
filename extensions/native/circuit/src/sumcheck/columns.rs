@@ -76,6 +76,10 @@ pub struct NativeSumcheckCols<T> {
     // Indicate whether the values read from hint slices should be written back to a witness array
     pub is_writeback: T,
 
+    // Hint space IDs for lookup bus interactions
+    pub prod_hint_id: T,
+    pub logup_hint_id: T,
+
     // /// 1. For header row, 5 registers, ctx, challenges
     // /// 2. For the rest: max_variables, p1, p2, q1, q2
     // pub read_records: [MemoryReadAuxCols<T>; 7],
