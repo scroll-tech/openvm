@@ -3,7 +3,7 @@ use std::borrow::Borrow;
 use openvm_circuit::{
     arch::{ExecutionBridge, ExecutionState},
     system::memory::{
-        offline_checker::{MemoryBridge, MemoryReadAuxCols},
+        offline_checker::{HintBridge, MemoryBridge, MemoryReadAuxCols},
         MemoryAddress,
     },
 };
@@ -33,13 +33,19 @@ pub const NUM_RWS_FOR_LOGUP: usize = 3;
 pub struct NativeSumcheckAir {
     pub execution_bridge: ExecutionBridge,
     pub memory_bridge: MemoryBridge,
+    pub hint_bridge: HintBridge,
 }
 
 impl NativeSumcheckAir {
-    pub fn new(execution_bridge: ExecutionBridge, memory_bridge: MemoryBridge) -> Self {
+    pub fn new(
+        execution_bridge: ExecutionBridge,
+        memory_bridge: MemoryBridge,
+        hint_bridge: HintBridge,
+    ) -> Self {
         Self {
             execution_bridge,
             memory_bridge,
+            hint_bridge,
         }
     }
 }

@@ -219,7 +219,7 @@ where
             execution_bus,
             program_bus,
             memory_bridge,
-            hint_bridge: _,
+            hint_bridge,
         } = inventory.system().port();
         let exec_bridge = ExecutionBridge::new(execution_bus, program_bus);
         let range_checker = inventory.range_checker().bus;
@@ -270,12 +270,13 @@ where
         let verify_batch = NativePoseidon2Air::<_, 1>::new(
             exec_bridge,
             memory_bridge,
+            hint_bridge,
             VerifyBatchBus::new(inventory.new_bus_idx()),
             Poseidon2Config::default(),
         );
         inventory.add_air(verify_batch);
 
-        let tower_evaluate = NativeSumcheckAir::new(exec_bridge, memory_bridge);
+        let tower_evaluate = NativeSumcheckAir::new(exec_bridge, memory_bridge, hint_bridge);
         inventory.add_air(tower_evaluate);
 
         Ok(())
