@@ -276,7 +276,7 @@ where
         );
         inventory.add_air(verify_batch);
 
-        let tower_evaluate = NativeSumcheckAir::new(exec_bridge, memory_bridge, hint_bridge);
+        let tower_evaluate = NativeSumcheckAir::new(exec_bridge, memory_bridge);
         inventory.add_air(tower_evaluate);
 
         Ok(())
