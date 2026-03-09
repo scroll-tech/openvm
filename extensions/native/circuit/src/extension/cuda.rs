@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use openvm_circuit::{
     arch::{ChipInventory, ChipInventoryError, DenseRecordArena, VmProverExtension},
     system::cuda::extensions::get_inventory_range_checker,
@@ -14,6 +16,7 @@ use crate::{
     field_arithmetic::{FieldArithmeticAir, FieldArithmeticChipGpu},
     field_extension::{FieldExtensionAir, FieldExtensionChipGpu},
     fri::{FriReducedOpeningAir, FriReducedOpeningChipGpu},
+    hint_space_provider::{cuda::HintSpaceProviderChipGpu, HintSpaceProviderAir, HintSpaceProviderChip},
     jal_rangecheck::{JalRangeCheckAir, JalRangeCheckGpu},
     loadstore::{NativeLoadStoreAir, NativeLoadStoreChipGpu},
     poseidon2::{air::NativePoseidon2Air, NativePoseidon2ChipGpu},
@@ -75,6 +78,13 @@ impl VmProverExtension<GpuBabyBearPoseidon2Engine, DenseRecordArena, Native>
         inventory.next_air::<NativePoseidon2Air<BabyBear, 1>>()?;
         let poseidon2 = NativePoseidon2ChipGpu::<1>::new(range_checker.clone(), timestamp_max_bits);
         inventory.add_executor_chip(poseidon2);
+
+        // HintSpaceProvider must be registered BEFORE NativeSumcheck because chips are
+        // dispatched in reverse order: sumcheck runs first and populates the provider.
+        let hint_air: &HintSpaceProviderAir = inventory.next_air::<HintSpaceProviderAir>()?;
+        let cpu_chip = Arc::new(HintSpaceProviderChip::new(hint_air.hint_bus.clone()));
+        let provider_gpu = HintSpaceProviderChipGpu::new(cpu_chip);
+        inventory.add_periphery_chip(provider_gpu);
 
         inventory.next_air::<NativeSumcheckAir>()?;
         let sumcheck = NativeSumcheckChipGpu::new(range_checker.clone(), timestamp_max_bits);
