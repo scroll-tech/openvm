@@ -84,7 +84,7 @@ impl<F> HintSpaceProviderChip<F> {
 
 impl<F: PrimeField32> HintSpaceProviderChip<F> {
     pub fn generate_trace(&self) -> RowMajorMatrix<F> {
-        let data = self.data.lock().unwrap();
+        let data = std::mem::take(&mut *self.data.lock().unwrap());
         let num_real_rows = data.len();
         let trace_height = num_real_rows.next_power_of_two().max(2);
 
