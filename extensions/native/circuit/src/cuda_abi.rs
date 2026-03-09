@@ -345,3 +345,33 @@ pub mod native_jal_rangecheck_cuda {
         ))
     }
 }
+
+pub mod hint_space_provider_cuda {
+    use super::*;
+
+    extern "C" {
+        pub fn _hint_space_provider_tracegen(
+            d_trace: *mut F,
+            height: usize,
+            width: usize,
+            d_records: *const F,
+            rows_used: usize,
+        ) -> i32;
+    }
+
+    pub unsafe fn tracegen(
+        d_trace: &DeviceBuffer<F>,
+        height: usize,
+        width: usize,
+        d_records: &DeviceBuffer<F>,
+        rows_used: usize,
+    ) -> Result<(), CudaError> {
+        CudaError::from_result(_hint_space_provider_tracegen(
+            d_trace.as_mut_ptr(),
+            height,
+            width,
+            d_records.as_ptr(),
+            rows_used,
+        ))
+    }
+}

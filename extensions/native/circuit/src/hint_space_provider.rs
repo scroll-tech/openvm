@@ -130,3 +130,56 @@ impl<F: PrimeField32> ChipUsageGetter for HintSpaceProviderChip<F> {
         NUM_HINT_SPACE_PROVIDER_COLS
     }
 }
+
+#[cfg(feature = "cuda")]
+pub mod cuda {
+    use std::sync::Arc;
+
+    use openvm_circuit::arch::DenseRecordArena;
+    use openvm_cuda_backend::{base::DeviceMatrix, prover_backend::GpuBackend, types::F};
+    use openvm_cuda_common::copy::MemCopyH2D;
+    use openvm_stark_backend::{prover::types::AirProvingContext, Chip};
+
+    use super::{HintSpaceProviderChip, NUM_HINT_SPACE_PROVIDER_COLS};
+    use crate::cuda_abi::hint_space_provider_cuda;
+
+    pub struct HintSpaceProviderChipGpu {
+        pub cpu_chip: Arc<HintSpaceProviderChip<F>>,
+    }
+
+    impl HintSpaceProviderChipGpu {
+        pub fn new(cpu_chip: Arc<HintSpaceProviderChip<F>>) -> Self {
+            Self { cpu_chip }
+        }
+    }
+
+    impl Chip<DenseRecordArena, GpuBackend> for HintSpaceProviderChipGpu {
+        fn generate_proving_ctx(&self, _: DenseRecordArena) -> AirProvingContext<GpuBackend> {
+            let data = std::mem::take(&mut *self.cpu_chip.data.lock().unwrap());
+            let rows_used = data.len();
+            let height = rows_used.next_power_of_two().max(2);
+
+            // Flatten (hint_id, offset, value) triples into a contiguous [F] buffer
+            let flat: Vec<F> = data
+                .into_iter()
+                .flat_map(|(h, o, v)| [h, o, v])
+                .collect();
+
+            let d_records = flat.to_device().unwrap();
+            let trace = DeviceMatrix::<F>::with_capacity(height, NUM_HINT_SPACE_PROVIDER_COLS);
+
+            unsafe {
+                hint_space_provider_cuda::tracegen(
+                    trace.buffer(),
+                    height,
+                    NUM_HINT_SPACE_PROVIDER_COLS,
+                    &d_records,
+                    rows_used,
+                )
+                .unwrap();
+            }
+
+            AirProvingContext::simple_no_pis(trace)
+        }
+    }
+}
