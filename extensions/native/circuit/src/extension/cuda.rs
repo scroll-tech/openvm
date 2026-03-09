@@ -82,12 +82,13 @@ impl VmProverExtension<GpuBabyBearPoseidon2Engine, DenseRecordArena, Native>
         // HintSpaceProvider must be registered BEFORE NativeSumcheck because chips are
         // dispatched in reverse order: sumcheck runs first and populates the provider.
         let hint_air: &HintSpaceProviderAir = inventory.next_air::<HintSpaceProviderAir>()?;
-        let cpu_chip = Arc::new(HintSpaceProviderChip::new(hint_air.hint_bus.clone()));
-        let provider_gpu = HintSpaceProviderChipGpu::new(cpu_chip);
+        let cpu_chip = Arc::new(HintSpaceProviderChip::new(hint_air.hint_bus));
+        let provider_gpu = HintSpaceProviderChipGpu::new(cpu_chip.clone());
         inventory.add_periphery_chip(provider_gpu);
 
         inventory.next_air::<NativeSumcheckAir>()?;
-        let sumcheck = NativeSumcheckChipGpu::new(range_checker.clone(), timestamp_max_bits);
+        let sumcheck =
+            NativeSumcheckChipGpu::new(range_checker.clone(), timestamp_max_bits, cpu_chip);
         inventory.add_executor_chip(sumcheck);
 
         Ok(())
