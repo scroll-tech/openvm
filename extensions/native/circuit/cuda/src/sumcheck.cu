@@ -32,34 +32,63 @@ __device__ void fill_sumcheck_specific(RowSlice row, MemoryAuxColsFactory &mem_h
         );
     } else if (row[COL_INDEX(NativeSumcheckCols, prod_row)] == Fp::one()) {
         if (row[COL_INDEX(NativeSumcheckCols, within_round_limit)] == Fp::one()) {
-            mem_fill_base(
-                mem_helper,
-                start_timestamp,
-                specific.slice_from(COL_INDEX(ProdSpecificCols, ps_record.base))
-            );
-            mem_fill_base(
-                mem_helper,
-                start_timestamp + 1,
-                specific.slice_from(COL_INDEX(ProdSpecificCols, write_record.base))
-            );
+            if (row[COL_INDEX(NativeSumcheckCols, is_writeback)] == Fp::one()) {
+                // writeback p1, p2
+                mem_fill_base(
+                    mem_helper,
+                    start_timestamp,
+                    specific.slice_from(COL_INDEX(ProdSpecificCols, ps_record.base))
+                );
+                // write p_eval
+                mem_fill_base(
+                    mem_helper,
+                    start_timestamp + 1,
+                    specific.slice_from(COL_INDEX(ProdSpecificCols, write_record.base))
+                );
+            } else {
+                // write p_eval only
+                mem_fill_base(
+                    mem_helper,
+                    start_timestamp,
+                    specific.slice_from(COL_INDEX(ProdSpecificCols, write_record.base))
+                );
+            }
         }
     } else if (row[COL_INDEX(NativeSumcheckCols, logup_row)] == Fp::one()) {
         if (row[COL_INDEX(NativeSumcheckCols, within_round_limit)] == Fp::one()) {
-            mem_fill_base(
-                mem_helper,
-                start_timestamp,
-                specific.slice_from(COL_INDEX(LogupSpecificCols, pqs_record.base))
-            );
-            mem_fill_base(
-                mem_helper,
-                start_timestamp + 1,
-                specific.slice_from(COL_INDEX(LogupSpecificCols, write_records[0].base))
-            );
-            mem_fill_base(
-                mem_helper,
-                start_timestamp + 2,
-                specific.slice_from(COL_INDEX(LogupSpecificCols, write_records[1].base))
-            );
+            if (row[COL_INDEX(NativeSumcheckCols, is_writeback)] == Fp::one()) {
+                // writeback p1, p2, q1, q2
+                mem_fill_base(
+                    mem_helper,
+                    start_timestamp,
+                    specific.slice_from(COL_INDEX(LogupSpecificCols, pqs_record.base))
+                );
+                // write p_eval
+                mem_fill_base(
+                    mem_helper,
+                    start_timestamp + 1,
+                    specific.slice_from(COL_INDEX(LogupSpecificCols, write_records[0].base))
+                );
+                // write q_eval
+                mem_fill_base(
+                    mem_helper,
+                    start_timestamp + 2,
+                    specific.slice_from(COL_INDEX(LogupSpecificCols, write_records[1].base))
+                );
+            } else {
+                // write p_eval
+                mem_fill_base(
+                    mem_helper,
+                    start_timestamp,
+                    specific.slice_from(COL_INDEX(LogupSpecificCols, write_records[0].base))
+                );
+                // write q_eval
+                mem_fill_base(
+                    mem_helper,
+                    start_timestamp + 1,
+                    specific.slice_from(COL_INDEX(LogupSpecificCols, write_records[1].base))
+                );
+            }
         }
     }
 }

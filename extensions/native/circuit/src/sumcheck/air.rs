@@ -120,6 +120,7 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         builder.assert_bool(prod_row);
         builder.assert_bool(logup_row);
         builder.assert_bool(within_round_limit);
+        builder.assert_bool(is_writeback);
         builder.assert_bool(prod_in_round_evaluation);
         builder.assert_bool(logup_in_round_evaluation);
 
@@ -188,6 +189,9 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
         builder
             .when(next.prod_row + next.logup_row)
             .assert_eq(logup_nested_len, next.logup_nested_len);
+        builder
+            .when(next.prod_row + next.logup_row)
+            .assert_eq(is_writeback, next.is_writeback);
         builder
             .when(next.prod_row + next.logup_row)
             .assert_eq(prod_hint_id, next.prod_hint_id);
