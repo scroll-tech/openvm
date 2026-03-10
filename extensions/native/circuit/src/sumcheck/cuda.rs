@@ -14,6 +14,7 @@ use crate::{
     cuda_abi::sumcheck_cuda,
     hint_space_provider::SharedHintSpaceProviderChip,
 };
+use p3_field::FieldAlgebra;
 
 #[derive(new)]
 pub struct NativeSumcheckChipGpu {
@@ -54,7 +55,7 @@ impl NativeSumcheckChipGpu {
                 for (j, &val) in prod_specific.p.iter().enumerate() {
                     self.hint_space_provider.request(
                         cols.prod_hint_id,
-                        prod_specific.data_ptr + F::from_canonical_usize(j),
+                        prod_specific.data_ptr + F::from_canonical_u16(j),
                         val,
                     );
                 }
@@ -64,7 +65,7 @@ impl NativeSumcheckChipGpu {
                 for (j, &val) in logup_specific.pq.iter().enumerate() {
                     self.hint_space_provider.request(
                         cols.logup_hint_id,
-                        logup_specific.data_ptr + F::from_canonical_usize(j),
+                        logup_specific.data_ptr + F::from_canonical_u16(j),
                         val,
                     );
                 }
