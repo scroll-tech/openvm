@@ -159,24 +159,30 @@ pub mod cuda {
             let rows_used = data.len();
             let height = rows_used.next_power_of_two().max(2);
 
-            // Flatten (hint_id, offset, value) triples into a contiguous [F] buffer
-            let flat: Vec<F> = data
-                .into_iter()
-                .flat_map(|(h, o, v)| [h, o, v])
-                .collect();
-
-            let d_records = flat.to_device().unwrap();
             let trace = DeviceMatrix::<F>::with_capacity(height, NUM_HINT_SPACE_PROVIDER_COLS);
 
-            unsafe {
-                hint_space_provider_cuda::tracegen(
-                    trace.buffer(),
-                    height,
-                    NUM_HINT_SPACE_PROVIDER_COLS,
-                    &d_records,
-                    rows_used,
-                )
-                .unwrap();
+            if rows_used > 0 {
+                // Flatten (hint_id, offset, value) triples into a contiguous [F] buffer
+                let flat: Vec<F> = data
+                    .into_iter()
+                    .flat_map(|(h, o, v)| [h, o, v])
+                    .collect();
+
+                let d_records = flat.to_device().unwrap();
+
+                unsafe {
+                    hint_space_provider_cuda::tracegen(
+                        trace.buffer(),
+                        height,
+                        NUM_HINT_SPACE_PROVIDER_COLS,
+                        &d_records,
+                        rows_used,
+                    )
+                    .unwrap();
+                }
+            } else {
+                // No data — zero-fill the trace (all padding rows with is_valid=0)
+                trace.buffer().fill_zero().unwrap();
             }
 
             AirProvingContext::simple_no_pis(trace)
