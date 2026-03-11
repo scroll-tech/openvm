@@ -298,7 +298,7 @@ where
                 prod_specific.p = ps;
 
                 // If p values come from the hint stream, write back to the actual witness array
-                if is_writeback > F::ZERO {
+                if is_writeback != F::ZERO {
                     tracing_write_native_inplace(
                         state.memory,
                         prod_evals_ptr.as_canonical_u32() + start,
@@ -335,7 +335,7 @@ where
                     eval,
                     &mut prod_specific.write_record,
                 );
-                cur_timestamp += if is_writeback > F::ZERO { 2 } else { 1 }; // Only write back to the witness array when the is_writeback indicator is true
+                cur_timestamp += if is_writeback != F::ZERO { 2 } else { 1 }; // Only write back to the witness array when the is_writeback indicator is true
 
                 let eval_rlc = FieldExtension::multiply(alpha_acc, eval);
                 prod_specific.eval_rlc = eval_rlc;
@@ -394,7 +394,7 @@ where
                 logup_specific.pq = pqs;
 
                 // write pqs
-                if is_writeback > F::ZERO {
+                if is_writeback != F::ZERO {
                     tracing_write_native_inplace(
                         state.memory,
                         logup_evals_ptr.as_canonical_u32() + start,
@@ -453,7 +453,7 @@ where
                     q_eval,
                     &mut logup_specific.write_records[1],
                 );
-                cur_timestamp += if is_writeback > F::ZERO { 3 } else { 2 }; // Only write back to the witness array when the is_writeback indicator is true
+                cur_timestamp += if is_writeback != F::ZERO { 3 } else { 2 }; // Only write back to the witness array when the is_writeback indicator is true
 
                 let eval_rlc = FieldExtension::add(
                     FieldExtension::multiply(alpha_numerator, p_eval),

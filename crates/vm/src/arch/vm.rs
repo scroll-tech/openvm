@@ -474,6 +474,7 @@ where
             .map(|(&h, w)| (h as usize, w))
             .collect::<Vec<_>>();
         let ctx = PreflightCtx::new_with_capacity(&capacities, instret_end);
+
         let system_config: &SystemConfig = self.config().as_ref();
         let adapter_offset = system_config.access_adapter_air_id_offset();
         // ATTENTION: this must agree with `num_memory_airs`
@@ -510,6 +511,7 @@ where
             .finalize::<Val<E::SC>>(system_config.continuation_enabled);
         #[cfg(feature = "perf-metrics")]
         crate::metrics::end_segment_metrics(&mut exec_state);
+
         let instret = exec_state.vm_state.instret();
         let pc = exec_state.vm_state.pc();
         let memory = exec_state.vm_state.memory;
@@ -683,6 +685,7 @@ where
             PreflightExecutor<Val<E::SC>, VB::RecordArena>,
     {
         self.transport_init_memory_to_device(&state.memory);
+
         let PreflightExecutionOutput {
             system_records,
             record_arenas,
@@ -693,6 +696,7 @@ where
             (system_records.exit_code == Some(ExitCode::Success as u32)).then_some(to_state.memory);
         let ctx = self.generate_proving_ctx(system_records, record_arenas)?;
         let proof = self.engine.prove(&self.pk, ctx);
+
         Ok((proof, final_memory))
     }
 
