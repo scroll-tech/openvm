@@ -1,5 +1,6 @@
 use std::{
     borrow::{Borrow, BorrowMut},
+    collections::HashMap,
     mem::size_of,
     sync::{Arc, Mutex},
 };
@@ -9,8 +10,8 @@ use openvm_circuit_primitives_derive::AlignedBorrow;
 use openvm_stark_backend::{
     config::{StarkGenericConfig, Val},
     interaction::InteractionBuilder,
-    p3_air::{Air, BaseAir},
-    p3_field::{Field, PrimeField32},
+    p3_air::{Air, AirBuilder, BaseAir},
+    p3_field::{Field, FieldAlgebra, PrimeField32},
     p3_matrix::{dense::RowMajorMatrix, Matrix},
     prover::{cpu::CpuBackend, types::AirProvingContext},
     rap::{get_air_name, BaseAirWithPublicValues, PartitionedBaseAir},
@@ -23,7 +24,15 @@ pub struct HintSpaceProviderCols<T> {
     pub hint_id: T,
     pub offset: T,
     pub value: T,
-    pub is_valid: T,
+    pub multiplicity: T,
+    /// Inverse of multiplicity when nonzero; 0 for padding rows.
+    /// Used to derive a virtual boolean `is_non_padding = multiplicity * mult_inv`.
+    pub mult_inv: T,
+    /// Boolean: 1 if hint_id changes between this row and the next non-padding row.
+    pub hint_id_changed: T,
+    /// When hint_id_changed = 1: inverse of (next.hint_id - hint_id), proving they differ.
+    /// When hint_id_changed = 0: unused (zero).
+    pub diff_hint_id_inv: T,
 }
 
 pub const NUM_HINT_SPACE_PROVIDER_COLS: usize = size_of::<HintSpaceProviderCols<u8>>();
@@ -45,24 +54,77 @@ impl<F: Field> BaseAir<F> for HintSpaceProviderAir {
 impl<AB: InteractionBuilder> Air<AB> for HintSpaceProviderAir {
     fn eval(&self, builder: &mut AB) {
         let main = builder.main();
-        let local = main.row_slice(0);
-        let local: &HintSpaceProviderCols<AB::Var> = (*local).borrow();
+        let curr = main.row_slice(0);
+        let curr: &HintSpaceProviderCols<AB::Var> = (*curr).borrow();
+        let next = main.row_slice(1);
+        let next: &HintSpaceProviderCols<AB::Var> = (*next).borrow();
 
-        builder.assert_bool(local.is_valid);
+        // Derive virtual boolean `is_non_padding` from multiplicity.
+        let curr_is_non_padding: AB::Expr = curr.multiplicity * curr.mult_inv;
+        let next_is_non_padding: AB::Expr = next.multiplicity * next.mult_inv;
+
+        // is_non_padding must be boolean.
+        builder.assert_zero(curr_is_non_padding.clone() * (curr_is_non_padding.clone() - AB::Expr::ONE));
+        // multiplicity = 0 when is_non_padding = 0 (padding rows can't provide to the bus).
+        builder.assert_zero((AB::Expr::ONE - curr_is_non_padding.clone()) * curr.multiplicity);
+
+        builder.assert_bool(curr.hint_id_changed);
+
+        // Non-padding rows must appear before padding rows (is_non_padding is non-increasing).
+        builder
+            .when_transition()
+            .when(next_is_non_padding.clone())
+            .assert_one(curr_is_non_padding.clone());
+
+        // Uniqueness of (hint_id, offset) among non-padding rows.
+        // Rows are sorted by (hint_id, offset). For consecutive non-padding rows:
+        //   - Same hint_id (hint_id_changed=0): offset must increase by exactly 1.
+        //   - Different hint_id (hint_id_changed=1): hint_id must actually differ
+        //     (proven via inverse), and the new block starts at offset 0.
+        // Since offsets within a hint_id form a contiguous 0,1,2,...,N-1 sequence,
+        // this prevents any duplicate (hint_id, offset) pairs.
+        let both_non_padding: AB::Expr = curr_is_non_padding * next_is_non_padding;
+        let d_id: AB::Expr = next.hint_id - curr.hint_id;
+
+        // hint_id_changed = 0 => same hint_id, offset increases by 1
+        builder
+            .when_transition()
+            .when(both_non_padding.clone())
+            .when_ne(curr.hint_id_changed, AB::Expr::ONE)
+            .assert_zero(d_id.clone());
+        builder
+            .when_transition()
+            .when(both_non_padding.clone())
+            .when_ne(curr.hint_id_changed, AB::Expr::ONE)
+            .assert_eq(next.offset, curr.offset + AB::Expr::ONE);
+
+        // hint_id_changed = 1 => hint_id actually differs, and new block starts at offset 0
+        builder
+            .when_transition()
+            .when(both_non_padding.clone())
+            .when(curr.hint_id_changed)
+            .assert_one(d_id * curr.diff_hint_id_inv);
+        builder
+            .when_transition()
+            .when(both_non_padding)
+            .when(curr.hint_id_changed)
+            .assert_zero(next.offset);
 
         self.hint_bus.provide(
             builder,
-            local.hint_id,
-            local.offset,
-            local.value,
-            local.is_valid,
+            curr.hint_id,
+            curr.offset,
+            curr.value,
+            curr.multiplicity,
         );
     }
 }
 
 pub struct HintSpaceProviderChip<F> {
     pub air: HintSpaceProviderAir,
-    data: Mutex<Vec<(F, F, F)>>,
+    /// Maps (hint_id, offset) -> (value, multiplicity).
+    /// Deduplicates keys and tracks how many times each is looked up.
+    data: Mutex<HashMap<(F, F), (F, F)>>,
 }
 
 pub type SharedHintSpaceProviderChip<F> = Arc<HintSpaceProviderChip<F>>;
@@ -71,37 +133,71 @@ impl<F> HintSpaceProviderChip<F> {
     pub fn new(hint_bus: HintBus) -> Self {
         Self {
             air: HintSpaceProviderAir { hint_bus },
-            data: Mutex::new(Vec::new()),
+            data: Mutex::new(HashMap::new()),
         }
     }
+}
 
+impl<F: Field> HintSpaceProviderChip<F> {
     /// Register a (hint_id, offset, value) triple for the provider trace.
     /// Called by consumer chips during trace filling to match each lookup.
+    /// Deduplicates by (hint_id, offset) and increments the multiplicity counter.
     pub fn request(&self, hint_id: F, offset: F, value: F) {
-        self.data.lock().unwrap().push((hint_id, offset, value));
+        self.data
+            .lock()
+            .unwrap()
+            .entry((hint_id, offset))
+            .and_modify(|(v, m)| {
+                debug_assert_eq!(*v, value, "conflicting values for same (hint_id, offset)");
+                *m += F::ONE;
+            })
+            .or_insert((value, F::ONE));
     }
 }
 
 impl<F: PrimeField32> HintSpaceProviderChip<F> {
     pub fn generate_trace(&self) -> RowMajorMatrix<F> {
         let data = std::mem::take(&mut *self.data.lock().unwrap());
-        let num_real_rows = data.len();
-        let trace_height = num_real_rows.next_power_of_two().max(2);
+        // Collect into a Vec and sort by (hint_id, offset) to satisfy the AIR ordering constraints.
+        let mut entries: Vec<_> = data.into_iter().collect();
+        entries.sort_by_key(|((h, o), _)| (h.as_canonical_u64(), o.as_canonical_u64()));
+
+        let num_non_padding_rows = entries.len();
+        let trace_height = num_non_padding_rows.next_power_of_two().max(2);
 
         let mut rows = F::zero_vec(trace_height * NUM_HINT_SPACE_PROVIDER_COLS);
-        for (n, row) in rows
-            .chunks_exact_mut(NUM_HINT_SPACE_PROVIDER_COLS)
-            .enumerate()
-        {
-            if n < num_real_rows {
-                let cols: &mut HintSpaceProviderCols<F> = row.borrow_mut();
-                cols.hint_id = data[n].0;
-                cols.offset = data[n].1;
-                cols.value = data[n].2;
-                cols.is_valid = F::ONE;
+        for (n, ((hint_id, offset), (value, multiplicity))) in entries.iter().enumerate() {
+            let row =
+                &mut rows[n * NUM_HINT_SPACE_PROVIDER_COLS..(n + 1) * NUM_HINT_SPACE_PROVIDER_COLS];
+            let cols: &mut HintSpaceProviderCols<F> = row.borrow_mut();
+            cols.hint_id = *hint_id;
+            cols.offset = *offset;
+            cols.value = *value;
+            cols.multiplicity = *multiplicity;
+            cols.mult_inv = multiplicity.try_inverse().unwrap();
+
+            // Fill auxiliary columns for the uniqueness constraint.
+            if n + 1 < num_non_padding_rows {
+                let next_hint_id = entries[n + 1].0 .0;
+                let d_id = next_hint_id - *hint_id;
+                if d_id != F::ZERO {
+                    cols.hint_id_changed = F::ONE;
+                    cols.diff_hint_id_inv = d_id.try_inverse().unwrap();
+                } else {
+                    debug_assert_eq!(
+                        entries[n + 1].0 .1,
+                        *offset + F::ONE,
+                        "Offsets for hint_id {:?} are not consecutive: {:?} -> {:?}",
+                        hint_id,
+                        offset,
+                        entries[n + 1].0 .1
+                    );
+                    // hint_id_changed = 0, diff_hint_id_inv = 0 (defaults)
+                }
             }
-            // padding rows are already zero (is_valid = 0)
+            // Last non-padding row: aux columns stay zero (no next non-padding row to compare)
         }
+        // padding rows are already zero (multiplicity = 0)
         RowMajorMatrix::new(rows, NUM_HINT_SPACE_PROVIDER_COLS)
     }
 }
@@ -136,12 +232,15 @@ pub mod cuda {
     use std::sync::Arc;
 
     use openvm_circuit::arch::DenseRecordArena;
-    use openvm_cuda_backend::{base::DeviceMatrix, prover_backend::GpuBackend, types::F};
-    use openvm_cuda_common::copy::MemCopyH2D;
-    use openvm_stark_backend::{prover::types::AirProvingContext, Chip};
+    use openvm_cuda_backend::{
+        chip::cpu_proving_ctx_to_gpu, prover_backend::GpuBackend, types::F, types::SC,
+    };
+    use openvm_stark_backend::{
+        prover::{cpu::CpuBackend, types::AirProvingContext},
+        Chip,
+    };
 
-    use super::{HintSpaceProviderChip, NUM_HINT_SPACE_PROVIDER_COLS};
-    use crate::cuda_abi::hint_space_provider_cuda;
+    use super::HintSpaceProviderChip;
 
     pub struct HintSpaceProviderChipGpu {
         pub cpu_chip: Arc<HintSpaceProviderChip<F>>,
@@ -155,37 +254,9 @@ pub mod cuda {
 
     impl Chip<DenseRecordArena, GpuBackend> for HintSpaceProviderChipGpu {
         fn generate_proving_ctx(&self, _: DenseRecordArena) -> AirProvingContext<GpuBackend> {
-            let data = std::mem::take(&mut *self.cpu_chip.data.lock().unwrap());
-            let rows_used = data.len();
-            let height = rows_used.next_power_of_two().max(2);
-
-            let trace = DeviceMatrix::<F>::with_capacity(height, NUM_HINT_SPACE_PROVIDER_COLS);
-
-            if rows_used > 0 {
-                // Flatten (hint_id, offset, value) triples into a contiguous [F] buffer
-                let flat: Vec<F> = data
-                    .into_iter()
-                    .flat_map(|(h, o, v)| [h, o, v])
-                    .collect();
-
-                let d_records = flat.to_device().unwrap();
-
-                unsafe {
-                    hint_space_provider_cuda::tracegen(
-                        trace.buffer(),
-                        height,
-                        NUM_HINT_SPACE_PROVIDER_COLS,
-                        &d_records,
-                        rows_used,
-                    )
-                    .unwrap();
-                }
-            } else {
-                // No data — zero-fill the trace (all padding rows with is_valid=0)
-                trace.buffer().fill_zero().unwrap();
-            }
-
-            AirProvingContext::simple_no_pis(trace)
+            let cpu_ctx: AirProvingContext<CpuBackend<SC>> =
+                AirProvingContext::simple_no_pis(Arc::new(self.cpu_chip.generate_trace()));
+            cpu_proving_ctx_to_gpu(cpu_ctx)
         }
     }
 }
