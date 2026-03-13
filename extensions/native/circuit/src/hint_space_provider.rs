@@ -26,13 +26,18 @@ pub struct HintSpaceProviderCols<T> {
     pub value: T,
     pub multiplicity: T,
     /// Inverse of multiplicity when nonzero; 0 for padding rows.
-    /// Used to derive a virtual boolean `is_non_padding = multiplicity * mult_inv`.
     pub mult_inv: T,
     /// Boolean: 1 if hint_id changes between this row and the next non-padding row.
     pub hint_id_changed: T,
     /// When hint_id_changed = 1: inverse of (next.hint_id - hint_id), proving they differ.
     /// When hint_id_changed = 0: unused (zero).
     pub diff_hint_id_inv: T,
+    /// Boolean: 1 if this row is not a padding row (multiplicity > 0).
+    pub curr_is_non_padding: T,
+    /// Boolean: 1 if the next row is not a padding row.
+    pub next_is_non_padding: T,
+    /// Boolean: curr_is_non_padding * next_is_non_padding.
+    pub both_non_padding: T,
 }
 
 pub const NUM_HINT_SPACE_PROVIDER_COLS: usize = size_of::<HintSpaceProviderCols<u8>>();
@@ -59,54 +64,65 @@ impl<AB: InteractionBuilder> Air<AB> for HintSpaceProviderAir {
         let next = main.row_slice(1);
         let next: &HintSpaceProviderCols<AB::Var> = (*next).borrow();
 
-        // Derive virtual boolean `is_non_padding` from multiplicity.
-        let curr_is_non_padding: AB::Expr = curr.multiplicity * curr.mult_inv;
-        let next_is_non_padding: AB::Expr = next.multiplicity * next.mult_inv;
-
-        // is_non_padding must be boolean.
-        builder.assert_zero(curr_is_non_padding.clone() * (curr_is_non_padding.clone() - AB::Expr::ONE));
-        // multiplicity = 0 when is_non_padding = 0 (padding rows can't provide to the bus).
-        builder.assert_zero((AB::Expr::ONE - curr_is_non_padding.clone()) * curr.multiplicity);
+        // curr_is_non_padding is boolean and tied to multiplicity via mult_inv.
+        builder.assert_bool(curr.curr_is_non_padding);
+        builder.assert_eq(
+            curr.curr_is_non_padding,
+            curr.multiplicity * curr.mult_inv,
+        );
+        // Padding rows must have multiplicity = 0.
+        builder.assert_zero(
+            (AB::Expr::ONE - curr.curr_is_non_padding) * curr.multiplicity,
+        );
 
         builder.assert_bool(curr.hint_id_changed);
 
-        // Non-padding rows must appear before padding rows (is_non_padding is non-increasing).
+        // Tie next_is_non_padding and both_non_padding columns to their definitions.
         builder
             .when_transition()
-            .when(next_is_non_padding.clone())
-            .assert_one(curr_is_non_padding.clone());
+            .assert_eq(curr.next_is_non_padding, next.curr_is_non_padding);
+        builder.when_transition().assert_eq(
+            curr.both_non_padding,
+            curr.curr_is_non_padding * curr.next_is_non_padding,
+        );
+
+        // Non-padding rows must appear before padding rows (non-increasing).
+        builder
+            .when_transition()
+            .when(curr.next_is_non_padding)
+            .assert_one(curr.curr_is_non_padding);
 
         // Uniqueness of (hint_id, offset) among non-padding rows.
         // Rows are sorted by (hint_id, offset). For consecutive non-padding rows:
         //   - Same hint_id (hint_id_changed=0): offset must increase by exactly 1.
         //   - Different hint_id (hint_id_changed=1): hint_id must actually differ
         //     (proven via inverse), and the new block starts at offset 0.
-        // Since offsets within a hint_id form a contiguous 0,1,2,...,N-1 sequence,
-        // this prevents any duplicate (hint_id, offset) pairs.
-        let both_non_padding: AB::Expr = curr_is_non_padding * next_is_non_padding;
         let d_id: AB::Expr = next.hint_id - curr.hint_id;
 
         // hint_id_changed = 0 => same hint_id, offset increases by 1
         builder
             .when_transition()
-            .when(both_non_padding.clone())
+            .when(curr.both_non_padding)
             .when_ne(curr.hint_id_changed, AB::Expr::ONE)
             .assert_zero(d_id.clone());
         builder
             .when_transition()
-            .when(both_non_padding.clone())
+            .when(curr.both_non_padding)
             .when_ne(curr.hint_id_changed, AB::Expr::ONE)
             .assert_eq(next.offset, curr.offset + AB::Expr::ONE);
 
-        // hint_id_changed = 1 => hint_id actually differs, and new block starts at offset 0
+        // Combined inverse check: d_id * diff_hint_id_inv = hint_id_changed.
+        // When hint_id_changed = 0: trivially 0 = 0 (since d_id = 0 from above).
+        // When hint_id_changed = 1: proves d_id != 0 (hint_id actually changed).
         builder
             .when_transition()
-            .when(both_non_padding.clone())
-            .when(curr.hint_id_changed)
-            .assert_one(d_id * curr.diff_hint_id_inv);
+            .when(curr.both_non_padding)
+            .assert_eq(d_id * curr.diff_hint_id_inv, curr.hint_id_changed);
+
+        // hint_id_changed = 1 => new block starts at offset 0
         builder
             .when_transition()
-            .when(both_non_padding)
+            .when(curr.both_non_padding)
             .when(curr.hint_id_changed)
             .assert_zero(next.offset);
 
@@ -175,6 +191,11 @@ impl<F: PrimeField32> HintSpaceProviderChip<F> {
             cols.value = *value;
             cols.multiplicity = *multiplicity;
             cols.mult_inv = multiplicity.try_inverse().unwrap();
+            cols.curr_is_non_padding = F::ONE;
+            cols.next_is_non_padding =
+                if n + 1 < num_non_padding_rows { F::ONE } else { F::ZERO };
+            cols.both_non_padding =
+                if n + 1 < num_non_padding_rows { F::ONE } else { F::ZERO };
 
             // Fill auxiliary columns for the uniqueness constraint.
             if n + 1 < num_non_padding_rows {
