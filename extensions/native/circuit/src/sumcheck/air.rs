@@ -251,30 +251,25 @@ impl<AB: InteractionBuilder> Air<AB> for NativeSumcheckAir {
                 start_timestamp + AB::F::from_canonical_usize(8),
             );
 
-        // _debug
-        // // Prod row timestamp transition
-        // // Equivalent to: when(prod_row): next_ts = ts + within_round_limit * (1 + is_writeback)
-        // // Reformulated using prod_in_round_evaluation + prod_next_round_evaluation = prod_row * within_round_limit
-        // // to stay within max constraint degree 3 while guarding against is_end boundary rows.
-        // builder
-        //     .when_transition()
-        //     .when_ne(is_end, AB::Expr::ONE)
-        //     .assert_eq(
-        //         prod_row * (next.start_timestamp - start_timestamp),
-        //         (prod_in_round_evaluation + prod_next_round_evaluation)
-        //             * (AB::Expr::ONE + is_writeback),
-        //     );
+        // Prod row timestamp transition
+        builder
+            .when_transition()
+            .when_ne(is_end, AB::Expr::ONE)
+            .assert_eq(
+                prod_row * (next.start_timestamp - start_timestamp),
+                (prod_in_round_evaluation + prod_next_round_evaluation)
+                    * (AB::Expr::ONE + is_writeback),
+            );
 
-        // // Logup row timestamp transition
-        // // Same reformulation using logup_in_round_evaluation + logup_next_round_evaluation = logup_row * within_round_limit
-        // builder
-        //     .when_transition()
-        //     .when_ne(is_end, AB::Expr::ONE)
-        //     .assert_eq(
-        //         logup_row * (next.start_timestamp - start_timestamp),
-        //         (logup_in_round_evaluation + logup_next_round_evaluation)
-        //             * (AB::Expr::TWO + is_writeback),
-        //     );
+        // Logup row timestamp transition
+        builder
+            .when_transition()
+            .when_ne(is_end, AB::Expr::ONE)
+            .assert_eq(
+                logup_row * (next.start_timestamp - start_timestamp),
+                (logup_in_round_evaluation + logup_next_round_evaluation)
+                    * (AB::Expr::TWO + is_writeback),
+            );
 
         // Termination condition
         assert_array_eq(
