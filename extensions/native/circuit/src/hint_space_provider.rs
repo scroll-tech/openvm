@@ -6,6 +6,11 @@ use std::{
 };
 
 use openvm_circuit::system::memory::offline_checker::HintBus;
+use openvm_circuit_primitives::{
+    is_less_than::{IsLessThanIo, IsLtSubAir},
+    var_range::SharedVariableRangeCheckerChip,
+    SubAir, TraceSubRowGenerator,
+};
 use openvm_circuit_primitives_derive::AlignedBorrow;
 use openvm_stark_backend::{
     config::{StarkGenericConfig, Val},
@@ -17,6 +22,7 @@ use openvm_stark_backend::{
     rap::{get_air_name, BaseAirWithPublicValues, PartitionedBaseAir},
     Chip, ChipUsageGetter,
 };
+pub const HINT_ID_LT_AUX_LEN: usize = 2;
 
 #[derive(Default, AlignedBorrow, Copy, Clone)]
 #[repr(C)]
@@ -29,9 +35,8 @@ pub struct HintSpaceProviderCols<T> {
     pub mult_inv: T,
     /// Boolean: 1 if hint_id changes between this row and the next non-padding row.
     pub hint_id_changed: T,
-    /// When hint_id_changed = 1: inverse of (next.hint_id - hint_id), proving they differ.
-    /// When hint_id_changed = 0: unused (zero).
-    pub diff_hint_id_inv: T,
+    /// Auxiliary limbs for IsLtSubAir range check decomposition of (curr.hint_id < next.hint_id).
+    pub hint_id_lt_aux: [T; HINT_ID_LT_AUX_LEN],
     /// Boolean: 1 if this row is not a padding row (multiplicity > 0).
     pub curr_is_non_padding: T,
     /// Boolean: 1 if the next row is not a padding row.
@@ -45,6 +50,7 @@ pub const NUM_HINT_SPACE_PROVIDER_COLS: usize = size_of::<HintSpaceProviderCols<
 #[derive(Clone, Debug)]
 pub struct HintSpaceProviderAir {
     pub hint_bus: HintBus,
+    pub lt_air: IsLtSubAir,
 }
 
 impl<F: Field> BaseAirWithPublicValues<F> for HintSpaceProviderAir {}
@@ -95,8 +101,8 @@ impl<AB: InteractionBuilder> Air<AB> for HintSpaceProviderAir {
         // Uniqueness of (hint_id, offset) among non-padding rows.
         // Rows are sorted by (hint_id, offset). For consecutive non-padding rows:
         //   - Same hint_id (hint_id_changed=0): offset must increase by exactly 1.
-        //   - Different hint_id (hint_id_changed=1): hint_id must actually differ
-        //     (proven via inverse), and the new block starts at offset 0.
+        //   - Different hint_id (hint_id_changed=1): hint_id strictly increases
+        //     (proven via IsLtSubAir range-check), and the new block starts at offset 0.
         let d_id: AB::Expr = next.hint_id - curr.hint_id;
 
         // hint_id_changed = 0 => same hint_id, offset increases by 1
@@ -104,20 +110,27 @@ impl<AB: InteractionBuilder> Air<AB> for HintSpaceProviderAir {
             .when_transition()
             .when(curr.both_non_padding)
             .when_ne(curr.hint_id_changed, AB::Expr::ONE)
-            .assert_zero(d_id.clone());
+            .assert_zero(d_id);
         builder
             .when_transition()
             .when(curr.both_non_padding)
             .when_ne(curr.hint_id_changed, AB::Expr::ONE)
             .assert_eq(next.offset, curr.offset + AB::Expr::ONE);
 
-        // Combined inverse check: d_id * diff_hint_id_inv = hint_id_changed.
-        // When hint_id_changed = 0: trivially 0 = 0 (since d_id = 0 from above).
-        // When hint_id_changed = 1: proves d_id != 0 (hint_id actually changed).
-        builder
-            .when_transition()
-            .when(curr.both_non_padding)
-            .assert_eq(d_id * curr.diff_hint_id_inv, curr.hint_id_changed);
+        // hint_id_changed = 1 => hint_id strictly increases (curr.hint_id < next.hint_id)
+        let lt_count: AB::Expr = curr.hint_id_changed.into() * curr.both_non_padding.into();
+        self.lt_air.eval(
+            builder,
+            (
+                IsLessThanIo {
+                    x: curr.hint_id.into(),
+                    y: next.hint_id.into(),
+                    out: curr.hint_id_changed.into(),
+                    count: lt_count,
+                },
+                &curr.hint_id_lt_aux,
+            ),
+        );
 
         // hint_id_changed = 1 => new block starts at offset 0
         builder
@@ -138,6 +151,7 @@ impl<AB: InteractionBuilder> Air<AB> for HintSpaceProviderAir {
 
 pub struct HintSpaceProviderChip<F> {
     pub air: HintSpaceProviderAir,
+    range_checker: SharedVariableRangeCheckerChip,
     /// Maps (hint_id, offset) -> (value, multiplicity).
     /// Deduplicates keys and tracks how many times each is looked up.
     data: Mutex<HashMap<(F, F), (F, F)>>,
@@ -146,9 +160,21 @@ pub struct HintSpaceProviderChip<F> {
 pub type SharedHintSpaceProviderChip<F> = Arc<HintSpaceProviderChip<F>>;
 
 impl<F> HintSpaceProviderChip<F> {
-    pub fn new(hint_bus: HintBus) -> Self {
+    pub fn new(
+        hint_bus: HintBus,
+        range_checker: SharedVariableRangeCheckerChip,
+        hint_id_max_bits: usize,
+    ) -> Self {
+        let lt_air = IsLtSubAir::new(range_checker.bus(), hint_id_max_bits);
+        assert_eq!(
+            lt_air.decomp_limbs, HINT_ID_LT_AUX_LEN,
+            "hint_id_max_bits={hint_id_max_bits} with range_max_bits={} requires {} limbs, but HINT_ID_LT_AUX_LEN={HINT_ID_LT_AUX_LEN}",
+            range_checker.range_max_bits(),
+            lt_air.decomp_limbs
+        );
         Self {
-            air: HintSpaceProviderAir { hint_bus },
+            air: HintSpaceProviderAir { hint_bus, lt_air },
+            range_checker,
             data: Mutex::new(HashMap::new()),
         }
     }
@@ -200,10 +226,16 @@ impl<F: PrimeField32> HintSpaceProviderChip<F> {
             // Fill auxiliary columns for the uniqueness constraint.
             if n + 1 < num_non_padding_rows {
                 let next_hint_id = entries[n + 1].0 .0;
-                let d_id = next_hint_id - *hint_id;
-                if d_id != F::ZERO {
-                    cols.hint_id_changed = F::ONE;
-                    cols.diff_hint_id_inv = d_id.try_inverse().unwrap();
+                if next_hint_id != *hint_id {
+                    // hint_id changes: fill IsLtSubAir aux columns
+                    self.air.lt_air.generate_subrow(
+                        (
+                            self.range_checker.as_ref(),
+                            hint_id.as_canonical_u32(),
+                            next_hint_id.as_canonical_u32(),
+                        ),
+                        (&mut cols.hint_id_lt_aux, &mut cols.hint_id_changed),
+                    );
                 } else {
                     debug_assert_eq!(
                         entries[n + 1].0 .1,
@@ -213,7 +245,7 @@ impl<F: PrimeField32> HintSpaceProviderChip<F> {
                         offset,
                         entries[n + 1].0 .1
                     );
-                    // hint_id_changed = 0, diff_hint_id_inv = 0 (defaults)
+                    // hint_id_changed = 0, hint_id_lt_aux = [0; ..] (defaults)
                 }
             }
             // Last non-padding row: aux columns stay zero (no next non-padding row to compare)

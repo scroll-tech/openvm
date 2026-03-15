@@ -14,6 +14,7 @@ use openvm_circuit::{
     },
     system::{memory::SharedMemoryHelper, SystemPort},
 };
+use openvm_circuit_primitives::is_less_than::IsLtSubAir;
 use openvm_circuit_derive::{AnyEnum, Executor, MeteredExecutor, PreflightExecutor};
 use openvm_instructions::{program::DEFAULT_PC_STEP, LocalOpcode, PhantomDiscriminant};
 use openvm_native_compiler::{
@@ -281,6 +282,10 @@ where
 
         let hint_space_provider = HintSpaceProviderAir {
             hint_bus: hint_bridge.hint_bus(),
+            lt_air: IsLtSubAir::new(
+                range_checker,
+                inventory.config().memory_config.timestamp_max_bits,
+            ),
         };
         inventory.add_air(hint_space_provider);
 
@@ -368,7 +373,11 @@ where
         inventory.add_executor_chip(poseidon2);
 
         let hint_bus = inventory.airs().system().hint_bridge.hint_bus();
-        let hint_space_provider = Arc::new(HintSpaceProviderChip::new(hint_bus));
+        let hint_space_provider = Arc::new(HintSpaceProviderChip::new(
+            hint_bus,
+            range_checker.clone(),
+            timestamp_max_bits,
+        ));
 
         inventory.next_air::<HintSpaceProviderAir>()?;
         inventory.add_periphery_chip(hint_space_provider.clone());
