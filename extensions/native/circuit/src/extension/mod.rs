@@ -366,11 +366,6 @@ where
         inventory.add_executor_chip(fri_reduced_opening);
 
         inventory.next_air::<NativePoseidon2Air<Val<SC>, 1>>()?;
-        let poseidon2 = NativePoseidon2Chip::<_, 1>::new(
-            NativePoseidon2Filler::new(Poseidon2Config::default()),
-            mem_helper.clone(),
-        );
-        inventory.add_executor_chip(poseidon2);
 
         let hint_bus = inventory.airs().system().hint_bridge.hint_bus();
         let hint_space_provider = Arc::new(HintSpaceProviderChip::new(
@@ -378,6 +373,12 @@ where
             range_checker.clone(),
             timestamp_max_bits,
         ));
+
+        let poseidon2 = NativePoseidon2Chip::<_, 1>::new(
+            NativePoseidon2Filler::new(Poseidon2Config::default(), hint_space_provider.clone()),
+            mem_helper.clone(),
+        );
+        inventory.add_executor_chip(poseidon2);
 
         inventory.next_air::<HintSpaceProviderAir>()?;
         inventory.add_periphery_chip(hint_space_provider.clone());

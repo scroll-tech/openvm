@@ -208,13 +208,14 @@ pub enum DslIr<C: Config> {
     /// Permutes an array of Bn254 elements using Poseidon2 (output = p2_permute(array)). Should
     /// only be used when target is a circuit.
     CircuitPoseidon2Permute([Var<C::N>; 3]),
-    /// Absorbs an array of baby bear elements into a duplex transcript with Poseidon2 permutations
-    /// (output = p2_multi_observe(array, els)).
+    /// Absorbs an array of baby bear elements into a duplex transcript with Poseidon2 permutations.
+    /// Context values (init_pos, len, is_hint) are passed via a context array instead of separate registers.
+    /// When is_hint=1, data is read from hint space using hint_id instead of from input array pointer.
     Poseidon2MultiObserve(
-        Ptr<C::N>,   // sponge_state
-        Var<C::N>,   // initial input_ptr position
-        Ptr<C::N>,   // input array (base elements)
-        Usize<C::N>, // len of els
+        Ptr<C::N>,  // sponge_state
+        Ptr<C::N>,  // ctx_ptr (context array: [init_pos, len, is_hint, reserved])
+        Ptr<C::N>,  // input array (base elements; used when is_hint=0)
+        Var<C::N>,  // hint_id (hint space id; used when is_hint=1)
     ),
 
     // Miscellaneous instructions.

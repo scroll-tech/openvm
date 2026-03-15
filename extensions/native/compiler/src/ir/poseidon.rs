@@ -19,6 +19,7 @@ impl<C: Config> Builder<C> {
         sponge_state: &Array<C, Felt<C::F>>,
         input_ptr: Ptr<C::N>,
         arr: &Array<C, Felt<C::F>>,
+        hint_id: Option<Var<C::N>>,
     ) -> Usize<C::N> {
         let buffer_size: Var<C::N> = Var::uninit(self);
         self.assign(&buffer_size, C::N::from_canonical_usize(HASH_RATE));
@@ -35,15 +36,36 @@ impl<C: Config> Builder<C> {
                     let init_pos: Var<C::N> = Var::uninit(self);
                     self.assign(&init_pos, input_ptr.address - sponge_ptr.address);
 
+                    let is_hint = hint_id.is_some();
+                    let hint_id_var: Var<C::N> = if let Some(id) = hint_id {
+                        id
+                    } else {
+                        let v: Var<C::N> = Var::uninit(self);
+                        self.assign(&v, C::N::ZERO);
+                        v
+                    };
+
+                    // Allocate context array: [init_pos, len, is_hint, reserved]
+                    let ctx = self.dyn_array::<Var<C::N>>(4usize);
+                    self.set(&ctx, 0, init_pos);
+                    self.set(&ctx, 1, len.get_var());
+                    self.set(
+                        &ctx,
+                        2,
+                        if is_hint { C::N::ONE } else { C::N::ZERO },
+                    );
+                    self.set(&ctx, 3, C::N::ZERO);
+
                     self.operations.push(DslIr::Poseidon2MultiObserve(
                         *sponge_ptr,
-                        init_pos,
+                        ctx.ptr(),
                         *ptr,
-                        len.clone(),
+                        hint_id_var,
                     ));
 
-                    // automatically updated by Poseidon2MultiObserve operation
-                    Usize::Var(init_pos)
+                    // Read back the updated init_pos from ctx[0]
+                    let final_pos: Var<C::N> = self.get(&ctx, 0);
+                    Usize::Var(final_pos)
                 }
             },
         }
