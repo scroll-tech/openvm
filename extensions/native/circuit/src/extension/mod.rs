@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use alu_native_adapter::{AluNativeAdapterAir, AluNativeAdapterExecutor};
 use branch_native_adapter::{BranchNativeAdapterAir, BranchNativeAdapterExecutor};
 use convert_adapter::{ConvertAdapterAir, ConvertAdapterExecutor};
@@ -12,6 +14,7 @@ use openvm_circuit::{
     },
     system::{memory::SharedMemoryHelper, SystemPort},
 };
+use openvm_circuit_primitives::is_less_than::IsLtSubAir;
 use openvm_circuit_derive::{AnyEnum, Executor, MeteredExecutor, PreflightExecutor};
 use openvm_instructions::{program::DEFAULT_PC_STEP, LocalOpcode, PhantomDiscriminant};
 use openvm_native_compiler::{
@@ -49,6 +52,7 @@ use crate::{
         FriReducedOpeningAir, FriReducedOpeningChip, FriReducedOpeningExecutor,
         FriReducedOpeningFiller,
     },
+    hint_space_provider::{HintSpaceProviderAir, HintSpaceProviderChip},
     jal_rangecheck::{
         JalRangeCheckAir, JalRangeCheckExecutor, JalRangeCheckFiller, NativeJalRangeCheckChip,
     },
@@ -219,6 +223,7 @@ where
             execution_bus,
             program_bus,
             memory_bridge,
+            hint_bridge,
         } = inventory.system().port();
         let exec_bridge = ExecutionBridge::new(execution_bus, program_bus);
         let range_checker = inventory.range_checker().bus;
@@ -269,12 +274,22 @@ where
         let verify_batch = NativePoseidon2Air::<_, 1>::new(
             exec_bridge,
             memory_bridge,
+            hint_bridge,
             VerifyBatchBus::new(inventory.new_bus_idx()),
             Poseidon2Config::default(),
         );
         inventory.add_air(verify_batch);
 
-        let tower_evaluate = NativeSumcheckAir::new(exec_bridge, memory_bridge);
+        let hint_space_provider = HintSpaceProviderAir {
+            hint_bus: hint_bridge.hint_bus(),
+            lt_air: IsLtSubAir::new(
+                range_checker,
+                inventory.config().memory_config.timestamp_max_bits,
+            ),
+        };
+        inventory.add_air(hint_space_provider);
+
+        let tower_evaluate = NativeSumcheckAir::new(exec_bridge, memory_bridge, hint_bridge);
         inventory.add_air(tower_evaluate);
 
         Ok(())
@@ -357,7 +372,20 @@ where
         );
         inventory.add_executor_chip(poseidon2);
 
-        let tower_verify = NativeSumcheckChip::new(NativeSumcheckFiller::new(), mem_helper.clone());
+        let hint_bus = inventory.airs().system().hint_bridge.hint_bus();
+        let hint_space_provider = Arc::new(HintSpaceProviderChip::new(
+            hint_bus,
+            range_checker.clone(),
+            timestamp_max_bits,
+        ));
+
+        inventory.next_air::<HintSpaceProviderAir>()?;
+        inventory.add_periphery_chip(hint_space_provider.clone());
+
+        let tower_verify = NativeSumcheckChip::new(
+            NativeSumcheckFiller::new(hint_space_provider),
+            mem_helper.clone(),
+        );
         inventory.add_executor_chip(tower_verify);
 
         Ok(())
@@ -542,6 +570,7 @@ impl<SC: StarkGenericConfig> VmCircuitExtension<SC> for CastFExtension {
             execution_bus,
             program_bus,
             memory_bridge,
+            hint_bridge: _,
         } = inventory.system().port();
         let exec_bridge = ExecutionBridge::new(execution_bus, program_bus);
         let range_checker = inventory.range_checker().bus;

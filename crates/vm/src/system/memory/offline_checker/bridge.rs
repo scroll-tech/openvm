@@ -10,7 +10,7 @@ use openvm_stark_backend::{
     interaction::InteractionBuilder, p3_air::AirBuilder, p3_field::FieldAlgebra,
 };
 
-use super::bus::MemoryBus;
+use super::bus::{HintBus, MemoryBus};
 use crate::system::memory::{
     offline_checker::columns::{
         MemoryBaseAuxCols, MemoryReadAuxCols, MemoryReadOrImmediateAuxCols, MemoryWriteAuxCols,
@@ -324,5 +324,54 @@ impl MemoryOfflineChecker {
         self.memory_bus
             .send(address, data.to_vec(), timestamp)
             .eval(builder, enabled);
+    }
+}
+
+/// The [HintBridge] is used to constrain hint space lookups.
+/// Consumer chips call `lookup` to verify that values they read from hint_space
+/// match what was originally loaded via the hint bus lookup table.
+#[derive(Clone, Copy, Debug)]
+pub struct HintBridge {
+    hint_bus: HintBus,
+}
+
+impl HintBridge {
+    /// Create a new [HintBridge] with the provided hint bus.
+    pub fn new(hint_bus: HintBus) -> Self {
+        Self { hint_bus }
+    }
+
+    pub fn hint_bus(&self) -> HintBus {
+        self.hint_bus
+    }
+
+    /// Perform a lookup on the hint bus for a single element.
+    ///
+    /// Constrains that `(hint_id, offset, value)` exists in the hint lookup table.
+    /// Caller must constrain that `enabled` is boolean.
+    pub fn lookup<AB: InteractionBuilder>(
+        &self,
+        builder: &mut AB,
+        hint_id: impl Into<AB::Expr>,
+        offset: impl Into<AB::Expr>,
+        value: impl Into<AB::Expr>,
+        enabled: impl Into<AB::Expr>,
+    ) {
+        self.hint_bus.lookup(builder, hint_id, offset, value, enabled);
+    }
+
+    /// Add a key to the hint lookup table.
+    ///
+    /// Provider chips call this to register that `(hint_id, offset, value)` is available.
+    pub fn provide<AB: InteractionBuilder>(
+        &self,
+        builder: &mut AB,
+        hint_id: impl Into<AB::Expr>,
+        offset: impl Into<AB::Expr>,
+        value: impl Into<AB::Expr>,
+        num_lookups: impl Into<AB::Expr>,
+    ) {
+        self.hint_bus
+            .provide(builder, hint_id, offset, value, num_lookups);
     }
 }

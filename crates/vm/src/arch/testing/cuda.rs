@@ -50,7 +50,7 @@ use crate::{
             execution::{air::ExecutionDummyAir, DeviceExecutionTester},
             memory::DeviceMemoryTester,
             program::{air::ProgramDummyAir, DeviceProgramTester},
-            TestBuilder, TestChipHarness, EXECUTION_BUS, MEMORY_BUS, MEMORY_MERKLE_BUS,
+            TestBuilder, TestChipHarness, EXECUTION_BUS, HINT_BUS, MEMORY_BUS, MEMORY_MERKLE_BUS,
             POSEIDON2_DIRECT_BUS, READ_INSTRUCTION_BUS,
         },
         Arena, DenseRecordArena, ExecutionBridge, ExecutionBus, ExecutionState, MatrixRecordArena,
@@ -59,7 +59,7 @@ use crate::{
     system::{
         cuda::{poseidon2::Poseidon2PeripheryChipGPU, DIGEST_WIDTH},
         memory::{
-            offline_checker::{MemoryBridge, MemoryBus},
+            offline_checker::{HintBridge, HintBus, MemoryBridge, MemoryBus},
             MemoryAirInventory, SharedMemoryHelper,
         },
         poseidon2::air::Poseidon2PeripheryAir,
@@ -393,7 +393,13 @@ impl GpuChipTestBuilder {
             execution_bus: self.execution_bus(),
             program_bus: self.program_bus(),
             memory_bridge: self.memory_bridge(),
+            hint_bridge: self.hint_bridge(),
         }
+    }
+
+    pub fn hint_bridge(&self) -> HintBridge {
+        let hint_bus = HintBus::new(HINT_BUS);
+        HintBridge::new(hint_bus)
     }
     pub fn execution_bridge(&self) -> ExecutionBridge {
         ExecutionBridge::new(self.execution.bus(), self.program.bus())

@@ -37,8 +37,9 @@ use crate::{
         testing::{
             execution::air::ExecutionDummyAir,
             program::{air::ProgramDummyAir, ProgramTester},
-            ExecutionTester, MemoryTester, TestBuilder, TestChipHarness, EXECUTION_BUS, MEMORY_BUS,
-            MEMORY_MERKLE_BUS, POSEIDON2_DIRECT_BUS, RANGE_CHECKER_BUS, READ_INSTRUCTION_BUS,
+            ExecutionTester, MemoryTester, TestBuilder, TestChipHarness, EXECUTION_BUS, HINT_BUS,
+            MEMORY_BUS, MEMORY_MERKLE_BUS, POSEIDON2_DIRECT_BUS, RANGE_CHECKER_BUS,
+            READ_INSTRUCTION_BUS,
         },
         vm_poseidon2_config, Arena, ExecutionBridge, ExecutionBus, ExecutionState,
         MatrixRecordArena, MemoryConfig, PreflightExecutor, Streams, VmStateMut,
@@ -46,7 +47,7 @@ use crate::{
     system::{
         memory::{
             adapter::records::arena_size_bound,
-            offline_checker::{MemoryBridge, MemoryBus},
+            offline_checker::{HintBridge, HintBus, MemoryBridge, MemoryBus},
             online::TracingMemory,
             MemoryAirInventory, MemoryController, SharedMemoryHelper, CHUNK,
         },
@@ -258,10 +259,13 @@ impl<F: PrimeField32> VmChipTestBuilder<F> {
     }
 
     pub fn system_port(&self) -> SystemPort {
+        let hint_bus = HintBus::new(HINT_BUS);
+        let hint_bridge = HintBridge::new(hint_bus);
         SystemPort {
             execution_bus: self.execution.bus,
             program_bus: self.program.bus,
             memory_bridge: self.memory_bridge(),
+            hint_bridge,
         }
     }
 

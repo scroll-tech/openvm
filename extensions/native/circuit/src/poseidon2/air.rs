@@ -3,7 +3,7 @@ use std::{array::from_fn, borrow::Borrow, sync::Arc};
 use itertools::Itertools;
 use openvm_circuit::{
     arch::{ExecutionBridge, ExecutionState},
-    system::memory::{offline_checker::MemoryBridge, MemoryAddress, CHUNK},
+    system::memory::{offline_checker::{HintBridge, MemoryBridge}, MemoryAddress, CHUNK},
 };
 use openvm_circuit_primitives::utils::not;
 use openvm_instructions::LocalOpcode;
@@ -36,6 +36,7 @@ use crate::poseidon2::{
 pub struct NativePoseidon2Air<F: Field, const SBOX_REGISTERS: usize> {
     pub execution_bridge: ExecutionBridge,
     pub memory_bridge: MemoryBridge,
+    pub hint_bridge: HintBridge,
     pub internal_bus: VerifyBatchBus,
     pub(crate) subair: Arc<Poseidon2SubAir<F, SBOX_REGISTERS>>,
     pub(crate) address_space: F,
@@ -45,12 +46,14 @@ impl<F: Field, const SBOX_REGISTERS: usize> NativePoseidon2Air<F, SBOX_REGISTERS
     pub fn new(
         execution_bridge: ExecutionBridge,
         memory_bridge: MemoryBridge,
+        hint_bridge: HintBridge,
         verify_batch_bus: VerifyBatchBus,
         poseidon2_config: Poseidon2Config<F>,
     ) -> Self {
         NativePoseidon2Air {
             execution_bridge,
             memory_bridge,
+            hint_bridge,
             internal_bus: verify_batch_bus,
             subair: Arc::new(Poseidon2SubAir::new(poseidon2_config.constants.into())),
             address_space: F::from_canonical_u32(AS::Native as u32),

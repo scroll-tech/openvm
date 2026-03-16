@@ -202,6 +202,7 @@ impl<SC: StarkGenericConfig> VmCircuitExtension<SC> for Rv32I {
             execution_bus,
             program_bus,
             memory_bridge,
+            hint_bridge: _,
         } = inventory.system().port();
 
         let exec_bridge = ExecutionBridge::new(execution_bus, program_bus);
@@ -466,6 +467,7 @@ impl<SC: StarkGenericConfig> VmCircuitExtension<SC> for Rv32M {
             execution_bus,
             program_bus,
             memory_bridge,
+            hint_bridge: _,
         } = inventory.system().port();
         let exec_bridge = ExecutionBridge::new(execution_bus, program_bus);
 
@@ -635,6 +637,7 @@ impl<SC: StarkGenericConfig> VmCircuitExtension<SC> for Rv32Io {
             execution_bus,
             program_bus,
             memory_bridge,
+            hint_bridge: _,
         } = inventory.system().port();
 
         let exec_bridge = ExecutionBridge::new(execution_bus, program_bus);
