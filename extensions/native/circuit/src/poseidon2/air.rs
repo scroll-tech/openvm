@@ -94,6 +94,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             inside_row,
             simple,
             multi_observe_row,
+            not_hint_multi_observe,
             end_inside_row,
             end_top_level,
             start_top_level,
@@ -723,6 +724,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             hint_id,
             ctx,
             read_ctx,
+            chunk_ts_count,
             is_first,
             is_last,
             curr_len,
@@ -748,6 +750,16 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         builder.when(multi_observe_row).assert_bool(is_last);
         builder.when(multi_observe_row).assert_bool(should_permute);
         builder.when(multi_observe_row).assert_bool(is_hint);
+        builder.assert_eq(
+            not_hint_multi_observe,
+            multi_observe_row * (AB::Expr::ONE - is_hint),
+        );
+        let hint_multi_observe: AB::Expr = multi_observe_row - not_hint_multi_observe;
+        // chunk_ts_count = (end_idx - start_idx) * (2 - is_hint)
+        builder.when(multi_observe_row).assert_eq(
+            chunk_ts_count,
+            (end_idx - start_idx) * AB::F::TWO - (end_idx - start_idx) * is_hint,
+        );
 
         self.execution_bridge
             .execute_and_increment_pc(
@@ -813,49 +825,48 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             )
             .eval(builder, multi_observe_row * is_first);
 
-        // ts_per_element = 2 - is_hint (non-hint: read+write=2, hint: write-only=1)
-        let is_hint_expr: AB::Expr = is_hint.into();
-        let ts_per_element: AB::Expr = AB::Expr::TWO - is_hint_expr.clone();
+        // Per-element constraints for chunk rows.
         for i in 0..CHUNK {
-            let i_var: AB::Expr = AB::F::from_canonical_usize(i).into();
-            let start_idx_expr: AB::Expr = start_idx.into();
-            let element_start_ts: AB::Expr =
-                start_timestamp.into() + (i_var.clone() - start_idx_expr.clone()) * ts_per_element.clone();
+            let i_var = AB::F::from_canonical_usize(i);
 
-            // Non-hint mode: read from memory
+            // Hint mode: lookup from hint space.
+            self.hint_bridge.lookup(
+                builder,
+                hint_id,
+                curr_len + i_var - start_idx,
+                data[i],
+                hint_multi_observe.clone() * aux_read_enabled[i],
+            );
+
+            // Non-hint mode: read from memory.
             self.memory_bridge
                 .read(
                     MemoryAddress::new(
                         self.address_space,
-                        input_ptr + curr_len + i_var.clone() - start_idx_expr.clone(),
+                        input_ptr + curr_len + i_var - start_idx,
                     ),
                     [data[i]],
-                    element_start_ts.clone(),
+                    start_timestamp + i_var * AB::F::TWO - start_idx * AB::F::TWO,
                     &read_data[i],
                 )
-                .eval(
-                    builder,
-                    multi_observe_row * aux_read_enabled[i] * (AB::Expr::ONE - is_hint_expr.clone()),
-                );
-
-            // Hint mode: lookup from hint space
-            self.hint_bridge.lookup(
-                builder,
-                hint_id,
-                curr_len + i_var.clone() - start_idx_expr.clone(),
-                data[i],
-                multi_observe_row * aux_read_enabled[i] * is_hint_expr.clone(),
-            );
-
-            // Write to sponge state (always, for both modes)
+                .eval(builder, not_hint_multi_observe * aux_read_enabled[i]);
             self.memory_bridge
                 .write(
                     MemoryAddress::new(self.address_space, state_ptr + i_var),
                     [data[i]],
-                    element_start_ts + (AB::Expr::ONE - is_hint_expr.clone()),
+                    start_timestamp + i_var * AB::F::TWO - start_idx * AB::F::TWO + AB::F::ONE,
                     &write_data[i],
                 )
-                .eval(builder, multi_observe_row * aux_read_enabled[i]);
+                .eval(builder, not_hint_multi_observe * aux_read_enabled[i]);
+
+            self.memory_bridge
+                .write(
+                    MemoryAddress::new(self.address_space, state_ptr + i_var),
+                    [data[i]],
+                    start_timestamp + i_var - start_idx,
+                    &write_data[i],
+                )
+                .eval(builder, hint_multi_observe.clone() * aux_read_enabled[i]);
         }
 
         for i in 0..(CHUNK - 1) {
@@ -926,7 +937,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .write(
                 MemoryAddress::new(self.address_space, state_ptr),
                 full_sponge_output,
-                start_timestamp + (end_idx - start_idx) * (AB::Expr::TWO - is_hint_expr.clone()),
+                start_timestamp + chunk_ts_count,
                 &write_sponge_state,
             )
             .eval(builder, multi_observe_row * should_permute);
@@ -955,7 +966,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .write(
                 MemoryAddress::new(self.address_space, ctx_ptr),
                 [final_idx],
-                start_timestamp + (end_idx - start_idx) * (AB::Expr::TWO - is_hint_expr) + should_permute,
+                start_timestamp + chunk_ts_count + should_permute,
                 &write_final_idx,
             )
             .eval(builder, multi_observe_row * is_last);

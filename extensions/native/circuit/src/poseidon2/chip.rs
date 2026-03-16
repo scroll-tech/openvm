@@ -771,7 +771,10 @@ where
                 multi_observe_cols.hint_id = hint_id;
                 multi_observe_cols.ctx = ctx;
 
+                // chunk_ts_count will be filled per-chunk row below
+
                 cols.multi_observe_row = F::ONE;
+                cols.not_hint_multi_observe = if is_hint { F::ZERO } else { F::ONE };
                 cols.very_first_timestamp = init_timestamp;
 
                 if i == 0 {
@@ -802,6 +805,7 @@ where
 
                 multi_observe_cols.start_idx = F::from_canonical_usize(chunk_start);
                 multi_observe_cols.end_idx = F::from_canonical_usize(chunk_end);
+                multi_observe_cols.chunk_ts_count = F::from_canonical_usize((chunk_end - chunk_start) * ts_per_element);
 
                 multi_observe_cols.is_first = F::ZERO;
                 multi_observe_cols.is_last = if i == num_chunks - 1 { F::ONE } else { F::ZERO };

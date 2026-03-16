@@ -31,6 +31,10 @@ pub struct NativePoseidon2Cols<T, const SBOX_REGISTERS: usize> {
     /// Indicates that this row is a multi_observe row.
     pub multi_observe_row: T,
 
+    /// Materialized column: multi_observe_row * (1 - is_hint).
+    /// Lives in main cols (not overlaid specific) so it is 0 on non-multi_observe rows.
+    pub not_hint_multi_observe: T,
+
     /// Indicates the last row in an inside-row block.
     pub end_inside_row: T,
     /// Indicates the last row in a top-level block.
@@ -227,6 +231,8 @@ pub struct MultiObserveCols<T> {
     // ctx[0] = init_pos, ctx[1] = len, ctx[2] = is_hint, ctx[3] = reserved
     pub ctx: [T; 4],
     pub read_ctx: MemoryReadAuxCols<T>,
+
+    pub chunk_ts_count: T,
 
     pub is_first: T,
     pub is_last: T,
