@@ -640,6 +640,12 @@ unsafe fn execute_multi_observe_e12_impl<
                 let [v]: [F; 1] = exec_state.vm_read(NATIVE_AS, input_ptr_u32 + input_idx);
                 v
             };
+
+            // _debug
+            if is_hint {
+                println!("=> n_f: {n_f}");
+            }
+            
             exec_state.vm_write(NATIVE_AS, sponge_ptr_u32 + (j as u32), &[n_f]);
             input_idx += 1;
         }

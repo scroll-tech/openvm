@@ -679,6 +679,10 @@ where
             let input_len = ctx[1];
             let is_hint = ctx[2].as_canonical_u32() != 0;
 
+
+            // _debug
+            println!("=> is_hint: {:?}", is_hint);
+
             // Read hint_id from register
             let [hint_id]: [F; 1] =
                 memory_read_native(state.memory.data(), hint_id_register.as_canonical_u32());
@@ -830,6 +834,12 @@ where
                         );
                         v
                     };
+
+                    // _debug
+                    if is_hint {
+                        println!("multi_observe hint mode: reading nf = {}", n_f);
+                    }
+
                     multi_observe_cols.aux_read_enabled[j] = F::ONE;
                     tracing_write_native_inplace(
                         state.memory,
@@ -1265,7 +1275,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Filler<F, SBOX
 
             for j in chunk_start..chunk_end {
                 if is_hint {
-                    // In hint mode: register hint read on the hint bus
+                    // In hint mode: register hint read on the hint bus.
                     let input_idx = multi_observe_cols.curr_len.as_canonical_u32()
                         + (j - chunk_start);
                     let val = multi_observe_cols.data[j as usize];

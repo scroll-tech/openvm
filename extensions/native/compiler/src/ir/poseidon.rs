@@ -19,6 +19,7 @@ impl<C: Config> Builder<C> {
         sponge_state: &Array<C, Felt<C::F>>,
         input_ptr: Ptr<C::N>,
         arr: &Array<C, Felt<C::F>>,
+        input_len: Usize<C::N>,
         hint_id: Option<Var<C::N>>,
     ) -> Usize<C::N> {
         let buffer_size: Var<C::N> = Var::uninit(self);
@@ -32,7 +33,7 @@ impl<C: Config> Builder<C> {
                 Array::Fixed(_) => {
                     panic!("Base elements input must be dynamic");
                 }
-                Array::Dyn(ptr, len) => {
+                Array::Dyn(ptr, _) => {
                     let init_pos: Var<C::N> = Var::uninit(self);
                     self.assign(&init_pos, input_ptr.address - sponge_ptr.address);
 
@@ -48,13 +49,22 @@ impl<C: Config> Builder<C> {
                     // Allocate context array: [init_pos, len, is_hint, reserved]
                     let ctx = self.dyn_array::<Var<C::N>>(4usize);
                     self.set(&ctx, 0, init_pos);
-                    self.set(&ctx, 1, len.get_var());
+                    self.set(&ctx, 1, input_len.get_var());
                     self.set(
                         &ctx,
                         2,
                         if is_hint { C::N::ONE } else { C::N::ZERO },
                     );
                     self.set(&ctx, 3, C::N::ZERO);
+
+
+                    // _debug
+                    let ctx1 = self.get(&ctx, 1);
+                    let ctx2 = self.get(&ctx, 2);
+                    self.print_debug(777);
+                    self.print_v(ctx1);
+                    self.print_v(ctx2);
+
 
                     self.operations.push(DslIr::Poseidon2MultiObserve(
                         *sponge_ptr,

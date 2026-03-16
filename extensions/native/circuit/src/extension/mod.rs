@@ -271,15 +271,6 @@ where
         );
         inventory.add_air(fri_reduced_opening);
 
-        let verify_batch = NativePoseidon2Air::<_, 1>::new(
-            exec_bridge,
-            memory_bridge,
-            hint_bridge,
-            VerifyBatchBus::new(inventory.new_bus_idx()),
-            Poseidon2Config::default(),
-        );
-        inventory.add_air(verify_batch);
-
         let hint_space_provider = HintSpaceProviderAir {
             hint_bus: hint_bridge.hint_bus(),
             lt_air: IsLtSubAir::new(
@@ -288,6 +279,15 @@ where
             ),
         };
         inventory.add_air(hint_space_provider);
+
+        let verify_batch = NativePoseidon2Air::<_, 1>::new(
+            exec_bridge,
+            memory_bridge,
+            hint_bridge,
+            VerifyBatchBus::new(inventory.new_bus_idx()),
+            Poseidon2Config::default(),
+        );
+        inventory.add_air(verify_batch);
 
         let tower_evaluate = NativeSumcheckAir::new(exec_bridge, memory_bridge, hint_bridge);
         inventory.add_air(tower_evaluate);
@@ -365,8 +365,6 @@ where
             FriReducedOpeningChip::new(FriReducedOpeningFiller::new(), mem_helper.clone());
         inventory.add_executor_chip(fri_reduced_opening);
 
-        inventory.next_air::<NativePoseidon2Air<Val<SC>, 1>>()?;
-
         let hint_bus = inventory.airs().system().hint_bridge.hint_bus();
         let hint_space_provider = Arc::new(HintSpaceProviderChip::new(
             hint_bus,
@@ -374,17 +372,19 @@ where
             timestamp_max_bits,
         ));
 
+        inventory.next_air::<HintSpaceProviderAir>()?;
+        inventory.add_periphery_chip(hint_space_provider.clone());
+
+        inventory.next_air::<NativePoseidon2Air<Val<SC>, 1>>()?;
+
         let poseidon2 = NativePoseidon2Chip::<_, 1>::new(
             NativePoseidon2Filler::new(Poseidon2Config::default(), hint_space_provider.clone()),
             mem_helper.clone(),
         );
         inventory.add_executor_chip(poseidon2);
 
-        inventory.next_air::<HintSpaceProviderAir>()?;
-        inventory.add_periphery_chip(hint_space_provider.clone());
-
         let tower_verify = NativeSumcheckChip::new(
-            NativeSumcheckFiller::new(hint_space_provider),
+            NativeSumcheckFiller::new(hint_space_provider.clone()),
             mem_helper.clone(),
         );
         inventory.add_executor_chip(tower_verify);

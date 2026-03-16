@@ -76,8 +76,6 @@ impl VmProverExtension<GpuBabyBearPoseidon2Engine, DenseRecordArena, Native>
         inventory.add_executor_chip(fri_reduced_opening);
 
         inventory.next_air::<NativePoseidon2Air<BabyBear, 1>>()?;
-        let poseidon2 = NativePoseidon2ChipGpu::<1>::new(range_checker.clone(), timestamp_max_bits);
-        inventory.add_executor_chip(poseidon2);
 
         let hint_air: &HintSpaceProviderAir = inventory.next_air::<HintSpaceProviderAir>()?;
         let cpu_chip = Arc::new(HintSpaceProviderChip::new(
@@ -85,6 +83,14 @@ impl VmProverExtension<GpuBabyBearPoseidon2Engine, DenseRecordArena, Native>
             range_checker.clone(),
             timestamp_max_bits,
         ));
+
+        let poseidon2 = NativePoseidon2ChipGpu::<1>::new_with_hint_space_provider(
+            range_checker.clone(),
+            timestamp_max_bits,
+            cpu_chip.clone(),
+        );
+        inventory.add_executor_chip(poseidon2);
+
         let provider_gpu = HintSpaceProviderChipGpu::new(cpu_chip.clone());
         inventory.add_periphery_chip(provider_gpu);
 
