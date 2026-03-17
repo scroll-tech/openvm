@@ -1330,8 +1330,6 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Filler<F, SBOX
         }
         if num_rows == 1 {
             // Head row is also the last row (zero-length input).
-            // Fill write_final_idx mem-aux cols: timestamp = head_row.start_timestamp
-            // (set by execute path to very_first_timestamp + NUM_HEAD_ACCESSES).
             let head_c: &mut NativePoseidon2Cols<F, SBOX_REGISTERS> =
                 chunk_slice[..width].borrow_mut();
             let head_mo: &mut MultiObserveCols<F> =

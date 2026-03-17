@@ -777,7 +777,6 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             )
             .eval(builder, multi_observe_row * is_first);
 
-        // Head row: 3 register reads + 1 context array read + 1 hint_id register read
         self.memory_bridge
             .read(
                 MemoryAddress::new(self.address_space, state_ptr_register),
