@@ -57,15 +57,6 @@ impl<C: Config> Builder<C> {
                     );
                     self.set(&ctx, 3, C::N::ZERO);
 
-
-                    // _debug
-                    let ctx1 = self.get(&ctx, 1);
-                    let ctx2 = self.get(&ctx, 2);
-                    self.print_debug(777);
-                    self.print_v(ctx1);
-                    self.print_v(ctx2);
-
-
                     self.operations.push(DslIr::Poseidon2MultiObserve(
                         *sponge_ptr,
                         ctx.ptr(),

@@ -679,10 +679,6 @@ where
             let input_len = ctx[1];
             let is_hint = ctx[2].as_canonical_u32() != 0;
 
-
-            // _debug
-            println!("=> is_hint: {:?}", is_hint);
-
             // Read hint_id from register
             let [hint_id]: [F; 1] =
                 memory_read_native(state.memory.data(), hint_id_register.as_canonical_u32());
@@ -717,7 +713,9 @@ where
                     pos += len;
                 }
             }
-            final_timestamp_inc += 1; // write back to ctx[0]
+            // Final ctx[0] writeback always happens (including zero-length input
+            // where the head row is both the first and last row).
+            final_timestamp_inc += 1;
 
             let allocated_rows = arena
                 .alloc(MultiRowLayout::new(NativePoseidon2Metadata {
@@ -788,9 +786,26 @@ where
                     multi_observe_cols.final_timestamp_increment =
                         F::from_canonical_usize(final_timestamp_inc);
                     multi_observe_cols.is_first = F::ONE;
-                    multi_observe_cols.is_last = F::ZERO;
+                    multi_observe_cols.is_last = if chunks.is_empty() { F::ONE } else { F::ZERO };
                     multi_observe_cols.curr_len = F::ZERO;
                     multi_observe_cols.should_permute = F::ZERO;
+                    if chunks.is_empty() {
+                        // Zero-length input: head row is both first and last.
+                        // Set start_timestamp to right after the 5 head reads,
+                        // and write back init_pos (unchanged) to ctx_ptr[0].
+                        cols.start_timestamp = F::from_canonical_u32(
+                            init_timestamp_u32 + NUM_HEAD_ACCESSES as u32,
+                        );
+                        multi_observe_cols.start_idx = init_pos;
+                        multi_observe_cols.end_idx = init_pos;
+                        // state.memory.timestamp == init_ts + NUM_HEAD_ACCESSES here.
+                        tracing_write_native_inplace(
+                            state.memory,
+                            ctx_ptr.as_canonical_u32(),
+                            [init_pos],
+                            &mut multi_observe_cols.write_final_idx,
+                        );
+                    }
                 }
             }
 
@@ -834,11 +849,6 @@ where
                         );
                         v
                     };
-
-                    // _debug
-                    if is_hint {
-                        println!("multi_observe hint mode: reading nf = {}", n_f);
-                    }
 
                     multi_observe_cols.aux_read_enabled[j] = F::ONE;
                     tracing_write_native_inplace(
@@ -1317,6 +1327,17 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Filler<F, SBOX
                     multi_observe_cols.write_final_idx.as_mut(),
                 );
             }
+        }
+        if num_rows == 1 {
+            // Head row is also the last row (zero-length input).
+            // Fill write_final_idx mem-aux cols: timestamp = head_row.start_timestamp
+            // (set by execute path to very_first_timestamp + NUM_HEAD_ACCESSES).
+            let head_c: &mut NativePoseidon2Cols<F, SBOX_REGISTERS> =
+                chunk_slice[..width].borrow_mut();
+            let head_mo: &mut MultiObserveCols<F> =
+                head_c.specific[..MultiObserveCols::<u8>::width()].borrow_mut();
+            let head_ts = head_c.start_timestamp.as_canonical_u32();
+            mem_fill_helper(mem_helper, head_ts, head_mo.write_final_idx.as_mut());
         }
     }
 

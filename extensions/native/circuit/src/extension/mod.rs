@@ -383,6 +383,7 @@ where
         );
         inventory.add_executor_chip(poseidon2);
 
+        inventory.next_air::<NativeSumcheckAir>()?;
         let tower_verify = NativeSumcheckChip::new(
             NativeSumcheckFiller::new(hint_space_provider.clone()),
             mem_helper.clone(),
