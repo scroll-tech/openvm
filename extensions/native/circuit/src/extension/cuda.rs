@@ -78,9 +78,13 @@ impl VmProverExtension<GpuBabyBearPoseidon2Engine, DenseRecordArena, Native>
         inventory.next_air::<NativePoseidon2Air<BabyBear, 1>>()?;
 
         let hint_air: &HintSpaceProviderAir = inventory.next_air::<HintSpaceProviderAir>()?;
+        let cpu_range_checker = range_checker
+            .cpu_chip
+            .clone()
+            .expect("VariableRangeCheckerChipGPU is expected to be hybrid with cpu_chip");
         let cpu_chip = Arc::new(HintSpaceProviderChip::new(
             hint_air.hint_bus,
-            range_checker.clone(),
+            cpu_range_checker,
             timestamp_max_bits,
         ));
 
