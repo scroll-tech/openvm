@@ -75,8 +75,6 @@ impl VmProverExtension<GpuBabyBearPoseidon2Engine, DenseRecordArena, Native>
             FriReducedOpeningChipGpu::new(range_checker.clone(), timestamp_max_bits);
         inventory.add_executor_chip(fri_reduced_opening);
 
-        inventory.next_air::<NativePoseidon2Air<BabyBear, 1>>()?;
-
         let hint_air: &HintSpaceProviderAir = inventory.next_air::<HintSpaceProviderAir>()?;
         let cpu_range_checker = range_checker
             .cpu_chip
@@ -87,6 +85,8 @@ impl VmProverExtension<GpuBabyBearPoseidon2Engine, DenseRecordArena, Native>
             cpu_range_checker,
             timestamp_max_bits,
         ));
+
+        inventory.next_air::<NativePoseidon2Air<BabyBear, 1>>()?;
 
         let poseidon2 = NativePoseidon2ChipGpu::<1>::new_with_hint_space_provider(
             range_checker.clone(),
