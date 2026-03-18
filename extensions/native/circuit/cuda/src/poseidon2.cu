@@ -24,6 +24,7 @@ template <typename T, size_t SBOX_REGISTERS> struct NativePoseidon2Cols {
     T inside_row;
     T simple;
     T multi_observe_row;
+    T not_hint_multi_observe;
 
     T end_inside_row;
     T end_top_level;
