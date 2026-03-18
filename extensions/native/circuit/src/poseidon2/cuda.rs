@@ -13,6 +13,7 @@ use super::columns::{MultiObserveCols, NativePoseidon2Cols};
 use crate::{
     cuda_abi::poseidon2_cuda,
     hint_space_provider::SharedHintSpaceProviderChip,
+    utils::{OPENVM_NATIVE_GPU_DEBUG_ID, debug_log_native_gpu_tracegen_input},
 };
 
 pub struct NativePoseidon2ChipGpu<const SBOX_REGISTERS: usize> {
@@ -140,6 +141,15 @@ impl<const SBOX_REGISTERS: usize> Chip<DenseRecordArena, GpuBackend>
         let height = records.len() / record_size;
         let padded_height = next_power_of_two_or_zero(height);
 
+        let records_hash = debug_log_native_gpu_tracegen_input(
+            "native_poseidon2",
+            records,
+            record_size,
+            height,
+            padded_height,
+            width,
+        );
+
         let d_chunk_start = {
             let mut row_idx = 0;
             let row_slice = unsafe {
@@ -175,7 +185,7 @@ impl<const SBOX_REGISTERS: usize> Chip<DenseRecordArena, GpuBackend>
         let d_records = records.to_device().unwrap();
 
         unsafe {
-            poseidon2_cuda::tracegen(
+            if let Err(err) = poseidon2_cuda::tracegen(
                 trace.buffer(),
                 padded_height,
                 width,
@@ -186,9 +196,31 @@ impl<const SBOX_REGISTERS: usize> Chip<DenseRecordArena, GpuBackend>
                 &self.range_checker.count,
                 SBOX_REGISTERS as u32,
                 self.timestamp_max_bits as u32,
-            )
-            .unwrap();
+            ) {
+                panic!(
+                    "native_poseidon2 cuda tracegen failed [{}]: err={:?}, height={}, padded_height={}, width={}, chunk_count={}, sbox_registers={}, timestamp_max_bits={}, hash=0x{:016x}",
+                    OPENVM_NATIVE_GPU_DEBUG_ID,
+                    err,
+                    height,
+                    padded_height,
+                    width,
+                    d_chunk_start.len(),
+                    SBOX_REGISTERS,
+                    self.timestamp_max_bits,
+                    records_hash,
+                );
+            }
         }
+
+        println!(
+            "[openvm-gpu-debug][{}][native_poseidon2] tracegen ok: height={} padded_height={} width={} chunk_count={} hash=0x{:016x}",
+            OPENVM_NATIVE_GPU_DEBUG_ID,
+            height,
+            padded_height,
+            width,
+            d_chunk_start.len(),
+            records_hash,
+        );
 
         AirProvingContext::simple_no_pis(trace)
     }

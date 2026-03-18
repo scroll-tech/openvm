@@ -373,6 +373,17 @@ template <size_t SBOX_REGISTERS> struct Poseidon2Wrapper {
                 very_start_timestamp + 4,
                 specific.slice_from(COL_INDEX(MultiObserveCols, read_data[3].base))
             );
+
+            // Zero-length MULTI_OBSERVE case: head row is both first and last.
+            // The final ctx[0] writeback lives at row.start_timestamp.
+            if (specific[COL_INDEX(MultiObserveCols, is_last)] == Fp::one()) {
+                uint32_t start_timestamp = row[COL_INDEX(Cols, start_timestamp)].asUInt32();
+                mem_fill_base(
+                    mem_helper,
+                    start_timestamp,
+                    specific.slice_from(COL_INDEX(MultiObserveCols, write_final_idx.base))
+                );
+            }
         } else {
             uint32_t start_timestamp = row[COL_INDEX(Cols, start_timestamp)].asUInt32();
             uint32_t chunk_start =

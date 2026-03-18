@@ -13,6 +13,7 @@ use super::columns::{LogupSpecificCols, NativeSumcheckCols, ProdSpecificCols};
 use crate::{
     cuda_abi::sumcheck_cuda,
     hint_space_provider::SharedHintSpaceProviderChip,
+    utils::{OPENVM_NATIVE_GPU_DEBUG_ID, debug_log_native_gpu_tracegen_input},
 };
 use p3_field::FieldAlgebra;
 
@@ -92,6 +93,15 @@ impl Chip<DenseRecordArena, GpuBackend> for NativeSumcheckChipGpu {
         let padded_height = next_power_of_two_or_zero(height);
         let trace = DeviceMatrix::<F>::with_capacity(padded_height, width);
 
+        let records_hash = debug_log_native_gpu_tracegen_input(
+            "native_sumcheck",
+            records,
+            record_size,
+            height,
+            padded_height,
+            width,
+        );
+
         let record_slice = unsafe {
             let ptr = records.as_ptr();
             from_raw_parts(ptr as *const F, records.len() / size_of::<F>())
@@ -99,7 +109,7 @@ impl Chip<DenseRecordArena, GpuBackend> for NativeSumcheckChipGpu {
         let d_records = record_slice.to_device().unwrap();
 
         unsafe {
-            sumcheck_cuda::tracegen(
+            if let Err(err) = sumcheck_cuda::tracegen(
                 trace.buffer(),
                 padded_height,
                 width,
@@ -107,9 +117,28 @@ impl Chip<DenseRecordArena, GpuBackend> for NativeSumcheckChipGpu {
                 height,
                 &self.range_checker.count,
                 self.timestamp_max_bits as u32,
-            )
-            .unwrap();
+            ) {
+                panic!(
+                    "native_sumcheck cuda tracegen failed [{}]: err={:?}, height={}, padded_height={}, width={}, timestamp_max_bits={}, hash=0x{:016x}",
+                    OPENVM_NATIVE_GPU_DEBUG_ID,
+                    err,
+                    height,
+                    padded_height,
+                    width,
+                    self.timestamp_max_bits,
+                    records_hash,
+                );
+            }
         }
+
+        println!(
+            "[openvm-gpu-debug][{}][native_sumcheck] tracegen ok: height={} padded_height={} width={} hash=0x{:016x}",
+            OPENVM_NATIVE_GPU_DEBUG_ID,
+            height,
+            padded_height,
+            width,
+            records_hash,
+        );
 
         AirProvingContext::simple_no_pis(trace)
     }

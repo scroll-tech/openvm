@@ -608,6 +608,11 @@ where
             .iter()
             .map(|(air_idx, ctx)| (*air_idx, ctx.main_trace_height()))
             .collect_vec();
+        println!(
+            "[openvm-gpu-debug][OVM-NATIVE-GPU-DBG-20260318][vm.generate_proving_ctx] num_airs={} trace_heights={:?}",
+            ctx.per_air.len(),
+            idx_trace_heights
+        );
         // 1. check max trace height isn't exceeded
         let max_trace_height = if TypeId::of::<Val<E::SC>>() == TypeId::of::<BabyBear>() {
             let min_log_blowup = log2_ceil_usize(self.config().as_ref().max_constraint_degree - 1);
@@ -695,7 +700,12 @@ where
         let final_memory =
             (system_records.exit_code == Some(ExitCode::Success as u32)).then_some(to_state.memory);
         let ctx = self.generate_proving_ctx(system_records, record_arenas)?;
+        let prove_start = std::time::Instant::now();
         let proof = self.engine.prove(&self.pk, ctx);
+        println!(
+            "[openvm-gpu-debug][OVM-NATIVE-GPU-DBG-20260318][vm.prove] engine.prove done in {:?}",
+            prove_start.elapsed()
+        );
 
         Ok((proof, final_memory))
     }

@@ -14,6 +14,7 @@ use super::NativeBranchEqualCoreRecord;
 use crate::{
     adapters::{BranchNativeAdapterCols, BranchNativeAdapterRecord},
     cuda_abi::native_branch_eq_cuda,
+    utils::{OPENVM_NATIVE_GPU_DEBUG_ID, debug_log_native_gpu_tracegen_input},
 };
 
 #[derive(new)]
@@ -38,19 +39,47 @@ impl Chip<DenseRecordArena, GpuBackend> for NativeBranchEqChipGpu {
             BranchNativeAdapterCols::<F>::width() + BranchEqualCoreCols::<F, 1>::width();
         let trace = DeviceMatrix::<F>::with_capacity(padded_height, trace_width);
 
+        let records_hash = debug_log_native_gpu_tracegen_input(
+            "native_branch_eq",
+            records,
+            RECORD_SIZE,
+            height,
+            padded_height,
+            trace_width,
+        );
+
         let d_records = records.to_device().unwrap();
 
         unsafe {
-            native_branch_eq_cuda::tracegen(
+            if let Err(err) = native_branch_eq_cuda::tracegen(
                 trace.buffer(),
                 padded_height,
                 trace_width,
                 &d_records,
                 &self.range_checker.count,
                 self.timestamp_max_bits as u32,
-            )
-            .unwrap();
+            ) {
+                panic!(
+                    "native_branch_eq cuda tracegen failed [{}]: err={:?}, height={}, padded_height={}, trace_width={}, timestamp_max_bits={}, hash=0x{:016x}",
+                    OPENVM_NATIVE_GPU_DEBUG_ID,
+                    err,
+                    height,
+                    padded_height,
+                    trace_width,
+                    self.timestamp_max_bits,
+                    records_hash,
+                );
+            }
         }
+
+        println!(
+            "[openvm-gpu-debug][{}][native_branch_eq] tracegen ok: height={} padded_height={} trace_width={} hash=0x{:016x}",
+            OPENVM_NATIVE_GPU_DEBUG_ID,
+            height,
+            padded_height,
+            trace_width,
+            records_hash,
+        );
 
         AirProvingContext::simple_no_pis(trace)
     }
