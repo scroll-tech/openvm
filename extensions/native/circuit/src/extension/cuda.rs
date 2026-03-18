@@ -86,6 +86,9 @@ impl VmProverExtension<GpuBabyBearPoseidon2Engine, DenseRecordArena, Native>
             timestamp_max_bits,
         ));
 
+        let provider_gpu = HintSpaceProviderChipGpu::new(cpu_chip.clone());
+        inventory.add_periphery_chip(provider_gpu);
+
         inventory.next_air::<NativePoseidon2Air<BabyBear, 1>>()?;
 
         let poseidon2 = NativePoseidon2ChipGpu::<1>::new_with_hint_space_provider(
@@ -94,9 +97,6 @@ impl VmProverExtension<GpuBabyBearPoseidon2Engine, DenseRecordArena, Native>
             cpu_chip.clone(),
         );
         inventory.add_executor_chip(poseidon2);
-
-        let provider_gpu = HintSpaceProviderChipGpu::new(cpu_chip.clone());
-        inventory.add_periphery_chip(provider_gpu);
 
         inventory.next_air::<NativeSumcheckAir>()?;
         let sumcheck =
