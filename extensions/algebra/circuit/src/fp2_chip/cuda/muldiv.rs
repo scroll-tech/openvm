@@ -11,6 +11,7 @@ use openvm_cuda_common::copy::MemCopyH2D;
 use openvm_instructions::riscv::RV32_CELL_BITS;
 use openvm_mod_circuit_builder::{
     ExprBuilderConfig, FieldExpressionChipGPU, FieldExpressionCoreAir, FieldExpressionMetadata,
+    utils::debug_log_field_expr_gpu_input,
 };
 use openvm_rv32_adapters::{Rv32VecHeapAdapterCols, Rv32VecHeapAdapterExecutor};
 use openvm_stark_backend::{prover::types::AirProvingContext, Chip};
@@ -65,6 +66,20 @@ impl<const BLOCKS: usize, const BLOCK_SIZE: usize> Chip<DenseRecordArena, GpuBac
 
         let adapter_width =
             Rv32VecHeapAdapterCols::<F, 2, BLOCKS, BLOCKS, BLOCK_SIZE, BLOCK_SIZE>::width();
+
+        debug_log_field_expr_gpu_input(
+            "fp2_muldiv",
+            record_size,
+            num_records,
+            adapter_width,
+            BLOCKS,
+            self.pointer_max_bits,
+            self.timestamp_max_bits,
+            &air.local_opcode_idx,
+            &air.opcode_flag_idx,
+            &air,
+            &records,
+        );
 
         let d_records = records.to_device().unwrap();
 
