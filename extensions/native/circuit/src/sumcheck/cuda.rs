@@ -99,7 +99,7 @@ impl Chip<DenseRecordArena, GpuBackend> for NativeSumcheckChipGpu {
         let d_records = record_slice.to_device().unwrap();
 
         unsafe {
-            if let Err(err) = sumcheck_cuda::tracegen(
+            sumcheck_cuda::tracegen(
                 trace.buffer(),
                 padded_height,
                 width,
@@ -107,12 +107,8 @@ impl Chip<DenseRecordArena, GpuBackend> for NativeSumcheckChipGpu {
                 height,
                 &self.range_checker.count,
                 self.timestamp_max_bits as u32,
-            ) {
-                panic!(
-                    "native_sumcheck cuda tracegen failed: err={:?}, height={}, padded_height={}, width={}, timestamp_max_bits={}",
-                    err, height, padded_height, width, self.timestamp_max_bits,
-                );
-            }
+            )
+            .unwrap();
         }
 
         AirProvingContext::simple_no_pis(trace)

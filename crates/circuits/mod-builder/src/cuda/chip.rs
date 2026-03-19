@@ -471,7 +471,7 @@ impl FieldExpressionChipGPU {
 
         unsafe {
             cudaDeviceSetLimit(cudaLimit::cudaLimitStackSize, 48 * 1024);
-            if let Err(err) = tracegen(
+            tracegen(
                 &self.records,
                 mat.buffer(),
                 &self.meta,
@@ -487,26 +487,7 @@ impl FieldExpressionChipGPU {
                 workspace.as_ptr(),
                 workspace_per_thread,
             )
-            {
-                panic!(
-                    "field_expression cuda tracegen failed: err={:?}, num_records={}, record_stride={}, padded_height={}, total_trace_width={}, workspace_per_thread={}, pointer_max_bits={}, timestamp_max_bits={}, num_inputs={}, num_vars={}, num_flags={}, num_local_opcodes={}, num_output_indices={}, max_q_count={}, max_ast_depth={}",
-                    err,
-                    self.num_records,
-                    self.record_stride,
-                    padded_height,
-                    self.total_trace_width,
-                    workspace_per_thread,
-                    self.pointer_max_bits,
-                    self.timestamp_max_bits,
-                    meta_host.num_inputs,
-                    meta_host.expr_meta.num_vars,
-                    meta_host.num_u32_flags,
-                    meta_host.num_local_opcodes,
-                    meta_host.num_output_indices,
-                    meta_host.max_q_count,
-                    meta_host.max_ast_depth,
-                );
-            }
+            .unwrap();
         }
         mat
     }

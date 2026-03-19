@@ -59,7 +59,7 @@ impl Chip<DenseRecordArena, GpuBackend> for FriReducedOpeningChipGpu {
         let trace = DeviceMatrix::<F>::with_capacity(trace_height, trace_width);
 
         unsafe {
-            if let Err(err) = fri_cuda::tracegen(
+            fri_cuda::tracegen(
                 trace.buffer(),
                 trace_height,
                 &d_records,
@@ -67,12 +67,8 @@ impl Chip<DenseRecordArena, GpuBackend> for FriReducedOpeningChipGpu {
                 &d_record_info,
                 &self.range_checker.count,
                 self.timestamp_max_bits as u32,
-            ) {
-                panic!(
-                    "native_fri_reduced_opening cuda tracegen failed: err={:?}, rows={}, padded_height={}, trace_width={}, timestamp_max_bits={}",
-                    err, record_info.len(), trace_height, trace_width, self.timestamp_max_bits,
-                );
-            }
+            )
+            .unwrap();
         }
 
         AirProvingContext::simple_no_pis(trace)

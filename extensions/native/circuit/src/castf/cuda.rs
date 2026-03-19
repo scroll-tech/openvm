@@ -38,19 +38,15 @@ impl Chip<DenseRecordArena, GpuBackend> for CastFChipGpu {
         let d_records = records.to_device().unwrap();
 
         unsafe {
-            if let Err(err) = castf_cuda::tracegen(
+            castf_cuda::tracegen(
                 trace.buffer(),
                 padded_height,
                 trace_width,
                 &d_records,
                 &self.range_checker.count,
                 self.timestamp_max_bits as u32,
-            ) {
-                panic!(
-                    "native_castf cuda tracegen failed: err={:?}, height={}, padded_height={}, trace_width={}, timestamp_max_bits={}",
-                    err, height, padded_height, trace_width, self.timestamp_max_bits,
-                );
-            }
+            )
+            .unwrap();
         }
 
         AirProvingContext::simple_no_pis(trace)

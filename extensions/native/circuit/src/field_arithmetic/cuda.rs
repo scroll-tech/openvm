@@ -40,7 +40,7 @@ impl Chip<DenseRecordArena, GpuBackend> for FieldArithmeticChipGpu {
         let d_records = records.to_device().unwrap();
 
         unsafe {
-            if let Err(err) = field_arithmetic_cuda::tracegen(
+            field_arithmetic_cuda::tracegen(
                 trace.buffer(),
                 padded_height,
                 trace_width,
@@ -48,12 +48,8 @@ impl Chip<DenseRecordArena, GpuBackend> for FieldArithmeticChipGpu {
                 self.range_checker.count.as_ptr() as *const u32,
                 self.range_checker.count.len(),
                 self.timestamp_max_bits as u32,
-            ) {
-                panic!(
-                    "native_field_arithmetic cuda tracegen failed: err={:?}, height={}, padded_height={}, trace_width={}, timestamp_max_bits={}",
-                    err, height, padded_height, trace_width, self.timestamp_max_bits,
-                );
-            }
+            )
+            .unwrap();
         }
 
         AirProvingContext::simple_no_pis(trace)

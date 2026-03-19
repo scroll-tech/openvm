@@ -41,19 +41,15 @@ impl Chip<DenseRecordArena, GpuBackend> for NativeBranchEqChipGpu {
         let d_records = records.to_device().unwrap();
 
         unsafe {
-            if let Err(err) = native_branch_eq_cuda::tracegen(
+            native_branch_eq_cuda::tracegen(
                 trace.buffer(),
                 padded_height,
                 trace_width,
                 &d_records,
                 &self.range_checker.count,
                 self.timestamp_max_bits as u32,
-            ) {
-                panic!(
-                    "native_branch_eq cuda tracegen failed: err={:?}, height={}, padded_height={}, trace_width={}, timestamp_max_bits={}",
-                    err, height, padded_height, trace_width, self.timestamp_max_bits,
-                );
-            }
+            )
+            .unwrap();
         }
 
         AirProvingContext::simple_no_pis(trace)

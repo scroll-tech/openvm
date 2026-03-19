@@ -38,19 +38,15 @@ impl Chip<DenseRecordArena, GpuBackend> for JalRangeCheckGpu {
         let d_records = records.to_device().unwrap();
 
         unsafe {
-            if let Err(err) = native_jal_rangecheck_cuda::tracegen(
+            native_jal_rangecheck_cuda::tracegen(
                 trace.buffer(),
                 padded_height,
                 width,
                 &d_records,
                 &self.range_checker.count,
                 self.timestamp_max_bits as u32,
-            ) {
-                panic!(
-                    "native_jal_rangecheck cuda tracegen failed: err={:?}, height={}, padded_height={}, width={}, timestamp_max_bits={}",
-                    err, height, padded_height, width, self.timestamp_max_bits,
-                );
-            }
+            )
+            .unwrap();
         }
 
         AirProvingContext::simple_no_pis(trace)

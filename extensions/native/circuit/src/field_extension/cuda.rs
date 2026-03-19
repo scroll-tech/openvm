@@ -42,19 +42,15 @@ impl Chip<DenseRecordArena, GpuBackend> for FieldExtensionChipGpu {
         let d_records = records.to_device().unwrap();
 
         unsafe {
-            if let Err(err) = field_extension_cuda::tracegen(
+            field_extension_cuda::tracegen(
                 trace.buffer(),
                 padded_height,
                 trace_width,
                 &d_records,
                 &self.range_checker.count,
                 self.timestamp_max_bits as u32,
-            ) {
-                panic!(
-                    "native_field_extension cuda tracegen failed: err={:?}, height={}, padded_height={}, trace_width={}, timestamp_max_bits={}",
-                    err, height, padded_height, trace_width, self.timestamp_max_bits,
-                );
-            }
+            )
+            .unwrap();
         }
 
         AirProvingContext::simple_no_pis(trace)

@@ -175,7 +175,7 @@ impl<const SBOX_REGISTERS: usize> Chip<DenseRecordArena, GpuBackend>
         let d_records = records.to_device().unwrap();
 
         unsafe {
-            if let Err(err) = poseidon2_cuda::tracegen(
+            poseidon2_cuda::tracegen(
                 trace.buffer(),
                 padded_height,
                 width,
@@ -186,18 +186,8 @@ impl<const SBOX_REGISTERS: usize> Chip<DenseRecordArena, GpuBackend>
                 &self.range_checker.count,
                 SBOX_REGISTERS as u32,
                 self.timestamp_max_bits as u32,
-            ) {
-                panic!(
-                    "native_poseidon2 cuda tracegen failed: err={:?}, height={}, padded_height={}, width={}, chunk_count={}, sbox_registers={}, timestamp_max_bits={}",
-                    err,
-                    height,
-                    padded_height,
-                    width,
-                    d_chunk_start.len(),
-                    SBOX_REGISTERS,
-                    self.timestamp_max_bits,
-                );
-            }
+            )
+            .unwrap();
         }
 
         AirProvingContext::simple_no_pis(trace)

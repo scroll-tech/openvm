@@ -49,7 +49,7 @@ impl<const NUM_CELLS: usize> Chip<DenseRecordArena, GpuBackend>
         let d_records = records.to_device().unwrap();
 
         unsafe {
-            if let Err(err) = native_loadstore_cuda::tracegen(
+            native_loadstore_cuda::tracegen(
                 trace.buffer(),
                 padded_height,
                 trace_width,
@@ -57,12 +57,8 @@ impl<const NUM_CELLS: usize> Chip<DenseRecordArena, GpuBackend>
                 &self.range_checker.count,
                 NUM_CELLS as u32,
                 self.timestamp_max_bits as u32,
-            ) {
-                panic!(
-                    "native_loadstore cuda tracegen failed: err={:?}, height={}, padded_height={}, trace_width={}, num_cells={}, timestamp_max_bits={}",
-                    err, height, padded_height, trace_width, NUM_CELLS, self.timestamp_max_bits,
-                );
-            }
+            )
+            .unwrap();
         }
 
         AirProvingContext::simple_no_pis(trace)
