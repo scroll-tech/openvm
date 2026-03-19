@@ -15,7 +15,6 @@ use openvm_stark_backend::{prover::types::AirProvingContext, Chip};
 use super::{FriReducedOpeningRecordMut, OVERALL_WIDTH};
 use crate::{
     cuda_abi::fri_cuda,
-    utils::{OPENVM_NATIVE_GPU_DEBUG_ID, debug_log_native_gpu_tracegen_input},
 };
 
 #[derive(new)]
@@ -59,15 +58,6 @@ impl Chip<DenseRecordArena, GpuBackend> for FriReducedOpeningChipGpu {
         let trace_width = OVERALL_WIDTH;
         let trace = DeviceMatrix::<F>::with_capacity(trace_height, trace_width);
 
-        let records_hash = debug_log_native_gpu_tracegen_input(
-            "native_fri_reduced_opening",
-            records,
-            0,
-            record_info.len(),
-            trace_height,
-            trace_width,
-        );
-
         unsafe {
             if let Err(err) = fri_cuda::tracegen(
                 trace.buffer(),
@@ -79,26 +69,11 @@ impl Chip<DenseRecordArena, GpuBackend> for FriReducedOpeningChipGpu {
                 self.timestamp_max_bits as u32,
             ) {
                 panic!(
-                    "native_fri_reduced_opening cuda tracegen failed [{}]: err={:?}, rows={}, padded_height={}, trace_width={}, timestamp_max_bits={}, hash=0x{:016x}",
-                    OPENVM_NATIVE_GPU_DEBUG_ID,
-                    err,
-                    record_info.len(),
-                    trace_height,
-                    trace_width,
-                    self.timestamp_max_bits,
-                    records_hash,
+                    "native_fri_reduced_opening cuda tracegen failed: err={:?}, rows={}, padded_height={}, trace_width={}, timestamp_max_bits={}",
+                    err, record_info.len(), trace_height, trace_width, self.timestamp_max_bits,
                 );
             }
         }
-
-        println!(
-            "[openvm-gpu-debug][{}][native_fri_reduced_opening] tracegen ok: rows={} padded_height={} trace_width={} hash=0x{:016x}",
-            OPENVM_NATIVE_GPU_DEBUG_ID,
-            record_info.len(),
-            trace_height,
-            trace_width,
-            records_hash,
-        );
 
         AirProvingContext::simple_no_pis(trace)
     }

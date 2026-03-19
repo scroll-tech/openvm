@@ -13,7 +13,6 @@ use super::{FieldExtensionCoreCols, FieldExtensionRecord, EXT_DEG};
 use crate::{
     adapters::{NativeVectorizedAdapterCols, NativeVectorizedAdapterRecord},
     cuda_abi::field_extension_cuda,
-    utils::{OPENVM_NATIVE_GPU_DEBUG_ID, debug_log_native_gpu_tracegen_input},
 };
 
 #[derive(new)]
@@ -40,15 +39,6 @@ impl Chip<DenseRecordArena, GpuBackend> for FieldExtensionChipGpu {
             + FieldExtensionCoreCols::<F>::width();
         let trace = DeviceMatrix::<F>::with_capacity(padded_height, trace_width);
 
-        let records_hash = debug_log_native_gpu_tracegen_input(
-            "native_field_extension",
-            records,
-            RECORD_SIZE,
-            height,
-            padded_height,
-            trace_width,
-        );
-
         let d_records = records.to_device().unwrap();
 
         unsafe {
@@ -61,26 +51,11 @@ impl Chip<DenseRecordArena, GpuBackend> for FieldExtensionChipGpu {
                 self.timestamp_max_bits as u32,
             ) {
                 panic!(
-                    "native_field_extension cuda tracegen failed [{}]: err={:?}, height={}, padded_height={}, trace_width={}, timestamp_max_bits={}, hash=0x{:016x}",
-                    OPENVM_NATIVE_GPU_DEBUG_ID,
-                    err,
-                    height,
-                    padded_height,
-                    trace_width,
-                    self.timestamp_max_bits,
-                    records_hash,
+                    "native_field_extension cuda tracegen failed: err={:?}, height={}, padded_height={}, trace_width={}, timestamp_max_bits={}",
+                    err, height, padded_height, trace_width, self.timestamp_max_bits,
                 );
             }
         }
-
-        println!(
-            "[openvm-gpu-debug][{}][native_field_extension] tracegen ok: height={} padded_height={} trace_width={} hash=0x{:016x}",
-            OPENVM_NATIVE_GPU_DEBUG_ID,
-            height,
-            padded_height,
-            trace_width,
-            records_hash,
-        );
 
         AirProvingContext::simple_no_pis(trace)
     }

@@ -13,7 +13,6 @@ use super::{NativeLoadStoreCoreCols, NativeLoadStoreCoreRecord};
 use crate::{
     adapters::{NativeLoadStoreAdapterCols, NativeLoadStoreAdapterRecord},
     cuda_abi::native_loadstore_cuda,
-    utils::{OPENVM_NATIVE_GPU_DEBUG_ID, debug_log_native_gpu_tracegen_input},
 };
 
 #[derive(new)]
@@ -47,15 +46,6 @@ impl<const NUM_CELLS: usize> Chip<DenseRecordArena, GpuBackend>
             + NativeLoadStoreCoreCols::<F, NUM_CELLS>::width();
         let trace = DeviceMatrix::<F>::with_capacity(padded_height, trace_width);
 
-        let records_hash = debug_log_native_gpu_tracegen_input(
-            "native_loadstore",
-            records,
-            record_size,
-            height,
-            padded_height,
-            trace_width,
-        );
-
         let d_records = records.to_device().unwrap();
 
         unsafe {
@@ -69,28 +59,11 @@ impl<const NUM_CELLS: usize> Chip<DenseRecordArena, GpuBackend>
                 self.timestamp_max_bits as u32,
             ) {
                 panic!(
-                    "native_loadstore cuda tracegen failed [{}]: err={:?}, height={}, padded_height={}, trace_width={}, num_cells={}, timestamp_max_bits={}, hash=0x{:016x}",
-                    OPENVM_NATIVE_GPU_DEBUG_ID,
-                    err,
-                    height,
-                    padded_height,
-                    trace_width,
-                    NUM_CELLS,
-                    self.timestamp_max_bits,
-                    records_hash,
+                    "native_loadstore cuda tracegen failed: err={:?}, height={}, padded_height={}, trace_width={}, num_cells={}, timestamp_max_bits={}",
+                    err, height, padded_height, trace_width, NUM_CELLS, self.timestamp_max_bits,
                 );
             }
         }
-
-        println!(
-            "[openvm-gpu-debug][{}][native_loadstore] tracegen ok: height={} padded_height={} trace_width={} num_cells={} hash=0x{:016x}",
-            OPENVM_NATIVE_GPU_DEBUG_ID,
-            height,
-            padded_height,
-            trace_width,
-            NUM_CELLS,
-            records_hash,
-        );
 
         AirProvingContext::simple_no_pis(trace)
     }

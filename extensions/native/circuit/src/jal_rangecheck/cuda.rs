@@ -12,7 +12,6 @@ use openvm_stark_backend::{prover::types::AirProvingContext, Chip};
 use super::{JalRangeCheckCols, JalRangeCheckRecord};
 use crate::{
     cuda_abi::native_jal_rangecheck_cuda,
-    utils::{OPENVM_NATIVE_GPU_DEBUG_ID, debug_log_native_gpu_tracegen_input},
 };
 
 #[derive(new)]
@@ -36,15 +35,6 @@ impl Chip<DenseRecordArena, GpuBackend> for JalRangeCheckGpu {
         let padded_height = next_power_of_two_or_zero(height);
         let trace = DeviceMatrix::<F>::with_capacity(padded_height, width);
 
-        let records_hash = debug_log_native_gpu_tracegen_input(
-            "native_jal_rangecheck",
-            records,
-            RECORD_SIZE,
-            height,
-            padded_height,
-            width,
-        );
-
         let d_records = records.to_device().unwrap();
 
         unsafe {
@@ -57,26 +47,11 @@ impl Chip<DenseRecordArena, GpuBackend> for JalRangeCheckGpu {
                 self.timestamp_max_bits as u32,
             ) {
                 panic!(
-                    "native_jal_rangecheck cuda tracegen failed [{}]: err={:?}, height={}, padded_height={}, width={}, timestamp_max_bits={}, hash=0x{:016x}",
-                    OPENVM_NATIVE_GPU_DEBUG_ID,
-                    err,
-                    height,
-                    padded_height,
-                    width,
-                    self.timestamp_max_bits,
-                    records_hash,
+                    "native_jal_rangecheck cuda tracegen failed: err={:?}, height={}, padded_height={}, width={}, timestamp_max_bits={}",
+                    err, height, padded_height, width, self.timestamp_max_bits,
                 );
             }
         }
-
-        println!(
-            "[openvm-gpu-debug][{}][native_jal_rangecheck] tracegen ok: height={} padded_height={} width={} hash=0x{:016x}",
-            OPENVM_NATIVE_GPU_DEBUG_ID,
-            height,
-            padded_height,
-            width,
-            records_hash,
-        );
 
         AirProvingContext::simple_no_pis(trace)
     }

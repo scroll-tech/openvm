@@ -5,53 +5,9 @@ use openvm_circuit::system::{
 use p3_field::PrimeField32;
 
 pub(crate) const CASTF_MAX_BITS: usize = 30;
-#[cfg(feature = "cuda")]
-pub(crate) const OPENVM_NATIVE_GPU_DEBUG_ID: &str = "OVM-NATIVE-GPU-DBG-20260318";
 
 pub(crate) const fn const_max(a: usize, b: usize) -> usize {
     [a, b][(a < b) as usize]
-}
-
-#[cfg(feature = "cuda")]
-fn fnv1a64(bytes: &[u8]) -> u64 {
-    let mut hash: u64 = 0xcbf29ce484222325;
-    for &b in bytes {
-        hash ^= b as u64;
-        hash = hash.wrapping_mul(0x100000001b3);
-    }
-    hash
-}
-
-#[cfg(feature = "cuda")]
-pub(crate) fn debug_log_native_gpu_tracegen_input(
-    chip_label: &str,
-    records: &[u8],
-    record_size: usize,
-    height: usize,
-    padded_height: usize,
-    trace_width: usize,
-) -> u64 {
-    let hash = fnv1a64(records);
-    let head_len = records.len().min(64);
-    println!(
-        "[openvm-gpu-debug][{}][{}] records_bytes={} record_size={} height={} padded_height={} trace_width={} hash=0x{:016x}",
-        OPENVM_NATIVE_GPU_DEBUG_ID,
-        chip_label,
-        records.len(),
-        record_size,
-        height,
-        padded_height,
-        trace_width,
-        hash
-    );
-    println!(
-        "[openvm-gpu-debug][{}][{}] records_head({})={:?}",
-        OPENVM_NATIVE_GPU_DEBUG_ID,
-        chip_label,
-        head_len,
-        &records[..head_len]
-    );
-    hash
 }
 
 /// Fill `MemoryBaseAuxCols`, assuming that the `prev_timestamp` is already set in `base_aux`.

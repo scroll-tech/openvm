@@ -23,7 +23,7 @@ use crate::{
         expr_op::ExprOp,
     },
     cuda_abi::field_expression::tracegen,
-    utils::{biguint_to_limbs_vec, OPENVM_GPU_DEBUG_ID},
+    utils::biguint_to_limbs_vec,
     ExprMeta, ExprNode, FieldExprMeta, FieldExpressionChipGPU, FieldExpressionCoreAir,
     SymbolicExpr,
 };
@@ -489,8 +489,7 @@ impl FieldExpressionChipGPU {
             )
             {
                 panic!(
-                    "field_expression cuda tracegen failed [{}]: err={:?}, num_records={}, record_stride={}, padded_height={}, total_trace_width={}, workspace_per_thread={}, pointer_max_bits={}, timestamp_max_bits={}, num_inputs={}, num_vars={}, num_flags={}, num_local_opcodes={}, num_output_indices={}, max_q_count={}, max_ast_depth={}",
-                    OPENVM_GPU_DEBUG_ID,
+                    "field_expression cuda tracegen failed: err={:?}, num_records={}, record_stride={}, padded_height={}, total_trace_width={}, workspace_per_thread={}, pointer_max_bits={}, timestamp_max_bits={}, num_inputs={}, num_vars={}, num_flags={}, num_local_opcodes={}, num_output_indices={}, max_q_count={}, max_ast_depth={}",
                     err,
                     self.num_records,
                     self.record_stride,
@@ -509,17 +508,6 @@ impl FieldExpressionChipGPU {
                 );
             }
         }
-
-        println!(
-            "[openvm-gpu-debug][{}] field_expression tracegen ok: num_records={} padded_height={} total_trace_width={} workspace_per_thread={} pointer_max_bits={} timestamp_max_bits={}",
-            OPENVM_GPU_DEBUG_ID,
-            self.num_records,
-            padded_height,
-            self.total_trace_width,
-            workspace_per_thread,
-            self.pointer_max_bits,
-            self.timestamp_max_bits,
-        );
         mat
     }
 }
