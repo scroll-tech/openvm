@@ -12,4 +12,3 @@ pub fn biguint_to_limbs_vec(x: &BigUint, num_limbs: usize) -> Vec<u8> {
         .take(num_limbs)
         .collect()
 }
-
