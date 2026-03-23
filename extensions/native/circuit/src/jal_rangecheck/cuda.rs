@@ -10,7 +10,9 @@ use openvm_cuda_common::copy::MemCopyH2D;
 use openvm_stark_backend::{prover::types::AirProvingContext, Chip};
 
 use super::{JalRangeCheckCols, JalRangeCheckRecord};
-use crate::cuda_abi::native_jal_rangecheck_cuda;
+use crate::{
+    cuda_abi::native_jal_rangecheck_cuda,
+};
 
 #[derive(new)]
 pub struct JalRangeCheckGpu {
