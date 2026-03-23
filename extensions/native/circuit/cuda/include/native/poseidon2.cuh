@@ -65,14 +65,17 @@ template <typename T> struct SimplePoseidonSpecificCols {
 template <typename T> struct MultiObserveCols {
     T pc;
     T final_timestamp_increment;
+    T state_ptr_register;
+    T ctx_register;
+    T input_ptr_register;
+    T hint_id_register;
     T state_ptr;
+    T ctx_ptr;
     T input_ptr;
-    T init_pos;
-    T len;
-    T input_register_1;
-    T input_register_2;
-    T input_register_3;
-    T output_register;
+    T hint_id;
+    T ctx[4];
+    MemoryReadAuxCols<T> read_ctx;
+    T chunk_ts_count;
     T is_first;
     T is_last;
     T curr_len;

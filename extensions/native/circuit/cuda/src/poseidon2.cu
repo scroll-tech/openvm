@@ -24,6 +24,7 @@ template <typename T, size_t SBOX_REGISTERS> struct NativePoseidon2Cols {
     T inside_row;
     T simple;
     T multi_observe_row;
+    T not_hint_multi_observe;
 
     T end_inside_row;
     T end_top_level;
@@ -355,11 +356,32 @@ template <size_t SBOX_REGISTERS> struct Poseidon2Wrapper {
         if (specific[COL_INDEX(MultiObserveCols, is_first)] == Fp::one()) {
             uint32_t very_start_timestamp =
                 row[COL_INDEX(Cols, very_first_timestamp)].asUInt32();
-            for (uint32_t i = 0; i < 4; ++i) {
+            for (uint32_t i = 0; i < 3; ++i) {
                 mem_fill_base(
                     mem_helper,
                     very_start_timestamp + i,
                     specific.slice_from(COL_INDEX(MultiObserveCols, read_data[i].base))
+                );
+            }
+            mem_fill_base(
+                mem_helper,
+                very_start_timestamp + 3,
+                specific.slice_from(COL_INDEX(MultiObserveCols, read_ctx.base))
+            );
+            mem_fill_base(
+                mem_helper,
+                very_start_timestamp + 4,
+                specific.slice_from(COL_INDEX(MultiObserveCols, read_data[3].base))
+            );
+
+            // Zero-length MULTI_OBSERVE case: head row is both first and last.
+            // The final ctx[0] writeback lives at row.start_timestamp.
+            if (specific[COL_INDEX(MultiObserveCols, is_last)] == Fp::one()) {
+                uint32_t start_timestamp = row[COL_INDEX(Cols, start_timestamp)].asUInt32();
+                mem_fill_base(
+                    mem_helper,
+                    start_timestamp,
+                    specific.slice_from(COL_INDEX(MultiObserveCols, write_final_idx.base))
                 );
             }
         } else {
@@ -368,18 +390,23 @@ template <size_t SBOX_REGISTERS> struct Poseidon2Wrapper {
                 specific[COL_INDEX(MultiObserveCols, start_idx)].asUInt32();
             uint32_t chunk_end =
                 specific[COL_INDEX(MultiObserveCols, end_idx)].asUInt32();
+            uint32_t is_hint =
+                specific[COL_INDEX(MultiObserveCols, ctx[2])].asUInt32();
+            uint32_t ts_per_element = 2 - is_hint;
             for (uint32_t j = chunk_start; j < chunk_end; ++j) {
+                if (!is_hint) {
+                    mem_fill_base(
+                        mem_helper,
+                        start_timestamp,
+                        specific.slice_from(COL_INDEX(MultiObserveCols, read_data[j].base))
+                    );
+                }
                 mem_fill_base(
                     mem_helper,
-                    start_timestamp,
-                    specific.slice_from(COL_INDEX(MultiObserveCols, read_data[j].base))
-                );
-                mem_fill_base(
-                    mem_helper,
-                    start_timestamp + 1,
+                    start_timestamp + (1 - is_hint),
                     specific.slice_from(COL_INDEX(MultiObserveCols, write_data[j].base))
                 );
-                start_timestamp += 2;
+                start_timestamp += ts_per_element;
             }
             if (chunk_end >= CHUNK) {
                 mem_fill_base(

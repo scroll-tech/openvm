@@ -441,15 +441,15 @@ fn convert_instruction<F: PrimeField32, EF: ExtensionField<F>>(
                     AS::Native,
                     AS::Native,
             )],
-        AsmInstruction::Poseidon2MultiObserve(dst, init, arr, len) => vec![
+        AsmInstruction::Poseidon2MultiObserve(dst, ctx, arr, hint_id) => vec![
             Instruction {
                 opcode: options.opcode_with_offset(Poseidon2Opcode::MULTI_OBSERVE),
                 a: i32_f(dst),
-                b: i32_f(init),
+                b: i32_f(ctx),
                 c: i32_f(arr),
                 d: AS::Native.to_field(),
                 e: AS::Native.to_field(),
-                f: i32_f(len),
+                f: i32_f(hint_id),
                 g: F::ZERO,
             }
         ],

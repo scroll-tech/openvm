@@ -489,13 +489,13 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
                 DslIr::HintBitsF(var, len) => {
                     self.push(AsmInstruction::HintBits(var.fp(), len), debug_info);
                 }
-                DslIr::Poseidon2MultiObserve(dst, init_pos, arr_ptr, len) => {
+                DslIr::Poseidon2MultiObserve(dst, ctx_ptr, arr_ptr, hint_id) => {
                     self.push(
                         AsmInstruction::Poseidon2MultiObserve(
                             dst.fp(),
-                            init_pos.fp(),
+                            ctx_ptr.fp(),
                             arr_ptr.fp(),
-                            len.get_var().fp(),
+                            hint_id.fp(),
                         ),
                         debug_info,
                     );

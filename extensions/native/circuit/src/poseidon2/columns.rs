@@ -31,6 +31,10 @@ pub struct NativePoseidon2Cols<T, const SBOX_REGISTERS: usize> {
     /// Indicates that this row is a multi_observe row.
     pub multi_observe_row: T,
 
+    /// Materialized column: multi_observe_row * (1 - is_hint).
+    /// Lives in main cols (not overlaid specific) so it is 0 on non-multi_observe rows.
+    pub not_hint_multi_observe: T,
+
     /// Indicates the last row in an inside-row block.
     pub end_inside_row: T,
     /// Indicates the last row in a top-level block.
@@ -211,16 +215,24 @@ pub struct MultiObserveCols<T> {
     pub pc: T,
     pub final_timestamp_increment: T,
 
-    // Initial reads from registers
-    // They are same across same instance of multi_observe
+    // Register addresses
+    pub state_ptr_register: T,
+    pub ctx_register: T,
+    pub input_ptr_register: T,
+    pub hint_id_register: T,
+
+    // Values read from registers
     pub state_ptr: T,
+    pub ctx_ptr: T,
     pub input_ptr: T,
-    pub init_pos: T,
-    pub len: T,
-    pub input_register_1: T,
-    pub input_register_2: T,
-    pub input_register_3: T,
-    pub output_register: T,
+    pub hint_id: T,
+
+    // Context array values read from ctx_ptr
+    // ctx[0] = init_pos, ctx[1] = len, ctx[2] = is_hint, ctx[3] = reserved
+    pub ctx: [T; 4],
+    pub read_ctx: MemoryReadAuxCols<T>,
+
+    pub chunk_ts_count: T,
 
     pub is_first: T,
     pub is_last: T,
@@ -240,6 +252,6 @@ pub struct MultiObserveCols<T> {
     pub should_permute: T,
     pub write_sponge_state: MemoryWriteAuxCols<T, { CHUNK * 2 }>,
 
-    // Final write back and registers
+    // Final write back to ctx[0]
     pub write_final_idx: MemoryWriteAuxCols<T, 1>,
 }

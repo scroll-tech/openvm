@@ -94,6 +94,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             inside_row,
             simple,
             multi_observe_row,
+            not_hint_multi_observe,
             end_inside_row,
             end_top_level,
             start_top_level,
@@ -713,10 +714,17 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         let &MultiObserveCols {
             pc,
             final_timestamp_increment,
+            state_ptr_register,
+            ctx_register,
+            input_ptr_register,
+            hint_id_register,
             state_ptr,
+            ctx_ptr,
             input_ptr,
-            init_pos,
-            len,
+            hint_id,
+            ctx,
+            read_ctx,
+            chunk_ts_count,
             is_first,
             is_last,
             curr_len,
@@ -731,26 +739,38 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             should_permute,
             write_sponge_state,
             write_final_idx,
-            input_register_1,
-            input_register_2,
-            input_register_3,
-            output_register,
         } = multi_observe_specific;
+
+        // Alias context values
+        let init_pos = ctx[0];
+        let len = ctx[1];
+        let is_hint = ctx[2];
 
         builder.when(multi_observe_row).assert_bool(is_first);
         builder.when(multi_observe_row).assert_bool(is_last);
         builder.when(multi_observe_row).assert_bool(should_permute);
+        builder.when(multi_observe_row).assert_bool(is_hint);
+        builder.assert_eq(
+            not_hint_multi_observe,
+            multi_observe_row * (AB::Expr::ONE - is_hint),
+        );
+        let hint_multi_observe: AB::Expr = multi_observe_row - not_hint_multi_observe;
+        // chunk_ts_count = (end_idx - start_idx) * (2 - is_hint)
+        builder.when(multi_observe_row).assert_eq(
+            chunk_ts_count,
+            (end_idx - start_idx) * AB::F::TWO - (end_idx - start_idx) * is_hint,
+        );
 
         self.execution_bridge
             .execute_and_increment_pc(
                 AB::F::from_canonical_usize(MULTI_OBSERVE.global_opcode().as_usize()),
                 [
-                    output_register.into(),
-                    input_register_1.into(),
-                    input_register_2.into(),
+                    state_ptr_register.into(),
+                    ctx_register.into(),
+                    input_ptr_register.into(),
                     self.address_space.into(),
                     self.address_space.into(),
-                    input_register_3.into(),
+                    hint_id_register.into(),
                 ],
                 ExecutionState::new(pc, very_first_timestamp),
                 final_timestamp_increment,
@@ -759,7 +779,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(self.address_space, output_register),
+                MemoryAddress::new(self.address_space, state_ptr_register),
                 [state_ptr],
                 very_first_timestamp,
                 &read_data[0],
@@ -768,8 +788,8 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(self.address_space, input_register_1),
-                [init_pos],
+                MemoryAddress::new(self.address_space, ctx_register),
+                [ctx_ptr],
                 very_first_timestamp + AB::F::ONE,
                 &read_data[1],
             )
@@ -777,24 +797,47 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
 
         self.memory_bridge
             .read(
-                MemoryAddress::new(self.address_space, input_register_2),
+                MemoryAddress::new(self.address_space, input_ptr_register),
                 [input_ptr],
                 very_first_timestamp + AB::F::TWO,
                 &read_data[2],
             )
             .eval(builder, multi_observe_row * is_first);
 
+        // Read context array: [init_pos, len, is_hint, reserved] from ctx_ptr
         self.memory_bridge
             .read(
-                MemoryAddress::new(self.address_space, input_register_3),
-                [len],
+                MemoryAddress::new(self.address_space, ctx_ptr),
+                ctx,
                 very_first_timestamp + AB::F::from_canonical_usize(3),
+                &read_ctx,
+            )
+            .eval(builder, multi_observe_row * is_first);
+
+        // Read hint_id from register (reuse spare read_data[3] on head row)
+        self.memory_bridge
+            .read(
+                MemoryAddress::new(self.address_space, hint_id_register),
+                [hint_id],
+                very_first_timestamp + AB::F::from_canonical_usize(4),
                 &read_data[3],
             )
             .eval(builder, multi_observe_row * is_first);
 
+        // Per-element constraints for chunk rows.
         for i in 0..CHUNK {
             let i_var = AB::F::from_canonical_usize(i);
+
+            // Hint mode: lookup from hint space.
+            self.hint_bridge.lookup(
+                builder,
+                hint_id,
+                curr_len + i_var - start_idx,
+                data[i],
+                hint_multi_observe.clone() * aux_read_enabled[i],
+            );
+
+            // Non-hint mode: read from memory.
             self.memory_bridge
                 .read(
                     MemoryAddress::new(
@@ -805,8 +848,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     start_timestamp + i_var * AB::F::TWO - start_idx * AB::F::TWO,
                     &read_data[i],
                 )
-                .eval(builder, multi_observe_row * aux_read_enabled[i]);
-
+                .eval(builder, not_hint_multi_observe * aux_read_enabled[i]);
             self.memory_bridge
                 .write(
                     MemoryAddress::new(self.address_space, state_ptr + i_var),
@@ -814,7 +856,16 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
                     start_timestamp + i_var * AB::F::TWO - start_idx * AB::F::TWO + AB::F::ONE,
                     &write_data[i],
                 )
-                .eval(builder, multi_observe_row * aux_read_enabled[i]);
+                .eval(builder, not_hint_multi_observe * aux_read_enabled[i]);
+
+            self.memory_bridge
+                .write(
+                    MemoryAddress::new(self.address_space, state_ptr + i_var),
+                    [data[i]],
+                    start_timestamp + i_var - start_idx,
+                    &write_data[i],
+                )
+                .eval(builder, hint_multi_observe.clone() * aux_read_enabled[i]);
         }
 
         for i in 0..(CHUNK - 1) {
@@ -885,7 +936,7 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
             .write(
                 MemoryAddress::new(self.address_space, state_ptr),
                 full_sponge_output,
-                start_timestamp + (end_idx - start_idx) * AB::F::TWO,
+                start_timestamp + chunk_ts_count,
                 &write_sponge_state,
             )
             .eval(builder, multi_observe_row * should_permute);
@@ -909,11 +960,12 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         // final_idx = aux_read_enabled[CHUNK-1] * 0 + (1 - aux_read_enabled[CHUNK-1]) * end_idx
         let final_idx = aux_read_enabled[CHUNK - 1] * AB::Expr::ZERO
             + (AB::Expr::ONE - aux_read_enabled[CHUNK - 1]) * end_idx;
+        // Write final_idx back to ctx[0] (ctx_ptr address)
         self.memory_bridge
             .write(
-                MemoryAddress::new(self.address_space, input_register_1),
+                MemoryAddress::new(self.address_space, ctx_ptr),
                 [final_idx],
-                start_timestamp + (end_idx - start_idx) * AB::F::TWO + should_permute,
+                start_timestamp + chunk_ts_count + should_permute,
                 &write_final_idx,
             )
             .eval(builder, multi_observe_row * is_last);
@@ -962,41 +1014,59 @@ impl<AB: InteractionBuilder, const SBOX_REGISTERS: usize> Air<AB>
         builder
             .when(next.multi_observe_row)
             .when(not(next_multi_observe_specific.is_first))
-            .assert_eq(init_pos, next_multi_observe_specific.init_pos);
+            .assert_eq(init_pos, next_multi_observe_specific.ctx[0]);
 
         builder
             .when(next.multi_observe_row)
             .when(not(next_multi_observe_specific.is_first))
-            .assert_eq(len, next_multi_observe_specific.len);
+            .assert_eq(len, next_multi_observe_specific.ctx[1]);
 
         builder
             .when(next.multi_observe_row)
             .when(not(next_multi_observe_specific.is_first))
             .assert_eq(
-                input_register_1,
-                next_multi_observe_specific.input_register_1,
+                state_ptr_register,
+                next_multi_observe_specific.state_ptr_register,
             );
 
         builder
             .when(next.multi_observe_row)
             .when(not(next_multi_observe_specific.is_first))
             .assert_eq(
-                input_register_2,
-                next_multi_observe_specific.input_register_2,
+                ctx_register,
+                next_multi_observe_specific.ctx_register,
             );
 
         builder
             .when(next.multi_observe_row)
             .when(not(next_multi_observe_specific.is_first))
             .assert_eq(
-                input_register_3,
-                next_multi_observe_specific.input_register_3,
+                input_ptr_register,
+                next_multi_observe_specific.input_ptr_register,
             );
 
         builder
             .when(next.multi_observe_row)
             .when(not(next_multi_observe_specific.is_first))
-            .assert_eq(output_register, next_multi_observe_specific.output_register);
+            .assert_eq(ctx_ptr, next_multi_observe_specific.ctx_ptr);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(hint_id, next_multi_observe_specific.hint_id);
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(
+                hint_id_register,
+                next_multi_observe_specific.hint_id_register,
+            );
+
+        builder
+            .when(next.multi_observe_row)
+            .when(not(next_multi_observe_specific.is_first))
+            .assert_eq(is_hint, next_multi_observe_specific.ctx[2]);
 
         // Timestamp constraints
         builder

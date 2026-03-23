@@ -35,9 +35,9 @@ struct Pos2PreCompute<'a, F: Field, const SBOX_REGISTERS: usize> {
 #[repr(C)]
 struct MultiObservePreCompute<'a, F: Field, const SBOX_REGISTERS: usize> {
     subchip: &'a Poseidon2SubChip<F, SBOX_REGISTERS>,
-    pub init_pos_register: u32,
+    pub ctx_register: u32,
     pub input_ptr_register: u32,
-    pub len_register: u32,
+    pub hint_id_register: u32,
     pub state_ptr_register: u32,
 }
 
@@ -137,9 +137,9 @@ impl<'a, F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Executor<F
 
         multi_observe_data.subchip = &self.subchip;
         multi_observe_data.state_ptr_register = a;
-        multi_observe_data.init_pos_register = b;
+        multi_observe_data.ctx_register = b;
         multi_observe_data.input_ptr_register = c;
-        multi_observe_data.len_register = f;
+        multi_observe_data.hint_id_register = f;
 
         Ok(())
     }
@@ -591,14 +591,20 @@ unsafe fn execute_multi_observe_e12_impl<
 
     let [sponge_ptr]: [F; 1] =
         exec_state.vm_read(AS::Native as u32, pre_compute.state_ptr_register);
-    let [init_pos]: [F; 1] = exec_state.vm_read(AS::Native as u32, pre_compute.init_pos_register);
+    let [ctx_ptr]: [F; 1] = exec_state.vm_read(AS::Native as u32, pre_compute.ctx_register);
     let [input_ptr]: [F; 1] = exec_state.vm_read(AS::Native as u32, pre_compute.input_ptr_register);
-    let [len]: [F; 1] = exec_state.vm_read(AS::Native as u32, pre_compute.len_register);
+    let ctx: [F; 4] = exec_state.vm_read(AS::Native as u32, ctx_ptr.as_canonical_u32());
+    let [hint_id]: [F; 1] = exec_state.vm_read(AS::Native as u32, pre_compute.hint_id_register);
 
-    let mut len = len.as_canonical_u32() as usize;
+    let init_pos = ctx[0];
+    let len_f = ctx[1];
+    let is_hint = ctx[2].as_canonical_u32() != 0;
+
+    let mut len = len_f.as_canonical_u32() as usize;
     let mut pos = init_pos.as_canonical_u32() as usize;
     let input_ptr_u32 = input_ptr.as_canonical_u32();
     let sponge_ptr_u32 = sponge_ptr.as_canonical_u32();
+    let hint_id_u32 = hint_id.as_canonical_u32();
     let mut height = 0;
 
     // split input into chunks s.t. each chunk fills the RATE portion of sponge state
@@ -617,11 +623,24 @@ unsafe fn execute_multi_observe_e12_impl<
     let final_idx = observation_chunks.last().map(|(_, end)| *end % CHUNK);
 
     height += 1;
-    let mut input_idx = 0;
+    let mut input_idx: u32 = 0;
+
+    // Get hint_space data if in hint mode
+    let hint_data: Vec<F> = if is_hint {
+        exec_state.streams.hint_space[hint_id_u32 as usize].clone()
+    } else {
+        vec![]
+    };
 
     for (chunk_start, chunk_end) in observation_chunks {
         for j in chunk_start..chunk_end {
-            let [n_f]: [F; 1] = exec_state.vm_read(NATIVE_AS, input_ptr_u32 + input_idx);
+            let n_f = if is_hint {
+                hint_data[input_idx as usize]
+            } else {
+                let [v]: [F; 1] = exec_state.vm_read(NATIVE_AS, input_ptr_u32 + input_idx);
+                v
+            };
+
             exec_state.vm_write(NATIVE_AS, sponge_ptr_u32 + (j as u32), &[n_f]);
             input_idx += 1;
         }
@@ -634,9 +653,10 @@ unsafe fn execute_multi_observe_e12_impl<
         height += 1;
     }
     if let Some(final_idx) = final_idx {
+        // Write final_idx back to ctx[0] (overwriting init_pos in context array)
         exec_state.vm_write::<F, 1>(
             NATIVE_AS,
-            pre_compute.init_pos_register,
+            ctx_ptr.as_canonical_u32(),
             &[F::from_canonical_usize(final_idx)],
         );
     }
