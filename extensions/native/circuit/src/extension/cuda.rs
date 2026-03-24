@@ -98,15 +98,6 @@ impl VmProverExtension<GpuBabyBearPoseidon2Engine, DenseRecordArena, Native>
         );
         inventory.add_executor_chip(poseidon2);
 
-        let hint_air: &HintSpaceProviderAir = inventory.next_air::<HintSpaceProviderAir>()?;
-        let cpu_chip = Arc::new(HintSpaceProviderChip::new(
-            hint_air.hint_bus,
-            range_checker.clone(),
-            timestamp_max_bits,
-        ));
-        let provider_gpu = HintSpaceProviderChipGpu::new(cpu_chip.clone());
-        inventory.add_periphery_chip(provider_gpu);
-
         inventory.next_air::<NativeSumcheckAir>()?;
         let sumcheck =
             NativeSumcheckChipGpu::new(range_checker.clone(), timestamp_max_bits, cpu_chip);
