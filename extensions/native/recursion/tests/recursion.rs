@@ -4,13 +4,22 @@ use openvm_circuit::{
         instructions::program::Program, PreflightExecutionOutput, PreflightExecutor, VmBuilder,
         VmCircuitConfig, VmExecutionConfig,
     },
-    utils::TestStarkEngine,
+    utils::{air_test_impl, TestStarkEngine},
 };
+#[cfg(feature = "cuda")]
+use openvm_cuda_backend::engine::GpuBabyBearPoseidon2Engine;
 use openvm_native_circuit::{
     execute_program_with_config, test_native_config, NativeBuilder, NativeConfig,
 };
-use openvm_native_compiler::{asm::AsmBuilder, ir::Felt};
-use openvm_native_recursion::testing_utils::inner::run_recursive_test;
+use openvm_native_compiler::{
+    asm::{AsmBuilder, AsmCompiler},
+    conversion::{convert_program, CompilerOptions},
+    ir::{Array, Builder, Config, Felt},
+};
+use openvm_native_recursion::{
+    challenger::{duplex::DuplexChallengerVariable, CanObserveVariable, CanSampleVariable},
+    testing_utils::inner::run_recursive_test,
+};
 use openvm_stark_backend::{
     config::{Domain, StarkGenericConfig, Val},
     p3_commit::PolynomialSpace,
@@ -24,12 +33,14 @@ use openvm_stark_backend::{
 use openvm_stark_sdk::{
     config::{
         baby_bear_poseidon2::{BabyBearPoseidon2Config, BabyBearPoseidon2Engine},
+        fri_params::standard_fri_params_with_100_bits_conjectured_security,
         FriParameters,
     },
     engine::StarkFriEngine,
     p3_baby_bear::BabyBear,
-    utils::ProofInputForTest,
+    utils::{create_seeded_rng, ProofInputForTest},
 };
+use rand::Rng;
 
 fn fibonacci_program(a: u32, b: u32, n: u32) -> Program<BabyBear> {
     type F = BabyBear;
@@ -165,4 +176,81 @@ fn test_fibonacci_program_halo2_verify() {
         fib_program_stark,
         FriParameters::new_for_testing(LOG_BLOWUP),
     );
+}
+
+#[test]
+fn test_multi_observe() {
+    type F = BabyBear;
+    type EF = BinomialExtensionField<BabyBear, 4>;
+    let mut builder = AsmBuilder::<F, EF>::default();
+
+    build_test_program(&mut builder);
+
+    let compilation_options = CompilerOptions::default().with_cycle_tracker();
+    let mut compiler = AsmCompiler::new(compilation_options.word_size);
+    compiler.build(builder.operations);
+    let asm_code = compiler.code();
+
+    let program: Program<_> = convert_program(asm_code, compilation_options);
+
+    let poseidon2_max_constraint_degree = 3;
+
+    let fri_params = if matches!(std::env::var("OPENVM_FAST_TEST"), Ok(x) if &x == "1") {
+        FriParameters {
+            // max constraint degree = 2^log_blowup + 1
+            log_blowup: 1,
+            log_final_poly_len: 0,
+            num_queries: 2,
+            proof_of_work_bits: 0,
+        }
+    } else {
+        standard_fri_params_with_100_bits_conjectured_security(1)
+    };
+
+    let mut config = NativeConfig::aggregation(0, poseidon2_max_constraint_degree);
+    config.system.memory_config.max_access_adapter_n = 16;
+
+    let vb = NativeBuilder::default();
+    #[cfg(not(feature = "cuda"))]
+    air_test_impl::<BabyBearPoseidon2Engine, _>(fri_params, vb, config, program, vec![], 1, true)
+        .unwrap();
+    #[cfg(feature = "cuda")]
+    {
+        air_test_impl::<GpuBabyBearPoseidon2Engine, _>(
+            fri_params,
+            vb,
+            config,
+            program,
+            vec![],
+            1,
+            true,
+        )
+        .unwrap();
+    }
+}
+
+fn build_test_program<C: Config>(builder: &mut Builder<C>) {
+    let sample_lens: Vec<usize> = vec![10, 2, 1, 0, 3, 20, 200, 400];
+
+    let mut rng = create_seeded_rng();
+
+    let mut c1 = DuplexChallengerVariable::new(builder);
+    let mut c2 = DuplexChallengerVariable::new(builder);
+
+    for l in sample_lens {
+        let sample_input: Array<C, Felt<C::F>> = builder.dyn_array(l);
+        builder.range(0, l).for_each(|idx_vec, builder| {
+            let f_u32: u32 = rng.gen_range(1..1 << 30);
+            builder.set(&sample_input, idx_vec[0], C::F::from_canonical_u32(f_u32));
+        });
+
+        c1.observe_slice_opt(builder, &sample_input);
+        c2.observe_slice(builder, sample_input);
+
+        let e1 = c1.sample(builder);
+        let e2 = c2.sample(builder);
+
+        builder.assert_felt_eq(e1, e2);
+    }
+    builder.halt();
 }

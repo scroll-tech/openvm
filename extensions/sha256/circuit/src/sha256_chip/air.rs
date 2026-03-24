@@ -53,6 +53,7 @@ impl Sha256VmAir {
             execution_bus,
             program_bus,
             memory_bridge,
+            hint_bridge: _,
         }: SystemPort,
         bitwise_lookup_bus: BitwiseOperationLookupBus,
         ptr_max_bits: usize,

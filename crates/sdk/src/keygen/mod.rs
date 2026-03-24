@@ -54,7 +54,7 @@ use crate::{
 };
 
 pub mod asm;
-pub(crate) mod dummy;
+pub mod dummy;
 pub mod perm;
 #[cfg(feature = "evm-prove")]
 pub mod static_verifier;

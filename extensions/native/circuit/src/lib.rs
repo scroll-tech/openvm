@@ -39,12 +39,15 @@ mod castf;
 mod field_arithmetic;
 mod field_extension;
 mod fri;
+pub(crate) mod hint_space_provider;
 mod jal_rangecheck;
 mod loadstore;
 mod poseidon2;
+mod sumcheck;
 
 mod extension;
 pub use extension::*;
+pub use field_extension::EXT_DEG;
 
 mod utils;
 #[cfg(any(test, feature = "test-utils"))]

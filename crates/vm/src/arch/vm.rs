@@ -910,7 +910,7 @@ where
     #[getset(get = "pub")]
     exe: Arc<VmExe<Val<E::SC>>>,
     #[getset(get = "pub", get_mut = "pub")]
-    state: Option<VmState<Val<E::SC>, GuestMemory>>,
+    pub state: Option<VmState<Val<E::SC>, GuestMemory>>,
 }
 
 impl<E, VB> VmInstance<E, VB>
@@ -1056,6 +1056,8 @@ where
         let mut trace_heights = trace_heights.to_vec();
         trace_heights[PUBLIC_VALUES_AIR_ID] = vm.config().as_ref().num_public_values as u32;
         let state = self.state.take().expect("State should always be present");
+        #[cfg(feature = "metrics")]
+        let debug_infos = state.metrics.debug_infos.clone();
         let num_custom_pvs = state.custom_pvs.len();
         let (proof, final_memory) = vm.prove(&mut self.interpreter, state, None, &trace_heights)?;
         let final_memory = final_memory.ok_or(ExecutionError::DidNotTerminate)?;
@@ -1068,6 +1070,10 @@ where
             DEFAULT_RNG_SEED,
             num_custom_pvs,
         ));
+        #[cfg(feature = "metrics")]
+        {
+            self.state.as_mut().unwrap().metrics.debug_infos = debug_infos;
+        }
         Ok(proof)
     }
 }

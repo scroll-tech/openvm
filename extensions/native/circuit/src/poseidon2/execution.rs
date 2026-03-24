@@ -5,10 +5,12 @@ use std::{
 
 use openvm_circuit::{arch::*, system::memory::online::GuestMemory};
 use openvm_circuit_primitives::AlignedBytesBorrow;
-use openvm_instructions::{instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode};
+use openvm_instructions::{
+    instruction::Instruction, program::DEFAULT_PC_STEP, LocalOpcode, NATIVE_AS,
+};
 use openvm_native_compiler::{
     conversion::AS,
-    Poseidon2Opcode::{COMP_POS2, PERM_POS2},
+    Poseidon2Opcode::{COMP_POS2, MULTI_OBSERVE, PERM_POS2},
     VerifyBatchOpcode::VERIFY_BATCH,
 };
 use openvm_poseidon2_air::Poseidon2SubChip;
@@ -27,6 +29,16 @@ struct Pos2PreCompute<'a, F: Field, const SBOX_REGISTERS: usize> {
     output_register: u32,
     input_register_1: u32,
     input_register_2: u32,
+}
+
+#[derive(AlignedBytesBorrow, Clone)]
+#[repr(C)]
+struct MultiObservePreCompute<'a, F: Field, const SBOX_REGISTERS: usize> {
+    subchip: &'a Poseidon2SubChip<F, SBOX_REGISTERS>,
+    pub ctx_register: u32,
+    pub input_ptr_register: u32,
+    pub hint_id_register: u32,
+    pub state_ptr_register: u32,
 }
 
 #[derive(AlignedBytesBorrow, Clone)]
@@ -88,6 +100,51 @@ impl<'a, F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Executor<F
     }
 
     #[inline(always)]
+    fn pre_compute_multi_observe_impl(
+        &'a self,
+        pc: u32,
+        inst: &Instruction<F>,
+        multi_observe_data: &mut MultiObservePreCompute<'a, F, SBOX_REGISTERS>,
+    ) -> Result<(), StaticProgramError> {
+        let &Instruction {
+            opcode,
+            a,
+            b,
+            c,
+            d,
+            e,
+            f,
+            ..
+        } = inst;
+
+        if opcode != MULTI_OBSERVE.global_opcode() {
+            return Err(StaticProgramError::InvalidInstruction(pc));
+        }
+
+        let a = a.as_canonical_u32();
+        let b = b.as_canonical_u32();
+        let c = c.as_canonical_u32();
+        let d = d.as_canonical_u32();
+        let e = e.as_canonical_u32();
+        let f = f.as_canonical_u32();
+
+        if d != AS::Native as u32 {
+            return Err(StaticProgramError::InvalidInstruction(pc));
+        }
+        if e != AS::Native as u32 {
+            return Err(StaticProgramError::InvalidInstruction(pc));
+        }
+
+        multi_observe_data.subchip = &self.subchip;
+        multi_observe_data.state_ptr_register = a;
+        multi_observe_data.ctx_register = b;
+        multi_observe_data.input_ptr_register = c;
+        multi_observe_data.hint_id_register = f;
+
+        Ok(())
+    }
+
+    #[inline(always)]
     fn pre_compute_verify_batch_impl(
         &'a self,
         pc: u32,
@@ -142,6 +199,7 @@ impl<'a, F: PrimeField32, const SBOX_REGISTERS: usize> NativePoseidon2Executor<F
 macro_rules! dispatch1 {
     (
         $execute_pos2_impl:ident,
+        $execute_multi_observe_impl:ident,
         $execute_verify_batch_impl:ident,
         $executor:ident,
         $opcode:expr,
@@ -157,6 +215,11 @@ macro_rules! dispatch1 {
             } else {
                 Ok($execute_pos2_impl::<_, _, SBOX_REGISTERS, false>)
             }
+        } else if $opcode == MULTI_OBSERVE.global_opcode() {
+            let multi_observe_data: &mut MultiObservePreCompute<F, SBOX_REGISTERS> =
+                $data.borrow_mut();
+            $executor.pre_compute_multi_observe_impl($pc, $inst, multi_observe_data)?;
+            Ok($execute_multi_observe_impl::<_, _, SBOX_REGISTERS>)
         } else {
             let verify_batch_data: &mut VerifyBatchPreCompute<F, SBOX_REGISTERS> =
                 $data.borrow_mut();
@@ -166,13 +229,18 @@ macro_rules! dispatch1 {
     };
 }
 
+fn max3(a: usize, b: usize, c: usize) -> usize {
+    std::cmp::max(a, std::cmp::max(b, c))
+}
+
 impl<F: PrimeField32, const SBOX_REGISTERS: usize> Executor<F>
     for NativePoseidon2Executor<F, SBOX_REGISTERS>
 {
     #[inline(always)]
     fn pre_compute_size(&self) -> usize {
-        std::cmp::max(
+        max3(
             size_of::<Pos2PreCompute<F, SBOX_REGISTERS>>(),
+            size_of::<MultiObservePreCompute<F, SBOX_REGISTERS>>(),
             size_of::<VerifyBatchPreCompute<F, SBOX_REGISTERS>>(),
         )
     }
@@ -187,6 +255,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> Executor<F>
     ) -> Result<ExecuteFunc<F, Ctx>, StaticProgramError> {
         dispatch1!(
             execute_pos2_e1_impl,
+            execute_multi_observe_e1_impl,
             execute_verify_batch_e1_impl,
             self,
             inst.opcode,
@@ -205,6 +274,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> Executor<F>
     ) -> Result<Handler<F, Ctx>, StaticProgramError> {
         dispatch1!(
             execute_pos2_e1_handler,
+            execute_multi_observe_e1_handler,
             execute_verify_batch_e1_handler,
             self,
             inst.opcode,
@@ -218,6 +288,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> Executor<F>
 macro_rules! dispatch2 {
     (
         $execute_pos2_impl:ident,
+        $execute_multi_observe_impl:ident,
         $execute_verify_batch_impl:ident,
         $executor:ident,
         $opcode:expr,
@@ -237,6 +308,13 @@ macro_rules! dispatch2 {
             } else {
                 Ok($execute_pos2_impl::<_, _, SBOX_REGISTERS, false>)
             }
+        } else if $opcode == MULTI_OBSERVE.global_opcode() {
+            let pre_compute: &mut E2PreCompute<MultiObservePreCompute<F, SBOX_REGISTERS>> =
+                $data.borrow_mut();
+            pre_compute.chip_idx = $chip_idx as u32;
+
+            $executor.pre_compute_multi_observe_impl($pc, $inst, &mut pre_compute.data)?;
+            Ok($execute_multi_observe_impl::<_, _, SBOX_REGISTERS>)
         } else {
             let pre_compute: &mut E2PreCompute<VerifyBatchPreCompute<F, SBOX_REGISTERS>> =
                 $data.borrow_mut();
@@ -253,8 +331,9 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> MeteredExecutor<F>
 {
     #[inline(always)]
     fn metered_pre_compute_size(&self) -> usize {
-        std::cmp::max(
+        max3(
             size_of::<E2PreCompute<Pos2PreCompute<F, SBOX_REGISTERS>>>(),
+            size_of::<E2PreCompute<MultiObservePreCompute<F, SBOX_REGISTERS>>>(),
             size_of::<E2PreCompute<VerifyBatchPreCompute<F, SBOX_REGISTERS>>>(),
         )
     }
@@ -270,6 +349,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> MeteredExecutor<F>
     ) -> Result<ExecuteFunc<F, Ctx>, StaticProgramError> {
         dispatch2!(
             execute_pos2_e2_impl,
+            execute_multi_observe_e2_impl,
             execute_verify_batch_e2_impl,
             self,
             inst.opcode,
@@ -290,6 +370,7 @@ impl<F: PrimeField32, const SBOX_REGISTERS: usize> MeteredExecutor<F>
     ) -> Result<Handler<F, Ctx>, StaticProgramError> {
         dispatch2!(
             execute_pos2_e2_handler,
+            execute_multi_observe_e2_handler,
             execute_verify_batch_e2_handler,
             self,
             inst.opcode,
@@ -335,6 +416,49 @@ unsafe fn execute_pos2_e2_impl<
 ) {
     let pre_compute: &E2PreCompute<Pos2PreCompute<F, SBOX_REGISTERS>> = pre_compute.borrow();
     let height = execute_pos2_e12_impl::<_, _, SBOX_REGISTERS, IS_PERM>(
+        &pre_compute.data,
+        instret,
+        pc,
+        exec_state,
+    );
+    exec_state
+        .ctx
+        .on_height_change(pre_compute.chip_idx as usize, height);
+}
+
+#[create_handler]
+#[inline(always)]
+unsafe fn execute_multi_observe_e1_impl<
+    F: PrimeField32,
+    CTX: ExecutionCtxTrait,
+    const SBOX_REGISTERS: usize,
+>(
+    pre_compute: &[u8],
+    instret: &mut u64,
+    pc: &mut u32,
+    _arg: u64,
+    exec_state: &mut VmExecState<F, GuestMemory, CTX>,
+) {
+    let pre_compute: &MultiObservePreCompute<F, SBOX_REGISTERS> = pre_compute.borrow();
+    execute_multi_observe_e12_impl::<_, _, SBOX_REGISTERS>(pre_compute, instret, pc, exec_state);
+}
+
+#[create_handler]
+#[inline(always)]
+unsafe fn execute_multi_observe_e2_impl<
+    F: PrimeField32,
+    CTX: MeteredExecutionCtxTrait,
+    const SBOX_REGISTERS: usize,
+>(
+    pre_compute: &[u8],
+    instret: &mut u64,
+    pc: &mut u32,
+    _arg: u64,
+    exec_state: &mut VmExecState<F, GuestMemory, CTX>,
+) {
+    let pre_compute: &E2PreCompute<MultiObservePreCompute<F, SBOX_REGISTERS>> =
+        pre_compute.borrow();
+    let height = execute_multi_observe_e12_impl::<_, _, SBOX_REGISTERS>(
         &pre_compute.data,
         instret,
         pc,
@@ -450,6 +574,96 @@ unsafe fn execute_pos2_e12_impl<
     *instret += 1;
 
     1
+}
+
+#[inline(always)]
+unsafe fn execute_multi_observe_e12_impl<
+    F: PrimeField32,
+    CTX: ExecutionCtxTrait,
+    const SBOX_REGISTERS: usize,
+>(
+    pre_compute: &MultiObservePreCompute<F, SBOX_REGISTERS>,
+    instret: &mut u64,
+    pc: &mut u32,
+    exec_state: &mut VmExecState<F, GuestMemory, CTX>,
+) -> u32 {
+    let subchip = pre_compute.subchip;
+
+    let [sponge_ptr]: [F; 1] =
+        exec_state.vm_read(AS::Native as u32, pre_compute.state_ptr_register);
+    let [ctx_ptr]: [F; 1] = exec_state.vm_read(AS::Native as u32, pre_compute.ctx_register);
+    let [input_ptr]: [F; 1] = exec_state.vm_read(AS::Native as u32, pre_compute.input_ptr_register);
+    let ctx: [F; 4] = exec_state.vm_read(AS::Native as u32, ctx_ptr.as_canonical_u32());
+    let [hint_id]: [F; 1] = exec_state.vm_read(AS::Native as u32, pre_compute.hint_id_register);
+
+    let init_pos = ctx[0];
+    let len_f = ctx[1];
+    let is_hint = ctx[2].as_canonical_u32() != 0;
+
+    let mut len = len_f.as_canonical_u32() as usize;
+    let mut pos = init_pos.as_canonical_u32() as usize;
+    let input_ptr_u32 = input_ptr.as_canonical_u32();
+    let sponge_ptr_u32 = sponge_ptr.as_canonical_u32();
+    let hint_id_u32 = hint_id.as_canonical_u32();
+    let mut height = 0;
+
+    // split input into chunks s.t. each chunk fills the RATE portion of sponge state
+    let mut observation_chunks: Vec<(usize, usize)> = vec![];
+    while len > 0 {
+        if len >= (CHUNK - pos) {
+            observation_chunks.push((pos, CHUNK));
+            len -= CHUNK - pos;
+            pos = 0;
+        } else {
+            observation_chunks.push((pos, pos + len));
+            len = 0;
+            pos += len;
+        }
+    }
+    let final_idx = observation_chunks.last().map(|(_, end)| *end % CHUNK);
+
+    height += 1;
+    let mut input_idx: u32 = 0;
+
+    // Get hint_space data if in hint mode
+    let hint_data: Vec<F> = if is_hint {
+        exec_state.streams.hint_space[hint_id_u32 as usize].clone()
+    } else {
+        vec![]
+    };
+
+    for (chunk_start, chunk_end) in observation_chunks {
+        for j in chunk_start..chunk_end {
+            let n_f = if is_hint {
+                hint_data[input_idx as usize]
+            } else {
+                let [v]: [F; 1] = exec_state.vm_read(NATIVE_AS, input_ptr_u32 + input_idx);
+                v
+            };
+
+            exec_state.vm_write(NATIVE_AS, sponge_ptr_u32 + (j as u32), &[n_f]);
+            input_idx += 1;
+        }
+        if chunk_end == CHUNK {
+            let mut p2_input: [F; CHUNK * 2] = exec_state.vm_read(NATIVE_AS, sponge_ptr_u32);
+            subchip.permute_mut(&mut p2_input);
+            exec_state.vm_write(NATIVE_AS, sponge_ptr_u32, &p2_input);
+        }
+
+        height += 1;
+    }
+    if let Some(final_idx) = final_idx {
+        // Write final_idx back to ctx[0] (overwriting init_pos in context array)
+        exec_state.vm_write::<F, 1>(
+            NATIVE_AS,
+            ctx_ptr.as_canonical_u32(),
+            &[F::from_canonical_usize(final_idx)],
+        );
+    }
+    *pc = pc.wrapping_add(DEFAULT_PC_STEP);
+    *instret += 1;
+
+    height
 }
 
 #[inline(always)]

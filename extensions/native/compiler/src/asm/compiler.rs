@@ -489,6 +489,17 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
                 DslIr::HintBitsF(var, len) => {
                     self.push(AsmInstruction::HintBits(var.fp(), len), debug_info);
                 }
+                DslIr::Poseidon2MultiObserve(dst, ctx_ptr, arr_ptr, hint_id) => {
+                    self.push(
+                        AsmInstruction::Poseidon2MultiObserve(
+                            dst.fp(),
+                            ctx_ptr.fp(),
+                            arr_ptr.fp(),
+                            hint_id.fp(),
+                        ),
+                        debug_info,
+                    );
+                }
                 DslIr::Poseidon2PermuteBabyBear(dst, src) => match (dst, src) {
                     (Array::Dyn(dst, _), Array::Dyn(src, _)) => self.push(
                         AsmInstruction::Poseidon2Permute(dst.fp(), src.fp()),
@@ -614,6 +625,37 @@ impl<F: PrimeField32 + TwoAdicField, EF: ExtensionField<F> + TwoAdicField> AsmCo
                     let (lo_bits, hi_bits) = lo_hi_bits(num_bits as u32);
                     self.push(
                         AsmInstruction::RangeCheck(v.fp(), lo_bits, hi_bits),
+                        debug_info,
+                    );
+                }
+                DslIr::ExtFromBaseVec(ext, base_vec) => {
+                    assert_eq!(base_vec.len(), EF::D);
+                    for (i, base) in base_vec.into_iter().enumerate() {
+                        self.push(
+                            AsmInstruction::CopyF(ext.fp() + (i as i32), base.fp()),
+                            debug_info.clone(),
+                        );
+                    }
+                }
+                DslIr::SumcheckLayerEval(
+                    input_ctx,
+                    challenges,
+                    prod_ptr,
+                    logup_ptr,
+                    prod_id,
+                    logup_id,
+                    r_ptr,
+                ) => {
+                    self.push(
+                        AsmInstruction::SumcheckLayerEval(
+                            input_ctx.fp(),
+                            challenges.fp(),
+                            prod_ptr.fp(),
+                            logup_ptr.fp(),
+                            prod_id.fp(),
+                            logup_id.fp(),
+                            r_ptr.fp(),
+                        ),
                         debug_info,
                     );
                 }

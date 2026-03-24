@@ -13,7 +13,9 @@ use openvm_cuda_common::copy::MemCopyH2D;
 use openvm_stark_backend::{prover::types::AirProvingContext, Chip};
 
 use super::{FriReducedOpeningRecordMut, OVERALL_WIDTH};
-use crate::cuda_abi::fri_cuda;
+use crate::{
+    cuda_abi::fri_cuda,
+};
 
 #[derive(new)]
 pub struct FriReducedOpeningChipGpu {

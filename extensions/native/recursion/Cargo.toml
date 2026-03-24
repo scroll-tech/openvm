@@ -8,6 +8,7 @@ repository.workspace = true
 
 [dependencies]
 openvm-stark-backend = { workspace = true }
+openvm-cuda-backend = { workspace = true, optional = true }
 openvm-native-circuit = { workspace = true, features = ["test-utils"] }
 openvm-native-compiler = { workspace = true }
 openvm-native-compiler-derive = { workspace = true }
@@ -58,4 +59,4 @@ parallel = ["openvm-stark-backend/parallel"]
 mimalloc = ["openvm-stark-backend/mimalloc"]
 jemalloc = ["openvm-stark-backend/jemalloc"]
 nightly-features = ["openvm-circuit/nightly-features"]
-cuda = ["openvm-circuit/cuda", "openvm-native-circuit/cuda"]
+cuda = ["openvm-circuit/cuda", "openvm-native-circuit/cuda", "dep:openvm-cuda-backend"]

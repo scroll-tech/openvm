@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use alu_native_adapter::{AluNativeAdapterAir, AluNativeAdapterExecutor};
 use branch_native_adapter::{BranchNativeAdapterAir, BranchNativeAdapterExecutor};
 use convert_adapter::{ConvertAdapterAir, ConvertAdapterExecutor};
@@ -12,12 +14,14 @@ use openvm_circuit::{
     },
     system::{memory::SharedMemoryHelper, SystemPort},
 };
+use openvm_circuit_primitives::is_less_than::IsLtSubAir;
 use openvm_circuit_derive::{AnyEnum, Executor, MeteredExecutor, PreflightExecutor};
 use openvm_instructions::{program::DEFAULT_PC_STEP, LocalOpcode, PhantomDiscriminant};
 use openvm_native_compiler::{
     CastfOpcode, FieldArithmeticOpcode, FieldExtensionOpcode, FriOpcode, NativeBranchEqualOpcode,
     NativeJalOpcode, NativeLoadStore4Opcode, NativeLoadStoreOpcode, NativePhantom,
-    NativeRangeCheckOpcode, Poseidon2Opcode, VerifyBatchOpcode, BLOCK_LOAD_STORE_SIZE,
+    NativeRangeCheckOpcode, Poseidon2Opcode, SumcheckOpcode, VerifyBatchOpcode,
+    BLOCK_LOAD_STORE_SIZE,
 };
 use openvm_poseidon2_air::Poseidon2Config;
 use openvm_rv32im_circuit::BranchEqualCoreAir;
@@ -48,6 +52,7 @@ use crate::{
         FriReducedOpeningAir, FriReducedOpeningChip, FriReducedOpeningExecutor,
         FriReducedOpeningFiller,
     },
+    hint_space_provider::{HintSpaceProviderAir, HintSpaceProviderChip},
     jal_rangecheck::{
         JalRangeCheckAir, JalRangeCheckExecutor, JalRangeCheckFiller, NativeJalRangeCheckChip,
     },
@@ -60,6 +65,10 @@ use crate::{
         air::{NativePoseidon2Air, VerifyBatchBus},
         chip::{NativePoseidon2Executor, NativePoseidon2Filler},
         NativePoseidon2Chip,
+    },
+    sumcheck::{
+        air::NativeSumcheckAir,
+        chip::{NativeSumcheckChip, NativeSumcheckExecutor, NativeSumcheckFiller},
     },
 };
 
@@ -94,6 +103,7 @@ pub enum NativeExecutor<F: Field> {
     FieldExtension(FieldExtensionExecutor),
     FriReducedOpening(FriReducedOpeningExecutor),
     VerifyBatch(NativePoseidon2Executor<F, 1>),
+    TowerVerify(NativeSumcheckExecutor),
 }
 
 impl<F: PrimeField32> VmExecutionExtension<F> for Native {
@@ -165,7 +175,14 @@ impl<F: PrimeField32> VmExecutionExtension<F> for Native {
                 VerifyBatchOpcode::VERIFY_BATCH.global_opcode(),
                 Poseidon2Opcode::PERM_POS2.global_opcode(),
                 Poseidon2Opcode::COMP_POS2.global_opcode(),
+                Poseidon2Opcode::MULTI_OBSERVE.global_opcode(),
             ],
+        )?;
+
+        let tower_verify = NativeSumcheckExecutor::new();
+        inventory.add_executor(
+            tower_verify,
+            [SumcheckOpcode::SUMCHECK_LAYER_EVAL.global_opcode()],
         )?;
 
         inventory.add_phantom_sub_executor(
@@ -206,6 +223,7 @@ where
             execution_bus,
             program_bus,
             memory_bridge,
+            hint_bridge,
         } = inventory.system().port();
         let exec_bridge = ExecutionBridge::new(execution_bus, program_bus);
         let range_checker = inventory.range_checker().bus;
@@ -253,13 +271,26 @@ where
         );
         inventory.add_air(fri_reduced_opening);
 
+        let hint_space_provider = HintSpaceProviderAir {
+            hint_bus: hint_bridge.hint_bus(),
+            lt_air: IsLtSubAir::new(
+                range_checker,
+                inventory.config().memory_config.timestamp_max_bits,
+            ),
+        };
+        inventory.add_air(hint_space_provider);
+
         let verify_batch = NativePoseidon2Air::<_, 1>::new(
             exec_bridge,
             memory_bridge,
+            hint_bridge,
             VerifyBatchBus::new(inventory.new_bus_idx()),
             Poseidon2Config::default(),
         );
         inventory.add_air(verify_batch);
+
+        let tower_evaluate = NativeSumcheckAir::new(exec_bridge, memory_bridge, hint_bridge);
+        inventory.add_air(tower_evaluate);
 
         Ok(())
     }
@@ -334,12 +365,30 @@ where
             FriReducedOpeningChip::new(FriReducedOpeningFiller::new(), mem_helper.clone());
         inventory.add_executor_chip(fri_reduced_opening);
 
+        let hint_bus = inventory.airs().system().hint_bridge.hint_bus();
+        let hint_space_provider = Arc::new(HintSpaceProviderChip::new(
+            hint_bus,
+            range_checker.clone(),
+            timestamp_max_bits,
+        ));
+
+        inventory.next_air::<HintSpaceProviderAir>()?;
+        inventory.add_periphery_chip(hint_space_provider.clone());
+
         inventory.next_air::<NativePoseidon2Air<Val<SC>, 1>>()?;
+
         let poseidon2 = NativePoseidon2Chip::<_, 1>::new(
-            NativePoseidon2Filler::new(Poseidon2Config::default()),
+            NativePoseidon2Filler::new(Poseidon2Config::default(), hint_space_provider.clone()),
             mem_helper.clone(),
         );
         inventory.add_executor_chip(poseidon2);
+
+        inventory.next_air::<NativeSumcheckAir>()?;
+        let tower_verify = NativeSumcheckChip::new(
+            NativeSumcheckFiller::new(hint_space_provider.clone()),
+            mem_helper.clone(),
+        );
+        inventory.add_executor_chip(tower_verify);
 
         Ok(())
     }
@@ -523,6 +572,7 @@ impl<SC: StarkGenericConfig> VmCircuitExtension<SC> for CastFExtension {
             execution_bus,
             program_bus,
             memory_bridge,
+            hint_bridge: _,
         } = inventory.system().port();
         let exec_bridge = ExecutionBridge::new(execution_bus, program_bus);
         let range_checker = inventory.range_checker().bus;

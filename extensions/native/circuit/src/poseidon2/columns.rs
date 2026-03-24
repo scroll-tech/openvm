@@ -28,6 +28,12 @@ pub struct NativePoseidon2Cols<T, const SBOX_REGISTERS: usize> {
     pub inside_row: T,
     /// Indicates that this row is a simple row.
     pub simple: T,
+    /// Indicates that this row is a multi_observe row.
+    pub multi_observe_row: T,
+
+    /// Materialized column: multi_observe_row * (1 - is_hint).
+    /// Lives in main cols (not overlaid specific) so it is 0 on non-multi_observe rows.
+    pub not_hint_multi_observe: T,
 
     /// Indicates the last row in an inside-row block.
     pub end_inside_row: T,
@@ -60,15 +66,16 @@ pub struct NativePoseidon2Cols<T, const SBOX_REGISTERS: usize> {
     /// indicates that cell `i + 1` inside a chunk is exhausted.
     pub is_exhausted: [T; CHUNK - 1],
 
-    pub specific: [T; max3(
+    pub specific: [T; max4(
         TopLevelSpecificCols::<usize>::width(),
         InsideRowSpecificCols::<usize>::width(),
         SimplePoseidonSpecificCols::<usize>::width(),
+        MultiObserveCols::<usize>::width(),
     )],
 }
 
-const fn max3(a: usize, b: usize, c: usize) -> usize {
-    const_max(a, const_max(b, c))
+const fn max4(a: usize, b: usize, c: usize, d: usize) -> usize {
+    const_max(a, const_max(b, const_max(c, d)))
 }
 #[repr(C)]
 #[derive(AlignedBorrow)]
@@ -199,4 +206,52 @@ pub struct SimplePoseidonSpecificCols<T> {
     pub read_data_2: MemoryReadAuxCols<T>,
     pub write_data_1: MemoryWriteAuxCols<T, { CHUNK }>,
     pub write_data_2: MemoryWriteAuxCols<T, { CHUNK }>,
+}
+
+#[repr(C)]
+#[derive(AlignedBorrow, Copy, Clone)]
+pub struct MultiObserveCols<T> {
+    // Program states
+    pub pc: T,
+    pub final_timestamp_increment: T,
+
+    // Register addresses
+    pub state_ptr_register: T,
+    pub ctx_register: T,
+    pub input_ptr_register: T,
+    pub hint_id_register: T,
+
+    // Values read from registers
+    pub state_ptr: T,
+    pub ctx_ptr: T,
+    pub input_ptr: T,
+    pub hint_id: T,
+
+    // Context array values read from ctx_ptr
+    // ctx[0] = init_pos, ctx[1] = len, ctx[2] = is_hint, ctx[3] = reserved
+    pub ctx: [T; 4],
+    pub read_ctx: MemoryReadAuxCols<T>,
+
+    pub chunk_ts_count: T,
+
+    pub is_first: T,
+    pub is_last: T,
+    pub curr_len: T,
+    pub start_idx: T,
+    pub end_idx: T,
+    pub aux_after_start: [T; CHUNK],
+    pub aux_before_end: [T; CHUNK],
+    pub aux_read_enabled: [T; CHUNK],
+
+    // Transcript observation
+    pub read_data: [MemoryReadAuxCols<T>; CHUNK],
+    pub write_data: [MemoryWriteAuxCols<T, 1>; CHUNK],
+    pub data: [T; CHUNK],
+
+    // Permutation
+    pub should_permute: T,
+    pub write_sponge_state: MemoryWriteAuxCols<T, { CHUNK * 2 }>,
+
+    // Final write back to ctx[0]
+    pub write_final_idx: MemoryWriteAuxCols<T, 1>,
 }

@@ -1,7 +1,7 @@
 use std::iter;
 
 use openvm_stark_backend::{
-    interaction::{BusIndex, InteractionBuilder, PermutationCheckBus},
+    interaction::{BusIndex, InteractionBuilder, LookupBus, PermutationCheckBus},
     p3_field::FieldAlgebra,
 };
 
@@ -99,5 +99,67 @@ impl<T: FieldAlgebra> MemoryBusInteraction<T> {
             self.bus
                 .interact(builder, fields, AB::Expr::NEG_ONE * direction.into());
         }
+    }
+}
+
+/// Represents a hint bus identified by a unique bus index.
+/// Used as a lookup table to constrain values read from hint space.
+///
+/// Consumer chips (e.g. NativeSumcheck) perform lookups to verify that
+/// hint_space values match what was originally loaded.
+/// Provider chips (e.g. a hint loader) add keys to the lookup table.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct HintBus {
+    pub inner: LookupBus,
+}
+
+impl HintBus {
+    pub const fn new(index: BusIndex) -> Self {
+        Self {
+            inner: LookupBus::new(index),
+        }
+    }
+
+    #[inline(always)]
+    pub fn index(&self) -> BusIndex {
+        self.inner.index
+    }
+
+    /// Performs a lookup on the hint bus.
+    ///
+    /// Asserts that `(hint_id, offset, value)` is present in the hint lookup table.
+    /// Caller must constrain that `enabled` is boolean.
+    pub fn lookup<AB: InteractionBuilder>(
+        &self,
+        builder: &mut AB,
+        hint_id: impl Into<AB::Expr>,
+        offset: impl Into<AB::Expr>,
+        value: impl Into<AB::Expr>,
+        enabled: impl Into<AB::Expr>,
+    ) {
+        self.inner.lookup_key(
+            builder,
+            [hint_id.into(), offset.into(), value.into()],
+            enabled,
+        );
+    }
+
+    /// Adds a key to the hint lookup table.
+    ///
+    /// The `num_lookups` parameter should equal the number of enabled lookups performed
+    /// for this key.
+    pub fn provide<AB: InteractionBuilder>(
+        &self,
+        builder: &mut AB,
+        hint_id: impl Into<AB::Expr>,
+        offset: impl Into<AB::Expr>,
+        value: impl Into<AB::Expr>,
+        num_lookups: impl Into<AB::Expr>,
+    ) {
+        self.inner.add_key_with_lookups(
+            builder,
+            [hint_id.into(), offset.into(), value.into()],
+            num_lookups,
+        );
     }
 }

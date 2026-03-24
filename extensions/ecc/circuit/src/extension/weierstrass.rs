@@ -200,6 +200,7 @@ impl<SC: StarkGenericConfig> VmCircuitExtension<SC> for WeierstrassExtension {
             execution_bus,
             program_bus,
             memory_bridge,
+            hint_bridge: _,
         } = inventory.system().port();
 
         let exec_bridge = ExecutionBridge::new(execution_bus, program_bus);

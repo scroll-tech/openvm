@@ -12,7 +12,7 @@ use crate::{
     asm::{AsmInstruction, AssemblyCode},
     FieldArithmeticOpcode, FieldExtensionOpcode, FriOpcode, NativeBranchEqualOpcode,
     NativeJalOpcode, NativeLoadStore4Opcode, NativeLoadStoreOpcode, NativePhantom,
-    NativeRangeCheckOpcode, Poseidon2Opcode, VerifyBatchOpcode,
+    NativeRangeCheckOpcode, Poseidon2Opcode, SumcheckOpcode, VerifyBatchOpcode,
 };
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
@@ -441,6 +441,18 @@ fn convert_instruction<F: PrimeField32, EF: ExtensionField<F>>(
                     AS::Native,
                     AS::Native,
             )],
+        AsmInstruction::Poseidon2MultiObserve(dst, ctx, arr, hint_id) => vec![
+            Instruction {
+                opcode: options.opcode_with_offset(Poseidon2Opcode::MULTI_OBSERVE),
+                a: i32_f(dst),
+                b: i32_f(ctx),
+                c: i32_f(arr),
+                d: AS::Native.to_field(),
+                e: AS::Native.to_field(),
+                f: i32_f(hint_id),
+                g: F::ZERO,
+            }
+        ],
         AsmInstruction::Poseidon2Compress(dst, src1, src2) => vec![inst(
             options.opcode_with_offset(Poseidon2Opcode::COMP_POS2),
             i32_f(dst),
@@ -523,7 +535,19 @@ fn convert_instruction<F: PrimeField32, EF: ExtensionField<F>>(
                 // Here it just requires a 0
                 AS::Immediate,
             )]
-        }
+        },
+        AsmInstruction::SumcheckLayerEval(ctx, cs, p_ptr, l_ptr, p_id, l_id, r_ptr) => vec![
+            Instruction {
+                opcode: options.opcode_with_offset(SumcheckOpcode::SUMCHECK_LAYER_EVAL),
+                a: i32_f(r_ptr),
+                b: i32_f(ctx),
+                c: i32_f(cs),
+                d: i32_f(p_id),
+                e: i32_f(l_id),
+                f: i32_f(p_ptr),
+                g: i32_f(l_ptr),
+            }
+        ],
     };
 
     let debug_infos = vec![debug_info; instructions.len()];

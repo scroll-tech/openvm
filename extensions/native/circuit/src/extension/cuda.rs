@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use openvm_circuit::{
     arch::{ChipInventory, ChipInventoryError, DenseRecordArena, VmProverExtension},
     system::cuda::extensions::get_inventory_range_checker,
@@ -14,9 +16,11 @@ use crate::{
     field_arithmetic::{FieldArithmeticAir, FieldArithmeticChipGpu},
     field_extension::{FieldExtensionAir, FieldExtensionChipGpu},
     fri::{FriReducedOpeningAir, FriReducedOpeningChipGpu},
+    hint_space_provider::{cuda::HintSpaceProviderChipGpu, HintSpaceProviderAir, HintSpaceProviderChip},
     jal_rangecheck::{JalRangeCheckAir, JalRangeCheckGpu},
     loadstore::{NativeLoadStoreAir, NativeLoadStoreChipGpu},
     poseidon2::{air::NativePoseidon2Air, NativePoseidon2ChipGpu},
+    sumcheck::{air::NativeSumcheckAir, NativeSumcheckChipGpu},
     CastFExtension, GpuBackend, Native,
 };
 
@@ -71,9 +75,33 @@ impl VmProverExtension<GpuBabyBearPoseidon2Engine, DenseRecordArena, Native>
             FriReducedOpeningChipGpu::new(range_checker.clone(), timestamp_max_bits);
         inventory.add_executor_chip(fri_reduced_opening);
 
+        let hint_air: &HintSpaceProviderAir = inventory.next_air::<HintSpaceProviderAir>()?;
+        let cpu_range_checker = range_checker
+            .cpu_chip
+            .clone()
+            .expect("VariableRangeCheckerChipGPU is expected to be hybrid with cpu_chip");
+        let cpu_chip = Arc::new(HintSpaceProviderChip::new(
+            hint_air.hint_bus,
+            cpu_range_checker,
+            timestamp_max_bits,
+        ));
+
+        let provider_gpu = HintSpaceProviderChipGpu::new(cpu_chip.clone());
+        inventory.add_periphery_chip(provider_gpu);
+
         inventory.next_air::<NativePoseidon2Air<BabyBear, 1>>()?;
-        let poseidon2 = NativePoseidon2ChipGpu::<1>::new(range_checker.clone(), timestamp_max_bits);
+
+        let poseidon2 = NativePoseidon2ChipGpu::<1>::new_with_hint_space_provider(
+            range_checker.clone(),
+            timestamp_max_bits,
+            cpu_chip.clone(),
+        );
         inventory.add_executor_chip(poseidon2);
+
+        inventory.next_air::<NativeSumcheckAir>()?;
+        let sumcheck =
+            NativeSumcheckChipGpu::new(range_checker.clone(), timestamp_max_bits, cpu_chip);
+        inventory.add_executor_chip(sumcheck);
 
         Ok(())
     }

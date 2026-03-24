@@ -62,12 +62,45 @@ template <typename T> struct SimplePoseidonSpecificCols {
     MemoryWriteAuxCols<T, CHUNK> write_data_2;
 };
 
+template <typename T> struct MultiObserveCols {
+    T pc;
+    T final_timestamp_increment;
+    T state_ptr_register;
+    T ctx_register;
+    T input_ptr_register;
+    T hint_id_register;
+    T state_ptr;
+    T ctx_ptr;
+    T input_ptr;
+    T hint_id;
+    T ctx[4];
+    MemoryReadAuxCols<T> read_ctx;
+    T chunk_ts_count;
+    T is_first;
+    T is_last;
+    T curr_len;
+    T start_idx;
+    T end_idx;
+    T aux_after_start[CHUNK];
+    T aux_before_end[CHUNK];
+    T aux_read_enabled[CHUNK];
+    MemoryReadAuxCols<T> read_data[CHUNK];
+    MemoryWriteAuxCols<T, 1> write_data[CHUNK];
+    T data[CHUNK];
+    T should_permute;
+    MemoryWriteAuxCols<T, CHUNK * 2> write_sponge_state;
+    MemoryWriteAuxCols<T, 1> write_final_idx;
+};
+
 template <typename T> constexpr T constexpr_max(T a, T b) { return a > b ? a : b; }
 
 constexpr size_t COL_SPECIFIC_WIDTH = constexpr_max(
     sizeof(TopLevelSpecificCols<uint8_t>),
     constexpr_max(
         sizeof(InsideRowSpecificCols<uint8_t>),
-        sizeof(SimplePoseidonSpecificCols<uint8_t>)
+        constexpr_max(
+            sizeof(SimplePoseidonSpecificCols<uint8_t>),
+            sizeof(MultiObserveCols<uint8_t>)
+        )
     )
 );

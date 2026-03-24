@@ -110,6 +110,12 @@ pub enum AsmInstruction<F, EF> {
     /// Halt.
     Halt,
 
+    /// Absorbs multiple base elements into a duplex transcript with Poseidon2 permutation.
+    /// (sponge_state, ctx_ptr, arr_ptr, hint_id)
+    /// Context array at ctx_ptr: [init_pos, len, is_hint, reserved]
+    /// When is_hint=1, data is read from hint space using hint_id.
+    Poseidon2MultiObserve(i32, i32, i32, i32),
+
     /// Perform a Poseidon2 permutation on state starting at address `lhs`
     /// and store new state at `rhs`.
     /// (a, b) are pointers to (lhs, rhs).
@@ -166,6 +172,17 @@ pub enum AsmInstruction<F, EF> {
 
     CycleTrackerStart(),
     CycleTrackerEnd(),
+
+    // Native opcode for calculating sumcheck layer evaluation
+    // SumcheckLayerEval(reg_a, reg_b, reg_c, ... , reg_f, reg_g)
+    // - reg_a: Output ptr for next layer's evaluations
+    // - reg_b: Context variables
+    // - reg_c: Challenge values (alpha, coeff)
+    // - reg_d: GKR product IOP evaluations hint space ID
+    // - reg_e: GKR logup IOP evaluations hint space ID
+    // - reg_g: GKR product IOP evaluations
+    // - reg_f: GKR logup IOP evaluations
+    SumcheckLayerEval(i32, i32, i32, i32, i32, i32, i32),
 }
 
 impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
@@ -334,6 +351,13 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
             AsmInstruction::Trap => write!(f, "trap"),
             AsmInstruction::Halt => write!(f, "halt"),
             AsmInstruction::HintBits(src, len) => write!(f, "hint_bits ({})fp, {}", src, len),
+            AsmInstruction::Poseidon2MultiObserve(dst, ctx, arr, hint_id) => {
+                write!(
+                    f,
+                    "poseidon2_multi_observe ({})fp, ({})fp ({})fp ({})fp",
+                    dst, ctx, arr, hint_id
+                )
+            }
             AsmInstruction::Poseidon2Permute(dst, lhs) => {
                 write!(f, "poseidon2_permute ({})fp, ({})fp", dst, lhs)
             }
@@ -394,6 +418,13 @@ impl<F: PrimeField32, EF: ExtensionField<F>> AsmInstruction<F, EF> {
             }
             AsmInstruction::RangeCheck(fp, lo_bits, hi_bits) => {
                 write!(f, "range_check_fp ({})fp, ({}), ({})", fp, lo_bits, hi_bits)
+            }
+            AsmInstruction::SumcheckLayerEval(ctx, cs, p_ptr, l_ptr, p_id, l_id, r_ptr) => {
+                write!(
+                    f,
+                    "sumcheck_layer_eval ({})fp, ({})fp, ({})fp, ({})fp, ({})fp, ({})fp, ({})fp",
+                    ctx, cs, p_ptr, l_ptr, p_id, l_id, r_ptr
+                )
             }
         }
     }

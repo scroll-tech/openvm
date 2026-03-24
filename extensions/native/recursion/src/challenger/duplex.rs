@@ -77,6 +77,24 @@ impl<C: Config> DuplexChallengerVariable<C> {
         }
     }
 
+    // Observes multiple elements from an array.
+    // This is equivalent to calling `observe` multiple times, but more efficient.
+    pub fn observe_slice_opt(&self, builder: &mut Builder<C>, arr: &Array<C, Felt<C::F>>) {
+        builder.if_ne(arr.len(), Usize::from(0)).then(|builder| {
+            let next_pos = builder.poseidon2_multi_observe(&self.sponge_state, self.input_ptr, arr, arr.len(), None);
+
+            builder.assign(&self.input_ptr, self.io_empty_ptr + next_pos.clone());
+            builder.if_ne(next_pos, Usize::from(0)).then_or_else(
+                |builder| {
+                    builder.assign(&self.output_ptr, self.io_empty_ptr);
+                },
+                |builder| {
+                    builder.assign(&self.output_ptr, self.io_full_ptr);
+                },
+            );
+        });
+    }
+
     fn sample(&self, builder: &mut Builder<C>) -> Felt<C::F> {
         builder
             .if_ne(self.input_ptr.address, self.io_empty_ptr.address)
@@ -101,7 +119,9 @@ impl<C: Config> DuplexChallengerVariable<C> {
         let b = self.sample(builder);
         let c = self.sample(builder);
         let d = self.sample(builder);
-        builder.ext_from_base_slice(&[a, b, c, d])
+        let ext = builder.uninit();
+        builder.ext_from_base_vec(ext, vec![a, b, c, d]);
+        ext
     }
 
     fn sample_bits(&self, builder: &mut Builder<C>, nb_bits: RVar<C::N>) -> Array<C, Var<C::N>>

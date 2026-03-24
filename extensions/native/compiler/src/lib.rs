@@ -184,6 +184,7 @@ pub enum NativePhantom {
 pub enum Poseidon2Opcode {
     PERM_POS2,
     COMP_POS2,
+    MULTI_OBSERVE,
 }
 
 /// Opcodes for FRI opening proofs.
@@ -210,4 +211,19 @@ pub enum VerifyBatchOpcode {
     /// In FRI pcs opening verification, the reduced opening polynomial is computed one evaluation
     /// per column polynomial, per opening point
     VERIFY_BATCH,
+}
+
+/// Opcodes for sumcheck.
+#[derive(
+    Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, EnumCount, EnumIter, FromRepr, LocalOpcode,
+)]
+#[opcode_offset = 0x180]
+#[repr(usize)]
+#[allow(non_camel_case_types)]
+pub enum SumcheckOpcode {
+    /// Compute the expected evaluation for each layer in the tower structure that GKR product IOP
+    /// and logup IOP uses Supports two modes of operation:
+    /// 1. Calculate current layer's expected evaluation
+    /// 2. Calculate next layer's evaluation
+    SUMCHECK_LAYER_EVAL,
 }

@@ -40,6 +40,7 @@ pub struct VmMetrics {
     /// Metric collection tools. Only collected when "perf-metrics" feature is enabled.
     pub cycle_tracker: CycleTracker,
 
+    pub(crate) num_insns_executed: usize,
     pub(crate) current_trace_cells: Vec<usize>,
 
     /// Backtrace for guest debug panic display
@@ -68,6 +69,7 @@ pub fn update_instruction_metrics<F, RA, Executor>(
     {
         let pc = state.pc();
         state.metrics.update_backtrace(pc);
+        state.metrics.num_insns_executed += 1;
     }
 
     #[cfg(feature = "perf-metrics")]
@@ -224,13 +226,13 @@ impl VmMetrics {
                 .map(|(_, func)| (*func).clone())
                 .unwrap();
             if pc == self.current_fn.start {
-                self.cycle_tracker.start(self.current_fn.name.clone());
+                // self.cycle_tracker.start(self.current_fn.name.clone(), 0);
             } else {
                 while let Some(name) = self.cycle_tracker.top() {
                     if name == &self.current_fn.name {
                         break;
                     }
-                    self.cycle_tracker.force_end();
+                    // self.cycle_tracker.force_end();
                 }
             }
         };

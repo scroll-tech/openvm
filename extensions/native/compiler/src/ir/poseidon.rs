@@ -2,12 +2,76 @@ use openvm_native_compiler_derive::iter_zip;
 use openvm_stark_backend::p3_field::FieldAlgebra;
 
 use super::{Array, ArrayLike, Builder, Config, DslIr, Ext, Felt, MemIndex, Ptr, Usize, Var};
+use crate::ir::Variable;
 
 pub const DIGEST_SIZE: usize = 8;
 pub const HASH_RATE: usize = 8;
 pub const PERMUTATION_WIDTH: usize = 16;
 
 impl<C: Config> Builder<C> {
+    /// Extends native VM ability to observe multiple base elements in one opcode operation
+    /// Absorbs elements sequentially at the RATE portion of sponge state and performs as many
+    /// permutations as necessary. Returns the index position of the next input_ptr.
+    ///
+    /// [Reference](https://docs.rs/p3-poseidon2/latest/p3_poseidon2/struct.Poseidon2.html)
+    pub fn poseidon2_multi_observe(
+        &mut self,
+        sponge_state: &Array<C, Felt<C::F>>,
+        input_ptr: Ptr<C::N>,
+        arr: &Array<C, Felt<C::F>>,
+        input_len: Usize<C::N>,
+        hint_id: Option<Var<C::N>>,
+    ) -> Usize<C::N> {
+        let buffer_size: Var<C::N> = Var::uninit(self);
+        self.assign(&buffer_size, C::N::from_canonical_usize(HASH_RATE));
+
+        match sponge_state {
+            Array::Fixed(_) => {
+                panic!("Poseidon2 permutation is not allowed on fixed arrays");
+            }
+            Array::Dyn(sponge_ptr, _) => match arr {
+                Array::Fixed(_) => {
+                    panic!("Base elements input must be dynamic");
+                }
+                Array::Dyn(ptr, _) => {
+                    let init_pos: Var<C::N> = Var::uninit(self);
+                    self.assign(&init_pos, input_ptr.address - sponge_ptr.address);
+
+                    let is_hint = hint_id.is_some();
+                    let hint_id_var: Var<C::N> = if let Some(id) = hint_id {
+                        id
+                    } else {
+                        let v: Var<C::N> = Var::uninit(self);
+                        self.assign(&v, C::N::ZERO);
+                        v
+                    };
+
+                    // Allocate context array: [init_pos, len, is_hint, reserved]
+                    let ctx = self.dyn_array::<Var<C::N>>(4usize);
+                    self.set(&ctx, 0, init_pos);
+                    self.set(&ctx, 1, input_len.get_var());
+                    self.set(
+                        &ctx,
+                        2,
+                        if is_hint { C::N::ONE } else { C::N::ZERO },
+                    );
+                    self.set(&ctx, 3, C::N::ZERO);
+
+                    self.operations.push(DslIr::Poseidon2MultiObserve(
+                        *sponge_ptr,
+                        ctx.ptr(),
+                        *ptr,
+                        hint_id_var,
+                    ));
+
+                    // Read back the updated init_pos from ctx[0]
+                    let final_pos: Var<C::N> = self.get(&ctx, 0);
+                    Usize::Var(final_pos)
+                }
+            },
+        }
+    }
+
     /// Applies the Poseidon2 permutation to the given array.
     ///
     /// [Reference](https://docs.rs/p3-poseidon2/latest/p3_poseidon2/struct.Poseidon2.html)

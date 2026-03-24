@@ -18,6 +18,7 @@ mod instructions;
 mod poseidon;
 mod ptr;
 mod select;
+mod sumcheck;
 mod symbolic;
 mod types;
 mod utils;
